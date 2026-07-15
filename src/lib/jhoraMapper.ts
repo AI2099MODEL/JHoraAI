@@ -401,10 +401,16 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   const cal = h.calendar_info || {};
 
   const panchanga = {
-    tithi: cal.Tithi ? cal.Tithi.split(" ")[0] || "Sukla Ekadashi" : "Sukla Ekadashi",
+    tithi: cal.Tithi 
+      ? (typeof cal.Tithi === "string" ? cal.Tithi.split(" ")[0] || "Sukla Ekadashi" : (cal.Tithi.name || String(cal.Tithi))) 
+      : "Sukla Ekadashi",
     nakshatra: moon_p.nakshatra,
-    yoga: cal.Yoga ? cal.Yoga.split(" ")[0] || "Preeti" : "Preeti",
-    karana: cal.Karana ? cal.Karana.split(" ")[0] || "Bava" : "Bava",
+    yoga: cal.Yoga 
+      ? (typeof cal.Yoga === "string" ? cal.Yoga.split(" ")[0] || "Preeti" : (cal.Yoga.name || String(cal.Yoga))) 
+      : "Preeti",
+    karana: cal.Karana 
+      ? (typeof cal.Karana === "string" ? cal.Karana.split(" ")[0] || "Bava" : (cal.Karana.name || String(cal.Karana))) 
+      : "Bava",
     varna: varnaName,
     vashya: vashyaName,
     yoni: yoniName,
@@ -455,9 +461,16 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   // Arudha Padhas
   const arudhas: { [key: string]: any } = {};
   Object.entries(h.arudha_padhas || h.arudhas || {}).forEach(([k, val]: [string, any]) => {
-    const parts = (val || "").split(" ");
-    const sign = parts[0] || "Aries";
-    const houseNum = parseInt(parts[1]) || 1;
+    let sign = "Aries";
+    let houseNum = 1;
+    if (val && typeof val === "object") {
+      sign = val.sign || "Aries";
+      houseNum = typeof val.house === "number" ? val.house : (parseInt(val.house) || 1);
+    } else {
+      const parts = String(val || "").trim().split(/\s+/);
+      sign = parts[0] || "Aries";
+      houseNum = parseInt(parts[1]) || 1;
+    }
     arudhas[k] = {
       house: houseNum,
       sign: sign,
@@ -468,10 +481,16 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   // Sphutas
   const sphutas: { [key: string]: any } = {};
   Object.entries(h.sphutas || h.sphuta || {}).forEach(([k, val]: [string, any]) => {
-    const parts = (val || "").split(" ");
-    const sign = parts[0] || "Aries";
-    const degStr = parts[1] || "0";
-    const degree = parseFloat(degStr) || 0;
+    let sign = "Aries";
+    let degree = 0;
+    if (val && typeof val === "object") {
+      sign = val.sign || "Aries";
+      degree = typeof val.degree === "number" ? val.degree : (parseFloat(val.degree) || 0);
+    } else {
+      const parts = String(val || "").trim().split(/\s+/);
+      sign = parts[0] || "Aries";
+      degree = parseFloat(parts[1]) || 0;
+    }
     sphutas[k] = {
       longitude: ZODIAC_SIGNS.indexOf(sign) * 30 + degree,
       sign: sign,
@@ -483,10 +502,16 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   // Upagrahas
   const upagrahas: { [key: string]: any } = {};
   Object.entries(h.upagrahas || {}).forEach(([k, val]: [string, any]) => {
-    const parts = (val || "").split(" ");
-    const sign = parts[0] || "Aries";
-    const degStr = parts[1] || "0";
-    const degree = parseFloat(degStr) || 0;
+    let sign = "Aries";
+    let degree = 0;
+    if (val && typeof val === "object") {
+      sign = val.sign || "Aries";
+      degree = typeof val.degree === "number" ? val.degree : (parseFloat(val.degree) || 0);
+    } else {
+      const parts = String(val || "").trim().split(/\s+/);
+      sign = parts[0] || "Aries";
+      degree = parseFloat(parts[1]) || 0;
+    }
     upagrahas[k] = {
       longitude: ZODIAC_SIGNS.indexOf(sign) * 30 + degree,
       sign: sign,
@@ -498,13 +523,20 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   // Sahams Parsing
   const sahams: { [key: string]: any } = {};
   Object.entries(h.sahams || {}).forEach(([k, val]: [string, any]) => {
-    const sVal = val as string;
-    const parts = sVal.trim().split(/\s+/);
-    const sign = parts[0] || "Aries";
-    const degVal = parseInt(parts[1]) || 0;
-    const minVal = parseInt(parts[2]) || 0;
-    const secVal = parseInt(parts[3]) || 0;
-    const degree = degVal + minVal / 60 + secVal / 3600;
+    let sign = "Aries";
+    let degree = 0;
+    if (val && typeof val === "object") {
+      sign = val.sign || "Aries";
+      degree = typeof val.degree === "number" ? val.degree : (parseFloat(val.degree) || 0);
+    } else {
+      const sVal = String(val || "").trim();
+      const parts = sVal.split(/\s+/);
+      sign = parts[0] || "Aries";
+      const degVal = parseInt(parts[1]) || 0;
+      const minVal = parseInt(parts[2]) || 0;
+      const secVal = parseInt(parts[3]) || 0;
+      degree = degVal + minVal / 60 + secVal / 3600;
+    }
 
     sahams[k] = {
       longitude: ZODIAC_SIGNS.indexOf(sign) * 30 + degree,

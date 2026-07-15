@@ -81,10 +81,14 @@ app.get("/api/jhora/location/autocomplete", async (req, res) => {
 // Endpoint to proxy horoscope calculations to official JHora API
 app.post("/api/jhora/horoscope", async (req, res) => {
   try {
+    const body = { ...req.body };
+    if (!body.place && body.location) {
+      body.place = body.location;
+    }
     const response = await fetch(`${JHORA_API_URL}/horoscope`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(body)
     });
     const data = await response.json();
     res.json(data);
@@ -97,10 +101,23 @@ app.post("/api/jhora/horoscope", async (req, res) => {
 // Endpoint to proxy marriage match calculations to official JHora API
 app.post("/api/jhora/marriage-match", async (req, res) => {
   try {
+    const body = { ...req.body };
+    if (body.boy_birth_details) {
+      body.boy_birth_details = { ...body.boy_birth_details };
+      if (!body.boy_birth_details.place && body.boy_birth_details.location) {
+        body.boy_birth_details.place = body.boy_birth_details.location;
+      }
+    }
+    if (body.girl_birth_details) {
+      body.girl_birth_details = { ...body.girl_birth_details };
+      if (!body.girl_birth_details.place && body.girl_birth_details.location) {
+        body.girl_birth_details.place = body.girl_birth_details.location;
+      }
+    }
     const response = await fetch(`${JHORA_API_URL}/marriage-match`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(body)
     });
     const data = await response.json();
     res.json(data);
@@ -203,10 +220,14 @@ app.get("/api/jhora/muhurta/events", (req, res) => {
 // React app primary calculation endpoint (Proxies directly to official JHora horoscope)
 app.post("/api/astrology/calculate", async (req, res) => {
   try {
+    const body = { ...req.body };
+    if (!body.place && body.location) {
+      body.place = body.location;
+    }
     const response = await fetch(`${JHORA_API_URL}/horoscope`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(body)
     });
     const data = await response.json();
     res.json(data);

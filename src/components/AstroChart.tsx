@@ -365,7 +365,7 @@ export default function AstroChart({
               </span>
             </h4>
             
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-x-4 gap-y-1.5 text-xs">
               {[
                 "Sun", "Moon", "Mars", "Mercury", 
                 "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"
@@ -383,7 +383,7 @@ export default function AstroChart({
                 return (
                   <div key={name} className="flex justify-between items-center py-1 border-b border-indigo-500/5">
                     <span className="text-slate-300 font-sans">{getPlanetFullSymbol(name)}</span>
-                    <span className="font-mono font-medium text-amber-500/90 bg-amber-500/5 px-1.5 py-0.5 rounded">
+                    <span className="font-mono font-semibold text-amber-500/90 bg-amber-500/5 px-1.5 py-0.5 rounded whitespace-nowrap">
                       H{planetHouse} ({signAbbr[signNo - 1]})
                     </span>
                   </div>

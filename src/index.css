@@ -7,35 +7,39 @@
 }
 
 /* ========================================================
-   GLOBAL WHITE THEME OVERRIDES
+   GLOBAL WHITE THEME OVERRIDES (ACTIVE ONLY IN LIGHT MODE)
    ======================================================== */
 
-body, 
-#root, 
-.bg-slate-950, 
-.bg-\[\#0a0e17\], 
-.bg-\[\#0b0f19\], 
-.bg-\[\#080b11\] {
+.light {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.light body,
+.light #root,
+.light #app-root-container {
   background-color: #f8fafc !important;
   color: #0f172a !important;
 }
 
 /* Premium Card & Box Overrides */
-.bg-slate-900,
-.bg-slate-900\/60,
-.bg-slate-900\/40,
-.bg-slate-900\/80,
-.bg-slate-950\/30,
-.bg-slate-950\/70,
-.bg-slate-950\/65,
-.bg-slate-950\/20,
-.bg-slate-950\/50,
-.bg-indigo-950\/40,
-.bg-indigo-900\/20,
-.bg-slate-900\/50,
-.bg-slate-900\/30,
-.bg-slate-950\/40,
-.bg-slate-950 {
+.light .bg-slate-900,
+.light .bg-slate-900\/60,
+.light .bg-slate-900\/40,
+.light .bg-slate-900\/80,
+.light .bg-slate-950\/30,
+.light .bg-slate-950\/70,
+.light .bg-slate-950\/65,
+.light .bg-slate-950\/60,
+.light .bg-slate-950\/80,
+.light .bg-slate-950\/20,
+.light .bg-slate-950\/50,
+.light .bg-indigo-950\/40,
+.light .bg-indigo-900\/20,
+.light .bg-slate-900\/50,
+.light .bg-slate-900\/30,
+.light .bg-slate-950\/40,
+.light .bg-slate-950 {
   background-color: #ffffff !important;
   border-color: #e2e8f0 !important;
   color: #1e293b !important;
@@ -43,179 +47,187 @@ body,
 }
 
 /* Outer Container backdrop blur support */
-.backdrop-blur-md {
+.light .backdrop-blur-md {
   backdrop-filter: blur(12px) !important;
   background-color: rgba(255, 255, 255, 0.8) !important;
 }
 
 /* Typography Color Overrides */
-.text-slate-100,
-.text-slate-200,
-.text-slate-300,
-.text-white,
-.text-amber-100,
-.text-amber-50,
-.text-indigo-100,
-.text-indigo-200,
-.text-indigo-50 {
+.light .text-slate-100,
+.light .text-slate-200,
+.light .text-slate-300,
+.light .text-white,
+.light .text-amber-100,
+.light .text-amber-50,
+.light .text-indigo-100,
+.light .text-indigo-200,
+.light .text-indigo-50 {
   color: #0f172a !important;
 }
 
-.text-slate-400,
-.text-slate-500,
-.text-indigo-300,
-.text-indigo-400 {
+.light .text-slate-400,
+.light .text-slate-500,
+.light .text-indigo-300,
+.light .text-indigo-400 {
   color: #475569 !important;
 }
 
 /* Highlight specific accent headers */
-.text-amber-400 {
+.light .text-amber-400 {
   color: #b45309 !important;
 }
 
-.text-amber-500 {
+.light .text-amber-500 {
   color: #d97706 !important;
 }
 
-.text-emerald-400,
-.text-green-400 {
+.light .text-emerald-400,
+.light .text-green-400 {
   color: #15803d !important;
 }
 
 /* General Border Overrides */
-.border-slate-800,
-.border-slate-900,
-.border-indigo-500\/10,
-.border-indigo-500\/20,
-.border-indigo-500\/30,
-.border-slate-800\/80,
-.border-slate-800\/85,
-.border-slate-800\/30,
-.border-slate-700\/50,
-.border-slate-800\/50,
-.border-amber-500\/20,
-.border-amber-500\/25,
-.border-rose-500\/20,
-.border-rose-500\/30,
-.border-dashed {
-  border-color: #e2e8f0 !important;
+.light .border-slate-800,
+.light .border-slate-900,
+.light .border-indigo-500\/10,
+.light .border-indigo-500\/20,
+.light .border-indigo-500\/30,
+.light .border-slate-800\/80,
+.light .border-slate-800\/85,
+.light .border-slate-800\/30,
+.light .border-slate-700\/50,
+.light .border-slate-800\/50,
+.light .border-amber-500\/20,
+.light .border-amber-500\/25,
+.light .border-rose-500\/20,
+.light .border-rose-500\/30,
+.light .border-dashed {
+  border-color: #cbd5e1 !important;
 }
 
 /* Remove gradient backgrounds and apply solid light slate background */
-.bg-gradient-to-br,
-.bg-gradient-to-r,
-.bg-gradient-to-b {
+.light .bg-gradient-to-br,
+.light .bg-gradient-to-r,
+.light .bg-gradient-to-b {
   background-image: none !important;
   background-color: #f1f5f9 !important;
 }
 
 /* Special Pill/Badge highlights */
-.bg-slate-950\/65, .bg-slate-950\/80 {
+.light .bg-slate-950\/65, 
+.light .bg-slate-950\/80 {
   background-color: #f1f5f9 !important;
   color: #334155 !important;
   border-color: #cbd5e1 !important;
 }
 
-.bg-amber-500\/5,
-.bg-amber-500\/10,
-.bg-amber-500\/15,
-.bg-amber-500\/20,
-.bg-amber-500\/25 {
+.light .bg-amber-500\/5,
+.light .bg-amber-500\/10,
+.light .bg-amber-500\/15,
+.light .bg-amber-500\/20,
+.light .bg-amber-500\/25 {
   background-color: #fef3c7 !important;
   color: #92400e !important;
   border-color: #fde68a !important;
 }
 
-.bg-indigo-500\/10,
-.bg-indigo-500\/20,
-.bg-indigo-500\/5,
-.bg-indigo-950\/50 {
+.light .bg-indigo-500\/10,
+.light .bg-indigo-500\/20,
+.light .bg-indigo-500\/5,
+.light .bg-indigo-950\/50 {
   background-color: #e0f2fe !important;
   color: #0369a1 !important;
   border-color: #bae6fd !important;
 }
 
-.bg-rose-500\/10,
-.bg-rose-500\/20,
-.bg-rose-500\/5,
-.bg-rose-500\/25 {
+.light .bg-rose-500\/10,
+.light .bg-rose-500\/20,
+.light .bg-rose-500\/5,
+.light .bg-rose-500\/25 {
   background-color: #fee2e2 !important;
   color: #991b1b !important;
   border-color: #fecaca !important;
 }
 
-.bg-green-500\/20,
-.bg-green-500\/10,
-.bg-green-500\/5 {
+.light .bg-green-500\/20,
+.light .bg-green-500\/10,
+.light .bg-green-500\/5 {
   background-color: #dcfce7 !important;
   color: #166534 !important;
   border-color: #bbf7d0 !important;
 }
 
 /* Input elements style customization */
-input, select, textarea {
+.light input, 
+.light select, 
+.light textarea {
   background-color: #ffffff !important;
   color: #0f172a !important;
   border: 1px solid #cbd5e1 !important;
 }
 
-input:focus, select:focus, textarea:focus {
+.light input:focus, 
+.light select:focus, 
+.light textarea:focus {
   border-color: #6366f1 !important;
   outline: 2px solid rgba(99, 102, 241, 0.2) !important;
 }
 
 /* Custom design for active navigation buttons */
-.bg-amber-500 {
+.light .bg-amber-500 {
   background-color: #f59e0b !important;
   color: #ffffff !important;
 }
 
-.bg-amber-500:hover {
+.light .bg-amber-500:hover {
   background-color: #d97706 !important;
 }
 
 /* Ensure SVG text and lines adapt elegantly */
-svg text.fill-white,
-svg text.fill-white\/90,
-svg text[class*="fill-white"],
-svg text[class*="fill-white/90"] {
+.light svg text.fill-white,
+.light svg text.fill-white\/90,
+.light svg text[class*="fill-white"],
+.light svg text[class*="fill-white/90"] {
   fill: #0f172a !important;
 }
 
-svg text.fill-indigo-300,
-svg text[class*="fill-indigo-300"] {
+.light svg text.fill-indigo-300,
+.light svg text[class*="fill-indigo-300"] {
   fill: #4f46e5 !important;
 }
 
-svg text.fill-amber-500\/80,
-svg text[class*="fill-amber-500"] {
+.light svg text.fill-amber-500\/80,
+.light svg text[class*="fill-amber-500"] {
   fill: #b45309 !important;
 }
 
-svg line,
-svg rect,
-svg polygon {
+.light svg line,
+.light svg rect,
+.light svg polygon {
   stroke: #94a3b8 !important;
 }
 
-svg text {
+.light svg text {
   font-family: "Inter", sans-serif !important;
 }
 
 /* Specific Chat and Message Area Styling overrides */
-.prose {
+.light .prose {
   color: #334155 !important;
 }
 
-.prose h1, .prose h2, .prose h3, .prose h4 {
+.light .prose h1, 
+.light .prose h2, 
+.light .prose h3, 
+.light .prose h4 {
   color: #0f172a !important;
 }
 
 /* Custom Scrollbar colors */
-::-webkit-scrollbar-track {
+.light ::-webkit-scrollbar-track {
   background: #f1f5f9 !important;
 }
-::-webkit-scrollbar-thumb {
+.light ::-webkit-scrollbar-thumb {
   background: #cbd5e1 !important;
 }
 
