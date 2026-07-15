@@ -12,22 +12,20 @@ const ZODIAC_SIGNS = [
 const buildTimeBaseUrl = (import.meta.env.VITE_JHORA_API_URL || '').replace(/\/$/, '');
 
 const getBaseUrl = (): string => {
-  if (buildTimeBaseUrl) {
-    return buildTimeBaseUrl;
-  }
-  
   if (typeof window !== 'undefined' && window.location) {
     const hostname = window.location.hostname;
-    // If we are on a standard dev or preview domain, or localhost, use local relative routing.
+    // If we are on a standard dev or preview domain, or localhost, use local routing.
     if (hostname === 'localhost' || 
         hostname === '127.0.0.1' ||
         hostname.includes('ais-dev-') ||
         hostname.includes('ais-pre-')) {
-      return '';
+      return buildTimeBaseUrl || '';
     }
+    // Otherwise, we are on an external domain like Cloudflare, so we MUST use direct client-side routing.
+    return 'DIRECT_CLIENT';
   }
-  // Otherwise, we are on an external domain like Cloudflare, so we will use direct client-side routing.
-  return 'DIRECT_CLIENT';
+  
+  return buildTimeBaseUrl || '';
 };
 
 export const apiFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
