@@ -570,6 +570,23 @@ export default function App() {
       ]
     },
     {
+      id: "kp_stellar",
+      label: "KP Stellar",
+      icon: Zap,
+      submenus: [
+        { id: "dashboard", label: "Dashboard", description: "Overview, Provider Health & Status." },
+        { id: "cusps", label: "Cusps", description: "12 Cusps, Degrees & Sub-Lords." },
+        { id: "planet_analysis", label: "Planet Analysis", description: "Planet Star-Lord & Sub-Lord placements." },
+        { id: "significators", label: "Significators", description: "Planet & House level significators." },
+        { id: "ruling_planets", label: "Ruling Planets", description: "Day, Moon & Ascendant rulers." },
+        { id: "kp_dasha", label: "KP Dasha", description: "KP Vimshottari & event period indicators." },
+        { id: "transit", label: "Transit", description: "Real-time coordinate significations." },
+        { id: "horary", label: "Horary", description: "Prashna seed number calculations." },
+        { id: "research", label: "Research", description: "Developer audit tools & raw model values." },
+        { id: "settings", label: "Settings", description: "Provider priority routing settings." }
+      ]
+    },
+    {
       id: "marriage",
       label: "Marriage",
       icon: Heart,
@@ -600,23 +617,6 @@ export default function App() {
         { id: "generate_pdf", label: "Generate PDF", description: "Export professional reports." },
         { id: "saved_reports", label: "Saved Reports", description: "Locally archived exports." },
         { id: "share_report", label: "Share Report", description: "Export or share QR link." }
-      ]
-    },
-    {
-      id: "kp_stellar",
-      label: "KP Stellar",
-      icon: Zap,
-      submenus: [
-        { id: "dashboard", label: "Dashboard", description: "Overview, Provider Health & Status." },
-        { id: "cusps", label: "Cusps", description: "12 Cusps, Degrees & Sub-Lords." },
-        { id: "planet_analysis", label: "Planet Analysis", description: "Planet Star-Lord & Sub-Lord placements." },
-        { id: "significators", label: "Significators", description: "Planet & House level significators." },
-        { id: "ruling_planets", label: "Ruling Planets", description: "Day, Moon & Ascendant rulers." },
-        { id: "kp_dasha", label: "KP Dasha", description: "KP Vimshottari & event period indicators." },
-        { id: "transit", label: "Transit", description: "Real-time coordinate significations." },
-        { id: "horary", label: "Horary", description: "Prashna seed number calculations." },
-        { id: "research", label: "Research", description: "Developer audit tools & raw model values." },
-        { id: "settings", label: "Settings", description: "Provider priority routing settings." }
       ]
     },
     {
