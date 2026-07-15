@@ -75,6 +75,11 @@ import TransitsTab from "./components/TransitsTab";
 import IngressTab from "./components/IngressTab";
 import PluginManager, { INITIAL_PLUGINS, PluginSpec } from "./components/PluginManager";
 import KpStellarDashboard from "./components/KpStellarDashboard";
+import { UserProfile, SessionManager, AuthManager } from "./lib/firebaseAuth";
+import AuthScreen from "./components/AuthScreen";
+import UpdateNotification from "./components/UpdateNotification";
+import { UpdateManager, UpdateManifest } from "./lib/androidOta";
+import GithubOtaView from "./components/GithubOtaView";
 
 // 1. Navigation Graph Definitions
 export interface SubmenuItem {
@@ -109,6 +114,7 @@ export default function App() {
   const [drawerExpanded, setDrawerExpanded] = useState<boolean>(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [provenanceEnabled, setProvenanceEnabled] = useState<boolean>(false);
+  const [activeUser, setActiveUser] = useState<UserProfile | null>(null);
   
   // Global settings
   const [ayanamsa, setAyanamsa] = useState<string>("Lahiri (Chitra Paksha)");
@@ -368,6 +374,55 @@ export default function App() {
   useEffect(() => {
     loadCacheHistory();
 
+    // Check for cached auth session
+    const localSession = SessionManager.getLocalSession();
+    if (localSession) {
+      setActiveUser({
+        uid: localSession.uid,
+        name: localSession.name || "Vedic Astrologer",
+        email: localSession.email || "",
+        photoURL: localSession.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150",
+        createdDate: new Date().toISOString(),
+        lastLogin: new Date(localSession.lastActive).toISOString(),
+        savedProfiles: [],
+        favorites: [],
+        history: [],
+        settings: {
+          theme: "dark",
+          ayanamsa: "Lahiri (Chitra Paksha)",
+          chartStyle: "north",
+          language: "English",
+          autoUpdate: true
+        }
+      });
+    }
+
+    // Set up Firebase Auth state change observer
+    const unsubscribe = AuthManager.onAuthStateChanged((user) => {
+      if (user) {
+        setActiveUser({
+          uid: user.uid,
+          name: user.displayName || "Vedic Astrologer",
+          email: user.email || "",
+          photoURL: user.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150",
+          createdDate: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+          savedProfiles: [],
+          favorites: [],
+          history: [],
+          settings: {
+            theme: "dark",
+            ayanamsa: "Lahiri (Chitra Paksha)",
+            chartStyle: "north",
+            language: "English",
+            autoUpdate: true
+          }
+        });
+      } else {
+        setActiveUser(null);
+      }
+    });
+
     const saved = localStorage.getItem("jhora_astrology_data");
     if (saved) {
       try {
@@ -378,6 +433,10 @@ export default function App() {
     } else {
       handleCalculate(true);
     }
+
+    return () => {
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
   }, []);
 
   const handleCalculate = async (isInitial = false) => {
@@ -625,6 +684,8 @@ export default function App() {
       icon: SettingsIcon,
       submenus: [
         { id: "theme", label: "Theme", description: "Dark, Light, and custom styling." },
+        { id: "google_account", label: "Google Account", description: "Enable Google Sign-In & Sync." },
+        { id: "github_ota", label: "GitHub OTA Updates", description: "Check for new releases." },
         { id: "language", label: "Language", description: "Switch display languages." },
         { id: "ayanamsa", label: "Ayanamsa", description: "Select precession correction systems." },
         { id: "chart_style", label: "Chart Style", description: "Choose North vs South Indian charts." },
@@ -1893,6 +1954,10 @@ export default function App() {
                       }
                     />
                   )
+                ) : activeSubmenuId === "google_account" ? (
+                  <AuthScreen onAuthSuccess={(user) => setActiveUser(user)} activeUser={activeUser} />
+                ) : activeSubmenuId === "github_ota" ? (
+                  <GithubOtaView isDarkTheme={isDark} />
                 ) : (
                   <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
                     <div className="border-b border-indigo-500/10 pb-4">
@@ -2056,6 +2121,9 @@ export default function App() {
           <span className="text-indigo-400">Grounded in Jyotish Science & Antigravity Intelligence</span>
         </div>
       </footer>
+
+      {/* Background/Foreground Service Worker & Version update notification */}
+      <UpdateNotification />
     </div>
   );
 }
