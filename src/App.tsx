@@ -522,7 +522,6 @@ export default function App() {
   // Navigation configuration representing Phase 10 spec
   const MAIN_MENU_STRUCTURE: MainMenuNode[] = [
     { id: "dashboard", label: "Dashboard", icon: Compass },
-    { id: "profiles", label: "Profiles", icon: User },
     {
       id: "horoscope",
       label: "JHORA",
@@ -599,18 +598,6 @@ export default function App() {
         { id: "generate_pdf", label: "Generate PDF", description: "Export professional reports." },
         { id: "saved_reports", label: "Saved Reports", description: "Locally archived exports." },
         { id: "share_report", label: "Share Report", description: "Export or share QR link." }
-      ]
-    },
-    {
-      id: "ai_assistant",
-      label: "AI Assistant",
-      icon: Sparkles,
-      submenus: [
-        { id: "chat", label: "Chat", description: "Converse with our Vedic AI." },
-        { id: "explain_horoscope", label: "Explain Horoscope", description: "Full natal analytical digest." },
-        { id: "explain_yogas", label: "Explain Yogas", description: "AI breakdowns of active yogas." },
-        { id: "explain_dashas", label: "Explain Dashas", description: "Dasha timeline counseling." },
-        { id: "future_prediction", label: "Future Prediction", description: "Predictive synthesis analysis." }
       ]
     },
     {
@@ -1068,6 +1055,104 @@ export default function App() {
                   )}
                 </div>
 
+                {/* Saved Profiles Directory */}
+                <div className={`p-6 rounded-2xl border ${containerStyle}`}>
+                  <h3 className={`text-lg font-sans font-medium flex items-center justify-between ${headingStyle}`}>
+                    <span className="flex items-center gap-2">
+                      <User className="w-5 h-5 text-amber-500" />
+                      Saved Profiles Directory
+                    </span>
+                    {cachedList.length > 0 && (
+                      <button
+                        onClick={handleClearAllRecords}
+                        className="text-xs text-rose-500 hover:text-rose-400 font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Clear All Records
+                      </button>
+                    )}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1 mb-6">
+                    Manage and instantly hotload previously calculated horoscopes from your offline IndexedDB database.
+                  </p>
+
+                  {cachedList.length === 0 ? (
+                    <div className="text-center py-8 rounded-xl bg-slate-950/20 border border-dashed border-slate-800 text-slate-500 text-xs">
+                      <FolderOpen className="w-10 h-10 text-slate-600 mx-auto mb-2 opacity-50" />
+                      No saved profiles found. Navigate to JHORA &rarr; Birth Details to cast and save a chart.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {cachedList.map((rec) => {
+                        const isLoaded = astrologyData && astrologyData.birthDetails && 
+                          astrologyData.birthDetails.name === rec.name && 
+                          astrologyData.birthDetails.date === rec.date && 
+                          astrologyData.birthDetails.time === rec.time;
+
+                        return (
+                          <div
+                            key={rec.id}
+                            className={`p-4 rounded-xl border flex flex-col justify-between ${cardStyle} ${
+                              isLoaded ? "border-amber-500/40 bg-amber-500/5" : ""
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-start justify-between gap-2">
+                                <span className="text-sm font-semibold text-amber-500 truncate block">
+                                  {rec.name}
+                                </span>
+                                <span className="text-[9px] font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded">
+                                  {rec.data?.lagna?.sign ? `${rec.data.lagna.sign} Asc` : 'Chart'}
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-slate-400 mt-2 space-y-1">
+                                <div>📅 {rec.date} • 🕒 {rec.time}</div>
+                                <div className="truncate">📍 {rec.location}</div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-indigo-500/5">
+                              <button
+                                onClick={() => handleLoadCachedRecord(rec)}
+                                className={`flex-1 font-bold rounded-lg py-1.5 text-[11px] transition-colors cursor-pointer ${
+                                  isLoaded 
+                                    ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" 
+                                    : "bg-amber-500 hover:bg-amber-600 text-slate-950"
+                                }`}
+                                disabled={isLoaded}
+                              >
+                                {isLoaded ? "Active Profile" : "Load Profile"}
+                              </button>
+                              <button
+                                onClick={(e) => handleDeleteRecord(rec.id, e)}
+                                className="p-1.5 text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg border border-transparent transition-colors cursor-pointer"
+                                title="Delete profile"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* JHora AI Assistant Chat Room */}
+                <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
+                  <div>
+                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
+                      <Sparkles className="w-5 h-5 text-amber-500" />
+                      JHora AI Consultation & Interpretations
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Converse with our Vedic AI grounded directly in your calculated horoscope, dasha timeline, and planetary aspects.
+                    </p>
+                  </div>
+                  
+                  <AstroChat astrologyData={astrologyData} />
+                </div>
+
                 {/* Dashboard Technical Provenance Checklist */}
                 {astrologyData && provenanceEnabled && (
                   <div className={`p-6 rounded-2xl border ${containerStyle}`}>
@@ -1125,84 +1210,6 @@ export default function App() {
                     </div>
                   </div>
                 )}
-              </motion.div>
-            </AnimatePresence>
-          ) : activeMenu === "profiles" ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key="profiles"
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="space-y-6"
-              >
-                <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                  <h3 className={`text-lg font-sans font-medium flex items-center justify-between ${headingStyle}`}>
-                    <span className="flex items-center gap-2">
-                      <User className="w-5 h-5 text-amber-500" />
-                      Saved Profiles Directory
-                    </span>
-                    {cachedList.length > 0 && (
-                      <button
-                        onClick={handleClearAllRecords}
-                        className="text-xs text-rose-500 hover:text-rose-400 font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Clear All Records
-                      </button>
-                    )}
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-1 mb-6">
-                    Manage and instantly hotload previously calculated horoscopes from your offline IndexedDB database.
-                  </p>
-
-                  {cachedList.length === 0 ? (
-                    <div className="text-center py-12 rounded-xl bg-slate-950/20 border border-dashed border-slate-800 text-slate-500 text-xs">
-                      <FolderOpen className="w-10 h-10 text-slate-600 mx-auto mb-2 opacity-50" />
-                      No saved profiles found. Navigate to JHORA &rarr; Birth Details to cast a chart.
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {cachedList.map((rec) => (
-                        <div
-                          key={rec.id}
-                          className={`p-4 rounded-xl border flex flex-col justify-between ${cardStyle}`}
-                        >
-                          <div>
-                            <div className="flex items-start justify-between gap-2">
-                              <span className="text-sm font-semibold text-amber-500 truncate block">
-                                {rec.name}
-                              </span>
-                              <span className="text-[9px] font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded">
-                                {rec.data?.lagna?.sign ? `${rec.data.lagna.sign} Asc` : 'Chart'}
-                              </span>
-                            </div>
-                            <div className="text-[11px] text-slate-400 mt-2 space-y-1">
-                              <div>📅 {rec.date} • 🕒 {rec.time}</div>
-                              <div className="truncate">📍 {rec.location}</div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-indigo-500/5">
-                            <button
-                              onClick={() => handleLoadCachedRecord(rec)}
-                              className="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-lg py-1.5 text-[11px] transition-colors"
-                            >
-                              Load Profile
-                            </button>
-                            <button
-                              onClick={(e) => handleDeleteRecord(rec.id, e)}
-                              className="p-1.5 text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg border border-transparent transition-colors cursor-pointer"
-                              title="Delete profile"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
               </motion.div>
             </AnimatePresence>
           ) : activeMenu === "horoscope" ? (
@@ -1878,55 +1885,6 @@ export default function App() {
                   <div className={`p-6 rounded-2xl border ${containerStyle}`}>
                     <h3 className="text-sm font-bold text-amber-500">Local Export Archives</h3>
                     <p className="text-xs text-slate-500 font-mono mt-1">No saved PDF exports found in local sandboxed storage directory.</p>
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          ) : activeMenu === "ai_assistant" ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSubmenuId}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="space-y-6"
-              >
-                {activeSubmenuId === "chat" && astrologyData ? (
-                  <AstroChat astrologyData={astrologyData} />
-                ) : (
-                  /* AI custom interpretive panels */
-                  <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                    <div>
-                      <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                        <Sparkles className="w-5 h-5 text-amber-500" />
-                        AI interpretive Summary: {activeSubmenus.find(s => s.id === activeSubmenuId)?.label}
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-1">
-                        Generative summaries derived strictly using Gemini computational groundings.
-                      </p>
-                    </div>
-
-                    {astrologyData ? (
-                      <div className="bg-slate-950/40 border border-indigo-500/10 p-5 rounded-xl space-y-4">
-                        <div className="flex items-center gap-2 text-xs font-mono text-indigo-400">
-                          <Activity className="w-4 h-4 animate-pulse" />
-                          GROUNDED CONTEXT STREAMS LOADED
-                        </div>
-                        <p className="text-xs text-slate-400 leading-relaxed">
-                          Click below to execute a secure query to the Gemini API backend using current birth parameters. Prompt includes: Name={astrologyData.birthDetails.name}, Date={astrologyData.birthDetails.date}, Lagna={astrologyData.lagna.sign}.
-                        </p>
-                        <button
-                          onClick={() => {
-                            setActiveSubMenu(prev => ({ ...prev, ai_assistant: "chat" }));
-                          }}
-                          className="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs cursor-pointer transition-all"
-                        >
-                          Open JHora AI Chat Window
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-xs text-slate-500 font-mono">Calculations needed.</div>
-                    )}
                   </div>
                 )}
               </motion.div>
