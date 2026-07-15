@@ -525,7 +525,7 @@ export default function App() {
     { id: "profiles", label: "Profiles", icon: User },
     {
       id: "horoscope",
-      label: "Horoscope",
+      label: "JHORA",
       icon: Activity,
       submenus: [
         { id: "overview", label: "Overview", description: "Vedic charts and summary." },
@@ -1047,7 +1047,7 @@ export default function App() {
                     <div className="text-center py-12">
                       <Sparkles className="w-8 h-8 text-amber-500 mx-auto mb-3 animate-pulse" />
                       <h4 className="text-sm font-semibold">Ready to Cast Your First Horoscope</h4>
-                      <p className="text-xs text-slate-500 mt-1 mb-4">Navigate to Horoscope &rarr; Birth Details to input parameters and cast.</p>
+                      <p className="text-xs text-slate-500 mt-1 mb-4">Navigate to JHORA &rarr; Birth Details to input parameters and cast.</p>
                       <button
                         onClick={() => {
                           setActiveMenu("horoscope");
@@ -1152,7 +1152,7 @@ export default function App() {
                   {cachedList.length === 0 ? (
                     <div className="text-center py-12 rounded-xl bg-slate-950/20 border border-dashed border-slate-800 text-slate-500 text-xs">
                       <FolderOpen className="w-10 h-10 text-slate-600 mx-auto mb-2 opacity-50" />
-                      No saved profiles found. Navigate to Horoscope &arr; Birth Details to cast a chart.
+                      No saved profiles found. Navigate to JHORA &rarr; Birth Details to cast a chart.
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
