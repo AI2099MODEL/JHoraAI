@@ -948,89 +948,20 @@ export default function App() {
                 className="space-y-6"
               >
                 {/* Dashboard Summary Header */}
-                <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-indigo-500/10 pb-5">
-                    <div>
-                      <h3 className={`text-xl font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                        <Compass className="w-5 h-5 text-amber-500" />
-                        Vedic Horoscope Dashboard
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-1">
-                        Synthesized cosmic indicators representing the native's natal alignments, lunar phases, and active mahadashas.
-                      </p>
-                    </div>
-                    {astrologyData && (
-                      <span className="text-[10px] font-mono text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded-lg px-3 py-1">
-                        AUTHORITATIVE COORD GATEWAY
-                      </span>
-                    )}
-                  </div>
-
-                  {astrologyData ? (
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mt-6">
-                      
-                      {/* Left: Quick Astro Stats List */}
-                      <div className="md:col-span-4 space-y-4">
-                        <div className={`p-4 rounded-xl border ${cardStyle}`}>
-                          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-2">Native Details</span>
-                          <div className="space-y-2 text-xs">
-                            <div className="flex justify-between">
-                              <span className={textMuted}>Name:</span>
-                              <span className="font-semibold">{astrologyData.birthDetails.name}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className={textMuted}>Date:</span>
-                              <span className="font-mono">{astrologyData.birthDetails.date}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className={textMuted}>Time:</span>
-                              <span className="font-mono">{astrologyData.birthDetails.time}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className={textMuted}>Location:</span>
-                              <span className="truncate max-w-[150px] font-medium" title={astrologyData.birthDetails.location}>
-                                {astrologyData.birthDetails.location}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className={`p-4 rounded-xl border ${cardStyle}`}>
-                          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-2">Panchanga Highlight</span>
-                          <div className="space-y-2 text-xs">
-                            <div className="flex justify-between">
-                              <span className={textMuted}>Lunar Day (Tithi):</span>
-                              <span className="font-semibold text-amber-400">{astrologyData.panchanga.tithi}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className={textMuted}>Astral Yoga:</span>
-                              <span className="font-medium">{astrologyData.panchanga.yoga}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className={textMuted}>Nakshatra:</span>
-                              <span className="font-semibold text-indigo-400">{astrologyData.panchanga.nakshatra}</span>
-                            </div>
-                          </div>
-                        </div>
+                {!astrologyData && (
+                  <div className={`p-6 rounded-2xl border ${containerStyle}`}>
+                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-indigo-500/10 pb-5">
+                      <div>
+                        <h3 className={`text-xl font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
+                          <Compass className="w-5 h-5 text-amber-500" />
+                          Vedic Horoscope Dashboard
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Synthesized cosmic indicators representing the native's natal alignments, lunar phases, and active mahadashas.
+                        </p>
                       </div>
-
-                      {/* Right: Interactive D1 Rasi Wheel */}
-                      <div className="md:col-span-8 flex flex-col items-center justify-center border border-indigo-500/10 p-4 rounded-xl bg-slate-950/30">
-                        <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-4">
-                          Natal D1 Rasi Chart
-                        </span>
-                        <div className="w-full">
-                          <AstroChart
-                            rasiChart={astrologyData.divisionalCharts["D-1_rasi"]?.housePlacements || {}}
-                            navamsaChart={astrologyData.divisionalCharts["D-9_navamsa"]?.housePlacements || {}}
-                            lagnaSignIndex={astrologyData.lagna.signIndex}
-                            lagnaSignName={astrologyData.lagna.sign}
-                          />
-                        </div>
-                      </div>
-
                     </div>
-                  ) : (
+
                     <div className="text-center py-12">
                       <Sparkles className="w-8 h-8 text-amber-500 mx-auto mb-3 animate-pulse" />
                       <h4 className="text-sm font-semibold">Ready to Cast Your First Horoscope</h4>
@@ -1045,8 +976,8 @@ export default function App() {
                         Go to Birth Details
                       </button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* Saved Profiles Directory */}
                 <div className={`p-6 rounded-2xl border ${containerStyle}`}>
