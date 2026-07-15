@@ -25,9 +25,14 @@ import {
   WifiOff,
   Database,
   Trash2,
-  FolderOpen
+  FolderOpen,
+  ChevronDown,
+  Zap,
+  Grid,
+  Shield
 } from "lucide-react";
 import { AstrologyData, convertTimeTo24h, convertDateToISO } from "./lib/astrology";
+import { mapJHoraResponseToAstrologyData } from "./lib/jhoraMapper";
 import { 
   saveCachedHoroscope, 
   getAllCachedHoroscopes, 
@@ -41,6 +46,9 @@ import CompatibilityTab from "./components/CompatibilityTab";
 import AstroChat from "./components/AstroChat";
 import AndroidDesignSystem from "./components/AndroidDesignSystem";
 import ApiAcceptanceDashboard from "./components/ApiAcceptanceDashboard";
+import HoroscopeDashboard from "./components/HoroscopeDashboard";
+import TransitsTab from "./components/TransitsTab";
+import IngressTab from "./components/IngressTab";
 
 export default function App() {
   // Input form state with authentic default values (New Delhi, India)
@@ -56,6 +64,11 @@ export default function App() {
 
   const [astrologyData, setAstrologyData] = useState<AstrologyData | null>(null);
   const [activeTab, setActiveTab] = useState<string>("cast");
+  const [activeSubTab, setActiveSubTab] = useState<string>("panchanga");
+  const [isHoroscopeExpanded, setIsHoroscopeExpanded] = useState<boolean>(true);
+  const [selectedVarga, setSelectedVarga] = useState<string>("D1");
+  const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Jupiter");
+  const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
   const [loading, setLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [cachedList, setCachedList] = useState<CachedHoroscopeRecord[]>([]);
@@ -325,7 +338,8 @@ export default function App() {
       if (!response.ok) {
         throw new Error(`API error: ${response.statusText}`);
       }
-      result = await response.json();
+      const rawJson = await response.json();
+      result = mapJHoraResponseToAstrologyData(rawJson);
 
       setAstrologyData(result);
       localStorage.setItem("jhora_astrology_data", JSON.stringify(result));
@@ -427,12 +441,94 @@ export default function App() {
     return colors[lord] || "text-slate-300 bg-slate-800/50";
   };
 
+  const ZODIAC_SIGNS = [
+    "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+  ];
+
+  const getSignName = (idx: number) => {
+    const signs = ["Pisces", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius"];
+    return signs[idx];
+  };
+
+  const getGridPositionClass = (idx: number) => {
+    switch (idx) {
+      case 0: return "col-start-1 row-start-1"; // Pisces
+      case 1: return "col-start-2 row-start-1"; // Aries
+      case 2: return "col-start-3 row-start-1"; // Taurus
+      case 3: return "col-start-4 row-start-1"; // Gemini
+      case 4: return "col-start-4 row-start-2"; // Cancer
+      case 5: return "col-start-4 row-start-3"; // Leo
+      case 6: return "col-start-4 row-start-4"; // Virgo
+      case 7: return "col-start-3 row-start-4"; // Libra
+      case 8: return "col-start-2 row-start-4"; // Scorpio
+      case 9: return "col-start-1 row-start-4"; // Sag
+      case 10: return "col-start-1 row-start-3"; // Cap
+      case 11: return "col-start-1 row-start-2"; // Aq
+      default: return "";
+    }
+  };
+
+  const getPlanetAbbr = (name: string) => {
+    const abbrs: { [key: string]: string } = {
+      Sun: "Sy",
+      Moon: "Ch",
+      Mars: "Ma",
+      Mercury: "Bu",
+      Jupiter: "Gu",
+      Venus: "Sk",
+      Saturn: "Sa",
+      Rahu: "Ra",
+      Ketu: "Ke",
+      Asc: "As",
+      Lagna: "Lg"
+    };
+    return abbrs[name] || name.slice(0, 2);
+  };
+
+  const getOccupantsForSouthIndianBoxFromLocal = (vargaChart: any, boxIdx: number, selectedVargaName: string) => {
+    const occupants: string[] = [];
+    if (!vargaChart || !astrologyData) return occupants;
+
+    const lagnaSignIdx = astrologyData.lagna.signIndex;
+
+    // Standard zodiac index corresponding to clockwise boxIdx (boxIdx 0 is Pisces: std index 11)
+    const boxStandardZodiacIdx = (boxIdx - 1 + 12) % 12;
+
+    const vargaLagnas = astrologyData.vargaLagnas || {};
+    const currentVargaLagnaSignIdx = vargaLagnas[selectedVargaName] !== undefined ? vargaLagnas[selectedVargaName] : lagnaSignIdx;
+
+    Object.entries(vargaChart).forEach(([houseStr, pNames]: [string, any]) => {
+      const houseNum = parseInt(houseStr, 10);
+      const houseStandardZodiacIdx = (currentVargaLagnaSignIdx + houseNum - 1) % 12;
+      if (houseStandardZodiacIdx === boxStandardZodiacIdx) {
+        pNames.forEach((pName: string) => {
+          occupants.push(pName);
+        });
+      }
+    });
+
+    if (boxStandardZodiacIdx === currentVargaLagnaSignIdx) {
+      occupants.push("Asc");
+    }
+
+    return occupants;
+  };
+
   const tabs = [
     { id: "cast", label: "Birth Chart Cast", icon: Sparkles },
     { id: "dashboard", label: "Horoscope Dashboard", icon: Compass },
-    { id: "charts", label: "Planetary Charts", icon: Layers },
-    { id: "dashas", label: "Vimshottari Dasha", icon: Calendar },
-    { id: "yogas", label: "Yogas & Doshas", icon: Award },
+    { id: "panchanga", label: "Panchanga", icon: Calendar },
+    { id: "grahas", label: "Grahas", icon: Compass },
+    { id: "vargas", label: "Vargas (Charts)", icon: Layers },
+    { id: "saham", label: "Saham Calculations", icon: Sparkles },
+    { id: "argala", label: "Argala & Obstructions", icon: Shield },
+    { id: "strengths", label: "Shad Bala & Bhava Bala", icon: Zap },
+    { id: "ashtakavarga", label: "Ashtakavarga", icon: Grid },
+    { id: "dashas", label: "Interactive Dashas", icon: Clock },
+    { id: "yogas", label: "Astrological Yogas", icon: Award },
+    { id: "transits", label: "Planetary Transits", icon: RefreshCw },
+    { id: "ingress", label: "Planetary Ingress", icon: Activity },
     { id: "compatibility", label: "Marriage Match", icon: Heart },
     { id: "muhurtas", label: "Daily Muhurta", icon: Clock },
     { id: "chat", label: "JHora AI Chat", icon: MessageSquare },
@@ -503,18 +599,32 @@ export default function App() {
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
+                const isSubItem = [
+                  "panchanga",
+                  "grahas",
+                  "vargas",
+                  "saham",
+                  "argala",
+                  "strengths",
+                  "ashtakavarga",
+                  "dashas",
+                  "yogas",
+                  "transits",
+                  "ingress"
+                ].includes(tab.id);
+
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all border text-left cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-medium transition-all border text-left cursor-pointer ${
                       isActive
                         ? "bg-amber-500/10 text-amber-400 border-amber-500/35 shadow-sm font-semibold"
                         : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/30 border-transparent"
-                    }`}
+                    } ${isSubItem ? "pl-7 border-l border-indigo-500/20" : ""}`}
                     id={`tab-btn-${tab.id}`}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-amber-400" : "text-slate-400"}`} />
+                    <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? "text-amber-400" : isSubItem ? "text-slate-500" : "text-slate-400"}`} />
                     <span className="truncate">{tab.label}</span>
                   </button>
                 );
@@ -863,237 +973,29 @@ export default function App() {
                   exit={{ opacity: 0, y: -5 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {/* Horosope Dashboard */}
-                  {activeTab === "dashboard" && (
-                    <div className="space-y-6" id="dashboard-tab">
-                      {/* Overview Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="bg-slate-900/40 border border-indigo-500/10 rounded-2xl p-5 flex flex-col justify-between">
-                          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-bold">Birth Star / Nakshatra</span>
-                          <h3 className="text-xl font-semibold text-white mt-1">
-                            {astrologyData.planets.find(p => p.name === "Moon")?.nakshatra}
-                          </h3>
-                          <span className="text-xs text-indigo-300 font-mono mt-0.5">
-                            Pada {astrologyData.planets.find(p => p.name === "Moon")?.pada} — Lord: {astrologyData.planets.find(p => p.name === "Moon")?.lord}
-                          </span>
-                        </div>
-
-                        <div className="bg-slate-900/40 border border-indigo-500/10 rounded-2xl p-5 flex flex-col justify-between">
-                          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-bold">Rasi (Moon Sign)</span>
-                          <h3 className="text-xl font-semibold text-white mt-1">
-                            {astrologyData.planets.find(p => p.name === "Moon")?.sign}
-                          </h3>
-                          <span className="text-xs text-indigo-300 font-mono mt-0.5">
-                            Natal Moon in House {astrologyData.planets.find(p => p.name === "Moon")?.house}
-                          </span>
-                        </div>
-
-                        <div className="bg-slate-900/40 border border-indigo-500/10 rounded-2xl p-5 flex flex-col justify-between">
-                          <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-bold">Lagna (Ascendant)</span>
-                          <h3 className="text-xl font-semibold text-white mt-1">
-                            {astrologyData.lagna.sign}
-                          </h3>
-                          <span className="text-xs text-indigo-300 font-mono mt-0.5">
-                            Ascendant Sign Degree: {astrologyData.lagna.degree.toFixed(2)}°
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Planet Positions Table */}
-                      <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-indigo-500/20 p-6 shadow-xl">
-                        <h3 className="text-sm font-semibold text-slate-200 border-b border-indigo-500/10 pb-3 mb-4 flex items-center justify-between">
-                          <span>Grahas (Planetary Positions)</span>
-                          <span className="text-xs text-slate-400 font-mono font-medium">Sidereal Lahiri Ayanamsa</span>
-                        </h3>
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left text-xs font-sans">
-                            <thead>
-                              <tr className="border-b border-indigo-500/10 text-slate-400">
-                                <th className="pb-3 font-medium">Planet (Graha)</th>
-                                <th className="pb-3 font-medium">Longitude</th>
-                                <th className="pb-3 font-medium">Zodiac Sign (Rasi)</th>
-                                <th className="pb-3 font-medium">House (Bhava)</th>
-                                <th className="pb-3 font-medium">Nakshatra (Pada)</th>
-                                <th className="pb-3 font-medium">Nak Lord</th>
-                                <th className="pb-3 font-medium text-right">Shadbala Strength</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-indigo-500/5">
-                              {astrologyData.planets.map((p) => (
-                                <tr key={p.name} className="hover:bg-slate-900/20 transition-colors">
-                                  <td className="py-3 font-semibold text-slate-100 flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-                                    {p.name}
-                                  </td>
-                                  <td className="py-3 font-mono text-slate-400">{p.longitude.toFixed(2)}°</td>
-                                  <td className="py-3 text-amber-300/90 font-medium">
-                                    {p.sign} <span className="text-xs text-slate-500">({p.degree.toFixed(1)}°)</span>
-                                  </td>
-                                  <td className="py-3 font-mono text-slate-200">H{p.house}</td>
-                                  <td className="py-3 text-slate-300">
-                                    {p.nakshatra} <span className="text-xs text-slate-500">(P{p.pada})</span>
-                                  </td>
-                                  <td className="py-3">
-                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold ${getLordColor(p.lord)}`}>
-                                      {p.lord}
-                                    </span>
-                                  </td>
-                                  <td className="py-3 text-right">
-                                    <div className="flex items-center justify-end gap-2">
-                                      <span className="font-mono font-bold text-slate-200">{p.strength}%</span>
-                                      <div className="w-12 bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                        <div
-                                          className="bg-amber-500 h-full"
-                                          style={{ width: `${p.strength}%` }}
-                                        />
-                                      </div>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Astro Charts */}
-                  {activeTab === "charts" && (
-                    <AstroChart
-                      rasiChart={astrologyData.rasiChart}
-                      navamsaChart={astrologyData.navamsaChart}
-                      lagnaSignIndex={astrologyData.lagna.signIndex}
-                      lagnaSignName={astrologyData.lagna.sign}
-                      sahams={astrologyData.sahams}
-                      argalas={astrologyData.argalas}
+                  {/* Horoscope Dashboard */}
+                  {["dashboard", "panchanga", "grahas", "vargas", "saham", "argala", "strengths", "ashtakavarga", "dashas", "yogas"].includes(activeTab) && (
+                    <HoroscopeDashboard
+                      astrologyData={astrologyData}
+                      activeSubTab={activeTab}
+                      setActiveSubTab={(tab) => setActiveTab(tab)}
+                      selectedVarga={selectedVarga}
+                      setSelectedVarga={setSelectedVarga}
+                      selectedBavPlanet={selectedBavPlanet}
+                      setSelectedBavPlanet={setSelectedBavPlanet}
+                      activeDashaSystem={activeDashaSystem}
+                      setActiveDashaSystem={setActiveDashaSystem}
                     />
                   )}
 
-                  {/* Vimshottari Dashas */}
-                  {activeTab === "dashas" && (
-                    <DashaTree dashas={astrologyData.dashas} />
+                  {/* Planetary Transits */}
+                  {activeTab === "transits" && (
+                    <TransitsTab astrologyData={astrologyData} />
                   )}
 
-                  {/* Yogas & Doshas */}
-                  {activeTab === "yogas" && (
-                    <div className="space-y-6" id="yogas-doshas-tab">
-                      {/* Overview explanation */}
-                      <div className="bg-slate-900/40 border border-indigo-500/10 rounded-2xl p-5">
-                        <h4 className="text-sm font-semibold text-slate-200 mb-1 flex items-center gap-2">
-                          <Award className="w-5 h-5 text-amber-500" />
-                          Celestial Combinations (Yogas & Doshas)
-                        </h4>
-                        <p className="text-xs text-slate-400 leading-relaxed">
-                          Yogas represent highly specific configurations of planets that release auspicious and powerful karmic energies, granting intelligence, success, or resilience. Doshas represent critical imbalances calling for lifestyle refinements and conscious remedies.
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Yogas Side */}
-                        <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
-                          <h3 className="text-base font-semibold text-amber-400 border-b border-indigo-500/10 pb-3 flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-amber-400" />
-                            Auspicious Astrological Yogas
-                          </h3>
-                          <div className="space-y-4">
-                            {astrologyData.yogas.map((y) => (
-                              <div
-                                key={y.name}
-                                className={`p-4 rounded-xl border transition-all ${
-                                  y.isPresent
-                                    ? "bg-green-500/5 border-green-500/30"
-                                    : "bg-slate-950/20 border-slate-800/80 opacity-60"
-                                }`}
-                              >
-                                <div className="flex justify-between items-center mb-1">
-                                  <h4 className="text-xs font-bold text-white">{y.name}</h4>
-                                  <span
-                                    className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
-                                      y.isPresent
-                                        ? "bg-green-500/20 text-green-400"
-                                        : "bg-slate-800 text-slate-500"
-                                    }`}
-                                  >
-                                    {y.isPresent ? "ACTIVE" : "INACTIVE"}
-                                  </span>
-                                </div>
-                                <span className="text-[10px] text-slate-400 block mb-2">{y.description}</span>
-                                <p className="text-[11px] text-slate-300 leading-relaxed">
-                                  {y.explanation}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Doshas Side */}
-                        <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
-                          <h3 className="text-base font-semibold text-rose-400 border-b border-indigo-500/10 pb-3 flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4 text-rose-400" />
-                            Astrological Challenges (Doshas)
-                          </h3>
-                          <div className="space-y-4">
-                            {/* Manglik */}
-                            <div className={`p-4 rounded-xl border transition-all ${
-                              astrologyData.doshas.manglik.isPresent
-                                ? "bg-rose-500/5 border-rose-500/30"
-                                : "bg-slate-950/20 border-slate-800/80"
-                            }`}>
-                              <div className="flex justify-between items-center mb-1">
-                                <h4 className="text-xs font-bold text-white">Manglik Dosha (Kuja Dosha)</h4>
-                                <span className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
-                                  astrologyData.doshas.manglik.isPresent ? "bg-rose-500/25 text-rose-400" : "bg-green-500/20 text-green-400"
-                                }`}>
-                                  {astrologyData.doshas.manglik.isPresent ? "PRESENT" : "ABSENT"}
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-slate-300 leading-relaxed mt-2">
-                                {astrologyData.doshas.manglik.explanation}
-                              </p>
-                            </div>
-
-                            {/* Kaal Sarp */}
-                            <div className={`p-4 rounded-xl border transition-all ${
-                              astrologyData.doshas.kaalSarp.isPresent
-                                ? "bg-rose-500/5 border-rose-500/30"
-                                : "bg-slate-950/20 border-slate-800/80"
-                            }`}>
-                              <div className="flex justify-between items-center mb-1">
-                                <h4 className="text-xs font-bold text-white">Kaal Sarp Dosha</h4>
-                                <span className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
-                                  astrologyData.doshas.kaalSarp.isPresent ? "bg-rose-500/25 text-rose-400" : "bg-green-500/20 text-green-400"
-                                }`}>
-                                  {astrologyData.doshas.kaalSarp.isPresent ? "PRESENT" : "ABSENT"}
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-slate-300 leading-relaxed mt-2">
-                                {astrologyData.doshas.kaalSarp.explanation}
-                              </p>
-                            </div>
-
-                            {/* Sade Sati */}
-                            <div className={`p-4 rounded-xl border transition-all ${
-                              astrologyData.doshas.sadeSati.isPresent
-                                ? "bg-rose-500/5 border-rose-500/30"
-                                : "bg-slate-950/20 border-slate-800/80"
-                            }`}>
-                              <div className="flex justify-between items-center mb-1">
-                                <h4 className="text-xs font-bold text-white">Shani Sade Sati Cycle</h4>
-                                <span className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
-                                  astrologyData.doshas.sadeSati.isPresent ? "bg-amber-500/25 text-amber-400" : "bg-green-500/20 text-green-400"
-                                }`}>
-                                  {astrologyData.doshas.sadeSati.isPresent ? "ACTIVE" : "INACTIVE"}
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-slate-300 leading-relaxed mt-2">
-                                {astrologyData.doshas.sadeSati.explanation}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  {/* Planetary Ingress */}
+                  {activeTab === "ingress" && (
+                    <IngressTab birthDate={astrologyData.birthDetails.date} />
                   )}
 
                   {/* Compatibility Milan */}

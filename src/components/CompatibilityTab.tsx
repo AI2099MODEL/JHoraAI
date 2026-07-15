@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Heart, ShieldCheck, Sparkles, AlertCircle, RefreshCw } from "lucide-react";
-import { CompatibilityResult, AstrologyData } from "../lib/astrology";
+import { CompatibilityResult, AstrologyData, calculateCompatibility } from "../lib/astrology";
 
 interface CompatibilityTabProps {
   astrologyData?: AstrologyData | null;
@@ -47,17 +47,12 @@ export default function CompatibilityTab({ astrologyData }: CompatibilityTabProp
   const handleCalculate = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/astrology/compatibility", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          p1SignIndex: person1.signIndex,
-          p1MoonLongitude: person1.longitude,
-          p2SignIndex: person2.signIndex,
-          p2MoonLongitude: person2.longitude,
-        }),
-      });
-      const data = await response.json();
+      const data = calculateCompatibility(
+        person1.signIndex,
+        person1.longitude,
+        person2.signIndex,
+        person2.longitude
+      );
       setResult(data);
     } catch (error) {
       console.error("Compatibility calculation failed:", error);
