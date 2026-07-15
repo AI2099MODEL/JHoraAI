@@ -531,7 +531,6 @@ export default function App() {
         { id: "overview", label: "Overview", description: "Vedic charts and summary." },
         { id: "birth_details", label: "Birth Details", description: "Edit native parameters and cast settings." },
         { id: "planetary_positions", label: "Planetary Positions", description: "Degrees, Signs, Nakshatras, and Houses." },
-        { id: "panchanga", label: "Panchanga", description: "Tithi, Vara, Nakshatra, Yoga, and Karana." },
         { id: "planet_strength", label: "Planet Strength", description: "Shadbala index matrices." },
         { id: "bhava_strength", label: "Bhava Strength", description: "House strength indexes." },
         { id: "ashtakavarga", label: "Ashtakavarga", description: "Samudhaya Ashtakavarga charts." },
@@ -586,14 +585,8 @@ export default function App() {
       submenus: [
         { id: "current_gochara", label: "Current Gochara", description: "Live celestial positions." },
         { id: "planet_ingress", label: "Planet Ingress", description: "Upcoming sign-change transits." },
-        { id: "transit_summary", label: "Transit Summary", description: "Astrological transit interpretation." }
-      ]
-    },
-    {
-      id: "muhurta",
-      label: "Muhurta",
-      icon: Calendar,
-      submenus: [
+        { id: "transit_summary", label: "Transit Summary", description: "Astrological transit interpretation." },
+        { id: "panchanga", label: "Panchanga", description: "Tithi, Vara, Nakshatra, Yoga, and Karana." },
         { id: "daily_muhurta", label: "Daily Muhurta", description: "Auspicious times (Choghadiya/Abhijit)." },
         { id: "event_muhurta", label: "Event Muhurta", description: "Custom electional windows." }
       ]
@@ -657,6 +650,32 @@ export default function App() {
 
   const handleSubmenuSelect = (submenuId: string) => {
     setActiveSubMenu(prev => ({ ...prev, [activeMenu]: submenuId }));
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleDashboardTabNavigation = (tab: string) => {
+    if (tab === "panchanga") {
+      setActiveMenu("transit");
+      setActiveSubMenu(prev => ({ ...prev, transit: "panchanga" }));
+    } else if (tab === "transits") {
+      setActiveMenu("transit");
+      setActiveSubMenu(prev => ({ ...prev, transit: "current_gochara" }));
+    } else if (tab === "ingress") {
+      setActiveMenu("transit");
+      setActiveSubMenu(prev => ({ ...prev, transit: "planet_ingress" }));
+    } else {
+      setActiveMenu("horoscope");
+      const subId = 
+        tab === "dashboard" ? "overview" :
+        tab === "grahas" ? "planetary_positions" :
+        tab === "strengths" ? "planet_strength" :
+        tab === "ashtakavarga" ? "ashtakavarga" :
+        tab === "yogas" ? "yogas" :
+        tab === "saham" ? "sahams" :
+        tab === "dashas" ? "vimshottari" :
+        "overview";
+      setActiveSubMenu(prev => ({ ...prev, horoscope: subId }));
+    }
     setIsMobileMenuOpen(false);
   };
 
@@ -1578,17 +1597,7 @@ export default function App() {
                       activeSubmenuId === "vimshottari" || activeSubmenuId === "yogini" || activeSubmenuId === "ashtottari" ? "dashas" :
                       "dashboard"
                     }
-                    setActiveSubTab={(tab) => handleSubmenuSelect(
-                      tab === "dashboard" ? "overview" :
-                      tab === "grahas" ? "planetary_positions" :
-                      tab === "panchanga" ? "panchanga" :
-                      tab === "strengths" ? "planet_strength" :
-                      tab === "ashtakavarga" ? "ashtakavarga" :
-                      tab === "yogas" ? "yogas" :
-                      tab === "saham" ? "sahams" :
-                      tab === "dashas" ? "vimshottari" :
-                      "overview"
-                    )}
+                    setActiveSubTab={handleDashboardTabNavigation}
                     selectedVarga={selectedVarga}
                     setSelectedVarga={setSelectedVarga}
                     selectedBavPlanet={selectedBavPlanet}
@@ -1636,96 +1645,103 @@ export default function App() {
                 exit={{ opacity: 0, y: -5 }}
                 className="space-y-6"
               >
-                {activeSubmenuId === "current_gochara" && astrologyData ? (
-                  <TransitsTab astrologyData={astrologyData} />
-                ) : activeSubmenuId === "planet_ingress" && astrologyData ? (
-                  <IngressTab birthDate={astrologyData.birthDetails.date} />
-                ) : (
-                  <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                      <RefreshCw className="w-5 h-5 text-amber-500" />
-                      Planetary Transit Interpretations
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1 mb-6">
-                      Evaluating continuous celestial transitions mapped relative to birth parameters.
-                    </p>
-
-                    <div className={`p-4 rounded-xl border ${cardStyle} space-y-4`}>
-                      <h4 className="text-xs font-bold font-mono text-slate-300 uppercase">Transit Synthesis</h4>
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        Saturn's transit represents heavy growth opportunities. Jupiter transit highlights expansion. Transits calculate using real-time ephemeris coordinates from Google Cloud JHora server.
-                      </p>
+                {activeSubmenuId === "current_gochara" ? (
+                  astrologyData ? (
+                    <TransitsTab astrologyData={astrologyData} />
+                  ) : (
+                    <div className="text-center py-12">
+                      Please cast a horoscope first to view this page.
                     </div>
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          ) : activeMenu === "muhurta" ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSubmenuId}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="space-y-6"
-              >
-                {activeSubmenuId === "daily_muhurta" && astrologyData ? (
-                  /* Daily solar timings */
-                  <div className={`p-6 rounded-2xl border ${containerStyle}`} id="muhurtas-tab">
-                    <div>
-                      <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                        <Clock className="w-5 h-5 text-amber-500" />
-                        Daily Solar Muhurtas (Choghadiya)
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-1 mb-6">
-                        Calculated based on local solar sunrise coordinates for the Cast date.
-                      </p>
+                  )
+                ) : activeSubmenuId === "planet_ingress" ? (
+                  astrologyData ? (
+                    <IngressTab birthDate={astrologyData.birthDetails.date} />
+                  ) : (
+                    <div className="text-center py-12">
+                      Please cast a horoscope first to view this page.
                     </div>
+                  )
+                ) : activeSubmenuId === "panchanga" ? (
+                  astrologyData ? (
+                    <HoroscopeDashboard
+                      astrologyData={astrologyData}
+                      activeSubTab="panchanga"
+                      setActiveSubTab={handleDashboardTabNavigation}
+                      selectedVarga={selectedVarga}
+                      setSelectedVarga={setSelectedVarga}
+                      selectedBavPlanet={selectedBavPlanet}
+                      setSelectedBavPlanet={setSelectedBavPlanet}
+                      activeDashaSystem={activeDashaSystem}
+                      setActiveDashaSystem={setActiveDashaSystem}
+                    />
+                  ) : (
+                    <div className="text-center py-12">
+                      Please cast a horoscope first to view this page.
+                    </div>
+                  )
+                ) : activeSubmenuId === "daily_muhurta" ? (
+                  astrologyData ? (
+                    /* Daily solar timings */
+                    <div className={`p-6 rounded-2xl border ${containerStyle}`} id="muhurtas-tab">
+                      <div>
+                        <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
+                          <Clock className="w-5 h-5 text-amber-500" />
+                          Daily Solar Muhurtas (Choghadiya)
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-1 mb-6">
+                          Calculated based on local solar sunrise coordinates for the Cast date.
+                        </p>
+                      </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {astrologyData.muhurtas.map((m) => (
-                        <div
-                          key={m.name}
-                          className={`p-4 rounded-xl border flex flex-col justify-between h-32 ${
-                            m.isAuspicious
-                              ? m.name === "Abhijit Muhurta" || m.name === "Brahma Muhurta"
-                                ? "bg-amber-500/10 border-amber-500/40"
-                                : "bg-green-500/5 border-green-500/20"
-                              : "bg-rose-500/5 border-rose-500/20 opacity-75"
-                          }`}
-                        >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h4 className="text-xs font-bold text-white">{m.name}</h4>
-                              <span className="text-[10px] text-slate-400 block font-mono mt-0.5">
-                                {m.startTime} to {m.endTime}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {astrologyData.muhurtas.map((m) => (
+                          <div
+                            key={m.name}
+                            className={`p-4 rounded-xl border flex flex-col justify-between h-32 ${
+                              m.isAuspicious
+                                ? m.name === "Abhijit Muhurta" || m.name === "Brahma Muhurta"
+                                  ? "bg-amber-500/10 border-amber-500/40"
+                                  : "bg-green-500/5 border-green-500/20"
+                                : "bg-rose-500/5 border-rose-500/20 opacity-75"
+                            }`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="text-xs font-bold text-white">{m.name}</h4>
+                                <span className="text-[10px] text-slate-400 block font-mono mt-0.5">
+                                  {m.startTime} to {m.endTime}
+                                </span>
+                              </div>
+                              <span className={`text-[8px] uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
+                                m.isAuspicious ? "bg-green-500/20 text-green-400" : "bg-rose-500/20 text-rose-400"
+                              }`}>
+                                {m.isAuspicious ? "Auspicious" : "Avoid"}
                               </span>
                             </div>
-                            <span className={`text-[8px] uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
-                              m.isAuspicious ? "bg-green-500/20 text-green-400" : "bg-rose-500/20 text-rose-400"
-                            }`}>
-                              {m.isAuspicious ? "Auspicious" : "Avoid"}
-                            </span>
-                          </div>
 
-                          <div className="flex justify-between items-center mt-3 pt-2 border-t border-indigo-500/5">
-                            <span className="text-[9px] text-slate-400">Cosmic Rating:</span>
-                            <div className="flex gap-0.5">
-                              {Array.from({ length: 5 }).map((_, idx) => (
-                                <span
-                                  key={idx}
-                                  className={`w-1.5 h-1.5 rounded-full ${
-                                    idx < m.score ? (m.isAuspicious ? "bg-amber-400" : "bg-rose-400") : "bg-slate-800"
-                                  }`}
-                                />
-                              ))}
+                            <div className="flex justify-between items-center mt-3 pt-2 border-t border-indigo-500/5">
+                              <span className="text-[9px] text-slate-400">Cosmic Rating:</span>
+                              <div className="flex gap-0.5">
+                                {Array.from({ length: 5 }).map((_, idx) => (
+                                  <span
+                                    key={idx}
+                                    className={`w-1.5 h-1.5 rounded-full ${
+                                      idx < m.score ? (m.isAuspicious ? "bg-amber-400" : "bg-rose-400") : "bg-slate-800"
+                                    }`}
+                                  />
+                                ))}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : (
+                  ) : (
+                    <div className="text-center py-12">
+                      Please cast a horoscope first to view this page.
+                    </div>
+                  )
+                ) : activeSubmenuId === "event_muhurta" ? (
                   /* Custom event electional Muhurta placeholder */
                   <div className={`p-6 rounded-2xl border ${containerStyle}`}>
                     <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
@@ -1754,6 +1770,23 @@ export default function App() {
                           </button>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`p-6 rounded-2xl border ${containerStyle}`}>
+                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
+                      <RefreshCw className="w-5 h-5 text-amber-500" />
+                      Planetary Transit Interpretations
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1 mb-6">
+                      Evaluating continuous celestial transitions mapped relative to birth parameters.
+                    </p>
+
+                    <div className={`p-4 rounded-xl border ${cardStyle} space-y-4`}>
+                      <h4 className="text-xs font-bold font-mono text-slate-300 uppercase">Transit Synthesis</h4>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        Saturn's transit represents heavy growth opportunities. Jupiter transit highlights expansion. Transits calculate using real-time ephemeris coordinates from Google Cloud JHora server.
+                      </p>
                     </div>
                   </div>
                 )}
