@@ -45,7 +45,7 @@ import ApiAcceptanceDashboard from "./components/ApiAcceptanceDashboard";
 export default function App() {
   // Input form state with authentic default values (New Delhi, India)
   const [inputs, setInputs] = useState({
-    name: "Aravind Kumar",
+    name: "",
     date: "1995-10-15",
     time: "08:30",
     location: "New Delhi, India",
