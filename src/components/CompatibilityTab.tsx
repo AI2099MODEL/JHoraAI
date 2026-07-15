@@ -3,15 +3,33 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Heart, ShieldCheck, Sparkles, AlertCircle, RefreshCw } from "lucide-react";
-import { calculateCompatibility, CompatibilityResult } from "../lib/astrology";
+import { calculateCompatibility, CompatibilityResult, AstrologyData } from "../lib/astrology";
 
-export default function CompatibilityTab() {
+interface CompatibilityTabProps {
+  astrologyData?: AstrologyData | null;
+}
+
+export default function CompatibilityTab({ astrologyData }: CompatibilityTabProps) {
   const [person1, setPerson1] = useState({ name: "Partner A", signIndex: 0, longitude: 10 });
   const [person2, setPerson2] = useState({ name: "Partner B", signIndex: 6, longitude: 190 });
   const [result, setResult] = useState<CompatibilityResult | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Synchronize Person 1 from astrologyData if present
+  useEffect(() => {
+    if (astrologyData) {
+      const moon = astrologyData.planets.find(p => p.name === "Moon");
+      if (moon) {
+        setPerson1({
+          name: astrologyData.birthDetails.name || "Partner A",
+          signIndex: moon.signIndex,
+          longitude: Number(moon.longitude.toFixed(2))
+        });
+      }
+    }
+  }, [astrologyData]);
 
   // Zodiac Signs
   const zodiacSigns = [

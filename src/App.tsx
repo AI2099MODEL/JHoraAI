@@ -258,10 +258,44 @@ export default function App() {
 
   const handleCalculate = async (isInitial = false) => {
     setLoading(true);
-    // Simulate slight celestial calculation delay
-    setTimeout(async () => {
-      try {
-        const result = calculateAstrology(
+    try {
+      let result: AstrologyData;
+      if (navigator.onLine) {
+        try {
+          const response = await fetch("/api/astrology/calculate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: inputs.name,
+              date: inputs.date,
+              time: inputs.time,
+              location: inputs.location,
+              latitude: Number(inputs.latitude),
+              longitude: Number(inputs.longitude),
+              timezone: Number(inputs.timezone),
+            }),
+          });
+          
+          if (!response.ok) {
+            throw new Error(`API error: ${response.statusText}`);
+          }
+          result = await response.json();
+        } catch (apiErr) {
+          console.warn("API calculation failed, falling back to local calculation:", apiErr);
+          result = calculateAstrology(
+            inputs.name,
+            inputs.date,
+            inputs.time,
+            inputs.location,
+            Number(inputs.latitude),
+            Number(inputs.longitude),
+            Number(inputs.timezone)
+          );
+        }
+      } else {
+        result = calculateAstrology(
           inputs.name,
           inputs.date,
           inputs.time,
@@ -270,36 +304,37 @@ export default function App() {
           Number(inputs.longitude),
           Number(inputs.timezone)
         );
-        setAstrologyData(result);
-        localStorage.setItem("jhora_astrology_data", JSON.stringify(result));
-        
-        // Save to IndexedDB Offline Caching Layer
-        try {
-          await saveCachedHoroscope(
-            inputs.name,
-            inputs.date,
-            inputs.time,
-            inputs.location,
-            Number(inputs.latitude),
-            Number(inputs.longitude),
-            Number(inputs.timezone),
-            result
-          );
-          // Refresh list
-          await loadCacheHistory();
-        } catch (dbErr) {
-          console.error("IndexedDB cache save failed:", dbErr);
-        }
-
-        if (!isInitial) {
-          setActiveTab("dashboard");
-        }
-      } catch (error) {
-        console.error("Calculation failed:", error);
-      } finally {
-        setLoading(false);
       }
-    }, 800);
+
+      setAstrologyData(result);
+      localStorage.setItem("jhora_astrology_data", JSON.stringify(result));
+      
+      // Save to IndexedDB Offline Caching Layer
+      try {
+        await saveCachedHoroscope(
+          inputs.name,
+          inputs.date,
+          inputs.time,
+          inputs.location,
+          Number(inputs.latitude),
+          Number(inputs.longitude),
+          Number(inputs.timezone),
+          result
+        );
+        // Refresh list
+        await loadCacheHistory();
+      } catch (dbErr) {
+        console.error("IndexedDB cache save failed:", dbErr);
+      }
+
+      if (!isInitial) {
+        setActiveTab("dashboard");
+      }
+    } catch (error) {
+      console.error("Calculation failed:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLoadCachedRecord = (record: CachedHoroscopeRecord) => {
@@ -1022,7 +1057,7 @@ export default function App() {
 
                   {/* Compatibility Milan */}
                   {activeTab === "compatibility" && (
-                    <CompatibilityTab />
+                    <CompatibilityTab astrologyData={astrologyData} />
                   )}
 
                   {/* Daily Muhurtas */}
