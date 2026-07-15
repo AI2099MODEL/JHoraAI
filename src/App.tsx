@@ -541,14 +541,9 @@ export default function App() {
         { id: "yogini", label: "Yogini Dasha", description: "36-year cycle." },
         { id: "ashtottari", label: "Ashtottari Dasha", description: "108-year cycle." },
         { id: "longevity", label: "Longevity", description: "Traditional life span calculations." },
-        { id: "sade_sati", label: "Sade Sati", description: "Saturn transit timeline cycles." }
-      ]
-    },
-    {
-      id: "charts",
-      label: "Charts",
-      icon: Layers,
-      submenus: [
+        { id: "sade_sati", label: "Sade Sati", description: "Saturn transit timeline cycles." },
+
+        // Divisional Charts
         { id: "d1_rasi", label: "D1 Rasi", description: "General birth chart." },
         { id: "d2_hora", label: "D2 Hora", description: "Wealth, assets, and money." },
         { id: "d3_drekkana", label: "D3 Drekkana", description: "Siblings, skills, and values." },
@@ -564,16 +559,9 @@ export default function App() {
         { id: "d30_trimsamsa", label: "D30 Trimsamsa", description: "Misfortunes, evils, and health." },
         { id: "d40_khavedamsa", label: "D40 Khavedamsa", description: "Auspicious alignments." },
         { id: "d45_akshavedamsa", label: "D45 Akshavedamsa", description: "General fortune." },
-        { id: "d60_shastiamsa", label: "D60 Shastiamsa", description: "Past life karmic balances." }
-      ]
-    },
-    {
-      id: "predictions",
-      label: "Predictions",
-      icon: Award,
-      submenus: [
-        { id: "yogas", label: "Yogas", description: "Natal alignments and effects." },
-        { id: "doshas", label: "Doshas", description: "Planetary afflictions." },
+        { id: "d60_shastiamsa", label: "D60 Shastiamsa", description: "Past life karmic balances." },
+
+        // Predictions
         { id: "arudhas", label: "Arudhas", description: "Image and projection reflections." },
         { id: "sphutas", label: "Sphutas", description: "Highly sensitive coordinate points." },
         { id: "upagrahas", label: "Upagrahas", description: "Shadow planets calculations." },
@@ -1480,155 +1468,64 @@ export default function App() {
                       </div>
                     )}
                   </div>
-                ) : astrologyData ? (
-                  /* Existing fully-working dashboard bindings */
-                  <HoroscopeDashboard
-                    astrologyData={astrologyData}
-                    activeSubTab={
-                      activeSubmenuId === "overview" ? "dashboard" :
-                      activeSubmenuId === "planetary_positions" ? "grahas" :
-                      activeSubmenuId === "panchanga" ? "panchanga" :
-                      activeSubmenuId === "planet_strength" ? "strengths" :
-                      activeSubmenuId === "bhava_strength" ? "strengths" :
-                      activeSubmenuId === "ashtakavarga" ? "ashtakavarga" :
-                      activeSubmenuId === "yogas" ? "yogas" :
-                      activeSubmenuId === "doshas" ? "dashboard" :
-                      activeSubmenuId === "vimshottari" || activeSubmenuId === "yogini" || activeSubmenuId === "ashtottari" ? "dashas" :
-                      "dashboard"
-                    }
-                    setActiveSubTab={(tab) => handleSubmenuSelect(
-                      tab === "dashboard" ? "overview" :
-                      tab === "grahas" ? "planetary_positions" :
-                      tab === "panchanga" ? "panchanga" :
-                      tab === "strengths" ? "planet_strength" :
-                      tab === "ashtakavarga" ? "ashtakavarga" :
-                      tab === "yogas" ? "yogas" :
-                      tab === "dashas" ? "vimshottari" :
-                      "overview"
-                    )}
-                    selectedVarga={selectedVarga}
-                    setSelectedVarga={setSelectedVarga}
-                    selectedBavPlanet={selectedBavPlanet}
-                    setSelectedBavPlanet={setSelectedBavPlanet}
-                    activeDashaSystem={
-                      activeSubmenuId === "vimshottari" ? "vimshottari" :
-                      activeSubmenuId === "yogini" ? "yogini" :
-                      activeSubmenuId === "ashtottari" ? "ashtottari" :
-                      activeDashaSystem
-                    }
-                    setActiveDashaSystem={(system) => {
-                      setActiveDashaSystem(system);
-                      handleSubmenuSelect(system);
-                    }}
-                  />
-                ) : (
-                  <div className="text-center py-12">
-                    Please cast a horoscope first to view this page.
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          ) : activeMenu === "charts" ? (
-            /* Charts Tab linking active varga divisions seamlessly */
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSubmenuId}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="space-y-6"
-              >
-                {astrologyData ? (
-                  <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                    <div className="border-b border-indigo-500/10 pb-4 mb-6">
-                      <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                        <Layers className="w-5 h-5 text-amber-500" />
-                        Divisional Vargas Wheel
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-1">
-                        Viewing high-fidelity wheel projections for <strong>{activeSubmenus.find(s => s.id === activeSubmenuId)?.label || activeSubmenuId}</strong>.
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                      <div className="md:col-span-8 flex items-center justify-center border border-indigo-500/10 p-4 rounded-xl bg-slate-950/30">
-                        <div className="w-full">
-                          <AstroChart
-                            rasiChart={
-                              activeSubmenuId === "d9_navamsa" 
-                                ? astrologyData.divisionalCharts["D-9_navamsa"]?.housePlacements || {}
-                                : astrologyData.divisionalCharts["D-1_rasi"]?.housePlacements || {}
-                            }
-                            navamsaChart={astrologyData.divisionalCharts["D-9_navamsa"]?.housePlacements || {}}
-                            lagnaSignIndex={astrologyData.lagna.signIndex}
-                            lagnaSignName={astrologyData.lagna.sign}
-                          />
-                        </div>
+                ) : activeSubmenuId.startsWith("d") ? (
+                  /* DIVISIONAL VARGAS WHEEL (Moved from Charts) */
+                  astrologyData ? (
+                    <div className={`p-6 rounded-2xl border ${containerStyle}`}>
+                      <div className="border-b border-indigo-500/10 pb-4 mb-6">
+                        <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
+                          <Layers className="w-5 h-5 text-amber-500" />
+                          Divisional Vargas Wheel
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Viewing high-fidelity wheel projections for <strong>{activeSubmenus.find(s => s.id === activeSubmenuId)?.label || activeSubmenuId}</strong>.
+                        </p>
                       </div>
 
-                      <div className="md:col-span-4 space-y-4">
-                        <div className={`p-4 rounded-xl border ${cardStyle}`}>
-                          <h4 className="text-xs font-bold font-mono text-slate-300 uppercase mb-2">Varga Interpretation</h4>
-                          <p className="text-xs text-slate-400 leading-relaxed">
-                            {activeSubmenuId === "d1_rasi" ? "Representing general physical body characteristics, overall health and native fortune." :
-                             activeSubmenuId === "d9_navamsa" ? "Deep subconscious potential, marriage luck, and spiritual destination path." :
-                             "Displaying structural divisions mapped from JHora response payload."}
-                          </p>
-                        </div>
-
-                        {provenanceEnabled && (
-                          <div className={`p-4 rounded-xl border ${cardStyle} font-mono text-[10px] space-y-1`}>
-                            <span className="text-slate-500 uppercase block">INTEGRITY META</span>
-                            <div>PATH: $.divisional_charts.{activeSubmenuId}</div>
-                            <div>SOURCE: SOURCE_A</div>
-                            <div>CONFIDENCE: AUTHORITATIVE</div>
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                        <div className="md:col-span-8 flex items-center justify-center border border-indigo-500/10 p-4 rounded-xl bg-slate-950/30">
+                          <div className="w-full">
+                            <AstroChart
+                              rasiChart={
+                                activeSubmenuId === "d9_navamsa" 
+                                  ? astrologyData.divisionalCharts["D-9_navamsa"]?.housePlacements || {}
+                                  : astrologyData.divisionalCharts["D-1_rasi"]?.housePlacements || {}
+                              }
+                              navamsaChart={astrologyData.divisionalCharts["D-9_navamsa"]?.housePlacements || {}}
+                              lagnaSignIndex={astrologyData.lagna.signIndex}
+                              lagnaSignName={astrologyData.lagna.sign}
+                            />
                           </div>
-                        )}
+                        </div>
+
+                        <div className="md:col-span-4 space-y-4">
+                          <div className={`p-4 rounded-xl border ${cardStyle}`}>
+                            <h4 className="text-xs font-bold font-mono text-slate-300 uppercase mb-2">Varga Interpretation</h4>
+                            <p className="text-xs text-slate-400 leading-relaxed">
+                              {activeSubmenuId === "d1_rasi" ? "Representing general physical body characteristics, overall health and native fortune." :
+                               activeSubmenuId === "d9_navamsa" ? "Deep subconscious potential, marriage luck, and spiritual destination path." :
+                               "Displaying structural divisions mapped from JHora response payload."}
+                            </p>
+                          </div>
+
+                          {provenanceEnabled && (
+                            <div className={`p-4 rounded-xl border ${cardStyle} font-mono text-[10px] space-y-1`}>
+                              <span className="text-slate-500 uppercase block">INTEGRITY META</span>
+                              <div>PATH: $.divisional_charts.{activeSubmenuId}</div>
+                              <div>SOURCE: SOURCE_A</div>
+                              <div>CONFIDENCE: AUTHORITATIVE</div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    Calculation needed.
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          ) : activeMenu === "predictions" ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSubmenuId}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="space-y-6"
-              >
-                {activeSubmenuId === "yogas" && astrologyData ? (
-                  <HoroscopeDashboard
-                    astrologyData={astrologyData}
-                    activeSubTab="yogas"
-                    setActiveSubTab={() => {}}
-                    selectedVarga={selectedVarga}
-                    setSelectedVarga={setSelectedVarga}
-                    selectedBavPlanet={selectedBavPlanet}
-                    setSelectedBavPlanet={setSelectedBavPlanet}
-                    activeDashaSystem={activeDashaSystem}
-                    setActiveDashaSystem={setActiveDashaSystem}
-                  />
-                ) : activeSubmenuId === "sahams" && astrologyData ? (
-                  <HoroscopeDashboard
-                    astrologyData={astrologyData}
-                    activeSubTab="saham"
-                    setActiveSubTab={() => {}}
-                    selectedVarga={selectedVarga}
-                    setSelectedVarga={setSelectedVarga}
-                    selectedBavPlanet={selectedBavPlanet}
-                    setSelectedBavPlanet={setSelectedBavPlanet}
-                    activeDashaSystem={activeDashaSystem}
-                    setActiveDashaSystem={setActiveDashaSystem}
-                  />
-                ) : (
-                  /* Standard predictive placeholders */
+                  ) : (
+                    <div className="text-center py-12">
+                      Please cast a horoscope first to view this page.
+                    </div>
+                  )
+                ) : ["arudhas", "sphutas", "upagrahas", "special_lagnas"].includes(activeSubmenuId) ? (
+                  /* Standard predictive placeholders (Moved from Predictions) */
                   <div className={`p-6 rounded-2xl border ${containerStyle}`}>
                     <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
                       <Award className="w-5 h-5 text-amber-500" />
@@ -1663,6 +1560,53 @@ export default function App() {
                         <span className="text-[9px] font-mono text-indigo-400 uppercase mt-4">API STATUS: IMMUTABLE REFERENCE</span>
                       </div>
                     </div>
+                  </div>
+                ) : astrologyData ? (
+                  /* Existing fully-working dashboard bindings with integrated Saham and Predictions */
+                  <HoroscopeDashboard
+                    astrologyData={astrologyData}
+                    activeSubTab={
+                      activeSubmenuId === "overview" ? "dashboard" :
+                      activeSubmenuId === "planetary_positions" ? "grahas" :
+                      activeSubmenuId === "panchanga" ? "panchanga" :
+                      activeSubmenuId === "planet_strength" ? "strengths" :
+                      activeSubmenuId === "bhava_strength" ? "strengths" :
+                      activeSubmenuId === "ashtakavarga" ? "ashtakavarga" :
+                      activeSubmenuId === "yogas" ? "yogas" :
+                      activeSubmenuId === "sahams" ? "saham" :
+                      activeSubmenuId === "doshas" ? "dashboard" :
+                      activeSubmenuId === "vimshottari" || activeSubmenuId === "yogini" || activeSubmenuId === "ashtottari" ? "dashas" :
+                      "dashboard"
+                    }
+                    setActiveSubTab={(tab) => handleSubmenuSelect(
+                      tab === "dashboard" ? "overview" :
+                      tab === "grahas" ? "planetary_positions" :
+                      tab === "panchanga" ? "panchanga" :
+                      tab === "strengths" ? "planet_strength" :
+                      tab === "ashtakavarga" ? "ashtakavarga" :
+                      tab === "yogas" ? "yogas" :
+                      tab === "saham" ? "sahams" :
+                      tab === "dashas" ? "vimshottari" :
+                      "overview"
+                    )}
+                    selectedVarga={selectedVarga}
+                    setSelectedVarga={setSelectedVarga}
+                    selectedBavPlanet={selectedBavPlanet}
+                    setSelectedBavPlanet={setSelectedBavPlanet}
+                    activeDashaSystem={
+                      activeSubmenuId === "vimshottari" ? "vimshottari" :
+                      activeSubmenuId === "yogini" ? "yogini" :
+                      activeSubmenuId === "ashtottari" ? "ashtottari" :
+                      activeDashaSystem
+                    }
+                    setActiveDashaSystem={(system) => {
+                      setActiveDashaSystem(system);
+                      handleSubmenuSelect(system);
+                    }}
+                  />
+                ) : (
+                  <div className="text-center py-12">
+                    Please cast a horoscope first to view this page.
                   </div>
                 )}
               </motion.div>
