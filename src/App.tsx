@@ -865,10 +865,14 @@ export default function App() {
 
         {/* RESPONSIVE SUBMENU DRAWER (Second Column) */}
         {activeSubmenus.length > 0 && (
-          <aside className={`transition-all duration-300 shrink-0 select-none ${
-            drawerExpanded ? "w-[240px] block" : "hidden"
-          } ${isMobileMenuOpen ? "fixed inset-y-0 left-[64px] z-50 w-64 block" : "hidden md:block"} ${
+          <aside className={`transition-all duration-300 shrink-0 select-none border-r ${
             isDark ? "bg-slate-900/60 border-r border-indigo-500/15" : "bg-neutral-50/95 border-r border-neutral-200"
+          } ${
+            isMobileMenuOpen 
+              ? "fixed inset-y-0 left-[64px] z-50 w-64 block md:relative md:inset-auto md:left-auto md:z-auto md:w-[240px] md:block" 
+              : "hidden md:block md:relative md:w-[240px]"
+          } ${
+            !drawerExpanded ? "md:hidden md:w-0 overflow-hidden" : ""
           }`} id="submenu-drawer-container">
             
             <div className="p-4 border-b border-indigo-500/10 flex items-center justify-between">
