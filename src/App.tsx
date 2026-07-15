@@ -513,8 +513,8 @@ export default function App() {
       }
       return p;
     }));
-    setActiveMenu("developer");
-    setActiveSubMenu(prev => ({ ...prev, developer: "plugin_manager" }));
+    setActiveMenu("settings");
+    setActiveSubMenu(prev => ({ ...prev, settings: "plugin_manager" }));
   };
 
   const isDark = theme === "dark";
@@ -610,14 +610,7 @@ export default function App() {
         { id: "ayanamsa", label: "Ayanamsa", description: "Select precession correction systems." },
         { id: "chart_style", label: "Chart Style", description: "Choose North vs South Indian charts." },
         { id: "notification", label: "Notification", description: "Ingress alert options." },
-        { id: "github_updates", label: "GitHub Updates", description: "System version history." }
-      ]
-    },
-    {
-      id: "developer",
-      label: "Developer",
-      icon: Terminal,
-      submenus: [
+        { id: "github_updates", label: "GitHub Updates", description: "System version history." },
         { id: "raw_json", label: "Raw JSON", description: "JHora API Response payload." },
         { id: "api_inspector", label: "API Inspector", description: "Response headers and latencies." },
         { id: "request_log", label: "Request Log", description: "Outgoing request archives." },
@@ -1899,119 +1892,120 @@ export default function App() {
                 exit={{ opacity: 0, y: -5 }}
                 className="space-y-6"
               >
-                <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                  <div className="border-b border-indigo-500/10 pb-4">
-                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                      <SettingsIcon className="w-5 h-5 text-amber-500" />
-                      Platform Settings (Material 3)
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Configure planetary coordinates systems, precession formulas, and visual themes.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Ayanamsa (Precession Formula)</label>
-                        <select
-                          value={ayanamsa}
-                          onChange={(e) => setAyanamsa(e.target.value)}
-                          className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                            isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                          }`}
-                        >
-                          <option>Lahiri (Chitra Paksha) - JHora Default</option>
-                          <option>Raman (Suryasiddhanta)</option>
-                          <option>Krishnamurti (KP System)</option>
-                          <option>Fagan-Bradley (Western Sidereal)</option>
-                          <option>Yukteshwar</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Chart Drawing Style</label>
-                        <div className="flex gap-2">
-                          {["north", "south"].map((style) => (
-                            <button
-                              key={style}
-                              onClick={() => setChartStyle(style as any)}
-                              className={`flex-1 py-2 rounded-lg border text-xs font-semibold capitalize transition-all cursor-pointer ${
-                                chartStyle === style
-                                  ? "bg-amber-500/10 text-amber-500 border-amber-500/35"
-                                  : isDark
-                                    ? "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
-                                    : "bg-white border-neutral-300 text-neutral-600 hover:bg-neutral-100"
-                              }`}
-                            >
-                              {style} Indian
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Language Translator</label>
-                        <select
-                          value={selectedLanguage}
-                          onChange={(e) => setSelectedLanguage(e.target.value)}
-                          className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                            isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                          }`}
-                        >
-                          <option>English</option>
-                          <option>Hindi (हिन्दी)</option>
-                          <option>Sanskrit (संस्कृतम्)</option>
-                          <option>Tamil (தமிழ்)</option>
-                          <option>Telugu (తెలుగు)</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Ingress Notification Alerts</label>
-                        <div className="flex items-center justify-between p-2 rounded-lg border border-indigo-500/5 bg-slate-950/20">
-                          <span className="text-xs text-slate-400">Push notification on major ingress</span>
-                          <input
-                            type="checkbox"
-                            checked={notificationsActive}
-                            onChange={(e) => setNotificationsActive(e.target.checked)}
-                            className="w-4 h-4 cursor-pointer text-amber-500 focus:ring-amber-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          ) : activeMenu === "developer" ? (
-            /* Custom developer diagnostics screens */
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSubmenuId}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="space-y-6"
-              >
-                {activeSubmenuId === "plugin_manager" ? (
-                  <PluginManager
-                    plugins={plugins}
-                    onTogglePlugin={handleTogglePlugin}
-                    onResetPlugins={handleResetPlugins}
-                    isDarkTheme={isDark}
-                  />
+                {[
+                  "raw_json",
+                  "api_inspector",
+                  "request_log",
+                  "response_log",
+                  "dto_viewer",
+                  "room_database_viewer",
+                  "plugin_manager",
+                  "performance",
+                  "cache_manager"
+                ].includes(activeSubmenuId) ? (
+                  activeSubmenuId === "plugin_manager" ? (
+                    <PluginManager
+                      plugins={plugins}
+                      onTogglePlugin={handleTogglePlugin}
+                      onResetPlugins={handleResetPlugins}
+                      isDarkTheme={isDark}
+                    />
+                  ) : (
+                    <ApiAcceptanceDashboard 
+                      focusSection={
+                        activeSubmenuId === "raw_json" ? "raw_json" :
+                        activeSubmenuId === "api_inspector" ? "metrics" :
+                        activeSubmenuId === "room_database_viewer" ? "cache" :
+                        "audit"
+                      }
+                    />
+                  )
                 ) : (
-                  <ApiAcceptanceDashboard 
-                    focusSection={
-                      activeSubmenuId === "raw_json" ? "raw_json" :
-                      activeSubmenuId === "api_inspector" ? "metrics" :
-                      activeSubmenuId === "room_database_viewer" ? "cache" :
-                      "audit"
-                    }
-                  />
+                  <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
+                    <div className="border-b border-indigo-500/10 pb-4">
+                      <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
+                        <SettingsIcon className="w-5 h-5 text-amber-500" />
+                        Platform Settings (Material 3)
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Configure planetary coordinates systems, precession formulas, and visual themes.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Ayanamsa (Precession Formula)</label>
+                          <select
+                            value={ayanamsa}
+                            onChange={(e) => setAyanamsa(e.target.value)}
+                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                              isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
+                            }`}
+                          >
+                            <option>Lahiri (Chitra Paksha) - JHora Default</option>
+                            <option>Raman (Suryasiddhanta)</option>
+                            <option>Krishnamurti (KP System)</option>
+                            <option>Fagan-Bradley (Western Sidereal)</option>
+                            <option>Yukteshwar</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Chart Drawing Style</label>
+                          <div className="flex gap-2">
+                            {["north", "south"].map((style) => (
+                              <button
+                                key={style}
+                                onClick={() => setChartStyle(style as any)}
+                                className={`flex-1 py-2 rounded-lg border text-xs font-semibold capitalize transition-all cursor-pointer ${
+                                  chartStyle === style
+                                    ? "bg-amber-500/10 text-amber-500 border-amber-500/35"
+                                    : isDark
+                                      ? "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
+                                      : "bg-white border-neutral-300 text-neutral-600 hover:bg-neutral-100"
+                                }`}
+                              >
+                                {style} Indian
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Language Translator</label>
+                          <select
+                            value={selectedLanguage}
+                            onChange={(e) => setSelectedLanguage(e.target.value)}
+                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                              isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
+                            }`}
+                          >
+                            <option>English</option>
+                            <option>Hindi (हिन्दी)</option>
+                            <option>Sanskrit (संस्कृतम्)</option>
+                            <option>Tamil (தமிழ்)</option>
+                            <option>Telugu (తెలుగు)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Ingress Notification Alerts</label>
+                          <div className="flex items-center justify-between p-2 rounded-lg border border-indigo-500/5 bg-slate-950/20">
+                            <span className="text-xs text-slate-400">Push notification on major ingress</span>
+                            <input
+                              type="checkbox"
+                              checked={notificationsActive}
+                              onChange={(e) => setNotificationsActive(e.target.checked)}
+                              className="w-4 h-4 cursor-pointer text-amber-500 focus:ring-amber-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </motion.div>
             </AnimatePresence>
