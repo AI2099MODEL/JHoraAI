@@ -312,15 +312,16 @@ app.post("/api/astrology/calculate", (req, res) => {
   try {
     const { name, date, time, location, latitude, longitude, timezone } = req.body;
     
-    if (!name || !date || !time) {
-      return res.status(400).json({ error: "Name, date, and time are required." });
+    if (!date || !time) {
+      return res.status(400).json({ error: "Date and time are required." });
     }
 
+    const calcName = (name && name.trim()) || "Native";
     const lat = latitude !== undefined ? Number(latitude) : 28.6139;
     const lng = longitude !== undefined ? Number(longitude) : 77.2090;
     const tz = timezone !== undefined ? Number(timezone) : 5.5;
 
-    const result = calculateAstrology(name, date, time, location || "New Delhi", lat, lng, tz);
+    const result = calculateAstrology(calcName, date, time, location || "New Delhi", lat, lng, tz);
     res.json(result);
   } catch (error: any) {
     console.error("Calculate API error:", error);

@@ -160,73 +160,73 @@ export default function AstroChart({
                 <text x="200" y="105" textAnchor="middle" className="fill-amber-500 font-semibold text-[11px]">{getSignForHouse(1)}</text>
                 <text x="200" y="65" textAnchor="middle" className="fill-indigo-300 font-medium text-[10px] uppercase font-sans">Lagna</text>
                 <text x="200" y="130" textAnchor="middle" className="fill-white font-semibold text-[13px] tracking-wide">
-                  {activeChart[1].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[1] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 2: Top Left Triangle (inner top left quadrant) */}
                 <text x="145" y="65" textAnchor="middle" className="fill-amber-500/80 text-[10px]">{getSignForHouse(2)}</text>
                 <text x="110" y="85" textAnchor="middle" className="fill-white/90 text-[12px]">
-                  {activeChart[2].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[2] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 3: Far Left Top Triangle */}
                 <text x="65" y="145" textAnchor="middle" className="fill-amber-500/80 text-[10px]">{getSignForHouse(3)}</text>
                 <text x="60" y="100" textAnchor="middle" className="fill-white/90 text-[12px]">
-                  {activeChart[3].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[3] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 4: Left Center Diamond */}
                 <text x="105" y="200" textAnchor="middle" className="fill-amber-500 font-semibold text-[11px]">{getSignForHouse(4)}</text>
                 <text x="65" y="220" textAnchor="middle" className="fill-white font-semibold text-[13px] tracking-wide">
-                  {activeChart[4].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[4] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 5: Far Left Bottom Triangle */}
                 <text x="65" y="260" textAnchor="middle" className="fill-amber-500/80 text-[10px]">{getSignForHouse(5)}</text>
                 <text x="60" y="305" textAnchor="middle" className="fill-white/90 text-[12px]">
-                  {activeChart[5].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[5] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 6: Bottom Left Triangle */}
                 <text x="145" y="340" textAnchor="middle" className="fill-amber-500/80 text-[10px]">{getSignForHouse(6)}</text>
                 <text x="110" y="325" textAnchor="middle" className="fill-white/90 text-[12px]">
-                  {activeChart[6].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[6] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 7: Bottom Center Diamond */}
                 <text x="200" y="305" textAnchor="middle" className="fill-amber-500 font-semibold text-[11px]">{getSignForHouse(7)}</text>
                 <text x="200" y="280" textAnchor="middle" className="fill-white font-semibold text-[13px] tracking-wide">
-                  {activeChart[7].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[7] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 8: Bottom Right Triangle */}
                 <text x="255" y="340" textAnchor="middle" className="fill-amber-500/80 text-[10px]">{getSignForHouse(8)}</text>
                 <text x="290" y="325" textAnchor="middle" className="fill-white/90 text-[12px]">
-                  {activeChart[8].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[8] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 9: Far Right Bottom Triangle */}
                 <text x="340" y="260" textAnchor="middle" className="fill-amber-500/80 text-[10px]">{getSignForHouse(9)}</text>
                 <text x="340" y="305" textAnchor="middle" className="fill-white/90 text-[12px]">
-                  {activeChart[9].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[9] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 10: Right Center Diamond */}
                 <text x="295" y="200" textAnchor="middle" className="fill-amber-500 font-semibold text-[11px]">{getSignForHouse(10)}</text>
                 <text x="335" y="220" textAnchor="middle" className="fill-white font-semibold text-[13px] tracking-wide">
-                  {activeChart[10].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[10] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 11: Far Right Top Triangle */}
                 <text x="340" y="145" textAnchor="middle" className="fill-amber-500/80 text-[10px]">{getSignForHouse(11)}</text>
                 <text x="340" y="100" textAnchor="middle" className="fill-white/90 text-[12px]">
-                  {activeChart[11].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[11] || []).map(getPlanetAbbr).join(" ")}
                 </text>
 
                 {/* House 12: Top Right Triangle */}
                 <text x="255" y="65" textAnchor="middle" className="fill-amber-500/80 text-[10px]">{getSignForHouse(12)}</text>
                 <text x="290" y="85" textAnchor="middle" className="fill-white/90 text-[12px]">
-                  {activeChart[12].map(getPlanetAbbr).join(" ")}
+                  {(activeChart[12] || []).map(getPlanetAbbr).join(" ")}
                 </text>
               </svg>
             </div>

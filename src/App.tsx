@@ -258,6 +258,7 @@ export default function App() {
 
   const handleCalculate = async (isInitial = false) => {
     setLoading(true);
+    const finalName = inputs.name.trim() || "Native";
     try {
       let result: AstrologyData;
       if (navigator.onLine) {
@@ -268,7 +269,7 @@ export default function App() {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              name: inputs.name,
+              name: finalName,
               date: inputs.date,
               time: inputs.time,
               location: inputs.location,
@@ -285,7 +286,7 @@ export default function App() {
         } catch (apiErr) {
           console.warn("API calculation failed, falling back to local calculation:", apiErr);
           result = calculateAstrology(
-            inputs.name,
+            finalName,
             inputs.date,
             inputs.time,
             inputs.location,
@@ -296,7 +297,7 @@ export default function App() {
         }
       } else {
         result = calculateAstrology(
-          inputs.name,
+          finalName,
           inputs.date,
           inputs.time,
           inputs.location,
@@ -312,7 +313,7 @@ export default function App() {
       // Save to IndexedDB Offline Caching Layer
       try {
         await saveCachedHoroscope(
-          inputs.name,
+          finalName,
           inputs.date,
           inputs.time,
           inputs.location,
