@@ -74,6 +74,7 @@ import HoroscopeDashboard from "./components/HoroscopeDashboard";
 import TransitsTab from "./components/TransitsTab";
 import IngressTab from "./components/IngressTab";
 import PluginManager, { INITIAL_PLUGINS, PluginSpec } from "./components/PluginManager";
+import KpStellarDashboard from "./components/KpStellarDashboard";
 
 // 1. Navigation Graph Definitions
 export interface SubmenuItem {
@@ -128,6 +129,7 @@ export default function App() {
     muhurta: "daily_muhurta",
     reports: "generate_pdf",
     ai_assistant: "chat",
+    kp_stellar: "dashboard",
     settings: "theme",
     developer: "raw_json"
   });
@@ -598,6 +600,23 @@ export default function App() {
         { id: "generate_pdf", label: "Generate PDF", description: "Export professional reports." },
         { id: "saved_reports", label: "Saved Reports", description: "Locally archived exports." },
         { id: "share_report", label: "Share Report", description: "Export or share QR link." }
+      ]
+    },
+    {
+      id: "kp_stellar",
+      label: "KP Stellar",
+      icon: Zap,
+      submenus: [
+        { id: "dashboard", label: "Dashboard", description: "Overview, Provider Health & Status." },
+        { id: "cusps", label: "Cusps", description: "12 Cusps, Degrees & Sub-Lords." },
+        { id: "planet_analysis", label: "Planet Analysis", description: "Planet Star-Lord & Sub-Lord placements." },
+        { id: "significators", label: "Significators", description: "Planet & House level significators." },
+        { id: "ruling_planets", label: "Ruling Planets", description: "Day, Moon & Ascendant rulers." },
+        { id: "kp_dasha", label: "KP Dasha", description: "KP Vimshottari & event period indicators." },
+        { id: "transit", label: "Transit", description: "Real-time coordinate significations." },
+        { id: "horary", label: "Horary", description: "Prashna seed number calculations." },
+        { id: "research", label: "Research", description: "Developer audit tools & raw model values." },
+        { id: "settings", label: "Settings", description: "Provider priority routing settings." }
       ]
     },
     {
@@ -1809,6 +1828,29 @@ export default function App() {
                   <div className={`p-6 rounded-2xl border ${containerStyle}`}>
                     <h3 className="text-sm font-bold text-amber-500">Local Export Archives</h3>
                     <p className="text-xs text-slate-500 font-mono mt-1">No saved PDF exports found in local sandboxed storage directory.</p>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          ) : activeMenu === "kp_stellar" ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSubmenuId}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="space-y-6"
+              >
+                {astrologyData ? (
+                  <KpStellarDashboard
+                    astrologyData={astrologyData}
+                    activeSubmenuId={activeSubmenuId}
+                    onSubmenuSelect={handleSubmenuSelect}
+                    isDarkTheme={isDark}
+                  />
+                ) : (
+                  <div className="text-center py-12">
+                    Please cast a horoscope first to view the KP Stellar workspace.
                   </div>
                 )}
               </motion.div>
