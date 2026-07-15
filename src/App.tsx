@@ -809,10 +809,10 @@ export default function App() {
       </header>
 
       {/* CORE FRAME LAYOUT */}
-      <div className="flex-1 w-full flex flex-col lg:flex-row max-w-[1400px] mx-auto min-w-0" id="main-content-layout">
+      <div className="flex-1 w-full flex flex-row max-w-[1400px] mx-auto min-w-0" id="main-content-layout">
         
-        {/* SIDE BAR RAIL (Tablet / Desktop First Column) */}
-        <nav className={`hidden lg:flex flex-col items-center py-4 border-r transition-all shrink-0 select-none ${
+        {/* SIDE BAR RAIL (Vertical Side Rail on all screens) */}
+        <nav className={`flex flex-col items-center py-4 border-r transition-all shrink-0 select-none ${
           drawerExpanded ? "w-[120px]" : "w-[64px]"
         } ${isDark ? "border-indigo-500/10 bg-slate-950" : "border-neutral-200 bg-white"}`} id="navigation-rail-sidebar">
           
@@ -834,7 +834,12 @@ export default function App() {
               return (
                 <button
                   key={node.id}
-                  onClick={() => handleMenuSelect(node.id)}
+                  onClick={() => {
+                    handleMenuSelect(node.id);
+                    if (node.submenus && node.submenus.length > 0) {
+                      setIsMobileMenuOpen(true);
+                    }
+                  }}
                   className={`w-full flex flex-col items-center justify-center rounded-xl py-2 px-1 transition-all border text-center cursor-pointer group ${
                     isActive
                       ? "bg-amber-500/10 text-amber-500 border-amber-500/30"
@@ -858,11 +863,11 @@ export default function App() {
           </div>
         </nav>
 
-        {/* RESPONSIVE SUBMENU DRAWER (Tablet/Desktop Second Column) */}
+        {/* RESPONSIVE SUBMENU DRAWER (Second Column) */}
         {activeSubmenus.length > 0 && (
           <aside className={`transition-all duration-300 shrink-0 select-none ${
-            drawerExpanded ? "w-full lg:w-[260px] block" : "hidden"
-          } ${isMobileMenuOpen ? "fixed inset-y-0 left-0 z-50 w-64 block" : "hidden lg:block"} ${
+            drawerExpanded ? "w-[240px] block" : "hidden"
+          } ${isMobileMenuOpen ? "fixed inset-y-0 left-[64px] z-50 w-64 block" : "hidden md:block"} ${
             isDark ? "bg-slate-900/60 border-r border-indigo-500/15" : "bg-neutral-50/95 border-r border-neutral-200"
           }`} id="submenu-drawer-container">
             
@@ -875,7 +880,7 @@ export default function App() {
               </div>
               <button 
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="lg:hidden p-1.5 rounded-lg hover:bg-slate-500/10"
+                className="md:hidden p-1.5 rounded-lg hover:bg-slate-500/10"
               >
                 <ChevronLeft className="w-5 h-5 text-amber-500" />
               </button>
@@ -912,45 +917,13 @@ export default function App() {
         {/* MOBILE MENU PORTAL */}
         {isMobileMenuOpen && (
           <div 
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" 
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" 
             onClick={() => setIsMobileMenuOpen(false)} 
           />
         )}
 
-        {/* RESPONSIVE BOTTOM NAVIGATION BAR FOR MOBILE SCREENS */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 border-t border-indigo-500/10 flex justify-around py-2.5 px-2 backdrop-blur-md">
-          {MAIN_MENU_STRUCTURE.slice(0, 5).map((node) => {
-            const Icon = node.icon;
-            const isActive = activeMenu === node.id;
-            return (
-              <button
-                key={node.id}
-                onClick={() => {
-                  handleMenuSelect(node.id);
-                  if (node.submenus && node.submenus.length > 0) {
-                    setIsMobileMenuOpen(true);
-                  }
-                }}
-                className={`flex flex-col items-center py-1 px-3 rounded-lg text-xs font-mono transition-colors ${
-                  isActive ? "text-amber-500" : "text-slate-500"
-                }`}
-              >
-                <Icon className="w-5 h-5" />
-                <span className="text-[9px] mt-1">{node.label}</span>
-              </button>
-            );
-          })}
-          <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="flex flex-col items-center py-1 px-3 rounded-lg text-xs font-mono text-slate-500"
-          >
-            <Menu className="w-5 h-5" />
-            <span className="text-[9px] mt-1">More</span>
-          </button>
-        </nav>
-
         {/* MAIN DISPLAY: Dynamic Content Stage */}
-        <main className="flex-1 p-4 sm:p-6 pb-24 lg:pb-6 min-w-0 overflow-y-auto" id="tab-body-container">
+        <main className="flex-1 p-4 sm:p-6 pb-6 min-w-0 overflow-y-auto" id="tab-body-container">
           
           {/* Global Data Integrity / Provenance Overlay Panel */}
           {provenanceEnabled && (
