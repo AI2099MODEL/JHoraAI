@@ -14,6 +14,7 @@ import {
   Award
 } from "lucide-react";
 import { getAllCachedHoroscopes } from "../lib/indexedDb";
+import WhatComesBackExplorer from "./WhatComesBackExplorer";
 
 interface TestResult {
   endpoint: string;
@@ -33,6 +34,7 @@ export default function ApiAcceptanceDashboard() {
   const [activeJsonView, setActiveJsonView] = useState<string | null>(null);
   const [rawJsonResponse, setRawJsonResponse] = useState<any>(null);
   const [actualDbCount, setActualDbCount] = useState(0);
+  const [activeSubTab, setActiveSubTab] = useState<"verification" | "whatcomesback">("verification");
 
   useEffect(() => {
     const fetchDbCount = async () => {
@@ -318,187 +320,223 @@ export default function ApiAcceptanceDashboard() {
         </button>
       </div>
 
-      {/* Grid of Tests and Offline Cache Controls */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Left Part: Suite Log & Acceptance Card */}
-        <div className="lg:col-span-8 bg-slate-900/40 border border-indigo-500/10 rounded-2xl p-6 shadow-xl space-y-4">
-          <h3 className="text-xs font-mono text-slate-400 uppercase tracking-widest font-bold flex items-center justify-between border-b border-indigo-500/10 pb-3">
-            <span>Acceptance Test Results</span>
-            <span className="text-[10px] text-indigo-400">Target: europe-west1.run.app</span>
-          </h3>
-
-          <div className="space-y-3">
-            {tests.map((t) => (
-              <div 
-                key={t.endpoint}
-                className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-slate-800 transition-colors"
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`mt-0.5 px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
-                    t.method === "POST" 
-                      ? "text-indigo-400 bg-indigo-500/5 border-indigo-500/25" 
-                      : "text-amber-400 bg-amber-500/5 border-amber-500/25"
-                  }`}>
-                    {t.method}
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-mono text-white font-semibold">{t.endpoint}</h4>
-                    <span className="text-[10px] text-slate-500 block mt-0.5">
-                      Verifies alignment with Kotlin data models & schema types
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-2 md:pt-0 border-indigo-500/5">
-                  {t.status === "passed" && t.timeMs && (
-                    <span className="text-[10px] font-mono text-indigo-400">
-                      {t.timeMs}ms
-                    </span>
-                  )}
-
-                  {t.status === "idle" && (
-                    <span className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-700" />
-                      Pending Run
-                    </span>
-                  )}
-
-                  {t.status === "running" && (
-                    <span className="text-xs text-amber-500 flex items-center gap-1.5 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
-                      Calling endpoint...
-                    </span>
-                  )}
-
-                  {t.status === "passed" && (
-                    <span className="text-xs text-green-400 flex items-center gap-1.5 font-medium">
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                      Verified
-                    </span>
-                  )}
-
-                  {t.status === "failed" && (
-                    <span className="text-xs text-rose-400 flex items-center gap-1.5 font-medium">
-                      <XCircle className="w-4 h-4 text-rose-400" />
-                      Failed
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Part: Cache Engine Status & Offline Simulator */}
-        <div className="lg:col-span-4 space-y-6">
-          
-          {/* Offline Cache Policy Controller */}
-          <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
-            <h3 className="text-xs font-mono text-slate-400 uppercase tracking-widest font-bold flex items-center gap-2 border-b border-indigo-500/10 pb-3">
-              <Database className="w-4 h-4 text-amber-400" />
-              Offline Cache Engine
-            </h3>
-
-            <p className="text-[11px] text-slate-400 leading-relaxed">
-              Every horoscope calculated successfully is stored in the local IndexedDB database using an authentic composite cache key structure:
-            </p>
-
-            <div className="bg-slate-950/80 rounded-xl p-3 border border-slate-850 font-mono text-[10px] text-indigo-300 leading-relaxed break-all">
-              key = "horoscope_&lt;DOB&gt;_&lt;TOB&gt;_&lt;LAT&gt;_&lt;LONG&gt;"
-            </div>
-
-            <div className="flex justify-between items-center bg-indigo-500/5 rounded-xl px-3 py-2 border border-indigo-500/10 text-xs text-slate-300">
-              <span className="font-sans">Active IndexedDB Records:</span>
-              <span className="font-mono font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
-                {actualDbCount} charts
-              </span>
-            </div>
-
-            {/* Simulated Offline Toggle */}
-            <div className="pt-3 border-t border-indigo-500/5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-semibold text-white block">Simulate Offline Mode</span>
-                  <span className="text-[10px] text-slate-500 block mt-0.5">Force loading from cached Room states</span>
-                </div>
-                <button
-                  onClick={() => setIsOfflineSimulated(!isOfflineSimulated)}
-                  className={`w-11 h-6 rounded-full transition-colors relative ${
-                    isOfflineSimulated ? "bg-amber-500" : "bg-slate-800"
-                  }`}
-                >
-                  <span className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${
-                    isOfflineSimulated ? "left-6" : "left-1"
-                  }`} />
-                </button>
-              </div>
-
-              {isOfflineSimulated && (
-                <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl text-[10px] text-amber-300 flex items-start gap-2 mt-3 leading-relaxed">
-                  <WifiOff className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                  Offline simulator is active. Hitting Calculate Horoscope will load calculated metrics directly from the local Room database mock payload.
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Model Structural Compatibility Card */}
-          <div className="bg-slate-900/30 border border-indigo-500/10 rounded-2xl p-5 text-[10px] text-slate-400 space-y-3">
-            <h4 className="font-bold text-amber-500/90 uppercase tracking-wider flex items-center gap-1.5">
-              <Award className="w-4 h-4" />
-              API Compatibility Report Summary
-            </h4>
-            <div className="space-y-1.5 text-[11px] font-sans">
-              <div className="flex justify-between py-1 border-b border-indigo-500/5">
-                <span className="text-slate-400">Tested Endpoint count:</span>
-                <span className="text-white font-semibold">6 of 6</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-indigo-500/5">
-                <span className="text-slate-400">D1 Divisional Charts matches:</span>
-                <span className="text-green-400 font-semibold flex items-center gap-1">100% Verified</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-indigo-500/5">
-                <span className="text-slate-400">Ayanamsa modes:</span>
-                <span className="text-indigo-300 font-semibold">Lahiri, Raman, Fagan</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-indigo-500/5">
-                <span className="text-slate-400">Offline Caching Strategy:</span>
-                <span className="text-green-400 font-semibold">Fully Compliant</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
+      {/* Sub-Navigation Switcher */}
+      <div className="flex border-b border-indigo-500/10 gap-6">
+        <button
+          onClick={() => setActiveSubTab("verification")}
+          className={`pb-3 text-xs font-mono font-bold uppercase tracking-wider relative transition-all ${
+            activeSubTab === "verification" 
+              ? "text-amber-400" 
+              : "text-slate-400 hover:text-white"
+          }`}
+        >
+          Verification Log & Cache Tests
+          {activeSubTab === "verification" && (
+            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveSubTab("whatcomesback")}
+          className={`pb-3 text-xs font-mono font-bold uppercase tracking-wider relative transition-all ${
+            activeSubTab === "whatcomesback" 
+              ? "text-amber-400" 
+              : "text-slate-400 hover:text-white"
+          }`}
+        >
+          "What Comes Back" Submenu Explorer
+          {activeSubTab === "whatcomesback" && (
+            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-400" />
+          )}
+        </button>
       </div>
 
-      {/* Raw JSON Inspect Panel */}
-      {rawJsonResponse && (
-        <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
-          <h3 className="text-xs font-mono text-slate-400 uppercase tracking-widest font-bold flex items-center justify-between border-b border-indigo-500/10 pb-3">
-            <span className="flex items-center gap-2">
-              <FileJson className="w-4 h-4 text-indigo-400" />
-              Live /horoscope JSON Response Inspector
-            </span>
-            <span className="text-[10px] text-slate-500">Payload size: ~3.5MB (truncated view)</span>
-          </h3>
+      {activeSubTab === "whatcomesback" ? (
+        <WhatComesBackExplorer initialData={rawJsonResponse} />
+      ) : (
+        <>
+          {/* Grid of Tests and Offline Cache Controls */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Left Part: Suite Log & Acceptance Card */}
+            <div className="lg:col-span-8 bg-slate-900/40 border border-indigo-500/10 rounded-2xl p-6 shadow-xl space-y-4">
+              <h3 className="text-xs font-mono text-slate-400 uppercase tracking-widest font-bold flex items-center justify-between border-b border-indigo-500/10 pb-3">
+                <span>Acceptance Test Results</span>
+                <span className="text-[10px] text-indigo-400">Target: europe-west1.run.app</span>
+              </h3>
 
-          <div className="bg-slate-950/80 rounded-xl p-4 border border-slate-850 overflow-x-auto max-h-[300px] text-xs font-mono scrollbar-thin text-indigo-300">
-            <pre>{JSON.stringify({
-              birth_details: rawJsonResponse.birth_details,
-              horoscope: {
-                calendar_info: rawJsonResponse.horoscope?.calendar_info,
-                ayanamsa_value: rawJsonResponse.horoscope?.ayanamsa_value,
-                julian_day: rawJsonResponse.horoscope?.julian_day,
-                sphuta_sample: rawJsonResponse.horoscope?.sphuta ? Object.fromEntries(Object.entries(rawJsonResponse.horoscope.sphuta).slice(0, 4)) : {},
-                divisional_charts_keys: rawJsonResponse.horoscope?.divisional_charts ? Object.keys(rawJsonResponse.horoscope.divisional_charts) : [],
-                yogas_detected: rawJsonResponse.horoscope?.yogas?.yoga_list ? Object.keys(rawJsonResponse.horoscope.yogas.yoga_list).length : 0,
-                doshas_detected: rawJsonResponse.horoscope?.doshas ? Object.keys(rawJsonResponse.horoscope.doshas) : []
-              }
-            }, null, 2)}</pre>
+              <div className="space-y-3">
+                {tests.map((t) => (
+                  <div 
+                    key={t.endpoint}
+                    className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-slate-800 transition-colors"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-0.5 px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
+                        t.method === "POST" 
+                          ? "text-indigo-400 bg-indigo-500/5 border-indigo-500/25" 
+                          : "text-amber-400 bg-amber-500/5 border-amber-500/25"
+                      }`}>
+                        {t.method}
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-mono text-white font-semibold">{t.endpoint}</h4>
+                        <span className="text-[10px] text-slate-500 block mt-0.5">
+                          Verifies alignment with Kotlin data models & schema types
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-2 md:pt-0 border-indigo-500/5">
+                      {t.status === "passed" && t.timeMs && (
+                        <span className="text-[10px] font-mono text-indigo-400">
+                          {t.timeMs}ms
+                        </span>
+                      )}
+
+                      {t.status === "idle" && (
+                        <span className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-700" />
+                          Pending Run
+                        </span>
+                      )}
+
+                      {t.status === "running" && (
+                        <span className="text-xs text-amber-500 flex items-center gap-1.5 font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
+                          Calling endpoint...
+                        </span>
+                      )}
+
+                      {t.status === "passed" && (
+                        <span className="text-xs text-green-400 flex items-center gap-1.5 font-medium">
+                          <CheckCircle className="w-4 h-4 text-green-400" />
+                          Verified
+                        </span>
+                      )}
+
+                      {t.status === "failed" && (
+                        <span className="text-xs text-rose-400 flex items-center gap-1.5 font-medium">
+                          <XCircle className="w-4 h-4 text-rose-400" />
+                          Failed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Part: Cache Engine Status & Offline Simulator */}
+            <div className="lg:col-span-4 space-y-6">
+              
+              {/* Offline Cache Policy Controller */}
+              <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
+                <h3 className="text-xs font-mono text-slate-400 uppercase tracking-widest font-bold flex items-center gap-2 border-b border-indigo-500/10 pb-3">
+                  <Database className="w-4 h-4 text-amber-400" />
+                  Offline Cache Engine
+                </h3>
+
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Every horoscope calculated successfully is stored in the local IndexedDB database using an authentic composite cache key structure:
+                </p>
+
+                <div className="bg-slate-950/80 rounded-xl p-3 border border-slate-850 font-mono text-[10px] text-indigo-300 leading-relaxed break-all">
+                  key = "horoscope_&lt;DOB&gt;_&lt;TOB&gt;_&lt;LAT&gt;_&lt;LONG&gt;"
+                </div>
+
+                <div className="flex justify-between items-center bg-indigo-500/5 rounded-xl px-3 py-2 border border-indigo-500/10 text-xs text-slate-300">
+                  <span className="font-sans">Active IndexedDB Records:</span>
+                  <span className="font-mono font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
+                    {actualDbCount} charts
+                  </span>
+                </div>
+
+                {/* Simulated Offline Toggle */}
+                <div className="pt-3 border-t border-indigo-500/5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-semibold text-white block">Simulate Offline Mode</span>
+                      <span className="text-[10px] text-slate-500 block mt-0.5">Force loading from cached Room states</span>
+                    </div>
+                    <button
+                      onClick={() => setIsOfflineSimulated(!isOfflineSimulated)}
+                      className={`w-11 h-6 rounded-full transition-colors relative ${
+                        isOfflineSimulated ? "bg-amber-500" : "bg-slate-800"
+                      }`}
+                    >
+                      <span className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${
+                        isOfflineSimulated ? "left-6" : "left-1"
+                      }`} />
+                    </button>
+                  </div>
+
+                  {isOfflineSimulated && (
+                    <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl text-[10px] text-amber-300 flex items-start gap-2 mt-3 leading-relaxed">
+                      <WifiOff className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                      Offline simulator is active. Hitting Calculate Horoscope will load calculated metrics directly from the local Room database mock payload.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Model Structural Compatibility Card */}
+              <div className="bg-slate-900/30 border border-indigo-500/10 rounded-2xl p-5 text-[10px] text-slate-400 space-y-3">
+                <h4 className="font-bold text-amber-500/90 uppercase tracking-wider flex items-center gap-1.5">
+                  <Award className="w-4 h-4" />
+                  API Compatibility Report Summary
+                </h4>
+                <div className="space-y-1.5 text-[11px] font-sans">
+                  <div className="flex justify-between py-1 border-b border-indigo-500/5">
+                    <span className="text-slate-400">Tested Endpoint count:</span>
+                    <span className="text-white font-semibold">6 of 6</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-indigo-500/5">
+                    <span className="text-slate-400">D1 Divisional Charts matches:</span>
+                    <span className="text-green-400 font-semibold flex items-center gap-1">100% Verified</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-indigo-500/5">
+                    <span className="text-slate-400">Ayanamsa modes:</span>
+                    <span className="text-indigo-300 font-semibold">Lahiri, Raman, Fagan</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-indigo-500/5">
+                    <span className="text-slate-400">Offline Caching Strategy:</span>
+                    <span className="text-green-400 font-semibold">Fully Compliant</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
           </div>
-        </div>
+
+          {/* Raw JSON Inspect Panel */}
+          {rawJsonResponse && (
+            <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
+              <h3 className="text-xs font-mono text-slate-400 uppercase tracking-widest font-bold flex items-center justify-between border-b border-indigo-500/10 pb-3">
+                <span className="flex items-center gap-2">
+                  <FileJson className="w-4 h-4 text-indigo-400" />
+                  Live /horoscope JSON Response Inspector
+                </span>
+                <span className="text-[10px] text-slate-500">Payload size: ~3.5MB (truncated view)</span>
+              </h3>
+
+              <div className="bg-slate-950/80 rounded-xl p-4 border border-slate-850 overflow-x-auto max-h-[300px] text-xs font-mono scrollbar-thin text-indigo-300">
+                <pre>{JSON.stringify({
+                  birth_details: rawJsonResponse.birth_details,
+                  horoscope: {
+                    calendar_info: rawJsonResponse.horoscope?.calendar_info,
+                    ayanamsa_value: rawJsonResponse.horoscope?.ayanamsa_value,
+                    julian_day: rawJsonResponse.horoscope?.julian_day,
+                    sphuta_sample: rawJsonResponse.horoscope?.sphuta ? Object.fromEntries(Object.entries(rawJsonResponse.horoscope.sphuta).slice(0, 4)) : {},
+                    divisional_charts_keys: rawJsonResponse.horoscope?.divisional_charts ? Object.keys(rawJsonResponse.horoscope.divisional_charts) : [],
+                    yogas_detected: rawJsonResponse.horoscope?.yogas?.yoga_list ? Object.keys(rawJsonResponse.horoscope.yogas.yoga_list).length : 0,
+                    doshas_detected: rawJsonResponse.horoscope?.doshas ? Object.keys(rawJsonResponse.horoscope.doshas) : []
+                  }
+                }, null, 2)}</pre>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
     </div>

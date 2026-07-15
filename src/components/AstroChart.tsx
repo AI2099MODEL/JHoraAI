@@ -11,6 +11,18 @@ interface AstroChartProps {
   navamsaChart: { [house: number]: string[] };
   lagnaSignIndex: number; // 0 to 11
   lagnaSignName: string;
+  sahams?: { [key: string]: { longitude: number; sign: string; degree: number; label: string } };
+  argalas?: {
+    [house: number]: Array<{
+      type: "Primary" | "Secondary";
+      argalaHouse: number;
+      argalaPlanets: string[];
+      virodhaHouse: number;
+      virodhaPlanets: string[];
+      isObstructed: boolean;
+      verdict: string;
+    }>;
+  };
 }
 
 export default function AstroChart({
@@ -18,11 +30,13 @@ export default function AstroChart({
   navamsaChart,
   lagnaSignIndex,
   lagnaSignName,
+  sahams,
+  argalas,
 }: AstroChartProps) {
   const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
-  const [selectedDivision, setSelectedDivision] = useState<"D1" | "D9">("D1");
+  const [selectedDivision, setSelectedDivision] = useState<"D1" | "D9" | "Sahams" | "Argalas">("D1");
 
-  const activeChart = selectedDivision === "D1" ? rasiChart : navamsaChart;
+  const activeChart = selectedDivision === "D9" ? navamsaChart : rasiChart;
 
   // Sign Names mapping (abbreviations)
   const signAbbr = ["Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi"];
@@ -80,8 +94,8 @@ export default function AstroChart({
         
         {/* Toggle Controls */}
         <div className="flex flex-wrap items-center gap-3">
-          {/* D1 / D9 Toggle */}
-          <div className="bg-slate-950/80 p-1 rounded-lg border border-indigo-500/15 flex">
+          {/* D1 / D9 / Saham / Argala Toggle */}
+          <div className="bg-slate-950/80 p-1 rounded-lg border border-indigo-500/15 flex flex-wrap gap-1">
             <button
               onClick={() => setSelectedDivision("D1")}
               className={`px-3 py-1 text-xs font-mono font-medium rounded-md transition-all ${
@@ -91,7 +105,7 @@ export default function AstroChart({
               }`}
               id="btn-d1-chart"
             >
-              D1 Rasi (Natal)
+              D1 Rasi
             </button>
             <button
               onClick={() => setSelectedDivision("D9")}
@@ -103,6 +117,28 @@ export default function AstroChart({
               id="btn-d9-chart"
             >
               D9 Navamsa
+            </button>
+            <button
+              onClick={() => setSelectedDivision("Sahams")}
+              className={`px-3 py-1 text-xs font-mono font-medium rounded-md transition-all ${
+                selectedDivision === "Sahams"
+                  ? "bg-amber-500 text-slate-950 shadow-md font-semibold"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+              id="btn-sahams-chart"
+            >
+              Sahams
+            </button>
+            <button
+              onClick={() => setSelectedDivision("Argalas")}
+              className={`px-3 py-1 text-xs font-mono font-medium rounded-md transition-all ${
+                selectedDivision === "Argalas"
+                  ? "bg-amber-500 text-slate-950 shadow-md font-semibold"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+              id="btn-argalas-chart"
+            >
+              Argalas
             </button>
           </div>
 
@@ -136,8 +172,67 @@ export default function AstroChart({
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* Render Chart */}
-        <div className="lg:col-span-7 flex justify-center">
-          {chartStyle === "north" ? (
+        <div className="lg:col-span-7 flex justify-center w-full">
+          {selectedDivision === "Sahams" ? (
+            <div className="w-full space-y-4 max-w-[420px] aspect-square bg-slate-950/40 rounded-xl border border-indigo-500/30 p-5 shadow-inner overflow-y-auto">
+              <h4 className="text-sm font-mono text-indigo-400 uppercase tracking-widest font-bold border-b border-slate-800 pb-2 mb-2">Auspicious Sahams (Arabic Parts)</h4>
+              <p className="text-[11px] text-slate-400 leading-relaxed mb-4">
+                Sahams are sensitive celestial longitude combinations representing special life domains.
+              </p>
+              <div className="space-y-2.5">
+                {sahams && Object.entries(sahams).length > 0 ? (
+                  Object.entries(sahams).map(([key, s]: [string, any]) => (
+                    <div key={key} className="bg-slate-900/60 p-3 rounded-xl border border-slate-850 flex justify-between items-center hover:border-indigo-500/20 transition-all">
+                      <div>
+                        <span className="text-xs font-semibold text-slate-100 block">{s.label}</span>
+                        <span className="text-[9px] text-indigo-400 font-mono">Formulaic point</span>
+                      </div>
+                      <span className="font-mono text-xs font-bold text-amber-400 bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10">
+                        {s.sign} ({(s.degree || 0).toFixed(1)}°)
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-500 italic text-center py-4">No Saham calculation data available. Please load horoscope birth details.</p>
+                )}
+              </div>
+            </div>
+          ) : selectedDivision === "Argalas" ? (
+            <div className="w-full space-y-4 max-w-[420px] aspect-square bg-slate-950/40 rounded-xl border border-indigo-500/30 p-5 shadow-inner overflow-y-auto">
+              <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h4 className="text-sm font-mono text-indigo-400 uppercase tracking-widest font-bold">Lagna Argala (Planetary Interventions)</h4>
+                <span className="text-[9px] font-mono font-bold bg-amber-500/10 text-amber-300 px-2 py-0.5 rounded border border-amber-500/20">Ref: Lagna (H1)</span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed mb-4">
+                Argala is a key concept showing planetary influences that open (Argala) or block (Virodha) specific life departments.
+              </p>
+              <div className="space-y-2.5">
+                {argalas && argalas[1] && argalas[1].length > 0 ? (
+                  argalas[1].map((arg, idx) => (
+                    <div key={idx} className="bg-slate-900/60 p-3 rounded-xl border border-slate-850 space-y-2 hover:border-indigo-500/20 transition-all">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-indigo-300">
+                          {arg.type} Argala (H{arg.argalaHouse})
+                        </span>
+                        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold tracking-wider ${
+                          arg.isObstructed 
+                            ? "bg-rose-500/15 text-rose-400 border border-rose-500/10" 
+                            : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/10"
+                        }`}>
+                          {arg.isObstructed ? "Obstructed" : "Unobstructed"}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-snug">
+                        {arg.verdict}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-500 italic text-center py-4">No Argala data available for Lagna. Check if planets are placed in 2nd, 4th, 5th, or 11th houses.</p>
+                )}
+              </div>
+            </div>
+          ) : chartStyle === "north" ? (
             /* NORTH INDIAN DIAMOND CHART */
             <div className="relative w-full max-w-[420px] aspect-square bg-slate-950/40 rounded-xl border border-indigo-500/30 p-2 shadow-inner">
               <svg

@@ -27,7 +27,7 @@ import {
   Trash2,
   FolderOpen
 } from "lucide-react";
-import { calculateAstrology, AstrologyData } from "./lib/astrology";
+import { AstrologyData, convertTimeTo24h, convertDateToISO } from "./lib/astrology";
 import { 
   saveCachedHoroscope, 
   getAllCachedHoroscopes, 
@@ -65,6 +65,48 @@ export default function App() {
   const [searchingLocation, setSearchingLocation] = useState(false);
   const [showLocationDropdown, setShowLocationDropdown] = useState(false);
   const [fetchingGps, setFetchingGps] = useState(false);
+
+  // Local state for birth time input to prevent cursor jumping and typing issues
+  const [localTimeInput, setLocalTimeInput] = useState("08:30");
+  const [localAmpm, setLocalAmpm] = useState("AM");
+
+  // Sync inputs.time to local inputs when loaded from external source (like cached record)
+  useEffect(() => {
+    if (!inputs.time) return;
+    const trimmed = inputs.time.trim();
+    let parsedTime = "";
+    let parsedAmpm = "";
+    
+    const ampmMatch = trimmed.match(/^([0-9]{1,2}:[0-9]{2})(?::[0-9]{2})?\s*(AM|PM)$/i);
+    if (ampmMatch) {
+      parsedTime = ampmMatch[1];
+      parsedAmpm = ampmMatch[2].toUpperCase();
+    } else {
+      // It's a 24h format or something else
+      const parts = trimmed.split(":");
+      if (parts.length >= 2) {
+        let hh = parseInt(parts[0], 10) || 0;
+        const mm = (parts[1] || "00").substring(0, 2);
+        if (hh >= 12) {
+          const displayHh = hh === 12 ? 12 : hh - 12;
+          parsedTime = `${displayHh.toString().padStart(2, "0")}:${mm}`;
+          parsedAmpm = "PM";
+        } else {
+          const displayHh = hh === 0 ? 12 : hh;
+          parsedTime = `${displayHh.toString().padStart(2, "0")}:${mm}`;
+          parsedAmpm = "AM";
+        }
+      } else {
+        parsedTime = trimmed;
+        parsedAmpm = "AM";
+      }
+    }
+
+    if (parsedTime !== localTimeInput || parsedAmpm !== localAmpm) {
+      setLocalTimeInput(parsedTime);
+      setLocalAmpm(parsedAmpm);
+    }
+  }, [inputs.time]);
 
   // Calculate timezone offset from IANA timezone name (e.g., 'Asia/Kolkata')
   const calculateTimezoneOffset = (timeZoneName: string, dateStr: string) => {
@@ -259,63 +301,42 @@ export default function App() {
   const handleCalculate = async (isInitial = false) => {
     setLoading(true);
     const finalName = inputs.name.trim() || "Native";
+    const fullTimeStr = `${localTimeInput} ${localAmpm}`;
     try {
       let result: AstrologyData;
-      if (navigator.onLine) {
-        try {
-          const response = await fetch("/api/astrology/calculate", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              name: finalName,
-              date: inputs.date,
-              time: inputs.time,
-              location: inputs.location,
-              latitude: Number(inputs.latitude),
-              longitude: Number(inputs.longitude),
-              timezone: Number(inputs.timezone),
-            }),
-          });
-          
-          if (!response.ok) {
-            throw new Error(`API error: ${response.statusText}`);
-          }
-          result = await response.json();
-        } catch (apiErr) {
-          console.warn("API calculation failed, falling back to local calculation:", apiErr);
-          result = calculateAstrology(
-            finalName,
-            inputs.date,
-            inputs.time,
-            inputs.location,
-            Number(inputs.latitude),
-            Number(inputs.longitude),
-            Number(inputs.timezone)
-          );
-        }
-      } else {
-        result = calculateAstrology(
-          finalName,
-          inputs.date,
-          inputs.time,
-          inputs.location,
-          Number(inputs.latitude),
-          Number(inputs.longitude),
-          Number(inputs.timezone)
-        );
+      const formattedDate = convertDateToISO(inputs.date);
+      const formattedTime = convertTimeTo24h(fullTimeStr);
+      const response = await fetch("/api/astrology/calculate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: finalName,
+          date: formattedDate,
+          time: formattedTime,
+          location: inputs.location,
+          latitude: Number(inputs.latitude),
+          longitude: Number(inputs.longitude),
+          timezone: Number(inputs.timezone),
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
       }
+      result = await response.json();
 
       setAstrologyData(result);
       localStorage.setItem("jhora_astrology_data", JSON.stringify(result));
+      setInputs(prev => ({ ...prev, time: fullTimeStr }));
       
       // Save to IndexedDB Offline Caching Layer
       try {
         await saveCachedHoroscope(
           finalName,
           inputs.date,
-          inputs.time,
+          fullTimeStr,
           inputs.location,
           Number(inputs.latitude),
           Number(inputs.longitude),
@@ -331,7 +352,7 @@ export default function App() {
       if (!isInitial) {
         setActiveTab("dashboard");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Calculation failed:", error);
     } finally {
       setLoading(false);
@@ -415,7 +436,6 @@ export default function App() {
     { id: "compatibility", label: "Marriage Match", icon: Heart },
     { id: "muhurtas", label: "Daily Muhurta", icon: Clock },
     { id: "chat", label: "JHora AI Chat", icon: MessageSquare },
-    { id: "android", label: "Android Design System", icon: Smartphone },
     { id: "acceptance", label: "API Acceptance & Caching", icon: Activity },
   ];
 
@@ -553,7 +573,7 @@ export default function App() {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-[11px] text-slate-400 font-medium mb-1">Birth Date</label>
+                            <label className="block text-[11px] text-slate-400 font-medium mb-1">Date of Birth</label>
                             <input
                               type="date"
                               value={inputs.date}
@@ -562,13 +582,31 @@ export default function App() {
                             />
                           </div>
                           <div>
-                            <label className="block text-[11px] text-slate-400 font-medium mb-1">Birth Time (24h)</label>
-                            <input
-                              type="time"
-                              value={inputs.time}
-                              onChange={(e) => setInputs({ ...inputs, time: e.target.value })}
-                              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500"
-                            />
+                            <label className="block text-[11px] text-slate-400 font-medium mb-1">Time of Birth</label>
+                            <div className="flex gap-1.5">
+                              <div className="relative flex-1">
+                                <Clock className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500 hover:text-amber-500 transition-colors" />
+                                <input
+                                  type="text"
+                                  placeholder="e.g. 6:40"
+                                  value={localTimeInput}
+                                  onChange={(e) => {
+                                    setLocalTimeInput(e.target.value);
+                                  }}
+                                  className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-2 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 font-medium"
+                                />
+                              </div>
+                              <select
+                                value={localAmpm}
+                                onChange={(e) => {
+                                  setLocalAmpm(e.target.value);
+                                }}
+                                className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-amber-500 font-medium cursor-pointer"
+                              >
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                              </select>
+                            </div>
                           </div>
                         </div>
 
@@ -927,6 +965,8 @@ export default function App() {
                       navamsaChart={astrologyData.navamsaChart}
                       lagnaSignIndex={astrologyData.lagna.signIndex}
                       lagnaSignName={astrologyData.lagna.sign}
+                      sahams={astrologyData.sahams}
+                      argalas={astrologyData.argalas}
                     />
                   )}
 

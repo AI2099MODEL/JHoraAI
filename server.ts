@@ -8,7 +8,7 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
-import { calculateAstrology, calculateCompatibility } from "./src/lib/astrology.js";
+import { calculateAstrology, calculateCompatibility, calculateDetailedCompatibility } from "./src/lib/astrology.js";
 
 // Load environment variables
 dotenv.config();
@@ -107,10 +107,15 @@ app.post("/api/jhora/horoscope", (req, res) => {
       },
       horoscope: {
         calendar_info: {
-          tithi: "Shukla Ekadashi",
+          tithi: astroData.panchanga?.tithi || "Shukla Ekadashi",
           nakshatra: astroData.planets.find(p => p.name === "Moon")?.nakshatra || "Ashwini",
-          yoga: "Preeti",
-          karana: "Bava"
+          yoga: astroData.panchanga?.yoga || "Preeti",
+          karana: astroData.panchanga?.karana || "Bava",
+          varna: astroData.panchanga?.varna || "Brahmin",
+          vashya: astroData.panchanga?.vashya || "Manushya",
+          yoni: astroData.panchanga?.yoni || "Simha",
+          gana: astroData.panchanga?.gana || "Manushya",
+          nadi: astroData.panchanga?.nadi || "Adi"
         },
         ayanamsa_value: 24.152,
         julian_day: 2450000 + Math.floor(Math.random() * 1000),
@@ -126,10 +131,7 @@ app.post("/api/jhora/horoscope", (req, res) => {
           };
           return acc;
         }, {} as any),
-        divisional_charts: {
-          D1: astroData.rasiChart,
-          D9: astroData.navamsaChart
-        },
+        divisional_charts: astroData.divisionalCharts,
         nakshatra_pada: astroData.planets.reduce((acc, p) => {
           acc[p.name] = `${p.nakshatra} (Pada ${p.pada})`;
           return acc;
@@ -150,7 +152,23 @@ app.post("/api/jhora/horoscope", (req, res) => {
           astroData.doshas.manglik.isPresent ? "Manglik" : "",
           astroData.doshas.kaalSarp.isPresent ? "KaalSarp" : "",
           astroData.doshas.sadeSati.isPresent ? "SadeSati" : ""
-        ].filter(Boolean)
+        ].filter(Boolean),
+        dashas: {
+          vimshottari: astroData.dashas,
+          yogini: astroData.additionalDashas?.yogini,
+          ashtottari: astroData.additionalDashas?.ashtottari
+        },
+        shad_bala: astroData.shadBala,
+        bhava_bala: astroData.bhavaBala,
+        ashtakavarga: astroData.ashtakavarga,
+        longevity: astroData.longevity,
+        sade_satis: astroData.sadeSati,
+        arudhas: astroData.arudhas,
+        sphutas: astroData.sphutas,
+        upagrahas: astroData.upagrahas,
+        sahams: astroData.sahams,
+        argalas: astroData.argalas,
+        marriage_compatibility: astroData.marriageCompatibilityDemo
       }
     };
 
@@ -189,15 +207,7 @@ app.post("/api/jhora/marriage-match", (req, res) => {
       Number(girl_birth_details.timezone || 5.5)
     );
 
-    const boyMoon = boyChart.planets.find(p => p.name === "Moon")!;
-    const girlMoon = girlChart.planets.find(p => p.name === "Moon")!;
-
-    const matchResult = calculateCompatibility(
-      boyMoon.signIndex,
-      boyMoon.longitude,
-      girlMoon.signIndex,
-      girlMoon.longitude
-    );
+    const matchResult = calculateDetailedCompatibility(boyChart, girlChart);
 
     res.json(matchResult);
   } catch (error: any) {

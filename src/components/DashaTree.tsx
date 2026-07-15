@@ -169,21 +169,55 @@ export default function DashaTree({ dashas }: DashaTreeProps) {
                               : "bg-slate-900/30 border-slate-800/80 hover:bg-slate-900/50"
                           }`}
                         >
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs font-bold text-slate-200">
-                              {d.lord} - {sub.lord}
-                            </span>
-                            {isCurrentA && (
-                              <span className="text-[8px] uppercase tracking-wider font-mono font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-400">
-                                ACTIVE
+                          <div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs font-bold text-slate-200">
+                                {d.lord} - {sub.lord}
                               </span>
-                            )}
+                              {isCurrentA && (
+                                <span className="text-[8px] uppercase tracking-wider font-mono font-bold px-1.5 py-0.5 rounded bg-green-500/20 text-green-400">
+                                  ACTIVE
+                                </span>
+                              )}
+                            </div>
+                            
+                            <div className="mt-2 text-[10px] font-mono text-slate-400 flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-slate-500" />
+                              {formatDate(sub.startDate)} - {formatDate(sub.endDate)}
+                            </div>
                           </div>
-                          
-                          <div className="mt-2 text-[10px] font-mono text-slate-400 flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-slate-500" />
-                            {formatDate(sub.startDate)} - {formatDate(sub.endDate)}
-                          </div>
+
+                          {/* Nested Pratyantardashas (Sub-sub-periods) */}
+                          {sub.subPeriods && sub.subPeriods.length > 0 && (
+                            <div className="mt-3 pt-3 border-t border-slate-800/80 space-y-1.5">
+                              <span className="text-[9px] font-mono uppercase tracking-wider text-amber-500/80 font-bold block">
+                                Pratyantardashas (Sub-sub periods)
+                              </span>
+                              <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
+                                {sub.subPeriods.map((pratyantar) => {
+                                  const isCurrentP = isPeriodActive(pratyantar.startDate, pratyantar.endDate);
+                                  return (
+                                    <div
+                                      key={pratyantar.lord}
+                                      className={`flex justify-between items-center text-[10px] p-1.5 rounded font-mono transition-all ${
+                                        isCurrentP
+                                          ? "bg-amber-500/15 text-amber-300 font-bold border border-amber-500/20"
+                                          : "text-slate-400 hover:text-slate-300 bg-slate-950/20"
+                                      }`}
+                                    >
+                                      <span className="flex items-center gap-1">
+                                        {isCurrentP && <span className="w-1 h-1 bg-amber-400 rounded-full animate-pulse" />}
+                                        {sub.lord} - {pratyantar.lord}
+                                      </span>
+                                      <span className="text-[9px] text-slate-500 font-medium">
+                                        {new Date(pratyantar.startDate).toLocaleDateString("en-US", { month: "short", year: "numeric" })} - {new Date(pratyantar.endDate).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}

@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Heart, ShieldCheck, Sparkles, AlertCircle, RefreshCw } from "lucide-react";
-import { calculateCompatibility, CompatibilityResult, AstrologyData } from "../lib/astrology";
+import { CompatibilityResult, AstrologyData } from "../lib/astrology";
 
 interface CompatibilityTabProps {
   astrologyData?: AstrologyData | null;
@@ -61,14 +61,6 @@ export default function CompatibilityTab({ astrologyData }: CompatibilityTabProp
       setResult(data);
     } catch (error) {
       console.error("Compatibility calculation failed:", error);
-      // Fallback to local calculation if server fails or hasn't booted fully yet
-      const fallback = calculateCompatibility(
-        person1.signIndex,
-        person1.longitude,
-        person2.signIndex,
-        person2.longitude
-      );
-      setResult(fallback);
     } finally {
       setLoading(false);
     }
