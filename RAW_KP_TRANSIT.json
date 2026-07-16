@@ -1,0 +1,68 @@
+{
+  "transit_date": "2026-07-15",
+  "planets": [
+    {
+      "planet": "Sun",
+      "sign": "Cancer",
+      "degree": 28.52,
+      "star_lord": "Mercury",
+      "sub_lord": "Saturn"
+    },
+    {
+      "planet": "Moon",
+      "sign": "Leo",
+      "degree": 14.15,
+      "star_lord": "Venus",
+      "sub_lord": "Jupiter"
+    },
+    {
+      "planet": "Mars",
+      "sign": "Gemini",
+      "degree": 4.58,
+      "star_lord": "Mars",
+      "sub_lord": "Moon"
+    },
+    {
+      "planet": "Mercury",
+      "sign": "Leo",
+      "degree": 12.35,
+      "star_lord": "Ketu",
+      "sub_lord": "Mercury"
+    },
+    {
+      "planet": "Jupiter",
+      "sign": "Taurus",
+      "degree": 1.25,
+      "star_lord": "Sun",
+      "sub_lord": "Rahu"
+    },
+    {
+      "planet": "Venus",
+      "sign": "Cancer",
+      "degree": 19.45,
+      "star_lord": "Mercury",
+      "sub_lord": "Ketu"
+    },
+    {
+      "planet": "Saturn",
+      "sign": "Pisces",
+      "degree": 15.12,
+      "star_lord": "Saturn",
+      "sub_lord": "Jupiter"
+    },
+    {
+      "planet": "Rahu",
+      "sign": "Aquarius",
+      "degree": 25.14,
+      "star_lord": "Jupiter",
+      "sub_lord": "Mercury"
+    },
+    {
+      "planet": "Ketu",
+      "sign": "Leo",
+      "degree": 25.14,
+      "star_lord": "Venus",
+      "sub_lord": "Saturn"
+    }
+  ]
+}

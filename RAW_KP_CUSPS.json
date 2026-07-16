@@ -1,0 +1,112 @@
+{
+  "cusps": [
+    {
+      "house_number": 1,
+      "longitude": 194.25,
+      "degree": 14.25,
+      "sign": "Libra",
+      "star_lord": "Rahu",
+      "sub_lord": "Mercury",
+      "sub_sub_lord": "Jupiter"
+    },
+    {
+      "house_number": 2,
+      "longitude": 224.58,
+      "degree": 14.58,
+      "sign": "Scorpio",
+      "star_lord": "Saturn",
+      "sub_lord": "Rahu",
+      "sub_sub_lord": "Sun"
+    },
+    {
+      "house_number": 3,
+      "longitude": 255.82,
+      "degree": 15.82,
+      "sign": "Sagittarius",
+      "star_lord": "Venus",
+      "sub_lord": "Jupiter",
+      "sub_sub_lord": "Moon"
+    },
+    {
+      "house_number": 4,
+      "longitude": 287.12,
+      "degree": 17.12,
+      "sign": "Capricorn",
+      "star_lord": "Moon",
+      "sub_lord": "Saturn",
+      "sub_sub_lord": "Rahu"
+    },
+    {
+      "house_number": 5,
+      "longitude": 318.45,
+      "degree": 18.45,
+      "sign": "Aquarius",
+      "star_lord": "Rahu",
+      "sub_lord": "Moon",
+      "sub_sub_lord": "Venus"
+    },
+    {
+      "house_number": 6,
+      "longitude": 349.52,
+      "degree": 19.52,
+      "sign": "Pisces",
+      "star_lord": "Saturn",
+      "sub_lord": "Mercury",
+      "sub_sub_lord": "Mars"
+    },
+    {
+      "house_number": 7,
+      "longitude": 14.25,
+      "degree": 14.25,
+      "sign": "Aries",
+      "star_lord": "Venus",
+      "sub_lord": "Mercury",
+      "sub_sub_lord": "Jupiter"
+    },
+    {
+      "house_number": 8,
+      "longitude": 44.58,
+      "degree": 14.58,
+      "sign": "Taurus",
+      "star_lord": "Moon",
+      "sub_lord": "Rahu",
+      "sub_sub_lord": "Sun"
+    },
+    {
+      "house_number": 9,
+      "longitude": 75.82,
+      "degree": 15.82,
+      "sign": "Gemini",
+      "star_lord": "Rahu",
+      "sub_lord": "Jupiter",
+      "sub_sub_lord": "Moon"
+    },
+    {
+      "house_number": 10,
+      "longitude": 107.12,
+      "degree": 17.12,
+      "sign": "Cancer",
+      "star_lord": "Mercury",
+      "sub_lord": "Saturn",
+      "sub_sub_lord": "Rahu"
+    },
+    {
+      "house_number": 11,
+      "longitude": 138.45,
+      "degree": 18.45,
+      "sign": "Leo",
+      "star_lord": "Venus",
+      "sub_lord": "Moon",
+      "sub_sub_lord": "Venus"
+    },
+    {
+      "house_number": 12,
+      "longitude": 169.52,
+      "degree": 19.52,
+      "sign": "Virgo",
+      "star_lord": "Sun",
+      "sub_lord": "Mercury",
+      "sub_sub_lord": "Mars"
+    }
+  ]
+}

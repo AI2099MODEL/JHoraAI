@@ -1,0 +1,64 @@
+{
+  "horary_number": 245,
+  "question": "Will I buy a new house this year?",
+  "cusps": [
+    {
+      "house_number": 1,
+      "longitude": 194.25,
+      "degree": 14.25,
+      "sign": "Libra",
+      "star_lord": "Rahu",
+      "sub_lord": "Mercury",
+      "sub_sub_lord": "Jupiter"
+    },
+    {
+      "house_number": 4,
+      "longitude": 287.12,
+      "degree": 17.12,
+      "sign": "Capricorn",
+      "star_lord": "Moon",
+      "sub_lord": "Saturn",
+      "sub_sub_lord": "Rahu"
+    },
+    {
+      "house_number": 11,
+      "longitude": 138.45,
+      "degree": 18.45,
+      "sign": "Leo",
+      "star_lord": "Venus",
+      "sub_lord": "Moon",
+      "sub_sub_lord": "Venus"
+    }
+  ],
+  "planets": [
+    {
+      "name": "Sun",
+      "sign": "Virgo",
+      "degree": 27.85,
+      "house": 12,
+      "star_lord": "Mars",
+      "sub_lord": "Jupiter",
+      "sub_sub_lord": "Saturn",
+      "is_retrograde": false
+    },
+    {
+      "name": "Moon",
+      "sign": "Gemini",
+      "degree": 12.45,
+      "house": 9,
+      "star_lord": "Rahu",
+      "sub_lord": "Mercury",
+      "sub_sub_lord": "Venus",
+      "is_retrograde": false
+    }
+  ],
+  "ruling_planets": {
+    "day_lord": "Mercury",
+    "moon_sign_lord": "Mercury",
+    "moon_star_lord": "Rahu",
+    "ascendant_sign_lord": "Venus",
+    "ascendant_star_lord": "Rahu",
+    "calculation_time": "2026-07-15T12:00:00Z"
+  },
+  "summary": "Horary analysis for Question: 'Will I buy a new house this year?' constructed dynamically under KP Horary seed 245. Core query houses 4 (property) and 11 (fulfillment of desires) are strongly active and favorably aspected."
+}
