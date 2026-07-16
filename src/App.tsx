@@ -640,18 +640,12 @@ export default function App() {
     {
       id: "ai_assistant",
       label: "Ask",
-      icon: Sparkles,
-      submenus: [
-        { id: "chat", label: "AI Chat", description: "Converse with our Vedic AI grounded in your chart." }
-      ]
+      icon: Sparkles
     },
     {
       id: "downloads",
       label: "Downloads",
-      icon: Download,
-      submenus: [
-        { id: "pdf_reports", label: "Astrology Reports", description: "Compiled high-fidelity PDF horoscopes." }
-      ]
+      icon: Download
     },
     {
       id: "horoscope",
