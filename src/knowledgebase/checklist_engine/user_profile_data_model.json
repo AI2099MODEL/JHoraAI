@@ -1,0 +1,544 @@
+{
+  "User": {
+    "google_user_id": "string (Google account identifier)",
+    "email": "string (User email address)",
+    "profile_name": "string (Display or birth name)",
+    "created_at": "string (ISO 8601 Timestamp)",
+    "updated_at": "string (ISO 8601 Timestamp)"
+  },
+  "Birth": {
+    "date": "YYYY-MM-DD",
+    "time": "HH:MM:SS (24-hour format)",
+    "latitude": "number (Decimal degrees, positive North, negative South)",
+    "longitude": "number (Decimal degrees, positive East, negative West)",
+    "timezone": "string (e.g. Asia/Kolkata or UTC offset)",
+    "place": "string (City, Region, Country)",
+    "ayanamsa": "Lahiri"
+  },
+  "systems": {
+    "Vedic": {
+      "ascendant": {
+        "sign": "string (Zodiac sign name)",
+        "sign_index": "number (0-11)",
+        "degree": "number (0-29)",
+        "minute": "number (0-59)",
+        "second": "number (0-59)",
+        "longitude_360": "number (0.0 - 359.999)",
+        "nakshatra": "string (Nakshatra name)",
+        "pada": "number (1-4)",
+        "nakshatra_lord": "string (Nakshatra lord name)"
+      },
+      "planets": {
+        "Sun": {
+          "sign": "string",
+          "sign_index": "number (0-11)",
+          "degree": "number",
+          "minute": "number",
+          "second": "number",
+          "longitude_360": "number",
+          "nakshatra": "string",
+          "pada": "number (1-4)",
+          "nakshatra_lord": "string",
+          "house": "number (1-12)",
+          "own_sign": "boolean",
+          "mooltrikona": "boolean",
+          "exalted": "boolean",
+          "debilitated": "boolean",
+          "retrograde": "boolean",
+          "combust": "boolean",
+          "planet_speed": "number (Degrees per day)"
+        },
+        "Moon": {
+          "sign": "string",
+          "sign_index": "number",
+          "degree": "number",
+          "minute": "number",
+          "second": "number",
+          "longitude_360": "number",
+          "nakshatra": "string",
+          "pada": "number",
+          "nakshatra_lord": "string",
+          "house": "number",
+          "own_sign": "boolean",
+          "mooltrikona": "boolean",
+          "exalted": "boolean",
+          "debilitated": "boolean",
+          "retrograde": "boolean",
+          "combust": "boolean",
+          "planet_speed": "number"
+        },
+        "Mars": {
+          "sign": "string",
+          "sign_index": "number",
+          "degree": "number",
+          "minute": "number",
+          "second": "number",
+          "longitude_360": "number",
+          "nakshatra": "string",
+          "pada": "number",
+          "nakshatra_lord": "string",
+          "house": "number",
+          "own_sign": "boolean",
+          "mooltrikona": "boolean",
+          "exalted": "boolean",
+          "debilitated": "boolean",
+          "retrograde": "boolean",
+          "combust": "boolean",
+          "planet_speed": "number"
+        },
+        "Mercury": {
+          "sign": "string",
+          "sign_index": "number",
+          "degree": "number",
+          "minute": "number",
+          "second": "number",
+          "longitude_360": "number",
+          "nakshatra": "string",
+          "pada": "number",
+          "nakshatra_lord": "string",
+          "house": "number",
+          "own_sign": "boolean",
+          "mooltrikona": "boolean",
+          "exalted": "boolean",
+          "debilitated": "boolean",
+          "retrograde": "boolean",
+          "combust": "boolean",
+          "planet_speed": "number"
+        },
+        "Jupiter": {
+          "sign": "string",
+          "sign_index": "number",
+          "degree": "number",
+          "minute": "number",
+          "second": "number",
+          "longitude_360": "number",
+          "nakshatra": "string",
+          "pada": "number",
+          "nakshatra_lord": "string",
+          "house": "number",
+          "own_sign": "boolean",
+          "mooltrikona": "boolean",
+          "exalted": "boolean",
+          "debilitated": "boolean",
+          "retrograde": "boolean",
+          "combust": "boolean",
+          "planet_speed": "number"
+        },
+        "Venus": {
+          "sign": "string",
+          "sign_index": "number",
+          "degree": "number",
+          "minute": "number",
+          "second": "number",
+          "longitude_360": "number",
+          "nakshatra": "string",
+          "pada": "number",
+          "nakshatra_lord": "string",
+          "house": "number",
+          "own_sign": "boolean",
+          "mooltrikona": "boolean",
+          "exalted": "boolean",
+          "debilitated": "boolean",
+          "retrograde": "boolean",
+          "combust": "boolean",
+          "planet_speed": "number"
+        },
+        "Saturn": {
+          "sign": "string",
+          "sign_index": "number",
+          "degree": "number",
+          "minute": "number",
+          "second": "number",
+          "longitude_360": "number",
+          "nakshatra": "string",
+          "pada": "number",
+          "nakshatra_lord": "string",
+          "house": "number",
+          "own_sign": "boolean",
+          "mooltrikona": "boolean",
+          "exalted": "boolean",
+          "debilitated": "boolean",
+          "retrograde": "boolean",
+          "combust": "boolean",
+          "planet_speed": "number"
+        },
+        "Rahu": {
+          "sign": "string",
+          "sign_index": "number",
+          "degree": "number",
+          "minute": "number",
+          "second": "number",
+          "longitude_360": "number",
+          "nakshatra": "string",
+          "pada": "number",
+          "nakshatra_lord": "string",
+          "house": "number",
+          "own_sign": "boolean",
+          "mooltrikona": "boolean",
+          "exalted": "boolean",
+          "debilitated": "boolean",
+          "retrograde": "boolean",
+          "combust": "boolean",
+          "planet_speed": "number"
+        },
+        "Ketu": {
+          "sign": "string",
+          "sign_index": "number",
+          "degree": "number",
+          "minute": "number",
+          "second": "number",
+          "longitude_360": "number",
+          "nakshatra": "string",
+          "pada": "number",
+          "nakshatra_lord": "string",
+          "house": "number",
+          "own_sign": "boolean",
+          "mooltrikona": "boolean",
+          "exalted": "boolean",
+          "debilitated": "boolean",
+          "retrograde": "boolean",
+          "combust": "boolean",
+          "planet_speed": "number"
+        }
+      },
+      "planet_aspects": [
+        {
+          "aspecting_planet": "string (e.g. Mars)",
+          "aspected_planet": "string (e.g. Jupiter)",
+          "aspect_type": "string (e.g. 4th Aspect, 7th Aspect, Conjunction)",
+          "orb_degree": "number"
+        }
+      ],
+      "house_aspects": [
+        {
+          "aspecting_planet": "string (e.g. Saturn)",
+          "aspected_house": "number (1-12)",
+          "aspect_type": "string (e.g. 3rd Aspect, 10th Aspect)"
+        }
+      ],
+      "divisional_charts": {
+        "D1": {
+          "description": "Rashi (Birth Chart - Physical Body & General Life)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": {
+            "1": ["string (Planet Name)"], "2": [], "3": [], "4": [], "5": [], "6": [],
+            "7": [], "8": [], "9": [], "10": [], "11": [], "12": []
+          }
+        },
+        "D2": {
+          "description": "Hora (Wealth, Prosperous Life)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D3": {
+          "description": "Drekkana (Siblings, Initiative, Talents)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D4": {
+          "description": "Chaturthamsa (Destiny, Fixed Assets, Housing)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D5": {
+          "description": "Panchamsa (Fame, Power, Past Life Merits)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D6": {
+          "description": "Shasthamsa (Obstacles, Litigations, Health)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D7": {
+          "description": "Saptamsa (Children, Progeny, Legacies)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D8": {
+          "description": "Ashtamsa (Unexpected Events, Longevity)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D9": {
+          "description": "Navamsa (Dharma, Spouse, Inner Potential, Second Half of Life)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D10": {
+          "description": "Dasamsa (Career, Profession, Public Status, Power)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D11": {
+          "description": "Rudramsa (Unexpected Gains, Victories)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D12": {
+          "description": "Dwadasamsa (Parents, Ancestry, Heritage)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D16": {
+          "description": "Shodasamsa (Vehicles, Mental Happiness, Luxuries)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D20": {
+          "description": "Vimsamsa (Spiritual Progress, Worship, Meditation)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D24": {
+          "description": "Chaturvimsamsa (Siddhamsha - Learning, Knowledge, Higher Education)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D27": {
+          "description": "Saptavimsamsa (Nakshtramsha - Strengths, Weaknesses, Vitality)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D30": {
+          "description": "Trimsamsa (Evils, Miseries, Subconscious Blocks)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D40": {
+          "description": "Khavedamsa (Matrilineal Auspiciousness/Inauspiciousness)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D45": {
+          "description": "Akshavedamsa (Patrilineal Auspiciousness/Inauspiciousness)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        },
+        "D60": {
+          "description": "Shastyamsa (Past Karma, Soul's Blueprint, Decisive Factor)",
+          "ascendant": { "sign": "string", "longitude": "number" },
+          "house_placements": { "1": [], "2": [], "3": [], "4": [], "5": [], "6": [], "7": [], "8": [], "9": [], "10": [], "11": [], "12": [] }
+        }
+      },
+      "panchanga": {
+        "tithi": "string (e.g. Ekadashi)",
+        "yoga": "string (e.g. Vyatipata)",
+        "karana": "string (e.g. Bava)",
+        "varna": "string (e.g. Kshatriya)",
+        "vashya": "string (e.g. Chatushpada)",
+        "yoni": "string (e.g. Ashwa)",
+        "gana": "string (e.g. Deva)",
+        "nadi": "string (e.g. Madhya)"
+      },
+      "strengths": {
+        "shadbala": {
+          "Sun": {
+            "sthana_bala": 0.0,
+            "dig_bala": 0.0,
+            "kala_bala": 0.0,
+            "cheshta_bala": 0.0,
+            "naisargika_bala": 0.0,
+            "drig_bala": 0.0,
+            "total_score": 0.0,
+            "strength_ratio": 0.0,
+            "strength_percentage": 0.0
+          },
+          "Moon": { "sthana_bala": 0.0, "dig_bala": 0.0, "kala_bala": 0.0, "cheshta_bala": 0.0, "naisargika_bala": 0.0, "drig_bala": 0.0, "total_score": 0.0, "strength_ratio": 0.0, "strength_percentage": 0.0 },
+          "Mars": { "sthana_bala": 0.0, "dig_bala": 0.0, "kala_bala": 0.0, "cheshta_bala": 0.0, "naisargika_bala": 0.0, "drig_bala": 0.0, "total_score": 0.0, "strength_ratio": 0.0, "strength_percentage": 0.0 },
+          "Mercury": { "sthana_bala": 0.0, "dig_bala": 0.0, "kala_bala": 0.0, "cheshta_bala": 0.0, "naisargika_bala": 0.0, "drig_bala": 0.0, "total_score": 0.0, "strength_ratio": 0.0, "strength_percentage": 0.0 },
+          "Jupiter": { "sthana_bala": 0.0, "dig_bala": 0.0, "kala_bala": 0.0, "cheshta_bala": 0.0, "naisargika_bala": 0.0, "drig_bala": 0.0, "total_score": 0.0, "strength_ratio": 0.0, "strength_percentage": 0.0 },
+          "Venus": { "sthana_bala": 0.0, "dig_bala": 0.0, "kala_bala": 0.0, "cheshta_bala": 0.0, "naisargika_bala": 0.0, "drig_bala": 0.0, "total_score": 0.0, "strength_ratio": 0.0, "strength_percentage": 0.0 },
+          "Saturn": { "sthana_bala": 0.0, "dig_bala": 0.0, "kala_bala": 0.0, "cheshta_bala": 0.0, "naisargika_bala": 0.0, "drig_bala": 0.0, "total_score": 0.0, "strength_ratio": 0.0, "strength_percentage": 0.0 }
+        },
+        "bhava_bala": {
+          "1": { "strength_shashtiamsas": 0.0, "rank": "number (1-12)" },
+          "2": { "strength_shashtiamsas": 0.0, "rank": "number" },
+          "3": { "strength_shashtiamsas": 0.0, "rank": "number" },
+          "4": { "strength_shashtiamsas": 0.0, "rank": "number" },
+          "5": { "strength_shashtiamsas": 0.0, "rank": "number" },
+          "6": { "strength_shashtiamsas": 0.0, "rank": "number" },
+          "7": { "strength_shashtiamsas": 0.0, "rank": "number" },
+          "8": { "strength_shashtiamsas": 0.0, "rank": "number" },
+          "9": { "strength_shashtiamsas": 0.0, "rank": "number" },
+          "10": { "strength_shashtiamsas": 0.0, "rank": "number" },
+          "11": { "strength_shashtiamsas": 0.0, "rank": "number" },
+          "12": { "strength_shashtiamsas": 0.0, "rank": "number" }
+        },
+        "ashtakavarga": {
+          "sav": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+          "bav": {
+            "Sun": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "Moon": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "Mars": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "Mercury": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "Jupiter": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "Venus": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "Saturn": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          }
+        },
+        "ishta_phala": {
+          "Sun": 0.0, "Moon": 0.0, "Mars": 0.0, "Mercury": 0.0, "Jupiter": 0.0, "Venus": 0.0, "Saturn": 0.0
+        },
+        "kashta_phala": {
+          "Sun": 0.0, "Moon": 0.0, "Mars": 0.0, "Mercury": 0.0, "Jupiter": 0.0, "Venus": 0.0, "Saturn": 0.0
+        }
+      },
+      "dashas": {
+        "vimshottari": [
+          {
+            "lord": "string (Planet)",
+            "start_date": "YYYY-MM-DD",
+            "end_date": "YYYY-MM-DD",
+            "children": [
+              {
+                "lord": "string (Planet)",
+                "start_date": "YYYY-MM-DD",
+                "end_date": "YYYY-MM-DD"
+              }
+            ]
+          }
+        ],
+        "yogini": [],
+        "ashtottari": []
+      },
+      "yogas": [
+        {
+          "name": "string (Yoga Name)",
+          "description": "string (Yoga combination description and results)",
+          "planets": ["string (Involved Planet Names)"],
+          "houses": ["number (Involved House Numbers)"],
+          "strength": "string or number"
+        }
+      ],
+      "doshas": [
+        {
+          "name": "string (Dosha Name, e.g. Kaal Sarp)",
+          "severity": "string (e.g. None, Low, Medium, High)",
+          "planets": ["string"],
+          "houses": ["number"],
+          "description": "string (Impact analysis and specific combinations)"
+        }
+      ]
+    },
+    "KP": {
+      "planets": {
+        "Sun": {
+          "nakshatra_lord": "string",
+          "sub_lord": "string",
+          "sub_sub_lord": "string",
+          "planet_occupation": ["number (Involved House Numbers)"],
+          "planet_ownership": ["number"],
+          "house_occupation": "number (1-12)",
+          "house_ownership": ["number"]
+        },
+        "Moon": {
+          "nakshatra_lord": "string",
+          "sub_lord": "string",
+          "sub_sub_lord": "string",
+          "planet_occupation": [],
+          "planet_ownership": [],
+          "house_occupation": "number",
+          "house_ownership": []
+        },
+        "Mars": { "nakshatra_lord": "string", "sub_lord": "string", "sub_sub_lord": "string", "planet_occupation": [], "planet_ownership": [], "house_occupation": "number", "house_ownership": [] },
+        "Mercury": { "nakshatra_lord": "string", "sub_lord": "string", "sub_sub_lord": "string", "planet_occupation": [], "planet_ownership": [], "house_occupation": "number", "house_ownership": [] },
+        "Jupiter": { "nakshatra_lord": "string", "sub_lord": "string", "sub_sub_lord": "string", "planet_occupation": [], "planet_ownership": [], "house_occupation": "number", "house_ownership": [] },
+        "Venus": { "nakshatra_lord": "string", "sub_lord": "string", "sub_sub_lord": "string", "planet_occupation": [], "planet_ownership": [], "house_occupation": "number", "house_ownership": [] },
+        "Saturn": { "nakshatra_lord": "string", "sub_lord": "string", "sub_sub_lord": "string", "planet_occupation": [], "planet_ownership": [], "house_occupation": "number", "house_ownership": [] },
+        "Rahu": { "nakshatra_lord": "string", "sub_lord": "string", "sub_sub_lord": "string", "planet_occupation": [], "planet_ownership": [], "house_occupation": "number", "house_ownership": [] },
+        "Ketu": { "nakshatra_lord": "string", "sub_lord": "string", "sub_sub_lord": "string", "planet_occupation": [], "planet_ownership": [], "house_occupation": "number", "house_ownership": [] }
+      },
+      "ruling_planets": {
+        "ascendant_sign_lord": "string",
+        "ascendant_star_lord": "string",
+        "ascendant_sub_lord": "string",
+        "moon_sign_lord": "string",
+        "moon_star_lord": "string",
+        "moon_sub_lord": "string",
+        "day_lord": "string"
+      },
+      "dba": {
+        "mahadasha": "string (Planet)",
+        "bhukti": "string (Planet)",
+        "antara": "string (Planet)",
+        "sookshma": "string (Planet)",
+        "prana": "string (Planet)",
+        "start_date": "YYYY-MM-DD",
+        "end_date": "YYYY-MM-DD"
+      }
+    },
+    "Jaimini": {
+      "karakas": {
+        "atmakaraka": "string",
+        "amatyakaraka": "string",
+        "bhratrukaraka": "string",
+        "matrukaraka": "string",
+        "putrakaraka": "string",
+        "gnatikaraka": "string",
+        "darakaraka": "string"
+      },
+      "lagnas": {
+        "karakamsha_lagna": "string (Zodiac Sign)",
+        "swamsha": "string (Zodiac Sign)",
+        "pada_lagna": "string (Zodiac Sign - Arudha Lagna)"
+      },
+      "pada_coordinates": {
+        "A1": { "sign": "string", "degree": "number" },
+        "A2": { "sign": "string", "degree": "number" },
+        "A3": { "sign": "string", "degree": "number" },
+        "A4": { "sign": "string", "degree": "number" },
+        "A5": { "sign": "string", "degree": "number" },
+        "A6": { "sign": "string", "degree": "number" },
+        "A7": { "sign": "string", "degree": "number" },
+        "A8": { "sign": "string", "degree": "number" },
+        "A9": { "sign": "string", "degree": "number" },
+        "A10": { "sign": "string", "degree": "number" },
+        "A11": { "sign": "string", "degree": "number" },
+        "A12": { "sign": "string", "degree": "number" }
+      }
+    },
+    "Western": {
+      "declinations": {
+        "Sun": "number",
+        "Moon": "number",
+        "Mars": "number",
+        "Mercury": "number",
+        "Jupiter": "number",
+        "Venus": "number",
+        "Saturn": "number",
+        "Uranus": "number",
+        "Neptune": "number",
+        "Pluto": "number"
+      },
+      "planet_speeds": {
+        "Sun": "number",
+        "Moon": "number",
+        "Mars": "number",
+        "Mercury": "number",
+        "Jupiter": "number",
+        "Venus": "number",
+        "Saturn": "number",
+        "Uranus": "number",
+        "Neptune": "number",
+        "Pluto": "number"
+      },
+      "aspects": [
+        {
+          "planet_a": "string",
+          "planet_b": "string",
+          "aspect_type": "string (e.g. Conjunction, Sextile, Square, Trine, Opposition)",
+          "orb": "number (Decimal degrees)"
+        }
+      ]
+    },
+    "Nadi": {},
+    "Lal Kitab": {},
+    "Tajik": {}
+  },
+  "Validation": {
+    "birth_time_rectified": "boolean",
+    "api_version": "string (e.g. v1.0.2)",
+    "api_confidence": "string (e.g. Authoritative / Verified)"
+  }
+}
