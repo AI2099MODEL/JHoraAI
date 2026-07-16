@@ -291,7 +291,7 @@ export function generateAstrologyPDF(profileData: any): jsPDF {
   doc.text("Panchanga (Five Pillars of Time)", 20, 42);
   doc.line(20, 45, 190, 45);
 
-  const pan = profileData.systems?.Vedic?.panchanga || {};
+  const pan = profileData.Vedic?.panchanga || profileData.systems?.Vedic?.panchanga || {};
   const panGrid = [
     { label: "Tithi (Lunar Day)", value: pan.tithi || "Shukla Chaturdashi" },
     { label: "Nakshatra (Mansion)", value: pan.nakshatra || "Rohini" },
@@ -323,7 +323,7 @@ export function generateAstrologyPDF(profileData: any): jsPDF {
   });
 
   // House Lords Table
-  const asc = profileData.systems?.Vedic?.ascendant || {};
+  const asc = profileData.Vedic?.ascendant || profileData.systems?.Vedic?.ascendant || {};
   const ascSignName = asc.sign || "Pisces";
   const ascSignIdx = SIGN_NAMES.indexOf(ascSignName) !== -1 ? SIGN_NAMES.indexOf(ascSignName) : 11;
 
@@ -428,7 +428,7 @@ export function generateAstrologyPDF(profileData: any): jsPDF {
   doc.text("House", 146, tableTop + 5);
   doc.text("Status", 168, tableTop + 5);
 
-  const planetsObj = profileData.systems?.Vedic?.planets || {};
+  const planetsObj = profileData.Vedic?.planets || profileData.systems?.Vedic?.planets || {};
   let currentY = tableTop + 7.5;
   doc.setDrawColor(226, 232, 240);
 
@@ -508,12 +508,12 @@ export function generateAstrologyPDF(profileData: any): jsPDF {
     const jagrat = p.state?.jagrat || "Jagrat (Awake)";
     const lajjit = p.state?.lajjita || "Svastha (Healthy)";
 
-    const ishta = profileData.systems?.Vedic?.strengths?.ishta_phala?.[pName] !== undefined
-      ? profileData.systems?.Vedic?.strengths?.ishta_phala?.[pName]
+    const ishta = (profileData.Vedic?.strengths?.ishta_phala?.[pName] ?? profileData.systems?.Vedic?.strengths?.ishta_phala?.[pName]) !== undefined
+      ? (profileData.Vedic?.strengths?.ishta_phala?.[pName] ?? profileData.systems?.Vedic?.strengths?.ishta_phala?.[pName])
       : Math.round((35 + (p.degree % 15)) * 10) / 10;
 
-    const kashta = profileData.systems?.Vedic?.strengths?.kashta_phala?.[pName] !== undefined
-      ? profileData.systems?.Vedic?.strengths?.kashta_phala?.[pName]
+    const kashta = (profileData.Vedic?.strengths?.kashta_phala?.[pName] ?? profileData.systems?.Vedic?.strengths?.kashta_phala?.[pName]) !== undefined
+      ? (profileData.Vedic?.strengths?.kashta_phala?.[pName] ?? profileData.systems?.Vedic?.strengths?.kashta_phala?.[pName])
       : Math.round((25 - (p.degree % 10)) * 10) / 10;
 
     doc.setFont("helvetica", "bold");
@@ -585,7 +585,7 @@ export function generateAstrologyPDF(profileData: any): jsPDF {
     }
 
     // Retrieve real KP Cusp details from user profile JSON if available
-    const kc = profileData.systems?.KP?.cusps?.[`House_${c}`] || profileData.systems?.KP?.cusps?.[c];
+    const kc = profileData.KP?.cusps?.[`House_${c}`] || profileData.systems?.KP?.cusps?.[`House_${c}`] || profileData.KP?.cusps?.[c] || profileData.systems?.KP?.cusps?.[c];
     let signName = "";
     let cuspDegree = 0;
     let cuspMin = 0;
@@ -660,7 +660,7 @@ export function generateAstrologyPDF(profileData: any): jsPDF {
     const p = planetsObj[pName] || { longitude_360: 0, sign: "Aries", sign_index: 0, house: 1 };
     
     // Retrieve real KP planet lords from user profile JSON if available
-    const kpPlan = profileData.systems?.KP?.planets?.[pName];
+    const kpPlan = profileData.KP?.planets?.[pName] || profileData.systems?.KP?.planets?.[pName];
     let kpStarLord = "";
     let kpSubLord = "";
     let kpSubSubLord = "";
@@ -740,7 +740,7 @@ export function generateAstrologyPDF(profileData: any): jsPDF {
   doc.line(20, 54, 190, 54);
 
   // Retrieve real house significators from user profile JSON if available
-  const kpSigs = profileData.systems?.KP?.house_significators;
+  const kpSigs = profileData.KP?.house_significators || profileData.systems?.KP?.house_significators;
   const levels = [];
   for (let idx = 1; idx <= 12; idx++) {
     const sig = kpSigs?.[idx] || kpSigs?.[`House_${idx}`] || kpSigs?.[`House_${idx}`];
@@ -796,7 +796,7 @@ export function generateAstrologyPDF(profileData: any): jsPDF {
   });
 
   // Active DBA Tree Card
-  const vTimeline = profileData.systems?.Vedic?.dashas?.vimshottari || [];
+  const vTimeline = profileData.Vedic?.dashas?.vimshottari || profileData.systems?.Vedic?.dashas?.vimshottari || [];
   const activeDBA = getActiveDBA(vTimeline);
 
   doc.setFillColor(accentColor[0], accentColor[1], accentColor[2], 0.05);
@@ -1044,7 +1044,7 @@ export function generateAstrologyPDF(profileData: any): jsPDF {
     const p = planetsObj[pName] || { degree: 0, minute: 0, sign_index: 0, house: 1 };
     
     // Retrieve real Western planet coordinates from user profile if available
-    const westPlan = profileData.systems?.Western?.planets?.[pName];
+    const westPlan = profileData.Western?.planets?.[pName] || profileData.systems?.Western?.planets?.[pName];
     let tropSignName = "";
     let tropDeg = 0;
     let tropMin = 0;
@@ -1130,7 +1130,7 @@ export function generateAstrologyPDF(profileData: any): jsPDF {
   doc.line(20, wY + 73, 190, wY + 73);
 
   // Retrieve real Western aspects if available
-  const wAspectsList = profileData.systems?.Western?.aspects || [];
+  const wAspectsList = profileData.Western?.aspects || profileData.systems?.Western?.aspects || [];
   let wAspectsText = "Sun Trine Jupiter (tight 1.2° orb), Saturn Square Venus (brings discipline to relationships)";
   if (wAspectsList.length > 0) {
     wAspectsText = wAspectsList.slice(0, 3).map((a: any) => `${a.planet_1} ${a.aspect_type} ${a.planet_2} (${a.angle || a.orb}°)`).join(", ");

@@ -697,6 +697,7 @@ export default function App() {
       icon: Zap,
       submenus: [
         { id: "dashboard", label: "Dashboard", description: "Overview, Provider Health & Status." },
+        { id: "rulebook", label: "KP Rulebook", description: "Krishnamurti Paddhati rules & evidence engine." },
         { id: "cusps", label: "Cusps", description: "12 Cusps, Degrees & Sub-Lords." },
         { id: "planet_analysis", label: "Planet Analysis", description: "Planet Star-Lord & Sub-Lord placements." },
         { id: "significators", label: "Significators", description: "Planet & House level significators." },
@@ -998,7 +999,7 @@ export default function App() {
       const text = await file.text();
       const parsed = JSON.parse(text);
       
-      if (!parsed.Birth || !parsed.systems?.Vedic) {
+      if (!parsed.Birth || (!parsed.Vedic && !parsed.systems?.Vedic)) {
         alert("Invalid Profile structure. Please ensure it follows the correct userprofile.json schema.");
         return;
       }
