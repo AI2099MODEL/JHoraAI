@@ -1,0 +1,509 @@
+{
+  "metadata": {
+    "schemaVersion": "1.0",
+    "engine": "CurrentSkyContext",
+    "version": "1.0.0",
+    "lastUpdated": "2026-07-16T03:04:00Z",
+    "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
+  },
+  "currentDateTime": {
+    "utcTime": "2026-07-16T10:04:00Z",
+    "localTime": "2026-07-16T03:04:00-07:00",
+    "timezone": "America/Los_Angeles"
+  },
+  "moon": {
+    "currentSign": {
+      "id": "",
+      "displayName": "",
+      "longitude": 0.0
+    },
+    "currentNakshatra": {
+      "id": "",
+      "displayName": "",
+      "lord": ""
+    },
+    "currentPada": 1,
+    "currentStarLord": {
+      "id": "",
+      "displayName": ""
+    },
+    "currentSubLord": {
+      "id": "",
+      "displayName": ""
+    },
+    "moonPhase": {
+      "type": "",
+      "displayName": "",
+      "illuminationPercentage": 0.0
+    },
+    "moonLongitude": 0.0,
+    "waxing": true,
+    "waning": false,
+    "voidOfCourse": {
+      "isVoidOfCourse": false,
+      "aspectFreeUntil": null,
+      "nextSign": ""
+    }
+  },
+  "sun": {
+    "sign": {
+      "id": "",
+      "displayName": ""
+    },
+    "longitude": 0.0,
+    "nakshatra": {
+      "id": "",
+      "displayName": ""
+    },
+    "starLord": {
+      "id": "",
+      "displayName": ""
+    }
+  },
+  "planets": {
+    "sun": {
+      "currentSign": "",
+      "longitude": 0.0,
+      "nakshatra": "",
+      "pada": 1,
+      "starLord": "",
+      "subLord": "",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "moon": {
+      "currentSign": "",
+      "longitude": 0.0,
+      "nakshatra": "",
+      "pada": 1,
+      "starLord": "",
+      "subLord": "",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "mars": {
+      "currentSign": "",
+      "longitude": 0.0,
+      "nakshatra": "",
+      "pada": 1,
+      "starLord": "",
+      "subLord": "",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "mercury": {
+      "currentSign": "",
+      "longitude": 0.0,
+      "nakshatra": "",
+      "pada": 1,
+      "starLord": "",
+      "subLord": "",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "jupiter": {
+      "currentSign": "",
+      "longitude": 0.0,
+      "nakshatra": "",
+      "pada": 1,
+      "starLord": "",
+      "subLord": "",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "venus": {
+      "currentSign": "",
+      "longitude": 0.0,
+      "nakshatra": "",
+      "pada": 1,
+      "starLord": "",
+      "subLord": "",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "saturn": {
+      "currentSign": "",
+      "longitude": 0.0,
+      "nakshatra": "",
+      "pada": 1,
+      "starLord": "",
+      "subLord": "",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "rahu": {
+      "currentSign": "",
+      "longitude": 0.0,
+      "nakshatra": "",
+      "pada": 1,
+      "starLord": "",
+      "subLord": "",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "ketu": {
+      "currentSign": "",
+      "longitude": 0.0,
+      "nakshatra": "",
+      "pada": 1,
+      "starLord": "",
+      "subLord": "",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    }
+  },
+  "dasha": {
+    "mahadasha": {
+      "planet": "",
+      "startDate": "",
+      "endDate": ""
+    },
+    "bhukti": {
+      "planet": "",
+      "startDate": "",
+      "endDate": ""
+    },
+    "antara": {
+      "planet": "",
+      "startDate": "",
+      "endDate": ""
+    },
+    "sookshma": {
+      "planet": "",
+      "startDate": "",
+      "endDate": ""
+    },
+    "prana": {
+      "planet": "",
+      "startDate": "",
+      "endDate": ""
+    },
+    "remainingTime": {
+      "years": 0,
+      "months": 0,
+      "days": 0
+    },
+    "nextDba": [
+      {
+        "level": "",
+        "planet": "",
+        "startDate": "",
+        "endDate": ""
+      }
+    ]
+  },
+  "transits": {
+    "currentTransit": {
+      "description": "Active transiting coordinates mapped to natal structure"
+    },
+    "upcomingTransit": {
+      "description": "Upcoming transit shifts in the near term"
+    },
+    "planetEnteringNewSign": [
+      {
+        "planet": "",
+        "fromSign": "",
+        "toSign": "",
+        "transitDateTime": ""
+      }
+    ],
+    "planetChangingNakshatra": [
+      {
+        "planet": "",
+        "fromNakshatra": "",
+        "toNakshatra": "",
+        "transitDateTime": ""
+      }
+    ],
+    "planetRetrograde": [
+      {
+        "planet": "",
+        "retrogradeStartDate": "",
+        "retrogradeEndDate": ""
+      }
+    ],
+    "planetDirect": [
+      {
+        "planet": "",
+        "directDate": ""
+      }
+    ],
+    "planetCombust": [
+      {
+        "planet": "",
+        "combustStartDate": "",
+        "combustEndDate": ""
+      }
+    ],
+    "planetExalted": [
+      {
+        "planet": "",
+        "sign": "",
+        "exaltationDegree": 0.0
+      }
+    ],
+    "planetDebilitated": [
+      {
+        "planet": "",
+        "sign": "",
+        "debilitationDegree": 0.0
+      }
+    ]
+  },
+  "rulingPlanets": {
+    "dayLord": "",
+    "ascendantLord": "",
+    "ascendantStarLord": "",
+    "ascendantSubLord": "",
+    "moonSignLord": "",
+    "moonStarLord": "",
+    "moonSubLord": ""
+  },
+  "panchanga": {
+    "tithi": {
+      "name": "",
+      "index": 1,
+      "paksha": "",
+      "endDate": ""
+    },
+    "vara": {
+      "name": "",
+      "lord": ""
+    },
+    "nakshatra": {
+      "name": "",
+      "lord": "",
+      "endDate": ""
+    },
+    "yoga": {
+      "name": "",
+      "lord": "",
+      "endDate": ""
+    },
+    "karana": {
+      "name": "",
+      "lord": "",
+      "endDate": ""
+    },
+    "sunrise": "",
+    "sunset": "",
+    "abhijitMuhurta": {
+      "startTime": "",
+      "endTime": ""
+    },
+    "rahuKalam": {
+      "startTime": "",
+      "endTime": ""
+    },
+    "yamaganda": {
+      "startTime": "",
+      "endTime": ""
+    },
+    "gulika": {
+      "startTime": "",
+      "endTime": ""
+    }
+  },
+  "currentEnergy": {
+    "overallEnergy": {
+      "score": 0.0,
+      "tone": "",
+      "description": ""
+    },
+    "mentalEnergy": {
+      "score": 0.0,
+      "tone": "",
+      "description": ""
+    },
+    "physicalEnergy": {
+      "score": 0.0,
+      "tone": "",
+      "description": ""
+    },
+    "relationshipEnergy": {
+      "score": 0.0,
+      "tone": "",
+      "description": ""
+    },
+    "careerEnergy": {
+      "score": 0.0,
+      "tone": "",
+      "description": ""
+    },
+    "financialEnergy": {
+      "score": 0.0,
+      "tone": "",
+      "description": ""
+    },
+    "spiritualEnergy": {
+      "score": 0.0,
+      "tone": "",
+      "description": ""
+    }
+  },
+  "currentMood": {
+    "dominantHouses": [
+      {
+        "houseNumber": 1,
+        "significance": ""
+      }
+    ],
+    "dominantPlanets": [
+      {
+        "planet": "",
+        "strength": 0.0,
+        "influenceType": ""
+      }
+    ],
+    "positiveThemes": [],
+    "negativeThemes": [],
+    "emotionalTone": ""
+  },
+  "currentFocus": {
+    "career": {
+      "priority": "medium",
+      "description": ""
+    },
+    "business": {
+      "priority": "medium",
+      "description": ""
+    },
+    "finance": {
+      "priority": "medium",
+      "description": ""
+    },
+    "relationship": {
+      "priority": "medium",
+      "description": ""
+    },
+    "family": {
+      "priority": "medium",
+      "description": ""
+    },
+    "children": {
+      "priority": "medium",
+      "description": ""
+    },
+    "health": {
+      "priority": "medium",
+      "description": ""
+    },
+    "education": {
+      "priority": "medium",
+      "description": ""
+    },
+    "travel": {
+      "priority": "medium",
+      "description": ""
+    },
+    "spirituality": {
+      "priority": "medium",
+      "description": ""
+    }
+  },
+  "currentChallenges": {
+    "delays": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "stress": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "legal": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "relationship": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "health": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "career": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "finance": {
+      "active": false,
+      "affectedAreas": []
+    }
+  },
+  "currentOpportunities": {
+    "marriageWindow": {
+      "active": false,
+      "timeframe": ""
+    },
+    "careerOpportunity": {
+      "active": false,
+      "timeframe": ""
+    },
+    "businessOpportunity": {
+      "active": false,
+      "timeframe": ""
+    },
+    "investmentOpportunity": {
+      "active": false,
+      "timeframe": ""
+    },
+    "travelOpportunity": {
+      "active": false,
+      "timeframe": ""
+    },
+    "learningOpportunity": {
+      "active": false,
+      "timeframe": ""
+    }
+  },
+  "timeline": {
+    "today": {
+      "summary": "",
+      "favorableActivities": [],
+      "unfavorableActivities": []
+    },
+    "tomorrow": {
+      "summary": "",
+      "favorableActivities": [],
+      "unfavorableActivities": []
+    },
+    "thisWeek": {
+      "summary": "",
+      "trends": []
+    },
+    "thisMonth": {
+      "summary": "",
+      "trends": []
+    },
+    "next3Months": {
+      "summary": "",
+      "trends": []
+    },
+    "next6Months": {
+      "summary": "",
+      "trends": []
+    },
+    "thisYear": {
+      "summary": "",
+      "trends": []
+    }
+  },
+  "validation": {
+    "currentSkyLoaded": false,
+    "transitLoaded": false,
+    "currentMoonLoaded": false,
+    "currentDashaLoaded": false,
+    "panchangaLoaded": false,
+    "readyForAi": false
+  }
+}
