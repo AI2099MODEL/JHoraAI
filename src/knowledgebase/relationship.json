@@ -1,0 +1,1136 @@
+{
+  "metadata": {
+    "schemaVersion": "1.0",
+    "engine": "RelationshipMaster",
+    "version": "1.0.0",
+    "lastUpdated": "2026-07-16T10:00:00Z",
+    "description": "JHoraAI Master Relationship Knowledge Base and Event Dossier"
+  },
+  "categories": [
+    {
+      "categoryId": "relationship",
+      "displayName": "Relationship",
+      "description": "All events, transitions, conflicts, legal resolutions, and milestones in personal and marital partnerships"
+    }
+  ],
+  "events": [
+    {
+      "id": "love",
+      "displayName": "Love",
+      "description": "Onset of romantic feelings and mutual attraction between two individuals",
+      "category": "Relationship",
+      "subcategory": "romance",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term", "long_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "crush",
+      "displayName": "Crush",
+      "description": "Infatuation, secret admiration, or temporary romantic obsession with another individual",
+      "category": "Relationship",
+      "subcategory": "romance",
+      "priority": "low",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets"],
+      "requiredSystems": ["kp", "western"],
+      "requiredEvidence": ["transit_trigger"],
+      "requiredTimeline": ["present", "near_future"],
+      "requiredReports": ["summary", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "proposal",
+      "displayName": "Proposal",
+      "description": "A formal or informal request or offer of marriage, exclusive commitment, or starting a relationship",
+      "category": "Relationship",
+      "subcategory": "milestone",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "dating",
+      "displayName": "Dating",
+      "description": "The phase of active social meeting and companionship to assess mutual compatibility",
+      "category": "Relationship",
+      "subcategory": "romance",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets"],
+      "requiredSystems": ["kp", "western"],
+      "requiredEvidence": ["transit_trigger", "synastry_match"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "courtship",
+      "displayName": "Courtship",
+      "description": "A formal pre-marriage phase of getting to know each other under familial or social guidance",
+      "category": "Relationship",
+      "subcategory": "milestone",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "engagement",
+      "displayName": "Engagement",
+      "description": "A formal agreement and social announcement of upcoming marriage, often with ring exchange",
+      "category": "Relationship",
+      "subcategory": "milestone",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger", "annual_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "marriage",
+      "displayName": "Marriage",
+      "description": "A legal, sacred, and social union of two individuals in matrimony",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term", "long_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "marriage_delay",
+      "displayName": "Marriage Delay",
+      "description": "Obstacles, planetary afflictions, or personal circumstances postponing marriage beyond typical age brackets",
+      "category": "Relationship",
+      "subcategory": "delay_cancellation",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term", "long_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "marriage_cancellation",
+      "displayName": "Marriage Cancellation",
+      "description": "Abrupt calling off of engagement, cancellation of wedding ceremonies, or total denial of marriage promise",
+      "category": "Relationship",
+      "subcategory": "delay_cancellation",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "lal_kitab"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "arranged_marriage",
+      "displayName": "Arranged Marriage",
+      "description": "A marital union facilitated, selected, and negotiated by parents, family members, or matches",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "love_marriage",
+      "displayName": "Love Marriage",
+      "description": "A marital union initiated and chosen primarily by the couple themselves due to romantic love",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "inter_caste_marriage",
+      "displayName": "Inter-caste Marriage",
+      "description": "A marital union spanning different traditional caste boundaries, highlighting progressive planetary influence",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "inter_religion_marriage",
+      "displayName": "Inter-religion Marriage",
+      "description": "A marital union between individuals of different religious beliefs, indicating Rahu/Ketu or strong 9th/12th house influence",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "court_marriage",
+      "displayName": "Court Marriage",
+      "description": "A secular, formal, and registered marriage performed before a government registrar under civil law",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "secret_marriage",
+      "displayName": "Secret Marriage",
+      "description": "A marital union performed in secret without parental or public knowledge, indicating heavy 8th and 12th house influence",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "live_in_relationship",
+      "displayName": "Live-in Relationship",
+      "description": "Co-habitation of two romantic partners without legal or formal marriage ceremonies, often triggered by Rahu or Uranus",
+      "category": "Relationship",
+      "subcategory": "romance",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "second_marriage",
+      "displayName": "Second Marriage",
+      "description": "A legal marital union following the death, divorce, or dissolution of the first marriage, signified by the 2nd and 9th houses",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term", "long_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "third_marriage",
+      "displayName": "Third Marriage",
+      "description": "A legal marital union following the dissolution of the second marriage, signified by the 11th house",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term", "long_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "remarriage",
+      "displayName": "Remarriage",
+      "description": "Re-marrying a former spouse or starting a fresh marital chapter after previous relationship terminations",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "extra_marital_affair",
+      "displayName": "Extra-marital Affair",
+      "description": "A secret physical or emotional romantic relationship outside of the active legal marriage",
+      "category": "Relationship",
+      "subcategory": "conflict",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "lal_kitab"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "relationship_conflict",
+      "displayName": "Relationship Conflict",
+      "description": "Active arguments, ideological clashes, or domestic disputes between partners, signified by the 6th house",
+      "category": "Relationship",
+      "subcategory": "conflict",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western", "lal_kitab"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "emotional_distance",
+      "displayName": "Emotional Distance",
+      "description": "Lack of communication, coldness, and loss of emotional intimacy while cohabiting, signified by Saturn or Ketu in the 7th",
+      "category": "Relationship",
+      "subcategory": "conflict",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "long_distance_relationship",
+      "displayName": "Long Distance Relationship",
+      "description": "A romantic relationship where partners are geographically separated, signified by the 3rd, 9th, and 12th houses",
+      "category": "Relationship",
+      "subcategory": "romance",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "separation",
+      "displayName": "Separation",
+      "description": "Physical separation or living in different homes due to relationship breakdown, without legal divorce",
+      "category": "Relationship",
+      "subcategory": "conflict",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term", "long_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "judicial_separation",
+      "displayName": "Judicial Separation",
+      "description": "A formal, court-ordered legal separation where spouses remain legally married but live apart",
+      "category": "Relationship",
+      "subcategory": "legal",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "divorce",
+      "displayName": "Divorce",
+      "description": "The complete legal dissolution of a marital contract, signified by the 12th from the 7th (6th house) and the 12th house",
+      "category": "Relationship",
+      "subcategory": "legal",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term", "long_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "mutual_divorce",
+      "displayName": "Mutual Divorce",
+      "description": "Amicable and consensual dissolution of marriage under mutual agreement, minimizing malefic legal battles",
+      "category": "Relationship",
+      "subcategory": "legal",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "contested_divorce",
+      "displayName": "Contested Divorce",
+      "description": "A highly disputed and litigated divorce where one party challenges terms, requiring planetary warfare indicators",
+      "category": "Relationship",
+      "subcategory": "legal",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term", "long_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "litigation",
+      "displayName": "Litigation",
+      "description": "Ongoing court battles, legal proceedings, and dispute resolutions regarding marital friction",
+      "category": "Relationship",
+      "subcategory": "legal",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger", "annual_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "domestic_violence",
+      "displayName": "Domestic Violence",
+      "description": "Physical, verbal, or emotional abuse within a household, signified by heavy afflictions of Mars, Rahu, and Saturn",
+      "category": "Relationship",
+      "subcategory": "conflict",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "lal_kitab"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "maintenance",
+      "displayName": "Maintenance",
+      "description": "Interim or final court-ordered financial maintenance support for a spouse during separation or litigation",
+      "category": "Relationship",
+      "subcategory": "legal",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "alimony",
+      "displayName": "Alimony",
+      "description": "One-time or recurring post-divorce financial settlement payouts, signified by the 8th and 12th houses",
+      "category": "Relationship",
+      "subcategory": "legal",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "child_custody",
+      "displayName": "Child Custody",
+      "description": "Legal dispute and court decision regarding custody, guardianship, and access to children after divorce",
+      "category": "Relationship",
+      "subcategory": "legal",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "reconciliation",
+      "displayName": "Reconciliation",
+      "description": "Resolution of differences, ending of litigation, and resuming cohabitation and harmony, signified by the 11th and 4th houses",
+      "category": "Relationship",
+      "subcategory": "milestone",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger", "annual_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "partner_health",
+      "displayName": "Partner Health",
+      "description": "Analyzing physical health, vital stability, and disease phases of the spouse, signified by the 7th house and its 6th/8th/12th lords",
+      "category": "Relationship",
+      "subcategory": "partner",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "lal_kitab"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "partner_death",
+      "displayName": "Partner Death",
+      "description": "Physical passing away of the partner, signified by maraka/randhra positions relative to the 7th house",
+      "category": "Relationship",
+      "subcategory": "partner",
+      "priority": "high",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term", "long_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "widowhood",
+      "displayName": "Widowhood",
+      "description": "The state of living after the death of the spouse, signified by heavy afflictions in the 8th house and to key significators",
+      "category": "Relationship",
+      "subcategory": "partner",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term", "long_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "foreign_spouse",
+      "displayName": "Foreign Spouse",
+      "description": "Marriage with an individual from a foreign land, culture, or different nationality, signified by the 7th and 12th houses",
+      "category": "Relationship",
+      "subcategory": "marriage",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "partner_relocation",
+      "displayName": "Partner Relocation",
+      "description": "Relocating to another city, state, or country after marriage, or partner moving for career purposes, signified by the 3rd and 12th houses",
+      "category": "Relationship",
+      "subcategory": "partner",
+      "priority": "medium",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger", "annual_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "relationship_counselling",
+      "displayName": "Relationship Counselling",
+      "description": "Seeking professional couples therapy or astrological consultation to resolve partnership friction and restore trust",
+      "category": "Relationship",
+      "subcategory": "milestone",
+      "priority": "low",
+      "requiredProfiles": ["self", "partner"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future"],
+      "requiredReports": ["summary", "evidence", "recommendations"],
+      "enabled": true
+    }
+  ],
+  "systems": {
+    "kp": {
+      "natalPromise": {
+        "description": "Evaluation of relationship promises in the birth chart via cuspal sub-lords",
+        "primaryHouses": [7],
+        "supportingHouses": [2, 11],
+        "detrimentalHouses": [1, 6, 12]
+      },
+      "primaryHouses": [7],
+      "supportingHouses": [2, 11],
+      "negativeHouses": [1, 6, 10, 12],
+      "cusps": {
+        "description": "Cuspal coordinates, degrees, and sign/star/sub/sub-sub lords",
+        "keys": ["signLord", "starLord", "subLord", "subSubLord"]
+      },
+      "houseOccupants": {
+        "description": "Planets residing inside the boundary degrees of relevant houses"
+      },
+      "houseLords": {
+        "description": "Rulers of signs occupying the cuspal degrees of the 12 houses"
+      },
+      "starLords": {
+        "description": "Constellation rulers governing planet positions and cuspal points"
+      },
+      "subLords": {
+        "description": "Sub-divisional rulers of stellar spaces determining final outcome event trends in KP"
+      },
+      "subSubLords": {
+        "description": "Micro-sub divisional rulers of sub spaces for hyper-precise timing"
+      },
+      "planetSignificators": {
+        "description": "Planetary significators categorized by A, B, C, D grades in KP system"
+      },
+      "houseSignificators": {
+        "description": "List of planets signifying specific houses sorted by strength"
+      },
+      "retrograde": {
+        "description": "Planetary backward motion indicators causing delays or repeating situations",
+        "treatment": "Retrograde star-lords or sub-lords negate progress during major periods"
+      },
+      "combust": {
+        "description": "Planets in close proximity to the Sun losing their explicit outward strength"
+      },
+      "conjunction": {
+        "description": "Close longitudinal alignment of planets within orb values"
+      },
+      "aspect": {
+        "description": "Planetary aspects on houses and other planets according to Vedic degrees"
+      },
+      "dba": {
+        "description": "Dasha, Bhukti, and Antara lord timeline significance for event activation"
+      },
+      "transit": {
+        "description": "Current or projected planet transits over natal cusps and planetary degrees"
+      },
+      "moonTransit": {
+        "description": "Daily trigger verification based on transiting Moon over key Nakshatras"
+      },
+      "saturnTransit": {
+        "description": "Macro-structural trends, delays, and structural lessons verified via Saturn's position"
+      },
+      "jupiterTransit": {
+        "description": "Blessing, expansion, and event sanctioning triggers validated via Jupiter's transits"
+      },
+      "rulingPlanets": {
+        "description": "Ascendant Sign/Star Lord, Moon Sign/Star Lord, and Day Lord computed for query hour",
+        "usage": "Cross-verification of horary queries or natal chart birth-time validation"
+      },
+      "horarySupport": {
+        "description": "KP Horary (Prasna) support based on a number from 1 to 249"
+      },
+      "supportingEvidence": {
+        "description": "Positive linkages where 7th sub lord signifies 2, 7, 11 and active DBA lords are positive significators"
+      },
+      "conflictingEvidence": {
+        "description": "Negative linkages where 7th sub lord signifies 1, 6, 12 and active DBA lords signify separation or delay"
+      },
+      "missingEvidence": {
+        "description": "Inability to verify precise sub-lords due to birth time uncertainty beyond 1 minute"
+      }
+    },
+    "parashari": {
+      "d1": {
+        "description": "Rashi (Natal) Chart analysis of houses and planets"
+      },
+      "d9": {
+        "description": "Navamsha Chart - the core divisional chart representing marriage, spouse quality, and inner strength"
+      },
+      "d60": {
+        "description": "Shastiamsha Chart for macro-karma evaluation of relationship life promises"
+      },
+      "seventhHouse": {
+        "description": "Evaluation of the 7th house in D1 and D9 for occupants, aspects, and structural strength"
+      },
+      "seventhLord": {
+        "description": "Evaluation of placement, dignity, aspects, and star of the 7th house lord"
+      },
+      "secondHouse": {
+        "description": "Family addition house and financial accumulation analysis"
+      },
+      "eighthHouse": {
+        "description": "Sustenance of marriage (Mangalya Sthana), in-laws, and joint assets analysis"
+      },
+      "twelfthHouse": {
+        "description": "Bed comfort, physical intimacy, and expenditure house analysis"
+      },
+      "venus": {
+        "description": "Primary natural significator (Karaka) of relationship, wife, and love"
+      },
+      "jupiter": {
+        "description": "Natural significator (Karaka) of husband, wisdom, and divine blessing"
+      },
+      "mars": {
+        "description": "Significator of physical attraction, energy, passion, and Manglik Dosha impacts"
+      },
+      "saturn": {
+        "description": "Significator of commitment, long-term duty, delays, and dry spells"
+      },
+      "rahu": {
+        "description": "Significator of unconventional relationships, sudden attraction, and foreign spouse"
+      },
+      "ketu": {
+        "description": "Significator of detachment, distance, spiritual liberation, and separation"
+      },
+      "yogas": {
+        "description": "Planetary combinations like Malavya Yoga, Gaja Kesari Yoga, or negative marital combinations",
+        "placeholders": ["ParijataYoga", "KamaYoga", "VivahaBadhaYoga"]
+      },
+      "doshas": {
+        "description": "Afflictions like Manglik Dosha, Kuja Dosha, Papakartari Dosha, or Rahu-Ketu axis afflictions",
+        "placeholders": ["ManglikDosha", "KalathraDosha", "KalyanaBhangaDosha"]
+      },
+      "vimshottari": {
+        "description": "120-year planetary dasha sequence showing psychological evolution and event triggers"
+      },
+      "transit": {
+        "description": "Double transit rules of Jupiter and Saturn sanctioning marriage and relationship changes"
+      },
+      "supportingEvidence": {
+        "description": "Strong 7th lord in kendra/trikona, benefic aspects on D1/D9 7th house, unafflicted Venus/Jupiter"
+      },
+      "conflictingEvidence": {
+        "description": "Afflicted 7th house by multiple malefics, debilitated Venus, 7th lord in 6/8/12 houses"
+      }
+    },
+    "jaimini": {
+      "atmakaraka": {
+        "description": "The planet with the highest longitudinal degree representing the soul's primary lessons"
+      },
+      "darakaraka": {
+        "description": "The planet with the lowest longitudinal degree representing the spouse and partnerships"
+      },
+      "upapada": {
+        "description": "Upapada Lagna (UL) - the arudha of the 12th house representing marriage partner and lineage"
+      },
+      "arudhaA7": {
+        "description": "Darapada (A7) - the arudha of the 7th house representing physical relationship and attraction"
+      },
+      "karakamsha": {
+        "description": "The sign occupied by the Atmakaraka in the Navamsha chart analyzed in D1"
+      },
+      "argala": {
+        "description": "Interventions or direct supports from planets in 2nd, 4th, 5th, and 11th from significator points"
+      },
+      "rashiDrishti": {
+        "description": "Sign aspects where cardinal signs aspect fixed signs (except adjacent) and mutable signs aspect each other"
+      },
+      "charaDasha": {
+        "description": "Jaimini sign-based dasha sequence timing critical relationship events"
+      },
+      "supportingEvidence": {
+        "description": "Benefic planets in or aspecting UL, clean aspect links between Atmakaraka and Darakaraka"
+      },
+      "conflictingEvidence": {
+        "description": "Malefics like Rahu, Ketu, or Saturn occupying or aspecting UL, afflicted Darakaraka"
+      }
+    },
+    "western": {
+      "seventhHouse": {
+        "description": "Descendant cusp, its sign, and planets residing in the 7th house"
+      },
+      "venus": {
+        "description": "Planet of harmony, affection, aesthetic bonding, and social relationships"
+      },
+      "mars": {
+        "description": "Planet of sexual drive, passion, pursuit, and assertiveness in partnerships"
+      },
+      "saturn": {
+        "description": "Planet of boundaries, realistic commitments, longevity, and cold restrictions"
+      },
+      "pluto": {
+        "description": "Planet of deep psychological transformation, power struggles, and obsession in love"
+      },
+      "juno": {
+        "description": "Asteroid representing committed marriage partner, devotion, and structural fairness"
+      },
+      "composite": {
+        "description": "The midpoint chart combining two individuals to represent the relationship entity"
+      },
+      "synastry": {
+        "description": "Degree-to-degree aspect overlays between two individual natal charts"
+      },
+      "progressions": {
+        "description": "Secondary progressions showing emotional and psychological shifts over time"
+      },
+      "solarReturn": {
+        "description": "Annual return of the Sun to its birth degree, highlighting the theme of the year"
+      },
+      "transit": {
+        "description": "Outer planets (Jupiter, Saturn, Uranus, Neptune, Pluto) aspecting natal Venus/Descendant"
+      }
+    },
+    "nadi": {
+      "nadiAmsa": {
+        "description": "Highly precise divisional arc (1/150th of a sign) determining micro-destiny"
+      },
+      "marriageRules": {
+        "description": "Bhrigu Nandi Nadi rules: Jupiter representing male native, Venus representing female native",
+        "indicators": ["JupiterTransitContactVenus", "VenusTransitContactMars"]
+      },
+      "timingRules": {
+        "description": "Transit nodes (Rahu/Ketu) conjuncting or aspecting Venus/Jupiter to activate events"
+      },
+      "supportingEvidence": {
+        "description": "Harmonious transit paths of key planets without Node intersections"
+      }
+    },
+    "lalKitab": {
+      "relevantHouses": {
+        "description": "Houses 2, 7, and 8 evaluated using the unique Lal Kitab aspects and blind planet rules"
+      },
+      "sleepingPlanets": {
+        "description": "Planets in inactive houses that require manual triggers to awaken"
+      },
+      "artificialPlanets": {
+        "description": "Lal Kitab planetary pairs that merge to form a synthetic third planet's energy"
+      },
+      "remedies": {
+        "description": "Symbolic actions, charity, or domestic habits to rectify planetary afflictions"
+      }
+    },
+    "tajik": {
+      "muntha": {
+        "description": "The progressed yearly point in the Varshaphala (annual) chart"
+      },
+      "varshaphala": {
+        "description": "The annual Solar Return chart calculated under Vedic Tajik rules"
+      },
+      "annualTrigger": {
+        "description": "Timing via Patyini Dasha or Mudda Dasha conjunct with transit aspects"
+      }
+    }
+  },
+  "timeline": {
+    "phases": [
+      {
+        "phase": "past",
+        "description": "Historical events, retro-active verification, and previous relationship milestones",
+        "timeframe": "Historical"
+      },
+      {
+        "phase": "present",
+        "description": "Current active energies, transits, and short-term trends",
+        "timeframe": "0 to 3 months"
+      },
+      {
+        "phase": "near_future",
+        "description": "Upcoming events and transit triggers",
+        "timeframe": "3 to 12 months"
+      },
+      {
+        "phase": "medium_term",
+        "description": "Medium-term dasha periods and major planetary shifts",
+        "timeframe": "1 to 3 years"
+      },
+      {
+        "phase": "long_term",
+        "description": "Life-long promises, outer planetary transits, and macro-dasha levels",
+        "timeframe": "3 to 10+ years"
+      }
+    ]
+  },
+  "validation": {
+    "pipeline": [
+      {
+        "step": 1,
+        "name": "Birth Data",
+        "description": "Validate date, time, and coordinates for precision"
+      },
+      {
+        "step": 2,
+        "name": "Profile Selection",
+        "description": "Identify relevant charts (self, partner, etc.)"
+      },
+      {
+        "step": 3,
+        "name": "Required System Available",
+        "description": "Verify calculation engines for selected systems are loaded"
+      },
+      {
+        "step": 4,
+        "name": "Natal Promise",
+        "description": "Analyze fundamental life promise across KP cusps and Parashari houses"
+      },
+      {
+        "step": 5,
+        "name": "Planet Validation",
+        "description": "Evaluate strength, dignity, and associations of significators"
+      },
+      {
+        "step": 6,
+        "name": "House Validation",
+        "description": "Assess relevant house strengths, cuspal sub lords, and aspects"
+      },
+      {
+        "step": 7,
+        "name": "Dasha Validation",
+        "description": "Examine Vimshottari and Chara dasha support for the timeframe"
+      },
+      {
+        "step": 8,
+        "name": "Transit Validation",
+        "description": "Track current and upcoming transit triggers over key degrees"
+      },
+      {
+        "step": 9,
+        "name": "Relationship Validation",
+        "description": "Evaluate mutual synastry and collective indicators"
+      },
+      {
+        "step": 10,
+        "name": "Supporting Evidence",
+        "description": "Gather and weight all positive astrological signatures"
+      },
+      {
+        "step": 11,
+        "name": "Conflicting Evidence",
+        "description": "Identify and evaluate malefic aspects, house negations, or afflictions"
+      },
+      {
+        "step": 12,
+        "name": "Missing Evidence",
+        "description": "Identify critical data gaps or unfulfilled condition sets"
+      },
+      {
+        "step": 13,
+        "name": "Evidence Package",
+        "description": "Assemble structured JSON payload containing all validated metrics"
+      },
+      {
+        "step": 14,
+        "name": "AI",
+        "description": "Relay the structured evidence package to the LLM for objective, calculated translation to the user"
+      }
+    ]
+  },
+  "evidence": {
+    "types": [
+      {
+        "typeId": "cuspal_sub_lord_link",
+        "displayName": "Cuspal Sub Lord Linkage",
+        "description": "Connectivity between a cusp sub-lord and the significator houses"
+      },
+      {
+        "typeId": "dasha_lord_significance",
+        "displayName": "Dasha Lord Significance",
+        "description": "Planetary ruler of the current Vimshottari dasha signifying event houses"
+      },
+      {
+        "typeId": "transit_conjunction",
+        "displayName": "Transit Conjunction",
+        "description": "A slow transiting planet conjunct with a natal significator degree"
+      }
+    ],
+    "weightingSystem": {
+      "description": "Algorithmic weights for matching patterns across multiple astrological disciplines",
+      "priorities": {
+        "high": 1.0,
+        "medium": 0.6,
+        "low": 0.3
+      }
+    }
+  },
+  "reports": {
+    "templates": {
+      "summary": {
+        "title": "Relationship Summary",
+        "sections": ["overview", "current_state", "key_trends"]
+      },
+      "detailedReport": {
+        "title": "Comprehensive Relationship Report",
+        "sections": ["astrological_framework", "astrological_details", "house_analysis", "planetary_strengths"]
+      },
+      "supportingEvidence": {
+        "title": "Supporting Evidence List",
+        "sections": ["kp_signatures", "parashari_signatures", "jaimini_signatures"]
+      },
+      "conflictingEvidence": {
+        "title": "Conflicting Evidence List",
+        "sections": ["negating_signatures", "malefic_afflictions", "retrograde_obstacles"]
+      },
+      "missingEvidence": {
+        "title": "Missing Evidence List",
+        "sections": ["missing_birth_details", "unresolved_cusps"]
+      },
+      "timeline": {
+        "title": "Event Timeline Projection",
+        "sections": ["past_events", "current_transit_triggers", "future_outlook"]
+      },
+      "recommendations": {
+        "title": "Strategic Recommendations",
+        "sections": ["timing_actions", "communication_focus", "personal_growth"]
+      },
+      "remedies": {
+        "title": "Astrological Remedies",
+        "sections": ["gems", "mantras", "charity", "lal_kitab_remedies"]
+      }
+    }
+  },
+  "notifications": {
+    "triggers": {
+      "marriageWindow": {
+        "id": "marriage_window",
+        "title": "Auspicious Marriage Window Alert",
+        "description": "Fired when concurrent DBA and major transits align perfectly for marriage",
+        "frequency": "Dynamic"
+      },
+      "relationshipChanges": {
+        "id": "relationship_changes",
+        "title": "Relationship Shift Warning",
+        "description": "Fired when a shift in dasha lords alters relationship dynamics",
+        "frequency": "On Event Shift"
+      },
+      "transitAlerts": {
+        "id": "transit_alerts",
+        "title": "Major Planet Transit Alert",
+        "description": "Fired when Jupiter, Saturn, Rahu, or Ketu transit key degrees or conjunct key house lords",
+        "frequency": "On Planet Transit"
+      },
+      "dailyRelationshipInsight": {
+        "id": "daily_insight",
+        "title": "Daily Relationship Insight",
+        "description": "Daily guidance based on transiting Moon's nakshatra and aspect to natal Venus",
+        "frequency": "Daily"
+      }
+    }
+  },
+  "futureExtensions": {
+    "plannedFeatures": [
+      {
+        "id": "synastry_heatmap",
+        "title": "Dynamic Synastry Heatmap",
+        "description": "Interactive visual map of exact degree-to-degree planetary synastry aspects",
+        "estimatedRelease": "v2.0"
+      },
+      {
+        "id": "ashtakavarga_koota_integration",
+        "title": "Detailed Koota Agreement Engine",
+        "description": "Combine 36-point Koota matching with Ashtakavarga point distributions",
+        "estimatedRelease": "v1.5"
+      },
+      {
+        "id": "ai_reconciliation_advisor",
+        "title": "AI Relationship Reconciliation Advisor",
+        "description": "Generate compassionate advice matching transiting planetary relief vectors",
+        "estimatedRelease": "v2.5"
+      }
+    ],
+    "schemaCompatibility": {
+      "minEngineVersion": "1.0",
+      "backwardCompatible": true,
+      "extensibilityRules": [
+        "All additions must be appended as nullable properties",
+        "Never delete or rename existing category or event IDs",
+        "Custom systems must be defined under a dedicated key within the systems schema"
+      ]
+    }
+  }
+}
