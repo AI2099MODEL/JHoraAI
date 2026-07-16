@@ -5,6 +5,8 @@
 
 import express from "express";
 import path from "path";
+import fs from "fs";
+import nodemailer from "nodemailer";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -47,6 +49,152 @@ function getGeminiClient(): GoogleGenAI {
   }
   return aiClient;
 }
+
+// Helper to send real-time personalized astrology report via Email using Nodemailer
+async function triggerAstrologyEmail(profile: any) {
+  const email = profile.email;
+  if (!email) {
+    console.log("No email in profile, skipping email trigger.");
+    return;
+  }
+
+  console.log(`Scheduling astrology report generation for user: ${profile.name} (${email})`);
+
+  // Run asynchronously after 5 seconds to avoid blocking response
+  setTimeout(async () => {
+    try {
+      let analysisText = "";
+      try {
+        const ai = getGeminiClient();
+        const prompt = `
+          You are a master Vedic and KP Astrologer. Generate a highly detailed, personalized, and visually beautiful Vedic Astrology Analysis and Reading Report for:
+          Name: ${profile.name}
+          Email: ${profile.email}
+          Phone: ${profile.phoneNumber || "Not provided"}
+          Theme: Premium JHoraAI Vedic and KP Astrology Engine
+
+          Include:
+          1. A warm, mystical greeting.
+          2. An analysis of their general personality based on their cosmic alignment.
+          3. Practical predictions for their Career, Relationships, and Spiritual Growth.
+          4. Remedial measures (Upayas) such as mantras or gemstone suggestions.
+          5. A welcoming invitation to return to JHoraAI for deeper Kundli calculations.
+
+          Format the output as clean, professional, and readable HTML inside a gorgeous modern email template. Keep it elegant, using professional typography spacing.
+        `;
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+        });
+        analysisText = response.text || "Cosmic energies are aligning. Check your profile dashboard for complete KP stellar and Western synastry calculations.";
+      } catch (aiErr) {
+        console.error("Gemini failed to generate email report, using backup:", aiErr);
+        analysisText = `
+          <h2>Your JHoraAI Astro Reading</h2>
+          <p>Welcome to JHoraAI, ${profile.name}!</p>
+          <p>Our cosmic analysis engines have synced your profile data securely across Local Machine, Google Drive, and our secure backend database.</p>
+          <p>Your current profile email: ${profile.email}</p>
+          <p>Your captured phone: ${profile.phoneNumber || "Not provided"}</p>
+          <p>We are currently analyzing your planetary positions, stellar nakshatras, house significators, and transits. Stay tuned for real-time astro updates on JHoraAI!</p>
+        `;
+      }
+
+      // Check if SMTP is configured
+      const smtpHost = process.env.SMTP_HOST || "";
+      const smtpPort = Number(process.env.SMTP_PORT || "587");
+      const smtpUser = process.env.SMTP_USER || "";
+      const smtpPass = process.env.SMTP_PASS || "";
+
+      if (smtpHost && smtpUser && smtpPass) {
+        const transporter = nodemailer.createTransport({
+          host: smtpHost,
+          port: smtpPort,
+          secure: smtpPort === 465,
+          auth: {
+            user: smtpUser,
+            pass: smtpPass,
+          },
+        });
+
+        const mailOptions = {
+          from: `"JHoraAI Cosmic Engine" <${smtpUser}>`,
+          to: email,
+          subject: `✨ Your Personalized JHoraAI Cosmic Astrology Analysis for ${profile.name}`,
+          html: `
+            <div style="font-family: 'Inter', Helvetica, Arial, sans-serif; background-color: #0b0f19; color: #f8fafc; padding: 40px; max-width: 600px; margin: auto; border-radius: 16px; border: 1px solid #312e81;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: #f59e0b; font-size: 28px; margin: 0; font-family: 'Georgia', serif;">JHoraAI Cosmic Report</h1>
+                <p style="color: #94a3b8; font-size: 12px; font-family: monospace;">VEDIC & KP STELLAR PRECISION ENGINE</p>
+              </div>
+              <div style="line-height: 1.6; font-size: 14px; color: #cbd5e1;">
+                ${analysisText}
+              </div>
+              <div style="text-align: center; margin-top: 40px; border-top: 1px solid #1e293b; padding-top: 20px; font-size: 11px; color: #64748b;">
+                <p>This report was securely generated and transmitted using Google Cloud Platform & AI Studio integrations.</p>
+                <p>&copy; 2026 JHoraAI Astro Platform. All cosmic alignments reserved.</p>
+              </div>
+            </div>
+          `,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Astrology report email successfully sent to ${email}`);
+      } else {
+        console.warn("SMTP environment variables are not configured in settings. Email report logged below instead:");
+        console.log("------------------ REPORT EMAIL START ------------------");
+        console.log(`To: ${email}`);
+        console.log(`Subject: ✨ Your Personalized JHoraAI Cosmic Astrology Analysis`);
+        console.log(`Body: ${analysisText}`);
+        console.log("------------------- REPORT EMAIL END -------------------");
+      }
+    } catch (err) {
+      console.error("Error in scheduled triggerAstrologyEmail execution:", err);
+    }
+  }, 5000);
+}
+
+// Save user profile and trigger reporting endpoint
+app.post("/api/user-profile/save", async (req, res) => {
+  try {
+    const profile = req.body;
+    if (!profile || !profile.uid) {
+      return res.status(400).json({ error: "Invalid profile data" });
+    }
+
+    const dataDir = path.join(process.cwd(), "data");
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+
+    const filePath = path.join(dataDir, "user_profiles.json");
+    let profiles: Record<string, any> = {};
+
+    if (fs.existsSync(filePath)) {
+      try {
+        const fileContent = fs.readFileSync(filePath, "utf-8");
+        profiles = JSON.parse(fileContent);
+      } catch (err) {
+        console.error("Failed to read user_profiles.json, resetting:", err);
+      }
+    }
+
+    profiles[profile.uid] = {
+      ...profile,
+      updatedAt: new Date().toISOString()
+    };
+
+    fs.writeFileSync(filePath, JSON.stringify(profiles, null, 2));
+    console.log(`Successfully saved profile ${profile.uid} to backend database.`);
+
+    // Trigger scheduled astrology email reading in the background
+    triggerAstrologyEmail(profile);
+
+    res.json({ success: true, message: "Profile successfully saved and synced on backend." });
+  } catch (error: any) {
+    console.error("Backend User Profile Save Error:", error);
+    res.status(500).json({ error: error.message || "Failed to save profile on backend." });
+  }
+});
 
 // ==========================================
 // API Endpoints (Pure Gateway Proxies)

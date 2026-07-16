@@ -77,7 +77,7 @@ import PluginManager, { INITIAL_PLUGINS, PluginSpec } from "./components/PluginM
 import KpStellarDashboard from "./components/KpStellarDashboard";
 import { WesternAstrologyView } from "./components/WesternAstrologyView";
 import { MysticalSystemsView } from "./components/MysticalSystemsView";
-import { UserProfile, SessionManager, AuthManager } from "./lib/firebaseAuth";
+import { UserProfile, SessionManager, AuthManager, UserProfileRepository } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
 import UpdateNotification from "./components/UpdateNotification";
 import { UpdateManager, UpdateManifest } from "./lib/androidOta";
@@ -379,9 +379,16 @@ export default function App() {
   useEffect(() => {
     loadCacheHistory();
 
-    // Check for cached auth session
+    // Check for cached user profile
+    const cachedProfile = localStorage.getItem("jhora_user_profile");
     const localSession = SessionManager.getLocalSession();
-    if (localSession) {
+    if (cachedProfile) {
+      try {
+        setActiveUser(JSON.parse(cachedProfile));
+      } catch (e) {
+        console.error("Failed to parse cached user profile:", e);
+      }
+    } else if (localSession) {
       setActiveUser({
         uid: localSession.uid,
         name: localSession.name || "Vedic Astrologer",
@@ -403,28 +410,42 @@ export default function App() {
     }
 
     // Set up Firebase Auth state change observer
-    const unsubscribe = AuthManager.onAuthStateChanged((user) => {
+    const unsubscribe = AuthManager.onAuthStateChanged(async (user) => {
       if (user) {
-        setActiveUser({
-          uid: user.uid,
-          name: user.displayName || "Vedic Astrologer",
-          email: user.email || "",
-          photoURL: user.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150",
-          createdDate: new Date().toISOString(),
-          lastLogin: new Date().toISOString(),
-          savedProfiles: [],
-          favorites: [],
-          history: [],
-          settings: {
-            theme: "dark",
-            ayanamsa: "Lahiri (Chitra Paksha)",
-            chartStyle: "north",
-            language: "English",
-            autoUpdate: true
+        try {
+          // Asynchronously fetch full user profile from firestore
+          const remoteProfile = await UserProfileRepository.getProfile(user.uid);
+          if (remoteProfile) {
+            setActiveUser(remoteProfile);
+            localStorage.setItem("jhora_user_profile", JSON.stringify(remoteProfile));
+          } else {
+            const defaultProfile: UserProfile = {
+              uid: user.uid,
+              name: user.displayName || "Vedic Astrologer",
+              email: user.email || "",
+              photoURL: user.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150",
+              createdDate: new Date().toISOString(),
+              lastLogin: new Date().toISOString(),
+              savedProfiles: [],
+              favorites: [],
+              history: [],
+              settings: {
+                theme: "dark",
+                ayanamsa: "Lahiri (Chitra Paksha)",
+                chartStyle: "north",
+                language: "English",
+                autoUpdate: true
+              }
+            };
+            setActiveUser(defaultProfile);
+            localStorage.setItem("jhora_user_profile", JSON.stringify(defaultProfile));
           }
-        });
+        } catch (err) {
+          console.error("Error fetching remote profile on auth change:", err);
+        }
       } else {
         setActiveUser(null);
+        localStorage.removeItem("jhora_user_profile");
       }
     });
 

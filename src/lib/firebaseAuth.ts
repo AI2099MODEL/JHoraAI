@@ -70,6 +70,7 @@ export interface UserProfile {
   uid: string;
   name: string;
   email: string;
+  phoneNumber?: string;
   photoURL: string;
   createdDate: string;
   lastLogin: string;
@@ -135,15 +136,124 @@ export const UserProfileRepository = {
 };
 
 /**
+ * Save user profile to Google Drive as jhora_user_profile.json
+ */
+export async function saveProfileToGoogleDrive(accessToken: string, profile: UserProfile): Promise<void> {
+  try {
+    const searchResponse = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name='jhora_user_profile.json' and trashed=false&fields=files(id)`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
+    let fileId: string | null = null;
+    if (searchResponse.ok) {
+      const searchData = await searchResponse.json();
+      if (searchData.files && searchData.files.length > 0) {
+        fileId = searchData.files[0].id;
+      }
+    }
+
+    const metadata = {
+      name: "jhora_user_profile.json",
+      mimeType: "application/json"
+    };
+    const fileContent = JSON.stringify(profile, null, 2);
+
+    const boundary = "314159265358979323846";
+    const delimiter = `\r\n--${boundary}\r\n`;
+    const closeDelimiter = `\r\n--${boundary}--`;
+    const body = 
+      delimiter +
+      'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+      JSON.stringify(metadata) +
+      delimiter +
+      'Content-Type: application/json\r\n\r\n' +
+      fileContent +
+      closeDelimiter;
+
+    const url = fileId 
+      ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
+      : "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
+    const method = fileId ? "PATCH" : "POST";
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": `multipart/related; boundary=${boundary}`
+      },
+      body
+    });
+    if (!response.ok) {
+      console.error("Google Drive API response error:", response.statusText);
+    } else {
+      console.log("Successfully saved profile to Google Drive.");
+    }
+  } catch (err) {
+    console.error("Error writing user profile to Google Drive:", err);
+  }
+}
+
+/**
+ * Fetch phone number from Google People API using Google OAuth Access Token
+ */
+export async function fetchGooglePhoneNumber(accessToken: string): Promise<string | undefined> {
+  try {
+    const response = await fetch(
+      "https://people.googleapis.com/v1/people/me?personFields=phoneNumbers",
+      {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
+    if (!response.ok) {
+      console.warn("Google People API returned error status:", response.status, response.statusText);
+      return undefined;
+    }
+    const data = await response.json();
+    if (data.phoneNumbers && data.phoneNumbers.length > 0) {
+      const primary = data.phoneNumbers.find((p: any) => p.metadata?.primary) || data.phoneNumbers[0];
+      return primary.value;
+    }
+  } catch (err) {
+    console.error("Error fetching Google phone number:", err);
+  }
+  return undefined;
+}
+
+/**
+ * Save user profile to Express Backend
+ */
+export async function saveProfileToBackend(profile: UserProfile): Promise<void> {
+  try {
+    const response = await fetch("/api/user-profile/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(profile)
+    });
+    if (!response.ok) {
+      console.error("Express backend user-profile save error:", response.statusText);
+    } else {
+      console.log("Successfully saved profile to backend.");
+    }
+  } catch (err) {
+    console.error("Error sending user profile to backend:", err);
+  }
+}
+
+/**
  * SessionManager handles active token refresh, local storage auth tracking, and auto sign-in states.
  */
 export const SessionManager = {
-  saveSession(user: FirebaseUser) {
+  saveSession(user: FirebaseUser, accessToken?: string) {
     localStorage.setItem("jhora_auth_session", JSON.stringify({
       uid: user.uid,
       email: user.email,
       name: user.displayName,
       photoURL: user.photoURL,
+      accessToken,
       lastActive: Date.now()
     }));
   },
@@ -167,25 +277,32 @@ export const SessionManager = {
  * AuthRepository coordinates user profiles with Firebase Auth services.
  */
 export const AuthRepository = {
-  async syncUserProfile(firebaseUser: FirebaseUser): Promise<UserProfile> {
+  async syncUserProfile(firebaseUser: FirebaseUser, accessToken?: string, forcePhone?: string): Promise<UserProfile> {
     const existing = await UserProfileRepository.getProfile(firebaseUser.uid);
     const nowISO = new Date().toISOString();
     
+    let phoneNumber = forcePhone || existing?.phoneNumber;
+    if (!phoneNumber && accessToken) {
+      phoneNumber = await fetchGooglePhoneNumber(accessToken);
+    }
+
+    let updatedProfile: UserProfile;
+    
     if (existing) {
-      const updated: UserProfile = {
+      updatedProfile = {
         ...existing,
         name: firebaseUser.displayName || existing.name || "Vedic Astrologer",
         email: firebaseUser.email || existing.email || "",
+        phoneNumber: phoneNumber || existing.phoneNumber || "",
         photoURL: firebaseUser.photoURL || existing.photoURL || "",
         lastLogin: nowISO
       };
-      await UserProfileRepository.saveProfile(updated);
-      return updated;
     } else {
-      const defaultProfile: UserProfile = {
+      updatedProfile = {
         uid: firebaseUser.uid,
         name: firebaseUser.displayName || "Vedic Astrologer",
         email: firebaseUser.email || "",
+        phoneNumber: phoneNumber || "",
         photoURL: firebaseUser.photoURL || "",
         createdDate: nowISO,
         lastLogin: nowISO,
@@ -200,9 +317,23 @@ export const AuthRepository = {
           autoUpdate: true
         }
       };
-      await UserProfileRepository.saveProfile(defaultProfile);
-      return defaultProfile;
     }
+
+    // Save to Firestore
+    await UserProfileRepository.saveProfile(updatedProfile);
+
+    // Save to local storage for offline support
+    localStorage.setItem("jhora_user_profile", JSON.stringify(updatedProfile));
+
+    // Save to Express Backend for analysis & reporting
+    await saveProfileToBackend(updatedProfile);
+
+    // Save to Google Drive if OAuth accessToken is available
+    if (accessToken) {
+      await saveProfileToGoogleDrive(accessToken, updatedProfile);
+    }
+
+    return updatedProfile;
   }
 };
 
@@ -219,41 +350,27 @@ export const AuthManager = {
     return onAuthStateChanged(auth, callback);
   },
 
-  async signInWithGoogle(): Promise<FirebaseUser> {
+  async signInWithGoogle(): Promise<{ user: FirebaseUser; accessToken?: string; profile: UserProfile }> {
     if (!auth) throw new Error("Firebase Auth is not initialized.");
     const provider = new GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/userinfo.email');
+    provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
+    provider.addScope('https://www.googleapis.com/auth/drive.file');
+    provider.addScope('https://www.googleapis.com/auth/user.phonenumbers.read');
+    
     const result = await signInWithPopup(auth, provider);
-    SessionManager.saveSession(result.user);
-    await AuthRepository.syncUserProfile(result.user);
-    return result.user;
-  },
-
-  async signInWithEmail(email: string, password: string): Promise<FirebaseUser> {
-    if (!auth) throw new Error("Firebase Auth is not initialized.");
-    const result = await signInWithEmailAndPassword(auth, email, password);
-    SessionManager.saveSession(result.user);
-    await AuthRepository.syncUserProfile(result.user);
-    return result.user;
-  },
-
-  async signUpWithEmail(email: string, password: string, name: string): Promise<FirebaseUser> {
-    if (!auth) throw new Error("Firebase Auth is not initialized.");
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(result.user, { displayName: name });
-    SessionManager.saveSession(result.user);
-    await AuthRepository.syncUserProfile(result.user);
-    return result.user;
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const accessToken = credential?.accessToken || undefined;
+    
+    SessionManager.saveSession(result.user, accessToken);
+    const profile = await AuthRepository.syncUserProfile(result.user, accessToken);
+    return { user: result.user, accessToken, profile };
   },
 
   async logout(): Promise<void> {
     if (!auth) return;
     await signOut(auth);
     SessionManager.clearSession();
-  },
-
-  async sendPasswordReset(email: string): Promise<void> {
-    if (!auth) return;
-    await sendPasswordResetEmail(auth, email);
   },
 
   async deleteAccount(): Promise<void> {

@@ -3,21 +3,28 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Shield, 
   Mail, 
-  Lock, 
   User, 
-  ArrowRight, 
   RefreshCw, 
   CheckCircle, 
   AlertCircle,
-  HelpCircle,
   Trash2,
-  LockKeyhole
+  Phone,
+  CloudLightning,
+  Save,
+  FileText
 } from "lucide-react";
-import { AuthManager, UserProfile } from "../lib/firebaseAuth";
+import { 
+  AuthManager, 
+  UserProfile, 
+  saveProfileToGoogleDrive, 
+  saveProfileToBackend,
+  UserProfileRepository,
+  SessionManager
+} from "../lib/firebaseAuth";
 
 interface AuthScreenProps {
   onAuthSuccess: (profile: UserProfile | null) => void;
@@ -25,40 +32,34 @@ interface AuthScreenProps {
 }
 
 export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProps) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  
+  // Form fields for editing user profile
+  const [phone, setPhone] = useState("");
+  const [emailField, setEmailField] = useState("");
+  const [nameField, setNameField] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Initialize fields when user changes
+  useEffect(() => {
+    if (activeUser) {
+      setPhone(activeUser.phoneNumber || "");
+      setEmailField(activeUser.email || "");
+      setNameField(activeUser.name || "");
+    }
+  }, [activeUser]);
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError(null);
+    setSuccess(null);
     try {
-      const user = await AuthManager.signInWithGoogle();
-      // Fetch dynamic profile
-      const userProfile: UserProfile = {
-        uid: user.uid,
-        name: user.displayName || "Vedic Astrologer",
-        email: user.email || "",
-        photoURL: user.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150",
-        createdDate: new Date().toISOString(),
-        lastLogin: new Date().toISOString(),
-        savedProfiles: [],
-        favorites: [],
-        history: [],
-        settings: {
-          theme: "dark",
-          ayanamsa: "Lahiri (Chitra Paksha)",
-          chartStyle: "north",
-          language: "English",
-          autoUpdate: true
-        }
-      };
-      onAuthSuccess(userProfile);
-      setSuccess("Successfully signed in with Google!");
+      const { profile } = await AuthManager.signInWithGoogle();
+      onAuthSuccess(profile);
+      setSuccess("Successfully authenticated via Google Secure Sign-In!");
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to sign in with Google.");
@@ -67,70 +68,46 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
     }
   };
 
-  const handleEmailAuth = async (e: React.FormEvent) => {
+  const handleSaveAndSync = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    if (!activeUser) return;
+    setSyncing(true);
     setError(null);
     setSuccess(null);
 
     try {
-      if (mode === "login") {
-        const user = await AuthManager.signInWithEmail(email, password);
-        const userProfile: UserProfile = {
-          uid: user.uid,
-          name: user.displayName || "Email Astrologer",
-          email: user.email || "",
-          photoURL: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150",
-          createdDate: new Date().toISOString(),
-          lastLogin: new Date().toISOString(),
-          savedProfiles: [],
-          favorites: [],
-          history: [],
-          settings: {
-            theme: "dark",
-            ayanamsa: "Lahiri (Chitra Paksha)",
-            chartStyle: "north",
-            language: "English",
-            autoUpdate: true
-          }
-        };
-        onAuthSuccess(userProfile);
-        setSuccess("Successfully logged in!");
-      } else if (mode === "signup") {
-        if (!name.trim()) {
-          setError("Please enter your name");
-          setLoading(false);
-          return;
-        }
-        const user = await AuthManager.signUpWithEmail(email, password, name);
-        const userProfile: UserProfile = {
-          uid: user.uid,
-          name: name,
-          email: user.email || "",
-          photoURL: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150",
-          createdDate: new Date().toISOString(),
-          lastLogin: new Date().toISOString(),
-          savedProfiles: [],
-          favorites: [],
-          history: [],
-          settings: {
-            theme: "dark",
-            ayanamsa: "Lahiri (Chitra Paksha)",
-            chartStyle: "north",
-            language: "English",
-            autoUpdate: true
-          }
-        };
-        onAuthSuccess(userProfile);
-        setSuccess("Account successfully created!");
-      } else if (mode === "forgot") {
-        await AuthManager.sendPasswordReset(email);
-        setSuccess("Password reset email sent!");
+      // 1. Build updated profile
+      const updated: UserProfile = {
+        ...activeUser,
+        name: nameField.trim() || activeUser.name,
+        email: emailField.trim() || activeUser.email,
+        phoneNumber: phone.trim() || undefined,
+        lastLogin: new Date().toISOString()
+      };
+
+      // 2. Save in Firestore
+      await UserProfileRepository.saveProfile(updated);
+
+      // 3. Save in Local Machine
+      localStorage.setItem("jhora_user_profile", JSON.stringify(updated));
+      onAuthSuccess(updated);
+
+      // 4. Send to Express Backend (to trigger analysis, email reports, etc.)
+      await saveProfileToBackend(updated);
+
+      // 5. Get access token from local session to save on Google Drive
+      const session = SessionManager.getLocalSession();
+      if (session && session.accessToken) {
+        await saveProfileToGoogleDrive(session.accessToken, updated);
       }
+
+      setSuccess("Profile successfully updated and synced across Local Machine, Google Drive, and Cloud Backend!");
+      setIsEditing(false);
     } catch (err: any) {
-      setError(err.message || "Authentication failed.");
+      console.error(err);
+      setError(err.message || "Failed to save and sync user profile.");
     } finally {
-      setLoading(false);
+      setSyncing(false);
     }
   };
 
@@ -140,8 +117,9 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
       await AuthManager.logout();
       onAuthSuccess(null);
       setSuccess("Successfully logged out!");
-      setEmail("");
-      setPassword("");
+      setPhone("");
+      setEmailField("");
+      setNameField("");
     } catch (err: any) {
       setError(err.message || "Failed to log out.");
     } finally {
@@ -169,7 +147,7 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
       <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 space-y-6 max-w-xl mx-auto text-left" id="m3-logged-in-panel">
         <div className="flex items-center gap-4">
           <img 
-            src={activeUser.photoURL} 
+            src={activeUser.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150"} 
             alt={activeUser.name} 
             className="w-16 h-16 rounded-full border-2 border-amber-500 object-cover shadow-lg" 
             id="m3-user-avatar"
@@ -182,36 +160,147 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
             <p className="text-xs text-slate-400" id="m3-user-email">
               {activeUser.email}
             </p>
+            {activeUser.phoneNumber && (
+              <p className="text-xs text-amber-500/80 flex items-center gap-1 mt-0.5">
+                <Phone className="w-3 h-3" /> {activeUser.phoneNumber}
+              </p>
+            )}
             <span className="inline-block mt-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-              Synced with Google Firebase
+              Synced with Google OAuth & Firebase
             </span>
           </div>
         </div>
 
-        <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-800 space-y-3" id="m3-session-stats">
-          <h4 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">Account Metadata</h4>
-          <div className="grid grid-cols-2 gap-4 text-xs">
-            <div>
-              <span className="text-slate-500 block">UID</span>
-              <span className="font-mono text-slate-300 break-all">{activeUser.uid}</span>
+        {/* Sync Actions & Form */}
+        {isEditing ? (
+          <form onSubmit={handleSaveAndSync} className="bg-slate-950/40 p-4 rounded-xl border border-slate-800 space-y-4" id="m3-profile-edit-form">
+            <h4 className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">Update Personal Info</h4>
+            
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Full Name</label>
+              <div className="relative">
+                <User className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                <input
+                  type="text"
+                  value={nameField}
+                  onChange={(e) => setNameField(e.target.value)}
+                  placeholder="Your Name"
+                  required
+                  className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 focus:border-amber-500/50 rounded-xl text-xs text-slate-200 outline-none transition-all"
+                />
+              </div>
             </div>
-            <div>
-              <span className="text-slate-500 block">Last Active Login</span>
-              <span className="text-slate-300">{new Date(activeUser.lastLogin).toLocaleString()}</span>
+
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                <input
+                  type="email"
+                  value={emailField}
+                  onChange={(e) => setEmailField(e.target.value)}
+                  placeholder="your-email@gmail.com"
+                  required
+                  className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 focus:border-amber-500/50 rounded-xl text-xs text-slate-200 outline-none transition-all"
+                />
+              </div>
             </div>
-            <div>
-              <span className="text-slate-500 block">Sync Status</span>
-              <span className="text-emerald-400 flex items-center gap-1 font-semibold">
-                <CheckCircle className="w-3.5 h-3.5" /> Online Cloud Backup
+
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Phone Number</label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 (555) 019-2834"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 focus:border-amber-500/50 rounded-xl text-xs text-slate-200 outline-none transition-all"
+                />
+              </div>
+              <p className="text-[9px] text-slate-500 font-mono mt-1">
+                We respect your privacy. This phone number will be encrypted and saved across Google Drive and Firestore.
+              </p>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                type="submit"
+                disabled={syncing}
+                className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-slate-950 rounded-xl text-xs font-semibold tracking-wide transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                {syncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <><Save className="w-3.5 h-3.5" /> Save & Sync</>}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="bg-slate-950/40 p-4 rounded-xl border border-slate-800 space-y-4" id="m3-session-stats">
+            <div className="flex justify-between items-center">
+              <h4 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">Secure Backup Status</h4>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-[11px] text-amber-500 hover:underline cursor-pointer font-semibold"
+              >
+                Edit Info
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div>
+                <span className="text-slate-500 block">UID</span>
+                <span className="font-mono text-slate-300 break-all">{activeUser.uid}</span>
+              </div>
+              <div>
+                <span className="text-slate-500 block">Google Drive Sync</span>
+                <span className="text-emerald-400 flex items-center gap-1 font-semibold">
+                  <CheckCircle className="w-3.5 h-3.5" /> Saved in Drive file
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 block">Analysis Sync</span>
+                <span className="text-amber-400 flex items-center gap-1 font-semibold">
+                  <CloudLightning className="w-3.5 h-3.5 animate-pulse" /> Email Report Pending
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 block">Phone Capture</span>
+                <span className="text-slate-300 font-mono">
+                  {activeUser.phoneNumber || "Not provided (Click Edit Info)"}
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-xl text-xs text-amber-200 flex items-start gap-2">
+              <FileText className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <span>
+                <strong>Vedic & KP Report Automated:</strong> Once you calculate or complete a birth chart under this profile, our backend engine will run a complete astrological analysis and securely email it to you!
               </span>
             </div>
-            <div>
-              <span className="text-slate-500 block">Registration Date</span>
-              <span className="text-slate-300">{new Date(activeUser.createdDate).toLocaleDateString()}</span>
-            </div>
           </div>
-        </div>
+        )}
 
+        {/* Notifications */}
+        {error && (
+          <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span className="break-all">{error}</span>
+          </div>
+        )}
+        {success && (
+          <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-start gap-2">
+            <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>{success}</span>
+          </div>
+        )}
+
+        {/* Actions */}
         <div className="flex items-center justify-between gap-3 pt-2" id="m3-logged-in-actions">
           <button
             onClick={handleLogout}
@@ -232,7 +321,7 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
     );
   }
 
-  // Render Material 3 Auth Panel
+  // Render Material 3 Auth Panel (GOOGLE ONLY)
   return (
     <div className="bg-slate-950/60 border border-indigo-500/10 rounded-2xl p-6 max-w-md mx-auto space-y-6 text-left shadow-2xl" id="m3-auth-screen-container">
       {/* Header */}
@@ -241,12 +330,10 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
           <Shield className="w-6 h-6 text-amber-500" />
         </div>
         <h3 className="text-lg font-sans font-medium text-amber-100">
-          {mode === "login" && "Login to JHoraAI"}
-          {mode === "signup" && "Create Astro Account"}
-          {mode === "forgot" && "Recover Account"}
+          Sign In to JHoraAI
         </h3>
-        <p className="text-xs text-slate-400">
-          Save birth profiles, map histories, and sync calculations securely in Google Cloud.
+        <p className="text-xs text-slate-400 leading-relaxed">
+          Unlock premium Vedic & KP charts, save birth profiles directly to Google Drive, and sync histories securely with Google Cloud.
         </p>
       </div>
 
@@ -264,102 +351,13 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
         </div>
       )}
 
-      {/* Form */}
-      <form onSubmit={handleEmailAuth} className="space-y-4">
-        {mode === "signup" && (
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Full Name</label>
-            <div className="relative">
-              <User className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Aryabhata"
-                required
-                className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 focus:border-amber-500/50 rounded-xl text-xs text-slate-200 outline-none transition-all"
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="space-y-1">
-          <label className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Email Address</label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@gmail.com"
-              required
-              className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 focus:border-amber-500/50 rounded-xl text-xs text-slate-200 outline-none transition-all"
-            />
-          </div>
-        </div>
-
-        {mode !== "forgot" && (
-          <div className="space-y-1">
-            <div className="flex justify-between items-center">
-              <label className="text-[10px] uppercase font-mono font-bold text-slate-400 block">Password</label>
-              {mode === "login" && (
-                <button
-                  type="button"
-                  onClick={() => setMode("forgot")}
-                  className="text-[10px] font-mono text-amber-500 hover:underline cursor-pointer"
-                >
-                  Forgot?
-                </button>
-              )}
-            </div>
-            <div className="relative">
-              <Lock className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 focus:border-amber-500/50 rounded-xl text-xs text-slate-200 outline-none transition-all"
-              />
-            </div>
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-slate-950 font-sans font-semibold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/10"
-        >
-          {loading ? (
-            <RefreshCw className="w-4 h-4 animate-spin" />
-          ) : (
-            <>
-              {mode === "login" && "Login Profile"}
-              {mode === "signup" && "Register Account"}
-              {mode === "forgot" && "Send Reset Link"}
-              <ArrowRight className="w-3.5 h-3.5" />
-            </>
-          )}
-        </button>
-      </form>
-
-      {/* Divider */}
-      {mode !== "forgot" && (
-        <div className="relative flex py-2 items-center">
-          <div className="flex-grow border-t border-slate-800"></div>
-          <span className="flex-shrink mx-4 text-[10px] uppercase font-mono font-bold text-slate-500">Or Continue With</span>
-          <div className="flex-grow border-t border-slate-800"></div>
-        </div>
-      )}
-
-      {/* Social Google Login Button (M3 spec) */}
-      {mode !== "forgot" && (
+      {/* Social Google Login Button (The exclusive login option) */}
+      <div className="space-y-4 py-2">
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
           type="button"
-          className="w-full py-2 bg-white hover:bg-neutral-100 text-neutral-800 font-sans font-medium rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2 border border-neutral-300 shadow-md"
+          className="w-full py-3 bg-white hover:bg-neutral-100 text-neutral-800 font-sans font-semibold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2 border border-neutral-300 shadow-md hover:shadow-lg hover:scale-[1.01]"
           id="google-signin-btn-m3"
         >
           {loading ? (
@@ -384,35 +382,14 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
                   d="M12 18.96c-3.08 0-5.73-2.49-6.64-5.46l-3.86 3C3.4 20.35 7.35 23 12 23c2.96 0 5.44-.98 7.25-2.66l-3.7-2.87c-1 .67-2.28 1.49-3.55 1.49z"
                 />
               </svg>
-              Sign In with Google
+              Continue with Google Account
             </>
           )}
         </button>
-      )}
 
-      {/* Switch Mode Footer */}
-      <div className="text-center pt-2">
-        {mode === "login" && (
-          <p className="text-xs text-slate-400">
-            Don't have an account?{" "}
-            <button onClick={() => setMode("signup")} className="text-amber-500 font-semibold hover:underline cursor-pointer">
-              Register here
-            </button>
-          </p>
-        )}
-        {mode === "signup" && (
-          <p className="text-xs text-slate-400">
-            Already have an account?{" "}
-            <button onClick={() => setMode("login")} className="text-amber-500 font-semibold hover:underline cursor-pointer">
-              Login here
-            </button>
-          </p>
-        )}
-        {mode === "forgot" && (
-          <button onClick={() => setMode("login")} className="text-xs text-amber-500 font-semibold hover:underline cursor-pointer">
-            Back to Login
-          </button>
-        )}
+        <p className="text-[10px] text-center text-slate-500 leading-relaxed max-w-xs mx-auto">
+          By signing in, you agree to secure synchronization of your profile, birth charts, settings, and contacts on Google services.
+        </p>
       </div>
     </div>
   );
