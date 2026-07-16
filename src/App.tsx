@@ -99,15 +99,15 @@ export interface MainMenuNode {
 }
 
 export default function App() {
-  // Input form state with authentic default values (New Delhi, India)
+  // Input form state starting completely clean and empty
   const [inputs, setInputs] = useState({
     name: "",
-    date: "1995-10-15",
-    time: "08:30",
-    location: "New Delhi, India",
-    latitude: 28.6139,
-    longitude: 77.2090,
-    timezone: 5.5,
+    date: "",
+    time: "",
+    location: "",
+    latitude: "" as any,
+    longitude: "" as any,
+    timezone: "" as any,
   });
 
   const [astrologyData, setAstrologyData] = useState<AstrologyData | null>(null);
@@ -162,7 +162,7 @@ export default function App() {
   const [fetchingGps, setFetchingGps] = useState(false);
 
   // Local state for birth time input to prevent cursor jumping
-  const [localTimeInput, setLocalTimeInput] = useState("08:30");
+  const [localTimeInput, setLocalTimeInput] = useState("");
   const [localAmpm, setLocalAmpm] = useState("AM");
 
   // Mock states for report generators, notifications, etc.
