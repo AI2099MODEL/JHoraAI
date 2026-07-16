@@ -186,9 +186,6 @@ app.post("/api/user-profile/save", async (req, res) => {
     fs.writeFileSync(filePath, JSON.stringify(profiles, null, 2));
     console.log(`Successfully saved profile ${profile.uid} to backend database.`);
 
-    // Trigger scheduled astrology email reading in the background
-    triggerAstrologyEmail(profile);
-
     res.json({ success: true, message: "Profile successfully saved and synced on backend." });
   } catch (error: any) {
     console.error("Backend User Profile Save Error:", error);

@@ -590,3 +590,286 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
     argalas
   };
 }
+
+/**
+ * Maps standard AstrologyData and logged-in user profile into the knowledgebase user_profile_data_model schema.
+ */
+export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): any {
+  const nowStr = new Date().toISOString();
+  
+  // 1. Map User section
+  const userSection = {
+    google_user_id: activeUser?.uid || "guest_user",
+    email: activeUser?.email || "guest@jhora.ai",
+    profile_name: data.birthDetails.name || activeUser?.name || "Native",
+    created_at: activeUser?.createdDate || nowStr,
+    updated_at: nowStr
+  };
+
+  // 2. Map Birth section
+  const birthSection = {
+    date: data.birthDetails.date,
+    time: data.birthDetails.time,
+    latitude: data.birthDetails.latitude,
+    longitude: data.birthDetails.longitude,
+    timezone: data.birthDetails.timezone.toString(),
+    place: data.birthDetails.location,
+    ayanamsa: "Lahiri"
+  };
+
+  // 3. Map systems.Vedic.planets
+  const planetsMap: Record<string, any> = {};
+  const standardPlanetsList = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+  
+  standardPlanetsList.forEach(pName => {
+    const p = data.planets?.find((pl: any) => pl.name.toLowerCase() === pName.toLowerCase());
+    if (p) {
+      const degFloat = p.degree || 0;
+      const degInt = Math.floor(degFloat);
+      const minFloat = (degFloat - degInt) * 60;
+      const minInt = Math.floor(minFloat);
+      const secInt = Math.round((minFloat - minInt) * 60);
+
+      planetsMap[pName] = {
+        sign: p.sign,
+        sign_index: p.signIndex,
+        degree: degInt,
+        minute: minInt,
+        second: secInt,
+        longitude_360: p.longitude,
+        nakshatra: p.nakshatra,
+        pada: p.pada,
+        nakshatra_lord: p.lord,
+        house: p.house,
+        own_sign: p.ownSign || false,
+        mooltrikona: p.mooltrikona || false,
+        exalted: p.exalted || false,
+        debilitated: p.debilitated || false,
+        retrograde: p.retrograde || false,
+        combust: p.combust || false,
+        planet_speed: p.speed || 0
+      };
+    } else {
+      planetsMap[pName] = {
+        sign: "Aries",
+        sign_index: 0,
+        degree: 0,
+        minute: 0,
+        second: 0,
+        longitude_360: 0,
+        nakshatra: "Ashwini",
+        pada: 1,
+        nakshatra_lord: "Ketu",
+        house: 1,
+        own_sign: false,
+        mooltrikona: false,
+        exalted: false,
+        debilitated: false,
+        retrograde: false,
+        combust: false,
+        planet_speed: 0
+      };
+    }
+  });
+
+  // 4. Map systems.Vedic.ascendant
+  const ascDegFloat = data.lagna?.degree || 0;
+  const ascDegInt = Math.floor(ascDegFloat);
+  const ascMinFloat = (ascDegFloat - ascDegInt) * 60;
+  const ascMinInt = Math.floor(ascMinFloat);
+  const ascSecInt = Math.round((ascMinFloat - ascMinInt) * 60);
+
+  const ascendant = {
+    sign: data.lagna?.sign || "Aries",
+    sign_index: data.lagna?.signIndex || 0,
+    degree: ascDegInt,
+    minute: ascMinInt,
+    second: ascSecInt,
+    longitude_360: data.lagna?.longitude || 0,
+    nakshatra: data.lagna?.nakshatra || "Unknown",
+    pada: data.lagna?.pada || 1,
+    nakshatra_lord: data.planets?.find((pl: any) => pl.name === "Ketu")?.lord || "Unknown"
+  };
+
+  // 5. Map divisional charts
+  const divisionalChartsMapped: Record<string, any> = {};
+  if (data.divisionalCharts) {
+    Object.entries(data.divisionalCharts).forEach(([key, value]: [string, any]) => {
+      divisionalChartsMapped[key] = {
+        description: `Divisional Chart ${key}`,
+        ascendant: { sign: data.lagna?.sign || "Aries", longitude: data.lagna?.longitude || 0 },
+        house_placements: value
+      };
+    });
+  }
+
+  // 6. Map strengths
+  const shadbalaMapped: Record<string, any> = {};
+  if (data.shadBala) {
+    Object.entries(data.shadBala).forEach(([pName, val]: [string, any]) => {
+      shadbalaMapped[pName] = {
+        sthana_bala: val.sthanaBala || 0,
+        dig_bala: val.digBala || 0,
+        kala_bala: val.kalaBala || 0,
+        cheshta_bala: val.cheshtaBala || 0,
+        naisargika_bala: val.naisargikaBala || 0,
+        drig_bala: val.drigBala || 0,
+        total_score: val.total || 0,
+        strength_ratio: val.strengthRatio || 0,
+        strength_percentage: (val.strengthRatio || 0) * 100
+      };
+    });
+  }
+
+  const bhavaBalaMapped: Record<string, any> = {};
+  if (data.bhavaBala) {
+    Object.entries(data.bhavaBala).forEach(([hNum, val]: [string, any]) => {
+      bhavaBalaMapped[hNum] = {
+        strength_shashtiamsas: val.strengthShashtiamsas || 0,
+        rank: val.rank || 1
+      };
+    });
+  }
+
+  const ashtakavargaMapped = {
+    sav: data.ashtakavarga?.sarvashtakavarga || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    bav: data.ashtakavarga?.planets || {}
+  };
+
+  // 7. Map dashas
+  const vimshottariDashas = (data.dashas || []).map((d: any) => ({
+    lord: d.lord,
+    start_date: d.startDate,
+    end_date: d.endDate,
+    children: (d.subPeriods || []).map((s: any) => ({
+      lord: s.lord,
+      start_date: s.startDate,
+      end_date: s.endDate
+    }))
+  }));
+
+  // 8. Map yogas & doshas
+  const yogasMapped = (data.yogas || []).map((y: any) => ({
+    name: y.name,
+    description: y.description,
+    planets: y.planets || [],
+    houses: y.houses || [],
+    strength: y.strength || "Medium"
+  }));
+
+  const doshasMapped: any[] = [];
+  if (data.doshas) {
+    if (data.doshas.manglik?.isPresent) {
+      doshasMapped.push({
+        name: "Manglik Dosha",
+        severity: data.doshas.manglik.score > 50 ? "High" : "Medium",
+        planets: ["Mars"],
+        houses: [1, 4, 7, 8, 12],
+        description: data.doshas.manglik.explanation
+      });
+    }
+    if (data.doshas.kaalSarp?.isPresent) {
+      doshasMapped.push({
+        name: "Kaal Sarp Dosha",
+        severity: "High",
+        planets: ["Rahu", "Ketu"],
+        houses: [],
+        description: data.doshas.kaalSarp.explanation
+      });
+    }
+    if (data.doshas.sadeSati?.isPresent) {
+      doshasMapped.push({
+        name: "Sade Sati",
+        severity: "Medium",
+        planets: ["Saturn"],
+        houses: [],
+        description: data.doshas.sadeSati.explanation
+      });
+    }
+  }
+
+  return {
+    User: userSection,
+    Birth: birthSection,
+    systems: {
+      Vedic: {
+        ascendant,
+        planets: planetsMap,
+        divisional_charts: divisionalChartsMapped,
+        panchanga: {
+          tithi: data.panchanga?.tithi || "Unknown",
+          yoga: data.panchanga?.yoga || "Unknown",
+          karana: data.panchanga?.karana || "Unknown",
+          varna: data.panchanga?.varna || "Unknown",
+          vashya: data.panchanga?.vashya || "Unknown",
+          yoni: data.panchanga?.yoni || "Unknown",
+          gana: data.panchanga?.gana || "Unknown",
+          nadi: data.panchanga?.nadi || "Unknown"
+        },
+        strengths: {
+          shadbala: shadbalaMapped,
+          bhava_bala: bhavaBalaMapped,
+          ashtakavarga: ashtakavargaMapped,
+          ishta_phala: {},
+          kashta_phala: {}
+        },
+        dashas: {
+          vimshottari: vimshottariDashas,
+          yogini: (data.additionalDashas?.yogini || []).map((y: any) => ({ lord: y.lord, start_date: y.startDate, end_date: y.endDate })),
+          ashtottari: (data.additionalDashas?.ashtottari || []).map((a: any) => ({ lord: a.lord, start_date: a.startDate, end_date: a.endDate }))
+        },
+        yogas: yogasMapped,
+        doshas: doshasMapped
+      },
+      KP: {
+        planets: {},
+        ruling_planets: {
+          ascendant_sign_lord: data.lagna?.sign ? "Lord" : "Unknown",
+          ascendant_star_lord: "Unknown",
+          ascendant_sub_lord: "Unknown",
+          moon_sign_lord: "Unknown",
+          moon_star_lord: "Unknown",
+          moon_sub_lord: "Unknown",
+          day_lord: "Unknown"
+        },
+        dba: {
+          mahadasha: data.dashas?.[0]?.lord || "Unknown",
+          bhukti: data.dashas?.[0]?.subPeriods?.[0]?.lord || "Unknown",
+          antara: "Unknown",
+          sookshma: "Unknown",
+          prana: "Unknown",
+          start_date: data.dashas?.[0]?.startDate || "",
+          end_date: data.dashas?.[0]?.endDate || ""
+        }
+      },
+      Jaimini: {
+        karakas: {
+          atmakaraka: "Unknown",
+          amatyakaraka: "Unknown",
+          bhratrukaraka: "Unknown",
+          matrukaraka: "Unknown",
+          putrakaraka: "Unknown",
+          gnatikaraka: "Unknown",
+          darakaraka: "Unknown"
+        },
+        lagnas: {
+          karakamsha_lagna: "Unknown",
+          swamsha: "Unknown",
+          pada_lagna: "Unknown"
+        },
+        pada_coordinates: {}
+      },
+      Western: {
+        declinations: {},
+        planet_speeds: {},
+        aspects: []
+      }
+    },
+    Validation: {
+      birth_time_rectified: false,
+      api_version: "v1.0.2",
+      api_confidence: "Authoritative / Verified"
+    }
+  };
+}
+

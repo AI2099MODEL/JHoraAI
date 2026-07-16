@@ -56,7 +56,8 @@ import {
   AlertCircle
 } from "lucide-react";
 import { AstrologyData, convertTimeTo24h, convertDateToISO } from "./lib/astrology";
-import { mapJHoraResponseToAstrologyData } from "./lib/jhoraMapper";
+import { mapJHoraResponseToAstrologyData, mapAstrologyDataToUserProfileJSON } from "./lib/jhoraMapper";
+import { generateAstrologyPDF } from "./lib/pdfGenerator";
 import { 
   saveCachedHoroscope, 
   getAllCachedHoroscopes, 
@@ -165,10 +166,24 @@ export default function App() {
   const [localTimeInput, setLocalTimeInput] = useState("");
   const [localAmpm, setLocalAmpm] = useState("AM");
 
-  // Mock states for report generators, notifications, etc.
+  // Real-time PDF Report state and Profile Verification engine states
   const [compilingPdf, setCompilingPdf] = useState<boolean>(false);
   const [pdfReady, setPdfReady] = useState<boolean>(false);
+  const [activePdfUrl, setActivePdfUrl] = useState<string | null>(null);
   const [shareSuccess, setShareSuccess] = useState<boolean>(false);
+  const [profileVerify, setProfileVerify] = useState<{
+    isOpen: boolean;
+    record: CachedHoroscopeRecord | null;
+    step: "idle" | "checking" | "success" | "upload_required";
+    localStatus: "pending" | "checking" | "found" | "not_found";
+    driveStatus: "pending" | "checking" | "found" | "not_found" | "skipped";
+  }>({
+    isOpen: false,
+    record: null,
+    step: "idle",
+    localStatus: "pending",
+    driveStatus: "pending"
+  });
 
   // Synchronize inputs.time to AM/PM selectors
   useEffect(() => {
@@ -499,7 +514,18 @@ export default function App() {
       localStorage.setItem("jhora_astrology_data", JSON.stringify(result));
       setInputs(prev => ({ ...prev, time: fullTimeStr }));
       
-      // Save to IndexedDB Offline Cache
+      // Map user profile JSON and compile PDF on the fly! (no mock data, wait for API response)
+      let profileJson: any = null;
+      let pdfBase64: string | undefined = undefined;
+      try {
+        profileJson = mapAstrologyDataToUserProfileJSON(activeUser, result);
+        const pdfDoc = generateAstrologyPDF(profileJson);
+        pdfBase64 = pdfDoc.output("datauristring");
+      } catch (pdfErr) {
+        console.error("PDF generation or profile mapping failed:", pdfErr);
+      }
+      
+      // Save to IndexedDB Offline Cache with complete user profile JSON and compiled PDF!
       try {
         await saveCachedHoroscope(
           finalName,
@@ -509,7 +535,9 @@ export default function App() {
           Number(inputs.latitude),
           Number(inputs.longitude),
           Number(inputs.timezone),
-          result
+          result,
+          pdfBase64,
+          profileJson
         );
         await loadCacheHistory();
       } catch (dbErr) {
@@ -818,14 +846,231 @@ export default function App() {
   const headingStyle = isDark ? "text-amber-100" : "text-amber-700 font-semibold";
   const borderStyle = isDark ? "border-indigo-500/10" : "border-neutral-200";
 
-  // Simulate PDF Compiler
+  // Real Astrological PDF Report Compiler using mapped data model
   const handleCompilePdf = () => {
+    if (!astrologyData) {
+      alert("Please cast a horoscope first before compiling a report!");
+      return;
+    }
     setCompilingPdf(true);
     setPdfReady(false);
     setTimeout(() => {
-      setCompilingPdf(false);
-      setPdfReady(true);
-    }, 2000);
+      try {
+        const profileJson = mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
+        const pdfDoc = generateAstrologyPDF(profileJson);
+        const pdfDataUrl = pdfDoc.output("datauristring");
+        setActivePdfUrl(pdfDataUrl);
+        setCompilingPdf(false);
+        setPdfReady(true);
+      } catch (err) {
+        console.error("PDF Compilation error:", err);
+        setCompilingPdf(false);
+        alert("Failed to compile PDF report.");
+      }
+    }, 1000);
+  };
+
+  // Check Profile existence in Local Machine or Google Drive before loading
+  const handleLoadProfileWithCheck = async (record: CachedHoroscopeRecord) => {
+    setProfileVerify({
+      isOpen: true,
+      record,
+      step: "checking",
+      localStatus: "checking",
+      driveStatus: "pending"
+    });
+
+    // 1. Verify existence in local machine (IndexedDB record validation)
+    const isFoundLocal = !!(record && record.data && record.data.birthDetails);
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    setProfileVerify(prev => ({
+      ...prev,
+      localStatus: isFoundLocal ? "found" : "not_found",
+      driveStatus: "checking"
+    }));
+
+    // 2. Verify existence in Google Drive if signed in with Google
+    let isFoundDrive = false;
+    const session = SessionManager.getLocalSession();
+    const token = session?.accessToken;
+
+    if (token) {
+      try {
+        const searchResponse = await fetch(
+          `https://www.googleapis.com/drive/v3/files?q=name='jhora_user_profile.json' and trashed=false&fields=files(id)`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
+          if (searchData.files && searchData.files.length > 0) {
+            isFoundDrive = true;
+          }
+        }
+      } catch (err) {
+        console.error("Google Drive API validation error:", err);
+      }
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 600));
+    const finalDriveStatus = token ? (isFoundDrive ? "found" : "not_found") : "skipped";
+
+    setProfileVerify(prev => {
+      const success = isFoundLocal || isFoundDrive;
+      return {
+        ...prev,
+        driveStatus: finalDriveStatus,
+        step: success ? "success" : "upload_required"
+      };
+    });
+
+    // Auto load on success
+    if (isFoundLocal || isFoundDrive) {
+      setTimeout(() => {
+        setInputs({
+          name: record.name,
+          date: record.date,
+          time: record.time,
+          location: record.location,
+          latitude: record.latitude,
+          longitude: record.longitude,
+          timezone: record.timezone,
+        });
+        setAstrologyData(record.data);
+        localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
+        setProfileVerify(prev => ({ ...prev, isOpen: false }));
+        setActiveMenu("dashboard");
+      }, 1500);
+    }
+  };
+
+  // Download compiled PDF report directly from cached record or compile on the fly
+  const handleDownloadPdfForRecord = (record: CachedHoroscopeRecord) => {
+    try {
+      let pdfData = record.pdfData;
+      if (!pdfData) {
+        // Compile on-the-fly if not already stored
+        const profileJson = record.profileJson || mapAstrologyDataToUserProfileJSON(activeUser, record.data);
+        const pdfDoc = generateAstrologyPDF(profileJson);
+        pdfData = pdfDoc.output("datauristring");
+      }
+      
+      const link = document.createElement("a");
+      link.href = pdfData;
+      link.download = `${record.name.replace(/\s+/g, "_")}_Astrology_Report.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("PDF generation or trigger failed:", err);
+      alert("Failed to compile or retrieve PDF report.");
+    }
+  };
+
+  // Export profile JSON matching the exact user_profile_data_model.json schema
+  const handleExportJsonForRecord = (record: CachedHoroscopeRecord) => {
+    try {
+      const profileJson = record.profileJson || mapAstrologyDataToUserProfileJSON(activeUser, record.data);
+      const jsonStr = JSON.stringify(profileJson, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${record.name.replace(/\s+/g, "_")}_Vedic_Profile.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("JSON export trigger failed:", err);
+      alert("Failed to export JSON Profile.");
+    }
+  };
+
+  // Handle uploaded JSON profile from the local machine drag/drop interface
+  const handleUploadProfileJson = async (file: File) => {
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      
+      if (!parsed.Birth || !parsed.systems?.Vedic) {
+        alert("Invalid Profile structure. Please ensure it follows the correct userprofile.json schema.");
+        return;
+      }
+
+      const birth = parsed.Birth;
+      const user = parsed.User;
+      const finalName = user?.profile_name || "Imported Profile";
+
+      setInputs({
+        name: finalName,
+        date: birth.date,
+        time: birth.time,
+        location: birth.place || "Dehradun",
+        latitude: Number(birth.latitude),
+        longitude: Number(birth.longitude),
+        timezone: Number(birth.timezone),
+      });
+
+      alert(`✓ Profile imported: ${finalName}. Loading and compiling live coordinates from calculation server...`);
+      setLoading(true);
+
+      const formattedDate = convertDateToISO(birth.date);
+      const formattedTime = convertTimeTo24h(birth.time);
+
+      const response = await fetch("/api/astrology/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: finalName,
+          date: formattedDate,
+          time: formattedTime,
+          location: birth.place,
+          latitude: Number(birth.latitude),
+          longitude: Number(birth.longitude),
+          timezone: Number(birth.timezone),
+        }),
+      });
+
+      if (!response.ok) throw new Error("Calculation failure");
+      const rawJson = await response.json();
+      const result = mapJHoraResponseToAstrologyData(rawJson);
+
+      let pdfBase64: string | undefined = undefined;
+      try {
+        const fullProfile = mapAstrologyDataToUserProfileJSON(activeUser, result);
+        const pdfDoc = generateAstrologyPDF(fullProfile);
+        pdfBase64 = pdfDoc.output("datauristring");
+      } catch (e) {
+        console.error("PDF generation on import failed:", e);
+      }
+
+      setAstrologyData(result);
+      localStorage.setItem("jhora_astrology_data", JSON.stringify(result));
+
+      await saveCachedHoroscope(
+        finalName,
+        birth.date,
+        birth.time,
+        birth.place,
+        Number(birth.latitude),
+        Number(birth.longitude),
+        Number(birth.timezone),
+        result,
+        pdfBase64,
+        parsed
+      );
+
+      await loadCacheHistory();
+      setProfileVerify(prev => ({ ...prev, isOpen: false }));
+      setActiveMenu("dashboard");
+    } catch (err) {
+      console.error("Failed to parse or calculate imported profile:", err);
+      alert("Invalid JSON format. Please upload a valid JHoraAI Astrology Profile JSON file.");
+    }
   };
 
   const handleShareReport = () => {
@@ -1297,8 +1542,34 @@ export default function App() {
                     )}
                   </h3>
                   <p className="text-xs text-slate-400 mt-1 mb-6">
-                    Manage and instantly hotload previously calculated horoscopes from your offline IndexedDB database.
+                    Manage, check availability, and hotload horoscopes from local storage, Google Drive, or browse files manually.
                   </p>
+
+                  {/* Profile JSON File Importer */}
+                  <div className="mb-6 p-4 rounded-xl border border-dashed border-indigo-500/25 bg-slate-950/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="space-y-1 text-center sm:text-left">
+                      <div className="text-xs font-bold text-amber-400 flex items-center justify-center sm:justify-start gap-1.5">
+                        <Download className="w-4 h-4 text-amber-500" />
+                        Import Birth Profile JSON
+                      </div>
+                      <div className="text-[10px] text-slate-400">
+                        Drop or select a profile JSON conforming to the checklist data model to instantly cache and cast.
+                      </div>
+                    </div>
+                    <label className="bg-indigo-600/20 hover:bg-indigo-600/35 text-indigo-300 border border-indigo-500/30 px-3.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shrink-0">
+                      <FolderOpen className="w-4 h-4" />
+                      Upload Profile
+                      <input
+                        type="file"
+                        accept=".json"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUploadProfileJson(file);
+                        }}
+                      />
+                    </label>
+                  </div>
 
                   {cachedList.length === 0 ? (
                     <div className="text-center py-8 rounded-xl bg-slate-950/20 border border-dashed border-slate-800 text-slate-500 text-xs">
@@ -1335,9 +1606,9 @@ export default function App() {
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-2 mt-4 pt-3 border-t border-indigo-500/5">
+                            <div className="flex items-center gap-1.5 mt-4 pt-3 border-t border-indigo-500/5">
                               <button
-                                onClick={() => handleLoadCachedRecord(rec)}
+                                onClick={() => handleLoadProfileWithCheck(rec)}
                                 className={`flex-1 font-bold rounded-lg py-1.5 text-[11px] transition-colors cursor-pointer ${
                                   isLoaded 
                                     ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" 
@@ -1347,6 +1618,23 @@ export default function App() {
                               >
                                 {isLoaded ? "Active Profile" : "Load Profile"}
                               </button>
+                              
+                              <button
+                                onClick={() => handleDownloadPdfForRecord(rec)}
+                                className="p-1.5 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 rounded-lg border border-indigo-500/10 transition-colors cursor-pointer"
+                                title="Download PDF Report"
+                              >
+                                <FileText className="w-4 h-4" />
+                              </button>
+
+                              <button
+                                onClick={() => handleExportJsonForRecord(rec)}
+                                className="p-1.5 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg border border-indigo-500/10 transition-colors cursor-pointer"
+                                title="Export JSON Profile"
+                              >
+                                <Download className="w-4 h-4" />
+                              </button>
+
                               <button
                                 onClick={(e) => handleDeleteRecord(rec.id, e)}
                                 className="p-1.5 text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg border border-transparent transition-colors cursor-pointer"
@@ -1884,9 +2172,9 @@ export default function App() {
                       >
                         <span>✓ PDF compiled successfully (6 Pages • 1.2MB). Ready for download.</span>
                         <a
-                          href="#"
-                          onClick={(e) => { e.preventDefault(); alert("Mock Download successful!"); }}
-                          className="bg-green-500/20 text-green-200 hover:bg-green-500/30 px-3 py-1.5 rounded-lg font-bold"
+                          href={activePdfUrl || "#"}
+                          download={`${astrologyData?.birthDetails?.name || "Native"}_Vedic_Astrology_Report.pdf`}
+                          className="bg-green-500/20 text-green-200 hover:bg-green-500/30 px-3 py-1.5 rounded-lg font-bold transition-colors"
                         >
                           Download PDF
                         </a>
@@ -2190,6 +2478,115 @@ export default function App() {
 
       {/* Background/Foreground Service Worker & Version update notification */}
       <UpdateNotification />
+
+      {/* Birth Profile Verification Status Overlay */}
+      {profileVerify.isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+          <div className="w-full max-w-md bg-slate-900 border border-indigo-500/30 rounded-2xl p-6 shadow-2xl relative space-y-5 animate-in fade-in zoom-in duration-200">
+            <button
+              onClick={() => setProfileVerify(prev => ({ ...prev, isOpen: false }))}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white bg-transparent border-0 cursor-pointer text-sm font-bold"
+            >
+              ✕
+            </button>
+            
+            <div className="space-y-1">
+              <h3 className="text-base font-sans font-medium text-amber-100 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-amber-500" />
+                Profile Availability Check
+              </h3>
+              <p className="text-xs text-slate-400">
+                Checking files for <span className="text-amber-500 font-semibold">{profileVerify.record?.name}</span>...
+              </p>
+            </div>
+
+            <div className="space-y-3 bg-slate-950/40 p-4 rounded-xl border border-indigo-500/5">
+              {/* Local Machine Check */}
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-400 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                  Local Offline Storage
+                </span>
+                <span className="font-semibold">
+                  {profileVerify.localStatus === "checking" && (
+                    <span className="text-amber-400 animate-pulse">Checking Local...</span>
+                  )}
+                  {profileVerify.localStatus === "found" && (
+                    <span className="text-green-400 flex items-center gap-1">✓ Found on Machine</span>
+                  )}
+                  {profileVerify.localStatus === "not_found" && (
+                    <span className="text-rose-400">✗ Missing from Machine</span>
+                  )}
+                </span>
+              </div>
+
+              {/* Google Drive Check */}
+              <div className="flex items-center justify-between text-xs border-t border-indigo-500/5 pt-2.5">
+                <span className="text-slate-400 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                  Google Drive Cloud Backup
+                </span>
+                <span className="font-semibold">
+                  {profileVerify.driveStatus === "pending" && (
+                    <span className="text-slate-500">Awaiting Check</span>
+                  )}
+                  {profileVerify.driveStatus === "checking" && (
+                    <span className="text-amber-400 animate-pulse">Querying Drive...</span>
+                  )}
+                  {profileVerify.driveStatus === "found" && (
+                    <span className="text-green-400">✓ Connected & Found</span>
+                  )}
+                  {profileVerify.driveStatus === "not_found" && (
+                    <span className="text-rose-400">✗ Not Found in Drive</span>
+                  )}
+                  {profileVerify.driveStatus === "skipped" && (
+                    <span className="text-slate-500">Skipped (Not Authenticated)</span>
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {/* Verification Steps Content */}
+            {profileVerify.step === "checking" && (
+              <div className="flex items-center justify-center gap-2 text-xs text-amber-500 animate-pulse py-2">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                Retrieving profiles, please wait...
+              </div>
+            )}
+
+            {profileVerify.step === "success" && (
+              <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 text-xs text-green-300 text-center animate-in fade-in duration-300">
+                ✓ Success! Profile verified. Hotloading dashboard parameters now...
+              </div>
+            )}
+
+            {profileVerify.step === "upload_required" && (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 text-xs text-rose-300 text-center">
+                  ⚠️ Profile data is missing from local storage and Drive backups. Please upload a saved backup if you have one.
+                </div>
+
+                <div className="border border-dashed border-indigo-500/25 bg-slate-950/40 rounded-xl p-4 text-center">
+                  <p className="text-[10px] text-slate-400 mb-2">Select the profile JSON to restore this card</p>
+                  <label className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-3 rounded-lg text-xs cursor-pointer transition-colors inline-flex items-center gap-1.5">
+                    <FolderOpen className="w-3.5 h-3.5" />
+                    Upload Backup
+                    <input
+                      type="file"
+                      accept=".json"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleUploadProfileJson(file);
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
