@@ -15,7 +15,8 @@ import {
   Phone,
   CloudLightning,
   Save,
-  FileText
+  FileText,
+  Send
 } from "lucide-react";
 import { 
   AuthManager, 
@@ -23,7 +24,8 @@ import {
   saveProfileToGoogleDrive, 
   saveProfileToBackend,
   UserProfileRepository,
-  SessionManager
+  SessionManager,
+  sendEmailViaGmail
 } from "../lib/firebaseAuth";
 
 interface AuthScreenProps {
@@ -34,6 +36,7 @@ interface AuthScreenProps {
 export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProps) {
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   
@@ -108,6 +111,68 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
       setError(err.message || "Failed to save and sync user profile.");
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const handleSendGmailReport = async () => {
+    if (!activeUser) return;
+    const session = SessionManager.getLocalSession();
+    if (!session || !session.accessToken) {
+      setError("Active Google login session not found. Please sign in again to authorize sending emails via Gmail.");
+      return;
+    }
+
+    setSendingEmail(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const subject = `✨ JHoraAI Cosmic Astrology Update for ${activeUser.name}`;
+      const htmlBody = `
+        <div style="font-family: sans-serif; background-color: #0b0f19; color: #f8fafc; padding: 40px 20px; max-width: 600px; margin: 0 auto; border-radius: 16px; border: 1px solid #312e81;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #f59e0b; font-size: 28px; margin: 0; font-family: 'Georgia', serif;">JHoraAI Cosmic Update</h1>
+            <p style="color: #94a3b8; font-size: 11px; font-family: monospace; letter-spacing: 2px;">VEDIC & KP PRECISION ENGINE</p>
+          </div>
+          <div style="line-height: 1.6; font-size: 14px; color: #cbd5e1;">
+            <p>Namaste <strong>${activeUser.name}</strong>,</p>
+            <p>Your JHoraAI profile has been securely backed up and synchronized across your Local Machine, Google Drive, and Cloud Database.</p>
+            
+            <div style="background-color: #1e293b; border-radius: 12px; padding: 20px; margin: 20px 0; border: 1px solid #334155;">
+              <h3 style="color: #f59e0b; margin-top: 0; font-size: 15px; font-family: monospace;">🔒 USER CLOUD LEDGER</h3>
+              <table style="width: 100%; font-size: 13px; color: #cbd5e1;">
+                <tr>
+                  <td style="padding: 4px 0; color: #64748b; width: 120px;">Email Profile</td>
+                  <td style="padding: 4px 0; font-family: monospace;">${activeUser.email}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 0; color: #64748b;">Phone Capture</td>
+                  <td style="padding: 4px 0; font-family: monospace;">${activeUser.phoneNumber || "Not provided"}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 0; color: #64748b;">Google Sync</td>
+                  <td style="padding: 4px 0; color: #10b981; font-weight: bold;">✓ Google Drive Active</td>
+                </tr>
+              </table>
+            </div>
+
+            <p>We are continuously processing cosmic calculations, house significators, stellar Nakshatra nakshatras, and transits to power your Vedic and KP Horoscopes.</p>
+            <p>Feel free to return to the JHoraAI dashboard to calculate charts, match compatibility, and analyze Kp stellar layouts.</p>
+          </div>
+          <div style="text-align: center; margin-top: 40px; border-top: 1px solid #1e293b; padding-top: 20px; font-size: 11px; color: #64748b;">
+            <p>This report was securely transmitted using the <strong>Google Gmail API</strong> following your authenticated sign-in.</p>
+            <p>&copy; 2026 JHoraAI Astro Platform. All cosmic alignments reserved.</p>
+          </div>
+        </div>
+      `;
+
+      await sendEmailViaGmail(session.accessToken, activeUser.email, subject, htmlBody);
+      setSuccess(`A beautiful personal astrology report has been successfully emailed to your Google account (${activeUser.email}) via Gmail API integration!`);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to dispatch email via Google Gmail API.");
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -282,6 +347,25 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
               <span>
                 <strong>Vedic & KP Report Automated:</strong> Once you calculate or complete a birth chart under this profile, our backend engine will run a complete astrological analysis and securely email it to you!
               </span>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={handleSendGmailReport}
+                disabled={sendingEmail}
+                className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold tracking-wide transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-indigo-500/10"
+                id="send-gmail-report-btn"
+              >
+                {sendingEmail ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5" />
+                    Send Astrology Report via Gmail Integration
+                  </>
+                )}
+              </button>
             </div>
           </div>
         )}

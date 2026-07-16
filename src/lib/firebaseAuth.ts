@@ -244,6 +244,52 @@ export async function saveProfileToBackend(profile: UserProfile): Promise<void> 
 }
 
 /**
+ * Encode MIME email message format into web-safe base64
+ */
+export function encodeEmail(to: string, subject: string, htmlBody: string): string {
+  const email = [
+    `To: ${to}`,
+    "Content-Type: text/html; charset=utf-8",
+    "MIME-Version: 1.0",
+    `Subject: ${subject}`,
+    "",
+    htmlBody
+  ].join("\r\n");
+
+  return btoa(unescape(encodeURIComponent(email)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
+/**
+ * Send personalized astrology analysis directly via the user's Gmail API (Google OAuth integration)
+ */
+export async function sendEmailViaGmail(accessToken: string, to: string, subject: string, htmlBody: string): Promise<void> {
+  try {
+    const raw = encodeEmail(to, subject, htmlBody);
+    const response = await fetch("https://gmail.googleapis.com/v1/users/me/messages/send", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ raw })
+    });
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("Gmail API failed with status:", response.status, response.statusText, errText);
+      throw new Error(`Gmail Send Error: ${response.statusText}`);
+    } else {
+      console.log("Email successfully dispatched via Google Gmail API!");
+    }
+  } catch (err) {
+    console.error("Error in sendEmailViaGmail:", err);
+    throw err;
+  }
+}
+
+/**
  * SessionManager handles active token refresh, local storage auth tracking, and auto sign-in states.
  */
 export const SessionManager = {
@@ -357,6 +403,7 @@ export const AuthManager = {
     provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
     provider.addScope('https://www.googleapis.com/auth/drive.file');
     provider.addScope('https://www.googleapis.com/auth/user.phonenumbers.read');
+    provider.addScope('https://www.googleapis.com/auth/gmail.send');
     
     const result = await signInWithPopup(auth, provider);
     const credential = GoogleAuthProvider.credentialFromResult(result);
