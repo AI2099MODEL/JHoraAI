@@ -76,6 +76,7 @@ import IngressTab from "./components/IngressTab";
 import PluginManager, { INITIAL_PLUGINS, PluginSpec } from "./components/PluginManager";
 import KpStellarDashboard from "./components/KpStellarDashboard";
 import { WesternAstrologyView } from "./components/WesternAstrologyView";
+import { MysticalSystemsView } from "./components/MysticalSystemsView";
 import { UserProfile, SessionManager, AuthManager } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
 import UpdateNotification from "./components/UpdateNotification";
@@ -139,6 +140,7 @@ export default function App() {
     ai_assistant: "chat",
     kp_stellar: "dashboard",
     western_astrology: "dashboard",
+    esoteric: "nadi",
     settings: "theme",
     developer: "raw_json"
   });
@@ -666,6 +668,20 @@ export default function App() {
         { id: "aspects", label: "Aspects", description: "Planetary aspects and aspect grid." },
         { id: "synastry", label: "Synastry", description: "Synastry & Composite compatibility." },
         { id: "transits", label: "Transits", description: "Solar return and active transits." }
+      ]
+    },
+    {
+      id: "esoteric",
+      label: "Mystical",
+      icon: Sparkles,
+      submenus: [
+        { id: "nadi", label: "Nadi Astrology", description: "Fine divisions (Nadi Amsas) and guidelines." },
+        { id: "lalkitab", label: "Lal Kitab", description: "Fixed Aries Ascendant house-remedies." },
+        { id: "varshaphala", label: "Tajik Varshaphala", description: "Progression solar return calculations." },
+        { id: "bazi", label: "Chinese BaZi", description: "The Four Pillars of Destiny (Stems & Branches)." },
+        { id: "numerology", label: "Numerology", description: "Pythagorean & Chaldean numbers profile." },
+        { id: "celtic", label: "Celtic Tree", description: "Sacred lunar tree zodiac signs." },
+        { id: "mayan", label: "Mayan Calendar", description: "Tzolkin & Haab Kin signature calculator." }
       ]
     },
     {
@@ -1926,6 +1942,23 @@ export default function App() {
                 className="space-y-6"
               >
                 <WesternAstrologyView nativeInputs={inputs} isDark={isDark} activeSubmenuId={activeSubmenuId} />
+              </motion.div>
+            </AnimatePresence>
+          ) : activeMenu === "esoteric" ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeSubmenuId}
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="space-y-6"
+              >
+                <MysticalSystemsView
+                  nativeInputs={inputs}
+                  isDark={isDark}
+                  activeSubmenuId={activeSubmenuId}
+                  astrologyData={astrologyData}
+                />
               </motion.div>
             </AnimatePresence>
           ) : activeMenu === "settings" ? (
