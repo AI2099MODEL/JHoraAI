@@ -646,6 +646,14 @@ export default function App() {
       ]
     },
     {
+      id: "downloads",
+      label: "Downloads",
+      icon: Download,
+      submenus: [
+        { id: "pdf_reports", label: "Astrology Reports", description: "Compiled high-fidelity PDF horoscopes." }
+      ]
+    },
+    {
       id: "horoscope",
       label: "JHORA",
       icon: Activity,
@@ -1730,6 +1738,215 @@ export default function App() {
                   </div>
                   
                   <AstroChat astrologyData={astrologyData} />
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          ) : activeMenu === "downloads" ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="downloads"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="space-y-6"
+              >
+                <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
+                  <div>
+                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
+                      <Download className="w-5 h-5 text-amber-500" />
+                      Vedic Astrology Downloads Manager
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Retrieve prepared astrological PDF reports, dynamic birth profiles, and custom celestial calendars.
+                    </p>
+                  </div>
+
+                  {/* Primary Prepared PDF Section */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="p-5 rounded-xl border border-amber-500/20 bg-amber-500/5 space-y-4">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                          <span className="bg-amber-500/10 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                            Authoritative Report
+                          </span>
+                          <h4 className="text-sm font-bold text-slate-200 mt-2">Vedic Astrology Report - Native</h4>
+                          <p className="text-xs text-slate-400">Pisces Ascendant Profile</p>
+                        </div>
+                        <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400 border border-amber-500/10">
+                          <FileText className="w-6 h-6" />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 border-t border-indigo-500/5 pt-3.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-slate-400">📅 Date of Birth:</span>
+                          <span className="text-slate-200 font-medium">6 Jan 1976</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-slate-400">🕒 Time of Birth:</span>
+                          <span className="text-slate-200 font-medium">06:40 PM</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-slate-400">📍 Place of Birth:</span>
+                          <span className="text-slate-200 font-medium">Dehradun, Uttarakhand, India</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-slate-400">📄 Format & Pages:</span>
+                          <span className="text-emerald-400 font-medium">PDF (8 Pages • 2.1MB)</span>
+                        </div>
+                      </div>
+
+                      <div className="pt-2">
+                        <button
+                          onClick={async () => {
+                            try {
+                              let targetData = astrologyData;
+                              if (!targetData) {
+                                // Dynamically calculate the high-precision 1976-01-06 profile first
+                                const defaultRes = await fetch("/api/astrology/calculate", {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({
+                                    name: "Native",
+                                    date: "1976-01-06",
+                                    time: "18:40:00",
+                                    place: "Dehradun, Uttarakhand, India",
+                                    latitude: 30.3165,
+                                    longitude: 78.0322,
+                                    timezone: 5.5
+                                  })
+                                });
+                                if (defaultRes.ok) {
+                                  targetData = await defaultRes.json();
+                                  setAstrologyData(targetData);
+                                }
+                              }
+                              
+                              if (targetData) {
+                                const profileJson = mapAstrologyDataToUserProfileJSON(activeUser, targetData);
+                                const pdfDoc = generateAstrologyPDF(profileJson);
+                                const pdfData = pdfDoc.output("datauristring");
+                                const link = document.createElement("a");
+                                link.href = pdfData;
+                                link.download = "Native_Vedic_Astrology_Report_19760106.pdf";
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                              } else {
+                                // Backup: fetch pre-generated static file
+                                const res = await fetch("/api/downloads/report-19760106");
+                                if (!res.ok) throw new Error(`Server returned status: ${res.status}`);
+                                const blob = await res.blob();
+                                const url = URL.createObjectURL(blob);
+                                const link = document.createElement("a");
+                                link.href = url;
+                                link.download = "Native_Vedic_Astrology_Report_19760106.pdf";
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                URL.revokeObjectURL(url);
+                              }
+                            } catch (err: any) {
+                              console.error("PDF download failed:", err);
+                              alert("Failed to download PDF report: " + err.message);
+                            }
+                          }}
+                          className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 px-4 rounded-xl text-xs cursor-pointer transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20"
+                        >
+                          <Download className="w-4 h-4" />
+                          Download Authoritative PDF Report
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Information and backup download */}
+                    <div className="p-5 rounded-xl border border-indigo-500/10 bg-slate-950/25 flex flex-col justify-between">
+                      <div className="space-y-3">
+                        <h4 className="text-xs font-bold text-indigo-400 flex items-center gap-1.5 uppercase tracking-wider">
+                          <Shield className="w-4 h-4" />
+                          Vedic Data Model Export
+                        </h4>
+                        <p className="text-xs text-slate-400 leading-relaxed">
+                          This high-fidelity compilation encapsulates planetary alignments, 16 divisional charts (Vargas), Shadbala matrices, Ashtakavarga points, and comprehensive Vimshottari & Yogini Dasha timelines.
+                        </p>
+                        <div className="bg-slate-950/40 p-3 rounded-lg border border-indigo-500/5 text-[11px] text-slate-400 space-y-1">
+                          <div className="flex items-center gap-1.5 text-amber-400 font-medium">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            Grounded in JHora Engine
+                          </div>
+                          <p>Compiled in strict compliance with traditional Parashari mathematical algorithms.</p>
+                        </div>
+                      </div>
+
+                      <div className="pt-4 flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            if (astrologyData) {
+                              const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(astrologyData, null, 2));
+                              const downloadAnchor = document.createElement('a');
+                              downloadAnchor.setAttribute("href", dataStr);
+                              downloadAnchor.setAttribute("download", "Vedic_Astrology_Profile_Active.json");
+                              document.body.appendChild(downloadAnchor);
+                              downloadAnchor.click();
+                              downloadAnchor.remove();
+                            } else {
+                              alert("No active astrology profile loaded to export JSON.");
+                            }
+                          }}
+                          className="flex-1 bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-500/20 py-2 rounded-xl text-[11px] font-bold cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          Export Active JSON
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Offline Saved Profiles Section */}
+                  <div className="space-y-4 pt-4 border-t border-indigo-500/5">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                        Your Offline Saved & Cached Profiles ({cachedList.length})
+                      </h4>
+                      <p className="text-[10px] text-slate-500">Stored in IndexedDB Offline Cache</p>
+                    </div>
+
+                    {cachedList.length === 0 ? (
+                      <div className="text-center py-6 rounded-xl bg-slate-950/10 border border-dashed border-slate-800 text-slate-500 text-xs">
+                        No saved profiles. Click "Cast Horoscope" in Birth to save a record.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        {cachedList.map((rec) => {
+                          return (
+                            <div key={rec.id} className="p-3.5 rounded-xl border border-indigo-500/5 bg-slate-950/10 flex flex-col justify-between space-y-3">
+                              <div className="space-y-1">
+                                <div className="text-xs font-bold text-slate-200 truncate">{rec.name}</div>
+                                <div className="text-[10px] text-slate-400">📅 {rec.date} • 🕒 {rec.time}</div>
+                                <div className="text-[10px] text-slate-400 truncate">📍 {rec.location}</div>
+                              </div>
+                              <div className="flex items-center gap-1.5 pt-2 border-t border-indigo-500/5">
+                                <button
+                                  onClick={() => handleDownloadPdfForRecord(rec)}
+                                  className="flex-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/10 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1"
+                                >
+                                  <FileText className="w-3 h-3" />
+                                  PDF
+                                </button>
+                                <button
+                                  onClick={() => handleExportJsonForRecord(rec)}
+                                  className="flex-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-indigo-500/10 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1"
+                                >
+                                  <Download className="w-3 h-3" />
+                                  JSON
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             </AnimatePresence>

@@ -123,6 +123,11 @@ export interface AstrologyData {
     percentage: number;
     kootas: { [key: string]: { boy: string; girl: string; points: number; maxPoints: number } };
   };
+  kpChart?: any;
+  kpCusps?: any;
+  kpSignificators?: any;
+  kpDasha?: any;
+  westernChart?: any;
 }
 
 export interface DashaPeriod {

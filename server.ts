@@ -366,6 +366,18 @@ app.get("/api/jhora/muhurta/events", (req, res) => {
   }
 });
 
+// Endpoint to fetch the pre-generated user profile PDF report (1976-01-06)
+app.get("/api/downloads/report-19760106", (req, res) => {
+  const filePath = path.join(process.cwd(), "public", "astrology_report_19760106.pdf");
+  if (fs.existsSync(filePath)) {
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", "attachment; filename=Native_Vedic_Astrology_Report_19760106.pdf");
+    res.sendFile(filePath);
+  } else {
+    res.status(404).send("File not found");
+  }
+});
+
 // React app primary calculation endpoint (Proxies directly to official JHora horoscope)
 app.post("/api/astrology/calculate", async (req, res) => {
   try {
