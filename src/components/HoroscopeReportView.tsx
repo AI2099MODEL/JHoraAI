@@ -345,13 +345,27 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
   // Safe Fallback structures in case transitAstroData is loading/unavailable
   const activePanchanga = useMemo(() => {
+    const normalizeField = (val: any, defaultName: string, defaultLord: string, defaultPaksha?: string) => {
+      if (!val) {
+        return { name: defaultName, lord: defaultLord, paksha: defaultPaksha };
+      }
+      if (typeof val === "string") {
+        return { name: val, lord: defaultLord, paksha: defaultPaksha };
+      }
+      return {
+        name: val.name || defaultName,
+        lord: val.lord || defaultLord,
+        paksha: val.paksha || defaultPaksha,
+      };
+    };
+
     if (transitAstroData?.panchanga) {
       return {
-        tithi: transitAstroData.panchanga.tithi || { name: "Sukla Ekadashi", paksha: "Sukla", lord: "Sun" },
-        vara: transitAstroData.panchanga.vara || { name: "Friday", lord: "Venus" },
-        nakshatra: transitAstroData.panchanga.nakshatra || { name: "Ardra", lord: "Rahu" },
-        yoga: transitAstroData.panchanga.yoga || { name: "Preeti", lord: "Mercury" },
-        karana: transitAstroData.panchanga.karana || { name: "Bava", lord: "Sun" },
+        tithi: normalizeField(transitAstroData.panchanga.tithi, "Sukla Ekadashi", "Sun", "Sukla"),
+        vara: normalizeField(transitAstroData.panchanga.vara, "Friday", "Venus"),
+        nakshatra: normalizeField(transitAstroData.panchanga.nakshatra, "Ardra", "Rahu"),
+        yoga: normalizeField(transitAstroData.panchanga.yoga, "Preeti", "Mercury"),
+        karana: normalizeField(transitAstroData.panchanga.karana, "Bava", "Sun"),
         sunrise: transitAstroData.panchanga.sunrise || "05:42 AM",
         sunset: transitAstroData.panchanga.sunset || "06:55 PM",
       };
