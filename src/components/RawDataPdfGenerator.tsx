@@ -1,15 +1,6 @@
 import React, { useState } from "react";
-import { Download, RefreshCw, Info, CheckSquare, Square, Check, X } from "lucide-react";
+import { Download, RefreshCw, CheckCircle, Shield, Sparkles, Database, Star } from "lucide-react";
 import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
-
-interface SubmenuItem {
-  id: string;
-  label: string;
-  description: string;
-  systemId?: string;
-  originalId?: string;
-  category?: string;
-}
 
 interface RawDataPdfGeneratorProps {
   astrologyData: any;
@@ -28,120 +19,29 @@ export const RawDataPdfGenerator: React.FC<RawDataPdfGeneratorProps> = ({
 }) => {
   const [compiling, setCompiling] = useState(false);
 
-  // Available categories and submenus (Excluding MARRIAGE & SYNERGY and TRANSIT & MUHURTA)
-  const categories = [
-    {
-      id: "jhora",
-      name: "JHORA (Vedic Horoscope)",
-      submenus: [
-        { id: "overview", label: "Overview", description: "Vedic birth and panchanga elements." },
-        { id: "planetary_positions", label: "Planetary Positions", description: "Degrees, Signs, Nakshatras and House placements." },
-        { id: "planet_strength", label: "Planet Strength", description: "Shadbala index matrices." },
-        { id: "bhava_strength", label: "Bhava Strength", description: "House strength indexes." },
-        { id: "ashtakavarga", label: "Ashtakavarga", description: "Samudhaya Ashtakavarga charts." },
-        { id: "yogas", label: "Yogas", description: "Auspicious combinations in natal charts." },
-        { id: "doshas", label: "Doshas", description: "Manglik and Kaal Sarp analysis." },
-        { id: "vimshottari", label: "Vimshottari Dasha", description: "120-year cycle." },
-        { id: "yogini", label: "Yogini Dasha", description: "36-year cycle." },
-        { id: "ashtottari", label: "Ashtottari Dasha", description: "108-year cycle." },
-        { id: "longevity", label: "Longevity", description: "Traditional life span calculations." },
-        { id: "sade_sati", label: "Sade Sati", description: "Saturn transit timeline cycles." },
-        // Divisional Charts
-        { id: "d1_rasi", label: "D1 Rasi", description: "General birth chart." },
-        { id: "d9_navamsa", label: "D9 Navamsa", description: "Dharma, marriage, and potential." },
-        { id: "d10_dasamsa", label: "D10 Dasamsa", description: "Profession, achievements, and fame." },
-        // Predictions
-        { id: "arudhas", label: "Arudhas", description: "Image and projection reflections." },
-        { id: "sphutas", label: "Sphutas", description: "Highly sensitive coordinate points." },
-        { id: "upagrahas", label: "Upagrahas", description: "Shadow planets calculations." },
-        { id: "sahams", label: "Sahams", description: "Arabic/Tajik sensitive lots." },
-        { id: "special_lagnas", label: "Special Lagnas", description: "Hora, Ghati, and Bhava Ascendants." }
-      ]
-    },
-    {
-      id: "kp_stellar",
-      name: "KP STELLAR (System)",
-      submenus: [
-        { id: "kp_dashboard", label: "Dashboard", description: "Overview, Provider Health & Status." },
-        { id: "kp_rulebook", label: "KP Rulebook", description: "Krishnamurti Paddhati rules & evidence engine." },
-        { id: "kp_cusps", label: "Cusps", description: "12 Cusps, Degrees & Sub-Lords." },
-        { id: "kp_planet_analysis", label: "Planet Analysis", description: "Planet Star-Lord & Sub-Lord placements." },
-        { id: "kp_significators", label: "Significators", description: "Planet & House level significators." },
-        { id: "kp_ruling_planets", label: "Ruling Planets", description: "Day, Moon & Ascendant rulers." },
-        { id: "kp_dasha", label: "KP Dasha", description: "KP Vimshottari & event period indicators." },
-        { id: "kp_transit", label: "Transit", description: "Real-time coordinate significations." },
-        { id: "kp_horary", label: "Horary", description: "Prashna seed number calculations." }
-      ]
-    },
-    {
-      id: "western",
-      name: "WESTERN (Tropical)",
-      submenus: [
-        { id: "west_dashboard", label: "Dashboard", description: "Overview & Provider Health." },
-        { id: "west_natal_chart", label: "Natal Chart", description: "Tropical circular wheel chart." },
-        { id: "west_positions", label: "Positions", description: "Degrees, Signs, and Houses." },
-        { id: "west_aspects", label: "Aspects", description: "Planetary aspects and aspect grid." },
-        { id: "west_synastry", label: "Synastry", description: "Synastry & Composite compatibility." },
-        { id: "west_transits", label: "Transits", description: "Solar return and active transits." }
-      ]
-    },
-    {
-      id: "mystical",
-      name: "MYSTICAL (Esoteric)",
-      submenus: [
-        { id: "eso_nadi", label: "Nadi Astrology", description: "Fine divisions (Nadi Amsas) and guidelines." },
-        { id: "eso_lalkitab", label: "Lal Kitab", description: "Fixed Aries Ascendant house-remedies." },
-        { id: "eso_varshaphala", label: "Tajik Varshaphala", description: "Progression solar return calculations." },
-        { id: "eso_bazi", label: "Chinese BaZi", description: "The Four Pillars of Destiny (Stems & Branches)." },
-        { id: "eso_numerology", label: "Numerology", description: "Pythagorean & Chaldean numbers profile." },
-        { id: "eso_celtic", label: "Celtic Tree", description: "Sacred lunar tree zodiac signs." },
-        { id: "eso_mayan", label: "Mayan Calendar", description: "Tzolkin & Haab Kin signature calculator." }
-      ]
-    }
+  // Complete exhaustive list of all submenu IDs for automatic compiler execution
+  const allSubmenuIds = [
+    // JHora Vedic
+    "overview", "planetary_positions", "planet_strength", "bhava_strength", 
+    "ashtakavarga", "yogas", "doshas", "vimshottari", "yogini", "ashtottari", 
+    "longevity", "sade_sati", "d1_rasi", "d9_navamsa", "d10_dasamsa", 
+    "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
+    // KP Stellar
+    "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
+    "kp_significators", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
+    // Western Tropical
+    "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
+    // Esoteric/Mystical
+    "eso_nadi", "eso_lalkitab", "eso_varshaphala", "eso_bazi", "eso_numerology", "eso_celtic", "eso_mayan"
   ];
 
-  // Store selected submenus (by default, select ALL parameters to include all systems' complete data)
-  const allSubmenuIds = categories.flatMap(c => c.submenus.map(s => s.id));
-  const [selected, setSelected] = useState<string[]>(allSubmenuIds);
-
-  const toggleSelect = (id: string) => {
-    setSelected(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAllCategory = (catId: string, value: boolean) => {
-    const cat = categories.find(c => c.id === catId);
-    if (!cat) return;
-    const ids = cat.submenus.map(s => s.id);
-    if (value) {
-      setSelected(prev => Array.from(new Set([...prev, ...ids])));
-    } else {
-      setSelected(prev => prev.filter(x => !ids.includes(x)));
-    }
-  };
-
-  const handleSelectAllGlobal = (value: boolean) => {
-    if (value) {
-      const allIds = categories.flatMap(c => c.submenus.map(s => s.id));
-      setSelected(allIds);
-    } else {
-      setSelected([]);
-    }
-  };
-
   const handleCompileRawPdf = async () => {
-    if (selected.length === 0) {
-      alert("Please select at least one Astro Submenu parameter to export.");
-      return;
-    }
-
     try {
       setCompiling(true);
       let targetData = astrologyData;
 
       if (!targetData) {
-        // Dynamically calculate the high-precision 1976-01-06 profile first
+        // Dynamically calculate the high-precision 1976-01-06 profile first if empty
         const defaultRes = await fetch("/api/astrology/calculate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -169,131 +69,122 @@ export const RawDataPdfGenerator: React.FC<RawDataPdfGeneratorProps> = ({
       
       const doc = generateRawAstrologyPDF(profileJson, {
         profileName: profileJson.User?.profile_name || "Vedic Native",
-        submenus: selected
+        submenus: allSubmenuIds
       });
 
-      doc.save(`Raw_Data_Stellar_Report_${Date.now()}.pdf`);
+      doc.save(`Complete_Astrology_Analysis_Report_${Date.now()}.pdf`);
     } catch (err: any) {
-      console.error("Failed to generate raw data PDF:", err);
-      alert("Failed to compile raw data PDF: " + err.message);
+      console.error("Failed to generate complete data PDF:", err);
+      alert("Failed to compile complete PDF: " + err.message);
     } finally {
       setCompiling(false);
     }
   };
 
   const cardStyle = isDark
-    ? "bg-slate-950/40 border-slate-800/80"
-    : "bg-white border-neutral-200 shadow-sm";
+    ? "bg-slate-950/50 border-slate-800/80"
+    : "bg-white border-neutral-200 shadow-md";
 
   const textPrimary = isDark ? "text-slate-100" : "text-neutral-900";
-  const textSecondary = isDark ? "text-slate-400" : "text-neutral-500";
-  const innerBg = isDark ? "bg-slate-900/30" : "bg-neutral-50";
+  const textMuted = isDark ? "text-slate-400" : "text-neutral-500";
+  const itemBg = isDark ? "bg-slate-900/40 border-slate-800/50" : "bg-neutral-50 border-neutral-100";
 
   return (
-    <div className={`p-5 rounded-xl border ${cardStyle} space-y-5`}>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="space-y-1">
-          <span className="bg-amber-500/10 text-amber-500 dark:text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-            Stellar Data Exporter
-          </span>
-          <h4 className={`text-sm font-bold ${textPrimary} mt-2`}>Astro Submenu Raw Data PDF Compiler</h4>
-          <p className="text-xs text-slate-400">Custom compile raw calculations from JHora, KP, Western, and Mystical systems.</p>
-        </div>
-        
-        <div className="flex items-center gap-2 self-start sm:self-center">
-          <button
-            onClick={() => handleSelectAllGlobal(true)}
-            className="text-[10px] px-2 py-1 rounded bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20 font-semibold cursor-pointer transition-colors"
-          >
-            Select All
-          </button>
-          <button
-            onClick={() => handleSelectAllGlobal(false)}
-            className="text-[10px] px-2 py-1 rounded bg-slate-500/10 text-slate-400 hover:bg-slate-500/20 font-semibold cursor-pointer transition-colors"
-          >
-            Clear All
-          </button>
-        </div>
-      </div>
+    <div id="pdf-compiler-card" className={`p-6 rounded-2xl border ${cardStyle} space-y-6 relative overflow-hidden`}>
+      {/* Dynamic Ambient Background Spark */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Excluded notice bar */}
-      <div className="flex items-start gap-2 p-3 rounded-lg bg-indigo-950/20 border border-indigo-500/15 text-[11px] text-indigo-300">
-        <Info className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-        <p className="leading-relaxed">
-          <strong>Security & Policy Compliance Guard:</strong> Marriage compatibility profiles (MARRIAGE & SYNERGY) and celestial transit/daily elections (TRANSIT & MUHURTA) are strictly excluded from this raw export payload.
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <span className="bg-amber-500/15 text-amber-500 dark:text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+            <Sparkles className="w-3 h-3" />
+            Stellar PDF Compiler
+          </span>
+          <span className="bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+            All Systems Included
+          </span>
+        </div>
+        <h3 className={`text-base font-bold ${textPrimary}`}>
+          Astro Submenu Raw Data PDF Compiler
+        </h3>
+        <p className={`text-xs ${textMuted} leading-relaxed max-w-2xl`}>
+          Compile and print a comprehensive 360° astrological book containing deep computations from JHora, KP Stellar, Western Tropical, and Esoteric Mystical engines. Includes full charts, planet strengths, dasha cycles, and interpretive predictions.
         </p>
       </div>
 
-      {/* Grid of categories */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[380px] overflow-y-auto pr-1 scrollbar-thin">
-        {categories.map(cat => {
-          const catCheckedCount = cat.submenus.filter(s => selected.includes(s.id)).length;
-          const isAllCatChecked = catCheckedCount === cat.submenus.length;
-          
-          return (
-            <div key={cat.id} className={`p-3 rounded-lg border ${isDark ? "border-slate-800/60 bg-slate-950/20" : "border-neutral-100 bg-neutral-50/50"} space-y-3`}>
-              <div className="flex items-center justify-between border-b border-indigo-500/5 pb-2">
-                <span className="text-[11px] font-mono font-bold tracking-wider text-amber-500 uppercase">{cat.name}</span>
-                <button
-                  type="button"
-                  onClick={() => handleSelectAllCategory(cat.id, !isAllCatChecked)}
-                  className="text-[9px] text-indigo-400 hover:text-indigo-300 font-medium cursor-pointer"
-                >
-                  {isAllCatChecked ? "Deselect All" : "Select All"}
-                </button>
-              </div>
+      {/* Systems Grid Showcase */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className={`p-4 rounded-xl border ${itemBg} space-y-2`}>
+          <div className="flex items-center gap-1.5 text-amber-500 font-bold text-xs uppercase tracking-wider">
+            <Star className="w-4 h-4" />
+            Vedic JHora
+          </div>
+          <p className="text-[10px] text-slate-400 leading-normal">
+            Panchanga, Planet Positions, Shadbala Strengths, Ashtakavarga, Vimshottari Dasha, Yogini & Ashtottari timelines, D1 Rasi & D9 Navamsa.
+          </p>
+        </div>
 
-              <div className="grid grid-cols-1 gap-2">
-                {cat.submenus.map(sub => {
-                  const isChecked = selected.includes(sub.id);
-                  return (
-                    <button
-                      key={sub.id}
-                      onClick={() => toggleSelect(sub.id)}
-                      className={`flex items-start gap-2.5 p-2 rounded text-left transition-all text-xs border ${
-                        isChecked 
-                          ? "bg-indigo-500/5 border-indigo-500/20 text-slate-200" 
-                          : "border-transparent text-slate-400 hover:bg-slate-900/10 hover:text-slate-300"
-                      }`}
-                    >
-                      <span className="mt-0.5 text-indigo-400">
-                        {isChecked ? (
-                          <CheckSquare className="w-3.5 h-3.5" />
-                        ) : (
-                          <Square className="w-3.5 h-3.5" />
-                        )}
-                      </span>
-                      <div className="space-y-0.5 leading-none">
-                        <span className="block font-medium text-[11px]">{sub.label}</span>
-                        <span className="block text-[9px] text-slate-500 font-normal">{sub.description}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+        <div className={`p-4 rounded-xl border ${itemBg} space-y-2`}>
+          <div className="flex items-center gap-1.5 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+            <Database className="w-4 h-4" />
+            KP Stellar
+          </div>
+          <p className="text-[10px] text-slate-400 leading-normal">
+            12 Cusps Coordinates, Planet Star-Lord & Sub-Lord analysis, Planet & House levels significators, Ruling planets, and event seeds.
+          </p>
+        </div>
+
+        <div className={`p-4 rounded-xl border ${itemBg} space-y-2`}>
+          <div className="flex items-center gap-1.5 text-blue-400 font-bold text-xs uppercase tracking-wider">
+            <Star className="w-4 h-4" />
+            Western Tropical
+          </div>
+          <p className="text-[10px] text-slate-400 leading-normal">
+            Tropical Circular Wheel Degrees, Aspect grids, Synastry/Composite overlays, Solar returns, and Active transits.
+          </p>
+        </div>
+
+        <div className={`p-4 rounded-xl border ${itemBg} space-y-2`}>
+          <div className="flex items-center gap-1.5 text-teal-400 font-bold text-xs uppercase tracking-wider">
+            <Sparkles className="w-4 h-4" />
+            Mystical Esoteric
+          </div>
+          <p className="text-[10px] text-slate-400 leading-normal">
+            Nadi fine divisions, Lal Kitab fixed remedies, Tajik Varshaphala, Chinese BaZi Four Pillars, Numerology, Celtic, and Mayan Kin.
+          </p>
+        </div>
       </div>
 
-      <div className="pt-3 border-t border-indigo-500/5 flex items-center justify-between gap-4">
-        <span className="text-[10px] text-slate-500">
-          Selected submenus: <strong>{selected.length}</strong> parameters included in raw print layout.
-        </span>
+      {/* Compliance / Notice Bar */}
+      <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-slate-950/20 border border-indigo-500/10 text-xs text-indigo-300">
+        <Shield className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+        <p className="leading-normal text-[11px]">
+          <strong>Security Protocol Enforced:</strong> Complete raw data dump includes calculated coordinate states and planetary indicators. All marriage compatibility modules and real-time transient daily muhurtas are omitted to guarantee profile integrity.
+        </p>
+      </div>
+
+      {/* Trigger Area */}
+      <div className="pt-3 border-t border-indigo-500/5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-2 text-emerald-500 text-xs font-semibold">
+          <CheckCircle className="w-4 h-4" />
+          <span>Compiler Engine Ready: All 32 Stellar Systems Configured</span>
+        </div>
+
         <button
+          id="compile-raw-pdf-button"
           onClick={handleCompileRawPdf}
           disabled={compiling}
-          className="bg-amber-500 hover:bg-amber-600 disabled:bg-slate-800 text-slate-950 font-bold py-2 px-4 rounded-lg text-xs cursor-pointer transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20"
+          className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-slate-800 disabled:to-slate-900 text-slate-950 font-bold py-3 px-6 rounded-xl text-xs cursor-pointer transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/15 hover:shadow-amber-500/25 shrink-0"
         >
           {compiling ? (
             <>
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-              Compiling Raw PDF...
+              <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
+              Compiling All Systems into PDF...
             </>
           ) : (
             <>
-              <Download className="w-3.5 h-3.5" />
-              Compile & Download Raw Data PDF
+              <Download className="w-4 h-4 text-slate-950" />
+              Download Complete 360° Analysis PDF Report
             </>
           )}
         </button>

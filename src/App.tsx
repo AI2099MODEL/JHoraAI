@@ -84,6 +84,7 @@ import { UnifiedEvidenceView } from "./components/UnifiedEvidenceView";
 import { AIRelationshipExpert } from "./components/AIRelationshipExpert";
 import { RelationshipReportGenerator } from "./components/RelationshipReportGenerator";
 import { RawDataPdfGenerator } from "./components/RawDataPdfGenerator";
+import { HoroscopeReportView } from "./components/HoroscopeReportView";
 import { MasterArchitectureView } from "./components/MasterArchitectureView";
 import { RelationshipKnowledgeCenter } from "./components/RelationshipKnowledgeCenter";
 import { AstrologicalReasoningEngine } from "./components/AstrologicalReasoningEngine";
@@ -149,7 +150,7 @@ export default function App() {
   };
 
   // Active Navigation Coordinate Graph
-  const [activeMenu, setActiveMenu] = useState<string>("dashboard");
+  const [activeMenu, setActiveMenu] = useState<string>("analysis");
   const [activeSubMenu, setActiveSubMenu] = useState<{ [key: string]: string }>({
     horoscope: "overview",
     charts: "d1_rasi",
@@ -408,6 +409,22 @@ export default function App() {
     try {
       const records = await getAllCachedHoroscopes();
       setCachedList(records);
+      
+      // Auto-load if there is exactly 1 profile in cached history
+      if (records.length === 1) {
+        const record = records[0];
+        setInputs({
+          name: record.name,
+          date: record.date,
+          time: record.time,
+          location: record.location,
+          latitude: record.latitude,
+          longitude: record.longitude,
+          timezone: record.timezone,
+        });
+        setAstrologyData(record.data);
+        localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
+      }
     } catch (e) {
       console.error("Failed to load IndexedDB records:", e);
     }
@@ -1774,47 +1791,43 @@ export default function App() {
                 exit={{ opacity: 0, y: -5 }}
                 className="space-y-6"
               >
-                <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                  <div>
-                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                      <BarChart className="w-5 h-5 text-amber-500" />
-                      Astro Systems Complete Data Analysis
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Extract and analyze raw, uncompiled metrics from JHora, KP, Western, and Mystical systems. Download all systems' complete data to train AI and build robust profiles.
-                    </p>
-                  </div>
+                {/* Traditional Horoscope Report (Main Default Presentation) */}
+                <HoroscopeReportView
+                  astrologyData={astrologyData}
+                  isDark={isDark}
+                />
 
-                  {/* Master Rules Engine Reference Analysis */}
-                  <MasterArchitectureView
-                    astrologyData={astrologyData}
-                    isDark={isDark}
-                  />
+                <div className="border-t border-indigo-500/10 my-6" />
 
-                  {/* Dynamic Raw Astro Submenu Data PDF Generator */}
-                  <RawDataPdfGenerator
-                    astrologyData={astrologyData}
-                    activeUser={activeUser}
-                    setAstrologyData={setAstrologyData}
-                    mapAstrologyDataToUserProfileJSON={mapAstrologyDataToUserProfileJSON}
-                    isDark={isDark}
-                  />
+                {/* Dynamic Raw Astro Submenu Data PDF Generator */}
+                <RawDataPdfGenerator
+                  astrologyData={astrologyData}
+                  activeUser={activeUser}
+                  setAstrologyData={setAstrologyData}
+                  mapAstrologyDataToUserProfileJSON={mapAstrologyDataToUserProfileJSON}
+                  isDark={isDark}
+                />
 
-                  {/* AI & Developer Insights Card */}
-                  <div className={`p-5 rounded-xl border ${isDark ? "border-slate-800 bg-slate-950/20" : "border-neutral-200 bg-neutral-50/50"} space-y-4`}>
-                    <div className="flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-indigo-400" />
-                      <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">AI Training & Pipeline Integration</h4>
+                {/* Advanced Systems Rules Reference & Engine Simulator */}
+                <div className={`p-5 rounded-xl border ${isDark ? "border-slate-800 bg-slate-950/20" : "border-neutral-200 bg-neutral-50/50"} space-y-4`}>
+                  <details className="group cursor-pointer">
+                    <summary className="flex items-center justify-between text-xs font-bold text-slate-300 uppercase tracking-wider select-none list-none">
+                      <div className="flex items-center gap-2">
+                        <Cpu className="w-4 h-4 text-indigo-400" />
+                        <span>Advanced Systems Rules Reference & Simulator Engine</span>
+                      </div>
+                      <span className="text-[10px] text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div className="pt-4 space-y-4 cursor-default" onClick={(e) => e.stopPropagation()}>
+                      <p className="text-xs text-slate-400 leading-relaxed">
+                        Explore the underlying micro-astrological rulebooks and simulated states that power the JHora, KP, Western, and Mystical systems.
+                      </p>
+                      <MasterArchitectureView
+                        astrologyData={astrologyData}
+                        isDark={isDark}
+                      />
                     </div>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      The generated PDF compiles the entire multi-system astrometric state. This complete dataset aligns with modern retrieval architectures, enabling precise embeddings and dynamic prompt construction for fine-tuning cosmological AI models.
-                    </p>
-                    <div className="bg-slate-950/40 p-3.5 rounded-lg border border-indigo-500/5 font-mono text-[10px] text-indigo-300 space-y-1.5">
-                      <div className="text-slate-400">// Example: load the extracted userJSON schema</div>
-                      <div>const userJson = loadProfileJSON(pdfData);</div>
-                      <div>const response = await ai.models.generateContent(&#123; model: 'gemini-2.5-flash', contents: ["Train or guide using this context:", userJson] &#125;);</div>
-                    </div>
-                  </div>
+                  </details>
                 </div>
               </motion.div>
             </AnimatePresence>

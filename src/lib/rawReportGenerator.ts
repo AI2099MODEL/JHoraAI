@@ -77,18 +77,45 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
   doc.setLineWidth(0.5);
   doc.rect(10, 10, 190, 277);
 
+  // Beautiful golden celestial zodiac sun emblem (Professional Picture/Vector element)
+  const cx = 105;
+  const cy = 34;
+  const r = 10;
+  doc.setDrawColor(accentColor[0], accentColor[1], accentColor[2]);
+  doc.setLineWidth(0.3);
+  doc.ellipse(cx, cy, r, r);
+  doc.ellipse(cx, cy, r - 2, r - 2);
+  doc.ellipse(cx, cy, r - 5, r - 5);
+  doc.ellipse(cx, cy, 1.5, 1.5);
+  for (let i = 0; i < 12; i++) {
+    const angle = (i * Math.PI) / 6;
+    const x1 = cx + (r - 5) * Math.cos(angle);
+    const y1 = cy + (r - 5) * Math.sin(angle);
+    const x2 = cx + r * Math.cos(angle);
+    const y2 = cy + r * Math.sin(angle);
+    doc.line(x1, y1, x2, y2);
+    
+    // Secondary radiant starburst rays
+    const angle2 = angle + Math.PI / 12;
+    const rx1 = cx + (r + 1) * Math.cos(angle2);
+    const ry1 = cy + (r + 1) * Math.sin(angle2);
+    const rx2 = cx + (r + 3) * Math.cos(angle2);
+    const ry2 = cy + (r + 3) * Math.sin(angle2);
+    doc.line(rx1, ry1, rx2, ry2);
+  }
+
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(24);
+  doc.setFontSize(22);
   doc.setTextColor(accentColor[0], accentColor[1], accentColor[2]);
-  doc.text("COSMIC RAW DATA REPORT", 105, 50, { align: "center" });
+  doc.text("COSMIC SYSTEMS ANALYSIS REPORT", 105, 54, { align: "center" });
 
   doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
+  doc.setFontSize(9.5);
   doc.setTextColor(255, 255, 255);
-  doc.text("HIGH-PRECISION ASTROLOGICAL SUBMENU CORE EXPORT", 105, 58, { align: "center" });
+  doc.text("COMPLETE 360° HIGH-PRECISION ASTROLOGICAL MULTI-SYSTEM DATA DUMP", 105, 61, { align: "center" });
 
   doc.setDrawColor(accentColor[0], accentColor[1], accentColor[2]);
-  doc.line(40, 65, 170, 65);
+  doc.line(30, 68, 180, 68);
 
   // Metadata block
   doc.setFillColor(30, 41, 59);
