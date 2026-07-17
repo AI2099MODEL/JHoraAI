@@ -1356,8 +1356,15 @@ export default function KpStellarDashboard({
                             {getRuleIcon(rule.output.category)}
                           </div>
                           <div className="min-w-0 flex-1 space-y-1">
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">{rule.id}</span>
+                             <div className="flex justify-between items-start gap-2">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">{rule.id}</span>
+                                <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded uppercase font-bold border ${
+                                  rule.type === "Transit" 
+                                    ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/15" 
+                                    : "bg-teal-500/10 text-teal-400 border-teal-500/15"
+                                }`}>{rule.type}</span>
+                              </div>
                               <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
                                 evaluation.status === "PASSED" 
                                   ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20" 

@@ -1,0 +1,24 @@
+{
+  "name": "JHora AI Professional",
+  "short_name": "JHoraAI",
+  "description": "Professional Vedic Astrology (Jyotish) AI with horoscope analysis, chart calculation, transits, dashas, and dynamic AI guidance.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

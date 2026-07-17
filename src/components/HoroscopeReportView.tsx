@@ -14,6 +14,7 @@ import { generateRelationshipPDF } from "../lib/relationshipReportGenerator";
 import { MasterArchitectureView } from "./MasterArchitectureView";
 import { PresentDayEngineView } from "./PresentDayEngineView";
 import RulesTerminal from "./RulesTerminal";
+import EventBookView from "./EventBookView";
 import AstroChart from "./AstroChart";
 import { KPRulebook } from "../lib/rules/kpRulebook";
 import { apiFetch as fetchKpApi } from "../lib/api";
@@ -96,7 +97,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
   const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("present");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
-  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "rules" | "event_muhurta" | "current_events">("present_day");
+  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "rules" | "event_book" | "event_muhurta" | "current_events">("present_day");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
   const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
@@ -1891,6 +1892,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           {[
             { id: "present_day", label: "Present Day Engine" },
             { id: "rules", label: "Astrological Rules" },
+            { id: "event_book", label: "Event Book" },
             { id: "event_muhurta", label: "Event Muhurta Finder" },
             { id: "current_events", label: "Space Weather Alerts" }
           ].map((tab) => (
@@ -1990,6 +1992,12 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             {eventsSubTab === "rules" && (
               <RulesTerminal
                 isDarkTheme={isDark}
+              />
+            )}
+            {eventsSubTab === "event_book" && (
+              <EventBookView
+                astrologyData={astrologyData}
+                isDark={isDark}
               />
             )}
             {eventsSubTab === "event_muhurta" && (
@@ -5488,9 +5496,16 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                             >
                               <div className="flex justify-between items-center w-full">
                                 <span className="text-[10px] font-mono text-indigo-400 font-semibold">{rule.id}</span>
-                                <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
-                                  evalRes.status === "PASSED" ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"
-                                }`}>{evalRes.status}</span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold border ${
+                                    rule.type === "Transit" 
+                                      ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/15" 
+                                      : "bg-teal-500/10 text-teal-400 border-teal-500/15"
+                                  }`}>{rule.type}</span>
+                                  <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
+                                    evalRes.status === "PASSED" ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"
+                                  }`}>{evalRes.status}</span>
+                                </div>
                               </div>
                               <span className="text-xs font-bold text-slate-200 line-clamp-1">{rule.name}</span>
                             </button>

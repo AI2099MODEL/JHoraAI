@@ -494,16 +494,19 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
                 <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left">
                   <thead className="bg-slate-50 dark:bg-slate-900/80">
                     <tr>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/5">
+                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/6">
                         System
                       </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/2">
+                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/8">
+                        Type
+                      </th>
+                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-5/12">
                         Logical Condition / Trigger Gate
                       </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/5">
+                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/6">
                         Target Output Status
                       </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center w-1/10">
+                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center w-1/12">
                         Actions
                       </th>
                     </tr>
@@ -511,6 +514,8 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-950/40">
                     {section.rules.map((rule) => {
                       const isEditing = editingRuleId === rule.id;
+                      const isTransitRule = rule.condition.toLowerCase().includes("transit") || rule.condition.toLowerCase().includes("gochara");
+                      const ruleTypeLabel = isTransitRule ? "Transit" : "Natal";
 
                       return (
                         <tr 
@@ -531,6 +536,17 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
                                 {rule.system}
                               </span>
                             )}
+                          </td>
+
+                          {/* Type column */}
+                          <td className="px-4 py-3">
+                            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase tracking-wider border ${
+                              isTransitRule 
+                                ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" 
+                                : "bg-teal-500/10 text-teal-400 border-teal-500/20"
+                            }`}>
+                              {ruleTypeLabel}
+                            </span>
                           </td>
 
                           {/* Logical Condition column */}

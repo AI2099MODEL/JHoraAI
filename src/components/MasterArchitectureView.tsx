@@ -871,7 +871,7 @@ export const MasterArchitectureView: React.FC<MasterArchitectureViewProps> = ({
                     }`}
                   >
                     <div className="space-y-3">
-                      <div className="flex items-start justify-between gap-2">
+                       <div className="flex items-start justify-between gap-2">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
                             rule.system === "Parashari"
@@ -882,6 +882,18 @@ export const MasterArchitectureView: React.FC<MasterArchitectureViewProps> = ({
                           }`}>
                             {rule.system}
                           </span>
+                          {(() => {
+                            const isTransitRule = rule.condition.toLowerCase().includes("transit") || rule.condition.toLowerCase().includes("gochara");
+                            return (
+                              <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono border ${
+                                isTransitRule 
+                                  ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/15" 
+                                  : "bg-teal-500/10 text-teal-400 border-teal-500/15"
+                              }`}>
+                                {isTransitRule ? "Transit" : "Natal"}
+                              </span>
+                            );
+                          })()}
                           <span className="font-mono text-[10px] font-bold text-slate-300 truncate max-w-[150px]">
                             ➔ {rule.outputStatus}
                           </span>

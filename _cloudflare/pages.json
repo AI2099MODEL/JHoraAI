@@ -1,0 +1,34 @@
+{
+  "project_name": "jhoraai-professional",
+  "production_branch": "main",
+  "build_config": {
+    "build_command": "npm run build",
+    "destination_dir": "dist",
+    "root_dir": "/"
+  },
+  "routing": {
+    "fallback_file": "/index.html",
+    "redirects_enabled": true,
+    "headers_enabled": true
+  },
+  "pwa": {
+    "manifest": "/manifest.json",
+    "service_worker": "/sw.js",
+    "assets_cached": [
+      "/",
+      "/index.html",
+      "/src/main.tsx",
+      "/src/App.tsx",
+      "/src/index.css"
+    ]
+  },
+  "environment_variables": {
+    "VITE_FIREBASE_API_KEY": "Required for Firebase Authentication and Database connectivity in production.",
+    "VITE_FIREBASE_AUTH_DOMAIN": "Required for Google Sign-In and session synchronization.",
+    "VITE_FIREBASE_PROJECT_ID": "Identifies the production Firebase project.",
+    "VITE_FIREBASE_STORAGE_BUCKET": "Required for storing user data or charts.",
+    "VITE_FIREBASE_MESSAGING_SENDER_ID": "Used for push notifications on planet transits / ingress alerts.",
+    "VITE_FIREBASE_APP_ID": "Uniquely identifies this PWA instance in Firebase console.",
+    "VITE_JHORA_API_URL": "The HTTPS base URL of the self-hosted JHoraAI / VedicAstro backend calculations."
+  }
+}
