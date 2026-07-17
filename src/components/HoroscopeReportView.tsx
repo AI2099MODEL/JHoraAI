@@ -95,6 +95,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
   const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("advanced");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
+  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "event_muhurta" | "current_events">("present_day");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
   const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
@@ -1849,7 +1850,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
-          Present
+          Events
         </button>
         <button
           onClick={() => setMajorTab("jhora")}
@@ -1882,6 +1883,29 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           Reports
         </button>
       </div>
+
+      {/* Sub-tabs bar for Events */}
+      {majorTab === "present" && (
+        <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40 animate-fade-in">
+          {[
+            { id: "present_day", label: "Present Day Engine" },
+            { id: "event_muhurta", label: "Event Muhurta Finder" },
+            { id: "current_events", label: "Space Weather Alerts" }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setEventsSubTab(tab.id as any)}
+              className={`px-2.5 py-1.5 text-[10px] font-mono rounded-md transition-all border text-center ${
+                eventsSubTab === tab.id
+                  ? "bg-amber-500/15 border-amber-500/50 text-amber-400 font-bold shadow-sm shadow-amber-500/10"
+                  : "border-slate-800 bg-slate-900/30 text-slate-400 hover:text-slate-200 hover:bg-slate-900/50"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Sub-tabs bar for Transit */}
       {majorTab === "transit" && (
@@ -1953,13 +1977,112 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           </div>
         )}
 
-        {/* ================= PRESENT DAY DYNAMIC ACTION ENGINE ================= */}
+        {/* ================= EVENTS DYNAMIC WORKSPACE ================= */}
         {majorTab === "present" && (
-          <div className="space-y-6">
-            <PresentDayEngineView
-              astrologyData={astrologyData}
-              isDark={isDark}
-            />
+          <div className="space-y-6 animate-fade-in">
+            {eventsSubTab === "present_day" && (
+              <PresentDayEngineView
+                astrologyData={astrologyData}
+                isDark={isDark}
+              />
+            )}
+            {eventsSubTab === "event_muhurta" && (
+              <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
+                <div className="border-b border-indigo-500/10 pb-4 mb-6">
+                  <span className="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                    Planetary Matcher
+                  </span>
+                  <h3 className="text-lg font-sans font-medium text-slate-200 mt-1 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-amber-500" />
+                    Event Muhurta Finder
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Identify perfect planetary times for weddings, business launches, investments, and creative pursuits.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[
+                    {
+                      name: "Wedding / Vivaha",
+                      desc: "Analyzes Jupiter strength and 7th house aspects to secure divine blessings.",
+                      active: dynamicEventOpportunity.marriageWindow.active,
+                      timeframe: dynamicEventOpportunity.marriageWindow.timeframe,
+                      badge: "Vivaha Samskara"
+                    },
+                    {
+                      name: "Business / Commercial Launch",
+                      desc: "Leverages Mercury and Sun's power to secure public reach, power, and cash flows.",
+                      active: dynamicEventOpportunity.businessOpportunity.active,
+                      timeframe: dynamicEventOpportunity.businessOpportunity.timeframe,
+                      badge: "Udyoga Aarambh"
+                    },
+                    {
+                      name: "Asset / Real Estate Acquisition",
+                      desc: "Maps Saturn's position and Mars aspects to rule out structural delays and secure longevity.",
+                      active: dynamicEventOpportunity.investmentOpportunity.active,
+                      timeframe: dynamicEventOpportunity.investmentOpportunity.timeframe,
+                      badge: "Grahapravesh / Capital"
+                    },
+                    {
+                      name: "Educational Enrollment / Courses",
+                      desc: "Aligns with Jupiter's transit to maximize wisdom retention, concentration, and successful graduation.",
+                      active: dynamicEventOpportunity.learningOpportunity.active,
+                      timeframe: dynamicEventOpportunity.learningOpportunity.timeframe,
+                      badge: "Vidya Aarambh"
+                    },
+                    {
+                      name: "Professional Career Leap",
+                      desc: "Calculates the operating DBA (Dasha-Bhukti-Antara) to secure authority and promotion parameters.",
+                      active: dynamicEventOpportunity.careerOpportunity.active,
+                      timeframe: dynamicEventOpportunity.careerOpportunity.timeframe,
+                      badge: "Karmasthala Rise"
+                    },
+                    {
+                      name: "Refreshes & Sacred Travel",
+                      desc: "Maps the 9th and 12th house transits to schedule rejuvenating pilgrimages or business trips.",
+                      active: dynamicEventOpportunity.travelOpportunity.active,
+                      timeframe: dynamicEventOpportunity.travelOpportunity.timeframe,
+                      badge: "Yatra Samskara"
+                    }
+                  ].map((event) => (
+                    <div key={event.name} className={`p-5 rounded-xl border flex flex-col justify-between min-h-[190px] transition-all bg-slate-900/40 ${
+                      event.active 
+                        ? "border-emerald-500/20 shadow-sm shadow-emerald-500/5 bg-slate-950/40" 
+                        : "border-slate-800"
+                    }`}>
+                      <div>
+                        <div className="flex justify-between items-start gap-2">
+                          <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">{event.badge}</span>
+                          <span className={`text-[8px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                            event.active ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-slate-800 text-slate-400"
+                          }`}>
+                            {event.active ? "Active Window" : "Consolidate"}
+                          </span>
+                        </div>
+                        <h4 className="text-xs font-bold text-amber-500 mt-1.5">{event.name}</h4>
+                        <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                          {event.desc}
+                        </p>
+                      </div>
+
+                      <div className="border-t border-slate-800/40 pt-2.5 mt-3">
+                        <span className="text-[9px] font-mono text-slate-500 block uppercase">Recommended Timeframe</span>
+                        <span className="text-[11px] font-bold text-slate-200 mt-0.5 block">{event.timeframe}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {eventsSubTab === "current_events" && (
+              <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
+                <TransitsTab 
+                  astrologyData={astrologyData}
+                  subTab="current_events"
+                />
+              </div>
+            )}
           </div>
         )}
 
