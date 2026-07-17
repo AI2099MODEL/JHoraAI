@@ -93,9 +93,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 }) => {
   const [compiling, setCompiling] = useState(false);
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
-  const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("advanced");
+  const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("present");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
-  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "event_muhurta" | "current_events">("present_day");
+  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "rulebook" | "event_muhurta" | "current_events">("present_day");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
   const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
@@ -1833,16 +1833,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       {/* Tabs bar for Advanced, Profile */}
       <div className="border-b border-slate-800 flex gap-1 overflow-x-auto pb-px">
         <button
-          onClick={() => setMajorTab("advanced")}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
-            majorTab === "advanced"
-              ? "border-indigo-500 text-indigo-400 font-extrabold bg-indigo-500/10"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          Advanced System
-        </button>
-        <button
           onClick={() => setMajorTab("present")}
           className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
             majorTab === "present"
@@ -1889,6 +1879,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40 animate-fade-in">
           {[
             { id: "present_day", label: "Present Day Engine" },
+            { id: "rulebook", label: "Rulebook Evaluation" },
             { id: "event_muhurta", label: "Event Muhurta Finder" },
             { id: "current_events", label: "Space Weather Alerts" }
           ].map((tab) => (
@@ -1966,22 +1957,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       {/* Main Container */}
       <div className="space-y-6">
 
-        {/* ================= ADVANCED SYSTEM: REFERENCE & AUTOMATED SIMULATIONS ================= */}
-        {majorTab === "advanced" && (
-          <div className="space-y-6">
-            {/* Simulated Rules Engine */}
-            <MasterArchitectureView
-              astrologyData={astrologyData}
-              isDark={isDark}
-            />
-          </div>
-        )}
-
         {/* ================= EVENTS DYNAMIC WORKSPACE ================= */}
         {majorTab === "present" && (
           <div className="space-y-6 animate-fade-in">
             {eventsSubTab === "present_day" && (
               <PresentDayEngineView
+                astrologyData={astrologyData}
+                isDark={isDark}
+              />
+            )}
+            {eventsSubTab === "rulebook" && (
+              <MasterArchitectureView
                 astrologyData={astrologyData}
                 isDark={isDark}
               />
