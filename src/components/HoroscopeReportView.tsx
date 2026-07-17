@@ -132,8 +132,18 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   // KP Planet Strength Table state variables
   const [kpStrengthPlanetFilter, setKpStrengthPlanetFilter] = useState<string>("All");
   const [kpStrengthHouseFilter, setKpStrengthHouseFilter] = useState<string>("All");
-  const [kpStrengthSortField, setKpStrengthSortField] = useState<"planet" | "houseNum" | "count" | "grade">("planet");
+  const [kpStrengthSortField, setKpStrengthSortField] = useState<"planet" | "houseNum" | "count" | "score" | "grade">("planet");
   const [kpStrengthSortOrder, setKpStrengthSortOrder] = useState<"asc" | "desc">("asc");
+
+  // Configurable KP priorities/weights state
+  const [kpWeights, setKpWeights] = useState({
+    L1: 5.0,
+    L2: 4.0,
+    L3: 3.0,
+    L4: 2.0,
+    L5: 1.0,
+    L6: 0.5
+  });
 
   // Dynamic Transit settings & calculations state variables
   const [transitDate, setTransitDate] = useState<string>(() => {
@@ -1303,34 +1313,80 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     return map;
   }, [rawHouseSignificators]);
 
-  const planetStrengthRows = useMemo(() => {
-    const rows: { planet: string; houseNum: number; levels: string[]; count: number; grade: string }[] = [];
+  // 1. Significator Matrix (Planet, House, L1-L6 flags, Evidence Count)
+  const significatorMatrix = useMemo(() => {
+    const matrix: {
+      planet: string;
+      houseNum: number;
+      L1: boolean;
+      L2: boolean;
+      L3: boolean;
+      L4: boolean;
+      L5: boolean;
+      L6: boolean;
+      count: number;
+    }[] = [];
+
     Object.entries(planetToHouseMap as any).forEach(([planet, houseEntries]: [string, any]) => {
       houseEntries.forEach((entry: any) => {
-        const sortedLevels = [...entry.levels].sort((a, b) => {
-          const numA = parseInt(a.replace("L", ""));
-          const numB = parseInt(b.replace("L", ""));
-          return numA - numB;
-        });
-        const count = sortedLevels.length;
-        let grade = "Medium";
-        if (count >= 4) grade = "Very High";
-        else if (count === 3) grade = "High";
-        else if (count === 2) grade = "High";
-        else if (count === 1) grade = "Medium";
-        else grade = "Low";
+        const L1 = entry.levels.includes("L1");
+        const L2 = entry.levels.includes("L2");
+        const L3 = entry.levels.includes("L3");
+        const L4 = entry.levels.includes("L4");
+        const L5 = entry.levels.includes("L5");
+        const L6 = entry.levels.includes("L6");
+        const count = entry.levels.length;
 
-        rows.push({
+        matrix.push({
           planet,
           houseNum: entry.houseNum,
-          levels: sortedLevels,
-          count,
-          grade
+          L1,
+          L2,
+          L3,
+          L4,
+          L5,
+          L6,
+          count
         });
       });
     });
-    return rows;
+
+    return matrix;
   }, [planetToHouseMap]);
+
+  // 2. KP Weight Engine (Reads matrix, applies priorities, computes score and grade)
+  const planetStrengthRows = useMemo(() => {
+    return significatorMatrix.map((row) => {
+      const score =
+        (row.L1 ? kpWeights.L1 : 0) +
+        (row.L2 ? kpWeights.L2 : 0) +
+        (row.L3 ? kpWeights.L3 : 0) +
+        (row.L4 ? kpWeights.L4 : 0) +
+        (row.L5 ? kpWeights.L5 : 0) +
+        (row.L6 ? kpWeights.L6 : 0);
+
+      let grade = "Low";
+      if (score >= 9.0) grade = "Very High";
+      else if (score >= 5.0) grade = "High";
+      else if (score >= 2.0) grade = "Medium";
+
+      // Reconstruct levels for backward-compatibility with UI render
+      const levels: string[] = [];
+      if (row.L1) levels.push("L1");
+      if (row.L2) levels.push("L2");
+      if (row.L3) levels.push("L3");
+      if (row.L4) levels.push("L4");
+      if (row.L5) levels.push("L5");
+      if (row.L6) levels.push("L6");
+
+      return {
+        ...row,
+        score,
+        grade,
+        levels
+      };
+    });
+  }, [significatorMatrix, kpWeights]);
 
   const filteredAndSortedPlanetStrength = useMemo(() => {
     let result = [...planetStrengthRows];
@@ -4831,20 +4887,83 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                     </div>
 
                     {/* KP Planet Strength Evaluation Section */}
-                    <div className="space-y-4 pt-6 border-t border-slate-800/40">
+                    <div className="space-y-5 pt-6 border-t border-slate-800/40">
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2">
                         <div>
                           <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
                             <Star className="w-4 h-4 text-amber-500 fill-amber-500/10" />
-                            KP Planet Strength Evaluation
+                            KP Planet Strength Evaluation &amp; Priorities
                           </h4>
                           <p className="text-[11px] text-slate-400 mt-1">
-                            Evaluating the 6-fold planet strength based on the signified houses and the count of significator levels (L1 - L6).
+                            Evaluating 6-fold planet strength. Refactored to map a Significator Matrix and execute the separate KP Weight Engine.
                           </p>
                         </div>
                         <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-1 rounded-full font-mono font-bold uppercase shrink-0">
-                          ⭐ 6-Fold Strength Matrix
+                          ⭐ Configurable Weight Engine
                         </span>
+                      </div>
+
+                      {/* KP Weight Engine Interactive Configuration */}
+                      <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-900/25 space-y-3.5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-2.5">
+                          <div>
+                            <span className="text-[9px] font-mono text-cyan-400 font-bold uppercase tracking-wider">Weight Matrix Controller</span>
+                            <h5 className="text-xs font-bold text-slate-200 mt-0.5">Customize KP Level Priorities</h5>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            <button
+                              onClick={() => setKpWeights({ L1: 5.0, L2: 4.0, L3: 3.0, L4: 2.0, L5: 1.0, L6: 0.5 })}
+                              className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
+                            >
+                              Classical Preset
+                            </button>
+                            <button
+                              onClick={() => setKpWeights({ L1: 1.0, L2: 1.0, L3: 1.0, L4: 1.0, L5: 1.0, L6: 1.0 })}
+                              className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
+                            >
+                              Equal Weights Preset
+                            </button>
+                            <button
+                              onClick={() => setKpWeights({ L1: 6.0, L2: 2.0, L3: 4.0, L4: 1.0, L5: 3.0, L6: 0.5 })}
+                              className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
+                            >
+                              Stellar Preset
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                          {[
+                            { key: "L1", desc: "Star Occupant" },
+                            { key: "L2", desc: "Cusp Occupant" },
+                            { key: "L3", desc: "Star Owner" },
+                            { key: "L4", desc: "Cusp Lord" },
+                            { key: "L5", desc: "Sub Occupant" },
+                            { key: "L6", desc: "Sub Owner" }
+                          ].map((item) => {
+                            const k = item.key as keyof typeof kpWeights;
+                            return (
+                              <div key={k} className="p-2.5 rounded-lg bg-slate-950/50 border border-slate-800/80 flex flex-col justify-between space-y-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[10px] font-bold text-slate-300 font-mono">{k}</span>
+                                  <span className="text-[10px] font-bold text-cyan-400 font-mono bg-cyan-500/10 px-1.5 py-0.2 rounded border border-cyan-500/10">
+                                    {kpWeights[k].toFixed(1)}
+                                  </span>
+                                </div>
+                                <div className="text-[9px] text-slate-400 font-medium truncate">{item.desc}</div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="10"
+                                  step="0.5"
+                                  value={kpWeights[k]}
+                                  onChange={(e) => setKpWeights(prev => ({ ...prev, [k]: parseFloat(e.target.value) }))}
+                                  className="w-full accent-cyan-500 cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                                />
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
 
                       {/* Filters & Statistics Summary Grid */}
@@ -4929,7 +5048,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                             <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono select-none">
                               {/* Clickable headers */}
                               <th 
-                                className="p-3.5 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors w-1/5"
+                                className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors"
                                 onClick={() => {
                                   if (kpStrengthSortField === "planet") {
                                     setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
@@ -4947,7 +5066,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                 </div>
                               </th>
                               <th 
-                                className="p-3.5 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors w-1/4"
+                                className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors"
                                 onClick={() => {
                                   if (kpStrengthSortField === "houseNum") {
                                     setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
@@ -4964,27 +5083,50 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                   )}
                                 </div>
                               </th>
-                              <th className="p-3.5 w-1/4">Evidence (L1-L6)</th>
+                              <th className="p-3 text-center">L1</th>
+                              <th className="p-3 text-center">L2</th>
+                              <th className="p-3 text-center">L3</th>
+                              <th className="p-3 text-center">L4</th>
+                              <th className="p-3 text-center">L5</th>
+                              <th className="p-3 text-center">L6</th>
                               <th 
-                                className="p-3.5 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors w-1/6"
+                                className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
                                 onClick={() => {
                                   if (kpStrengthSortField === "count") {
                                     setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
                                   } else {
                                     setKpStrengthSortField("count");
-                                    setKpStrengthSortOrder("desc"); // Default to desc for count strength
+                                    setKpStrengthSortOrder("desc");
                                   }
                                 }}
                               >
-                                <div className="flex items-center gap-1">
-                                  Evidence Count
+                                <div className="flex items-center justify-center gap-1">
+                                  Count
                                   {kpStrengthSortField === "count" && (
                                     <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
                                   )}
                                 </div>
                               </th>
                               <th 
-                                className="p-3.5 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors w-1/6"
+                                className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
+                                onClick={() => {
+                                  if (kpStrengthSortField === "score") {
+                                    setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setKpStrengthSortField("score");
+                                    setKpStrengthSortOrder("desc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center justify-center gap-1">
+                                  Score
+                                  {kpStrengthSortField === "score" && (
+                                    <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
+                                  )}
+                                </div>
+                              </th>
+                              <th 
+                                className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
                                 onClick={() => {
                                   if (kpStrengthSortField === "grade") {
                                     setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
@@ -4994,7 +5136,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                   }
                                 }}
                               >
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center justify-center gap-1">
                                   Strength Grade
                                   {kpStrengthSortField === "grade" && (
                                     <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
@@ -5024,44 +5166,70 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                 return (
                                   <tr key={`${row.planet}-${row.houseNum}-${index}`} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0 transition-colors">
                                     {/* Planet Column */}
-                                    <td className="p-3.5 font-bold text-cyan-300 font-mono text-xs flex items-center gap-1.5">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                                      {row.planet}
-                                    </td>
-                                    {/* House Column */}
-                                    <td className="p-3.5 text-xs text-slate-200">
-                                      <span className="font-mono font-bold text-slate-300 bg-slate-900 px-1.5 py-0.5 rounded mr-1.5">H{row.houseNum}</span>
-                                      <span className="text-[11px] text-slate-400 font-mono">{houseSanskritMap[row.houseNum] || `House ${row.houseNum}`}</span>
-                                    </td>
-                                    {/* Evidence Column */}
-                                    <td className="p-3.5 font-mono text-xs">
-                                      <div className="flex flex-wrap gap-1">
-                                        {row.levels.map((lvl) => {
-                                          const lvlColorMap: Record<string, string> = {
-                                            "L1": "bg-indigo-500/10 text-indigo-300 border-indigo-500/20",
-                                            "L2": "bg-amber-500/10 text-amber-300 border-amber-500/20",
-                                            "L3": "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
-                                            "L4": "bg-slate-500/10 text-slate-300 border-slate-500/20",
-                                            "L5": "bg-fuchsia-500/10 text-fuchsia-300 border-fuchsia-500/20",
-                                            "L6": "bg-cyan-500/10 text-cyan-300 border-cyan-500/20"
-                                          };
-                                          return (
-                                            <span 
-                                              key={lvl} 
-                                              className={`text-[9px] px-1.5 py-0.5 rounded border font-bold ${lvlColorMap[lvl] || "bg-slate-800/40 text-slate-400 border-slate-700"}`}
-                                            >
-                                              {lvl}
-                                            </span>
-                                          );
-                                        })}
+                                    <td className="p-3 font-bold text-cyan-300 font-mono text-xs">
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                                        {row.planet}
                                       </div>
                                     </td>
+                                    {/* House Column */}
+                                    <td className="p-3 text-xs text-slate-200">
+                                      <span className="font-mono font-bold text-slate-300 bg-slate-900 px-1.5 py-0.5 rounded mr-1.5">H{row.houseNum}</span>
+                                      <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">{houseSanskritMap[row.houseNum] || `House ${row.houseNum}`}</span>
+                                    </td>
+                                    {/* L1 - L6 Column */}
+                                    <td className="p-3 text-center text-xs">
+                                      {row.L1 ? (
+                                        <span className="text-emerald-400 font-extrabold" title="L1 Active">✅</span>
+                                      ) : (
+                                        <span className="text-slate-700" title="L1 Inactive">❌</span>
+                                      )}
+                                    </td>
+                                    <td className="p-3 text-center text-xs">
+                                      {row.L2 ? (
+                                        <span className="text-emerald-400 font-extrabold" title="L2 Active">✅</span>
+                                      ) : (
+                                        <span className="text-slate-700" title="L2 Inactive">❌</span>
+                                      )}
+                                    </td>
+                                    <td className="p-3 text-center text-xs">
+                                      {row.L3 ? (
+                                        <span className="text-emerald-400 font-extrabold" title="L3 Active">✅</span>
+                                      ) : (
+                                        <span className="text-slate-700" title="L3 Inactive">❌</span>
+                                      )}
+                                    </td>
+                                    <td className="p-3 text-center text-xs">
+                                      {row.L4 ? (
+                                        <span className="text-emerald-400 font-extrabold" title="L4 Active">✅</span>
+                                      ) : (
+                                        <span className="text-slate-700" title="L4 Inactive">❌</span>
+                                      )}
+                                    </td>
+                                    <td className="p-3 text-center text-xs">
+                                      {row.L5 ? (
+                                        <span className="text-emerald-400 font-extrabold" title="L5 Active">✅</span>
+                                      ) : (
+                                        <span className="text-slate-700" title="L5 Inactive">❌</span>
+                                      )}
+                                    </td>
+                                    <td className="p-3 text-center text-xs">
+                                      {row.L6 ? (
+                                        <span className="text-emerald-400 font-extrabold" title="L6 Active">✅</span>
+                                      ) : (
+                                        <span className="text-slate-700" title="L6 Inactive">❌</span>
+                                      )}
+                                    </td>
                                     {/* Evidence Count Column */}
-                                    <td className="p-3.5 font-mono text-xs font-bold text-slate-300 pl-8">
+                                    <td className="p-3 font-mono text-xs font-bold text-slate-300 text-center">
                                       {row.count}
                                     </td>
+                                    {/* Score Column */}
+                                    <td className="p-3 font-mono text-xs font-extrabold text-cyan-400 text-center bg-cyan-500/5">
+                                      {row.score.toFixed(1)}
+                                    </td>
                                     {/* Strength Grade Column */}
-                                    <td className="p-3.5">
+                                    <td className="p-3 text-center">
                                       <span className={`text-[10px] px-2.5 py-1 rounded-full font-mono font-bold uppercase tracking-wider shadow-sm border ${
                                         row.grade === "Very High"
                                           ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
@@ -5079,7 +5247,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                               })
                             ) : (
                               <tr>
-                                <td colSpan={5} className="p-8 text-center text-slate-500 italic font-mono text-xs">
+                                <td colSpan={11} className="p-8 text-center text-slate-500 italic font-mono text-xs">
                                   No records found matching the specified filters.
                                 </td>
                               </tr>
