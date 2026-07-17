@@ -14,6 +14,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import OpenAI from "openai";
 import { KpService } from "./src/lib/kp/KpService";
 import { WesternService } from "./src/lib/western/WesternService";
+import { calculateAstrology } from "./src/lib/astrology";
 
 // Load environment variables
 dotenv.config();
@@ -282,13 +283,33 @@ app.post("/api/jhora/horoscope", async (req, res) => {
     if (!body.place && body.location) {
       body.place = body.location;
     }
-    const response = await fetch(`${JHORA_API_URL}/horoscope`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    const data = await response.json();
-    res.json(data);
+    try {
+      const response = await fetch(`${JHORA_API_URL}/horoscope`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await response.json();
+      res.json(data);
+    } catch (fetchErr) {
+      console.warn("Remote JHora Horoscope fetch failed, using local fallback:", fetchErr);
+      const targetDate = body.date || new Date().toISOString().split("T")[0];
+      const targetTime = body.time || "12:00:00";
+      const latNum = Number(body.latitude) || 28.6139;
+      const lonNum = Number(body.longitude) || 77.2090;
+      const tzNum = Number(body.timezone) || 5.5;
+      
+      const localData = calculateAstrology(
+        body.name || "Native",
+        targetDate,
+        targetTime,
+        body.place || "Query Location",
+        latNum,
+        lonNum,
+        tzNum
+      );
+      res.json(localData);
+    }
   } catch (error: any) {
     console.error("JHora Horoscope proxy error:", error);
     res.status(500).json({ error: error.message || "Failed to query JHora API." });
@@ -460,44 +481,64 @@ app.post("/api/jhora/gochara", async (req, res) => {
     // Resilient Fallback: JHora Horoscope API
     if (!processedFromFreeApi) {
       console.log("[Transit System] Using dedicated JHora Transit engine.");
-      const response = await fetch(`${JHORA_API_URL}/horoscope`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          date: targetDate,
-          time: targetTime,
-          latitude: latNum,
-          longitude: lonNum,
-          timezone: tzNum,
-          place: "Transit Location"
-        })
-      });
-
-      const text = await response.text();
-      let data: any = null;
       try {
-        data = JSON.parse(text);
-      } catch (e) {
-        if (text.includes("Rate exceeded")) {
-          throw new Error("Astrology calculation rate limit exceeded. Please try again in an hour.");
+        const response = await fetch(`${JHORA_API_URL}/horoscope`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            date: targetDate,
+            time: targetTime,
+            latitude: latNum,
+            longitude: lonNum,
+            timezone: tzNum,
+            place: "Transit Location"
+          })
+        });
+
+        const text = await response.text();
+        let data: any = null;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          if (text.includes("Rate exceeded")) {
+            throw new Error("Astrology calculation rate limit exceeded. Please try again in an hour.");
+          }
+          throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
         }
-        throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
+
+        const rasi = data.horoscope?.divisional_charts?.["D-1_rasi"] || {};
+        const ascSign = rasi["Ascendant"]?.sign || "Aries";
+        const ascSignIdx = ZODIAC_SIGNS.indexOf(ascSign);
+
+        planets = Object.entries(rasi).map(([pName, pVal]: [string, any]) => {
+          const signIdx = ZODIAC_SIGNS.indexOf(pVal.sign);
+          return {
+            name: pName,
+            sign: pVal.sign,
+            degree: pVal.longitude,
+            house: (signIdx - ascSignIdx + 12) % 12 + 1,
+            longitude: signIdx * 30 + pVal.longitude
+          };
+        }).filter(p => p.name !== "Ascendant" && ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
+      } catch (fallbackErr) {
+        console.warn("[Transit System] Remote JHora Horoscope fallback failed, calculating locally:", fallbackErr);
+        const localData = calculateAstrology(
+          "Transit Sky",
+          targetDate,
+          targetTime,
+          "Transit Location",
+          latNum,
+          lonNum,
+          tzNum
+        );
+        planets = localData.planets.map(p => ({
+          name: p.name,
+          sign: p.sign,
+          degree: p.degree,
+          house: p.house,
+          longitude: p.longitude
+        }));
       }
-
-      const rasi = data.horoscope?.divisional_charts?.["D-1_rasi"] || {};
-      const ascSign = rasi["Ascendant"]?.sign || "Aries";
-      const ascSignIdx = ZODIAC_SIGNS.indexOf(ascSign);
-
-      planets = Object.entries(rasi).map(([pName, pVal]: [string, any]) => {
-        const signIdx = ZODIAC_SIGNS.indexOf(pVal.sign);
-        return {
-          name: pName,
-          sign: pVal.sign,
-          degree: pVal.longitude,
-          house: (signIdx - ascSignIdx + 12) % 12 + 1,
-          longitude: signIdx * 30 + pVal.longitude
-        };
-      }).filter(p => p.name !== "Ascendant" && ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
     }
 
     const payload = {
@@ -602,21 +643,36 @@ app.post("/api/astrology/calculate", async (req, res) => {
       return res.json(cached.data);
     }
 
-    const response = await fetch(`${JHORA_API_URL}/horoscope`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-
-    const text = await response.text();
     let data: any = null;
     try {
-      data = JSON.parse(text);
-    } catch (e) {
-      if (text.includes("Rate exceeded")) {
-        throw new Error("Astrology calculation rate limit exceeded. Please try again in an hour.");
+      const response = await fetch(`${JHORA_API_URL}/horoscope`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      const text = await response.text();
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        if (text.includes("Rate exceeded")) {
+          throw new Error("Astrology calculation rate limit exceeded. Please try again in an hour.");
+        }
+        throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
       }
-      throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
+    } catch (fetchErr) {
+      console.warn("[Astro Engine] Remote JHora API fetch failed, falling back to local calculation:", fetchErr);
+      const tzNum = Number(body.timezone) || 5.5;
+      const localData = calculateAstrology(
+        body.name || "Transit Sky",
+        targetDate,
+        targetTime,
+        body.place || "Query Location",
+        latNum,
+        lonNum,
+        tzNum
+      );
+      data = localData;
     }
 
     // Save to cache

@@ -136,6 +136,9 @@ export function calculateArgalas(rasiChart: { [house: number]: string[] }) {
 }
 
 export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
+  if (d && d.birthDetails && d.lagna && d.planets) {
+    return d as AstrologyData;
+  }
   if (!d || !d.horoscope) {
     throw new Error("Invalid JHora response payload");
   }
