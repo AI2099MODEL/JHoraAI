@@ -13,6 +13,7 @@ import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelati
 import { generateRelationshipPDF } from "../lib/relationshipReportGenerator";
 import { MasterArchitectureView } from "./MasterArchitectureView";
 import { PresentDayEngineView } from "./PresentDayEngineView";
+import RulesTerminal from "./RulesTerminal";
 import AstroChart from "./AstroChart";
 import { KPRulebook } from "../lib/rules/kpRulebook";
 import { apiFetch as fetchKpApi } from "../lib/api";
@@ -95,7 +96,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
   const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("present");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
-  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "rulebook" | "event_muhurta" | "current_events">("present_day");
+  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "rules" | "event_muhurta" | "current_events">("present_day");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
   const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
@@ -1879,7 +1880,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40 animate-fade-in">
           {[
             { id: "present_day", label: "Present Day Engine" },
-            { id: "rulebook", label: "Rulebook Evaluation" },
+            { id: "rules", label: "Astrological Rules" },
             { id: "event_muhurta", label: "Event Muhurta Finder" },
             { id: "current_events", label: "Space Weather Alerts" }
           ].map((tab) => (
@@ -1966,10 +1967,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 isDark={isDark}
               />
             )}
-            {eventsSubTab === "rulebook" && (
-              <MasterArchitectureView
-                astrologyData={astrologyData}
-                isDark={isDark}
+            {eventsSubTab === "rules" && (
+              <RulesTerminal
+                isDarkTheme={isDark}
               />
             )}
             {eventsSubTab === "event_muhurta" && (
