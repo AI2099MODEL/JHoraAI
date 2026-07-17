@@ -96,6 +96,7 @@ import { UpdateManager, UpdateManifest } from "./lib/androidOta";
 import GithubOtaView from "./components/GithubOtaView";
 import { apiFetch as fetch } from "./lib/api";
 import RulesTerminal from "./components/RulesTerminal";
+import KpStrengthDashboard from "./components/KpStrengthDashboard";
 
 // 1. Navigation Graph Definitions
 export interface SubmenuItem {
@@ -872,6 +873,7 @@ export default function App() {
         { id: "rules_terminal", label: "Rules Terminal", description: "Review and edit core astrological logic gates." },
         { id: "theme", label: "Theme", description: "Dark, Light, and custom styling." },
         { id: "google_account", label: "Google Account", description: "Enable Google Sign-In & Sync." },
+        { id: "kp_strength", label: "KP Strength ⭐", description: "Krishnamurti Paddhati 6-fold planet strength evaluation." },
         { id: "github_ota", label: "GitHub OTA Updates", description: "Check for new releases." },
         { id: "language", label: "Language", description: "Switch display languages." },
         { id: "ayanamsa", label: "Ayanamsa", description: "Select precession correction systems." },
@@ -2839,6 +2841,8 @@ export default function App() {
                   <RulesTerminal isDarkTheme={isDark} />
                 ) : activeSubmenuId === "google_account" ? (
                   <AuthScreen onAuthSuccess={(user) => setActiveUser(user)} activeUser={activeUser} />
+                ) : activeSubmenuId === "kp_strength" ? (
+                  <KpStrengthDashboard astrologyData={astrologyData} isDarkTheme={isDark} />
                 ) : activeSubmenuId === "github_ota" ? (
                   <GithubOtaView isDarkTheme={isDark} />
                 ) : (
