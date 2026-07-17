@@ -129,6 +129,12 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [kpHoraryQuestion, setKpHoraryQuestion] = useState<string>("Will my current business venture succeed in this dasha period?");
   const [selectedKpRuleId, setSelectedKpRuleId] = useState<string | null>("KP_MAR_01");
 
+  // KP Planet Strength Table state variables
+  const [kpStrengthPlanetFilter, setKpStrengthPlanetFilter] = useState<string>("All");
+  const [kpStrengthHouseFilter, setKpStrengthHouseFilter] = useState<string>("All");
+  const [kpStrengthSortField, setKpStrengthSortField] = useState<"planet" | "houseNum" | "count" | "grade">("planet");
+  const [kpStrengthSortOrder, setKpStrengthSortOrder] = useState<"asc" | "desc">("asc");
+
   // Dynamic Transit settings & calculations state variables
   const [transitDate, setTransitDate] = useState<string>(() => {
     const localStr = new Date().toLocaleDateString("en-CA");
@@ -1296,6 +1302,68 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
     return map;
   }, [rawHouseSignificators]);
+
+  const planetStrengthRows = useMemo(() => {
+    const rows: { planet: string; houseNum: number; levels: string[]; count: number; grade: string }[] = [];
+    Object.entries(planetToHouseMap as any).forEach(([planet, houseEntries]: [string, any]) => {
+      houseEntries.forEach((entry: any) => {
+        const sortedLevels = [...entry.levels].sort((a, b) => {
+          const numA = parseInt(a.replace("L", ""));
+          const numB = parseInt(b.replace("L", ""));
+          return numA - numB;
+        });
+        const count = sortedLevels.length;
+        let grade = "Medium";
+        if (count >= 4) grade = "Very High";
+        else if (count === 3) grade = "High";
+        else if (count === 2) grade = "High";
+        else if (count === 1) grade = "Medium";
+        else grade = "Low";
+
+        rows.push({
+          planet,
+          houseNum: entry.houseNum,
+          levels: sortedLevels,
+          count,
+          grade
+        });
+      });
+    });
+    return rows;
+  }, [planetToHouseMap]);
+
+  const filteredAndSortedPlanetStrength = useMemo(() => {
+    let result = [...planetStrengthRows];
+
+    // Filter by Planet
+    if (kpStrengthPlanetFilter !== "All") {
+      result = result.filter(r => r.planet === kpStrengthPlanetFilter);
+    }
+
+    // Filter by House
+    if (kpStrengthHouseFilter !== "All") {
+      const houseNum = parseInt(kpStrengthHouseFilter.replace("House ", ""));
+      result = result.filter(r => r.houseNum === houseNum);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      let valA: any = a[kpStrengthSortField];
+      let valB: any = b[kpStrengthSortField];
+
+      if (typeof valA === "string") {
+        return kpStrengthSortOrder === "asc"
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      } else {
+        return kpStrengthSortOrder === "asc"
+          ? valA - valB
+          : valB - valA;
+      }
+    });
+
+    return result;
+  }, [planetStrengthRows, kpStrengthPlanetFilter, kpStrengthHouseFilter, kpStrengthSortField, kpStrengthSortOrder]);
 
   // Helper formatting for Date
   const formatDashaDate = (d: Date) => {
@@ -4757,6 +4825,265 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                 </tr>
                               );
                             })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* KP Planet Strength Evaluation Section */}
+                    <div className="space-y-4 pt-6 border-t border-slate-800/40">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2">
+                        <div>
+                          <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                            <Star className="w-4 h-4 text-amber-500 fill-amber-500/10" />
+                            KP Planet Strength Evaluation
+                          </h4>
+                          <p className="text-[11px] text-slate-400 mt-1">
+                            Evaluating the 6-fold planet strength based on the signified houses and the count of significator levels (L1 - L6).
+                          </p>
+                        </div>
+                        <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-1 rounded-full font-mono font-bold uppercase shrink-0">
+                          ⭐ 6-Fold Strength Matrix
+                        </span>
+                      </div>
+
+                      {/* Filters & Statistics Summary Grid */}
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+                        {/* Filters Column */}
+                        <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {/* Planet Filter */}
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-mono text-slate-400 uppercase font-bold">Filter Planet</label>
+                            <select
+                              value={kpStrengthPlanetFilter}
+                              onChange={(e) => setKpStrengthPlanetFilter(e.target.value)}
+                              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
+                            >
+                              <option value="All">All Planets</option>
+                              {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map(p => (
+                                <option key={p} value={p}>{p}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* House Filter */}
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-mono text-slate-400 uppercase font-bold">Filter House</label>
+                            <select
+                              value={kpStrengthHouseFilter}
+                              onChange={(e) => setKpStrengthHouseFilter(e.target.value)}
+                              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
+                            >
+                              <option value="All">All Houses</option>
+                              {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
+                                <option key={h} value={`House ${h}`}>House {h}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Reset Filters Button */}
+                          <div className="flex items-end">
+                            <button
+                              onClick={() => {
+                                setKpStrengthPlanetFilter("All");
+                                setKpStrengthHouseFilter("All");
+                                setKpStrengthSortField("planet");
+                                setKpStrengthSortOrder("asc");
+                              }}
+                              className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-slate-700 font-mono transition-colors cursor-pointer"
+                            >
+                              Clear Filters
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Summary Metrics Panel */}
+                        <div className="lg:col-span-4 bg-slate-900/40 border border-slate-800/60 rounded-xl p-2.5 flex justify-around text-center">
+                          <div>
+                            <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Total Evaluated</div>
+                            <div className="text-sm font-bold font-mono text-cyan-400 mt-0.5">
+                              {filteredAndSortedPlanetStrength.length}
+                            </div>
+                          </div>
+                          <div className="border-l border-slate-800 h-8 self-center"></div>
+                          <div>
+                            <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Very High/High</div>
+                            <div className="text-sm font-bold font-mono text-emerald-400 mt-0.5">
+                              {filteredAndSortedPlanetStrength.filter(r => r.grade === "Very High" || r.grade === "High").length}
+                            </div>
+                          </div>
+                          <div className="border-l border-slate-800 h-8 self-center"></div>
+                          <div>
+                            <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Medium/Low</div>
+                            <div className="text-sm font-bold font-mono text-amber-500 mt-0.5">
+                              {filteredAndSortedPlanetStrength.filter(r => r.grade === "Medium" || r.grade === "Low").length}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Interactive Data Table */}
+                      <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                        <table className="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono select-none">
+                              {/* Clickable headers */}
+                              <th 
+                                className="p-3.5 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors w-1/5"
+                                onClick={() => {
+                                  if (kpStrengthSortField === "planet") {
+                                    setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setKpStrengthSortField("planet");
+                                    setKpStrengthSortOrder("asc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  Planet
+                                  {kpStrengthSortField === "planet" && (
+                                    <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
+                                  )}
+                                </div>
+                              </th>
+                              <th 
+                                className="p-3.5 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors w-1/4"
+                                onClick={() => {
+                                  if (kpStrengthSortField === "houseNum") {
+                                    setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setKpStrengthSortField("houseNum");
+                                    setKpStrengthSortOrder("asc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  House / Bhava
+                                  {kpStrengthSortField === "houseNum" && (
+                                    <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
+                                  )}
+                                </div>
+                              </th>
+                              <th className="p-3.5 w-1/4">Evidence (L1-L6)</th>
+                              <th 
+                                className="p-3.5 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors w-1/6"
+                                onClick={() => {
+                                  if (kpStrengthSortField === "count") {
+                                    setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setKpStrengthSortField("count");
+                                    setKpStrengthSortOrder("desc"); // Default to desc for count strength
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  Evidence Count
+                                  {kpStrengthSortField === "count" && (
+                                    <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
+                                  )}
+                                </div>
+                              </th>
+                              <th 
+                                className="p-3.5 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors w-1/6"
+                                onClick={() => {
+                                  if (kpStrengthSortField === "grade") {
+                                    setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setKpStrengthSortField("grade");
+                                    setKpStrengthSortOrder("desc");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-1">
+                                  Strength Grade
+                                  {kpStrengthSortField === "grade" && (
+                                    <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
+                                  )}
+                                </div>
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
+                            {filteredAndSortedPlanetStrength.length > 0 ? (
+                              filteredAndSortedPlanetStrength.map((row, index) => {
+                                const houseSanskritMap: Record<number, string> = {
+                                  1: "Ascendant (Tanu)",
+                                  2: "Wealth (Dhana)",
+                                  3: "Siblings (Sahaja)",
+                                  4: "Home & Comfort (Sukha)",
+                                  5: "Progeny & Intellect (Putra)",
+                                  6: "Debts & Enemies (Shatru)",
+                                  7: "Spouse & Partnership (Yuvati)",
+                                  8: "Longevity (Randhra)",
+                                  9: "Fortune & Dharma (Dharma)",
+                                  10: "Career & Status (Karma)",
+                                  11: "Gains & Wishes (Labha)",
+                                  12: "Losses & Moksha (Vyaya)"
+                                };
+
+                                return (
+                                  <tr key={`${row.planet}-${row.houseNum}-${index}`} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0 transition-colors">
+                                    {/* Planet Column */}
+                                    <td className="p-3.5 font-bold text-cyan-300 font-mono text-xs flex items-center gap-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                                      {row.planet}
+                                    </td>
+                                    {/* House Column */}
+                                    <td className="p-3.5 text-xs text-slate-200">
+                                      <span className="font-mono font-bold text-slate-300 bg-slate-900 px-1.5 py-0.5 rounded mr-1.5">H{row.houseNum}</span>
+                                      <span className="text-[11px] text-slate-400 font-mono">{houseSanskritMap[row.houseNum] || `House ${row.houseNum}`}</span>
+                                    </td>
+                                    {/* Evidence Column */}
+                                    <td className="p-3.5 font-mono text-xs">
+                                      <div className="flex flex-wrap gap-1">
+                                        {row.levels.map((lvl) => {
+                                          const lvlColorMap: Record<string, string> = {
+                                            "L1": "bg-indigo-500/10 text-indigo-300 border-indigo-500/20",
+                                            "L2": "bg-amber-500/10 text-amber-300 border-amber-500/20",
+                                            "L3": "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
+                                            "L4": "bg-slate-500/10 text-slate-300 border-slate-500/20",
+                                            "L5": "bg-fuchsia-500/10 text-fuchsia-300 border-fuchsia-500/20",
+                                            "L6": "bg-cyan-500/10 text-cyan-300 border-cyan-500/20"
+                                          };
+                                          return (
+                                            <span 
+                                              key={lvl} 
+                                              className={`text-[9px] px-1.5 py-0.5 rounded border font-bold ${lvlColorMap[lvl] || "bg-slate-800/40 text-slate-400 border-slate-700"}`}
+                                            >
+                                              {lvl}
+                                            </span>
+                                          );
+                                        })}
+                                      </div>
+                                    </td>
+                                    {/* Evidence Count Column */}
+                                    <td className="p-3.5 font-mono text-xs font-bold text-slate-300 pl-8">
+                                      {row.count}
+                                    </td>
+                                    {/* Strength Grade Column */}
+                                    <td className="p-3.5">
+                                      <span className={`text-[10px] px-2.5 py-1 rounded-full font-mono font-bold uppercase tracking-wider shadow-sm border ${
+                                        row.grade === "Very High"
+                                          ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                                          : row.grade === "High"
+                                          ? "bg-teal-500/15 text-teal-400 border-teal-500/30"
+                                          : row.grade === "Medium"
+                                          ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                                          : "bg-rose-500/15 text-rose-400 border-rose-500/30"
+                                      }`}>
+                                        {row.grade}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                );
+                              })
+                            ) : (
+                              <tr>
+                                <td colSpan={5} className="p-8 text-center text-slate-500 italic font-mono text-xs">
+                                  No records found matching the specified filters.
+                                </td>
+                              </tr>
+                            )}
                           </tbody>
                         </table>
                       </div>
