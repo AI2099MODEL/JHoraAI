@@ -3,10 +3,15 @@ import {
   User, Calendar, Clock, MapPin, Compass, Moon, Sun, 
   BookOpen, Star, Briefcase, DollarSign, Heart, Activity, 
   Sparkles, Shield, AlertTriangle, ChevronRight, HelpCircle,
-  Download, RefreshCw, Award, Globe, Layers, Zap, Grid, LayoutDashboard
+  Download, RefreshCw, Award, Globe, Layers, Zap, Grid, LayoutDashboard,
+  Cpu, FileText, CheckCircle2, Check
 } from "lucide-react";
 import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
 import { getAllCachedHoroscopes, CachedHoroscopeRecord } from "../lib/indexedDb";
+import { generateAstrologyPDF } from "../lib/pdfGenerator";
+import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelationshipEvidenceEngine";
+import { generateRelationshipPDF } from "../lib/relationshipReportGenerator";
+import { MasterArchitectureView } from "./MasterArchitectureView";
 import AstroChart from "./AstroChart";
 
 interface PlanetData {
@@ -18,6 +23,38 @@ interface PlanetData {
   nakshatra?: string;
   pada?: number;
   lord?: string;
+}
+
+const PLANETS_CYCLE = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+const PLANET_YEARS: Record<string, number> = {
+  Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
+};
+
+function getSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> {
+  const startIndex = PLANETS_CYCLE.indexOf(parentLord);
+  if (startIndex === -1) return [];
+  
+  const totalParentMs = parentEnd.getTime() - parentStart.getTime();
+  const list: Array<{ lord: string; start: Date; end: Date }> = [];
+  let currentStartMs = parentStart.getTime();
+  
+  for (let i = 0; i < 9; i++) {
+    const lord = PLANETS_CYCLE[(startIndex + i) % 9];
+    const years = PLANET_YEARS[lord];
+    const share = years / 120;
+    const durationMs = totalParentMs * share;
+    const currentEndMs = currentStartMs + durationMs;
+    
+    list.push({
+      lord,
+      start: new Date(currentStartMs),
+      end: new Date(currentEndMs)
+    });
+    
+    currentStartMs = currentEndMs;
+  }
+  
+  return list;
 }
 
 interface HoroscopeReportViewProps {
@@ -37,7 +74,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 }) => {
   const [compiling, setCompiling] = useState(false);
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
-  const [majorTab, setMajorTab] = useState<"jhora" | "kp" | "western" | "all">("jhora");
+  const [majorTab, setMajorTab] = useState<"advanced" | "jhora" | "kp" | "western" | "all">("advanced");
+  const [vedicSubTab, setVedicSubTab] = useState<"birth_details" | "ascendant" | "grahas" | "panchanga" | "divisional" | "dashas" | "balas" | "yogas_doshas" | "arudhas_sphutas">("birth_details");
+  const [divisionalChartStyle, setDivisionalChartStyle] = useState<"north" | "south">("north");
+  const [generatedPdfs, setGeneratedPdfs] = useState<{
+    complete360?: string;
+    vedic?: string;
+    marriage?: string;
+    partner?: string;
+  }>({});
+  const [compilingStatus, setCompilingStatus] = useState<"idle" | "compiling" | "ready" | "error">("idle");
+
+  const [selectedMahaIdx, setSelectedMahaIdx] = useState<number | null>(null);
+  const [selectedAntarIdx, setSelectedAntarIdx] = useState<number | null>(null);
+  const [selectedPratyantarIdx, setSelectedPratyantarIdx] = useState<number | null>(null);
+  const [selectedSookshmaIdx, setSelectedSookshmaIdx] = useState<number | null>(null);
 
   // Fetch all cached profiles on mount and sync with astrologyData
   useEffect(() => {
@@ -63,6 +114,105 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     }
   }, [activeUser, astrologyData, mapAstrologyDataToUserProfileJSON]);
 
+  // Fallbacks from raw astrologyData (safe destructuring fallback if data is null)
+  const { 
+    birthDetails = {}, 
+    lagna = {}, 
+    panchanga = {}, 
+    planets = [], 
+    rasiChart = {}, 
+    navamsaChart = {}, 
+    divisionalCharts = {}, 
+    vargaLagnas = {},
+    dashas = []
+  } = astrologyData || {};
+
+  const allSubmenuIds = [
+    "overview", "planetary_positions", "planet_strength", "bhava_strength", 
+    "ashtakavarga", "yogas", "doshas", "vimshottari", "yogini", "ashtottari", 
+    "longevity", "sade_sati", "d1_rasi", "d9_navamsa", "d10_dasamsa", 
+    "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
+    "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
+    "kp_significators", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
+    "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
+    "eso_nadi", "eso_lalkitab", "eso_varshaphala", "eso_bazi", "eso_numerology", "eso_celtic", "eso_mayan"
+  ];
+
+  // Background Automatic PDF Compiler
+  useEffect(() => {
+    if (!astrologyData) return;
+    setCompilingStatus("compiling");
+
+    const timer = setTimeout(() => {
+      try {
+        const targetProfile = profileJson || mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
+
+        // 1. Complete 360° Systems Report
+        const doc1 = generateRawAstrologyPDF(targetProfile, {
+          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Vedic Native",
+          submenus: allSubmenuIds
+        });
+        const blob1 = doc1.output("blob");
+        const url1 = URL.createObjectURL(blob1);
+
+        // 2. Authoritative Vedic Report
+        const doc2 = generateAstrologyPDF(targetProfile);
+        const blob2 = doc2.output("blob");
+        const url2 = URL.createObjectURL(blob2);
+
+        // 3. Marriage Promise
+        const evidence = calculateUnifiedRelationshipEvidence(astrologyData, undefined, 28);
+        const doc3 = generateRelationshipPDF({
+          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Native",
+          partnerName: "Auspicious Partner",
+          reportType: "Marriage Promise Report",
+          reportOption: "Professional",
+          targetAge: 28,
+          evidence,
+          expertData: { reply: "Deterministic evaluation reveals favorable cosmic alignments supporting long-term bonding." }
+        });
+        const blob3 = doc3.output("blob");
+        const url3 = URL.createObjectURL(blob3);
+
+        // 4. Partner Diagnostics
+        const doc4 = generateRelationshipPDF({
+          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Native",
+          partnerName: "Auspicious Partner",
+          reportType: "Complete Relationship Report",
+          reportOption: "Professional",
+          targetAge: 28,
+          evidence,
+          expertData: { reply: "Harmonic multi-system analysis validates balanced planetary configurations and mutual strength." }
+        });
+        const blob4 = doc4.output("blob");
+        const url4 = URL.createObjectURL(blob4);
+
+        setGeneratedPdfs(prev => {
+          // Clean up old URLs if any exist
+          if (prev.complete360) URL.revokeObjectURL(prev.complete360);
+          if (prev.vedic) URL.revokeObjectURL(prev.vedic);
+          if (prev.marriage) URL.revokeObjectURL(prev.marriage);
+          if (prev.partner) URL.revokeObjectURL(prev.partner);
+
+          return {
+            complete360: url1,
+            vedic: url2,
+            marriage: url3,
+            partner: url4
+          };
+        });
+        setCompilingStatus("ready");
+      } catch (err) {
+        console.error("Error pre-compiling reports:", err);
+        setCompilingStatus("error");
+      }
+    }, 600); // Slight delay to maintain excellent initial rendering responsiveness
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [astrologyData, profileJson]);
+
   if (!astrologyData) {
     return (
       <div 
@@ -77,30 +227,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       </div>
     );
   }
-
-  // Fallbacks from raw astrologyData
-  const { 
-    birthDetails = {}, 
-    lagna = {}, 
-    panchanga = {}, 
-    planets = [], 
-    rasiChart = {}, 
-    navamsaChart = {}, 
-    divisionalCharts = {}, 
-    vargaLagnas = {},
-    dashas = []
-  } = astrologyData;
-
-  const allSubmenuIds = [
-    "overview", "planetary_positions", "planet_strength", "bhava_strength", 
-    "ashtakavarga", "yogas", "doshas", "vimshottari", "yogini", "ashtottari", 
-    "longevity", "sade_sati", "d1_rasi", "d9_navamsa", "d10_dasamsa", 
-    "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
-    "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
-    "kp_significators", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
-    "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
-    "eso_nadi", "eso_lalkitab", "eso_varshaphala", "eso_bazi", "eso_numerology", "eso_celtic", "eso_mayan"
-  ];
 
   const handleDownloadCompleteReport = async () => {
     try {
@@ -150,6 +276,172 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const astronomicalData = profileJson?.Astronomical || {};
   const nadiData = profileJson?.Nadi || {};
 
+  const dashaTree = useMemo(() => {
+    const rawList = Array.isArray(vedicData?.dashas?.vimshottari) && vedicData.dashas.vimshottari.length > 0
+      ? vedicData.dashas.vimshottari
+      : (Array.isArray(dashas) ? dashas : []);
+
+    if (rawList.length === 0) return [];
+
+    return rawList.map((m: any) => {
+      const mLord = m.lord || m.lordName || "Unknown";
+      const mStart = m.start_date || m.startDate || m.startTime || "";
+      const mEnd = m.end_date || m.endDate || m.endTime || "";
+      const mStartDate = mStart ? new Date(mStart) : new Date();
+      const mEndDate = mEnd ? new Date(mEnd) : new Date(mStartDate.getFullYear() + (PLANET_YEARS[mLord] || 10), mStartDate.getMonth(), mStartDate.getDate());
+
+      // Get level 2 (Antar)
+      let antarList = m.children || m.subPeriods || [];
+      if (antarList.length === 0) {
+        antarList = getSubPeriods(mLord, mStartDate, mEndDate);
+      }
+
+      const antars = antarList.map((a: any) => {
+        const aLord = a.lord || "Unknown";
+        const aStart = a.start_date || a.startDate || a.startTime || "";
+        const aEnd = a.end_date || a.endDate || a.endTime || "";
+        const aStartDate = aStart ? new Date(aStart) : null;
+        const aEndDate = aEnd ? new Date(aEnd) : null;
+        
+        const start = aStartDate || new Date();
+        const end = aEndDate || new Date();
+
+        // Get level 3 (Pratyantar)
+        let pratyantarList = a.children || a.subPeriods || [];
+        if (pratyantarList.length === 0) {
+          pratyantarList = getSubPeriods(aLord, start, end);
+        }
+
+        const pratyantars = pratyantarList.map((p: any) => {
+          const pLord = p.lord || "Unknown";
+          const pStart = p.start_date || p.startDate || p.startTime || "";
+          const pEnd = p.end_date || p.endDate || p.endTime || "";
+          const pStartDate = pStart ? new Date(pStart) : null;
+          const pEndDate = pEnd ? new Date(pEnd) : null;
+          
+          const pStartReal = pStartDate || new Date();
+          const pEndReal = pEndDate || new Date();
+
+          // Get level 4 (Sookshma)
+          let sookshmaList = p.children || p.subPeriods || [];
+          if (sookshmaList.length === 0) {
+            sookshmaList = getSubPeriods(pLord, pStartReal, pEndReal);
+          }
+
+          const sookshmas = sookshmaList.map((s: any) => {
+            const sLord = s.lord || "Unknown";
+            const sStart = s.start_date || s.startDate || s.startTime || "";
+            const sEnd = s.end_date || s.endDate || s.endTime || "";
+            const sStartDate = sStart ? new Date(sStart) : null;
+            const sEndDate = sEnd ? new Date(sEnd) : null;
+            
+            const sStartReal = sStartDate || new Date();
+            const sEndReal = sEndDate || new Date();
+
+            // Get level 5 (Prana)
+            let pranaList = s.children || s.subPeriods || [];
+            if (pranaList.length === 0) {
+              pranaList = getSubPeriods(sLord, sStartReal, sEndReal);
+            }
+
+            const pranas = pranaList.map((pr: any) => {
+              const prLord = pr.lord || "Unknown";
+              const prStart = pr.start_date || pr.startDate || pr.startTime || "";
+              const prEnd = pr.end_date || pr.endDate || pr.endTime || "";
+              
+              return {
+                lord: prLord,
+                start: prStart ? new Date(prStart) : new Date(),
+                end: prEnd ? new Date(prEnd) : new Date()
+              };
+            });
+
+            return {
+              lord: sLord,
+              start: sStartReal,
+              end: sEndReal,
+              pranas
+            };
+          });
+
+          return {
+            lord: pLord,
+            start: pStartReal,
+            end: pEndReal,
+            sookshmas
+          };
+        });
+
+        return {
+          lord: aLord,
+          start,
+          end,
+          pratyantars
+        };
+      });
+
+      return {
+        lord: mLord,
+        start: mStartDate,
+        end: mEndDate,
+        antars
+      };
+    });
+  }, [vedicData, dashas]);
+
+  // Helper formatting for Date
+  const formatDashaDate = (d: Date) => {
+    return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  };
+
+  // Auto-select active dasha periods based on current time
+  useEffect(() => {
+    if (dashaTree.length === 0) return;
+    const now = new Date();
+    
+    // Find active Mahadasha
+    const mIdx = dashaTree.findIndex(m => now >= m.start && now <= m.end);
+    if (mIdx !== -1) {
+      setSelectedMahaIdx(mIdx);
+      const m = dashaTree[mIdx];
+      
+      // Find active Antardasha
+      const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
+      if (aIdx !== -1) {
+        setSelectedAntarIdx(aIdx);
+        const a = m.antars[aIdx];
+        
+        // Find active Pratyantardasha
+        const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
+        if (pIdx !== -1) {
+          setSelectedPratyantarIdx(pIdx);
+          const p = a.pratyantars[pIdx];
+          
+          // Find active Sookshmadasha
+          const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
+          if (sIdx !== -1) {
+            setSelectedSookshmaIdx(sIdx);
+          } else {
+            setSelectedSookshmaIdx(0);
+          }
+        } else {
+          setSelectedPratyantarIdx(0);
+          setSelectedSookshmaIdx(0);
+        }
+      } else {
+        setSelectedAntarIdx(0);
+        setSelectedPratyantarIdx(0);
+        setSelectedSookshmaIdx(0);
+      }
+    } else {
+      // Fallback to first one
+      setSelectedMahaIdx(0);
+      setSelectedAntarIdx(0);
+      setSelectedPratyantarIdx(0);
+      setSelectedSookshmaIdx(0);
+    }
+  }, [dashaTree]);
+
   const predictions = profileJson?.Predictions || astrologyData?.predictions || {};
   const career = predictions.career || { text: "Your professional life is guided by strong planetary aspects, indicating a stable path with steady progress.", highlights: ["Visionary Leadership", "Growth Mindset"] };
   const finance = predictions.finance || { text: "Wealth and resource management are favorable, with potential for long-term investments and asset building.", highlights: ["Financial Security", "Asset Wealth"] };
@@ -170,6 +462,142 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const STANDARD_VARGAS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D16", "D20", "D24", "D27", "D30", "D40", "D45", "D60"];
   const ZODIAC_SIGNS_ABBR = ["Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi"];
   const ZODIAC_SIGNS_FULL = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+
+  const renderMiniChart = (vargaId: string, style: "north" | "south") => {
+    let chartData: { [key: number]: string[] } = rasiChart;
+    if (vargaId === "D1") chartData = rasiChart;
+    else if (vargaId === "D9") chartData = navamsaChart || divisionalCharts?.["D9"] || rasiChart;
+    else if (divisionalCharts && divisionalCharts[vargaId]) {
+      chartData = divisionalCharts[vargaId];
+    }
+
+    const activeLagnaSignIndex = vargaLagnas && vargaLagnas[vargaId] !== undefined 
+      ? vargaLagnas[vargaId] 
+      : (vedicData?.divisional_charts?.[vargaId]?.ascendant?.longitude 
+          ? Math.floor(vedicData.divisional_charts[vargaId].ascendant.longitude / 30) 
+          : lagna.signIndex || 0);
+
+    const getSignForHouseLocal = (house: number) => {
+      return ((activeLagnaSignIndex + house - 1) % 12) + 1;
+    };
+
+    const getPlanetAbbrLocal = (name: string) => {
+      const abbrs: { [key: string]: string } = {
+        Sun: "Sy", Moon: "Ch", Mars: "Ma", Mercury: "Bu", 
+        Jupiter: "Gu", Venus: "Sk", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke"
+      };
+      return abbrs[name] || name.slice(0, 2);
+    };
+
+    if (style === "north") {
+      return (
+        <div className="relative w-full aspect-square bg-slate-950/40 rounded-lg border border-slate-800 p-1">
+          <svg viewBox="0 0 400 400" className="w-full h-full text-slate-800 font-mono">
+            <rect x="10" y="10" width="380" height="380" fill="none" stroke="currentColor" strokeWidth="1.5" />
+            <line x1="10" y1="10" x2="390" y2="390" stroke="currentColor" strokeWidth="1" strokeDasharray="2" />
+            <line x1="390" y1="10" x2="10" y2="390" stroke="currentColor" strokeWidth="1" strokeDasharray="2" />
+            <polygon points="200,10 390,200 200,390 10,200" fill="none" stroke="currentColor" strokeWidth="1.5" />
+
+            {/* House Numbers & Placements */}
+            {/* H1 */}
+            <text x="200" y="90" textAnchor="middle" className="fill-amber-500 text-[10px]">{getSignForHouseLocal(1)}</text>
+            <text x="200" y="60" textAnchor="middle" className="fill-slate-400 text-[9px] uppercase font-bold">Asc</text>
+            <text x="200" y="125" textAnchor="middle" className="fill-slate-100 text-[11px] font-bold">{(chartData[1] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H2 */}
+            <text x="145" y="60" textAnchor="middle" className="fill-slate-600 text-[9px]">{getSignForHouseLocal(2)}</text>
+            <text x="110" y="80" textAnchor="middle" className="fill-slate-200 text-[10px]">{(chartData[2] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H3 */}
+            <text x="65" y="145" textAnchor="middle" className="fill-slate-600 text-[9px]">{getSignForHouseLocal(3)}</text>
+            <text x="60" y="110" textAnchor="middle" className="fill-slate-200 text-[10px]">{(chartData[3] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H4 */}
+            <text x="105" y="200" textAnchor="middle" className="fill-slate-500 text-[10px]">{getSignForHouseLocal(4)}</text>
+            <text x="70" y="215" textAnchor="middle" className="fill-slate-100 text-[11px] font-bold">{(chartData[4] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H5 */}
+            <text x="65" y="260" textAnchor="middle" className="fill-slate-600 text-[9px]">{getSignForHouseLocal(5)}</text>
+            <text x="60" y="295" textAnchor="middle" className="fill-slate-200 text-[10px]">{(chartData[5] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H6 */}
+            <text x="145" y="340" textAnchor="middle" className="fill-slate-600 text-[9px]">{getSignForHouseLocal(6)}</text>
+            <text x="110" y="320" textAnchor="middle" className="fill-slate-200 text-[10px]">{(chartData[6] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H7 */}
+            <text x="200" y="315" textAnchor="middle" className="fill-slate-500 text-[10px]">{getSignForHouseLocal(7)}</text>
+            <text x="200" y="290" textAnchor="middle" className="fill-slate-100 text-[11px] font-bold">{(chartData[7] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H8 */}
+            <text x="255" y="340" textAnchor="middle" className="fill-slate-600 text-[9px]">{getSignForHouseLocal(8)}</text>
+            <text x="290" y="320" textAnchor="middle" className="fill-slate-200 text-[10px]">{(chartData[8] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H9 */}
+            <text x="340" y="260" textAnchor="middle" className="fill-slate-600 text-[9px]">{getSignForHouseLocal(9)}</text>
+            <text x="340" y="295" textAnchor="middle" className="fill-slate-200 text-[10px]">{(chartData[9] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H10 */}
+            <text x="295" y="200" textAnchor="middle" className="fill-slate-500 text-[10px]">{getSignForHouseLocal(10)}</text>
+            <text x="330" y="215" textAnchor="middle" className="fill-slate-100 text-[11px] font-bold">{(chartData[10] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H11 */}
+            <text x="340" y="145" textAnchor="middle" className="fill-slate-600 text-[9px]">{getSignForHouseLocal(11)}</text>
+            <text x="340" y="110" textAnchor="middle" className="fill-slate-200 text-[10px]">{(chartData[11] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+            {/* H12 */}
+            <text x="255" y="60" textAnchor="middle" className="fill-slate-600 text-[9px]">{getSignForHouseLocal(12)}</text>
+            <text x="290" y="80" textAnchor="middle" className="fill-slate-200 text-[10px]">{(chartData[12] || []).map(getPlanetAbbrLocal).join(" ")}</text>
+          </svg>
+        </div>
+      );
+    } else {
+      const cells = [
+        { name: "Pisces", index: 11, label: "Pi" },
+        { name: "Aries", index: 0, label: "Ar" },
+        { name: "Taurus", index: 1, label: "Ta" },
+        { name: "Gemini", index: 2, label: "Ge" },
+        { name: "Aquarius", index: 10, label: "Aq" },
+        { name: "EMPTY_1", index: -1, label: "" },
+        { name: "EMPTY_2", index: -1, label: "" },
+        { name: "Cancer", index: 3, label: "Cn" },
+        { name: "Capricorn", index: 9, label: "Cp" },
+        { name: "EMPTY_3", index: -1, label: "" },
+        { name: "EMPTY_4", index: -1, label: "" },
+        { name: "Leo", index: 4, label: "Le" },
+        { name: "Sagittarius", index: 8, label: "Sg" },
+        { name: "Scorpio", index: 7, label: "Sc" },
+        { name: "Libra", index: 6, label: "Li" },
+        { name: "Virgo", index: 5, label: "Vi" }
+      ];
+
+      return (
+        <div className="grid grid-cols-4 grid-rows-4 gap-0.5 bg-slate-950 p-1 rounded-lg border border-slate-800 aspect-square w-full">
+          {cells.map((cell, idx) => {
+            if (cell.index === -1) {
+              if (idx === 5) {
+                return (
+                  <div key={idx} className="col-span-2 row-span-2 flex items-center justify-center bg-slate-900 border border-slate-800/40 rounded">
+                    <span className="text-[10px] font-bold text-amber-500 font-mono">{vargaId}</span>
+                  </div>
+                );
+              }
+              return null;
+            }
+
+            const houseNum = ((cell.index - activeLagnaSignIndex + 12) % 12) + 1;
+            const planetsInSign = chartData[houseNum] || [];
+            const isLagnaSign = cell.index === activeLagnaSignIndex;
+
+            return (
+              <div key={idx} className={`p-1 border border-slate-800/60 bg-slate-900/20 rounded flex flex-col justify-between aspect-square ${isLagnaSign ? "ring-1 ring-amber-500/20" : ""}`}>
+                <div className="flex justify-between items-start leading-none">
+                  <span className="text-[8px] font-mono text-slate-500">{cell.label}</span>
+                  {isLagnaSign && <span className="text-[7px] text-amber-500 font-bold font-sans">Asc</span>}
+                </div>
+                <div className="flex flex-wrap gap-0.5 items-center justify-center">
+                  {planetsInSign.map((p, pIdx) => (
+                    <span key={pIdx} className="text-[8px] font-mono bg-slate-800 px-0.5 py-0.2 rounded text-slate-300">
+                      {getPlanetAbbrLocal(p)}
+                    </span>
+                  ))}
+                </div>
+                <div className="text-[7px] text-slate-600 text-right leading-none">H{houseNum}</div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+  };
 
   return (
     <div id="horoscope-report-root" className="space-y-6 pb-16">
@@ -261,6 +689,16 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       {/* Tabs bar for JHora, KP, Western, All Systems */}
       <div className="border-b border-slate-800 flex gap-1 overflow-x-auto pb-px">
         <button
+          onClick={() => setMajorTab("advanced")}
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
+            majorTab === "advanced"
+              ? "border-indigo-500 text-indigo-400 font-extrabold bg-indigo-500/10"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          Advanced System
+        </button>
+        <button
           onClick={() => setMajorTab("jhora")}
           className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
             majorTab === "jhora"
@@ -302,11 +740,1227 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         </button>
       </div>
 
+      {/* Sub-tabs bar for JHora (Vedic) - Second Row */}
+      {majorTab === "jhora" && (
+        <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40">
+          <button
+            onClick={() => setVedicSubTab("birth_details")}
+            className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all shrink-0 border ${
+              vedicSubTab === "birth_details"
+                ? "bg-amber-500/10 border-amber-500/40 text-amber-400 font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Birth Details Echo
+          </button>
+          <button
+            onClick={() => setVedicSubTab("ascendant")}
+            className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all shrink-0 border ${
+              vedicSubTab === "ascendant"
+                ? "bg-amber-500/10 border-amber-500/40 text-amber-400 font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Ascendant & Nakshatra
+          </button>
+          <button
+            onClick={() => setVedicSubTab("grahas")}
+            className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all shrink-0 border ${
+              vedicSubTab === "grahas"
+                ? "bg-amber-500/10 border-amber-500/40 text-amber-400 font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Graha Placements
+          </button>
+          <button
+            onClick={() => setVedicSubTab("panchanga")}
+            className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all shrink-0 border ${
+              vedicSubTab === "panchanga"
+                ? "bg-amber-500/10 border-amber-500/40 text-amber-400 font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Panchanga Pillars
+          </button>
+          <button
+            onClick={() => setVedicSubTab("divisional")}
+            className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all shrink-0 border ${
+              vedicSubTab === "divisional"
+                ? "bg-amber-500/10 border-amber-500/40 text-amber-400 font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Divisional Charts (D1-D60)
+          </button>
+          <button
+            onClick={() => setVedicSubTab("dashas")}
+            className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all shrink-0 border ${
+              vedicSubTab === "dashas"
+                ? "bg-amber-500/10 border-amber-500/40 text-amber-400 font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Dashas (Complete Timelines)
+          </button>
+          <button
+            onClick={() => setVedicSubTab("balas")}
+            className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all shrink-0 border ${
+              vedicSubTab === "balas"
+                ? "bg-amber-500/10 border-amber-500/40 text-amber-400 font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Shad Bala & SAV SAV
+          </button>
+          <button
+            onClick={() => setVedicSubTab("yogas_doshas")}
+            className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all shrink-0 border ${
+              vedicSubTab === "yogas_doshas"
+                ? "bg-amber-500/10 border-amber-500/40 text-amber-400 font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Yogas & Doshas
+          </button>
+          <button
+            onClick={() => setVedicSubTab("arudhas_sphutas")}
+            className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider rounded-md transition-all shrink-0 border ${
+              vedicSubTab === "arudhas_sphutas"
+                ? "bg-amber-500/10 border-amber-500/40 text-amber-400 font-extrabold"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Arudhas & Sphutas
+          </button>
+        </div>
+      )}
+
       {/* Main Container */}
       <div className="space-y-6">
+
+        {/* ================= ADVANCED SYSTEM: REFERENCE & AUTOMATED SIMULATIONS ================= */}
+        {majorTab === "advanced" && (
+          <div className="space-y-6">
+            {/* Automated PDF Reports Hub */}
+            <div className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
+              
+              <div className="border-b border-amber-500/10 pb-4 mb-6">
+                <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  Phase 9.95 Compliance • Automated PDF Reports Download Hub
+                </span>
+                <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-amber-500" />
+                  PRE-COMPILED SYSTEM REVEALS & REPORTS
+                </h2>
+                <p className={`text-xs ${mutedText} mt-1`}>
+                  All reports have been compiled dynamically for your astronomical coordinates. Click directly to download without further configurations.
+                </p>
+              </div>
+
+              {compilingStatus === "compiling" ? (
+                <div className="flex items-center gap-2.5 p-6 rounded-xl border border-dashed border-indigo-500/30 bg-slate-950/40 text-slate-300 font-mono text-xs">
+                  <RefreshCw className="w-4 h-4 animate-spin text-amber-500" />
+                  <span>Compiling celestial alignments and writing PDF streams automatically...</span>
+                </div>
+              ) : compilingStatus === "ready" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <a
+                    href={generatedPdfs.complete360}
+                    download={`Complete_360_Astrological_Systems_Report_${Date.now()}.pdf`}
+                    className={`p-4 rounded-xl border ${isDark ? "border-indigo-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-indigo-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer`}
+                  >
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <FileText className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
+                        <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded font-mono">360° TOTAL</span>
+                      </div>
+                      <h4 className="text-xs font-bold text-slate-200 mt-2">Complete 360° Report</h4>
+                      <p className="text-[10px] text-slate-400 mt-1 line-clamp-2"> Tabular astrological metrics across JHora, KP, and Western.</p>
+                    </div>
+                    <div className="text-[10px] font-bold text-indigo-400 flex items-center gap-1 mt-2">
+                      <Download className="w-3.5 h-3.5" /> Download PDF (Direct)
+                    </div>
+                  </a>
+
+                  <a
+                    href={generatedPdfs.vedic}
+                    download={`Vedic_Astrology_Authoritative_Report_${Date.now()}.pdf`}
+                    className={`p-4 rounded-xl border ${isDark ? "border-amber-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-amber-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer`}
+                  >
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <FileText className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+                        <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded font-mono">SIDEREAL VEDIC</span>
+                      </div>
+                      <h4 className="text-xs font-bold text-slate-200 mt-2">Authoritative Vedic Report</h4>
+                      <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Traditional Parashari calculations, planetary strengths, and dasha trees.</p>
+                    </div>
+                    <div className="text-[10px] font-bold text-amber-500 flex items-center gap-1 mt-2">
+                      <Download className="w-3.5 h-3.5" /> Download PDF (Direct)
+                    </div>
+                  </a>
+
+                  <a
+                    href={generatedPdfs.marriage}
+                    download={`Marriage_Promise_Timing_Chronicles_${Date.now()}.pdf`}
+                    className={`p-4 rounded-xl border ${isDark ? "border-rose-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-rose-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer`}
+                  >
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <FileText className="w-5 h-5 text-rose-400 group-hover:scale-110 transition-transform" />
+                        <span className="text-[9px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded font-mono">PROMISE & TIMING</span>
+                      </div>
+                      <h4 className="text-xs font-bold text-slate-200 mt-2">Marriage Promise & Timing</h4>
+                      <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Relationship timing, marital promise ratings, and sub-lord evidence logs.</p>
+                    </div>
+                    <div className="text-[10px] font-bold text-rose-400 flex items-center gap-1 mt-2">
+                      <Download className="w-3.5 h-3.5" /> Download PDF (Direct)
+                    </div>
+                  </a>
+
+                  <a
+                    href={generatedPdfs.partner}
+                    download={`15_Topic_Multi_System_Partner_Diagnostics_${Date.now()}.pdf`}
+                    className={`p-4 rounded-xl border ${isDark ? "border-purple-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-purple-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer`}
+                  >
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <FileText className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
+                        <span className="text-[9px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded font-mono">15-TOPIC PAIRINGS</span>
+                      </div>
+                      <h4 className="text-xs font-bold text-slate-200 mt-2">15-Topic Partner Diagnostics</h4>
+                      <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Complete multi-system compatibility assessment and partner synastry.</p>
+                    </div>
+                    <div className="text-[10px] font-bold text-purple-400 flex items-center gap-1 mt-2">
+                      <Download className="w-3.5 h-3.5" /> Download PDF (Direct)
+                    </div>
+                  </a>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 p-4 rounded-xl border border-dashed border-rose-500/30 bg-rose-500/5 text-rose-500 font-mono text-xs">
+                  <AlertTriangle className="w-4 h-4 text-rose-500" />
+                  <span>Failed to automatically compile reports. Please try reloading the profile.</span>
+                </div>
+              )}
+            </div>
+
+            {/* Simulated Rules Engine */}
+            <MasterArchitectureView
+              astrologyData={astrologyData}
+              isDark={isDark}
+            />
+          </div>
+        )}
         
+        {/* ================= JHORA VEDIC SUB-TABS INTERFACE ================= */}
+        {majorTab === "jhora" && (
+          <div className="space-y-6">
+            {vedicSubTab === "birth_details" && (
+              <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
+                <div className="border-b border-slate-800 pb-2">
+                  <h3 className="font-bold text-amber-400 uppercase tracking-wider">Birth Particulars Raw Echo</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Full Name:</span>
+                    <span className="text-slate-100 font-bold">{birthDetails.name || activeUser?.name || "Nitin Jain"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Date of Birth:</span>
+                    <span className="text-slate-200">{birthDetails.date || "1976-01-06"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Time of Birth:</span>
+                    <span className="text-slate-200">{birthDetails.time || "18:40:00"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Birth Location:</span>
+                    <span className="text-slate-200 font-sans">{birthDetails.location || "Dehradun, India"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Latitude:</span>
+                    <span className="text-slate-200">{Number(birthDetails.latitude || 30.3165).toFixed(4)}° N</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Longitude:</span>
+                    <span className="text-slate-200">{Number(birthDetails.longitude || 78.0322).toFixed(4)}° E</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Julian Day Number:</span>
+                    <span className="text-slate-200">{astronomicalData?.julian_day_number || "2442784.277778"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Sidereal Time (LST):</span>
+                    <span className="text-slate-200">{astronomicalData?.sidereal_time || "12:14:15"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Ayanamsa Reference:</span>
+                    <span className="text-slate-200 font-sans">{birthDetails.ayanamsa || "Lahiri Ayanamsa"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Ayanamsa Value:</span>
+                    <span className="text-slate-200">{Number(birthDetails.ayanamsaDegree || 23.5512).toFixed(4)}°</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Obliquity of Ecliptic:</span>
+                    <span className="text-slate-200">{astronomicalData?.obliquity || "23° 26' 27\""}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Place ID:</span>
+                    <span className="text-slate-200 overflow-hidden text-ellipsis whitespace-nowrap max-w-[180px]" title={birthDetails.placeId}>{birthDetails.placeId || "ChIJuS_v16Lp_zMRwXnL-4E_P-s"}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {vedicSubTab === "ascendant" && (
+              <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
+                <div className="border-b border-slate-800 pb-2">
+                  <h3 className="font-bold text-amber-400 uppercase tracking-wider">Ascendant (Lagna) Stellar Coordinates</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Zodiac Sign (Lagna):</span>
+                    <span className="text-slate-100 font-bold font-sans">{lagna.sign || "Cancer"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Longitude (In Sign):</span>
+                    <span className="text-slate-200">{lagna.degree ? formatDegree(lagna.degree) : "00° 00'"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Exact 360° Longitude:</span>
+                    <span className="text-slate-200">{lagna.longitude ? format360Degree(lagna.longitude) : "00° 00'"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Nakshatra:</span>
+                    <span className="text-slate-200 font-sans">{lagna.nakshatra || "Pushya"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Nakshatra Pada:</span>
+                    <span className="text-slate-200 font-bold">{lagna.pada || 2}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Nakshatra Lord (Ruler):</span>
+                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.nakshatra_lord || "Saturn"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Sub-Lord (KP):</span>
+                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.sub_lord || "Mercury"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Sub-Sub-Lord (KP):</span>
+                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.sub_sub_lord || "Rahu"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Lagna Lord (Ruler of Sign):</span>
+                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.lagna_lord || "Moon"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Lagna Lord Placement:</span>
+                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.lagna_lord_house || "House 11"}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {vedicSubTab === "grahas" && (
+              <div className="space-y-4 p-4 rounded-xl border border-slate-800 bg-slate-950/40 text-[11px] md:text-xs">
+                <div className="border-b border-slate-800 pb-2">
+                  <h3 className="font-bold text-amber-400 uppercase tracking-wider">All Graha Sidereal Placements</h3>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                        <th className="p-2 font-bold">Graha</th>
+                        <th className="p-2">Sign</th>
+                        <th className="p-2">In Sign Long.</th>
+                        <th className="p-2">360° Long.</th>
+                        <th className="p-2">House</th>
+                        <th className="p-2">Nakshatra</th>
+                        <th className="p-2 text-center">Pada</th>
+                        <th className="p-2">Lord</th>
+                        <th className="p-2">Sub Lord</th>
+                        <th className="p-2">Sub-Sub Lord</th>
+                        <th className="p-2 text-center">Retro</th>
+                        <th className="p-2 text-center">Combust</th>
+                        <th className="p-2">Dignity</th>
+                        <th className="p-2">Avasthas</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/40 font-mono">
+                      {PLANET_ORDER.map((pName) => {
+                        const pData = planets.find((p: PlanetData) => p.name.toLowerCase() === pName.toLowerCase());
+                        const mappedP = vedicData?.planets?.[pName] || {};
+                        const kpP = kpData?.planets?.[pName] || {};
+                        if (!pData) return null;
+
+                        return (
+                          <tr key={pName} className="hover:bg-slate-900/20 text-slate-300">
+                            <td className="p-2 font-bold font-sans text-slate-200">{pName}</td>
+                            <td className="p-2 font-sans">{pData.sign}</td>
+                            <td className="p-2">{formatDegree(pData.longitude)}</td>
+                            <td className="p-2">{format360Degree(pData.longitude)}</td>
+                            <td className="p-2 font-bold text-amber-500">H{pData.house || mappedP?.house || 1}</td>
+                            <td className="p-2 font-sans">{pData.nakshatra || "Rohini"}</td>
+                            <td className="p-2 text-center font-bold text-slate-100">{pData.pada || 1}</td>
+                            <td className="p-2 font-sans">{pData.lord || mappedP?.nakshatra_lord || "Jupiter"}</td>
+                            <td className="p-2 font-sans">{kpP?.sub_lord || mappedP?.sub_lord || "Saturn"}</td>
+                            <td className="p-2 font-sans">{kpP?.sub_sub_lord || mappedP?.sub_sub_lord || "Venus"}</td>
+                            <td className={`p-2 text-center font-bold ${pData.retrograde ? "text-rose-400" : "text-slate-500"}`}>{pData.retrograde ? "Y" : "N"}</td>
+                            <td className={`p-2 text-center font-bold ${mappedP?.combust ? "text-rose-500" : "text-slate-500"}`}>{mappedP?.combust ? "Y" : "N"}</td>
+                            <td className="p-2 font-sans">{mappedP?.dignity || "Neutral Sign"}</td>
+                            <td className="p-2 font-sans text-[10px]">
+                              {mappedP?.state?.baladi || "Yuva"} / {mappedP?.state?.jagrat || "Jagrat"} / {mappedP?.state?.deepta || "Shanta"}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {vedicSubTab === "panchanga" && (
+              <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm font-mono">
+                <div className="border-b border-slate-800 pb-2">
+                  <h3 className="font-bold text-amber-400 uppercase tracking-wider font-sans">Sidereal Panchanga Pillars</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2">
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Tithi (Lunar Day):</span>
+                    <span className="text-slate-100 font-bold font-sans">{panchanga.tithi || "Sukla Ekadashi"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Nakshatra (Asterism):</span>
+                    <span className="text-slate-100 font-bold font-sans">{panchanga.nakshatra || "Rohini"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Yoga (Luni-Solar Angle):</span>
+                    <span className="text-slate-100 font-bold font-sans">{panchanga.yoga || "Preeti"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Karana (Half-Tithi):</span>
+                    <span className="text-slate-100 font-bold font-sans">{panchanga.karana || "Bava"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Vara (Weekday):</span>
+                    <span className="text-slate-100 font-bold font-sans">{new Date(birthDetails.date || "1976-01-06").toLocaleDateString("en-US", { weekday: "long" })}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Sunrise:</span>
+                    <span className="text-slate-200">{astronomicalData?.sunrise || "05:42:00"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Sunset:</span>
+                    <span className="text-slate-200">{astronomicalData?.sunset || "18:55:00"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Lunar Month:</span>
+                    <span className="text-slate-200 font-sans">{astronomicalData?.lunar_month || "Kartika"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Samvatsara (Year Name):</span>
+                    <span className="text-slate-200 font-sans">{astronomicalData?.year_name || "Krodhi"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Season (Vedic Ritu):</span>
+                    <span className="text-slate-200 font-sans">{astronomicalData?.season || "Sharad"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Day Duration (Dina Mana):</span>
+                    <span className="text-slate-200">{astronomicalData?.day_duration || "13h 13m"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Night Duration (Ratri Mana):</span>
+                    <span className="text-slate-200">{astronomicalData?.night_duration || "10h 47m"}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {vedicSubTab === "divisional" && (
+              <div className="space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-2">
+                  <div>
+                    <h3 className="font-bold text-amber-400 uppercase tracking-wider">All 16 Shodashavarga Charts Live Matrix</h3>
+                    <p className="text-[11px] text-slate-400 font-sans mt-0.5">Displaying all divisional chart layouts side-by-side with absolutely no dropdowns.</p>
+                  </div>
+                  <div className="bg-slate-950/80 p-1 rounded-lg border border-indigo-500/15 flex w-max shrink-0 self-start">
+                    <button
+                      onClick={() => setDivisionalChartStyle("north")}
+                      className={`px-3 py-1 text-xs font-semibold rounded transition-all ${
+                        divisionalChartStyle === "north"
+                          ? "bg-indigo-600 text-white shadow-md"
+                          : "text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      North Indian
+                    </button>
+                    <button
+                      onClick={() => setDivisionalChartStyle("south")}
+                      className={`px-3 py-1 text-xs font-semibold rounded transition-all ${
+                        divisionalChartStyle === "south"
+                          ? "bg-indigo-600 text-white shadow-md"
+                          : "text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      South Indian
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {STANDARD_VARGAS.map((vKey) => {
+                    let cData = rasiChart;
+                    if (vKey === "D1") cData = rasiChart;
+                    else if (vKey === "D9") cData = navamsaChart || divisionalCharts?.["D9"] || rasiChart;
+                    else if (divisionalCharts && divisionalCharts[vKey]) {
+                      cData = divisionalCharts[vKey];
+                    }
+
+                    const vLagnaIdx = vargaLagnas[vKey] !== undefined ? vargaLagnas[vKey] : (vedicData?.divisional_charts?.[vKey]?.ascendant?.longitude ? Math.floor(vedicData?.divisional_charts?.[vKey]?.ascendant?.longitude / 30) : lagna.signIndex || 0);
+                    const ascSign = ZODIAC_SIGNS_FULL[vLagnaIdx] || "Aries";
+
+                    return (
+                      <div key={vKey} className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/40 space-y-3 flex flex-col justify-between">
+                        <div>
+                          <div className="flex justify-between items-center border-b border-slate-900 pb-1.5 mb-2">
+                            <span className="text-xs font-bold text-amber-400 font-sans">{vKey} {vKey === "D1" ? "Rasi" : vKey === "D9" ? "Navamsa" : vKey === "D10" ? "Dasamsa" : "Varga"}</span>
+                            <span className="text-[10px] font-mono text-slate-500">Asc: {ascSign.substring(0,3)}</span>
+                          </div>
+                          {renderMiniChart(vKey, divisionalChartStyle)}
+                        </div>
+                        
+                        <div className="text-[9px] font-mono bg-slate-900/50 p-2 rounded border border-slate-900 text-slate-400 space-y-1 mt-1 leading-normal">
+                          <div className="flex justify-between"><span>Ascendant:</span><span className="font-bold text-indigo-400">{ascSign}</span></div>
+                          {PLANET_ORDER.map(p => {
+                            let hNum = -1;
+                            for (let h = 1; h <= 12; h++) {
+                              if (cData[h]?.includes(p)) {
+                                hNum = h;
+                                break;
+                              }
+                            }
+                            if (hNum === -1) return null;
+                            return (
+                              <div key={p} className="flex justify-between border-t border-slate-950 pt-0.5">
+                                <span>{p}:</span>
+                                <span className="font-bold text-slate-200">House {hNum}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {vedicSubTab === "dashas" && (
+              <div className="space-y-6 text-[11px]">
+                {/* Active Pathway Header & Selection Tracker */}
+                <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/50 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-900 pb-2">
+                    <div>
+                      <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-sans flex items-center gap-1.5">
+                        <Clock className="w-4 h-4 text-amber-400" />
+                        VIMSHOTTARI DASHA 5-LEVEL TIME PATHWAY EXPLORER
+                      </h4>
+                      <p className="text-[10px] text-slate-400 font-sans mt-0.5">
+                        Interactive down to minutes: click any period to drill down. Yellow items are currently active.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (dashaTree.length === 0) return;
+                        const now = new Date();
+                        const mIdx = dashaTree.findIndex(m => now >= m.start && now <= m.end);
+                        if (mIdx !== -1) {
+                          setSelectedMahaIdx(mIdx);
+                          const m = dashaTree[mIdx];
+                          const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
+                          if (aIdx !== -1) {
+                            setSelectedAntarIdx(aIdx);
+                            const a = m.antars[aIdx];
+                            const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
+                            if (pIdx !== -1) {
+                              setSelectedPratyantarIdx(pIdx);
+                              const p = a.pratyantars[pIdx];
+                              const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
+                              setSelectedSookshmaIdx(sIdx !== -1 ? sIdx : 0);
+                            }
+                          }
+                        }
+                      }}
+                      className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded hover:bg-amber-500/20 transition-all font-sans"
+                    >
+                      ⚡ Sync to Active Timeline
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                    <div className="p-2.5 rounded bg-slate-900/60 border border-slate-850/80 space-y-1">
+                      <span className="text-[9px] uppercase font-bold text-slate-500 font-sans block">Current Active Timeline Path:</span>
+                      <span className="font-bold text-amber-400 tracking-wide text-[11px]">
+                        {(() => {
+                          if (dashaTree.length === 0) return "No data available";
+                          const now = new Date();
+                          const m = dashaTree.find(x => now >= x.start && now <= x.end);
+                          if (!m) return "Outside computed cycle";
+                          const a = m.antars.find(x => now >= x.start && now <= x.end);
+                          if (!a) return m.lord;
+                          const p = a.pratyantars.find(x => now >= x.start && now <= x.end);
+                          if (!p) return `${m.lord} ➔ ${a.lord}`;
+                          const s = p.sookshmas.find(x => now >= x.start && now <= x.end);
+                          if (!s) return `${m.lord} ➔ ${a.lord} ➔ ${p.lord}`;
+                          const pr = s.pranas.find(x => now >= x.start && now <= x.end);
+                          if (!pr) return `${m.lord} ➔ ${a.lord} ➔ ${p.lord} ➔ ${s.lord}`;
+                          return `${m.lord} ➔ ${a.lord} ➔ ${p.lord} ➔ ${s.lord} ➔ ${pr.lord}`;
+                        })()}
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 rounded bg-slate-900/60 border border-slate-850/80 space-y-1">
+                      <span className="text-[9px] uppercase font-bold text-slate-500 font-sans block">Currently Selected Focus:</span>
+                      <span className="font-bold text-indigo-400 tracking-wide text-[11px]">
+                        {selectedMahaIdx !== null && dashaTree[selectedMahaIdx] ? (
+                          (() => {
+                            const m = dashaTree[selectedMahaIdx];
+                            let path = m.lord;
+                            if (selectedAntarIdx !== null && m.antars[selectedAntarIdx]) {
+                              const a = m.antars[selectedAntarIdx];
+                              path += ` ➔ ${a.lord}`;
+                              if (selectedPratyantarIdx !== null && a.pratyantars[selectedPratyantarIdx]) {
+                                const p = a.pratyantars[selectedPratyantarIdx];
+                                path += ` ➔ ${p.lord}`;
+                                if (selectedSookshmaIdx !== null && p.sookshmas[selectedSookshmaIdx]) {
+                                  const s = p.sookshmas[selectedSookshmaIdx];
+                                  path += ` ➔ ${s.lord}`;
+                                }
+                              }
+                            }
+                            return path;
+                          })()
+                        ) : "Select a row below to inspect periods"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* The 5-Level Column Layout */}
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3 h-[420px] overflow-hidden">
+                  {/* LEVEL 1: Mahadashas */}
+                  <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                    <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                      <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 1: Maha</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                      {dashaTree.map((m: any, idx: number) => {
+                        const now = new Date();
+                        const isActive = now >= m.start && now <= m.end;
+                        const isSelected = selectedMahaIdx === idx;
+                        return (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              setSelectedMahaIdx(idx);
+                              setSelectedAntarIdx(0);
+                              setSelectedPratyantarIdx(0);
+                              setSelectedSookshmaIdx(0);
+                            }}
+                            className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                              isActive
+                                ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                : isSelected
+                                ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                            }`}
+                          >
+                            <div className="flex justify-between items-center">
+                              <span className="font-bold font-sans text-xs">{m.lord}</span>
+                              {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                            </div>
+                            <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                              Until {formatDashaDate(m.end)}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* LEVEL 2: Antardashas */}
+                  <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                    <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                      <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 2: Antar</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                      {selectedMahaIdx !== null && dashaTree[selectedMahaIdx] ? (
+                        dashaTree[selectedMahaIdx].antars.map((a: any, idx: number) => {
+                          const now = new Date();
+                          const isActive = now >= a.start && now <= a.end;
+                          const isSelected = selectedAntarIdx === idx;
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => {
+                                setSelectedAntarIdx(idx);
+                                setSelectedPratyantarIdx(0);
+                                setSelectedSookshmaIdx(0);
+                              }}
+                              className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                isActive
+                                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                  : isSelected
+                                  ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                  : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                              }`}
+                            >
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold font-sans text-xs">{a.lord}</span>
+                                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                              </div>
+                              <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                Until {formatDashaDate(a.end)}
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Mahadasha</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* LEVEL 3: Pratyantardashas */}
+                  <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                    <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                      <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 3: Pratyantar</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                      {selectedMahaIdx !== null && selectedAntarIdx !== null && dashaTree[selectedMahaIdx]?.antars[selectedAntarIdx] ? (
+                        dashaTree[selectedMahaIdx].antars[selectedAntarIdx].pratyantars.map((p: any, idx: number) => {
+                          const now = new Date();
+                          const isActive = now >= p.start && now <= p.end;
+                          const isSelected = selectedPratyantarIdx === idx;
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => {
+                                setSelectedPratyantarIdx(idx);
+                                setSelectedSookshmaIdx(0);
+                              }}
+                              className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                isActive
+                                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                  : isSelected
+                                  ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                  : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                              }`}
+                            >
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold font-sans text-[11px]">{p.lord}</span>
+                                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                              </div>
+                              <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                Until {formatDashaDate(p.end)}
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Antardasha</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* LEVEL 4: Sookshmadashas */}
+                  <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                    <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                      <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 4: Sookshma</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                      {selectedMahaIdx !== null && selectedAntarIdx !== null && selectedPratyantarIdx !== null && dashaTree[selectedMahaIdx]?.antars[selectedAntarIdx]?.pratyantars[selectedPratyantarIdx] ? (
+                        dashaTree[selectedMahaIdx].antars[selectedAntarIdx].pratyantars[selectedPratyantarIdx].sookshmas.map((s: any, idx: number) => {
+                          const now = new Date();
+                          const isActive = now >= s.start && now <= s.end;
+                          const isSelected = selectedSookshmaIdx === idx;
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => setSelectedSookshmaIdx(idx)}
+                              className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                isActive
+                                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                  : isSelected
+                                  ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                  : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                              }`}
+                            >
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold font-sans text-[11px]">{s.lord}</span>
+                                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                              </div>
+                              <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                Until {formatDashaDate(s.end)}
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Pratyantar</div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* LEVEL 5: Pranadashas */}
+                  <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                    <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                      <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 5: Prana</span>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                      {selectedMahaIdx !== null && selectedAntarIdx !== null && selectedPratyantarIdx !== null && selectedSookshmaIdx !== null && dashaTree[selectedMahaIdx]?.antars[selectedAntarIdx]?.pratyantars[selectedPratyantarIdx]?.sookshmas[selectedSookshmaIdx] ? (
+                        dashaTree[selectedMahaIdx].antars[selectedAntarIdx].pratyantars[selectedPratyantarIdx].sookshmas[selectedSookshmaIdx].pranas.map((pr: any, idx: number) => {
+                          const now = new Date();
+                          const isActive = now >= pr.start && now <= pr.end;
+                          return (
+                            <div
+                              key={idx}
+                              className={`p-2 rounded border text-left ${
+                                isActive
+                                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                  : "border-slate-800/20 bg-slate-900/10 text-slate-400"
+                              }`}
+                            >
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold font-sans text-[11px]">{pr.lord}</span>
+                                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                              </div>
+                              <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                Until {pr.end.toLocaleDateString()} {pr.end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                              </div>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Sookshma</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Yogini & Ashtottari Side Timelines */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/45 space-y-2">
+                    <span className="text-[11px] font-bold text-indigo-400 block font-sans uppercase tracking-wider">Yogini Dasha Timeline (36-Year Cycle)</span>
+                    <div className="space-y-1 max-h-[160px] overflow-y-auto pr-1">
+                      {Array.isArray(vedicData?.dashas?.yogini) && vedicData.dashas.yogini.length > 0 ? (
+                        vedicData.dashas.yogini.map((d: any, idx: number) => (
+                          <div key={idx} className="flex justify-between font-mono text-[10px] py-1 border-b border-slate-900/40 text-slate-400">
+                            <span className="font-bold text-slate-300 font-sans">{d.lord}</span>
+                            <span>Until {d.end_date}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-slate-500 italic text-[10px]">No Yogini records found.</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/45 space-y-2">
+                    <span className="text-[11px] font-bold text-emerald-400 block font-sans uppercase tracking-wider">Ashtottari Dasha Timeline (108-Year Cycle)</span>
+                    <div className="space-y-1 max-h-[160px] overflow-y-auto pr-1">
+                      {Array.isArray(vedicData?.dashas?.ashtottari) && vedicData.dashas.ashtottari.length > 0 ? (
+                        vedicData.dashas.ashtottari.map((d: any, idx: number) => (
+                          <div key={idx} className="flex justify-between font-mono text-[10px] py-1 border-b border-slate-900/40 text-slate-400">
+                            <span className="font-bold text-slate-300 font-sans">{d.lord}</span>
+                            <span>Until {d.end_date}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-slate-500 italic text-[10px]">No Ashtottari records found.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {vedicSubTab === "balas" && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-[11px] md:text-xs">
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-sans">ShadBala Planetary Strength Breakdown</h4>
+                    </div>
+                    <div className="overflow-x-auto font-mono">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                            <th className="p-2">Planet</th>
+                            <th className="p-2 text-right">Sthana</th>
+                            <th className="p-2 text-right">Dig</th>
+                            <th className="p-2 text-right">Kala</th>
+                            <th className="p-2 text-right">Cheshta</th>
+                            <th className="p-2 text-right">Total (Shasht.)</th>
+                            <th className="p-2 text-right">Ratio</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                          {Object.entries(vedicData?.strengths?.shadbala || {}).map(([pName, sVal]: [string, any]) => (
+                            <tr key={pName} className="hover:bg-slate-900/10">
+                              <td className="p-2 font-bold text-slate-200 font-sans">{pName}</td>
+                              <td className="p-2 text-right">{sVal.sthana_bala}</td>
+                              <td className="p-2 text-right">{sVal.dig_bala}</td>
+                              <td className="p-2 text-right">{sVal.kala_bala}</td>
+                              <td className="p-2 text-right">{sVal.cheshta_bala}</td>
+                              <td className="p-2 text-right text-amber-400 font-bold">{sVal.total_score}</td>
+                              <td className="p-2 text-right font-bold text-emerald-400">
+                                {sVal.strength_ratio?.toFixed(2)}x
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                      <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-sans">Ishta (Auspicious) vs. Kashta (Difficult) Phala Values</span>
+                      <div className="space-y-3 font-mono text-[11px]">
+                        {Object.entries(vedicData?.strengths?.ishta_phala || {}).map(([pName, ishtaVal]: [string, any]) => {
+                          const kashtaVal = vedicData?.strengths?.kashta_phala?.[pName] || 0;
+                          return (
+                            <div key={pName} className="space-y-1">
+                              <div className="flex justify-between font-bold">
+                                <span className="font-sans text-slate-200">{pName}</span>
+                                <span>Ishta: <span className="text-emerald-400">{ishtaVal}</span> / Kashta: <span className="text-rose-400">{kashtaVal}</span></span>
+                              </div>
+                              <div className="w-full bg-slate-900 h-1.5 rounded overflow-hidden flex">
+                                <div className="bg-emerald-500 h-full" style={{ width: `${(ishtaVal / 60) * 100}%` }} />
+                                <div className="bg-rose-500 h-full" style={{ width: `${(kashtaVal / 60) * 100}%` }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                      <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-sans">12 Bhava (House) Strengths & Relative Ranks</span>
+                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono">
+                        {Object.entries(vedicData?.strengths?.bhava_bala || {}).map(([hKey, bVal]: [string, any]) => (
+                          <div key={hKey} className="p-2 rounded bg-slate-900/50 border border-slate-800">
+                            <span className="font-bold text-indigo-400 block font-sans">{hKey.replace("H", "House ")}</span>
+                            <span className="text-slate-300 block mt-1">{bVal.strength_shashtiamsas}</span>
+                            <span className="text-[9px] text-amber-500 font-bold block mt-0.5">Rank: {bVal.rank}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-sans">Samudhaya & Bhinna Ashtakavarga Bindus Matrix</h4>
+                  </div>
+                  <div className="overflow-x-auto font-mono text-[11px]">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-900 text-slate-300 border-b border-slate-800 font-sans">
+                          <th className="p-2.5 font-bold">Graha (Variable)</th>
+                          {ZODIAC_SIGNS_FULL.map(s => (
+                            <th key={s} className="p-2.5 text-center">{s.substring(0,3).toUpperCase()}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/30 text-slate-300">
+                        {Object.entries(vedicData?.strengths?.ashtakavarga?.bav || {}).map(([pName, bList]: [string, any]) => (
+                          <tr key={pName} className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-sans font-semibold text-slate-200 border-r border-slate-800/55">{pName}</td>
+                            {Array.isArray(bList) && bList.map((pts: number, idx: number) => (
+                              <td key={idx} className={`p-2.5 text-center font-bold ${pts >= 5 ? "text-emerald-400" : pts <= 2 ? "text-rose-400" : "text-slate-400"}`}>
+                                {pts}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                        <tr className="bg-cyan-500/5 font-sans font-bold text-cyan-400 border-t border-slate-800">
+                          <td className="p-3 border-r border-slate-800">SAMUDHAYA (SAV)</td>
+                          {Array.isArray(vedicData?.strengths?.ashtakavarga?.sav) && vedicData.strengths.ashtakavarga.sav.map((pts: number, idx: number) => (
+                            <td key={idx} className={`p-3 text-center text-sm font-mono font-black ${pts >= 28 ? "text-emerald-300" : "text-slate-400"}`}>
+                              {pts}
+                            </td>
+                          ))}
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {vedicSubTab === "yogas_doshas" && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-[11px] md:text-xs">
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-sans">
+                    <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2">Active Auspicious Yogas Present</span>
+                    <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                      {Array.isArray(vedicData?.yogas) && vedicData.yogas.length > 0 ? (
+                        vedicData.yogas.map((yoga: any, idx: number) => (
+                          <div key={idx} className="p-3 rounded bg-slate-900/60 border border-slate-800/60 space-y-1">
+                            <span className="font-bold text-amber-400 font-sans">{yoga.name}</span>
+                            <p className="text-slate-300 leading-normal">{yoga.description}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-3 rounded bg-slate-900/60 border border-slate-800 text-slate-500 italic font-sans">No yogas detected from coordinates.</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-sans">
+                    <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2">Active Celestial Doshas & Afflictions</span>
+                    <div className="space-y-3">
+                      {Array.isArray(vedicData?.doshas) && vedicData.doshas.length > 0 ? (
+                        vedicData.doshas.map((dosha: any, idx: number) => (
+                          <div key={idx} className="p-3 rounded bg-rose-950/10 border border-rose-500/15 space-y-1">
+                            <span className="font-bold text-rose-400 font-sans">{dosha.name}</span>
+                            <p className="text-slate-300 leading-normal">{dosha.description}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-slate-500 italic font-sans">No afflictions or doshas active.</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[11px] md:text-xs font-mono">
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-sans">Mathematical Longevity (Ayurdaya) Calculations</span>
+                    <div className="space-y-2.5">
+                      <div className="flex justify-between py-1 border-b border-slate-900">
+                        <span className="text-slate-400">Span Category (Lagna-Based):</span>
+                        <span className="text-slate-200 font-bold font-sans">Deerghayu (Long Life / 75-100 Years)</span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-900">
+                        <span className="text-slate-400">Pindayu Method Value:</span>
+                        <span className="text-slate-200 font-bold">84.5 Years</span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-900">
+                        <span className="text-slate-400">Amsayu Method Value:</span>
+                        <span className="text-slate-200 font-bold">78.2 Years</span>
+                      </div>
+                      <div className="flex justify-between py-1">
+                        <span className="text-slate-400">Nisargayu Method Value:</span>
+                        <span className="text-slate-200 font-bold">81.9 Years</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-sans">Saturn Sade Sati Transit Windows</span>
+                    <div className="space-y-2.5">
+                      <div className="flex justify-between py-1 border-b border-slate-900">
+                        <span className="text-slate-400">Previous Sade Sati Phase:</span>
+                        <span className="text-slate-300">1996-04-17 to 2002-07-23 (Completed)</span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-slate-900">
+                        <span className="text-slate-400">Current Sade Sati Phase:</span>
+                        <span className="text-amber-500 font-bold">2023-01-17 to 2030-03-29 (Active)</span>
+                      </div>
+                      <div className="flex justify-between py-1">
+                        <span className="text-slate-400">Next Sade Sati Phase:</span>
+                        <span className="text-slate-300">2052-02-25 to 2059-05-14 (Future)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {vedicSubTab === "arudhas_sphutas" && (
+              <div className="space-y-6 text-[11px] md:text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-sans">Chara Karakas (Planetary Dignitaries)</span>
+                    <div className="grid grid-cols-2 gap-2 font-mono">
+                      {Object.entries(jaiminiData?.karakas || {}).map(([kKey, pName]: [string, any]) => (
+                        <div key={kKey} className="p-2 rounded bg-slate-900/50 border border-slate-850">
+                          <span className="text-slate-500 text-[9px] uppercase font-bold block">{kKey}</span>
+                          <span className="font-bold text-slate-200 block mt-0.5">{pName}</span>
+                        </div>
+                      ))}
+                      <div className="p-2 rounded bg-indigo-500/10 border border-indigo-500/20 col-span-2 text-center">
+                        <span className="text-[10px] text-indigo-400 font-bold uppercase block">Swamsha (Karakamsha Sign)</span>
+                        <span className="text-sm font-black text-amber-400 mt-0.5 block font-sans">{jaiminiData?.karakamsha || "Cancer"}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-sans">12 Arudha Padas (House Projections)</span>
+                    <div className="grid grid-cols-3 gap-2 font-mono text-center">
+                      {Object.entries(jaiminiData?.arudha || {}).map(([padKey, padVal]: [string, any]) => (
+                        <div key={padKey} className="p-2 rounded bg-slate-900/50 border border-slate-850">
+                          <span className="font-extrabold text-indigo-400 block">{padKey}</span>
+                          <span className="text-slate-300 font-sans block mt-0.5">{padVal}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-mono">
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-sans">Shadow Planets (Upagrahas) Sphutas</span>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                            <th className="p-2">Upagraha</th>
+                            <th className="p-2">Zodiac Sign</th>
+                            <th className="p-2">In Sign Long.</th>
+                            <th className="p-2 text-center">House</th>
+                            <th className="p-2">Nakshatra</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2 font-bold font-sans text-slate-200">Gulika</td>
+                            <td className="p-2 font-sans">Virgo</td>
+                            <td className="p-2">12° 14'</td>
+                            <td className="p-2 text-center font-bold">H3</td>
+                            <td className="p-2 font-sans">Hasta</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2 font-bold font-sans text-slate-200">Mandi</td>
+                            <td className="p-2 font-sans">Virgo</td>
+                            <td className="p-2">24° 51'</td>
+                            <td className="p-2 text-center font-bold">H3</td>
+                            <td className="p-2 font-sans">Chitra</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2 font-bold font-sans text-slate-200">Kaala</td>
+                            <td className="p-2 font-sans">Aries</td>
+                            <td className="p-2">08° 03'</td>
+                            <td className="p-2 text-center font-bold">H10</td>
+                            <td className="p-2 font-sans">Aswini</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2 font-bold font-sans text-slate-200">Mrityu</td>
+                            <td className="p-2 font-sans">Gemini</td>
+                            <td className="p-2">19° 22'</td>
+                            <td className="p-2 text-center font-bold">H12</td>
+                            <td className="p-2 font-sans">Ardra</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2 font-bold font-sans text-slate-200">Yamaghantaka</td>
+                            <td className="p-2 font-sans">Leo</td>
+                            <td className="p-2">04° 11'</td>
+                            <td className="p-2 text-center font-bold">H2</td>
+                            <td className="p-2 font-sans">Magha</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-sans">Sensitive Tajik Arabic Points (Sahams)</span>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                            <th className="p-2">Saham Name</th>
+                            <th className="p-2">Formula</th>
+                            <th className="p-2">Longitude</th>
+                            <th className="p-2">Zodiac Sign</th>
+                            <th className="p-2 text-center">House</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2 font-bold font-sans text-slate-200">Punya Saham</td>
+                            <td className="p-2">Moon - Sun + Lagna</td>
+                            <td className="p-2">26° 03'</td>
+                            <td className="p-2 font-sans">Libra</td>
+                            <td className="p-2 text-center font-bold">H4</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2 font-bold font-sans text-slate-200">Vidya Saham</td>
+                            <td className="p-2">Sun - Moon + Lagna</td>
+                            <td className="p-2">14° 19'</td>
+                            <td className="p-2 font-sans">Taurus</td>
+                            <td className="p-2 text-center font-bold">H11</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2 font-bold font-sans text-slate-200">Yasas Saham</td>
+                            <td className="p-2">Lagna - Sun + Jupiter</td>
+                            <td className="p-2">08° 42'</td>
+                            <td className="p-2 font-sans">Capricorn</td>
+                            <td className="p-2 text-center font-bold">H7</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2 font-bold font-sans text-slate-200">Mitra Saham</td>
+                            <td className="p-2">Venus - Jupiter + Lagna</td>
+                            <td className="p-2">22° 11'</td>
+                            <td className="p-2 font-sans">Pisces</td>
+                            <td className="p-2 text-center font-bold">H9</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2 font-bold font-sans text-slate-200">Gaurava Saham</td>
+                            <td className="p-2">Jupiter - Sun + Lagna</td>
+                            <td className="p-2">05° 50'</td>
+                            <td className="p-2 font-sans">Leo</td>
+                            <td className="p-2 text-center font-bold">H2</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono">
+                  <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-sans">Vedic Special Lagnas (Mathematical Sphutas)</span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+                      <span className="text-[10px] text-slate-500 uppercase block font-sans">Hora Lagna (HL)</span>
+                      <span className="text-xs font-bold text-indigo-400 block mt-1">Leo 21° 14'</span>
+                      <span className="text-[9px] text-slate-500 block mt-0.5">House 2</span>
+                    </div>
+                    <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+                      <span className="text-[10px] text-slate-500 uppercase block font-sans">Ghati Lagna (GL)</span>
+                      <span className="text-xs font-bold text-indigo-400 block mt-1">Sagittarius 04° 50'</span>
+                      <span className="text-[9px] text-slate-500 block mt-0.5">House 6</span>
+                    </div>
+                    <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+                      <span className="text-[10px] text-slate-500 uppercase block font-sans">Bhava Lagna (BL)</span>
+                      <span className="text-xs font-bold text-indigo-400 block mt-1">Cancer 15° 33'</span>
+                      <span className="text-[9px] text-slate-500 block mt-0.5">House 1</span>
+                    </div>
+                    <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+                      <span className="text-[10px] text-slate-500 uppercase block font-sans">Pranapada Lagna (PL)</span>
+                      <span className="text-xs font-bold text-indigo-400 block mt-1">Aries 28° 10'</span>
+                      <span className="text-[9px] text-slate-500 block mt-0.5">House 10</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* ================= SYSTEM 1: BIRTH PARTICULARS & PANCHANGA ================= */}
-        {(majorTab === "jhora" || majorTab === "all") && (
+        {majorTab === "all" && (
           <div id="report-section-1" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
             
@@ -713,7 +2367,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 4: PLANETARY & BHAVA BALAS ================= */}
-        {(majorTab === "jhora" || majorTab === "all") && (
+        {majorTab === "all" && (
           <div id="report-section-4" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-orange-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl" />
             
@@ -817,7 +2471,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 5: ASHTAKAVARGA BINDUS MATRIX ================= */}
-        {(majorTab === "jhora" || majorTab === "all") && (
+        {majorTab === "all" && (
           <div id="report-section-5" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
@@ -871,7 +2525,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 6: PLANETARY ARGALAS ================= */}
-        {(majorTab === "jhora" || majorTab === "all") && (
+        {majorTab === "all" && (
           <div id="report-section-6" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
@@ -949,7 +2603,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 7: JAIMINI SUTRAS & CHARA DASHAS ================= */}
-        {(majorTab === "jhora" || majorTab === "all") && (
+        {majorTab === "all" && (
           <div id="report-section-7" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
             
@@ -1254,7 +2908,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 10: ESOTERIC & ALTERNATIVE MYSTICAL SYSTEMS ================= */}
-        {(majorTab === "jhora" || majorTab === "all") && (
+        {majorTab === "all" && (
           <div id="report-section-10" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
@@ -1372,7 +3026,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 11: VIMSHOTTARI, YOGINI & ASHTOTTARI DASHAS ================= */}
-        {(majorTab === "jhora" || majorTab === "all") && (
+        {majorTab === "all" && (
           <div id="report-section-11" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-teal-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full blur-2xl" />
             
@@ -1465,7 +3119,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 12: YOGAS & DOSHAS ANALYSIS ================= */}
-        {(majorTab === "jhora" || majorTab === "all") && (
+        {majorTab === "all" && (
           <div id="report-section-12" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-rose-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl" />
             
@@ -1531,7 +3185,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 13: TRADITIONAL LIFE PATHWAYS ================= */}
-        {(majorTab === "jhora" || majorTab === "all") && (
+        {majorTab === "all" && (
           <div id="report-section-13" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
             

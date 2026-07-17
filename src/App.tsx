@@ -1800,38 +1800,6 @@ export default function App() {
                   isDark={isDark}
                 />
 
-                <div className="border-t border-indigo-500/10 my-6" />
-
-                {/* Dynamic Raw Astro Submenu Data PDF Generator */}
-                <RawDataPdfGenerator
-                  astrologyData={astrologyData}
-                  activeUser={activeUser}
-                  setAstrologyData={setAstrologyData}
-                  mapAstrologyDataToUserProfileJSON={mapAstrologyDataToUserProfileJSON}
-                  isDark={isDark}
-                />
-
-                {/* Advanced Systems Rules Reference & Engine Simulator */}
-                <div className={`p-5 rounded-xl border ${isDark ? "border-slate-800 bg-slate-950/20" : "border-neutral-200 bg-neutral-50/50"} space-y-4`}>
-                  <details className="group cursor-pointer">
-                    <summary className="flex items-center justify-between text-xs font-bold text-slate-300 uppercase tracking-wider select-none list-none">
-                      <div className="flex items-center gap-2">
-                        <Cpu className="w-4 h-4 text-indigo-400" />
-                        <span>Advanced Systems Rules Reference & Simulator Engine</span>
-                      </div>
-                      <span className="text-[10px] text-indigo-400 group-open:rotate-180 transition-transform">▼</span>
-                    </summary>
-                    <div className="pt-4 space-y-4 cursor-default" onClick={(e) => e.stopPropagation()}>
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        Explore the underlying micro-astrological rulebooks and simulated states that power the JHora, KP, Western, and Mystical systems.
-                      </p>
-                      <MasterArchitectureView
-                        astrologyData={astrologyData}
-                        isDark={isDark}
-                      />
-                    </div>
-                  </details>
-                </div>
               </motion.div>
             </AnimatePresence>
           ) : activeMenu === "reports" ? (
