@@ -92,7 +92,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 }) => {
   const [compiling, setCompiling] = useState(false);
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
-  const [majorTab, setMajorTab] = useState<"advanced" | "jhora" | "transit" | "kp" | "western" | "all">("advanced");
+  const [majorTab, setMajorTab] = useState<"advanced" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("advanced");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
@@ -1625,6 +1625,16 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         >
           Transit
         </button>
+        <button
+          onClick={() => setMajorTab("reports")}
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
+            majorTab === "reports"
+              ? "border-amber-500 text-amber-500 font-extrabold bg-slate-900/20"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          Reports
+        </button>
       </div>
 
       {/* Sub-tabs bar for Transit */}
@@ -1688,6 +1698,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
         {/* ================= ADVANCED SYSTEM: REFERENCE & AUTOMATED SIMULATIONS ================= */}
         {majorTab === "advanced" && (
+          <div className="space-y-6">
+            {/* Simulated Rules Engine */}
+            <MasterArchitectureView
+              astrologyData={astrologyData}
+              isDark={isDark}
+            />
+          </div>
+        )}
+
+        {/* ================= REPORTS HUB ================= */}
+        {majorTab === "reports" && (
           <div className="space-y-6">
             {/* Automated PDF Reports Hub */}
             <div className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
@@ -1792,17 +1813,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 </div>
               )}
             </div>
-
-            {/* Simulated Rules Engine */}
-            <MasterArchitectureView
-              astrologyData={astrologyData}
-              isDark={isDark}
-            />
           </div>
         )}
         
         {/* ================= MULTI-SYSTEM LAYOUT (WITHOUT STICKY CHART RAIL TO PREVENT DISPLAY ERRORS AND OVERLAPS) ================= */}
-        {majorTab !== "advanced" && majorTab !== "transit" && (
+        {majorTab !== "advanced" && majorTab !== "transit" && majorTab !== "reports" && (
           <div className="space-y-6">
             {/* Sub-tab / System Specific Content Column */}
             <div className="w-full space-y-6">
