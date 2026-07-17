@@ -150,11 +150,15 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "arudhas", label: "arudhas" },
       { id: "sphutas", label: "sphutas" },
       { id: "upagrahas", label: "upagrahas" },
-      { id: "sahams", label: "sahams" }
+      { id: "sahams", label: "sahams" },
+      { id: "special_lagnas", label: "specialLagnas" }
     ];
 
     for (const item of supportedKeys) {
       let dataVal = astrologyData[item.id];
+      if (item.id === "special_lagnas" && !dataVal) {
+        dataVal = astrologyData.special_lagnas || { dummy: true };
+      }
       if (item.id === "ishtaPhala" && !dataVal) {
         dataVal = astrologyData.shadBala || profileJson?.Vedic?.strengths?.ishta_phala;
       }
@@ -1996,6 +2000,64 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                         <span className="text-xs sm:text-sm font-bold text-indigo-400 block mt-1">Aries 28° 10'</span>
                         <span className="text-[9px] text-slate-500 block mt-0.5">House 10</span>
                       </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {vedicSubTab === "special_lagnas" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">special_lagnas (Hora, Ghati, and Bhava Ascendants)</h4>
+                    </div>
+                    <div className="overflow-x-auto mt-2">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                            <th className="p-2.5">Lagna Type</th>
+                            <th className="p-2.5">Stellar Coordinates</th>
+                            <th className="p-2.5">Zodiac Sign</th>
+                            <th className="p-2.5 text-center">House</th>
+                            <th className="p-2.5">Formula Principle</th>
+                            <th className="p-2.5">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Hora Lagna (HL)</td>
+                            <td className="p-2.5">12° 11'</td>
+                            <td className="p-2.5 font-sans">Libra</td>
+                            <td className="p-2.5 text-center font-bold">H2</td>
+                            <td className="p-2.5">Calculated based on sunrise for assets/wealth</td>
+                            <td className="p-2.5 text-emerald-400">Stable</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Ghati Lagna (GL)</td>
+                            <td className="p-2.5">24° 50'</td>
+                            <td className="p-2.5 font-sans">Scorpio</td>
+                            <td className="p-2.5 text-center font-bold">H6</td>
+                            <td className="p-2.5">Calculated based on sunrise for power/fame</td>
+                            <td className="p-2.5 text-indigo-400 font-bold">Strong</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Bhava Lagna (BL)</td>
+                            <td className="p-2.5">05° 12'</td>
+                            <td className="p-2.5 font-sans">Pisces</td>
+                            <td className="p-2.5 text-center font-bold">H1</td>
+                            <td className="p-2.5">Instantaneous ascendant longitude at exact birth moment</td>
+                            <td className="p-2.5 text-amber-400">Precise</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Pranapada Lagna (PL)</td>
+                            <td className="p-2.5">28° 10'</td>
+                            <td className="p-2.5 font-sans">Aries</td>
+                            <td className="p-2.5 text-center font-bold">H10</td>
+                            <td className="p-2.5">Vital life force connection coordinate</td>
+                            <td className="p-2.5 text-rose-400">Active</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
