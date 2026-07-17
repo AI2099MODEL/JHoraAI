@@ -4,7 +4,23 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Sparkles, MessageSquare, Compass, ShieldAlert, BrainCircuit } from "lucide-react";
+import {
+  Send,
+  Sparkles,
+  ShieldAlert,
+  Clock,
+  User,
+  Heart,
+  AlertTriangle,
+  RefreshCw,
+  Calendar,
+  Award,
+  Copy,
+  Download,
+  Check,
+  Flame,
+  Info
+} from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
 
@@ -12,299 +28,402 @@ interface AstroChatProps {
   astrologyData: AstrologyData | null;
 }
 
-interface ChatMessage {
-  id: string;
-  sender: "user" | "ai";
-  text: string;
-  timestamp: Date;
-}
-
 export default function AstroChat({ astrologyData }: AstroChatProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  // Selected Prompt & Analysis State
+  const [selectedPrompt, setSelectedPrompt] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [targetAge, setTargetAge] = useState<number>(28);
   const [currentStatusMsg, setCurrentStatusMsg] = useState("");
-  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const statusMessages = [
-    "Consulting the constellations...",
-    "Decoding planetary conjunctions...",
-    "Interpreting Vimshottari dasha periods...",
-    "Formulating astrological recommendations...",
-    "Analyzing celestial aspect patterns...",
+  const analysisRef = useRef<HTMLDivElement>(null);
+
+  const quickPrompts = [
+    {
+      title: "Marriage Promise",
+      label: "💍 Marriage Promise",
+      query: "Explain my overall Marriage Promise. Is it auspicious, or are there significant obstructions?",
+      icon: Heart,
+      color: "hover:border-rose-500/40 hover:bg-rose-500/5 text-rose-400 border-rose-500/10"
+    },
+    {
+      title: "Marriage Timing",
+      label: "📅 Marriage Timing",
+      query: "When will I marry? Which planetary DBA period indicates activation of my marriage gates?",
+      icon: Clock,
+      color: "hover:border-emerald-500/40 hover:bg-emerald-500/5 text-emerald-400 border-emerald-500/10"
+    },
+    {
+      title: "Love vs Arranged",
+      label: "💑 Love or Arranged?",
+      query: "Does my chart favor Love or Arranged Marriage? Show D1/D9 5th and 7th house connections.",
+      icon: Flame,
+      color: "hover:border-amber-500/40 hover:bg-amber-500/5 text-amber-400 border-amber-500/10"
+    },
+    {
+      title: "Delay Factors",
+      label: "⚠️ Delay Factors",
+      query: "What are the primary factors causing marriage delay in my chart? Detail Saturn or Rahu's aspect on the 7th house.",
+      icon: AlertTriangle,
+      color: "hover:border-yellow-500/40 hover:bg-yellow-500/5 text-yellow-400 border-yellow-500/10"
+    },
+    {
+      title: "Divorce Analysis",
+      label: "💔 Divorce Analysis",
+      query: "Analyze divorce or separation risks in my chart. Check the role of 6th, 8th, and 12th houses.",
+      icon: ShieldAlert,
+      color: "hover:border-red-500/40 hover:bg-red-500/5 text-red-400 border-red-500/10"
+    },
+    {
+      title: "Spouse Prediction",
+      label: "🔮 Spouse Profile",
+      query: "Provide a detailed Spouse Prediction: physical appearance, character, profession, social standing, and possible direction of origin.",
+      icon: User,
+      color: "hover:border-indigo-500/40 hover:bg-indigo-500/5 text-indigo-400 border-indigo-500/10"
+    },
+    {
+      title: "Dasha Activation",
+      label: "👑 Dasha Activation",
+      query: "Detail my active Vimshottari dasha timeline. Which planets are opening doors for marriage or career right now?",
+      icon: Calendar,
+      color: "hover:border-violet-500/40 hover:bg-violet-500/5 text-violet-400 border-violet-500/10"
+    },
+    {
+      title: "Career Path",
+      label: "🌟 Career Path",
+      query: "Analyze my professional profile, career promise, and 10th house strength. What fields suit me best?",
+      icon: Sparkles,
+      color: "hover:border-blue-500/40 hover:bg-blue-500/5 text-blue-400 border-blue-500/10"
+    },
+    {
+      title: "Vedic Remedies",
+      label: "✨ Vedic Remedies",
+      query: "What are my recommended Relationship Remedies? List Vedic mantras, gem recommendations, and charity directives.",
+      icon: Award,
+      color: "hover:border-teal-500/40 hover:bg-teal-500/5 text-teal-400 border-teal-500/10"
+    }
   ];
 
-  // Set initial welcome message
-  useEffect(() => {
-    if (messages.length === 0) {
-      setMessages([
-        {
-          id: "welcome",
-          sender: "ai",
-          text: astrologyData
-            ? `Pranam! 🙏 I am JHora AI, your personal Vedic Astrology & Jyotish consultant. I have loaded the birth chart details for **${astrologyData.birthDetails.name}**.\n\nYou are born with a **${astrologyData.lagna.sign}** Ascendant and your Moon is in **${astrologyData.planets.find(p => p.name === "Moon")?.sign}**. \n\nHow can I guide you today? Feel free to ask about your career, relationship compatibility, dasha cycles, auspicious yogas, or any remedies.`
-            : `Pranam! 🙏 I am JHora AI, your personal Vedic Astrology consultant. \n\nPlease configure your birth details in the **Horoscope Dashboard** first. Once calculated, I can analyze your specific planetary aspects, dasha periods, yogas, and answer any direct life questions.`,
-          timestamp: new Date(),
-        },
-      ]);
-    }
-  }, [astrologyData]);
+  const statusMessages = [
+    "Consulting celestial engines...",
+    "Retrieving multi-system rule maps...",
+    "Querying KP & Vedic relationship guidelines...",
+    "Synthesizing Jaimini sub-rulers...",
+    "Executing Tajik Year Vivaha Saham indicators..."
+  ];
 
-  // Auto scroll to bottom
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  // Rotate loading messages
+  // Loading animation status rotation
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (loading) {
+    if (analysisLoading) {
       let idx = 0;
       setCurrentStatusMsg(statusMessages[0]);
       interval = setInterval(() => {
         idx = (idx + 1) % statusMessages.length;
         setCurrentStatusMsg(statusMessages[idx]);
-      }, 3500);
+      }, 2000);
     }
     return () => clearInterval(interval);
-  }, [loading]);
+  }, [analysisLoading]);
 
-  const handleSend = async (textToSend?: string) => {
-    const text = textToSend || input;
-    if (!text.trim() || loading) return;
-
+  // Execute Analysis (handles both Quick Prompts and Custom queries)
+  const runAnalysis = async (queryText: string, title: string) => {
+    if (analysisLoading) return;
     if (!astrologyData) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Math.random().toString(),
-          sender: "user",
-          text,
-          timestamp: new Date(),
-        },
-        {
-          id: Math.random().toString(),
-          sender: "ai",
-          text: "Please configure and calculate your birth chart in the **Horoscope Dashboard** tab before asking specific questions! This enables me to run precise Parashari computations for you.",
-          timestamp: new Date(),
-        },
-      ]);
-      if (!textToSend) setInput("");
+      alert("Please cast a horoscope first in the Horoscope Dashboard tab to enable Master AI Astrologer analysis.");
       return;
     }
 
-    // Append user message
-    const userMsgId = Math.random().toString();
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: userMsgId,
-        sender: "user",
-        text,
-        timestamp: new Date(),
-      },
-    ]);
-    if (!textToSend) setInput("");
-    setLoading(true);
+    setSelectedPrompt(title);
+    setAnalysisResult(null);
+    setAnalysisLoading(true);
 
     try {
-      const response = await fetch("/api/astrology/ai-analyze", {
+      const response = await fetch("/api/astrology/master-ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           astrologyData,
-          question: text,
-        }),
+          question: queryText,
+          targetAge,
+          history: [] // strictly focused on this targeted query
+        })
       });
 
       const data = await response.json();
-      
       if (data.error) {
         throw new Error(data.error);
       }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Math.random().toString(),
-          sender: "ai",
-          text: data.analysis,
-          timestamp: new Date(),
-        },
-      ]);
+      setAnalysisResult(data.reply);
     } catch (err: any) {
-      console.error("AI analysis error:", err);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Math.random().toString(),
-          sender: "ai",
-          text: `⚠️ **System Alignments Unsuccessful:** \n\n${err.message || "Failed to establish planetary communication. Ensure your server is running and a valid GEMINI_API_KEY is configured in Settings > Secrets."}\n\n*Note: To resolve this, verify that your Gemini API Key is saved in the AI Studio secrets.*`,
-          timestamp: new Date(),
-        },
-      ]);
+      console.error(err);
+      setAnalysisResult(`⚠️ **Master AI Astrologer Session Interrupted:**\n\n${err.message || "Failed to generate report. Check your network or verify your GEMINI_API_KEY."}`);
     } finally {
-      setLoading(false);
+      setAnalysisLoading(false);
+      // Smooth scroll to results
+      setTimeout(() => {
+        analysisRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     }
   };
 
-  const sampleQuestions = [
-    { label: "💼 Career & Wealth", text: "What does my chart indicate about my career path, ideal profession, and financial prospects?" },
-    { label: "🌟 Auspicious Yogas", text: "Do I have any significant planetary Yogas in my chart? Explain their placement and outcomes." },
-    { label: "📅 Active Dasha Period", text: "Analyze my current active Dasha cycle. What are the key life themes and lessons during this period?" },
-    { label: "🛡️ Remedies & Wellness", text: "What are the traditional Vedic remedies (mantras, charitable deeds, gemstones) for any negative placements or active doshas in my chart?" }
-  ];
+  const handleCustomSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    runAnalysis(input, "Custom Inquiry");
+  };
+
+  const downloadAnalysisText = () => {
+    if (!analysisResult) return;
+    const element = document.createElement("a");
+    const file = new Blob([`JHora AI Celestial Analysis: ${selectedPrompt}\n==================================================\n\n${analysisResult}`], { type: 'text/plain;charset=utf-8' });
+    element.href = URL.createObjectURL(file);
+    element.download = `${selectedPrompt?.toLowerCase().replace(/\s+/g, "_")}_analysis.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const copyToClipboard = () => {
+    if (!analysisResult) return;
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = analysisResult;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Clipboard copy failed", err);
+    }
+  };
+
+  if (!astrologyData) {
+    return (
+      <div className="p-8 border border-slate-800 rounded-2xl bg-slate-950/40 backdrop-blur-md text-center max-w-lg mx-auto my-12 space-y-4">
+        <Info className="w-8 h-8 text-indigo-400 mx-auto" />
+        <h4 className="text-sm font-bold text-slate-200 uppercase tracking-wider">No Active Horoscope</h4>
+        <p className="text-xs text-slate-400 leading-relaxed">
+          Please configure and calculate your birth chart in the **Horoscope Dashboard** first to enable full AI-guided master astrologer consultation.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-[600px] max-h-[75vh]" id="ai-chat-interface">
-      {/* Suggestions and Info Sidebar */}
-      <div className="lg:col-span-4 flex flex-col justify-between bg-slate-900/60 backdrop-blur-md rounded-2xl border border-indigo-500/20 p-5 shadow-xl h-full overflow-y-auto">
-        <div>
-          <h4 className="text-sm font-semibold text-slate-200 mb-2 flex items-center gap-2">
-            <BrainCircuit className="w-4 h-4 text-amber-500" />
-            Jyotish AI Intelligence
-          </h4>
-          <p className="text-[11px] text-slate-400 leading-relaxed mb-6">
-            Our AI Astrologer reads your computed Parashari variables in real-time, combining classical Sanskrit guidelines with the advanced reasoning of Gemini Flash to deliver accurate interpretations.
-          </p>
-
-          <h5 className="text-[10px] uppercase tracking-wider font-mono font-bold text-amber-400/90 mb-3">
-            Suggested Consultations
-          </h5>
-          <div className="space-y-2">
-            {sampleQuestions.map((q, idx) => (
-              <button
-                key={idx}
-                disabled={loading}
-                onClick={() => handleSend(q.text)}
-                className="w-full text-left bg-slate-950/40 border border-indigo-500/10 hover:border-amber-500/30 hover:bg-slate-950/80 rounded-xl p-3 text-xs text-slate-300 transition-all flex items-start gap-2.5"
-              >
-                <Compass className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold block text-slate-100 mb-0.5">{q.label}</span>
-                  <span className="text-slate-400 text-[10px] line-clamp-1">{q.text}</span>
-                </div>
-              </button>
-            ))}
-          </div>
+    <div className="max-w-3xl mx-auto space-y-6 py-6 px-4">
+      {/* INTERACTIVE CELESTIAL PROMPTS (Pills placed at the very top as requested) */}
+      <div className="space-y-3 text-center">
+        <div className="inline-flex items-center gap-1.5 text-[10px] text-indigo-400 font-bold uppercase tracking-wider">
+          <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+          <span>Interactive Alignment & Diagnostics</span>
         </div>
-
-        {astrologyData && (
-          <div className="bg-slate-950/50 border border-indigo-500/10 p-3 rounded-xl text-[10px] text-slate-400 mt-6 flex items-center gap-2.5">
-            <MessageSquare className="w-4 h-4 text-indigo-400 shrink-0" />
-            <span>
-              Now analyzing **{astrologyData.birthDetails.name}**&apos;s chart ({astrologyData.birthDetails.date}).
-            </span>
-          </div>
-        )}
+        <div className="flex flex-wrap justify-center gap-2">
+          {quickPrompts.map((prompt) => {
+            const IconComponent = prompt.icon;
+            const isSelected = selectedPrompt === prompt.title;
+            return (
+              <button
+                key={prompt.title}
+                type="button"
+                disabled={analysisLoading}
+                onClick={() => {
+                  setInput(""); // Clear custom input to focus on the selected prompt
+                  runAnalysis(prompt.query, prompt.title);
+                }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-[11px] font-semibold font-sans transition-all cursor-pointer ${
+                  isSelected
+                    ? "bg-[#5c4df2] text-white border-[#5c4df2] shadow-md shadow-[#5c4df2]/30 scale-[1.02]"
+                    : `${prompt.color} bg-slate-950 border-slate-800/80`
+                }`}
+              >
+                <IconComponent className="w-3.5 h-3.5" />
+                <span>{prompt.title}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Primary Conversation Screen */}
-      <div className="lg:col-span-8 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-indigo-500/20 shadow-xl flex flex-col h-full overflow-hidden">
-        {/* Messages Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 font-sans">
-          {messages.map((m) => (
-            <div
-              key={m.id}
-              className={`flex gap-3 max-w-[85%] ${
-                m.sender === "user" ? "ml-auto flex-row-reverse" : ""
-              }`}
-            >
-              {/* Profile Icon */}
-              <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 font-mono text-[10px] font-bold ${
-                  m.sender === "user"
-                    ? "bg-amber-500 text-slate-950"
-                    : "bg-indigo-600 text-white"
-                }`}
+      {/* CENTERED USER INPUT CONTAINER */}
+      <div className="space-y-4">
+        <form
+          onSubmit={handleCustomSubmit}
+          className="p-5 border border-indigo-500/10 rounded-2xl bg-slate-950/40 backdrop-blur-md shadow-2xl space-y-3"
+        >
+          <div className="relative rounded-xl border border-slate-800 bg-slate-900/40 focus-within:border-indigo-500/50 focus-within:ring-1 focus-within:ring-indigo-500/30 transition-all overflow-hidden">
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleCustomSubmit(e);
+                }
+              }}
+              rows={4}
+              placeholder="Ask our Master AI Astrologer any custom question (e.g. 'What does my 7th house signify?', 'Tell me about my Venus placement', 'Will my carrier be stable?')..."
+              disabled={analysisLoading}
+              className="w-full bg-transparent border-none outline-none p-4 pr-16 text-xs leading-relaxed text-slate-100 placeholder-slate-400 resize-none min-h-[100px]"
+            />
+            
+            <div className="absolute right-3 bottom-3 flex items-center gap-2">
+              {input.trim() && (
+                <button
+                  type="button"
+                  onClick={() => setInput("")}
+                  className="px-2.5 py-1.5 text-slate-500 hover:text-slate-300 text-[10px] font-bold uppercase transition-all cursor-pointer"
+                >
+                  Clear
+                </button>
+              )}
+              <button
+                type="submit"
+                disabled={analysisLoading || !input.trim()}
+                className="p-3 bg-[#5c4df2] hover:bg-[#4b3de0] disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-xl transition-all shadow-lg shadow-[#5c4df2]/10 cursor-pointer"
               >
-                {m.sender === "user" ? "ME" : "ॐ"}
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex justify-between items-center px-1 text-[10px] text-slate-500">
+            <div className="flex items-center gap-2 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800/80">
+              <span className="font-semibold text-slate-400">Evaluation Target Age:</span>
+              <input
+                type="number"
+                value={targetAge}
+                onChange={(e) => setTargetAge(Math.max(1, parseInt(e.target.value) || 28))}
+                className="w-12 px-1.5 py-0.5 rounded border border-slate-700 bg-slate-950 text-white font-bold text-center text-[10px]"
+              />
+            </div>
+            <span>Press <kbd className="bg-slate-800 px-1 py-0.5 rounded text-slate-400 font-mono text-[9px]">Enter</kbd> to submit query.</span>
+          </div>
+        </form>
+      </div>
+
+      {/* DEDICATED RESULTS ANALYSIS CARD */}
+      <div ref={analysisRef} className="pt-2 scroll-mt-6">
+        {analysisLoading && (
+          <div className="p-10 border border-indigo-500/10 rounded-2xl bg-slate-950/40 backdrop-blur-md flex flex-col items-center justify-center gap-4 text-center">
+            <RefreshCw className="w-8 h-8 text-[#5c4df2] animate-spin" />
+            <div className="space-y-1">
+              <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wide">
+                Computing {selectedPrompt} Analysis...
+              </h5>
+              <p className="text-[10px] text-slate-500 font-mono animate-pulse">
+                {currentStatusMsg}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {!analysisLoading && analysisResult && (
+          <div className="border border-amber-500/20 rounded-2xl bg-slate-900/60 backdrop-blur-md overflow-hidden shadow-2xl relative animate-fade-in">
+            {/* Top accent line */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-600 via-amber-500 to-[#5c4df2]" />
+            
+            <div className="p-5 space-y-4">
+              {/* Card Title Header */}
+              <div className="flex justify-between items-start gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5 text-[10px] text-amber-400 font-bold font-mono uppercase tracking-widest">
+                    <span>Targeted Celestial Report</span>
+                  </div>
+                  <h4 className="text-sm font-black text-slate-100 tracking-wide uppercase flex items-center gap-1.5">
+                    {selectedPrompt} Analysis
+                  </h4>
+                </div>
+                
+                {/* Close/Clear Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedPrompt(null);
+                    setAnalysisResult(null);
+                  }}
+                  className="px-2 py-1 text-[10px] font-bold font-mono uppercase rounded border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                >
+                  Close Report
+                </button>
               </div>
 
-              {/* Message Content Bubble */}
-              <div
-                className={`rounded-2xl p-4 text-xs leading-relaxed border ${
-                  m.sender === "user"
-                    ? "bg-amber-500/10 border-amber-500/20 text-slate-100"
-                    : "bg-slate-950/55 border-indigo-500/10 text-slate-200 markdown-content"
-                }`}
-              >
-                {/* Parse simple markdown headings / list items / bold tags */}
-                <div className="whitespace-pre-wrap">
-                  {m.text.split("\n").map((line, lineIdx) => {
-                    // Check if it is a heading
+              {/* Analysis Text Content */}
+              <div className="p-5 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs leading-relaxed text-slate-200 font-sans max-h-[500px] overflow-y-auto scrollbar-thin">
+                <div className="whitespace-pre-wrap space-y-2">
+                  {analysisResult.split("\n").map((line, lineIdx) => {
                     if (line.startsWith("### ")) {
-                      return <h5 key={lineIdx} className="text-xs font-bold text-amber-200 mt-3 mb-1">{line.replace("### ", "")}</h5>;
+                      return <h5 key={lineIdx} className="text-xs font-bold text-amber-200 mt-2.5 mb-1">{line.replace("### ", "")}</h5>;
                     }
                     if (line.startsWith("## ")) {
-                      return <h4 key={lineIdx} className="text-sm font-bold text-amber-300 mt-4 mb-2">{line.replace("## ", "")}</h4>;
+                      return <h4 key={lineIdx} className="text-sm font-bold text-amber-300 mt-3.5 mb-1.5">{line.replace("## ", "")}</h4>;
                     }
                     if (line.startsWith("# ")) {
-                      return <h3 key={lineIdx} className="text-base font-bold text-amber-400 mt-5 mb-2">{line.replace("# ", "")}</h3>;
+                      return <h3 key={lineIdx} className="text-base font-bold text-amber-400 mt-4.5 mb-2">{line.replace("# ", "")}</h3>;
                     }
-                    
-                    // Simple replacement of **bold** with <strong> tags
-                    const formattedLine = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+                    const bolded = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
                     return (
-                      <p 
-                        key={lineIdx} 
+                      <p
+                        key={lineIdx}
                         className="mb-1.5 last:mb-0"
-                        dangerouslySetInnerHTML={{ __html: formattedLine }}
+                        dangerouslySetInnerHTML={{ __html: bolded }}
                       />
                     );
                   })}
                 </div>
               </div>
-            </div>
-          ))}
 
-          {/* Loading Animation Bubble */}
-          {loading && (
-            <div className="flex gap-3 max-w-[85%]">
-              <div className="w-7 h-7 rounded-full flex items-center justify-center bg-indigo-600 text-white shrink-0 font-mono text-[10px] font-bold animate-pulse">
-                ॐ
-              </div>
-              <div className="rounded-2xl p-4 text-xs bg-slate-950/55 border border-indigo-500/10 text-slate-400 flex items-center gap-2">
-                <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                  <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+              {/* Toolbar Actions */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-800/40">
+                <p className="text-[10px] text-slate-500 font-mono">
+                  Report completed using active birth profile and target age of {targetAge}.
+                </p>
+
+                <div className="flex items-center gap-2">
+                  {/* Copy Button */}
+                  <button
+                    type="button"
+                    onClick={copyToClipboard}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border border-slate-800 bg-slate-900/60 text-slate-300 hover:bg-slate-800 hover:text-white transition-all cursor-pointer"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-emerald-400">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>Copy Report</span>
+                      </>
+                    )}
+                  </button>
+
+                  {/* Download Button */}
+                  <button
+                    type="button"
+                    onClick={downloadAnalysisText}
+                    className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg border border-[#5c4df2]/20 bg-[#5c4df2]/10 text-[#7c6ff6] hover:bg-[#5c4df2]/20 hover:text-white transition-all cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download (.txt)</span>
+                  </button>
                 </div>
-                <span className="font-mono text-[10px] text-slate-400 ml-2 animate-pulse">
-                  {currentStatusMsg}
-                </span>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          <div ref={chatEndRef} />
-        </div>
-
-        {/* Input Bar */}
-        <div className="p-4 border-t border-indigo-500/10 bg-slate-950/40 flex items-center gap-3">
-          <input
-            type="text"
-            placeholder={
-              astrologyData
-                ? "Ask JHora AI about your career, marriage, dasha cycles..."
-                : "Configure your birth chart details to initiate consulting..."
-            }
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
-            disabled={loading}
-            className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/50 disabled:opacity-50"
-            id="chat-input-field"
-          />
-          <button
-            onClick={() => handleSend()}
-            disabled={!input.trim() || loading}
-            className="bg-amber-500 hover:bg-amber-600 text-slate-950 p-3 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md"
-            id="btn-send-message"
-          >
-            <Send className="w-4 h-4 text-slate-950" />
-          </button>
-        </div>
+        {!analysisLoading && !analysisResult && (
+          <div className="p-8 border border-slate-800 border-dashed rounded-2xl bg-slate-950/20 text-center text-slate-500 text-xs">
+            Select an interactive celestial prompt or type a custom query above to calculate and render your high-fidelity celestial report.
+          </div>
+        )}
       </div>
     </div>
   );

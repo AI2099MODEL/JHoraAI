@@ -25,6 +25,15 @@ import {
   Grid
 } from "lucide-react";
 
+import {
+  LalKitabEvidenceAdapter,
+  LalKitabDecisionAdapter
+} from "../lib/rules/lalKitabRelationshipEngine";
+import {
+  TajikEvidenceAdapter,
+  TajikDecisionAdapter
+} from "../lib/rules/tajikRelationshipEngine";
+
 // --- Types & Interfaces ---
 
 interface PlanetPosition {
@@ -144,6 +153,8 @@ export const MysticalSystemsView: React.FC<MysticalSystemsViewProps> = ({
   astrologyData
 }) => {
   const [activeTab, setActiveTab] = useState<string>("nadi");
+  const [lkSubTab, setLkSubTab] = useState<"teva" | "relationship">("relationship");
+  const [tajikSubTab, setTajikSubTab] = useState<"relationship" | "solarReturn">("relationship");
   
   // Dynamic Year/Age inputs for Tajik Varshaphala
   const [targetAge, setTargetAge] = useState<number>(30);
@@ -437,170 +448,441 @@ export const MysticalSystemsView: React.FC<MysticalSystemsViewProps> = ({
       return generalRemedies[(planetName.charCodeAt(0) + houseNum) % generalRemedies.length];
     };
 
+    // Calculate Lal Kitab Relationship Rules using the Adapter & Engine
+    const lkEvidence = LalKitabEvidenceAdapter(resolvedData.planets);
+    const lkDecision = LalKitabDecisionAdapter(resolvedData.planets, resolvedData.lagna, targetAge);
+
     return (
       <div className="space-y-6">
-        <div>
-          <h3 className="text-xl font-semibold flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-red-500" />
-            Lal Kitab Teva & Upay Remedies
-          </h3>
-          <p className={`text-sm ${textMuted} mt-1`}>
-            Traditional Urdu-Persian astrological systems using a fixed Aries Ascendant house map.
-          </p>
-        </div>
-
-        {/* Lal Kitab Teva Graphic */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className={`p-4 border rounded-lg ${cardStyle} flex flex-col justify-center items-center`}>
-            <span className="text-xs font-mono font-bold text-red-500 mb-3">LAL KITAB TEVA (FIXED HOUSE CHART)</span>
-            
-            {/* North Indian style chart container */}
-            <div className="relative w-72 h-72 border-2 border-red-500/40 bg-red-500/5 rotate-45 rounded">
-              {/* Diagonals */}
-              <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-red-500/20"></div>
-              <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-red-500/20"></div>
-              
-              {/* Inner Diamond */}
-              <div className="absolute inset-12 border border-red-500/20 bg-red-500/5 rotate-45"></div>
-
-              {/* Houses Labels and Planets (needs to counter-rotate to keep text horizontal) */}
-              {/* House 1: Top Center */}
-              <div className="absolute -rotate-45 top-6 left-[124px] flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H1</span>
-                <span className="text-xs font-semibold">{lalkitabHouses[1].join(", ") || "—"}</span>
-              </div>
-              
-              {/* House 4: Left Center */}
-              <div className="absolute -rotate-45 left-6 top-[124px] flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H4</span>
-                <span className="text-xs font-semibold">{lalkitabHouses[4].join(", ") || "—"}</span>
-              </div>
-
-              {/* House 7: Bottom Center */}
-              <div className="absolute -rotate-45 bottom-6 left-[124px] flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H7</span>
-                <span className="text-xs font-semibold">{lalkitabHouses[7].join(", ") || "—"}</span>
-              </div>
-
-              {/* House 10: Right Center */}
-              <div className="absolute -rotate-45 right-6 top-[124px] flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H10</span>
-                <span className="text-xs font-semibold">{lalkitabHouses[10].join(", ") || "—"}</span>
-              </div>
-
-              {/* House 2: Upper Left */}
-              <div className="absolute -rotate-45 left-14 top-14 flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H2</span>
-                <span className="text-[11px]">{lalkitabHouses[2].join(", ") || "—"}</span>
-              </div>
-
-              {/* House 3: Lower Left */}
-              <div className="absolute -rotate-45 left-14 bottom-14 flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H3</span>
-                <span className="text-[11px]">{lalkitabHouses[3].join(", ") || "—"}</span>
-              </div>
-
-              {/* House 5: Lower Right */}
-              <div className="absolute -rotate-45 right-14 bottom-14 flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H5</span>
-                <span className="text-[11px]">{lalkitabHouses[5].join(", ") || "—"}</span>
-              </div>
-
-              {/* House 6: Lower Center Edge */}
-              <div className="absolute -rotate-45 bottom-[68px] left-[124px] flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H6</span>
-                <span className="text-[11px]">{lalkitabHouses[6].join(", ") || "—"}</span>
-              </div>
-
-              {/* House 8: Lower Right Corner */}
-              <div className="absolute -rotate-45 right-[68px] bottom-[68px] flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H8</span>
-                <span className="text-[11px]">{lalkitabHouses[8].join(", ") || "—"}</span>
-              </div>
-
-              {/* House 9: Upper Right */}
-              <div className="absolute -rotate-45 right-14 top-14 flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H9</span>
-                <span className="text-[11px]">{lalkitabHouses[9].join(", ") || "—"}</span>
-              </div>
-
-              {/* House 11: Upper Right Inner */}
-              <div className="absolute -rotate-45 right-[68px] top-[68px] flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H11</span>
-                <span className="text-[11px]">{lalkitabHouses[11].join(", ") || "—"}</span>
-              </div>
-
-              {/* House 12: Upper Left Inner */}
-              <div className="absolute -rotate-45 left-[68px] top-[68px] flex flex-col items-center">
-                <span className="text-[10px] font-bold text-red-500">H12</span>
-                <span className="text-[11px]">{lalkitabHouses[12].join(", ") || "—"}</span>
-              </div>
-            </div>
-
-            <div className={`mt-4 text-xs ${textMuted} text-center max-w-sm leading-relaxed`}>
-              Unlike traditional rasi charts, Lal Kitab places Aries (1) in the 1st House regardless of actual natal ascendant.
-            </div>
+        {/* Header and Inner Sub-tabs */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-500/10 pb-4">
+          <div>
+            <h3 className="text-xl font-semibold flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-red-500" />
+              Lal Kitab Astrological Systems
+            </h3>
+            <p className={`text-sm ${textMuted} mt-1`}>
+              Fixed Aries Ascendant house mappings and authentic Urdu-Persian relationship engine.
+            </p>
           </div>
 
-          {/* Satus & Masnuoi (Artificial) Planets */}
-          <div className="space-y-4">
-            <div className={`p-4 border rounded-lg ${cardStyle}`}>
-              <h4 className="text-sm font-semibold text-red-500 mb-2">Artificial Planets (Masnuoi Grah)</h4>
-              <p className={`text-xs ${textMuted} mb-3`}>
-                Lal Kitab combines pairs of planets to form another virtual celestial entity:
-              </p>
-              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                <div className="p-2 bg-slate-500/5 rounded">Mercury + Venus = <strong className="text-amber-500">Sun</strong></div>
-                <div className="p-2 bg-slate-500/5 rounded">Sun + Jupiter = <strong className="text-amber-500">Moon</strong></div>
-                <div className="p-2 bg-slate-500/5 rounded">Sun + Mercury = <strong className="text-amber-500">Mars</strong></div>
-                <div className="p-2 bg-slate-500/5 rounded">Saturn + Venus = <strong className="text-amber-500">Rahu</strong></div>
+          <div className="flex items-center gap-1.5 bg-slate-500/5 p-1 rounded-lg border border-slate-500/10 self-start md:self-auto">
+            <button
+              onClick={() => setLkSubTab("relationship")}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                lkSubTab === "relationship"
+                  ? "bg-red-500 text-white shadow-sm"
+                  : `hover:${isDark ? "bg-slate-800" : "bg-slate-100"} ${textMuted}`
+              }`}
+            >
+              Relationship Engine
+            </button>
+            <button
+              onClick={() => setLkSubTab("teva")}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                lkSubTab === "teva"
+                  ? "bg-red-500 text-white shadow-sm"
+                  : `hover:${isDark ? "bg-slate-800" : "bg-slate-100"} ${textMuted}`
+              }`}
+            >
+              Teva & General Upays
+            </button>
+          </div>
+        </div>
+
+        {lkSubTab === "teva" ? (
+          /* ==================== SUB-TAB 1: ORIGINAL TEVA VIEW ==================== */
+          <div className="space-y-6">
+            {/* Lal Kitab Teva Graphic */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className={`p-4 border rounded-lg ${cardStyle} flex flex-col justify-center items-center`}>
+                <span className="text-xs font-mono font-bold text-red-500 mb-3">LAL KITAB TEVA (FIXED HOUSE CHART)</span>
+                
+                {/* North Indian style chart container */}
+                <div className="relative w-72 h-72 border-2 border-red-500/40 bg-red-500/5 rotate-45 rounded">
+                  {/* Diagonals */}
+                  <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-red-500/20"></div>
+                  <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-red-500/20"></div>
+                  
+                  {/* Inner Diamond */}
+                  <div className="absolute inset-12 border border-red-500/20 bg-red-500/5 rotate-45"></div>
+
+                  {/* Houses Labels and Planets (needs to counter-rotate to keep text horizontal) */}
+                  {/* House 1: Top Center */}
+                  <div className="absolute -rotate-45 top-6 left-[124px] flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H1</span>
+                    <span className="text-xs font-semibold">{lalkitabHouses[1].join(", ") || "—"}</span>
+                  </div>
+                  
+                  {/* House 4: Left Center */}
+                  <div className="absolute -rotate-45 left-6 top-[124px] flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H4</span>
+                    <span className="text-xs font-semibold">{lalkitabHouses[4].join(", ") || "—"}</span>
+                  </div>
+
+                  {/* House 7: Bottom Center */}
+                  <div className="absolute -rotate-45 bottom-6 left-[124px] flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H7</span>
+                    <span className="text-xs font-semibold">{lalkitabHouses[7].join(", ") || "—"}</span>
+                  </div>
+
+                  {/* House 10: Right Center */}
+                  <div className="absolute -rotate-45 right-6 top-[124px] flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H10</span>
+                    <span className="text-xs font-semibold">{lalkitabHouses[10].join(", ") || "—"}</span>
+                  </div>
+
+                  {/* House 2: Upper Left */}
+                  <div className="absolute -rotate-45 left-14 top-14 flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H2</span>
+                    <span className="text-[11px]">{lalkitabHouses[2].join(", ") || "—"}</span>
+                  </div>
+
+                  {/* House 3: Lower Left */}
+                  <div className="absolute -rotate-45 left-14 bottom-14 flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H3</span>
+                    <span className="text-[11px]">{lalkitabHouses[3].join(", ") || "—"}</span>
+                  </div>
+
+                  {/* House 5: Lower Right */}
+                  <div className="absolute -rotate-45 right-14 bottom-14 flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H5</span>
+                    <span className="text-[11px]">{lalkitabHouses[5].join(", ") || "—"}</span>
+                  </div>
+
+                  {/* House 6: Lower Center Edge */}
+                  <div className="absolute -rotate-45 bottom-[68px] left-[124px] flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H6</span>
+                    <span className="text-[11px]">{lalkitabHouses[6].join(", ") || "—"}</span>
+                  </div>
+
+                  {/* House 8: Lower Right Corner */}
+                  <div className="absolute -rotate-45 right-[68px] bottom-[68px] flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H8</span>
+                    <span className="text-[11px]">{lalkitabHouses[8].join(", ") || "—"}</span>
+                  </div>
+
+                  {/* House 9: Upper Right */}
+                  <div className="absolute -rotate-45 right-14 top-14 flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H9</span>
+                    <span className="text-[11px]">{lalkitabHouses[9].join(", ") || "—"}</span>
+                  </div>
+
+                  {/* House 11: Upper Right Inner */}
+                  <div className="absolute -rotate-45 right-[68px] top-[68px] flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H11</span>
+                    <span className="text-[11px]">{lalkitabHouses[11].join(", ") || "—"}</span>
+                  </div>
+
+                  {/* House 12: Upper Left Inner */}
+                  <div className="absolute -rotate-45 left-[68px] top-[68px] flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-red-500">H12</span>
+                    <span className="text-[11px]">{lalkitabHouses[12].join(", ") || "—"}</span>
+                  </div>
+                </div>
+
+                <div className={`mt-4 text-xs ${textMuted} text-center max-w-sm leading-relaxed`}>
+                  Unlike traditional rasi charts, Lal Kitab places Aries (1) in the 1st House regardless of actual natal ascendant.
+                </div>
+              </div>
+
+              {/* Satus & Masnuoi (Artificial) Planets */}
+              <div className="space-y-4">
+                <div className={`p-4 border rounded-lg ${cardStyle}`}>
+                  <h4 className="text-sm font-semibold text-red-500 mb-2">Artificial Planets (Masnuoi Grah)</h4>
+                  <p className={`text-xs ${textMuted} mb-3`}>
+                    Lal Kitab combines pairs of planets to form another virtual celestial entity:
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div className="p-2 bg-slate-500/5 rounded">Mercury + Venus = <strong className="text-amber-500">Sun</strong></div>
+                    <div className="p-2 bg-slate-500/5 rounded">Sun + Jupiter = <strong className="text-amber-500">Moon</strong></div>
+                    <div className="p-2 bg-slate-500/5 rounded">Sun + Mercury = <strong className="text-amber-500">Mars</strong></div>
+                    <div className="p-2 bg-slate-500/5 rounded">Saturn + Venus = <strong className="text-amber-500">Rahu</strong></div>
+                  </div>
+                </div>
+
+                <div className={`p-4 border rounded-lg ${cardStyle}`}>
+                  <h4 className="text-sm font-semibold text-red-500 mb-2">Dormant Planets (Soye Grah)</h4>
+                  <div className="space-y-1.5 text-xs">
+                    {resolvedData.planets.slice(0, 5).map((p) => {
+                      const lkHouse = p.signIndex + 1;
+                      const status = getDormantStatus(p.name, lkHouse);
+                      return (
+                        <div key={p.name} className="flex justify-between items-center py-1 border-b border-dashed border-slate-500/10">
+                          <span>{p.name} (House {lkHouse})</span>
+                          <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${status.includes("Asleep") ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"}`}>
+                            {status}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className={`p-4 border rounded-lg ${cardStyle}`}>
-              <h4 className="text-sm font-semibold text-red-500 mb-2">Dormant Planets (Soye Grah)</h4>
-              <div className="space-y-1.5 text-xs">
-                {resolvedData.planets.slice(0, 5).map((p) => {
-                  const lkHouse = p.signIndex + 1;
-                  const status = getDormantStatus(p.name, lkHouse);
+            {/* Upay Remedies List */}
+            <div>
+              <h4 className="text-sm font-semibold mb-3 flex items-center gap-1">
+                <Award className="w-4 h-4 text-red-500" />
+                Tailored Lal Kitab Upays (Remedies)
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {resolvedData.planets.slice(0, 6).map((planet) => {
+                  const lkHouse = planet.signIndex + 1;
+                  const remedy = getRemedy(planet.name, lkHouse);
                   return (
-                    <div key={p.name} className="flex justify-between items-center py-1 border-b border-dashed border-slate-500/10">
-                      <span>{p.name} (House {lkHouse})</span>
-                      <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${status.includes("Asleep") ? "bg-red-500/10 text-red-600 dark:text-red-400" : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"}`}>
-                        {status}
-                      </span>
+                    <div key={planet.name} className={`p-4 border rounded-lg ${cardStyle}`}>
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-bold text-xs">{planet.name} in House {lkHouse}</span>
+                        <span className="text-[10px] px-2 py-0.5 bg-red-500/10 text-red-500 rounded uppercase font-bold">UPAY</span>
+                      </div>
+                      <p className="text-xs leading-relaxed text-slate-800 dark:text-slate-200">
+                        {remedy}
+                      </p>
                     </div>
                   );
                 })}
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Upay Remedies List */}
-        <div>
-          <h4 className="text-sm font-semibold mb-3 flex items-center gap-1">
-            <Award className="w-4 h-4 text-red-500" />
-            Tailored Lal Kitab Upays (Remedies)
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {resolvedData.planets.slice(0, 6).map((planet) => {
-              const lkHouse = planet.signIndex + 1;
-              const remedy = getRemedy(planet.name, lkHouse);
-              return (
-                <div key={planet.name} className={`p-4 border rounded-lg ${cardStyle}`}>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold text-xs">{planet.name} in House {lkHouse}</span>
-                    <span className="text-[10px] px-2 py-0.5 bg-red-500/10 text-red-500 rounded uppercase font-bold">UPAY</span>
-                  </div>
-                  <p className="text-xs leading-relaxed text-slate-800 dark:text-slate-200">
-                    {remedy}
-                  </p>
+        ) : (
+          /* ==================== SUB-TAB 2: RELATIONSHIP ENGINE ==================== */
+          <div className="space-y-6">
+            {/* 1. Core Metrics Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Promise Score */}
+              <div className={`p-4 border rounded-lg ${cardStyle} flex flex-col justify-between`}>
+                <div>
+                  <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Marriage Promise Index</span>
+                  <h4 className="text-2xl font-bold font-mono mt-1 text-slate-900 dark:text-white">
+                    {lkDecision.overallPromiseScore}%
+                  </h4>
                 </div>
-              );
-            })}
+                <div className="mt-3">
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                    <div
+                      className={`h-full transition-all ${
+                        lkDecision.overallPromiseScore >= 70
+                          ? "bg-emerald-500"
+                          : lkDecision.overallPromiseScore >= 45
+                          ? "bg-amber-500"
+                          : "bg-red-500"
+                      }`}
+                      style={{ width: `${lkDecision.overallPromiseScore}%` }}
+                    ></div>
+                  </div>
+                  <span className={`text-[10px] block mt-1.5 font-medium ${textMuted}`}>
+                    {lkDecision.overallPromiseScore >= 70
+                      ? "Firm marriage promise confirmed"
+                      : lkDecision.overallPromiseScore >= 45
+                      ? "Moderate promise; triggers on remedies"
+                      : "Severe afflictions; remedial path advised"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Happiness Index */}
+              <div className={`p-4 border rounded-lg ${cardStyle} flex flex-col justify-between`}>
+                <div>
+                  <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Marital Happiness Index</span>
+                  <h4 className="text-2xl font-bold font-mono mt-1 text-slate-900 dark:text-white">
+                    {lkDecision.overallHappinessScore}%
+                  </h4>
+                </div>
+                <div className="mt-3">
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                    <div
+                      className={`h-full transition-all ${
+                        lkDecision.overallHappinessScore >= 70
+                          ? "bg-emerald-500"
+                          : lkDecision.overallHappinessScore >= 45
+                          ? "bg-amber-500"
+                          : "bg-red-500"
+                      }`}
+                      style={{ width: `${lkDecision.overallHappinessScore}%` }}
+                    ></div>
+                  </div>
+                  <span className={`text-[10px] block mt-1.5 font-medium ${textMuted}`}>
+                    {lkDecision.overallHappinessScore >= 70
+                      ? "Harmonious domestic parameters"
+                      : lkDecision.overallHappinessScore >= 45
+                      ? "Mixed harmony; typical communication issues"
+                      : "High domestic friction spotted"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Delay Risk */}
+              <div className={`p-4 border rounded-lg ${cardStyle} flex flex-col justify-between`}>
+                <div>
+                  <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Marriage Delay Risk</span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <h4 className="text-2xl font-bold font-mono text-slate-900 dark:text-white">
+                      {lkDecision.marriageDelayRisk}
+                    </h4>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                        lkDecision.marriageDelayRisk === "High"
+                          ? "bg-red-500/10 text-red-500"
+                          : lkDecision.marriageDelayRisk === "Medium"
+                          ? "bg-amber-500/10 text-amber-500"
+                          : "bg-emerald-500/10 text-emerald-500"
+                      }`}
+                    >
+                      {lkDecision.marriageDelayRisk === "High" ? "Critical Delay" : lkDecision.marriageDelayRisk === "Medium" ? "Moderate Delay" : "No Delay"}
+                    </span>
+                  </div>
+                </div>
+                <p className={`text-[10px] ${textMuted} leading-relaxed mt-3`}>
+                  Derived from Saturn, Rahu, and Ketu's placements across key relationship house nodes (2, 7, 8).
+                </p>
+              </div>
+            </div>
+
+            {/* 2. Final Verdict Text Callout */}
+            <div className="p-4 rounded-lg bg-red-500/5 border border-red-500/10 text-xs leading-relaxed">
+              <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider block mb-1">
+                Lal Kitab Relationship Verdict
+              </span>
+              <p className="text-slate-800 dark:text-slate-200">
+                {lkDecision.finalVerdictText}
+              </p>
+            </div>
+
+            {/* 3. Evidence Adapter Dossier */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Dormancy Dossier */}
+              <div className={`p-4 border rounded-lg ${cardStyle}`}>
+                <h4 className="text-sm font-semibold text-red-500 mb-2 flex items-center gap-1.5">
+                  <Activity className="w-4 h-4" />
+                  Key Marriage House Dormancy States (Evidence)
+                </h4>
+                <p className={`text-xs ${textMuted} mb-3`}>
+                  Lal Kitab houses can fall asleep (Soye Grah) if opposing triggers in opposite houses are missing.
+                </p>
+                <div className="space-y-2 text-xs">
+                  {lkEvidence.dormancyStates.map((ds) => (
+                    <div
+                      key={ds.house}
+                      className="flex justify-between items-center py-1.5 border-b border-dashed border-slate-500/10"
+                    >
+                      <span className="font-medium">House {ds.house} ({ds.house === 2 ? "Family Extension" : ds.house === 7 ? "Spouse/Marriage" : "Marital Longevity"})</span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono ${
+                          ds.isDormant
+                            ? "bg-red-500/10 text-red-500"
+                            : "bg-emerald-500/10 text-emerald-500"
+                        }`}
+                      >
+                        {ds.isDormant ? "ASLEEP (Dormant)" : "ACTIVE"}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Relationship Planets Dossier */}
+              <div className={`p-4 border rounded-lg ${cardStyle}`}>
+                <h4 className="text-sm font-semibold text-red-500 mb-2 flex items-center gap-1.5">
+                  <User className="w-4 h-4" />
+                  Relationship Significators (Lal Kitab Positions)
+                </h4>
+                <p className={`text-xs ${textMuted} mb-3`}>
+                  Fixed houses mapping of the primary relationship and nodal coordinates.
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                  {lkEvidence.planetsPositions
+                    .filter((p) => ["Venus", "Jupiter", "Moon", "Saturn", "Rahu", "Ketu"].includes(p.name))
+                    .map((p) => (
+                      <div key={p.name} className="p-2 bg-slate-500/5 rounded flex justify-between items-center">
+                        <span className="font-bold">{p.name}</span>
+                        <span className="text-red-500">House {p.lkHouse}</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 4. Decision Adapter Rulebook */}
+            <div>
+              <h4 className="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4 text-red-500" />
+                Lal Kitab Rulebook & Decision Matrix (17 Modules)
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {lkDecision.ruleEvaluations.map((evalItem) => {
+                  const r = evalItem.result;
+                  return (
+                    <div
+                      key={evalItem.ruleId}
+                      className={`p-4 border rounded-lg ${cardStyle} flex flex-col justify-between`}
+                    >
+                      <div>
+                        {/* Header */}
+                        <div className="flex justify-between items-start gap-2 mb-2">
+                          <div>
+                            <span className="text-[9px] font-mono font-bold text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded uppercase">
+                              {evalItem.module}
+                            </span>
+                            <h5 className="font-bold text-xs mt-1 text-slate-900 dark:text-white">
+                              {evalItem.ruleName}
+                            </h5>
+                          </div>
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase font-mono ${
+                              r.status === "PASS"
+                                ? "bg-emerald-500/10 text-emerald-500"
+                                : r.status === "FAIL"
+                                ? "bg-red-500/10 text-red-500"
+                                : "bg-slate-500/10 text-slate-500"
+                            }`}
+                          >
+                            {r.status}
+                          </span>
+                        </div>
+
+                        {/* Evidences */}
+                        {r.supportingEvidence.length > 0 && (
+                          <div className="mt-2">
+                            <span className="text-[9px] font-bold text-emerald-500 block">Supporting Evidence</span>
+                            <ul className="list-disc pl-4 text-[10px] text-slate-600 dark:text-slate-400 space-y-1 mt-1">
+                              {r.supportingEvidence.map((se, i) => (
+                                <li key={i}>{se}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {r.contradictingEvidence.length > 0 && (
+                          <div className="mt-2">
+                            <span className="text-[9px] font-bold text-red-500 block">Contradicting Evidence</span>
+                            <ul className="list-disc pl-4 text-[10px] text-slate-600 dark:text-slate-400 space-y-1 mt-1">
+                              {r.contradictingEvidence.map((ce, i) => (
+                                <li key={i}>{ce}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Remedy (Upay) */}
+                      <div className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded">
+                        <span className="text-[9px] font-bold text-amber-500 flex items-center gap-1 mb-1">
+                          <Sparkles className="w-2.5 h-2.5" />
+                          LAL KITAB UPAY (REMEDY)
+                        </span>
+                        <p className="text-[10px] italic leading-normal text-slate-700 dark:text-slate-300">
+                          {r.suggestedRemedy}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     );
   };
@@ -629,9 +911,13 @@ export const MysticalSystemsView: React.FC<MysticalSystemsViewProps> = ({
       munthaPrediction = `Caution period. Muntha in House ${munthaHouse} is traditionally challenging. It indicates mental exhaustion, legal disputes, expenditure spikes, and demands structured disciplined living.`;
     }
 
+    const tjEvidence = TajikEvidenceAdapter(resolvedData.planets, resolvedData.lagna, targetAge, nativeInputs);
+    const tjDecision = TajikDecisionAdapter(resolvedData.planets, resolvedData.lagna, targetAge, nativeInputs);
+
     return (
       <div className="space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Header and Inner Sub-tabs */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-500/10 pb-4">
           <div>
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-indigo-500" />
@@ -642,90 +928,352 @@ export const MysticalSystemsView: React.FC<MysticalSystemsViewProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-slate-500/5 p-1 rounded border border-slate-500/10">
-            <label className="text-xs font-bold pl-2">Target Age:</label>
-            <input
-              type="number"
-              value={targetAge}
-              onChange={(e) => setTargetAge(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-16 px-2 py-1 bg-white dark:bg-slate-900 border border-slate-500/20 text-xs rounded font-mono"
-            />
+          <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+            <div className="flex items-center gap-1.5 bg-slate-500/5 p-1 rounded-lg border border-slate-500/10">
+              <button
+                onClick={() => setTajikSubTab("relationship")}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                  tajikSubTab === "relationship"
+                    ? "bg-indigo-500 text-white shadow-sm"
+                    : `hover:${isDark ? "bg-slate-800" : "bg-slate-100"} ${textMuted}`
+                }`}
+              >
+                Relationship Engine
+              </button>
+              <button
+                onClick={() => setTajikSubTab("solarReturn")}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
+                  tajikSubTab === "solarReturn"
+                    ? "bg-indigo-500 text-white shadow-sm"
+                    : `hover:${isDark ? "bg-slate-800" : "bg-slate-100"} ${textMuted}`
+                }`}
+              >
+                Solar Return Chart & Yogas
+              </button>
+            </div>
+
+            <div className="flex items-center gap-2 bg-slate-500/5 px-2 py-1.5 rounded border border-slate-500/10">
+              <label className="text-xs font-bold pl-1">Target Age:</label>
+              <input
+                type="number"
+                value={targetAge}
+                onChange={(e) => setTargetAge(Math.max(1, parseInt(e.target.value) || 1))}
+                className="w-14 px-1.5 py-0.5 bg-white dark:bg-slate-900 border border-slate-500/20 text-xs rounded font-mono text-center"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Muntha Card */}
-        <div className={`p-5 border rounded-lg ${cardStyle} grid grid-cols-1 md:grid-cols-3 gap-6`}>
-          <div className="flex flex-col justify-center items-center text-center p-4 bg-indigo-500/5 rounded-lg border border-indigo-500/10">
-            <span className="text-xs uppercase tracking-widest text-indigo-500 font-bold">The Muntha Point</span>
-            <span className="text-2xl font-bold font-mono mt-2 text-indigo-600 dark:text-indigo-400">{munthaSign}</span>
-            <span className="text-sm font-semibold mt-1">Varsha House {munthaHouse}</span>
-            <span className={`text-[10px] mt-1 font-mono ${textMuted}`}>Progressed sign coordinate</span>
+        {tajikSubTab === "solarReturn" ? (
+          /* ==================== SUB-TAB: SOLAR RETURN DETAILS ==================== */
+          <div className="space-y-6 animate-fadeIn">
+            {/* Muntha Card */}
+            <div className={`p-5 border rounded-lg ${cardStyle} grid grid-cols-1 md:grid-cols-3 gap-6`}>
+              <div className="flex flex-col justify-center items-center text-center p-4 bg-indigo-500/5 rounded-lg border border-indigo-500/10">
+                <span className="text-xs uppercase tracking-widest text-indigo-500 font-bold">The Muntha Point</span>
+                <span className="text-2xl font-bold font-mono mt-2 text-indigo-600 dark:text-indigo-400">{munthaSign}</span>
+                <span className="text-sm font-semibold mt-1">Varsha House {munthaHouse}</span>
+                <span className={`text-[10px] mt-1 font-mono ${textMuted}`}>Progressed sign coordinate</span>
+              </div>
+              <div className="md:col-span-2 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold mb-1">Yearly Progression Focus</h4>
+                  <p className={`text-xs ${textMuted} leading-relaxed`}>
+                    At birth, the Muntha resides in the 1st house (Ascendant) and progresses exactly one sign forward every year of age. Its current coordinates map to your Varsha House {munthaHouse}.
+                  </p>
+                </div>
+                <div className="mt-4 p-3 bg-indigo-500/5 border border-indigo-500/10 rounded text-xs leading-relaxed text-indigo-900 dark:text-indigo-200">
+                  <strong>Tajik Interpretation:</strong> {munthaPrediction}
+                </div>
+              </div>
+            </div>
+
+            {/* Harsha Bala & Tajik Aspects */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Harsha Bala */}
+              <div className={`p-4 border rounded-lg ${cardStyle}`}>
+                <h4 className="text-sm font-semibold text-indigo-500 mb-2">Harsha Bala (Planetary Delights)</h4>
+                <p className={`text-xs ${textMuted} mb-3`}>
+                  Calculates planetary delight-points (0 to 4) based on gender of signs, house position, and day/night birth.
+                </p>
+                <div className="space-y-2">
+                  {resolvedData.planets.slice(0, 5).map((p, idx) => {
+                    const score = ((p.signIndex + p.house + idx) % 4) + 1; // Authentic simulated scorecard
+                    return (
+                      <div key={p.name} className="flex justify-between items-center text-xs">
+                        <span>{p.name} Delight</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                            <div className="bg-indigo-500 h-full" style={{ width: `${(score / 4) * 100}%` }}></div>
+                          </div>
+                          <span className="font-mono font-bold">{score} / 4 pts</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Tajik Yogas */}
+              <div className={`p-4 border rounded-lg ${cardStyle}`}>
+                <h4 className="text-sm font-semibold text-indigo-500 mb-2">Tajik Aspects & Yogas</h4>
+                <p className={`text-xs ${textMuted} mb-2`}>
+                  Aspects evaluate applying (Ithasala) and separating (Easarpha) alignments:
+                </p>
+                <div className="space-y-1.5 text-xs font-mono">
+                  <div className="flex justify-between border-b border-slate-500/10 py-1">
+                    <span>Sun Ithasala Jupiter</span>
+                    <span className="text-emerald-500">Active (Applying)</span>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-500/10 py-1">
+                    <span>Moon Easarpha Mars</span>
+                    <span className="text-slate-400">Separating Aspect</span>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-500/10 py-1">
+                    <span>Venus Kamboola Moon</span>
+                    <span className="text-indigo-500 font-bold">Highly Auspicious</span>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-500/10 py-1">
+                    <span>Saturn Kuttha Mercury</span>
+                    <span className="text-amber-500">Inimical Yoga</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="md:col-span-2 flex flex-col justify-between">
-            <div>
-              <h4 className="text-sm font-semibold mb-1">Yearly Progression Focus</h4>
-              <p className={`text-xs ${textMuted} leading-relaxed`}>
-                At birth, the Muntha resides in the 1st house (Ascendant) and progresses exactly one sign forward every year of age. Its current coordinates map to your Varsha House {munthaHouse}.
+        ) : (
+          /* ==================== SUB-TAB: RELATIONSHIP ENGINE ==================== */
+          <div className="space-y-6 animate-fadeIn">
+            {/* 1. Core Metrics Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Marriage Potential Score */}
+              <div className={`p-4 border rounded-lg ${cardStyle} flex flex-col justify-between`}>
+                <div>
+                  <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">Annual Marriage Potential</span>
+                  <h4 className="text-2xl font-bold font-mono mt-1 text-slate-900 dark:text-white">
+                    {tjDecision.marriagePotentialScore}%
+                  </h4>
+                </div>
+                <div className="mt-3">
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                    <div
+                      className={`h-full transition-all ${
+                        tjDecision.marriagePotentialScore >= 70
+                          ? "bg-emerald-500"
+                          : tjDecision.marriagePotentialScore >= 45
+                          ? "bg-amber-500"
+                          : "bg-red-500"
+                      }`}
+                      style={{ width: `${tjDecision.marriagePotentialScore}%` }}
+                    ></div>
+                  </div>
+                  <span className={`text-[10px] block mt-1.5 font-medium ${textMuted}`}>
+                    {tjDecision.marriagePotentialScore >= 70
+                      ? "Highly propitious potential for union"
+                      : tjDecision.marriagePotentialScore >= 45
+                      ? "Moderate potential; supportive transit needed"
+                      : "Dormant potential; high hurdles indicated"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Timing Strength Score */}
+              <div className={`p-4 border rounded-lg ${cardStyle} flex flex-col justify-between`}>
+                <div>
+                  <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">Timing Strength Index</span>
+                  <h4 className="text-2xl font-bold font-mono mt-1 text-slate-900 dark:text-white">
+                    {tjDecision.timingStrengthScore}%
+                  </h4>
+                </div>
+                <div className="mt-3">
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                    <div
+                      className={`h-full transition-all ${
+                        tjDecision.timingStrengthScore >= 70
+                          ? "bg-emerald-500"
+                          : tjDecision.timingStrengthScore >= 45
+                          ? "bg-amber-500"
+                          : "bg-red-500"
+                      }`}
+                      style={{ width: `${tjDecision.timingStrengthScore}%` }}
+                    ></div>
+                  </div>
+                  <span className={`text-[10px] block mt-1.5 font-medium ${textMuted}`}>
+                    {tjDecision.timingStrengthScore >= 70
+                      ? "Applying Ithasala active; perfect timing"
+                      : tjDecision.timingStrengthScore >= 45
+                      ? "Dormant or neutral timeline"
+                      : "Eesarpha/Separating aspects; delayed window"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Conflict Risk */}
+              <div className={`p-4 border rounded-lg ${cardStyle} flex flex-col justify-between`}>
+                <div>
+                  <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider">Tajik Conflict Risk</span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <h4 className="text-2xl font-bold font-mono text-slate-900 dark:text-white">
+                      {tjDecision.conflictRisk}
+                    </h4>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                        tjDecision.conflictRisk === "High"
+                          ? "bg-red-500/10 text-red-500"
+                          : tjDecision.conflictRisk === "Medium"
+                          ? "bg-amber-500/10 text-amber-500"
+                          : "bg-emerald-500/10 text-emerald-500"
+                      }`}
+                    >
+                      {tjDecision.conflictRisk === "High" ? "High Friction" : tjDecision.conflictRisk === "Medium" ? "Moderate Friction" : "Harmonious Axis"}
+                    </span>
+                  </div>
+                </div>
+                <p className={`text-[10px] ${textMuted} leading-relaxed mt-3`}>
+                  Derived from squares, oppositions, or Manahoo interceptions of heavy transiting bodies.
+                </p>
+              </div>
+            </div>
+
+            {/* 2. Final Verdict Callout */}
+            <div className="p-4 rounded-lg bg-indigo-500/5 border border-indigo-500/10 text-xs leading-relaxed">
+              <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider block mb-1">
+                Tajik Relationship Synthesis Verdict
+              </span>
+              <p className="text-slate-800 dark:text-slate-200 font-medium">
+                {tjDecision.verdictText}
               </p>
             </div>
-            <div className="mt-4 p-3 bg-indigo-500/5 border border-indigo-500/10 rounded text-xs leading-relaxed text-indigo-900 dark:text-indigo-200">
-              <strong>Tajik Interpretation:</strong> {munthaPrediction}
-            </div>
-          </div>
-        </div>
 
-        {/* Harsha Bala & Tajik Aspects */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Harsha Bala */}
-          <div className={`p-4 border rounded-lg ${cardStyle}`}>
-            <h4 className="text-sm font-semibold text-indigo-500 mb-2">Harsha Bala (Planetary Delights)</h4>
-            <p className={`text-xs ${textMuted} mb-3`}>
-              Calculates planetary delight-points (0 to 4) based on gender of signs, house position, and day/night birth.
-            </p>
-            <div className="space-y-2">
-              {resolvedData.planets.slice(0, 5).map((p, idx) => {
-                const score = ((p.signIndex + p.house + idx) % 4) + 1; // Authentic simulated scorecard
-                return (
-                  <div key={p.name} className="flex justify-between items-center text-xs">
-                    <span>{p.name} Delight</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
-                        <div className="bg-indigo-500 h-full" style={{ width: `${(score / 4) * 100}%` }}></div>
-                      </div>
-                      <span className="font-mono font-bold">{score} / 4 pts</span>
-                    </div>
+            {/* 3. Evidence Adapter Dossier */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Varshaphala Elements Dossier */}
+              <div className={`p-4 border rounded-lg ${cardStyle}`}>
+                <h4 className="text-sm font-semibold text-indigo-500 mb-2 flex items-center gap-1.5">
+                  <Activity className="w-4 h-4" />
+                  Solar Return (Varshaphala) Coordinates
+                </h4>
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between py-1 border-b border-slate-500/5">
+                    <span>Varsha Lagna Sign / Lord</span>
+                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">{tjEvidence.varshaLagnaSign} ({tjEvidence.varshaLagnaLord})</span>
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                  <div className="flex justify-between py-1 border-b border-slate-500/5">
+                    <span>Muntha progressed Sign / House</span>
+                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">{tjEvidence.munthaSign} (House {tjEvidence.munthaHouse})</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-500/5">
+                    <span>Muntha Lord</span>
+                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">{tjEvidence.munthaLord}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-500/5">
+                    <span>Vivaha Saham Sign / House</span>
+                    <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">{tjEvidence.vivahaSahamSign} (House {tjEvidence.vivahaSahamHouse})</span>
+                  </div>
+                </div>
+              </div>
 
-          {/* Tajik Yogas */}
-          <div className={`p-4 border rounded-lg ${cardStyle}`}>
-            <h4 className="text-sm font-semibold text-indigo-500 mb-2">Tajik Aspects & Yogas</h4>
-            <p className={`text-xs ${textMuted} mb-2`}>
-              Aspects evaluate applying (Ithasala) and separating (Easarpha) alignments:
-            </p>
-            <div className="space-y-1.5 text-xs font-mono">
-              <div className="flex justify-between border-b border-slate-500/10 py-1">
-                <span>Sun Ithasala Jupiter</span>
-                <span className="text-emerald-500">Active (Applying)</span>
+              {/* Tajik Planetary Aspects & Yogas Dossier */}
+              <div className={`p-4 border rounded-lg ${cardStyle}`}>
+                <h4 className="text-sm font-semibold text-indigo-500 mb-2 flex items-center gap-1.5">
+                  <User className="w-4 h-4" />
+                  Lagna & 7th Lord Relationship Core
+                </h4>
+                <p className={`text-xs ${textMuted} mb-3`}>
+                  Tajika aspects evaluate whether energy flow is applying (Ithasala) or separating (Eesarpha).
+                </p>
+                <div className="space-y-2 text-xs font-mono">
+                  <div className="flex justify-between py-1 border-b border-slate-500/5">
+                    <span>Lord 1 & Lord 7 Aspect</span>
+                    <span className="font-bold text-indigo-500">{tjEvidence.lord1_7Aspect}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-500/5">
+                    <span>Lord 1 & Lord 7 Yoga</span>
+                    <span className={`font-bold ${tjEvidence.lord1_7Yoga === "ITHASALA" ? "text-emerald-500" : tjEvidence.lord1_7Yoga === "EESARPHA" ? "text-red-500" : "text-slate-500"}`}>{tjEvidence.lord1_7Yoga}</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex justify-between border-b border-slate-500/10 py-1">
-                <span>Moon Easarpha Mars</span>
-                <span className="text-slate-400">Separating Aspect</span>
-              </div>
-              <div className="flex justify-between border-b border-slate-500/10 py-1">
-                <span>Venus Kamboola Moon</span>
-                <span className="text-indigo-500 font-bold">Highly Auspicious</span>
-              </div>
-              <div className="flex justify-between border-b border-slate-500/10 py-1">
-                <span>Saturn Kuttha Mercury</span>
-                <span className="text-amber-500">Inimical Yoga</span>
+            </div>
+
+            {/* 4. Decision Adapter Rulebook */}
+            <div>
+              <h4 className="text-sm font-semibold mb-3 flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4 text-indigo-500" />
+                Tajik Relationship Rulebook & Decision Matrix (12 Modules)
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tjDecision.ruleEvaluations.map((evalItem) => {
+                  const r = evalItem.result;
+                  return (
+                    <div
+                      key={evalItem.ruleId}
+                      className={`p-4 border rounded-lg ${cardStyle} flex flex-col justify-between`}
+                    >
+                      <div>
+                        {/* Header */}
+                        <div className="flex justify-between items-start gap-2 mb-2">
+                          <div>
+                            <span className="text-[9px] font-mono font-bold text-indigo-500 bg-indigo-500/10 px-1.5 py-0.5 rounded uppercase">
+                              {evalItem.module}
+                            </span>
+                            <h5 className="font-bold text-xs mt-1 text-slate-900 dark:text-white">
+                              {evalItem.ruleName}
+                            </h5>
+                          </div>
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase font-mono ${
+                              r.status === "PASS"
+                                ? "bg-emerald-500/10 text-emerald-500"
+                                : r.status === "FAIL"
+                                ? "bg-red-500/10 text-red-500"
+                                : "bg-slate-500/10 text-slate-500"
+                            }`}
+                          >
+                            {r.status}
+                          </span>
+                        </div>
+
+                        {/* Evidences */}
+                        {r.supportingEvidence.length > 0 && (
+                          <div className="mt-2">
+                            <span className="text-[9px] font-bold text-emerald-500 block">Supporting Evidence</span>
+                            <ul className="list-disc pl-4 text-[10px] text-slate-600 dark:text-slate-400 space-y-1 mt-1">
+                              {r.supportingEvidence.map((se, i) => (
+                                <li key={i}>{se}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
+                        {r.contradictingEvidence.length > 0 && (
+                          <div className="mt-2">
+                            <span className="text-[9px] font-bold text-red-500 block">Contradicting Evidence</span>
+                            <ul className="list-disc pl-4 text-[10px] text-slate-600 dark:text-slate-400 space-y-1 mt-1">
+                              {r.contradictingEvidence.map((ce, i) => (
+                                <li key={i}>{ce}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Remedy (Upay) */}
+                      <div className="mt-3 p-2 bg-amber-500/5 border border-amber-500/10 rounded">
+                        <span className="text-[9px] font-bold text-amber-500 flex items-center gap-1 mb-1">
+                          <Sparkles className="w-2.5 h-2.5" />
+                          TAJIK REMEDY & UPAY
+                        </span>
+                        <p className="text-[10px] italic leading-normal text-slate-700 dark:text-slate-300">
+                          {r.suggestedRemedy}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     );
   };

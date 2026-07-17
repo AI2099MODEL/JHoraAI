@@ -354,8 +354,8 @@ export default function WhatComesBackExplorer({ initialData }: WhatComesBackExpl
   // Quick Action: Apply Autocomplete selection to other forms
   const applyCoordinatesFromSearch = (result: any) => {
     const label = `${result.name}, ${result.country}`;
-    const latNum = Number(result.latitude.toFixed(4));
-    const lngNum = Number(result.longitude.toFixed(4));
+    const latNum = Number(Number(result.latitude || 0).toFixed(4));
+    const lngNum = Number(Number(result.longitude || 0).toFixed(4));
     
     // Set for horoscope
     setHoroParams(prev => ({

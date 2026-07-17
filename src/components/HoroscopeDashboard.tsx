@@ -146,7 +146,7 @@ export default function HoroscopeDashboard({
                 <div className="col-span-2 sm:col-span-1">Location: <span className="text-slate-200 font-semibold">{astrologyData.birthDetails.location}</span></div>
                 <div>Date: <span className="text-slate-200 font-semibold">{astrologyData.birthDetails.date}</span></div>
                 <div>Time: <span className="text-slate-200 font-semibold">{astrologyData.birthDetails.time}</span></div>
-                <div>Lat/Lng: <span className="text-slate-200 font-semibold">{astrologyData.birthDetails.latitude.toFixed(4)}°, {astrologyData.birthDetails.longitude.toFixed(4)}°</span></div>
+                <div>Lat/Lng: <span className="text-slate-200 font-semibold">{Number(astrologyData.birthDetails.latitude || 0).toFixed(4)}°, {Number(astrologyData.birthDetails.longitude || 0).toFixed(4)}°</span></div>
               </div>
             </div>
 

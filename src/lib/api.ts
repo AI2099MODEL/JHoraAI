@@ -284,5 +284,15 @@ Hello! I have analyzed your Vedic Astrology Birth Chart calculated dynamically f
     }
   }
   
-  return window.fetch(urlStr, init);
+  const finalInit = init ? { ...init } : {};
+  if (typeof window !== "undefined") {
+    const userOpenaiKey = window.localStorage.getItem("user_openai_api_key");
+    if (userOpenaiKey && userOpenaiKey.trim()) {
+      const headers = new Headers(finalInit.headers || {});
+      headers.set("x-openai-api-key", userOpenaiKey.trim());
+      finalInit.headers = headers;
+    }
+  }
+
+  return window.fetch(urlStr, finalInit);
 };

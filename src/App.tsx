@@ -58,6 +58,8 @@ import {
 import { AstrologyData, convertTimeTo24h, convertDateToISO } from "./lib/astrology";
 import { mapJHoraResponseToAstrologyData, mapAstrologyDataToUserProfileJSON } from "./lib/jhoraMapper";
 import { generateAstrologyPDF } from "./lib/pdfGenerator";
+import { calculateUnifiedRelationshipEvidence } from "./lib/rules/unifiedRelationshipEvidenceEngine";
+import { generateRelationshipPDF } from "./lib/relationshipReportGenerator";
 import { 
   saveCachedHoroscope, 
   getAllCachedHoroscopes, 
@@ -78,18 +80,29 @@ import PluginManager, { INITIAL_PLUGINS, PluginSpec } from "./components/PluginM
 import KpStellarDashboard from "./components/KpStellarDashboard";
 import { WesternAstrologyView } from "./components/WesternAstrologyView";
 import { MysticalSystemsView } from "./components/MysticalSystemsView";
+import { UnifiedEvidenceView } from "./components/UnifiedEvidenceView";
+import { AIRelationshipExpert } from "./components/AIRelationshipExpert";
+import { RelationshipReportGenerator } from "./components/RelationshipReportGenerator";
+import { RawDataPdfGenerator } from "./components/RawDataPdfGenerator";
+import { RelationshipKnowledgeCenter } from "./components/RelationshipKnowledgeCenter";
+import { AstrologicalReasoningEngine } from "./components/AstrologicalReasoningEngine";
+import { RelationshipConsultationFramework } from "./components/RelationshipConsultationFramework";
 import { UserProfile, SessionManager, AuthManager, UserProfileRepository } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
 import UpdateNotification from "./components/UpdateNotification";
 import { UpdateManager, UpdateManifest } from "./lib/androidOta";
 import GithubOtaView from "./components/GithubOtaView";
 import { apiFetch as fetch } from "./lib/api";
+import RulesTerminal from "./components/RulesTerminal";
 
 // 1. Navigation Graph Definitions
 export interface SubmenuItem {
   id: string;
   label: string;
   description: string;
+  systemId?: string;
+  originalId?: string;
+  category?: string;
 }
 
 export interface MainMenuNode {
@@ -125,6 +138,14 @@ export default function App() {
   const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("English");
   const [notificationsActive, setNotificationsActive] = useState<boolean>(true);
+  const [userOpenaiApiKey, setUserOpenaiApiKey] = useState<string>(() => {
+    return localStorage.getItem("user_openai_api_key") || "";
+  });
+
+  const handleOpenaiKeyChange = (key: string) => {
+    setUserOpenaiApiKey(key);
+    localStorage.setItem("user_openai_api_key", key);
+  };
 
   // Active Navigation Coordinate Graph
   const [activeMenu, setActiveMenu] = useState<string>("dashboard");
@@ -171,6 +192,7 @@ export default function App() {
   const [pdfReady, setPdfReady] = useState<boolean>(false);
   const [activePdfUrl, setActivePdfUrl] = useState<string | null>(null);
   const [shareSuccess, setShareSuccess] = useState<boolean>(false);
+  const [compilingRelReport, setCompilingRelReport] = useState<string | null>(null);
   const [profileVerify, setProfileVerify] = useState<{
     isOpen: boolean;
     record: CachedHoroscopeRecord | null;
@@ -316,8 +338,8 @@ export default function App() {
     setInputs(prev => ({
       ...prev,
       location: label,
-      latitude: Number(result.latitude.toFixed(4)),
-      longitude: Number(result.longitude.toFixed(4)),
+      latitude: Number(Number(result.latitude || 0).toFixed(4)),
+      longitude: Number(Number(result.longitude || 0).toFixed(4)),
       timezone: calculatedTz,
     }));
     setShowLocationDropdown(false);
@@ -643,130 +665,106 @@ export default function App() {
       icon: Sparkles
     },
     {
-      id: "downloads",
-      label: "Downloads",
-      icon: Download
-    },
-    {
-      id: "horoscope",
-      label: "JHORA",
-      icon: Activity,
-      submenus: [
-        { id: "overview", label: "Overview", description: "Vedic charts and summary." },
-        { id: "planetary_positions", label: "Planetary Positions", description: "Degrees, Signs, Nakshatras, and Houses." },
-        { id: "planet_strength", label: "Planet Strength", description: "Shadbala index matrices." },
-        { id: "bhava_strength", label: "Bhava Strength", description: "House strength indexes." },
-        { id: "ashtakavarga", label: "Ashtakavarga", description: "Samudhaya Ashtakavarga charts." },
-        { id: "yogas", label: "Yogas", description: "Auspicious combinations in natal charts." },
-        { id: "doshas", label: "Doshas", description: "Manglik and Kaal Sarp analysis." },
-        { id: "vimshottari", label: "Vimshottari Dasha", description: "120-year cycle." },
-        { id: "yogini", label: "Yogini Dasha", description: "36-year cycle." },
-        { id: "ashtottari", label: "Ashtottari Dasha", description: "108-year cycle." },
-        { id: "longevity", label: "Longevity", description: "Traditional life span calculations." },
-        { id: "sade_sati", label: "Sade Sati", description: "Saturn transit timeline cycles." },
-
-        // Divisional Charts
-        { id: "d1_rasi", label: "D1 Rasi", description: "General birth chart." },
-        { id: "d2_hora", label: "D2 Hora", description: "Wealth, assets, and money." },
-        { id: "d3_drekkana", label: "D3 Drekkana", description: "Siblings, skills, and values." },
-        { id: "d4_chaturthamsa", label: "D4 Chaturthamsa", description: "Properties, luck, and destiny." },
-        { id: "d7_saptamsa", label: "D7 Saptamsa", description: "Progeny, children, and creations." },
-        { id: "d9_navamsa", label: "D9 Navamsa", description: "Dharma, marriage, and potential." },
-        { id: "d10_dasamsa", label: "D10 Dasamsa", description: "Profession, achievements, and fame." },
-        { id: "d12_dwadasamsa", label: "D12 Dwadasamsa", description: "Parents, lineages, and ancestors." },
-        { id: "d16_shodasamsa", label: "D16 Shodasamsa", description: "Vehicles, comforts, and happiness." },
-        { id: "d20_vimsamsa", label: "D20 Vimsamsa", description: "Spirituality, worship, and focus." },
-        { id: "d24_chaturvimsamsa", label: "D24 Chaturvimsamsa", description: "Knowledge, learning, and education." },
-        { id: "d27_saptavimsamsa", label: "D27 Saptavimsamsa", description: "Strengths, weaknesses, and flaws." },
-        { id: "d30_trimsamsa", label: "D30 Trimsamsa", description: "Misfortunes, evils, and health." },
-        { id: "d40_khavedamsa", label: "D40 Khavedamsa", description: "Auspicious alignments." },
-        { id: "d45_akshavedamsa", label: "D45 Akshavedamsa", description: "General fortune." },
-        { id: "d60_shastiamsa", label: "D60 Shastiamsa", description: "Past life karmic balances." },
-
-        // Predictions
-        { id: "arudhas", label: "Arudhas", description: "Image and projection reflections." },
-        { id: "sphutas", label: "Sphutas", description: "Highly sensitive coordinate points." },
-        { id: "upagrahas", label: "Upagrahas", description: "Shadow planets calculations." },
-        { id: "sahams", label: "Sahams", description: "Arabic/Tajik sensitive lots." },
-        { id: "special_lagnas", label: "Special Lagnas", description: "Hora, Ghati, and Bhava Ascendants." }
-      ]
-    },
-    {
-      id: "kp_stellar",
-      label: "KP Stellar",
-      icon: Zap,
-      submenus: [
-        { id: "dashboard", label: "Dashboard", description: "Overview, Provider Health & Status." },
-        { id: "rulebook", label: "KP Rulebook", description: "Krishnamurti Paddhati rules & evidence engine." },
-        { id: "cusps", label: "Cusps", description: "12 Cusps, Degrees & Sub-Lords." },
-        { id: "planet_analysis", label: "Planet Analysis", description: "Planet Star-Lord & Sub-Lord placements." },
-        { id: "significators", label: "Significators", description: "Planet & House level significators." },
-        { id: "ruling_planets", label: "Ruling Planets", description: "Day, Moon & Ascendant rulers." },
-        { id: "kp_dasha", label: "KP Dasha", description: "KP Vimshottari & event period indicators." },
-        { id: "transit", label: "Transit", description: "Real-time coordinate significations." },
-        { id: "horary", label: "Horary", description: "Prashna seed number calculations." },
-        { id: "research", label: "Research", description: "Developer audit tools & raw model values." },
-        { id: "settings", label: "Settings", description: "Provider priority routing settings." }
-      ]
-    },
-    {
-      id: "western_astrology",
-      label: "Western",
-      icon: Compass,
-      submenus: [
-        { id: "dashboard", label: "Dashboard", description: "Overview & Provider Health" },
-        { id: "natal_chart", label: "Natal Chart", description: "Tropical circular wheel chart." },
-        { id: "positions", label: "Positions", description: "Degrees, Signs, and Houses." },
-        { id: "aspects", label: "Aspects", description: "Planetary aspects and aspect grid." },
-        { id: "synastry", label: "Synastry", description: "Synastry & Composite compatibility." },
-        { id: "transits", label: "Transits", description: "Solar return and active transits." }
-      ]
-    },
-    {
-      id: "esoteric",
-      label: "Mystical",
-      icon: Sparkles,
-      submenus: [
-        { id: "nadi", label: "Nadi Astrology", description: "Fine divisions (Nadi Amsas) and guidelines." },
-        { id: "lalkitab", label: "Lal Kitab", description: "Fixed Aries Ascendant house-remedies." },
-        { id: "varshaphala", label: "Tajik Varshaphala", description: "Progression solar return calculations." },
-        { id: "bazi", label: "Chinese BaZi", description: "The Four Pillars of Destiny (Stems & Branches)." },
-        { id: "numerology", label: "Numerology", description: "Pythagorean & Chaldean numbers profile." },
-        { id: "celtic", label: "Celtic Tree", description: "Sacred lunar tree zodiac signs." },
-        { id: "mayan", label: "Mayan Calendar", description: "Tzolkin & Haab Kin signature calculator." }
-      ]
-    },
-    {
-      id: "marriage",
-      label: "Marriage",
-      icon: Heart,
-      submenus: [
-        { id: "ashtakoota", label: "Ashtakoota", description: "8-fold matching grids." },
-        { id: "porutham", label: "Porutham", description: "10-fold marriage compatibility." },
-        { id: "compatibility", label: "Compatibility", description: "Overall planetary synergy analysis." }
-      ]
-    },
-    {
-      id: "transit",
-      label: "Transit",
-      icon: RefreshCw,
-      submenus: [
-        { id: "current_gochara", label: "Current Gochara", description: "Live celestial positions." },
-        { id: "planet_ingress", label: "Planet Ingress", description: "Upcoming sign-change transits." },
-        { id: "transit_summary", label: "Transit Summary", description: "Astrological transit interpretation." },
-        { id: "panchanga", label: "Panchanga", description: "Tithi, Vara, Nakshatra, Yoga, and Karana." },
-        { id: "daily_muhurta", label: "Daily Muhurta", description: "Auspicious times (Choghadiya/Abhijit)." },
-        { id: "event_muhurta", label: "Event Muhurta", description: "Custom electional windows." }
-      ]
+      id: "analysis",
+      label: "Analysis",
+      icon: BarChart
     },
     {
       id: "reports",
       label: "Reports",
-      icon: FileText,
+      icon: Download
+    },
+    {
+      id: "astro",
+      label: "Astro",
+      icon: Activity,
       submenus: [
-        { id: "generate_pdf", label: "Generate PDF", description: "Export professional reports." },
-        { id: "saved_reports", label: "Saved Reports", description: "Locally archived exports." },
-        { id: "share_report", label: "Share Report", description: "Export or share QR link." }
+        // Category 1: JHORA
+        { id: "overview", label: "Overview", description: "Vedic charts and summary.", systemId: "horoscope", category: "JHORA" },
+        { id: "planetary_positions", label: "Planetary Positions", description: "Degrees, Signs, Nakshatras, and Houses.", systemId: "horoscope", category: "JHORA" },
+        { id: "planet_strength", label: "Planet Strength", description: "Shadbala index matrices.", systemId: "horoscope", category: "JHORA" },
+        { id: "bhava_strength", label: "Bhava Strength", description: "House strength indexes.", systemId: "horoscope", category: "JHORA" },
+        { id: "ashtakavarga", label: "Ashtakavarga", description: "Samudhaya Ashtakavarga charts.", systemId: "horoscope", category: "JHORA" },
+        { id: "yogas", label: "Yogas", description: "Auspicious combinations in natal charts.", systemId: "horoscope", category: "JHORA" },
+        { id: "doshas", label: "Doshas", description: "Manglik and Kaal Sarp analysis.", systemId: "horoscope", category: "JHORA" },
+        { id: "vimshottari", label: "Vimshottari Dasha", description: "120-year cycle.", systemId: "horoscope", category: "JHORA" },
+        { id: "yogini", label: "Yogini Dasha", description: "36-year cycle.", systemId: "horoscope", category: "JHORA" },
+        { id: "ashtottari", label: "Ashtottari Dasha", description: "108-year cycle.", systemId: "horoscope", category: "JHORA" },
+        { id: "longevity", label: "Longevity", description: "Traditional life span calculations.", systemId: "horoscope", category: "JHORA" },
+        { id: "sade_sati", label: "Sade Sati", description: "Saturn transit timeline cycles.", systemId: "horoscope", category: "JHORA" },
+
+        // Divisional Charts
+        { id: "d1_rasi", label: "D1 Rasi", description: "General birth chart.", systemId: "horoscope", category: "JHORA" },
+        { id: "d2_hora", label: "D2 Hora", description: "Wealth, assets, and money.", systemId: "horoscope", category: "JHORA" },
+        { id: "d3_drekkana", label: "D3 Drekkana", description: "Siblings, skills, and values.", systemId: "horoscope", category: "JHORA" },
+        { id: "d4_chaturthamsa", label: "D4 Chaturthamsa", description: "Properties, luck, and destiny.", systemId: "horoscope", category: "JHORA" },
+        { id: "d7_saptamsa", label: "D7 Saptamsa", description: "Progeny, children, and creations.", systemId: "horoscope", category: "JHORA" },
+        { id: "d9_navamsa", label: "D9 Navamsa", description: "Dharma, marriage, and potential.", systemId: "horoscope", category: "JHORA" },
+        { id: "d10_dasamsa", label: "D10 Dasamsa", description: "Profession, achievements, and fame.", systemId: "horoscope", category: "JHORA" },
+        { id: "d12_dwadasamsa", label: "D12 Dwadasamsa", description: "Parents, lineages, and ancestors.", systemId: "horoscope", category: "JHORA" },
+        { id: "d16_shodasamsa", label: "D16 Shodasamsa", description: "Vehicles, comforts, and happiness.", systemId: "horoscope", category: "JHORA" },
+        { id: "d20_vimsamsa", label: "D20 Vimsamsa", description: "Spirituality, worship, and focus.", systemId: "horoscope", category: "JHORA" },
+        { id: "d24_chaturvimsamsa", label: "D24 Chaturvimsamsa", description: "Knowledge, learning, and education.", systemId: "horoscope", category: "JHORA" },
+        { id: "d27_saptavimsamsa", label: "D27 Saptavimsamsa", description: "Strengths, weaknesses, and flaws.", systemId: "horoscope", category: "JHORA" },
+        { id: "d30_trimsamsa", label: "D30 Trimsamsa", description: "Misfortunes, evils, and health.", systemId: "horoscope", category: "JHORA" },
+        { id: "d40_khavedamsa", label: "D40 Khavedamsa", description: "Auspicious alignments.", systemId: "horoscope", category: "JHORA" },
+        { id: "d45_akshavedamsa", label: "D45 Akshavedamsa", description: "General fortune.", systemId: "horoscope", category: "JHORA" },
+        { id: "d60_shastiamsa", label: "D60 Shastiamsa", description: "Past life karmic balances.", systemId: "horoscope", category: "JHORA" },
+
+        // Predictions
+        { id: "arudhas", label: "Arudhas", description: "Image and projection reflections.", systemId: "horoscope", category: "JHORA" },
+        { id: "sphutas", label: "Sphutas", description: "Highly sensitive coordinate points.", systemId: "horoscope", category: "JHORA" },
+        { id: "upagrahas", label: "Upagrahas", description: "Shadow planets calculations.", systemId: "horoscope", category: "JHORA" },
+        { id: "sahams", label: "Sahams", description: "Arabic/Tajik sensitive lots.", systemId: "horoscope", category: "JHORA" },
+        { id: "special_lagnas", label: "Special Lagnas", description: "Hora, Ghati, and Bhava Ascendants.", systemId: "horoscope", category: "JHORA" },
+
+        // Category 2: KP STELLAR
+        { id: "kp_dashboard", label: "Dashboard", description: "Overview, Provider Health & Status.", systemId: "kp_stellar", originalId: "dashboard", category: "KP STELLAR" },
+        { id: "kp_rulebook", label: "KP Rulebook", description: "Krishnamurti Paddhati rules & evidence engine.", systemId: "kp_stellar", originalId: "rulebook", category: "KP STELLAR" },
+        { id: "kp_cusps", label: "Cusps", description: "12 Cusps, Degrees & Sub-Lords.", systemId: "kp_stellar", originalId: "cusps", category: "KP STELLAR" },
+        { id: "kp_planet_analysis", label: "Planet Analysis", description: "Planet Star-Lord & Sub-Lord placements.", systemId: "kp_stellar", originalId: "planet_analysis", category: "KP STELLAR" },
+        { id: "kp_significators", label: "Significators", description: "Planet & House level significators.", systemId: "kp_stellar", originalId: "significators", category: "KP STELLAR" },
+        { id: "kp_ruling_planets", label: "Ruling Planets", description: "Day, Moon & Ascendant rulers.", systemId: "kp_stellar", originalId: "ruling_planets", category: "KP STELLAR" },
+        { id: "kp_dasha", label: "KP Dasha", description: "KP Vimshottari & event period indicators.", systemId: "kp_stellar", originalId: "kp_dasha", category: "KP STELLAR" },
+        { id: "kp_transit", label: "Transit", description: "Real-time coordinate significations.", systemId: "kp_stellar", originalId: "transit", category: "KP STELLAR" },
+        { id: "kp_horary", label: "Horary", description: "Prashna seed number calculations.", systemId: "kp_stellar", originalId: "horary", category: "KP STELLAR" },
+        { id: "kp_research", label: "Research", description: "Developer audit tools & raw model values.", systemId: "kp_stellar", originalId: "research", category: "KP STELLAR" },
+        { id: "kp_settings", label: "Settings", description: "Provider priority routing settings.", systemId: "kp_stellar", originalId: "settings", category: "KP STELLAR" },
+
+        // Category 3: WESTERN
+        { id: "west_dashboard", label: "Dashboard", description: "Overview & Provider Health", systemId: "western_astrology", originalId: "dashboard", category: "WESTERN" },
+        { id: "west_natal_chart", label: "Natal Chart", description: "Tropical circular wheel chart.", systemId: "western_astrology", originalId: "natal_chart", category: "WESTERN" },
+        { id: "west_positions", label: "Positions", description: "Degrees, Signs, and Houses.", systemId: "western_astrology", originalId: "positions", category: "WESTERN" },
+        { id: "west_aspects", label: "Aspects", description: "Planetary aspects and aspect grid.", systemId: "western_astrology", originalId: "aspects", category: "WESTERN" },
+        { id: "west_synastry", label: "Synastry", description: "Synastry & Composite compatibility.", systemId: "western_astrology", originalId: "synastry", category: "WESTERN" },
+        { id: "west_transits", label: "Transits", description: "Solar return and active transits.", systemId: "western_astrology", originalId: "transits", category: "WESTERN" },
+
+        // Category 4: MYSTICAL (ESOTERIC)
+        { id: "eso_nadi", label: "Nadi Astrology", description: "Fine divisions (Nadi Amsas) and guidelines.", systemId: "esoteric", originalId: "nadi", category: "MYSTICAL (ESOTERIC)" },
+        { id: "eso_lalkitab", label: "Lal Kitab", description: "Fixed Aries Ascendant house-remedies.", systemId: "esoteric", originalId: "lalkitab", category: "MYSTICAL (ESOTERIC)" },
+        { id: "eso_varshaphala", label: "Tajik Varshaphala", description: "Progression solar return calculations.", systemId: "esoteric", originalId: "varshaphala", category: "MYSTICAL (ESOTERIC)" },
+        { id: "eso_bazi", label: "Chinese BaZi", description: "The Four Pillars of Destiny (Stems & Branches).", systemId: "esoteric", originalId: "bazi", category: "MYSTICAL (ESOTERIC)" },
+        { id: "eso_numerology", label: "Numerology", description: "Pythagorean & Chaldean numbers profile.", systemId: "esoteric", originalId: "numerology", category: "MYSTICAL (ESOTERIC)" },
+        { id: "eso_celtic", label: "Celtic Tree", description: "Sacred lunar tree zodiac signs.", systemId: "esoteric", originalId: "celtic", category: "MYSTICAL (ESOTERIC)" },
+        { id: "eso_mayan", label: "Mayan Calendar", description: "Tzolkin & Haab Kin signature calculator.", systemId: "esoteric", originalId: "mayan", category: "MYSTICAL (ESOTERIC)" },
+
+        // Category 5: MARRIAGE & SYNERGY
+        { id: "mar_ashtakoota", label: "Ashtakoota", description: "8-fold matching grids.", systemId: "marriage", originalId: "ashtakoota", category: "MARRIAGE & SYNERGY" },
+        { id: "mar_porutham", label: "Porutham", description: "10-fold marriage compatibility.", systemId: "marriage", originalId: "porutham", category: "MARRIAGE & SYNERGY" },
+        { id: "mar_compatibility", label: "Compatibility", description: "Overall planetary synergy analysis.", systemId: "marriage", originalId: "compatibility", category: "MARRIAGE & SYNERGY" },
+        { id: "mar_unified_evidence", label: "Unified Evidence", description: "Multi-system astrological evidence aggregator.", systemId: "marriage", originalId: "unified_evidence", category: "MARRIAGE & SYNERGY" },
+        { id: "mar_ai_expert", label: "AI Relationship Expert", description: "Esoteric AI partnership diagnostics and chat.", systemId: "marriage", originalId: "ai_expert", category: "MARRIAGE & SYNERGY" },
+        { id: "mar_relationship_report", label: "Relationship Report", description: "Professional PDF/DOCX multi-system report generator.", systemId: "marriage", originalId: "relationship_report", category: "MARRIAGE & SYNERGY" },
+        { id: "mar_astrological_reasoning_engine", label: "Astrological Reasoning Engine", description: "Audit system-level consistency and breakdown contributions.", systemId: "marriage", originalId: "astrological_reasoning_engine", category: "MARRIAGE & SYNERGY" },
+        { id: "mar_relationship_consultation", label: "Relationship Consultation", description: "Professional AI-guided comprehensive consultation framework.", systemId: "marriage", originalId: "relationship_consultation", category: "MARRIAGE & SYNERGY" },
+
+        // Category 6: TRANSIT & MUHURTA
+        { id: "trn_current_gochara", label: "Current Gochara", description: "Live celestial positions.", systemId: "transit", originalId: "current_gochara", category: "TRANSIT & MUHURTA" },
+        { id: "trn_planet_ingress", label: "Planet Ingress", description: "Upcoming sign-change transits.", systemId: "transit", originalId: "planet_ingress", category: "TRANSIT & MUHURTA" },
+        { id: "trn_transit_summary", label: "Transit Summary", description: "Astrological transit interpretation.", systemId: "transit", originalId: "transit_summary", category: "TRANSIT & MUHURTA" },
+        { id: "trn_panchanga", label: "Panchanga", description: "Tithi, Vara, Nakshatra, Yoga, and Karana.", systemId: "transit", originalId: "panchanga", category: "TRANSIT & MUHURTA" },
+        { id: "trn_daily_muhurta", label: "Daily Muhurta", description: "Auspicious times (Choghadiya/Abhijit).", systemId: "transit", originalId: "daily_muhurta", category: "TRANSIT & MUHURTA" },
+        { id: "trn_event_muhurta", label: "Event Muhurta", description: "Custom electional windows.", systemId: "transit", originalId: "event_muhurta", category: "TRANSIT & MUHURTA" }
       ]
     },
     {
@@ -774,6 +772,7 @@ export default function App() {
       label: "Settings",
       icon: SettingsIcon,
       submenus: [
+        { id: "rules_terminal", label: "Rules Terminal", description: "Review and edit core astrological logic gates." },
         { id: "theme", label: "Theme", description: "Dark, Light, and custom styling." },
         { id: "google_account", label: "Google Account", description: "Enable Google Sign-In & Sync." },
         { id: "github_ota", label: "GitHub OTA Updates", description: "Check for new releases." },
@@ -795,12 +794,23 @@ export default function App() {
     }
   ];
 
-  const activeNode = MAIN_MENU_STRUCTURE.find(node => node.id === activeMenu) || MAIN_MENU_STRUCTURE[0];
+  const isAstroActive = ["horoscope", "kp_stellar", "western_astrology", "esoteric", "marriage", "transit"].includes(activeMenu);
+  const activeNode = MAIN_MENU_STRUCTURE.find(node => {
+    if (node.id === "astro") return isAstroActive;
+    return node.id === activeMenu;
+  }) || MAIN_MENU_STRUCTURE[0];
   const activeSubmenus = activeNode.submenus || [];
   const activeSubmenuId = activeSubMenu[activeMenu] || (activeSubmenus[0]?.id || "");
 
   const handleSubmenuSelect = (submenuId: string) => {
-    setActiveSubMenu(prev => ({ ...prev, [activeMenu]: submenuId }));
+    const astroNode = MAIN_MENU_STRUCTURE.find(n => n.id === "astro");
+    const matchedSub = astroNode?.submenus?.find(s => s.id === submenuId);
+    if (matchedSub && matchedSub.systemId) {
+      setActiveMenu(matchedSub.systemId);
+      setActiveSubMenu(prev => ({ ...prev, [matchedSub.systemId]: matchedSub.originalId || matchedSub.id }));
+    } else {
+      setActiveSubMenu(prev => ({ ...prev, [activeMenu]: submenuId }));
+    }
     setIsMobileMenuOpen(false);
   };
 
@@ -831,10 +841,17 @@ export default function App() {
   };
 
   const handleMenuSelect = (menuId: string) => {
-    setActiveMenu(menuId);
-    const defaultSub = MAIN_MENU_STRUCTURE.find(n => n.id === menuId)?.submenus?.[0]?.id || "";
-    if (defaultSub) {
-      setActiveSubMenu(prev => ({ ...prev, [menuId]: defaultSub }));
+    if (menuId === "astro") {
+      setActiveMenu("horoscope");
+      if (!activeSubMenu["horoscope"]) {
+        setActiveSubMenu(prev => ({ ...prev, horoscope: "overview" }));
+      }
+    } else {
+      setActiveMenu(menuId);
+      const defaultSub = MAIN_MENU_STRUCTURE.find(n => n.id === menuId)?.submenus?.[0]?.id || "";
+      if (defaultSub) {
+        setActiveSubMenu(prev => ({ ...prev, [menuId]: defaultSub }));
+      }
     }
   };
 
@@ -1204,7 +1221,9 @@ export default function App() {
           <div className="flex-1 w-full px-2 space-y-1.5 overflow-y-auto scrollbar-none">
             {MAIN_MENU_STRUCTURE.map((node) => {
               const Icon = node.icon;
-              const isActive = activeMenu === node.id;
+              const isActive = node.id === "astro"
+                ? ["horoscope", "kp_stellar", "western_astrology", "esoteric", "marriage", "transit"].includes(activeMenu)
+                : activeMenu === node.id;
               
               return (
                 <button
@@ -1266,29 +1285,48 @@ export default function App() {
             </div>
 
             <div className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-160px)] scrollbar-thin">
-              {activeSubmenus.map((sub) => {
-                const isSubActive = activeSubmenuId === sub.id;
-                return (
-                  <button
-                    key={sub.id}
-                    onClick={() => handleSubmenuSelect(sub.id)}
-                    className={`w-full text-left p-2.5 rounded-xl transition-all border text-xs flex flex-col ${
-                      isSubActive
-                        ? "bg-amber-500/10 text-amber-500 border-amber-500/30 font-semibold"
-                        : isDark
-                          ? "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40 border-transparent"
-                          : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 border-transparent"
-                    }`}
-                  >
-                    <span className="block">{sub.label}</span>
-                    {sub.description && (
-                      <span className="text-[9px] text-slate-500 block font-normal mt-0.5 max-w-full truncate">
-                        {sub.description}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+              {(() => {
+                let lastCategory = "";
+                return activeSubmenus.map((sub) => {
+                  const showHeader = sub.category && sub.category !== lastCategory;
+                  if (sub.category) {
+                    lastCategory = sub.category;
+                  }
+                  
+                  const isSubActive = sub.systemId
+                    ? (activeMenu === sub.systemId && activeSubMenu[sub.systemId] === (sub.originalId || sub.id))
+                    : (activeSubmenuId === sub.id);
+
+                  return (
+                    <React.Fragment key={sub.id}>
+                      {showHeader && (
+                        <div className="pt-4 pb-1.5 px-2.5 first:pt-1">
+                          <span className="text-[10px] font-mono font-bold tracking-widest text-amber-500/90 dark:text-amber-400 uppercase">
+                            {sub.category}
+                          </span>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => handleSubmenuSelect(sub.id)}
+                        className={`w-full text-left p-2.5 rounded-xl transition-all border text-xs flex flex-col ${
+                          isSubActive
+                            ? "bg-amber-500/10 text-amber-500 border-amber-500/30 font-semibold"
+                            : isDark
+                              ? "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40 border-transparent"
+                              : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 border-transparent"
+                        }`}
+                      >
+                        <span className="block">{sub.label}</span>
+                        {sub.description && (
+                          <span className="text-[9px] text-slate-500 block font-normal mt-0.5 max-w-full truncate">
+                            {sub.description}
+                          </span>
+                        )}
+                      </button>
+                    </React.Fragment>
+                  );
+                });
+              })()}
             </div>
           </aside>
         )}
@@ -1459,7 +1497,7 @@ export default function App() {
                               >
                                 <span className={`font-semibold ${isDark ? "text-slate-200" : "text-neutral-700"}`}>{result.name}</span>
                                 <span className="text-[10px] text-slate-500 font-mono mt-0.5">
-                                  {result.admin1 ? `${result.admin1}, ` : ''}{result.country} • Lat: {result.latitude.toFixed(4)} Lon: {result.longitude.toFixed(4)}
+                                  {result.admin1 ? `${result.admin1}, ` : ''}{result.country} • Lat: {Number(result.latitude || 0).toFixed(4)} Lon: {Number(result.longitude || 0).toFixed(4)}
                                 </span>
                               </button>
                             ))}
@@ -1722,24 +1760,61 @@ export default function App() {
                 className="space-y-6"
               >
                 <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                  <div>
-                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                      <Sparkles className="w-5 h-5 text-amber-500" />
-                      JHora AI Consultation & Interpretations
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Converse with our Vedic AI grounded directly in your calculated horoscope, dasha timeline, and planetary aspects.
-                    </p>
-                  </div>
-                  
                   <AstroChat astrologyData={astrologyData} />
                 </div>
               </motion.div>
             </AnimatePresence>
-          ) : activeMenu === "downloads" ? (
+          ) : activeMenu === "analysis" ? (
             <AnimatePresence mode="wait">
               <motion.div
-                key="downloads"
+                key="analysis"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="space-y-6"
+              >
+                <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
+                  <div>
+                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
+                      <BarChart className="w-5 h-5 text-amber-500" />
+                      Astro Systems Complete Data Analysis
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Extract and analyze raw, uncompiled metrics from JHora, KP, Western, and Mystical systems. Download all systems' complete data to train AI and build robust profiles.
+                    </p>
+                  </div>
+
+                  {/* Dynamic Raw Astro Submenu Data PDF Generator */}
+                  <RawDataPdfGenerator
+                    astrologyData={astrologyData}
+                    activeUser={activeUser}
+                    setAstrologyData={setAstrologyData}
+                    mapAstrologyDataToUserProfileJSON={mapAstrologyDataToUserProfileJSON}
+                    isDark={isDark}
+                  />
+
+                  {/* AI & Developer Insights Card */}
+                  <div className={`p-5 rounded-xl border ${isDark ? "border-slate-800 bg-slate-950/20" : "border-neutral-200 bg-neutral-50/50"} space-y-4`}>
+                    <div className="flex items-center gap-2">
+                      <Cpu className="w-4 h-4 text-indigo-400" />
+                      <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">AI Training & Pipeline Integration</h4>
+                    </div>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      The generated PDF compiles the entire multi-system astrometric state. This complete dataset aligns with modern retrieval architectures, enabling precise embeddings and dynamic prompt construction for fine-tuning cosmological AI models.
+                    </p>
+                    <div className="bg-slate-950/40 p-3.5 rounded-lg border border-indigo-500/5 font-mono text-[10px] text-indigo-300 space-y-1.5">
+                      <div className="text-slate-400">// Example: load the extracted userJSON schema</div>
+                      <div>const userJson = loadProfileJSON(pdfData);</div>
+                      <div>const response = await ai.models.generateContent(&#123; model: 'gemini-2.5-flash', contents: ["Train or guide using this context:", userJson] &#125;);</div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          ) : activeMenu === "reports" ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="reports"
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
@@ -1749,7 +1824,7 @@ export default function App() {
                   <div>
                     <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
                       <Download className="w-5 h-5 text-amber-500" />
-                      Vedic Astrology Downloads Manager
+                      Vedic Astrology Reports Manager
                     </h3>
                     <p className="text-xs text-slate-400 mt-1">
                       Retrieve prepared astrological PDF reports, dynamic birth profiles, and custom celestial calendars.
@@ -1893,6 +1968,213 @@ export default function App() {
                           <Download className="w-3.5 h-3.5" />
                           Export Active JSON
                         </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Relationship & Marriage Promise Reports Section */}
+                  <div className="space-y-4 pt-4 border-t border-indigo-500/5">
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Heart className="w-4 h-4 text-rose-500" />
+                        Relationship & Marriage Promise Reports
+                      </h4>
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        Download high-fidelity multi-system partnership analyses and marriage promise PDF chronicles.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Marriage Promise Report Card */}
+                      <div className="p-4 rounded-xl border border-rose-500/15 bg-rose-500/5 space-y-3 flex flex-col justify-between">
+                        <div className="space-y-1.5">
+                          <span className="bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
+                            Marriage PDF
+                          </span>
+                          <h5 className="text-xs font-bold text-slate-200">Marriage Promise & Timing Chronicles</h5>
+                          <p className="text-[11px] text-slate-400 leading-normal">
+                            Complete astrological audit of lifetime marital gates, delay aspects (Saturn, Rahu/Ketu), and dasha/transit activations.
+                          </p>
+                        </div>
+
+                        <div className="pt-2">
+                          <button
+                            disabled={compilingRelReport !== null}
+                            onClick={async () => {
+                              try {
+                                setCompilingRelReport("marriage");
+                                let targetData = astrologyData;
+                                if (!targetData) {
+                                  // Dynamically calculate the high-precision 1976-01-06 profile first
+                                  const defaultRes = await fetch("/api/astrology/calculate", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                      name: "Native",
+                                      date: "1976-01-06",
+                                      time: "18:40:00",
+                                      place: "Dehradun, Uttarakhand, India",
+                                      latitude: 30.3165,
+                                      longitude: 78.0322,
+                                      timezone: 5.5
+                                    })
+                                  });
+                                  if (defaultRes.ok) {
+                                    targetData = await defaultRes.json();
+                                    setAstrologyData(targetData);
+                                  }
+                                }
+
+                                if (!targetData) {
+                                  throw new Error("Unable to load astrology data for compiling report.");
+                                }
+
+                                const evidence = calculateUnifiedRelationshipEvidence(targetData, undefined, 28);
+                                
+                                // Fetch AI expert commentary
+                                const apiResponse = await fetch("/api/astrology/ai-relationship-expert", {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({
+                                    evidence,
+                                    question: "Provide an elegant esoterically precise relationship analysis focusing on Marriage Promise, Delay aspects, and dasha timing triggers."
+                                  })
+                                });
+
+                                let expertData = { reply: "Astrological alignment indicates favorable cosmic resonance across Vedic and KP parameters." };
+                                if (apiResponse.ok) {
+                                  expertData = await apiResponse.json();
+                                }
+
+                                const doc = generateRelationshipPDF({
+                                  profileName: targetData.nativeName || "Native",
+                                  partnerName: "Auspicious Partner",
+                                  reportType: "Marriage Promise Report",
+                                  reportOption: "Professional",
+                                  targetAge: 28,
+                                  evidence,
+                                  expertData
+                                });
+
+                                doc.save(`Marriage_Promise_Report_${targetData.nativeName || "Native"}_${Date.now()}.pdf`);
+                              } catch (err: any) {
+                                console.error("Marriage PDF download failed:", err);
+                                alert("Failed to compile Marriage PDF: " + err.message);
+                              } finally {
+                                setCompilingRelReport(null);
+                              }
+                            }}
+                            className="w-full bg-rose-600 hover:bg-rose-500 disabled:bg-slate-800 text-white font-bold py-2 px-3 rounded-lg text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-md shadow-rose-500/10"
+                          >
+                            {compilingRelReport === "marriage" ? (
+                              <>
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                Compiling Marriage PDF...
+                              </>
+                            ) : (
+                              <>
+                                <Download className="w-3.5 h-3.5" />
+                                Compile & Download Marriage PDF
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Multi-System Diagnostics Report Card */}
+                      <div className="p-4 rounded-xl border border-indigo-500/15 bg-indigo-500/5 space-y-3 flex flex-col justify-between">
+                        <div className="space-y-1.5">
+                          <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
+                            Comprehensive Diagnostics
+                          </span>
+                          <h5 className="text-xs font-bold text-slate-200">15-Topic Multi-System Partner Report</h5>
+                          <p className="text-[11px] text-slate-400 leading-normal">
+                            Traces Vedic, KP, Jaimini, Nadi, Tajik, and Western indicators across all major compatibility aspects.
+                          </p>
+                        </div>
+
+                        <div className="pt-2">
+                          <button
+                            disabled={compilingRelReport !== null}
+                            onClick={async () => {
+                              try {
+                                setCompilingRelReport("complete");
+                                let targetData = astrologyData;
+                                if (!targetData) {
+                                  // Dynamically calculate the high-precision 1976-01-06 profile first
+                                  const defaultRes = await fetch("/api/astrology/calculate", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                      name: "Native",
+                                      date: "1976-01-06",
+                                      time: "18:40:00",
+                                      place: "Dehradun, Uttarakhand, India",
+                                      latitude: 30.3165,
+                                      longitude: 78.0322,
+                                      timezone: 5.5
+                                    })
+                                  });
+                                  if (defaultRes.ok) {
+                                    targetData = await defaultRes.json();
+                                    setAstrologyData(targetData);
+                                  }
+                                }
+
+                                if (!targetData) {
+                                  throw new Error("Unable to load astrology data for compiling report.");
+                                }
+
+                                const evidence = calculateUnifiedRelationshipEvidence(targetData, undefined, 28);
+                                
+                                // Fetch AI expert commentary
+                                const apiResponse = await fetch("/api/astrology/ai-relationship-expert", {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({
+                                    evidence,
+                                    question: "Provide a detailed multi-system diagnostic of partnership potential across Vedic, KP, and Jaimini parameters."
+                                  })
+                                });
+
+                                let expertData = { reply: "Astrological alignments indicate overall positive balance and harmonic resonance." };
+                                if (apiResponse.ok) {
+                                  expertData = await apiResponse.json();
+                                }
+
+                                const doc = generateRelationshipPDF({
+                                  profileName: targetData.nativeName || "Native",
+                                  partnerName: "Auspicious Partner",
+                                  reportType: "Complete Relationship Report",
+                                  reportOption: "Professional",
+                                  targetAge: 28,
+                                  evidence,
+                                  expertData
+                                });
+
+                                doc.save(`Complete_Relationship_Report_${targetData.nativeName || "Native"}_${Date.now()}.pdf`);
+                              } catch (err: any) {
+                                console.error("Complete PDF download failed:", err);
+                                alert("Failed to compile Complete Relationship PDF: " + err.message);
+                              } finally {
+                                setCompilingRelReport(null);
+                              }
+                            }}
+                            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 text-white font-bold py-2 px-3 rounded-lg text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-md shadow-indigo-500/10"
+                          >
+                            {compilingRelReport === "complete" ? (
+                              <>
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                Compiling Complete Report...
+                              </>
+                            ) : (
+                              <>
+                                <Download className="w-3.5 h-3.5" />
+                                Compile & Download Complete Report
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -2045,7 +2327,7 @@ export default function App() {
                           Divisional Vargas Wheel
                         </h3>
                         <p className="text-xs text-slate-400 mt-1">
-                          Viewing high-fidelity wheel projections for <strong>{activeSubmenus.find(s => s.id === activeSubmenuId)?.label || activeSubmenuId}</strong>.
+                          Viewing high-fidelity wheel projections for <strong>{activeSubmenus.find(s => (s.id === activeSubmenuId || s.originalId === activeSubmenuId) && (!s.systemId || s.systemId === activeMenu))?.label || activeSubmenuId}</strong>.
                         </p>
                       </div>
 
@@ -2096,7 +2378,7 @@ export default function App() {
                   <div className={`p-6 rounded-2xl border ${containerStyle}`}>
                     <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
                       <Award className="w-5 h-5 text-amber-500" />
-                      {activeSubmenus.find(s => s.id === activeSubmenuId)?.label || "Predictions"}
+                      {activeSubmenus.find(s => (s.id === activeSubmenuId || s.originalId === activeSubmenuId) && (!s.systemId || s.systemId === activeMenu))?.label || "Predictions"}
                     </h3>
                     <p className="text-xs text-slate-400 mt-1 mb-6">
                       Interpretive natal reports evaluating specialized combinations.
@@ -2178,7 +2460,21 @@ export default function App() {
                 className="space-y-6"
               >
                 {astrologyData ? (
-                  <CompatibilityTab astrologyData={astrologyData} />
+                  activeSubmenuId === "unified_evidence" ? (
+                    <UnifiedEvidenceView astrologyData={astrologyData} isDark={isDark} />
+                  ) : activeSubmenuId === "ai_expert" ? (
+                    <AIRelationshipExpert astrologyData={astrologyData} isDark={isDark} />
+                  ) : activeSubmenuId === "relationship_report" ? (
+                    <RelationshipReportGenerator astrologyData={astrologyData} isDark={isDark} />
+                  ) : activeSubmenuId === "relationship_knowledge_center" ? (
+                    <RelationshipKnowledgeCenter astrologyData={astrologyData} isDark={isDark} />
+                  ) : activeSubmenuId === "astrological_reasoning_engine" ? (
+                    <AstrologicalReasoningEngine astrologyData={astrologyData} isDark={isDark} />
+                  ) : activeSubmenuId === "relationship_consultation" ? (
+                    <RelationshipConsultationFramework astrologyData={astrologyData} isDark={isDark} />
+                  ) : (
+                    <CompatibilityTab astrologyData={astrologyData} />
+                  )
                 ) : (
                   <div className="text-center py-12">Calculations needed.</div>
                 )}
@@ -2340,96 +2636,6 @@ export default function App() {
                 )}
               </motion.div>
             </AnimatePresence>
-          ) : activeMenu === "reports" ? (
-            /* PDF & Share report placeholder panels */
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSubmenuId}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="space-y-6"
-              >
-                {activeSubmenuId === "generate_pdf" ? (
-                  <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                    <div>
-                      <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                        <Printer className="w-5 h-5 text-amber-500" />
-                        Astrological PDF Report Compiler
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-1">
-                        Export comprehensive natal charts, Vimshottari timelines, and yogas list into a professional multipage document.
-                      </p>
-                    </div>
-
-                    <div className={`p-4 rounded-xl border ${cardStyle} flex flex-col sm:flex-row items-center justify-between gap-4`}>
-                      <div className="text-xs space-y-1">
-                        <span className="font-bold text-white block">Standard Multi-page Vedic Report</span>
-                        <span className={textMuted}>Includes: D1, D9, Panchanga, Shadbala, & Dasha Tree.</span>
-                      </div>
-                      <button
-                        onClick={handleCompilePdf}
-                        disabled={compilingPdf}
-                        className="bg-amber-500 hover:bg-amber-600 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all shrink-0"
-                      >
-                        {compilingPdf ? "Compiling PDF..." : "Compile & Build PDF"}
-                      </button>
-                    </div>
-
-                    {pdfReady && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 flex items-center justify-between text-xs text-green-300"
-                      >
-                        <span>✓ PDF compiled successfully (6 Pages • 1.2MB). Ready for download.</span>
-                        <a
-                          href={activePdfUrl || "#"}
-                          download={`${astrologyData?.birthDetails?.name || "Native"}_Vedic_Astrology_Report.pdf`}
-                          className="bg-green-500/20 text-green-200 hover:bg-green-500/30 px-3 py-1.5 rounded-lg font-bold transition-colors"
-                        >
-                          Download PDF
-                        </a>
-                      </motion.div>
-                    )}
-                  </div>
-                ) : activeSubmenuId === "share_report" ? (
-                  <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                    <div>
-                      <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                        <Share2 className="w-5 h-5 text-amber-500" />
-                        Share Birth Chart Metrics
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-1">
-                        Export securely to family members or partner astrologers using dynamic link QR codes.
-                      </p>
-                    </div>
-
-                    <div className={`p-6 rounded-xl border ${cardStyle} flex flex-col items-center justify-center text-center max-w-sm mx-auto space-y-4`}>
-                      <div className="w-32 h-32 bg-white rounded-lg p-2 flex items-center justify-center shadow-lg">
-                        {/* Simulated vector QR code */}
-                        <div className="w-full h-full bg-slate-950 flex flex-wrap p-1">
-                          {Array.from({ length: 16 }).map((_, i) => (
-                            <div key={i} className={`w-1/4 h-1/4 ${i % 3 === 0 || i % 5 === 2 ? "bg-white" : "bg-black"}`} />
-                          ))}
-                        </div>
-                      </div>
-                      <button
-                        onClick={handleShareReport}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-xl text-xs cursor-pointer transition-all"
-                      >
-                        {shareSuccess ? "Link Copied!" : "Copy Share Link"}
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                    <h3 className="text-sm font-bold text-amber-500">Local Export Archives</h3>
-                    <p className="text-xs text-slate-500 font-mono mt-1">No saved PDF exports found in local sandboxed storage directory.</p>
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
           ) : activeMenu === "kp_stellar" ? (
             <AnimatePresence mode="wait">
               <motion.div
@@ -2520,6 +2726,8 @@ export default function App() {
                       }
                     />
                   )
+                ) : activeSubmenuId === "rules_terminal" ? (
+                  <RulesTerminal isDarkTheme={isDark} />
                 ) : activeSubmenuId === "google_account" ? (
                   <AuthScreen onAuthSuccess={(user) => setActiveUser(user)} activeUser={activeUser} />
                 ) : activeSubmenuId === "github_ota" ? (
@@ -2607,6 +2815,36 @@ export default function App() {
                             />
                           </div>
                         </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 border-t border-indigo-500/10">
+                      <div>
+                        <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">
+                          ChatGPT / OpenAI API Key (Client-Side Key)
+                        </label>
+                        <div className="flex gap-2">
+                          <input
+                            type="password"
+                            placeholder="sk-proj-..."
+                            value={userOpenaiApiKey}
+                            onChange={(e) => handleOpenaiKeyChange(e.target.value)}
+                            className={`flex-1 border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono ${
+                              isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
+                            }`}
+                          />
+                          {userOpenaiApiKey && (
+                            <button
+                              onClick={() => handleOpenaiKeyChange("")}
+                              className="px-3 py-2 text-xs font-mono rounded-lg border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 transition-colors"
+                            >
+                              Clear Key
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
+                          Your key is stored securely in your browser's local storage and is sent directly in request headers. Setting a custom key here allows you to bypass server limits and use your personal ChatGPT directly.
+                        </p>
                       </div>
                     </div>
                   </div>

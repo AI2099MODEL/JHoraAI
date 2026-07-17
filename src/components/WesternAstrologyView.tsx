@@ -560,7 +560,7 @@ export const WesternAstrologyView: React.FC<WesternAstrologyViewProps> = ({ nati
                     </div>
                     <div className="flex justify-between py-1.5 border-b border-indigo-500/5">
                       <span className="text-slate-400">Coordinates:</span>
-                      <span className="text-slate-200">{nativeInputs.latitude.toFixed(4)}° N, {nativeInputs.longitude.toFixed(4)}° E</span>
+                      <span className="text-slate-200">{Number(nativeInputs.latitude || 0).toFixed(4)}° N, {Number(nativeInputs.longitude || 0).toFixed(4)}° E</span>
                     </div>
                     <div className="flex justify-between py-1.5">
                       <span className="text-slate-400">Ayanamsa Correction:</span>

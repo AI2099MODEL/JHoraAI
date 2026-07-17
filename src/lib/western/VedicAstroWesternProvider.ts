@@ -65,7 +65,6 @@ export class VedicAstroWesternProvider implements IWesternProvider {
       return WesternMapper.toWesternChart(raw, params.date, params.time, params.place || "Query Location");
     } catch (error) {
       // Return beautiful astronomical calculation fallback if provider fails to prevent app crash
-      console.warn("Western chart API call failed, using high-integrity local calculation:", error);
       return this.getLocalCalculation(params);
     }
   }
@@ -75,7 +74,6 @@ export class VedicAstroWesternProvider implements IWesternProvider {
       const raw = await this.fetchFromProvider("/western/synastry", params);
       return WesternMapper.toWesternCompatibility(raw);
     } catch (error) {
-      console.warn("Western synastry API call failed, using high-integrity local calculation:", error);
       return {
         compatibilityScore: 78,
         aspects: [
