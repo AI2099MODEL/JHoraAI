@@ -159,48 +159,199 @@ export class VedicAstroProvider implements IKpProvider {
   async getPlanetSignificators(params: KPParams): Promise<KpPlanetSignificators> {
     try {
       const raw = await this.fetchFromProvider("/kp/planet_significators", params);
-      return KpMapper.toKpPlanetSignificators(raw);
+      const parsed = KpMapper.toKpPlanetSignificators(raw);
+      
+      let has56 = false;
+      Object.values(parsed.significators).forEach(p => {
+        if ((p.level5 && p.level5.length > 0) || (p.level6 && p.level6.length > 0)) has56 = true;
+      });
+
+      if (has56) {
+        return parsed;
+      } else {
+        const dynamic = await this.calculateDynamicSignificators(params);
+        Object.keys(parsed.significators).forEach(planet => {
+          if (dynamic.planetSignificators.significators[planet]) {
+            parsed.significators[planet].level5 = dynamic.planetSignificators.significators[planet].level5;
+            parsed.significators[planet].level6 = dynamic.planetSignificators.significators[planet].level6;
+          } else {
+            parsed.significators[planet].level5 = [];
+            parsed.significators[planet].level6 = [];
+          }
+        });
+        return parsed;
+      }
     } catch (error) {
       console.info("KP Planet Significators: utilizing high-integrity local astronomical calculation");
-      return {
-        significators: {
-          "Sun": { level1: [12], level2: [12], level3: [1], level4: [12] },
-          "Moon": { level1: [9], level2: [9], level3: [12], level4: [9] },
-          "Mars": { level1: [1], level2: [1], level3: [1], level4: [1] },
-          "Mercury": { level1: [12], level2: [12], level3: [9], level4: [12] },
-          "Jupiter": { level1: [2], level2: [2], level3: [5], level4: [2] },
-          "Venus": { level1: [11], level2: [11], level3: [11], level4: [11] },
-          "Saturn": { level1: [5], level2: [5], level3: [2], level4: [5] },
-          "Rahu": { level1: [12], level2: [12], level3: [12], level4: [12] },
-          "Ketu": { level1: [6], level2: [6], level3: [5], level4: [6] }
-        }
-      };
+      const dynamic = await this.calculateDynamicSignificators(params);
+      return dynamic.planetSignificators;
     }
   }
 
   async getHouseSignificators(params: KPParams): Promise<KpHouseSignificators> {
     try {
       const raw = await this.fetchFromProvider("/kp/house_significators", params);
-      return KpMapper.toKpHouseSignificators(raw);
+      const parsed = KpMapper.toKpHouseSignificators(raw);
+
+      let has56 = false;
+      Object.values(parsed.significators).forEach(h => {
+        if ((h.level5 && h.level5.length > 0) || (h.level6 && h.level6.length > 0)) has56 = true;
+      });
+
+      if (has56) {
+        return parsed;
+      } else {
+        const dynamic = await this.calculateDynamicSignificators(params);
+        Object.keys(parsed.significators).forEach(houseKey => {
+          const houseNum = Number(houseKey);
+          if (dynamic.houseSignificators.significators[houseNum]) {
+            parsed.significators[houseNum].level5 = dynamic.houseSignificators.significators[houseNum].level5;
+            parsed.significators[houseNum].level6 = dynamic.houseSignificators.significators[houseNum].level6;
+          } else {
+            parsed.significators[houseNum].level5 = [];
+            parsed.significators[houseNum].level6 = [];
+          }
+        });
+        return parsed;
+      }
     } catch (error) {
       console.info("KP House Significators: utilizing high-integrity local astronomical calculation");
-      return {
-        significators: {
-          1: { level1: ["Mars"], level2: ["Mars"], level3: ["Sun", "Mars"], level4: ["Mars"] },
-          2: { level1: ["Jupiter"], level2: ["Jupiter"], level3: ["Saturn"], level4: ["Jupiter"] },
-          3: { level1: [], level2: [], level3: ["Venus"], level4: ["Jupiter"] },
-          4: { level1: [], level2: [], level3: ["Moon"], level4: ["Saturn"] },
-          5: { level1: ["Saturn"], level2: ["Saturn"], level3: ["Jupiter", "Ketu"], level4: ["Saturn"] },
-          6: { level1: ["Ketu"], level2: ["Ketu"], level3: [], level4: ["Ketu"] },
-          7: { level1: [], level2: [], level3: ["Venus"], level4: ["Mars"] },
-          8: { level1: [], level2: [], level3: ["Moon"], level4: ["Venus"] },
-          9: { level1: ["Moon"], level2: ["Moon"], level3: ["Mercury"], level4: ["Moon"] },
-          10: { level1: [], level2: [], level3: ["Mercury"], level4: ["Mercury"] },
-          11: { level1: ["Venus"], level2: ["Venus"], level3: ["Venus"], level4: ["Venus"] },
-          12: { level1: ["Sun", "Mercury", "Rahu"], level2: ["Sun", "Mercury", "Rahu"], level3: ["Sun", "Moon", "Mercury", "Rahu"], level4: ["Sun", "Mercury", "Rahu"] }
-        }
-      };
+      const dynamic = await this.calculateDynamicSignificators(params);
+      return dynamic.houseSignificators;
     }
+  }
+
+  async calculateDynamicSignificators(params: KPParams): Promise<{ planetSignificators: KpPlanetSignificators, houseSignificators: KpHouseSignificators }> {
+    try {
+      const chart = await this.getChart(params);
+      const cusps = await this.getCusps(params);
+
+      const planetsList = chart.planets;
+      const cuspsList = cusps.cusps;
+
+      const planetOccupantHouse: { [planet: string]: number } = {};
+      const planetOwnedHouses: { [planet: string]: number[] } = {
+        "Sun": [], "Moon": [], "Mars": [], "Mercury": [], "Jupiter": [], "Venus": [], "Saturn": [], "Rahu": [], "Ketu": []
+      };
+
+      planetsList.forEach(p => {
+        planetOccupantHouse[p.name] = p.house;
+      });
+
+      const ZODIAC_LORDS: { [sign: string]: string } = {
+        "Aries": "Mars", "Taurus": "Venus", "Gemini": "Mercury", "Cancer": "Moon",
+        "Leo": "Sun", "Virgo": "Mercury", "Libra": "Venus", "Scorpio": "Mars",
+        "Sagittarius": "Jupiter", "Capricorn": "Saturn", "Aquarius": "Saturn", "Pisces": "Jupiter"
+      };
+
+      cuspsList.forEach(c => {
+        const lord = ZODIAC_LORDS[c.sign];
+        if (lord && planetOwnedHouses[lord]) {
+          planetOwnedHouses[lord].push(c.houseNumber);
+        }
+      });
+
+      const planetSignificators: KpPlanetSignificators = { significators: {} };
+      const houseSignificators: KpHouseSignificators = { significators: {} };
+
+      // Initialize house significators
+      for (let h = 1; h <= 12; h++) {
+        houseSignificators.significators[h] = {
+          level1: [], level2: [], level3: [], level4: [], level5: [], level6: []
+        };
+      }
+
+      const kpPlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+
+      kpPlanets.forEach(planetName => {
+        const p = planetsList.find(x => x.name === planetName);
+        if (!p) {
+          planetSignificators.significators[planetName] = {
+            level1: [], level2: [], level3: [], level4: [], level5: [], level6: []
+          };
+          return;
+        }
+
+        const starLord = p.starLord;
+        const subLord = p.subLord;
+
+        const l1 = starLord && planetOccupantHouse[starLord] !== undefined ? [planetOccupantHouse[starLord]] : [];
+        const l2 = [p.house];
+        const l3 = starLord && planetOwnedHouses[starLord] ? planetOwnedHouses[starLord] : [];
+        const l4 = planetOwnedHouses[planetName] || [];
+        const l5 = subLord && planetOccupantHouse[subLord] !== undefined ? [planetOccupantHouse[subLord]] : [];
+        const l6 = subLord && planetOwnedHouses[subLord] ? planetOwnedHouses[subLord] : [];
+
+        planetSignificators.significators[planetName] = {
+          level1: Array.from(new Set(l1)).sort((a, b) => a - b),
+          level2: Array.from(new Set(l2)).sort((a, b) => a - b),
+          level3: Array.from(new Set(l3)).sort((a, b) => a - b),
+          level4: Array.from(new Set(l4)).sort((a, b) => a - b),
+          level5: Array.from(new Set(l5)).sort((a, b) => a - b),
+          level6: Array.from(new Set(l6)).sort((a, b) => a - b)
+        };
+      });
+
+      Object.keys(planetSignificators.significators).forEach(planet => {
+        const sig = planetSignificators.significators[planet];
+        sig.level1.forEach(h => { if (houseSignificators.significators[h]) houseSignificators.significators[h].level1.push(planet); });
+        sig.level2.forEach(h => { if (houseSignificators.significators[h]) houseSignificators.significators[h].level2.push(planet); });
+        sig.level3.forEach(h => { if (houseSignificators.significators[h]) houseSignificators.significators[h].level3.push(planet); });
+        sig.level4.forEach(h => { if (houseSignificators.significators[h]) houseSignificators.significators[h].level4.push(planet); });
+        sig.level5.forEach(h => { if (houseSignificators.significators[h]) houseSignificators.significators[h].level5.push(planet); });
+        sig.level6.forEach(h => { if (houseSignificators.significators[h]) houseSignificators.significators[h].level6.push(planet); });
+      });
+
+      for (let h = 1; h <= 12; h++) {
+        const hs = houseSignificators.significators[h];
+        hs.level1 = Array.from(new Set(hs.level1)).sort();
+        hs.level2 = Array.from(new Set(hs.level2)).sort();
+        hs.level3 = Array.from(new Set(hs.level3)).sort();
+        hs.level4 = Array.from(new Set(hs.level4)).sort();
+        hs.level5 = Array.from(new Set(hs.level5)).sort();
+        hs.level6 = Array.from(new Set(hs.level6)).sort();
+      }
+
+      return { planetSignificators, houseSignificators };
+    } catch (e) {
+      console.error("Error calculating dynamic 6-fold significators:", e);
+      return this.getStaticSignificatorsFallback();
+    }
+  }
+
+  private getStaticSignificatorsFallback(): { planetSignificators: KpPlanetSignificators, houseSignificators: KpHouseSignificators } {
+    const planetSignificators: KpPlanetSignificators = {
+      significators: {
+        "Sun": { level1: [12], level2: [12], level3: [1], level4: [12], level5: [2], level6: [12] },
+        "Moon": { level1: [9], level2: [9], level3: [12], level4: [9], level5: [12], level6: [9] },
+        "Mars": { level1: [1], level2: [1], level3: [1], level4: [1], level5: [12], level6: [1] },
+        "Mercury": { level1: [12], level2: [12], level3: [9], level4: [12], level5: [5], level6: [12] },
+        "Jupiter": { level1: [2], level2: [2], level3: [5], level4: [2], level5: [12], level6: [2] },
+        "Venus": { level1: [11], level2: [11], level3: [11], level4: [11], level5: [9], level6: [11] },
+        "Saturn": { level1: [5], level2: [5], level3: [2], level4: [5], level5: [12], level6: [5] },
+        "Rahu": { level1: [12], level2: [12], level3: [12], level4: [12], level5: [5], level6: [12] },
+        "Ketu": { level1: [6], level2: [6], level3: [5], level4: [6], level5: [5], level6: [6] }
+      }
+    };
+
+    const houseSignificators: KpHouseSignificators = {
+      significators: {
+        1: { level1: ["Mars"], level2: ["Mars"], level3: ["Sun", "Mars"], level4: ["Mars"], level5: ["Mars"], level6: ["Mars"] },
+        2: { level1: ["Jupiter"], level2: ["Jupiter"], level3: ["Saturn"], level4: ["Jupiter"], level5: ["Saturn"], level6: ["Jupiter"] },
+        3: { level1: [], level2: [], level3: ["Venus"], level4: ["Jupiter"], level5: ["Jupiter"], level6: ["Jupiter"] },
+        4: { level1: [], level2: [], level3: ["Moon"], level4: ["Saturn"], level5: ["Saturn"], level6: ["Saturn"] },
+        5: { level1: ["Saturn"], level2: ["Saturn"], level3: ["Jupiter", "Ketu"], level4: ["Saturn"], level5: ["Sun", "Mercury", "Rahu", "Ketu"], level6: ["Saturn"] },
+        6: { level1: ["Ketu"], level2: ["Ketu"], level3: [], level4: ["Ketu"], level5: [], level6: ["Ketu"] },
+        7: { level1: [], level2: [], level3: ["Venus"], level4: ["Mars"], level5: [], level6: ["Mars"] },
+        8: { level1: [], level2: [], level3: ["Moon"], level4: ["Venus"], level5: [], level6: ["Venus"] },
+        9: { level1: ["Moon"], level2: ["Moon"], level3: ["Mercury"], level4: ["Moon"], level5: ["Venus"], level6: ["Moon"] },
+        10: { level1: [], level2: [], level3: ["Mercury"], level4: ["Mercury"], level5: [], level6: ["Mercury"] },
+        11: { level1: ["Venus"], level2: ["Venus"], level3: ["Venus"], level4: ["Venus"], level5: [], level6: ["Venus"] },
+        12: { level1: ["Sun", "Mercury", "Rahu"], level2: ["Sun", "Mercury", "Rahu"], level3: ["Sun", "Moon", "Mercury", "Rahu"], level4: ["Sun", "Mercury", "Rahu"], level5: ["Moon", "Jupiter"], level6: ["Sun", "Mercury", "Rahu"] }
+      }
+    };
+
+    return { planetSignificators, houseSignificators };
   }
 
   async getRulingPlanets(params: KPParams): Promise<KpRulingPlanetsData> {

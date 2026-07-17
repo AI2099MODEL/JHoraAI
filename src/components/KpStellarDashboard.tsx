@@ -715,8 +715,8 @@ export default function KpStellarDashboard({
               {sigTab === "planets" ? (
                 <div className="space-y-4" id="kp-planet-sigs-panel">
                   <div className="text-xs text-slate-400 leading-relaxed font-sans max-w-2xl bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/10">
-                    <p className="font-semibold text-indigo-400 mb-1">Planet Significators (Level 1–4):</p>
-                    Represents the houses signified by each planet based on stellar occupancy, planetary occupancy, stellar lordship, and planetary lordship.
+                    <p className="font-semibold text-indigo-400 mb-1">Planet Significators (6-Fold Table):</p>
+                    Represents the houses signified by each planet across 6 full levels of astrological strength: stellar occupancy (L1), planetary occupancy (L2), stellar lordship (L3), planetary lordship (L4), sub-lord occupancy (L5), and sub-lord lordship (L6).
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {Object.keys(significatorsData?.planetSignificators || significatorsData?.significators || {}).map((planet) => {
@@ -743,6 +743,14 @@ export default function KpStellarDashboard({
                               <span className="text-slate-500">L4 (Planet Owner):</span>
                               <span className="text-slate-300 font-semibold">{sig.level4?.length ? sig.level4.join(", ") : "—"}</span>
                             </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L5 (Sub Occupant):</span>
+                              <span className="text-fuchsia-400 font-semibold">{sig.level5?.length ? sig.level5.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L6 (Sub Owner):</span>
+                              <span className="text-cyan-400 font-semibold">{sig.level6?.length ? sig.level6.join(", ") : "—"}</span>
+                            </div>
                           </div>
                         </div>
                       );
@@ -752,8 +760,8 @@ export default function KpStellarDashboard({
               ) : (
                 <div className="space-y-4" id="kp-house-sigs-panel">
                   <div className="text-xs text-slate-400 leading-relaxed font-sans max-w-2xl bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/10">
-                    <p className="font-semibold text-indigo-400 mb-1">House Significators (Level 1–4):</p>
-                    Represents the planets that act as strong significators for each of the 12 houses (Bhavas), sorted by their level of strength.
+                    <p className="font-semibold text-indigo-400 mb-1">House Significators (6-Fold Table):</p>
+                    Represents the planets acting as significators for each house across 6 full levels of astrological strength: stellar occupancy (L1), planetary occupancy (L2), stellar lordship (L3), planetary lordship (L4), sub-lord occupancy (L5), and sub-lord lordship (L6).
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {Array.from({ length: 12 }, (_, i) => i + 1).map((houseNum) => {
@@ -780,6 +788,14 @@ export default function KpStellarDashboard({
                             <div className="flex justify-between">
                               <span className="text-slate-500">L4 (Planet Owner):</span>
                               <span className="text-slate-300 font-semibold">{sig.level4?.length ? sig.level4.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L5 (Sub Occupant):</span>
+                              <span className="text-fuchsia-400 font-semibold">{sig.level5?.length ? sig.level5.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L6 (Sub Owner):</span>
+                              <span className="text-cyan-400 font-semibold">{sig.level6?.length ? sig.level6.join(", ") : "—"}</span>
                             </div>
                           </div>
                         </div>
