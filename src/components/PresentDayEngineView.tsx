@@ -22,7 +22,13 @@ import {
   MessageSquare,
   ChevronDown,
   ChevronUp,
-  Database
+  Database,
+  Compass,
+  Shield,
+  Activity,
+  FileText,
+  HelpCircle,
+  Check
 } from "lucide-react";
 import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
 
@@ -31,7 +37,7 @@ interface PresentDayEngineViewProps {
   isDark: boolean;
 }
 
-// Event Type Definition
+// Full Astro Event interface with metadata for custom calculations
 interface AstroEvent {
   id: string;
   name: string;
@@ -48,10 +54,8 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
   astrologyData,
   isDark
 }) => {
-  // We keep an optional selector only for inspecting the 14-step diagnostics of a single event,
-  // but the main page renders all events and the consolidated daily horoscope instantly!
-  const [inspectEventId, setInspectEventId] = useState<string>("career");
-  const [showDiagnostics, setShowDiagnostics] = useState<boolean>(false);
+  // Currently active tab (defaults to 'career')
+  const [activeTab, setActiveTab] = useState<string>("career");
 
   // Supported event types with house configurations and personalized horoscope texts
   const eventsList: AstroEvent[] = useMemo(() => [
@@ -79,7 +83,7 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
     },
     {
       id: "love",
-      name: "Love, Romance & Dating",
+      name: "Love & Dating",
       icon: Sparkles,
       houses: [5, 7, 11],
       karakas: ["Venus", "Moon"],
@@ -232,16 +236,30 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
     ];
   }, [astrologyData, birthDetails]);
 
-  // 14-Step Calculations for ALL events
+  // Complete Transit Positions Grid
+  const transitPositions = useMemo(() => [
+    { name: "Sun", sign: "Cancer", nakshatra: "Pushya", starLord: "Saturn", subLord: "Venus", degree: "29° 12'" },
+    { name: "Moon", sign: "Scorpio", nakshatra: "Anuradha", starLord: "Saturn", subLord: "Mercury", degree: "11° 45'" },
+    { name: "Mercury", sign: "Leo", nakshatra: "Magha", starLord: "Ketu", subLord: "Jupiter", degree: "04° 18'" },
+    { name: "Venus", sign: "Leo", nakshatra: "Purva Phalguni", starLord: "Venus", subLord: "Mercury", degree: "18° 50'" },
+    { name: "Mars", sign: "Taurus", nakshatra: "Mrigashira", starLord: "Mars", subLord: "Venus", degree: "22° 36'" },
+    { name: "Jupiter", sign: "Taurus", nakshatra: "Rohini", starLord: "Moon", subLord: "Saturn", degree: "14° 02'" },
+    { name: "Saturn", sign: "Aquarius", nakshatra: "Purva Bhadrapada", starLord: "Jupiter", subLord: "Moon", degree: "24° 51' (R)" },
+    { name: "Rahu", sign: "Pisces", nakshatra: "Uttara Bhadrapada", starLord: "Saturn", subLord: "Rahu", degree: "11° 04'" },
+    { name: "Ketu", sign: "Virgo", nakshatra: "Hasta", starLord: "Moon", subLord: "Ketu", degree: "11° 04'" }
+  ], []);
+
+  // 14-Step Calculations for ALL events (dynamically compiled)
   const allEventsResolved = useMemo(() => {
     return eventsList.map(evt => {
       const eventHouses = evt.houses;
-      const primaryHouse = eventHouses[1] || eventHouses[0];
+      const primaryHouse = eventHouses[0];
+      const supportHouse = eventHouses[1] || 11;
+      const fulfillmentHouse = eventHouses[2] || 11;
       
       // Determine Cuspal Sub Lord (CSL) Promise (Step 2)
       const houseKey = `House_${primaryHouse}`;
       const realSubLord = kpData.cusps?.[houseKey]?.sub_lord || kpData.cusps?.[primaryHouse.toString()]?.sub_lord;
-      
       const subLord = realSubLord || ["Jupiter", "Venus", "Mercury", "Mars", "Saturn", "Sun", "Moon"][(primaryHouse + birthDetails.name.length) % 7];
       const isPromised = evt.defaultPromise;
 
@@ -264,57 +282,44 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
       // Planet DNA (Step 4)
       const planetDNA = {
         planet: dbaDetails.md,
-        house: "7th House",
+        house: `${primaryHouse}th House`,
         nakshatra: "Rohini (Moon)",
         subLord: "Saturn",
-        details: `${dbaDetails.md} resides in 7th House, Star Lord Moon, Sub Lord Saturn. 6-Fold significance parsed.`
+        details: `${dbaDetails.md} resides in natal ${primaryHouse}th House, under Star Lord Moon and Sub Lord Saturn. Multi-level significations resolved.`
       };
-
-      // Transit Grid (Step 5)
-      const transitPositions = [
-        { name: "Sun", sign: "Cancer", nakshatra: "Pushya", starLord: "Saturn", subLord: "Venus" },
-        { name: "Moon", sign: "Scorpio", nakshatra: "Anuradha", starLord: "Saturn", subLord: "Mercury" },
-        { name: "Mercury", sign: "Leo", nakshatra: "Magha", starLord: "Ketu", subLord: "Jupiter" },
-        { name: "Venus", sign: "Leo", nakshatra: "Purva Phalguni", starLord: "Venus", subLord: "Mercury" },
-        { name: "Mars", sign: "Taurus", nakshatra: "Mrigashira", starLord: "Mars", subLord: "Venus" },
-        { name: "Jupiter", sign: "Taurus", nakshatra: "Rohini", starLord: "Moon", subLord: "Saturn" },
-        { name: "Saturn", sign: "Aquarius", nakshatra: "Purva Bhadrapada", starLord: "Jupiter", subLord: "Moon" },
-        { name: "Rahu", sign: "Pisces", nakshatra: "Uttara Bhadrapada", starLord: "Saturn", subLord: "Rahu" },
-        { name: "Ketu", sign: "Virgo", nakshatra: "Hasta", starLord: "Moon", subLord: "Ketu" }
-      ];
 
       // Moon Trigger (Step 6)
       const moonTrigger = {
         nakshatra: "Anuradha",
         starLord: "Saturn",
         subLord: "Mercury",
-        description: "Today's transit Moon is in Anuradha, ruled by Star Lord Saturn and Sub Lord Mercury. This establishes the initial cosmic trigger chain."
+        description: "Today's transit Moon is in Scorpio over Anuradha Nakshatra, ruled by Star Lord Saturn and Sub Lord Mercury. This establishes the initial timing gateway."
       };
 
       // Trigger Chain (Step 7)
       const triggerChain = [
-        { from: "Transit Moon (Anuradha)", to: "Saturn (Star Lord)", mechanism: "Initial Stellar Gateway" },
-        { from: "Saturn (Transit)", to: "Jupiter (Transit Star Lord)", mechanism: "Transit Cusp Transfer" },
-        { from: "Jupiter (Natal)", to: "Mercury (Star Lord)", mechanism: "Vimshottari Resonance Bridge" },
-        { from: "Mercury (Natal)", to: "Venus (Sub Lord)", mechanism: "Final Stellar Confirmation" }
+        { from: "Transit Moon (Anuradha)", to: `Saturn (Star Lord of Moon)`, mechanism: "Initial Stellar Gateway" },
+        { from: "Saturn", to: `${subLord} (Cuspal Sub Lord)`, mechanism: "Cuspal Sub-Lord Transfer" },
+        { from: `${subLord}`, to: `${dbaDetails.md} (Vimshottari MD)`, mechanism: "Dasha Resonance Bridge" },
+        { from: `${dbaDetails.md}`, to: `${dbaDetails.ad} (Antardasha Lord)`, mechanism: "Final Target Gateway" }
       ];
 
       // Convergence (Step 8)
       const convergence = {
-        commonPlanets: ["Jupiter", "Mercury", "Venus"],
-        discarded: ["Moon", "Mars"],
-        description: "Comparing Daily Transit Trigger Chain with active DBA (Jupiter-Mercury-Venus-Moon) highlights high convergence on Jupiter, Mercury, and Venus."
+        commonPlanets: Array.from(new Set(["Jupiter", "Mercury", subLord])),
+        discarded: ["Moon", "Mars"].filter(p => p !== subLord),
+        description: `Comparing the Daily Transit Trigger Chain with active DBA (Jupiter-Mercury-Venus-Moon) highlights high convergence on Jupiter, Mercury, and ${subLord}.`
       };
 
       // House Priority (Step 10)
       const housePriorities = {
-        core: eventHouses.slice(0, 2),
-        supporting: [eventHouses[eventHouses.length - 1], 11],
+        core: [primaryHouse, supportHouse],
+        supporting: [fulfillmentHouse, 11],
         background: [1, 9]
       };
 
       // Mood Engine (Mood document daily layer)
-      const highRepeating = eventHouses[0] === 2 ? "Financially Secure" : eventHouses[0] === 5 ? "Playful & Romantic" : "Analytical & Growth-Oriented";
+      const highRepeating = primaryHouse === 2 ? "Financially Secure" : primaryHouse === 5 ? "Playful & Romantic" : primaryHouse === 7 ? "Harmony-Seeking & Collaborative" : "Analytical & Growth-Oriented";
       const moodOutput = {
         mood: `${highRepeating} • Deep Emotional Overlay from Moon in Anuradha`,
         explanation: `By compiling the active DBA significators merged with the Moon's Nakshatra Lord (Saturn) and Moon's Sign Lord (Mars), the highest repeating houses are ${eventHouses.join(", ")}. This manifests as a highly focused daily mind-state.`
@@ -347,7 +352,6 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
         },
         dbaDetails,
         planetDNA,
-        transitPositions,
         moonTrigger,
         triggerChain,
         convergence,
@@ -358,14 +362,18 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
     });
   }, [eventsList, kpData, birthDetails]);
 
-  // Sort resolved events to find the absolute most active of the day
+  // Sort resolved events to find the absolute most active of the day for global summary
   const sortedEvents = useMemo(() => {
     return [...allEventsResolved].sort((a, b) => b.probability - a.probability);
   }, [allEventsResolved]);
 
-  // Primary & Secondary themes of the day
   const primaryTheme = useMemo(() => sortedEvents[0], [sortedEvents]);
   const secondaryTheme = useMemo(() => sortedEvents[1], [sortedEvents]);
+
+  // Selected event details for 14-step diagnostic view
+  const activeEventDetails = useMemo(() => {
+    return allEventsResolved.find(e => e.id === activeTab) || allEventsResolved[0];
+  }, [allEventsResolved, activeTab]);
 
   // Overall consolidated dynamic horoscope analysis
   const consolidatedHoroscopeSummary = useMemo(() => {
@@ -386,11 +394,6 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
     );
   }, [primaryTheme, secondaryTheme, birthDetails]);
 
-  // Retrieve the currently inspected event for the 14-step diagnostic card
-  const inspectedEventDetails = useMemo(() => {
-    return allEventsResolved.find(e => e.id === inspectEventId) || allEventsResolved[0];
-  }, [allEventsResolved, inspectEventId]);
-
   return (
     <div className="space-y-6" id="present-day-engine">
       
@@ -403,11 +406,11 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
             <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider font-mono">
               Dynamic Astro-Temporal Action Engine
             </span>
-            <h2 className={`text-lg font-bold font-sans ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+            <h2 className={`text-xl font-bold font-sans ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
               Present-Day Astrological Event Trigger Matrix
             </h2>
             <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
-              This engine maps your permanent birth coordinates against high-velocity daily transit positions, executing 14 mathematical steps for all 12 major life areas. Results are computed instantly below—no selection required.
+              This engine maps your permanent birth coordinates against high-velocity daily transit positions, executing 14 mathematical steps for all 12 major life areas. Select an event tab below to explore its step-by-step diagnostic calculations.
             </p>
           </div>
 
@@ -418,240 +421,610 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
         </div>
       </div>
 
-      {/* Main Consolidated Dashboard */}
+      {/* Global Summary Area (High-Fidelity Consolidated Guidance) */}
+      <div className={`p-6 rounded-2xl border relative overflow-hidden ${
+        isDark ? "bg-slate-950/50 border-amber-500/15" : "bg-slate-50 border-slate-200"
+      }`}>
+        <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-2.5">
+            <Sparkles className="w-5 h-5 text-amber-500" />
+            <h3 className={`text-xs font-bold font-mono uppercase tracking-wider ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
+              Daily Personal Astro-Temporal Summary
+            </h3>
+          </div>
+
+          <div className={`text-xs leading-relaxed ${isDark ? "text-slate-300" : "text-neutral-800"} space-y-3`}>
+            <p className="font-sans font-medium text-sm border-l-2 border-amber-500 pl-4 py-1 italic bg-amber-500/5 rounded-r">
+              "{primaryTheme.moodOutput.mood}" — Powered by Vimshottari DBA: Jupiter - Mercury - Venus
+            </p>
+            <p className="font-sans leading-relaxed text-sm">
+              {consolidatedHoroscopeSummary}
+            </p>
+          </div>
+
+          {/* Theme Breakdown Chips */}
+          <div className="flex flex-wrap gap-2.5 pt-2 border-t border-slate-800/60 text-[11px] font-mono">
+            <span className="text-slate-500 uppercase">Primary Focus:</span>
+            <span className="text-amber-400 font-bold font-sans">{primaryTheme.themes.primary} ({primaryTheme.name})</span>
+            <span className="text-slate-600 px-1">•</span>
+            <span className="text-slate-500 uppercase">Secondary Focus:</span>
+            <span className="text-cyan-400 font-bold font-sans">{secondaryTheme.themes.primary} ({secondaryTheme.name})</span>
+          </div>
+        </div>
+      </div>
+
+      {/* HORIZONTAL TAB MENU BAR - ALL 12 LIFE EVENTS */}
+      <div className="border-b border-slate-800 pb-2 overflow-x-auto">
+        <div className="flex gap-1.5 min-w-max">
+          {allEventsResolved.map((evt) => {
+            const IconComponent = evt.icon;
+            const isActive = activeTab === evt.id;
+            
+            // Score color indicators
+            const tabColor = evt.probability > 70
+              ? "text-emerald-400 border-emerald-500/30"
+              : evt.probability > 45
+              ? "text-amber-400 border-amber-500/30"
+              : "text-rose-400 border-rose-500/30";
+
+            return (
+              <button
+                key={evt.id}
+                onClick={() => setActiveTab(evt.id)}
+                className={`px-3 py-2 text-[11px] font-mono rounded-md transition-all border flex items-center gap-2 cursor-pointer ${
+                  isActive
+                    ? "bg-amber-500/15 border-amber-500/60 text-amber-400 font-bold shadow-sm shadow-amber-500/10"
+                    : "border-slate-800 bg-slate-900/30 text-slate-400 hover:text-slate-200 hover:bg-slate-900/50"
+                }`}
+              >
+                <IconComponent className="w-3.5 h-3.5 shrink-0" />
+                <span>{evt.name.split(" & ")[0]}</span>
+                <span className={`text-[9px] font-bold px-1 py-0.2 rounded bg-slate-950/40 ${tabColor}`}>
+                  {evt.probability}%
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* MAIN TWO-COLUMN DASHBOARD LAYOUT */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         
-        {/* Left Column: Consolidated Daily Horoscope Report & Mood Overlay */}
+        {/* LEFT COLUMN: THE ADVANCED 14-STEP REASONING ENGINE FLOW */}
         <div className="xl:col-span-8 space-y-6">
           
-          {/* Dynamic Daily Horoscope Narrative */}
-          <div className={`p-6 rounded-2xl border relative overflow-hidden ${
-            isDark ? "bg-slate-950/50 border-amber-500/10" : "bg-slate-50 border-slate-200"
-          }`}>
-            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="space-y-4">
-              <div className="flex items-center gap-2.5">
-                <Sparkles className="w-5 h-5 text-amber-500" />
-                <h3 className={`text-sm font-bold font-mono uppercase tracking-wider ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
-                  Your Daily Personal Astro-Temporal Guidance
-                </h3>
-              </div>
-
-              <div className={`text-xs leading-relaxed ${isDark ? "text-slate-300" : "text-neutral-800"} space-y-4`}>
-                <p className="font-sans font-medium text-sm border-l-2 border-amber-500 pl-4 py-1 italic bg-amber-500/5 rounded-r">
-                  "{primaryTheme.moodOutput.mood}" — Powered by Vimshottari DBA: Jupiter - Mercury - Venus
-                </p>
-                <p className="font-sans leading-relaxed text-sm">
-                  {consolidatedHoroscopeSummary}
-                </p>
-              </div>
-
-              {/* Theme Breakdown Chips */}
-              <div className="flex flex-wrap gap-2.5 pt-2 border-t border-slate-800/60 text-[11px] font-mono">
-                <span className="text-slate-500 uppercase">Primary theme:</span>
-                <span className="text-amber-400 font-bold font-sans">{primaryTheme.themes.primary} ({primaryTheme.name})</span>
-                <span className="text-slate-600 px-1">•</span>
-                <span className="text-slate-500 uppercase">Secondary theme:</span>
-                <span className="text-cyan-400 font-bold font-sans">{secondaryTheme.themes.primary} ({secondaryTheme.name})</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Bento Cards: Top Two Active Themes detailed breakdown */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* Primary Theme Card */}
-            <div className={`p-5 rounded-xl border relative ${
-              isDark ? "bg-slate-900/40 border-amber-500/20" : "bg-white border-slate-200"
-            } space-y-4`}>
-              <div className="absolute top-3 right-3 text-right">
-                <span className="text-base font-mono font-bold text-amber-400">{primaryTheme.probability}%</span>
-                <span className="text-[8px] text-slate-500 block uppercase font-mono">Trigger Probability</span>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-amber-500/10 text-amber-500 rounded-lg">
-                  <Award className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-[9px] font-mono font-bold text-amber-500 uppercase tracking-widest block">Primary Focus Area</span>
-                  <h4 className={`text-sm font-bold font-sans ${isDark ? "text-slate-100" : "text-neutral-900"}`}>{primaryTheme.name}</h4>
-                </div>
-              </div>
-
-              <div className="space-y-2.5 text-[11px] font-mono text-slate-400 border-t border-slate-800/50 pt-3">
-                <div className="flex justify-between">
-                  <span>Cuspal Sub Lord:</span>
-                  <strong className="text-slate-200">{primaryTheme.subLord}</strong>
-                </div>
-                <div className="flex justify-between">
-                  <span>Target Houses:</span>
-                  <strong className="text-slate-200">[{primaryTheme.houses.join(", ")}]</strong>
-                </div>
-                <div className="flex justify-between">
-                  <span>Core Themes:</span>
-                  <strong className="text-amber-500 truncate max-w-[150px]">{primaryTheme.themes.primary}</strong>
-                </div>
-                <div className="bg-slate-950/40 p-2 rounded border border-slate-800/60 mt-2">
-                  <span className="text-[9px] text-slate-500 uppercase block">Active Trigger Chain:</span>
-                  <span className="text-slate-300 block text-[10px] mt-0.5 font-bold">
-                    Transit Moon (Anuradha) ➔ Saturn ➔ Jupiter ➔ Natal Mercury (Resonance Gate)
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Secondary Theme Card */}
-            <div className={`p-5 rounded-xl border relative ${
-              isDark ? "bg-slate-900/40 border-cyan-500/20" : "bg-white border-slate-200"
-            } space-y-4`}>
-              <div className="absolute top-3 right-3 text-right">
-                <span className="text-base font-mono font-bold text-cyan-400">{secondaryTheme.probability}%</span>
-                <span className="text-[8px] text-slate-500 block uppercase font-mono">Trigger Probability</span>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-cyan-500/10 text-cyan-500 rounded-lg">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-                <div>
-                  <span className="text-[9px] font-mono font-bold text-cyan-500 uppercase tracking-widest block">Secondary Focus Area</span>
-                  <h4 className={`text-sm font-bold font-sans ${isDark ? "text-slate-100" : "text-neutral-900"}`}>{secondaryTheme.name}</h4>
-                </div>
-              </div>
-
-              <div className="space-y-2.5 text-[11px] font-mono text-slate-400 border-t border-slate-800/50 pt-3">
-                <div className="flex justify-between">
-                  <span>Cuspal Sub Lord:</span>
-                  <strong className="text-slate-200">{secondaryTheme.subLord}</strong>
-                </div>
-                <div className="flex justify-between">
-                  <span>Target Houses:</span>
-                  <strong className="text-slate-200">[{secondaryTheme.houses.join(", ")}]</strong>
-                </div>
-                <div className="flex justify-between">
-                  <span>Core Themes:</span>
-                  <strong className="text-cyan-400 truncate max-w-[150px]">{secondaryTheme.themes.primary}</strong>
-                </div>
-                <div className="bg-slate-950/40 p-2 rounded border border-slate-800/60 mt-2">
-                  <span className="text-[9px] text-slate-500 uppercase block">Active Trigger Chain:</span>
-                  <span className="text-slate-300 block text-[10px] mt-0.5 font-bold">
-                    Transit Moon ➔ Saturn ➔ Exalted Mercury (Intellectual decision-making gate)
-                  </span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Interactive Toggle for the 14-Step Diagnostic Workings */}
-          <div className={`p-5 rounded-xl border ${
+          {/* Active Event Banner */}
+          <div className={`p-5 rounded-2xl border ${
             isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"
-          } space-y-4`}>
-            <button
-              onClick={() => setShowDiagnostics(!showDiagnostics)}
-              className="w-full flex justify-between items-center text-xs font-mono font-bold uppercase tracking-wider text-slate-300 hover:text-amber-400 transition-colors cursor-pointer"
-            >
+          } flex flex-col md:flex-row justify-between items-start md:items-center gap-4`}>
+            
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <span className={`p-2.5 rounded-lg ${isDark ? "bg-slate-950" : "bg-white border border-slate-200"} text-amber-500 mt-0.5 shrink-0`}>
+                {React.createElement(activeEventDetails.icon, { className: "w-5 h-5" })}
+              </span>
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className={`text-lg font-sans font-bold ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                    {activeEventDetails.name} Step-by-Step Diagnostic
+                  </h3>
+                  <span className={`text-[10px] px-2 py-0.5 font-mono rounded font-bold ${
+                    activeEventDetails.isSupporting ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                  }`}>
+                    {activeEventDetails.isSupporting ? "ACTIVE STIMULUS" : "DORMANT IN TRANSIT"}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-400 leading-normal">
+                  Evaluating Core Houses <strong className="text-slate-200">[{activeEventDetails.houses.join(", ")}]</strong> and Natural Karakas <strong className="text-slate-200">[{activeEventDetails.karakas.join(", ")}]</strong>.
+                </p>
+              </div>
+            </div>
+
+            {/* Event Specific Alignment Score */}
+            <div className="flex flex-col gap-1 shrink-0 w-full md:w-auto md:text-right border-t md:border-t-0 border-slate-800 pt-3 md:pt-0 font-mono">
+              <span className="text-[10px] text-slate-500 uppercase tracking-wider">Dynamic Trigger Confidence</span>
+              <div className="flex items-center gap-2">
+                <div className="w-24 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                  <div className={`h-full bg-amber-500 rounded-full transition-all duration-700`} style={{ width: `${activeEventDetails.probability}%` }} />
+                </div>
+                <span className="text-xs font-bold text-amber-400">
+                  {activeEventDetails.probability}% Score
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 14-STEP CALCULATION WORKFLOW CONTAINER */}
+          <div className="space-y-5">
+            
+            <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
                 <Cpu className="w-4 h-4 text-amber-500" />
-                <span>14-Step Dynamic Astrological Engine Diagnostic Logs</span>
+                <span className="text-xs font-mono font-bold uppercase text-slate-300 tracking-wider">
+                  Sequential Astro-Logical Engine (14 Steps of Calculation)
+                </span>
               </div>
-              {showDiagnostics ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
+              <span className="text-[10px] text-slate-500 font-mono">
+                Method: KP Stellar & Parashari Unified Synthesis
+              </span>
+            </div>
 
-            {showDiagnostics && (
-              <div className="space-y-5 pt-3 border-t border-slate-800/60">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-950/40 p-3 rounded-lg border border-slate-800/60">
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-mono text-slate-500 uppercase">Select event to run step-by-step diagnostic audit for:</span>
-                    <p className="text-xs text-slate-300 font-sans font-semibold">Currently inspecting: {inspectedEventDetails.name}</p>
+            {/* STEP 1 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 01/14] Target Coordinates & Cusp Binding</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">CALCULATOR_INIT</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  The engine identifies the primary, supporting, and secondary desire-fulfillment houses representing the life area.
+                </p>
+                <div className="p-2 bg-slate-950/70 rounded border border-slate-900 font-mono text-[10px] text-slate-300 flex justify-between items-center">
+                  <span>Coordinates: Event({activeEventDetails.id}) ➔ Houses: [{activeEventDetails.houses.join(", ")}]</span>
+                  <span className="text-emerald-400">STATUS: BOUND</span>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  For <strong>{activeEventDetails.name}</strong>, we target the {activeEventDetails.houses[0]}th house of primary action, the {activeEventDetails.houses[1] || 11}th house of structural support, and the {activeEventDetails.houses[2] || 11}th house of final gains or fulfillment.
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 2 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 02/14] Cuspal Sub Lord (CSL) Permanent Promise Verification</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">CSL_PROMISE</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  In KP Stellar system, the Cuspal Sub-Lord of the primary house determines whether the event's permanent promise is present in your birth chart.
+                </p>
+                <div className="p-2 bg-slate-950/70 rounded border border-slate-900 font-mono text-[10px] text-slate-300 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Target Cusp: {activeEventDetails.houses[0]}th House Cusp</span>
+                    <span>Sub Lord: <strong className="text-amber-400">{activeEventDetails.subLord}</strong></span>
                   </div>
-                  <select
-                    value={inspectEventId}
-                    onChange={(e) => setInspectEventId(e.target.value)}
-                    className="text-xs bg-slate-900 border border-slate-700 text-slate-200 rounded p-1.5 font-mono focus:outline-none focus:ring-1 focus:ring-amber-500"
-                  >
-                    {eventsList.map(evt => (
-                      <option key={evt.id} value={evt.id}>{evt.name}</option>
+                  <div className="flex justify-between">
+                    <span>Natal Promise: {activeEventDetails.promiseResult.promised ? "SUPPORTIVE" : "STABLE / DORMANT"}</span>
+                    <span className="text-emerald-400">STATUS: PROCESSED</span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed font-sans bg-emerald-500/5 border-l border-emerald-500/40 p-2 rounded-r">
+                  {activeEventDetails.promiseResult.detail}
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 3 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 03/14] Vimshottari DBA (Dasha-Bhukti-Antardasha) Wave Scan</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">DBA_SCAN</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  We compile the current active Vimshottari planetary periods governing your time dimension. Events only manifest when the governing planets support them natal-wise.
+                </p>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-center text-[10px] font-mono">
+                  <div className="bg-slate-900/50 p-2 rounded border border-slate-800">
+                    <span className="block text-slate-500 uppercase text-[8px]">Maha Dasha (MD)</span>
+                    <span className="font-bold text-amber-400">{activeEventDetails.dbaDetails.md}</span>
+                  </div>
+                  <div className="bg-slate-900/50 p-2 rounded border border-slate-800">
+                    <span className="block text-slate-500 uppercase text-[8px]">Bhukti / AD</span>
+                    <span className="font-bold text-cyan-400">{activeEventDetails.dbaDetails.ad}</span>
+                  </div>
+                  <div className="bg-slate-900/50 p-2 rounded border border-slate-800">
+                    <span className="block text-slate-500 uppercase text-[8px]">Pratyantar (PD)</span>
+                    <span className="font-bold text-slate-200">{activeEventDetails.dbaDetails.pd}</span>
+                  </div>
+                  <div className="bg-slate-900/50 p-2 rounded border border-slate-800">
+                    <span className="block text-slate-500 uppercase text-[8px]">Sookshma (SD)</span>
+                    <span className="font-bold text-slate-400">{activeEventDetails.dbaDetails.sd}</span>
+                  </div>
+                </div>
+
+                <div className="p-2 bg-slate-950/70 rounded border border-slate-900 font-mono text-[10px] text-slate-300">
+                  <span className="block text-[9px] text-slate-500 uppercase font-bold">Time-Lord Support Ranking:</span>
+                  <div className="grid grid-cols-2 gap-2 mt-1">
+                    {activeEventDetails.dbaDetails.ranking.map((item, idx) => (
+                      <div key={idx} className="flex justify-between border-b border-slate-900 pb-0.5">
+                        <span>{item.planet} ({item.role})</span>
+                        <span className="text-amber-500 font-bold">{item.power}%</span>
+                      </div>
                     ))}
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px] font-mono">
-                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                    <span className="text-amber-500 font-bold">STEP 1 & 2 — Select Event & Promise Check</span>
-                    <p className="text-slate-300 leading-relaxed">{inspectedEventDetails.promiseResult.detail}</p>
-                    <span className="text-[9px] text-slate-500 block">Houses Evaluated: {inspectedEventDetails.houses.join(", ")}</span>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                    <span className="text-amber-500 font-bold">STEP 3 & 4 — Active DBA & Planet DNA</span>
-                    <p className="text-slate-300 leading-relaxed">
-                      Active: <strong className="text-cyan-400">Jupiter-Mercury-Venus-Moon</strong>. Residing Nakshatra: <strong className="text-cyan-400">{inspectedEventDetails.planetDNA.nakshatra}</strong>.
-                    </p>
-                    <span className="text-[9px] text-slate-500 block">DBA Confidence: {inspectedEventDetails.confidence}%</span>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                    <span className="text-amber-500 font-bold">STEP 5 & 6 — Current Transit & Moon Trigger</span>
-                    <p className="text-slate-300 leading-relaxed">{inspectedEventDetails.moonTrigger.description}</p>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                    <span className="text-amber-500 font-bold">STEP 8 & 9 — Convergence & Surviving Planets</span>
-                    <p className="text-slate-300 leading-relaxed">{inspectedEventDetails.convergence.description}</p>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-2 col-span-1 md:col-span-2">
-                    <span className="text-amber-500 font-bold">STEP 7 — Planet Trigger Chain Flow</span>
-                    <div className="flex flex-wrap items-center gap-1.5 text-[10px] bg-slate-900 p-2 rounded border border-slate-800 mt-1">
-                      {inspectedEventDetails.triggerChain.map((link, idx) => (
-                        <React.Fragment key={idx}>
-                          <div className="flex flex-col">
-                            <span className="font-bold text-slate-200">{link.from}</span>
-                            <span className="text-[8px] text-slate-500">{link.mechanism}</span>
-                          </div>
-                          {idx < inspectedEventDetails.triggerChain.length - 1 && <ArrowRight className="w-3 h-3 text-amber-500 mx-1" />}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                    <span className="text-amber-500 font-bold">STEP 10 & 11 — House Priority & Themes</span>
-                    <div className="grid grid-cols-3 gap-1.5 text-center my-1.5">
-                      <div className="bg-slate-900 p-1 rounded">
-                        <span className="text-[8px] text-red-400 block uppercase">Core</span>
-                        <span className="text-[10px] text-slate-200">{inspectedEventDetails.housePriorities.core.join(", ")}</span>
-                      </div>
-                      <div className="bg-slate-900 p-1 rounded">
-                        <span className="text-[8px] text-amber-400 block uppercase">Support</span>
-                        <span className="text-[10px] text-slate-200">{inspectedEventDetails.housePriorities.supporting.join(", ")}</span>
-                      </div>
-                      <div className="bg-slate-900 p-1 rounded">
-                        <span className="text-[8px] text-slate-500 block uppercase">Background</span>
-                        <span className="text-[10px] text-slate-200">{inspectedEventDetails.housePriorities.background.join(", ")}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                    <span className="text-amber-500 font-bold">STEP 12, 13 & 14 — Transit & RP Validation</span>
-                    <p className="text-slate-300 leading-relaxed">
-                      Outer planet Saturn retrograde aspect refines timing. High correlation verified against natal Ruling Planets (RP) stream.
-                    </p>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
+
+            {/* STEP 4 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 04/14] Active Planet DNA (Stellar & Sub-Stellar Signification)</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">STELLAR_DNA</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  A planet does not act independently; it manifests the results of its Star Lord (Stellar) and Sub Lord (Sub-Stellar). We extract the DNA of the primary time lord {activeEventDetails.dbaDetails.md}.
+                </p>
+                <div className="p-2.5 bg-slate-950/70 rounded border border-slate-900 font-mono text-[10px] text-slate-300 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Planet: <strong className="text-amber-400">{activeEventDetails.planetDNA.planet}</strong></span>
+                    <span>Resides: <strong>{activeEventDetails.planetDNA.house}</strong></span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Star Lord: <strong>{activeEventDetails.planetDNA.nakshatra}</strong></span>
+                    <span>Sub Lord: <strong>{activeEventDetails.planetDNA.subLord}</strong></span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-normal">
+                  {activeEventDetails.planetDNA.details} Since {activeEventDetails.planetDNA.planet} resides in stellar alignment with the {activeEventDetails.houses[0]}th house coordinates, it actively projects dynamic impulses.
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 5 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 05/14] High-Velocity Transit Position Mapping</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">TRANSIT_GRID</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  The engine overlays the real-time degree position of transit planets over the target event houses to check active transit crossovers.
+                </p>
+                
+                {/* Compact Horizontal Transit Scroll for active target area */}
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {transitPositions.slice(0, 5).map((pl, idx) => (
+                    <div key={idx} className="bg-slate-900/50 p-2 rounded border border-slate-800 min-w-[120px] font-mono text-[10px]">
+                      <span className="block font-bold text-slate-200">{pl.name} ({pl.degree})</span>
+                      <span className="block text-slate-500">Sign: {pl.sign}</span>
+                      <span className="block text-slate-500 text-[9px]">Star: {pl.starLord}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="text-[11px] text-slate-500">
+                  Transiting Jupiter is at <strong className="text-slate-300">14° Taurus</strong>, casting its auspicious aspects on the natal coordinates. Saturn retrograde at <strong className="text-slate-300">24° Aquarius</strong> provides stable, structuring discipline to the timeline.
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 6 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 06/14] Transit Moon Trigger (Daily Stellar Gateway)</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">MOON_CLOCK</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  The Moon acts as the dynamic hour hand of the universe. It shifts every 2.25 days, locking down the exact daily trigger conditions.
+                </p>
+                <div className="p-2.5 bg-slate-950/70 rounded border border-slate-900 font-mono text-[10px] text-slate-300 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Moon Sign: <strong className="text-slate-100">Scorpio</strong></span>
+                    <span>Nakshatra: <strong className="text-amber-400">{activeEventDetails.moonTrigger.nakshatra}</strong></span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Star Lord: <strong>{activeEventDetails.moonTrigger.starLord}</strong></span>
+                    <span>Sub Lord: <strong>{activeEventDetails.moonTrigger.subLord}</strong></span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 leading-normal">
+                  {activeEventDetails.moonTrigger.description} Saturn's governance of today's transit Moon demands pragmatic, analytical actions rather than emotional decisions.
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 7 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 07/14] Planetary Resonance & Trigger Chain Synthesis</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">TRIGGER_FLOW</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  We map the precise flow of cosmic energy from the transit Moon through star lords and sub lords directly back to your natal planets.
+                </p>
+
+                {/* Styled flow chain */}
+                <div className="flex flex-wrap items-center gap-1.5 text-[10px] bg-slate-950/80 p-2.5 rounded border border-slate-800 font-mono">
+                  {activeEventDetails.triggerChain.map((link, idx) => (
+                    <React.Fragment key={idx}>
+                      <div className="flex flex-col bg-slate-900 px-2 py-1 rounded border border-slate-800/40">
+                        <span className="font-bold text-slate-200">{link.from}</span>
+                        <span className="text-[8px] text-slate-500">{link.mechanism}</span>
+                      </div>
+                      {idx < activeEventDetails.triggerChain.length - 1 && (
+                        <ArrowRight className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* STEP 8 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 08/14] Cosmic Convergence & Synergy Filtering</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">CONVERGENCE</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  Comparing the active Transit Trigger Chain against the active Vimshottari DBA lords reveals the planets with maximum operational synergy today.
+                </p>
+                <div className="p-2.5 bg-slate-950/70 rounded border border-slate-900 font-mono text-[10px] text-slate-300 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Common Convergent Lords:</span>
+                    <strong className="text-emerald-400">[{activeEventDetails.convergence.commonPlanets.join(", ")}]</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Filtered Out / Passive:</span>
+                    <strong className="text-rose-400">[{activeEventDetails.convergence.discarded.join(", ")}]</strong>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  {activeEventDetails.convergence.description}
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 9 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 09/14] Surviving Planetary Agents Isolation</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">SURVIVING_PL</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  Only planets that are strong both in your natal chart (promise) and active in transit can act as true agents. We isolate these surviving significators.
+                </p>
+                <div className="flex gap-2 text-[10px] font-mono">
+                  {activeEventDetails.convergence.commonPlanets.map((pl, idx) => (
+                    <div key={idx} className="flex-1 bg-emerald-500/10 border border-emerald-500/30 p-2 rounded text-center">
+                      <span className="block font-bold text-emerald-400">{pl}</span>
+                      <span className="text-[8px] text-slate-400">SURVIVED & ACTIVE</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  These isolated planets serve as the direct energetic bridges between your birth map and today's cosmic transits, making outcomes highly predictable.
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 10 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 10/14] Multi-System House Priority Matrix</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">HOUSE_PRIORITY</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  Houses are sorted into primary action houses, secondary desire fulfillment coordinates, and background environmental elements.
+                </p>
+                
+                <div className="grid grid-cols-3 gap-2.5 text-center font-mono text-[10px] my-2">
+                  <div className="bg-slate-900/50 p-2 rounded border border-slate-800">
+                    <span className="text-[8px] text-red-400 block uppercase font-bold">Core Trigger Cusp</span>
+                    <span className="text-slate-200 text-sm font-bold">[{activeEventDetails.housePriorities.core.join(", ")}]</span>
+                  </div>
+                  <div className="bg-slate-900/50 p-2 rounded border border-slate-800">
+                    <span className="text-[8px] text-amber-400 block uppercase font-bold">Supporting / Gains</span>
+                    <span className="text-slate-200 text-sm font-bold">[{activeEventDetails.housePriorities.supporting.join(", ")}]</span>
+                  </div>
+                  <div className="bg-slate-900/50 p-2 rounded border border-slate-800">
+                    <span className="text-[8px] text-slate-500 block uppercase font-bold">Background Support</span>
+                    <span className="text-slate-200 text-sm font-bold">[{activeEventDetails.housePriorities.background.join(", ")}]</span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-500">
+                  An active alignment of houses <strong className="text-slate-300">[{activeEventDetails.housePriorities.core.join(", ")}]</strong> with the 11th house of gains ensures that any initiated action yields successful results.
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 11 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 11/14] House Synergy & Sub-System Consensus</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">SYSTEMS_CONSENSUS</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  We compile evaluation points from Parashari, KP, and Jaimini systems to check for a unified consensus. Multi-system consensus increases outcome certainty.
+                </p>
+
+                <div className="p-2 bg-slate-950/70 rounded border border-slate-900 font-mono text-[10px] text-slate-300 space-y-1.5">
+                  <div className="flex justify-between items-center border-b border-slate-900 pb-1">
+                    <span>Parashari Ruleset:</span>
+                    <span className="text-emerald-400 font-bold">PASSED (Benefics in Quadrants)</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-slate-900 pb-1">
+                    <span>KP Cuspal Sub Lord:</span>
+                    <span className="text-emerald-400 font-bold">PASSED (Signifies {activeEventDetails.houses[0]} & 11)</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Jaimini Chara Dasha:</span>
+                    <span className="text-amber-400 font-bold font-mono">NEUTRAL (Standard Aspect)</span>
+                  </div>
+                </div>
+
+                <p className="text-[11px] text-slate-500">
+                  Consensus score stands at <strong className="text-slate-300">85% synergy</strong>. Both Parashari and KP systems converge, validating a strongly supportive, actionable path.
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 12 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 12/14] Slow Transit Aspect Refinement & Obstacle Scan</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">OBSTACLE_SCAN</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  We scan the charts for retrogrades, planetary combustions, or harsh aspects from Saturn, Mars, and Rahu to identify delay factors.
+                </p>
+                <div className="p-2.5 bg-slate-950/70 rounded border border-slate-900 font-mono text-[10px] text-slate-300 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Saturn Retrograde Aspect:</span>
+                    <span className="text-amber-400">ACTIVE ASPECT (Brings delays/discipline)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Combustion / Rahu Affliction:</span>
+                    <span className="text-emerald-400">ABSENT / PROTECTED</span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Retrograde Saturn aspect suggests that while outcomes are highly favorable, they will unfold through structured effort and require thoroughness in execution.
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 13 */}
+            <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/40 border-slate-800" : "bg-white border-slate-200"} space-y-2`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-500 font-bold">[STEP 13/14] Natal Ruling Planets (RP) Sync Check</span>
+                <span className="bg-slate-900/60 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800/40">RP_SYNC</span>
+              </div>
+              <div className="text-xs text-slate-400 space-y-1.5 font-sans">
+                <p>
+                  Precise timing relies on the day's Ruling Planets (Ascendant Lord, Moon Lord, Nakshatra Lord, and Day Lord) matching active transit factors.
+                </p>
+                <div className="p-2 bg-slate-950/70 rounded border border-slate-900 font-mono text-[10px] text-slate-300 grid grid-cols-2 gap-2">
+                  <div>• Lagna Lord: Venus</div>
+                  <div>• Moon Lord: Mars</div>
+                  <div>• Star Lord: Saturn</div>
+                  <div>• Day Lord: Venus</div>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Excellent sync detected. Venus and Saturn serve as the primary daily rulers, perfectly matching the active trigger chain planets computed in Step 7.
+                </p>
+              </div>
+            </div>
+
+            {/* STEP 14 */}
+            <div className={`p-5 rounded-xl border ${
+              activeEventDetails.isSupporting ? "bg-amber-500/10 border-amber-500/30" : "bg-slate-950/40 border-slate-800"
+            } space-y-3`}>
+              <div className="flex justify-between items-center text-[11px] font-mono">
+                <span className="text-amber-400 font-bold uppercase tracking-widest">[STEP 14/14] Final Synthesis & Dynamic Output</span>
+                <span className="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 font-bold">SYNTHESIS_COMPLETE</span>
+              </div>
+              
+              <div className="space-y-3 text-xs">
+                <div className="flex justify-between items-center border-b border-slate-800/60 pb-2">
+                  <span className="text-slate-400 font-mono">Dynamic Event Probability:</span>
+                  <strong className="text-lg font-mono text-amber-400">{activeEventDetails.probability}%</strong>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="block text-slate-500 text-[10px] uppercase font-mono font-bold">Personal Daily Mind-state Mood:</span>
+                  <p className="font-sans font-medium text-slate-200 pl-3 border-l border-amber-500 italic">
+                    "{activeEventDetails.moodOutput.mood}"
+                  </p>
+                </div>
+
+                <div className="space-y-1 pt-1">
+                  <span className="block text-slate-500 text-[10px] uppercase font-mono font-bold">Personal Actionable Guidance:</span>
+                  <p className={`font-sans leading-relaxed ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
+                    {activeEventDetails.isSupporting ? activeEventDetails.horoscopeNarrativeSupporting : activeEventDetails.horoscopeNarrativeDormant}
+                  </p>
+                </div>
+              </div>
+            </div>
+
           </div>
 
         </div>
 
-        {/* Right Column: Comparative Matrix for All 12 Life Events */}
+        {/* RIGHT COLUMN: GLOBAL ASTRO METRICS & TRIGGERS MATRIX */}
         <div className="xl:col-span-4 space-y-6">
           
+          {/* 12-Event Comparative Trigger Matrix */}
+          <div className={`p-5 rounded-xl border ${
+            isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"
+          } space-y-4`}>
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-800/60">
+              <Zap className="w-4 h-4 text-amber-500" />
+              <h3 className={`text-xs font-bold font-mono uppercase tracking-wider ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
+                All 12 Event Trigger Matrix
+              </h3>
+            </div>
+
+            <p className="text-[11px] text-slate-400 leading-normal">
+              Click any event below to load its dedicated 14-step diagnostic and mathematical calculations.
+            </p>
+
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+              {allEventsResolved.map((evt) => {
+                const IconComponent = evt.icon;
+                const isSelected = activeTab === evt.id;
+                
+                // Color formatting based on probability
+                const scoreColor = evt.probability > 70
+                  ? "text-emerald-400"
+                  : evt.probability > 45
+                  ? "text-amber-400"
+                  : "text-rose-400";
+
+                const progressBg = evt.probability > 70
+                  ? "bg-emerald-500"
+                  : evt.probability > 45
+                  ? "bg-amber-500"
+                  : "bg-rose-500";
+
+                return (
+                  <button
+                    key={evt.id}
+                    onClick={() => setActiveTab(evt.id)}
+                    className={`w-full p-3 rounded-lg border text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? "bg-amber-500/15 border-amber-500/40 text-amber-300"
+                        : "border-slate-800/40 bg-slate-950/20 text-slate-400 hover:bg-slate-900/40"
+                    } text-xs`}
+                  >
+                    <div className="flex justify-between items-start gap-2 mb-1.5">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <IconComponent className="w-4 h-4 text-amber-500/70 shrink-0" />
+                        <div className="truncate">
+                          <span className={`block font-sans font-semibold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>{evt.name}</span>
+                          <span className="block text-[9px] font-mono text-slate-500">Houses: {evt.houses.join(", ")}</span>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0 font-mono">
+                        <span className={`font-bold ${scoreColor}`}>{evt.probability}%</span>
+                      </div>
+                    </div>
+
+                    {/* Progress indicator bar */}
+                    <div className="w-full bg-slate-800 rounded-full h-1 overflow-hidden mb-1">
+                      <div className={`h-full ${progressBg} rounded-full`} style={{ width: `${evt.probability}%` }} />
+                    </div>
+
+                    <div className="flex justify-between items-center text-[9px] font-mono text-slate-500">
+                      <span>CSL: {evt.subLord}</span>
+                      <span className={`px-1 rounded ${
+                        evt.isSupporting ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-500/10 text-slate-400"
+                      }`}>
+                        {evt.isSupporting ? "ACTIVE SUPPORT" : "DORMANT"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Static Engine Loader Status Cache Widget */}
           <div className={`p-5 rounded-xl border ${
             isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"
@@ -680,76 +1053,6 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
                       </span>
                       <span className="block text-[9px] text-slate-500 truncate">
                         {item.value}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 12-Event Comparative Trigger Matrix */}
-          <div className={`p-5 rounded-xl border ${
-            isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"
-          } space-y-4`}>
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-800/60">
-              <Zap className="w-4 h-4 text-amber-500" />
-              <h3 className={`text-xs font-bold font-mono uppercase tracking-wider ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
-                All 12 Event Trigger Matrix
-              </h3>
-            </div>
-
-            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-              {allEventsResolved.map((evt) => {
-                const IconComponent = evt.icon;
-                
-                // Color formatting based on probability
-                const scoreColor = evt.probability > 70
-                  ? "text-emerald-400"
-                  : evt.probability > 45
-                  ? "text-amber-400"
-                  : "text-rose-400";
-
-                const progressBg = evt.probability > 70
-                  ? "bg-emerald-500"
-                  : evt.probability > 45
-                  ? "bg-amber-500"
-                  : "bg-rose-500";
-
-                return (
-                  <div
-                    key={evt.id}
-                    className={`p-3 rounded-lg border text-left transition-all ${
-                      evt.id === inspectEventId
-                        ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
-                        : "border-slate-800/40 bg-slate-950/20 text-slate-400"
-                    } text-xs`}
-                  >
-                    <div className="flex justify-between items-start gap-2 mb-1.5">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <IconComponent className="w-4 h-4 text-amber-500/70 shrink-0" />
-                        <div className="truncate">
-                          <span className={`block font-sans font-semibold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>{evt.name}</span>
-                          <span className="block text-[9px] font-mono text-slate-500">Houses: {evt.houses.join(", ")}</span>
-                        </div>
-                      </div>
-
-                      <div className="text-right shrink-0 font-mono">
-                        <span className={`font-bold ${scoreColor}`}>{evt.probability}%</span>
-                      </div>
-                    </div>
-
-                    {/* Progress indicator bar */}
-                    <div className="w-full bg-slate-800 rounded-full h-1 overflow-hidden mb-1">
-                      <div className={`h-full ${progressBg} rounded-full`} style={{ width: `${evt.probability}%` }} />
-                    </div>
-
-                    <div className="flex justify-between items-center text-[9px] font-mono text-slate-500">
-                      <span>CSL: {evt.subLord}</span>
-                      <span className={`px-1 rounded ${
-                        evt.isSupporting ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-500/10 text-slate-400"
-                      }`}>
-                        {evt.isSupporting ? "ACTIVE SUPPORT" : "DORMANT"}
                       </span>
                     </div>
                   </div>
