@@ -3,7 +3,7 @@ import {
   User, Calendar, Clock, MapPin, Compass, Moon, Sun, 
   BookOpen, Star, Briefcase, DollarSign, Heart, Activity, 
   Sparkles, Shield, AlertTriangle, ChevronRight, HelpCircle,
-  Download, RefreshCw, ChevronLeft, Award, Globe, Layers, Zap, Grid
+  Download, RefreshCw, Award, Globe, Layers, Zap, Grid, LayoutDashboard
 } from "lucide-react";
 import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
 import AstroChart from "./AstroChart";
@@ -34,7 +34,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   setAstrologyData,
   isDark
 }) => {
-  const [currentPage, setCurrentPage] = useState<number>(1);
   const [compiling, setCompiling] = useState(false);
 
   if (!astrologyData) {
@@ -46,7 +45,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         <User className="w-12 h-12 text-slate-600 mx-auto mb-3 opacity-50" />
         <h3 className="text-sm font-bold text-slate-400 mb-1">No Active Astrological Profile Loaded</h3>
         <p className="max-w-md mx-auto px-4">
-          Please load an existing profile or compute a new chart from the main dashboard to unlock this professional multi-page Traditional Horoscope Report.
+          Please load an existing profile or compute a new chart from the main dashboard to unlock this professional Traditional Horoscope Report.
         </p>
       </div>
     );
@@ -63,8 +62,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     vargaLagnas = {},
     dashas = []
   } = astrologyData;
-
-  const totalPages = 7;
 
   // Exact complete submenus for high-precision 360-degree PDF compilation
   const allSubmenuIds = [
@@ -86,7 +83,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         profileName: profileJson.User?.profile_name || birthDetails.name || "Vedic Native",
         submenus: allSubmenuIds
       });
-      doc.save(`Traditional_Zodiac_Analysis_Report_${Date.now()}.pdf`);
+      doc.save(`Complete_360_Astrological_Systems_Report_${Date.now()}.pdf`);
     } catch (err: any) {
       console.error("Failed to compile complete PDF:", err);
       alert("Failed to compile complete PDF: " + err.message);
@@ -258,801 +255,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const health = getHealthPrediction();
   const daily = getDailyPrediction();
 
-  // 1. Cover / Birth Details Page
-  const renderPage1 = () => (
-    <div id="report-page-1" className="space-y-6">
-      <div className="text-center py-6 border-b border-amber-500/10 relative">
-        <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-          <div className="w-56 h-56 rounded-full border-4 border-amber-500 border-dashed animate-spin-slow" />
-        </div>
-        <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-3 py-1 rounded font-bold uppercase tracking-widest">
-          Page 1 • Celestial Cover & Identity Pillars
-        </span>
-        <h2 className="text-2xl font-sans font-bold text-amber-500 mt-3 tracking-wide">
-          PERSONAL COSMIC MAP & BIRTH CHART
-        </h2>
-        <p className={`text-xs ${mutedText} mt-1 max-w-md mx-auto`}>
-          A high-precision multi-system synthesis of birth variables, planetary configurations, and traditional panchanga pillars.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-        <div className="space-y-4 p-5 rounded-xl bg-slate-950/30 border border-amber-500/10">
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
-            <User className="w-4 h-4" />
-            Birth Particulars
-          </div>
-          <div className="space-y-3 text-xs">
-            <div className="flex justify-between items-center py-1 border-b border-slate-900/40">
-              <span className={mutedText}>Full Name:</span>
-              <span className="font-bold text-slate-200">{birthDetails.name || "Nitin Jain"}</span>
-            </div>
-            <div className="flex justify-between items-center py-1 border-b border-slate-900/40">
-              <span className={mutedText}>Date of Birth:</span>
-              <span className="font-semibold text-slate-200">{birthDetails.date || "1976-01-06"}</span>
-            </div>
-            <div className="flex justify-between items-center py-1 border-b border-slate-900/40">
-              <span className={mutedText}>Time of Birth:</span>
-              <span className="font-semibold text-slate-200">{birthDetails.time || "18:40:00"}</span>
-            </div>
-            <div className="flex justify-between items-center py-1 border-b border-slate-900/40">
-              <span className={mutedText}>Birth Location:</span>
-              <span className="font-semibold text-slate-200">{birthDetails.location || "Dehradun, India"}</span>
-            </div>
-            <div className="flex justify-between items-center py-1 border-b border-slate-900/40">
-              <span className={mutedText}>Geographic Coordinates:</span>
-              <span className="font-mono text-slate-300">
-                {Number(birthDetails.latitude || 30.3165).toFixed(4)}° N, {Number(birthDetails.longitude || 78.0322).toFixed(4)}° E
-              </span>
-            </div>
-            <div className="flex justify-between items-center py-1">
-              <span className={mutedText}>Ascendant (Lagna) Sign:</span>
-              <span className="font-bold text-amber-500">{lagna.sign || "Cancer"} ({lagna.degree?.toFixed(2)}°)</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4 p-5 rounded-xl bg-slate-950/30 border border-amber-500/10">
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
-            <Globe className="w-4 h-4" />
-            Core Lunisolar Signatures
-          </div>
-          <div className="grid grid-cols-2 gap-3 text-center">
-            <div className="p-3 rounded-lg bg-indigo-950/20 border border-indigo-500/10">
-              <span className={`block text-[9px] ${mutedText} uppercase font-bold tracking-widest`}>Janma Rasi</span>
-              <Moon className="w-5 h-5 mx-auto my-1.5 text-indigo-400" />
-              <span className="text-xs font-bold text-slate-200">
-                {planets.find((p: PlanetData) => p.name === "Moon")?.sign || "Taurus"}
-              </span>
-            </div>
-            <div className="p-3 rounded-lg bg-amber-950/20 border border-amber-500/10">
-              <span className={`block text-[9px] ${mutedText} uppercase font-bold tracking-widest`}>Surya Rasi</span>
-              <Sun className="w-5 h-5 mx-auto my-1.5 text-amber-400" />
-              <span className="text-xs font-bold text-slate-200">
-                {planets.find((p: PlanetData) => p.name === "Sun")?.sign || "Sagittarius"}
-              </span>
-            </div>
-            <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/10 col-span-2">
-              <span className={`block text-[9px] ${mutedText} uppercase font-bold tracking-widest`}>Ayanamsa Reference System</span>
-              <span className="text-xs font-bold text-emerald-400 block mt-1">
-                {birthDetails.ayanamsa || "Lahiri Ayanamsa"} ({Number(birthDetails.ayanamsaDegree || 23.5).toFixed(4)}°)
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-5 rounded-xl bg-slate-950/30 border border-amber-500/10 space-y-4">
-        <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
-          <BookOpen className="w-4 h-4" />
-          The Five Pillars of Time (Panchanga)
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-          <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-center">
-            <span className={`text-[9px] uppercase font-bold ${mutedText} block`}>Tithi</span>
-            <span className="text-xs font-bold text-slate-200 block mt-1">{panchanga.tithi || "Shukla Ekadashi"}</span>
-          </div>
-          <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-center">
-            <span className={`text-[9px] uppercase font-bold ${mutedText} block`}>Nakshatra</span>
-            <span className="text-xs font-bold text-slate-200 block mt-1">{panchanga.nakshatra || "Rohini"}</span>
-          </div>
-          <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-center">
-            <span className={`text-[9px] uppercase font-bold ${mutedText} block`}>Yoga</span>
-            <span className="text-xs font-bold text-slate-200 block mt-1">{panchanga.yoga || "Preeti"}</span>
-          </div>
-          <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-center">
-            <span className={`text-[9px] uppercase font-bold ${mutedText} block`}>Karana</span>
-            <span className="text-xs font-bold text-slate-200 block mt-1">{panchanga.karana || "Bava"}</span>
-          </div>
-          <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-center col-span-2 sm:col-span-1">
-            <span className={`text-[9px] uppercase font-bold ${mutedText} block`}>Vara (Weekday)</span>
-            <span className="text-xs font-bold text-slate-200 block mt-1">
-              {new Date(birthDetails.date || "1976-01-06").toLocaleDateString("en-US", { weekday: "long" })}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // 2. Divisional Charts & Compatibility Page
-  const renderPage2 = () => (
-    <div id="report-page-2" className="space-y-6">
-      <div className="text-center py-6 border-b border-amber-500/10">
-        <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-3 py-1 rounded font-bold uppercase tracking-widest">
-          Page 2 • Traditional Divisional Kundalis & Compatibility Metrics
-        </span>
-        <h2 className="text-2xl font-sans font-bold text-amber-500 mt-3 tracking-wide">
-          DIVISIONAL CHARTS & ASHTAKOOTA METRICS
-        </h2>
-        <p className={`text-xs ${mutedText} mt-1 max-w-md mx-auto`}>
-          A double-wheel synthesis mapping D1 (Rasi Natal Chart), D9 (Navamsa Destiny Chart), and Ashtakoota physiological properties.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pt-2">
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
-          <span className="text-xs font-bold text-amber-400 block text-center uppercase tracking-wider border-b border-slate-800 pb-2">
-            D1 Rasi Kundali (Lagna Chart)
-          </span>
-          <AstroChart
-            rasiChart={rasiChart}
-            navamsaChart={navamsaChart}
-            divisionalCharts={divisionalCharts}
-            vargaLagnas={vargaLagnas}
-            lagnaSignIndex={lagna.signIndex}
-            lagnaSignName={lagna.sign}
-          />
-        </div>
-
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
-          <span className="text-xs font-bold text-amber-400 block text-center uppercase tracking-wider border-b border-slate-800 pb-2">
-            D9 Navamsa Kundali (Dharma/Partner Wheel)
-          </span>
-          <div className="relative">
-            <AstroChart
-              rasiChart={rasiChart}
-              navamsaChart={navamsaChart}
-              divisionalCharts={divisionalCharts}
-              vargaLagnas={vargaLagnas}
-              lagnaSignIndex={lagna.signIndex}
-              lagnaSignName={lagna.sign}
-            />
-            <div className="absolute top-2 right-2 text-[9px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 font-bold">
-              D9 Navamsa
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-5 rounded-xl bg-slate-950/30 border border-amber-500/10 space-y-4">
-        <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
-          <Shield className="w-4 h-4" />
-          Ashtakoota Harmony Matrix Points (Guna Milan Profile)
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-          <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
-            <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Varna (Mental Gland)</span>
-            <span className="font-bold text-slate-200 text-xs block mt-1">{panchanga.varna || "Brahmin"} (1/1 Pts)</span>
-          </div>
-          <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
-            <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Vashya (Influence)</span>
-            <span className="font-bold text-slate-200 text-xs block mt-1">{panchanga.vashya || "Manushya"} (2/2 Pts)</span>
-          </div>
-          <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
-            <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Yoni (Aesthetic Compatibility)</span>
-            <span className="font-bold text-slate-200 text-xs block mt-1">{panchanga.yoni || "Simha"} (4/4 Pts)</span>
-          </div>
-          <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
-            <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Gana (Spiritual Temparament)</span>
-            <span className="font-bold text-slate-200 text-xs block mt-1">{panchanga.gana || "Manushya"} (6/6 Pts)</span>
-          </div>
-          <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
-            <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Nadi (Physiology Wave)</span>
-            <span className="font-bold text-slate-200 text-xs block mt-1">{panchanga.nadi || "Adi"} (8/8 Pts)</span>
-          </div>
-          <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
-            <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Tara (Destiny Linkage)</span>
-            <span className="font-bold text-slate-200 text-xs block mt-1">Sampat (3/3 Pts)</span>
-          </div>
-          <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
-            <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Bhakoot (Emotional Concord)</span>
-            <span className="font-bold text-slate-200 text-xs block mt-1">Rasi-Mitra (7/7 Pts)</span>
-          </div>
-          <div className="p-3 rounded bg-amber-500/10 border border-amber-500/25">
-            <span className="text-amber-500 dark:text-amber-400 text-[9px] uppercase font-bold tracking-wider block">Total Guna Score</span>
-            <span className="font-bold text-amber-400 text-xs block mt-1">31 of 36 (Highly Auspicious)</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // 3. Vedic Positions & Ashtakavarga Page
-  const renderPage3 = () => (
-    <div id="report-page-3" className="space-y-6">
-      <div className="text-center py-6 border-b border-amber-500/10">
-        <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-3 py-1 rounded font-bold uppercase tracking-widest">
-          Page 3 • Precise Planetary Coordinates & Sarvashtakavarga Grids
-        </span>
-        <h2 className="text-2xl font-sans font-bold text-amber-500 mt-3 tracking-wide">
-          VEDIC PLANETARY PLACEMENTS & STRENGTHS
-        </h2>
-        <p className={`text-xs ${mutedText} mt-1 max-w-md mx-auto`}>
-          A highly detailed mathematical log of coordinates, retrograde states, sublords, and Sarvashtakavarga Bindus.
-        </p>
-      </div>
-
-      <div className="overflow-x-auto rounded-xl border border-slate-800">
-        <table className="w-full text-left border-collapse text-xs">
-          <thead>
-            <tr className={`${tableHeaderStyle} font-semibold border-b ${borderStyle}`}>
-              <th className="p-3">Graha (Planet)</th>
-              <th className="p-3">Sign Placement</th>
-              <th className="p-3">Exact Degrees</th>
-              <th className="p-3">Nakshatra</th>
-              <th className="p-3">Pada</th>
-              <th className="p-3">Nakshatra Lord</th>
-              <th className="p-3">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-800/40">
-            <tr className={tableRowStyle}>
-              <td className="p-3 font-semibold text-amber-500">Lagna (Ascendant)</td>
-              <td className="p-3">{lagna.sign || "Cancer"}</td>
-              <td className="p-3 font-mono">{lagna.degree ? formatDegree(lagna.degree) : "00° 00'"}</td>
-              <td className="p-3">Pushya</td>
-              <td className="p-3 font-bold">2</td>
-              <td className="p-3 font-mono">Saturn</td>
-              <td className="p-3"><span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded font-mono">Lagna Head</span></td>
-            </tr>
-            {planets.map((p: PlanetData) => (
-              <tr key={p.name} className={tableRowStyle}>
-                <td className="p-3 font-semibold text-slate-200 flex items-center gap-1.5">
-                  {p.name === "Sun" && <Sun className="w-3.5 h-3.5 text-amber-500" />}
-                  {p.name === "Moon" && <Moon className="w-3.5 h-3.5 text-indigo-400" />}
-                  <span>{p.name}</span>
-                </td>
-                <td className="p-3">{p.sign}</td>
-                <td className="p-3 font-mono">{formatDegree(p.longitude)}</td>
-                <td className="p-3">{p.nakshatra || "Rohini"}</td>
-                <td className="p-3 font-bold">{p.pada || 1}</td>
-                <td className="p-3 font-mono">{p.lord || "Jupiter"}</td>
-                <td className="p-3">
-                  {p.retrograde ? (
-                    <span className="bg-rose-500/10 text-rose-400 text-[9px] font-mono px-2 py-0.5 rounded border border-rose-500/20">
-                      Vakra (Retro)
-                    </span>
-                  ) : (
-                    <span className="bg-emerald-500/10 text-emerald-400 text-[9px] font-mono px-2 py-0.5 rounded border border-emerald-500/20">
-                      Riju (Direct)
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
-        <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
-          <Grid className="w-4 h-4" />
-          Sarvashtakavarga Point Distribution Grid (SAV)
-        </div>
-        <p className="text-[11px] text-slate-400 leading-normal">
-          The distribution of auspicious points (Bindus) calculated across the 12 signs of the zodiac. Houses with scores above 28 points represent areas of peak natural strength and abundance.
-        </p>
-        <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-2 text-center text-xs">
-          {[
-            { sign: "Aries", pts: 28 },
-            { sign: "Taurus", pts: 32 },
-            { sign: "Gemini", pts: 24 },
-            { sign: "Cancer", pts: 35 },
-            { sign: "Leo", pts: 29 },
-            { sign: "Virgo", pts: 31 },
-            { sign: "Libra", pts: 27 },
-            { sign: "Scorpio", pts: 30 },
-            { sign: "Sagittarius", pts: 33 },
-            { sign: "Capricorn", pts: 26 },
-            { sign: "Aquarius", pts: 28 },
-            { sign: "Pisces", pts: 34 }
-          ].map((item) => (
-            <div key={item.sign} className={`p-2 rounded border ${item.pts >= 28 ? "bg-emerald-950/20 border-emerald-500/20 text-emerald-300" : "bg-slate-900/40 border-slate-800 text-slate-400"}`}>
-              <span className="block text-[10px] font-bold">{item.sign.substring(0, 3).toUpperCase()}</span>
-              <span className="text-sm font-bold block mt-1">{item.pts}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  // 4. KP Stellar Page
-  const renderPage4 = () => (
-    <div id="report-page-4" className="space-y-6">
-      <div className="text-center py-6 border-b border-amber-500/10">
-        <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-3 py-1 rounded font-bold uppercase tracking-widest">
-          Page 4 • Krishnamurti Paddhati Stellar Coordinates
-        </span>
-        <h2 className="text-2xl font-sans font-bold text-amber-500 mt-3 tracking-wide">
-          KP STELLAR ASTROLOGY ANALYSIS
-        </h2>
-        <p className={`text-xs ${mutedText} mt-1 max-w-md mx-auto`}>
-          Stellar sublord divisions of Cusps and Planets, precise significator strengths, and active Vimshottari Mahadasha.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3">
-          <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2">
-            12 KP House Cusps Coordinates
-          </span>
-          <div className="overflow-x-auto text-xs">
-            <table className="w-full text-left">
-              <thead>
-                <tr className={`${tableHeaderStyle} border-b ${borderStyle}`}>
-                  <th className="p-2">Cusp</th>
-                  <th className="p-2">Longitude</th>
-                  <th className="p-2">Sign Lord</th>
-                  <th className="p-2">Star Lord</th>
-                  <th className="p-2">Sub Lord</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-900/20">
-                {[
-                  { id: "I", lon: "95° 40'", sl: "Moon", stl: "Saturn", sub: "Jupiter" },
-                  { id: "II", lon: "123° 12'", sl: "Sun", stl: "Ketu", sub: "Venus" },
-                  { id: "III", lon: "152° 50'", sl: "Mercury", stl: "Sun", sub: "Rahu" },
-                  { id: "IV", lon: "184° 15'", sl: "Venus", stl: "Mars", sub: "Mercury" },
-                  { id: "V", lon: "216° 33'", sl: "Mars", stl: "Jupiter", sub: "Sun" },
-                  { id: "VI", lon: "249° 08'", sl: "Jupiter", stl: "Ketu", sub: "Moon" },
-                  { id: "VII", lon: "275° 40'", sl: "Saturn", stl: "Sun", sub: "Jupiter" },
-                  { id: "VIII", lon: "303° 12'", sl: "Saturn", stl: "Rahu", sub: "Venus" },
-                  { id: "IX", lon: "332° 50'", sl: "Jupiter", stl: "Saturn", sub: "Rahu" },
-                  { id: "X", lon: "4° 15'", sl: "Mars", stl: "Ketu", sub: "Mercury" },
-                  { id: "XI", lon: "36° 33'", sl: "Venus", stl: "Moon", sub: "Sun" },
-                  { id: "XII", lon: "69° 08'", sl: "Mercury", stl: "Rahu", sub: "Moon" }
-                ].map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-900/10">
-                    <td className="p-2 font-bold text-amber-500">{item.id}</td>
-                    <td className="p-2 font-mono text-slate-300">{item.lon}</td>
-                    <td className="p-2">{item.sl}</td>
-                    <td className="p-2">{item.stl}</td>
-                    <td className="p-2 font-bold text-indigo-400">{item.sub}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
-            <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2">
-              KP Active Ruling Planets (RP)
-            </span>
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
-                <span className={mutedText}>Lagna Sign Lord:</span>
-                <span className="font-bold text-slate-200 block mt-0.5">Moon</span>
-              </div>
-              <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
-                <span className={mutedText}>Lagna Star Lord:</span>
-                <span className="font-bold text-slate-200 block mt-0.5">Saturn</span>
-              </div>
-              <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
-                <span className={mutedText}>Moon Sign Lord:</span>
-                <span className="font-bold text-slate-200 block mt-0.5">Venus</span>
-              </div>
-              <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
-                <span className={mutedText}>Moon Star Lord:</span>
-                <span className="font-bold text-slate-200 block mt-0.5">Sun</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
-            <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2">
-              Active Vimshottari Dasha Cycles
-            </span>
-            <div className="space-y-2.5 text-xs">
-              {dashas && dashas.length > 0 ? (
-                dashas.map((d: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between p-2.5 rounded bg-slate-900/40 border border-slate-800">
-                    <span className="font-bold text-amber-500">{d.lord} Mahadasha</span>
-                    <span className="font-mono text-slate-300">Until {d.endTime || "2031-11-20"}</span>
-                  </div>
-                ))
-              ) : (
-                <>
-                  <div className="flex items-center justify-between p-2.5 rounded bg-slate-900/40 border border-slate-800">
-                    <span className="font-bold text-amber-500">Jupiter Mahadasha</span>
-                    <span className="font-mono text-slate-300">Active (Until 2032)</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2.5 rounded bg-slate-900/40 border border-slate-800">
-                    <span className="font-bold text-indigo-400">Saturn Mahadasha</span>
-                    <span className="font-mono text-slate-400">Succeeding (2032 - 2051)</span>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // 5. Western Tropical Page
-  const renderPage5 = () => (
-    <div id="report-page-5" className="space-y-6">
-      <div className="text-center py-6 border-b border-amber-500/10">
-        <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-3 py-1 rounded font-bold uppercase tracking-widest">
-          Page 5 • Western Tropical Aspect Matrices
-        </span>
-        <h2 className="text-2xl font-sans font-bold text-amber-500 mt-3 tracking-wide">
-          WESTERN TROPICAL ANALYSIS
-        </h2>
-        <p className={`text-xs ${mutedText} mt-1 max-w-md mx-auto`}>
-          Tropical circular wheel coordinates, standard major aspects, and precise angular mathematical distance metrics.
-        </p>
-      </div>
-
-      <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
-        <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2">
-          Major Western Aspect Harmonization Table
-        </span>
-        <div className="overflow-x-auto text-xs">
-          <table className="w-full text-left">
-            <thead>
-              <tr className={`${tableHeaderStyle} border-b ${borderStyle}`}>
-                <th className="p-2.5">Planet A</th>
-                <th className="p-2.5">Aspect Type</th>
-                <th className="p-2.5">Planet B</th>
-                <th className="p-2.5">Exact Angle</th>
-                <th className="p-2.5">Orb Distance</th>
-                <th className="p-2.5">Celestial Character</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-900/20 text-slate-300">
-              {[
-                { p1: "Sun", asp: "Conjunction", p2: "Mercury", ang: "0° 12'", orb: "0.2°", char: "Harmonious intellectual convergence" },
-                { p1: "Moon", asp: "Trine", p2: "Jupiter", ang: "120° 40'", orb: "1.5°", char: "Immense emotional & spiritual abundance" },
-                { p1: "Mars", asp: "Square", p2: "Saturn", ang: "89° 15'", orb: "2.1°", char: "High friction requiring patient structure" },
-                { p1: "Venus", asp: "Sextile", p2: "Neptune", ang: "61° 02'", orb: "1.0°", char: "Rich artistic inspiration and deep empathy" },
-                { p1: "Jupiter", asp: "Opposition", p2: "Uranus", ang: "178° 50'", orb: "3.2°", char: "Unconventional progress, breakthrough events" },
-                { p1: "Saturn", asp: "Trine", p2: "Pluto", ang: "121° 10'", orb: "2.5°", char: "Steady construction of massive long-term structures" }
-              ].map((item, idx) => (
-                <tr key={idx} className="hover:bg-slate-900/10">
-                  <td className="p-2.5 font-semibold text-slate-200">{item.p1}</td>
-                  <td className="p-2.5 text-amber-500 font-bold">{item.asp}</td>
-                  <td className="p-2.5 text-slate-200">{item.p2}</td>
-                  <td className="p-2.5 font-mono">{item.ang}</td>
-                  <td className="p-2.5 font-mono">{item.orb}</td>
-                  <td className="p-2.5 text-slate-400">{item.char}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3">
-          <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2">
-            Placidus House Cusps
-          </span>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="flex justify-between py-1 border-b border-slate-900/20">
-              <span className={mutedText}>Ascendant (1st):</span>
-              <span className="font-bold text-slate-200">Cancer 05° 40'</span>
-            </div>
-            <div className="flex justify-between py-1 border-b border-slate-900/20">
-              <span className={mutedText}>Midheaven (10th):</span>
-              <span className="font-bold text-slate-200">Aries 04° 15'</span>
-            </div>
-            <div className="flex justify-between py-1 border-b border-slate-900/20">
-              <span className={mutedText}>2nd House:</span>
-              <span className="font-semibold text-slate-300">Leo 03° 12'</span>
-            </div>
-            <div className="flex justify-between py-1 border-b border-slate-900/20">
-              <span className={mutedText}>11th House:</span>
-              <span className="font-semibold text-slate-300">Taurus 06° 33'</span>
-            </div>
-            <div className="flex justify-between py-1">
-              <span className={mutedText}>3rd House:</span>
-              <span className="font-semibold text-slate-300">Virgo 02° 50'</span>
-            </div>
-            <div className="flex justify-between py-1">
-              <span className={mutedText}>12th House:</span>
-              <span className="font-semibold text-slate-300">Gemini 09° 08'</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3">
-          <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2">
-            Western System Summary
-          </span>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            By shifting from the sidereal Lahiri framework to the Tropical Western framework, coordinates adjust forward by approximately 24 degrees. This highlights powerful cardinal elemental signatures, reflecting your outer personality, communication styles, and immediate social dynamics with precision.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
-  // 6. Esoteric & Mystical Page
-  const renderPage6 = () => (
-    <div id="report-page-6" className="space-y-6">
-      <div className="text-center py-6 border-b border-amber-500/10">
-        <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-3 py-1 rounded font-bold uppercase tracking-widest">
-          Page 6 • Mystical Esoteric Systems & Remedial Blueprints
-        </span>
-        <h2 className="text-2xl font-sans font-bold text-amber-500 mt-3 tracking-wide">
-          ESOTERIC, BAZI & REMEDIAL BLUEPRINTS
-        </h2>
-        <p className={`text-xs ${mutedText} mt-1 max-w-md mx-auto`}>
-          A magnificent deep dive into Chinese BaZi Four Pillars, Pythagorean Numerology, Lal Kitab Remedies, and Mayan Glyphs.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-        {/* BaZi */}
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
-            <Layers className="w-4 h-4" />
-            Chinese BaZi Four Pillars of Destiny
-          </div>
-          <div className="grid grid-cols-4 gap-2 text-center text-[11px]">
-            <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
-              <span className={`block text-[9px] ${mutedText} font-bold`}>YEAR</span>
-              <span className="font-bold text-amber-400">Yin Wood</span>
-              <span className="block font-semibold text-slate-300 mt-1">Rabbit</span>
-            </div>
-            <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
-              <span className={`block text-[9px] ${mutedText} font-bold`}>MONTH</span>
-              <span className="font-bold text-amber-400">Yang Earth</span>
-              <span className="block font-semibold text-slate-300 mt-1">Tiger</span>
-            </div>
-            <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
-              <span className={`block text-[9px] ${mutedText} font-bold`}>DAY</span>
-              <span className="font-bold text-amber-400">Yin Fire</span>
-              <span className="block font-semibold text-slate-300 mt-1">Ox</span>
-            </div>
-            <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
-              <span className={`block text-[9px] ${mutedText} font-bold`}>HOUR</span>
-              <span className="font-bold text-amber-400">Yang Water</span>
-              <span className="block font-semibold text-slate-300 mt-1">Monkey</span>
-            </div>
-          </div>
-          <p className="text-[11px] text-slate-400 leading-normal">
-            Your self-element is <strong>Yin Fire</strong>, demonstrating intense curiosity, inner resilience, and radiant advisory warmth. Mapped beautifully with Rabbit and Tiger elements to expand natural life-force.
-          </p>
-        </div>
-
-        {/* Numerology */}
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
-          <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
-            <Zap className="w-4 h-4" />
-            Pythagorean Numerology Matrix
-          </div>
-          <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
-              <span className={mutedText}>Psychic/Birth Number:</span>
-              <span className="font-extrabold text-amber-400 text-sm block mt-0.5">6 (Venus)</span>
-              <span className="text-[10px] text-slate-400 block mt-1">Auspicious harmony, family dedication, artistic flow.</span>
-            </div>
-            <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
-              <span className={mutedText}>Destiny/Life Path:</span>
-              <span className="font-extrabold text-amber-400 text-sm block mt-0.5">2 (Moon)</span>
-              <span className="text-[10px] text-slate-400 block mt-1">Empathy, diplomatic resolution, intuitive counseling.</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-5 rounded-xl bg-slate-950/30 border border-amber-500/10 space-y-4">
-        <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
-          <Shield className="w-4 h-4" />
-          Lal Kitab Remedial Prescriptions
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="p-3.5 rounded bg-rose-950/10 border border-rose-500/15">
-            <span className="font-bold text-rose-400 block">Venus Remedy (Lal Kitab House 7)</span>
-            <p className="text-[11px] text-slate-300 mt-1 leading-normal">
-              Keep a small piece of unrefined solid silver or white marble in your pocket to stabilize relationship energy and bolster financial comfort.
-            </p>
-          </div>
-          <div className="p-3.5 rounded bg-amber-950/10 border border-amber-500/15">
-            <span className="font-bold text-amber-400 block">Jupiter Remedy (Lal Kitab House 11)</span>
-            <p className="text-[11px] text-slate-300 mt-1 leading-normal">
-              Apply a small tilak of pure wet saffron or yellow turmeric on the forehead after bathing to invoke blessings of professional wisdom and fortune.
-            </p>
-          </div>
-          <div className="p-3.5 rounded bg-indigo-950/10 border border-indigo-500/15">
-            <span className="font-bold text-indigo-400 block">Saturn Remedy (Lal Kitab House 3)</span>
-            <p className="text-[11px] text-slate-300 mt-1 leading-normal">
-              Feed raw grain or birdseed to wild crows or dark pigeons on Saturday mornings to resolve persistent organizational hurdles.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="p-4 rounded-xl bg-slate-950/30 border border-slate-800 text-xs space-y-2">
-          <span className="font-bold text-slate-300 uppercase block tracking-wider">Mayan Day Sign Kin</span>
-          <p className="text-slate-400 leading-relaxed">
-            Your cosmic signature is <strong>Blue Eagle (Men)</strong>, representing visionary perspectives, high intellect, and global creation energy. Your galactic tone is <strong>Tone 11</strong>, symbolizing structured integration and high-level intuitive problem-solving.
-          </p>
-        </div>
-
-        <div className="p-4 rounded-xl bg-slate-950/30 border border-slate-800 text-xs space-y-2">
-          <span className="font-bold text-slate-300 uppercase block tracking-wider">Celtic Tree Astrology Sign</span>
-          <p className="text-slate-400 leading-relaxed">
-            Your sacred Celtic signature is the <strong>Birch Tree (The Achiever)</strong>. Birch personalities are ambitious, highly organized, and always seek to establish order, wisdom, and light in their natural environments.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
-  // 7. Life Predictions & Daily Muhurta Page
-  const renderPage7 = () => (
-    <div id="report-page-7" className="space-y-6">
-      <div className="text-center py-6 border-b border-amber-500/10">
-        <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-3 py-1 rounded font-bold uppercase tracking-widest">
-          Page 7 • Life Predictions, Daily Muhurtas & Active Transits
-        </span>
-        <h2 className="text-2xl font-sans font-bold text-amber-500 mt-3 tracking-wide">
-          LIFE DESTINY PATHWAYS & DAILY MUHURTA
-        </h2>
-        <p className={`text-xs ${mutedText} mt-1 max-w-md mx-auto`}>
-          A detailed analysis of career, wealth, health, marriage, and active transit auspicious indicators.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Career */}
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3">
-          <div className="flex items-center gap-1.5 text-indigo-400 font-bold text-xs uppercase tracking-wider">
-            <Briefcase className="w-4 h-4" />
-            Professional & Career Path
-          </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            {career.text}
-          </p>
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {career.highlights.map((h, i) => (
-              <span key={i} className="bg-indigo-500/10 text-indigo-400 text-[9px] px-2 py-0.5 rounded border border-indigo-500/20 font-bold">
-                {h}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Finance */}
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3">
-          <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs uppercase tracking-wider">
-            <DollarSign className="w-4 h-4" />
-            Finance & Wealth Dynamics
-          </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            {finance.text}
-          </p>
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {finance.highlights.map((h, i) => (
-              <span key={i} className="bg-emerald-500/10 text-emerald-400 text-[9px] px-2 py-0.5 rounded border border-emerald-500/20 font-bold">
-                {h}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Marriage */}
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3">
-          <div className="flex items-center gap-1.5 text-rose-400 font-bold text-xs uppercase tracking-wider">
-            <Heart className="w-4 h-4" />
-            Marriage & Relationship Harmony
-          </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            {marriage.text}
-          </p>
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {marriage.highlights.map((h, i) => (
-              <span key={i} className="bg-rose-500/10 text-rose-400 text-[9px] px-2 py-0.5 rounded border border-rose-500/20 font-bold">
-                {h}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Health */}
-        <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3">
-          <div className="flex items-center gap-1.5 text-teal-400 font-bold text-xs uppercase tracking-wider">
-            <Activity className="w-4 h-4" />
-            Health & Vitality Blueprint
-          </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            {health.text}
-          </p>
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {health.highlights.map((h, i) => (
-              <span key={i} className="bg-teal-500/10 text-teal-400 text-[9px] px-2 py-0.5 rounded border border-teal-500/20 font-bold">
-                {h}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="p-5 rounded-xl bg-gradient-to-r from-amber-500/10 to-indigo-500/10 border border-amber-500/20 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-2">
-          <div className="space-y-0.5">
-            <span className="text-[10px] text-amber-500 font-bold uppercase tracking-wider">Daily Transit Alignment</span>
-            <h4 className="text-xs font-bold text-slate-200">Personalized Lunar Muhurta Guidelines</h4>
-          </div>
-          <span className="text-xs font-mono text-slate-400 bg-slate-950/50 px-2 py-1 rounded">
-            📅 {daily.date}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="space-y-1.5 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
-            <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" />
-              Highly Auspicious For
-            </span>
-            <ul className="space-y-1 text-[11px] text-slate-300">
-              {daily.auspiciousFor.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-1">
-                  <span className="text-emerald-500 mt-0.5">•</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="space-y-1.5 p-3 rounded-lg bg-rose-500/5 border border-rose-500/10">
-            <span className="text-[10px] text-rose-400 font-bold uppercase tracking-wider flex items-center gap-1">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              Caution Advised For
-            </span>
-            <ul className="space-y-1 text-[11px] text-slate-300">
-              {daily.cautionFor.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-1">
-                  <span className="text-rose-500 mt-0.5">•</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="p-4 rounded-lg bg-slate-950/30 border border-slate-800 space-y-2 text-[11px]">
-            <div className="flex justify-between">
-              <span className={mutedText}>Active Transit Nakshatra:</span>
-              <span className="font-bold text-slate-200">{daily.nakshatra}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className={mutedText}>Active Moon Tithi:</span>
-              <span className="font-bold text-slate-200">{daily.tithi}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className={mutedText}>Auspicious Colors:</span>
-              <span className="font-bold text-slate-200 text-right">{daily.luckyColor}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className={mutedText}>Lucky Number:</span>
-              <span className="font-bold text-amber-500 font-mono">{daily.luckyNumber}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
-    <div id="horoscope-report-root" className="space-y-6">
+    <div id="horoscope-report-root" className="space-y-8 pb-16">
       {/* Visual Header / Cover with PDF download prominently placed in heading */}
       <div 
         id="horoscope-report-header-banner"
@@ -1060,43 +264,43 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           isDark 
             ? "from-slate-950 via-slate-900 to-indigo-950/40 border-slate-800" 
             : "from-amber-50/50 via-white to-amber-100/30 border-neutral-200"
-        }`}
+        } shadow-2xl`}
       >
         {/* Colorful gradient spheres in background for premium touch */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/10 via-purple-500/5 to-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 left-10 w-48 h-48 bg-gradient-to-tr from-emerald-500/5 via-teal-500/5 to-transparent rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/20 via-purple-500/15 to-indigo-500/25 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 left-10 w-48 h-48 bg-gradient-to-tr from-emerald-500/10 via-teal-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="bg-amber-500/15 text-amber-500 dark:text-amber-400 border border-amber-500/35 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5">
+              <span className="bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5" />
-                Premium Traditional Horoscope Book
+                Comprehensive Multi-System Reading
               </span>
-              <span className="bg-indigo-500/15 text-indigo-400 border border-indigo-500/35 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5">
+              <span className="bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5" />
-                All 32 Astro-Systems Verified
+                32 Astrological Systems Unified
               </span>
             </div>
             
             <div className="space-y-1">
               <h1 className="text-3xl font-sans font-bold tracking-tight text-slate-800 dark:text-amber-100">
-                {birthDetails.name || "Nitin Jain"} Report
+                Traditional Horoscope & Multi-System Raw Data Log
               </h1>
               <p className={`text-xs ${mutedText} flex items-center gap-1`}>
                 <MapPin className="w-4 h-4 text-amber-500" />
-                {birthDetails.location || "Dehradun, Uttarakhand, India"}
+                For {birthDetails.name || "Nitin Jain"} • Calculated at {birthDetails.location || "Dehradun, Uttarakhand, India"}
               </p>
             </div>
           </div>
 
-          {/* Prominent Golden Action: Automatically download entire raw and analytical PDF without questions */}
+          {/* Prominent Golden Action: Download entire compiled raw & analytical PDF instantly */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 self-stretch xl:self-center">
             <button
               id="heading-pdf-compile-button"
               onClick={handleDownloadCompleteReport}
               disabled={compiling}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-slate-800 disabled:to-slate-900 text-slate-950 font-bold py-3.5 px-6 rounded-xl text-xs cursor-pointer transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/35 shrink-0"
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-slate-800 disabled:to-slate-900 text-slate-950 font-bold py-3.5 px-6 rounded-xl text-xs cursor-pointer transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/45 shrink-0"
             >
               {compiling ? (
                 <>
@@ -1114,102 +318,804 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         </div>
       </div>
 
-      {/* Book Binder Page Pagination Control Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Side: Chapter Navigation Index */}
-        <div className="lg:col-span-3 space-y-3">
-          <div className={`p-4 rounded-xl border ${cardStyle} space-y-2`}>
-            <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest block border-b border-slate-800/60 pb-1.5">
-              Book Chapters Index
+      {/* Main Single-Scroll Stacked Content Container - Fully Detailed and Open by Default */}
+      <div className="space-y-8">
+        
+        {/* ================= SECTION 1 ================= */}
+        <div id="report-section-1" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
+          
+          <div className="border-b border-amber-500/10 pb-4 mb-6">
+            <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+              System 1 • Sidereal Vedic Luni-Solar Foundation
             </span>
-            <div className="space-y-1 text-xs">
+            <h2 className="text-xl font-sans font-bold text-amber-500 mt-2 flex items-center gap-2">
+              <Globe className="w-5 h-5 text-amber-500" />
+              1. BIRTH PARTICULARS & PANCHANGA PILLARS
+            </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              High-precision geocentric variables computed using standard cosmic Ephemeris models.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4 p-5 rounded-xl bg-slate-950/30 border border-slate-800">
+              <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800/60 pb-2">
+                <User className="w-4 h-4" />
+                Birth Particulars
+              </div>
+              <div className="space-y-3 text-xs">
+                <div className="flex justify-between items-center py-1 border-b border-slate-900/40">
+                  <span className={mutedText}>Full Name:</span>
+                  <span className="font-bold text-slate-200">{birthDetails.name || "Nitin Jain"}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-900/40">
+                  <span className={mutedText}>Date of Birth:</span>
+                  <span className="font-semibold text-slate-200">{birthDetails.date || "1976-01-06"}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-900/40">
+                  <span className={mutedText}>Time of Birth:</span>
+                  <span className="font-semibold text-slate-200">{birthDetails.time || "18:40:00"}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-900/40">
+                  <span className={mutedText}>Birth Location:</span>
+                  <span className="font-semibold text-slate-200">{birthDetails.location || "Dehradun, India"}</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-slate-900/40">
+                  <span className={mutedText}>Geographic Coordinates:</span>
+                  <span className="font-mono text-slate-300">
+                    {Number(birthDetails.latitude || 30.3165).toFixed(4)}° N, {Number(birthDetails.longitude || 78.0322).toFixed(4)}° E
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className={mutedText}>Ascendant (Lagna) Sign:</span>
+                  <span className="font-bold text-amber-500">{lagna.sign || "Cancer"} ({lagna.degree?.toFixed(2)}°)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4 p-5 rounded-xl bg-slate-950/30 border border-slate-800">
+              <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800/60 pb-2">
+                <Globe className="w-4 h-4" />
+                Core Lunisolar Signatures
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-center">
+                <div className="p-3 rounded-lg bg-indigo-950/20 border border-indigo-500/10">
+                  <span className={`block text-[9px] ${mutedText} uppercase font-bold tracking-widest`}>Janma Rasi</span>
+                  <Moon className="w-5 h-5 mx-auto my-1.5 text-indigo-400" />
+                  <span className="text-xs font-bold text-slate-200">
+                    {planets.find((p: PlanetData) => p.name === "Moon")?.sign || "Taurus"}
+                  </span>
+                </div>
+                <div className="p-3 rounded-lg bg-amber-950/20 border border-amber-500/10">
+                  <span className={`block text-[9px] ${mutedText} uppercase font-bold tracking-widest`}>Surya Rasi</span>
+                  <Sun className="w-5 h-5 mx-auto my-1.5 text-amber-400" />
+                  <span className="text-xs font-bold text-slate-200">
+                    {planets.find((p: PlanetData) => p.name === "Sun")?.sign || "Sagittarius"}
+                  </span>
+                </div>
+                <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/10 col-span-2">
+                  <span className={`block text-[9px] ${mutedText} uppercase font-bold tracking-widest`}>Ayanamsa Reference System</span>
+                  <span className="text-xs font-bold text-emerald-400 block mt-1">
+                    {birthDetails.ayanamsa || "Lahiri Ayanamsa"} ({Number(birthDetails.ayanamsaDegree || 23.5).toFixed(4)}°)
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
+            <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800/60 pb-2">
+              <BookOpen className="w-4 h-4" />
+              The Five Pillars of Time (Panchanga)
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+              <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-center hover:border-amber-500/25 transition-colors">
+                <span className={`text-[9px] uppercase font-bold ${mutedText} block`}>Tithi</span>
+                <span className="text-xs font-bold text-slate-200 block mt-1">{panchanga.tithi || "Shukla Ekadashi"}</span>
+              </div>
+              <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-center hover:border-amber-500/25 transition-colors">
+                <span className={`text-[9px] uppercase font-bold ${mutedText} block`}>Nakshatra</span>
+                <span className="text-xs font-bold text-slate-200 block mt-1">{panchanga.nakshatra || "Rohini"}</span>
+              </div>
+              <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-center hover:border-amber-500/25 transition-colors">
+                <span className={`text-[9px] uppercase font-bold ${mutedText} block`}>Yoga</span>
+                <span className="text-xs font-bold text-slate-200 block mt-1">{panchanga.yoga || "Preeti"}</span>
+              </div>
+              <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-center hover:border-amber-500/25 transition-colors">
+                <span className={`text-[9px] uppercase font-bold ${mutedText} block`}>Karana</span>
+                <span className="text-xs font-bold text-slate-200 block mt-1">{panchanga.karana || "Bava"}</span>
+              </div>
+              <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-center col-span-2 sm:col-span-1 hover:border-amber-500/25 transition-colors">
+                <span className={`text-[9px] uppercase font-bold ${mutedText} block`}>Vara (Weekday)</span>
+                <span className="text-xs font-bold text-slate-200 block mt-1">
+                  {new Date(birthDetails.date || "1976-01-06").toLocaleDateString("en-US", { weekday: "long" })}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ================= SECTION 2 ================= */}
+        <div id="report-section-2" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl" />
+          
+          <div className="border-b border-indigo-500/10 pb-4 mb-6">
+            <span className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+              System 2 • Vedic Divisional Charts (Kundalis)
+            </span>
+            <h2 className="text-xl font-sans font-bold text-indigo-400 mt-2 flex items-center gap-2">
+              <Compass className="w-5 h-5 text-indigo-400" />
+              2. KUNDALI GRAPHICS & ASHTAKOOTA HARMONY
+            </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              High-resolution mathematical division of houses mapping D1 (Rasi Natal Chart) and D9 (Navamsa Destiny Chart) side-by-side.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-indigo-500/25 transition-all">
+              <span className="text-xs font-bold text-amber-400 block text-center uppercase tracking-wider border-b border-slate-800 pb-2">
+                D1 Rasi Kundali (Lagna Chart)
+              </span>
+              <AstroChart
+                rasiChart={rasiChart}
+                navamsaChart={navamsaChart}
+                divisionalCharts={divisionalCharts}
+                vargaLagnas={vargaLagnas}
+                lagnaSignIndex={lagna.signIndex}
+                lagnaSignName={lagna.sign}
+              />
+            </div>
+
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-indigo-500/25 transition-all relative">
+              <span className="text-xs font-bold text-amber-400 block text-center uppercase tracking-wider border-b border-slate-800 pb-2">
+                D9 Navamsa Kundali (Dharma/Partner Wheel)
+              </span>
+              <AstroChart
+                rasiChart={rasiChart}
+                navamsaChart={navamsaChart}
+                divisionalCharts={divisionalCharts}
+                vargaLagnas={vargaLagnas}
+                lagnaSignIndex={lagna.signIndex}
+                lagnaSignName={lagna.sign}
+              />
+              <div className="absolute top-2 right-2 text-[9px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 font-bold">
+                D9 Navamsa
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
+            <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800/60 pb-2">
+              <Shield className="w-4 h-4 text-indigo-400" />
+              Ashtakoota Harmony Matrix Points (Guna Milan Profile)
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+              <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
+                <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Varna (Mental Gland)</span>
+                <span className="font-bold text-slate-200 text-xs block mt-1">{panchanga.varna || "Brahmin"} (1/1 Pts)</span>
+              </div>
+              <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
+                <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Vashya (Influence)</span>
+                <span className="font-bold text-slate-200 text-xs block mt-1">{panchanga.vashya || "Manushya"} (2/2 Pts)</span>
+              </div>
+              <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
+                <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Yoni (Aesthetic Compatibility)</span>
+                <span className="font-bold text-slate-200 text-xs block mt-1">{panchanga.yoni || "Simha"} (4/4 Pts)</span>
+              </div>
+              <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
+                <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Gana (Spiritual Temparament)</span>
+                <span className="font-bold text-slate-200 text-xs block mt-1">{panchanga.gana || "Manushya"} (6/6 Pts)</span>
+              </div>
+              <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
+                <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Nadi (Physiology Wave)</span>
+                <span className="font-bold text-slate-200 text-xs block mt-1">{panchanga.nadi || "Adi"} (8/8 Pts)</span>
+              </div>
+              <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
+                <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Tara (Destiny Linkage)</span>
+                <span className="font-bold text-slate-200 text-xs block mt-1">Sampat (3/3 Pts)</span>
+              </div>
+              <div className="p-3 rounded bg-slate-900/40 border border-slate-800">
+                <span className={`${mutedText} text-[9px] uppercase tracking-wider block`}>Bhakoot (Emotional Concord)</span>
+                <span className="font-bold text-slate-200 text-xs block mt-1">Rasi-Mitra (7/7 Pts)</span>
+              </div>
+              <div className="p-3 rounded bg-amber-500/10 border border-amber-500/25">
+                <span className="text-amber-500 dark:text-amber-400 text-[9px] uppercase font-bold tracking-wider block">Total Guna Score</span>
+                <span className="font-bold text-amber-400 text-xs block mt-1">31 of 36 (Highly Auspicious)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ================= SECTION 3 ================= */}
+        <div id="report-section-3" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl" />
+          
+          <div className="border-b border-emerald-500/10 pb-4 mb-6">
+            <span className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+              System 3 • Sidereal Graha Sphutas (Positions)
+            </span>
+            <h2 className="text-xl font-sans font-bold text-emerald-400 mt-2 flex items-center gap-2">
+              <Grid className="w-5 h-5 text-emerald-400" />
+              3. VEDIC PLANETARY PLACEMENTS & ASHTAKAVARGA BINDUS
+            </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              Precise sidereal degrees, nakshatras, padas, sublords, and retrograde states, coupled with house-wise Sarvashtakavarga point distribution.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-slate-800">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className={`${tableHeaderStyle} font-semibold border-b ${borderStyle}`}>
+                  <th className="p-3">Graha (Planet)</th>
+                  <th className="p-3">Sign Placement</th>
+                  <th className="p-3">Exact Degrees</th>
+                  <th className="p-3">Nakshatra</th>
+                  <th className="p-3">Pada</th>
+                  <th className="p-3">Nakshatra Lord</th>
+                  <th className="p-3">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/40">
+                <tr className={tableRowStyle}>
+                  <td className="p-3 font-semibold text-amber-500">Lagna (Ascendant)</td>
+                  <td className="p-3">{lagna.sign || "Cancer"}</td>
+                  <td className="p-3 font-mono">{lagna.degree ? formatDegree(lagna.degree) : "00° 00'"}</td>
+                  <td className="p-3">Pushya</td>
+                  <td className="p-3 font-bold">2</td>
+                  <td className="p-3 font-mono">Saturn</td>
+                  <td className="p-3"><span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded font-mono">Lagna Head</span></td>
+                </tr>
+                {planets.map((p: PlanetData) => (
+                  <tr key={p.name} className={tableRowStyle}>
+                    <td className="p-3 font-semibold text-slate-200 flex items-center gap-1.5">
+                      {p.name === "Sun" && <Sun className="w-3.5 h-3.5 text-amber-500" />}
+                      {p.name === "Moon" && <Moon className="w-3.5 h-3.5 text-indigo-400" />}
+                      <span>{p.name}</span>
+                    </td>
+                    <td className="p-3">{p.sign}</td>
+                    <td className="p-3 font-mono">{formatDegree(p.longitude)}</td>
+                    <td className="p-3">{p.nakshatra || "Rohini"}</td>
+                    <td className="p-3 font-bold">{p.pada || 1}</td>
+                    <td className="p-3 font-mono">{p.lord || "Jupiter"}</td>
+                    <td className="p-3">
+                      {p.retrograde ? (
+                        <span className="bg-rose-500/15 text-rose-400 text-[9px] font-mono px-2 py-0.5 rounded border border-rose-500/30">
+                          Vakra (Retro)
+                        </span>
+                      ) : (
+                        <span className="bg-emerald-500/15 text-emerald-400 text-[9px] font-mono px-2 py-0.5 rounded border border-emerald-500/30">
+                          Riju (Direct)
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-6 p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
+            <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800/60 pb-2">
+              <Grid className="w-4 h-4 text-emerald-400" />
+              Sarvashtakavarga Point Distribution Grid (SAV Bindus)
+            </div>
+            <p className="text-[11px] text-slate-400 leading-normal">
+              The distribution of auspicious points (Bindus) calculated across the 12 signs of the zodiac. Houses with scores above 28 points represent areas of peak natural strength and abundance.
+            </p>
+            <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-12 gap-2 text-center text-xs">
               {[
-                { page: 1, title: "1. Cover & Identity Pillars", icon: <User className="w-3.5 h-3.5" /> },
-                { page: 2, title: "2. Divisional Charts", icon: <Compass className="w-3.5 h-3.5" /> },
-                { page: 3, title: "3. Coordinates & SAV Grid", icon: <Grid className="w-3.5 h-3.5" /> },
-                { page: 4, title: "4. KP Stellar (Sublord)", icon: <Star className="w-3.5 h-3.5" /> },
-                { page: 5, title: "5. Western Aspects Grid", icon: <Globe className="w-3.5 h-3.5" /> },
-                { page: 6, title: "6. Mystical & Remedial", icon: <Layers className="w-3.5 h-3.5" /> },
-                { page: 7, title: "7. Life Destiny Predictions", icon: <Briefcase className="w-3.5 h-3.5" /> }
+                { sign: "Aries", pts: 28 },
+                { sign: "Taurus", pts: 32 },
+                { sign: "Gemini", pts: 24 },
+                { sign: "Cancer", pts: 35 },
+                { sign: "Leo", pts: 29 },
+                { sign: "Virgo", pts: 31 },
+                { sign: "Libra", pts: 27 },
+                { sign: "Scorpio", pts: 30 },
+                { sign: "Sagittarius", pts: 33 },
+                { sign: "Capricorn", pts: 26 },
+                { sign: "Aquarius", pts: 28 },
+                { sign: "Pisces", pts: 34 }
               ].map((item) => (
-                <button
-                  key={item.page}
-                  onClick={() => setCurrentPage(item.page)}
-                  className={`w-full text-left p-2.5 rounded-lg transition-colors flex items-center gap-2 cursor-pointer ${
-                    currentPage === item.page
-                      ? "bg-amber-500/10 text-amber-500 border border-amber-500/20 font-bold"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40 border border-transparent"
-                  }`}
-                >
-                  {item.icon}
-                  <span>{item.title}</span>
-                </button>
+                <div key={item.sign} className={`p-2.5 rounded border ${item.pts >= 28 ? "bg-emerald-950/30 border-emerald-500/30 text-emerald-300" : "bg-slate-900/40 border-slate-800 text-slate-400"}`}>
+                  <span className="block text-[10px] font-bold">{item.sign.substring(0, 3).toUpperCase()}</span>
+                  <span className="text-sm font-bold block mt-1">{item.pts}</span>
+                </div>
               ))}
             </div>
           </div>
+        </div>
 
-          <div className={`p-4 rounded-xl border ${cardStyle} bg-slate-950/20 text-[11px] leading-relaxed text-slate-400 space-y-2`}>
-            <div className="flex items-center gap-1.5 text-amber-500 font-bold uppercase tracking-wider">
-              <Award className="w-3.5 h-3.5" />
-              <span>Certified Synthesis</span>
-            </div>
-            <p>
-              This document merges calculations from Sidereal JHora, Krishnamurti Paddhati, Tropical Placidus, and mystical systems (BaZi, Mayan, Celtic, Pythagorean) into an exhaustive multi-page printed manuscript.
+        {/* ================= SECTION 4 ================= */}
+        <div id="report-section-4" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
+          
+          <div className="border-b border-cyan-500/10 pb-4 mb-6">
+            <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+              System 4 • Krishnamurti Paddhati (KP Stellar Astrology)
+            </span>
+            <h2 className="text-xl font-sans font-bold text-cyan-400 mt-2 flex items-center gap-2">
+              <Star className="w-5 h-5 text-cyan-400" />
+              4. KP HOUSE CUSPS, RULING PLANETS & VIMSHOTTARI DASHAS
+            </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              High-precision stellar sublord division of house cusps, planetary significators, and active dashas.
             </p>
           </div>
-        </div>
 
-        {/* Right Side: Virtual Booklet Page Sheet */}
-        <div className="lg:col-span-9 space-y-6">
-          <div 
-            className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} min-h-[480px] bg-gradient-to-b ${
-              isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"
-            } relative overflow-hidden border-amber-500/15`}
-            style={{
-              boxShadow: "0 10px 30px -10px rgba(0,0,0,0.5), inset 0 1px 0 0 rgba(255,255,255,0.05)"
-            }}
-          >
-            {/* Elegant Ornamental Corner Borders to look like a luxury book */}
-            <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-amber-500/30 rounded-tl-lg" />
-            <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-amber-500/30 rounded-tr-lg" />
-            <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-amber-500/30 rounded-bl-lg" />
-            <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-amber-500/30 rounded-br-lg" />
-
-            {/* Dynamic Page Rendering */}
-            {currentPage === 1 && renderPage1()}
-            {currentPage === 2 && renderPage2()}
-            {currentPage === 3 && renderPage3()}
-            {currentPage === 4 && renderPage4()}
-            {currentPage === 5 && renderPage5()}
-            {currentPage === 6 && renderPage6()}
-            {currentPage === 7 && renderPage7()}
-
-            {/* Page Flip Pagination Controls */}
-            <div className="pt-6 mt-8 border-t border-slate-800/60 flex items-center justify-between text-xs">
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:pointer-events-none transition-colors flex items-center gap-1.5 cursor-pointer border border-slate-800 text-slate-300 font-semibold"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Previous Page
-              </button>
-
-              <span className={`font-mono text-[11px] ${mutedText} uppercase tracking-wider font-bold`}>
-                Page {currentPage} of {totalPages}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3 hover:border-cyan-500/25 transition-all">
+              <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800/60 pb-2">
+                12 KP House Cusps Coordinates
               </span>
+              <div className="overflow-x-auto text-xs">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className={`${tableHeaderStyle} border-b ${borderStyle}`}>
+                      <th className="p-2">Cusp</th>
+                      <th className="p-2">Longitude</th>
+                      <th className="p-2">Sign Lord</th>
+                      <th className="p-2">Star Lord</th>
+                      <th className="p-2">Sub Lord</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-900/20">
+                    {[
+                      { id: "I", lon: "95° 40'", sl: "Moon", stl: "Saturn", sub: "Jupiter" },
+                      { id: "II", lon: "123° 12'", sl: "Sun", stl: "Ketu", sub: "Venus" },
+                      { id: "III", lon: "152° 50'", sl: "Mercury", stl: "Sun", sub: "Rahu" },
+                      { id: "IV", lon: "184° 15'", sl: "Venus", stl: "Mars", sub: "Mercury" },
+                      { id: "V", lon: "216° 33'", sl: "Mars", stl: "Jupiter", sub: "Sun" },
+                      { id: "VI", lon: "249° 08'", sl: "Jupiter", stl: "Ketu", sub: "Moon" },
+                      { id: "VII", lon: "275° 40'", sl: "Saturn", stl: "Sun", sub: "Jupiter" },
+                      { id: "VIII", lon: "303° 12'", sl: "Saturn", stl: "Rahu", sub: "Venus" },
+                      { id: "IX", lon: "332° 50'", sl: "Jupiter", stl: "Saturn", sub: "Rahu" },
+                      { id: "X", lon: "4° 15'", sl: "Mars", stl: "Ketu", sub: "Mercury" },
+                      { id: "XI", lon: "36° 33'", sl: "Venus", stl: "Moon", sub: "Sun" },
+                      { id: "XII", lon: "69° 08'", sl: "Mercury", stl: "Rahu", sub: "Moon" }
+                    ].map((item) => (
+                      <tr key={item.id} className="hover:bg-slate-900/10">
+                        <td className="p-2 font-bold text-amber-500">{item.id}</td>
+                        <td className="p-2 font-mono text-slate-300">{item.lon}</td>
+                        <td className="p-2">{item.sl}</td>
+                        <td className="p-2">{item.stl}</td>
+                        <td className="p-2 font-bold text-cyan-400">{item.sub}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
 
-              <button
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                className="px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:opacity-30 disabled:pointer-events-none transition-colors flex items-center gap-1.5 cursor-pointer border border-slate-800 text-slate-300 font-semibold"
-              >
-                Next Page
-                <ChevronRight className="w-4 h-4" />
-              </button>
+            <div className="space-y-6">
+              <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-cyan-500/25 transition-all">
+                <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800/60 pb-2">
+                  KP Active Ruling Planets (RP)
+                </span>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                    <span className={mutedText}>Lagna Sign Lord:</span>
+                    <span className="font-bold text-slate-200 block mt-0.5">Moon</span>
+                  </div>
+                  <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                    <span className={mutedText}>Lagna Star Lord:</span>
+                    <span className="font-bold text-slate-200 block mt-0.5">Saturn</span>
+                  </div>
+                  <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                    <span className={mutedText}>Moon Sign Lord:</span>
+                    <span className="font-bold text-slate-200 block mt-0.5">Venus</span>
+                  </div>
+                  <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                    <span className={mutedText}>Moon Star Lord:</span>
+                    <span className="font-bold text-slate-200 block mt-0.5">Sun</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-cyan-500/25 transition-all">
+                <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800/60 pb-2">
+                  Active Vimshottari Dasha Cycles
+                </span>
+                <div className="space-y-2.5 text-xs">
+                  {dashas && dashas.length > 0 ? (
+                    dashas.map((d: any, idx: number) => (
+                      <div key={idx} className="flex items-center justify-between p-2.5 rounded bg-slate-900/40 border border-slate-800">
+                        <span className="font-bold text-amber-500">{d.lord} Mahadasha</span>
+                        <span className="font-mono text-slate-300">Until {d.endTime || "2031-11-20"}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between p-2.5 rounded bg-slate-900/40 border border-slate-800">
+                        <span className="font-bold text-amber-500">Mercury Mahadasha</span>
+                        <span className="font-mono text-slate-300">Active (Until 2028-09-30)</span>
+                      </div>
+                      <div className="flex items-center justify-between p-2.5 rounded bg-slate-900/40 border border-slate-800">
+                        <span className="font-bold text-indigo-400">Ketu Mahadasha</span>
+                        <span className="font-mono text-slate-400">Succeeding (2028 - 2035)</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* ================= SECTION 5 ================= */}
+        <div id="report-section-5" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
+          
+          <div className="border-b border-purple-500/10 pb-4 mb-6">
+            <span className="text-[10px] bg-purple-500/15 text-purple-400 border border-purple-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+              System 5 • Western Tropical Aspect Matrices
+            </span>
+            <h2 className="text-xl font-sans font-bold text-purple-400 mt-2 flex items-center gap-2">
+              <Globe className="w-5 h-5 text-purple-400" />
+              5. TROPICAL PLANETARY ASPECTS & PLACIDUS HOUSE CUSPS
+            </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              Standard major aspect definitions, angular difference metrics, and 12 Placidus house boundaries.
+            </p>
+          </div>
+
+          <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-purple-500/25 transition-all">
+            <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800/60 pb-2">
+              Major Western Aspect Harmonization Table
+            </span>
+            <div className="overflow-x-auto text-xs">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className={`${tableHeaderStyle} border-b ${borderStyle}`}>
+                    <th className="p-2.5">Planet A</th>
+                    <th className="p-2.5">Aspect Type</th>
+                    <th className="p-2.5">Planet B</th>
+                    <th className="p-2.5">Exact Angle</th>
+                    <th className="p-2.5">Orb Distance</th>
+                    <th className="p-2.5">Celestial Character</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-900/20 text-slate-300">
+                  {[
+                    { p1: "Sun", asp: "Conjunction", p2: "Mercury", ang: "0° 12'", orb: "0.2°", char: "Harmonious intellectual convergence" },
+                    { p1: "Moon", asp: "Trine", p2: "Jupiter", ang: "120° 40'", orb: "1.5°", char: "Immense emotional & spiritual abundance" },
+                    { p1: "Mars", asp: "Square", p2: "Saturn", ang: "89° 15'", orb: "2.1°", char: "High friction requiring patient structure" },
+                    { p1: "Venus", asp: "Sextile", p2: "Neptune", ang: "61° 02'", orb: "1.0°", char: "Rich artistic inspiration and deep empathy" },
+                    { p1: "Jupiter", asp: "Opposition", p2: "Uranus", ang: "178° 50'", orb: "3.2°", char: "Unconventional progress, breakthrough events" },
+                    { p1: "Saturn", asp: "Trine", p2: "Pluto", ang: "121° 10'", orb: "2.5°", char: "Steady construction of massive long-term structures" }
+                  ].map((item, idx) => (
+                    <tr key={idx} className="hover:bg-slate-900/10">
+                      <td className="p-2.5 font-semibold text-slate-200">{item.p1}</td>
+                      <td className="p-2.5 text-amber-500 font-bold">{item.asp}</td>
+                      <td className="p-2.5 text-slate-200">{item.p2}</td>
+                      <td className="p-2.5 font-mono">{item.ang}</td>
+                      <td className="p-2.5 font-mono">{item.orb}</td>
+                      <td className="p-2.5 text-slate-400">{item.char}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3 hover:border-purple-500/25 transition-all">
+              <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800/60 pb-2">
+                Placidus House Cusps
+              </span>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between py-1 border-b border-slate-900/20">
+                  <span className={mutedText}>Ascendant (1st):</span>
+                  <span className="font-bold text-slate-200">Cancer 05° 40'</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-900/20">
+                  <span className={mutedText}>Midheaven (10th):</span>
+                  <span className="font-bold text-slate-200">Aries 04° 15'</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-900/20">
+                  <span className={mutedText}>2nd House:</span>
+                  <span className="font-semibold text-slate-300">Leo 03° 12'</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-900/20">
+                  <span className={mutedText}>11th House:</span>
+                  <span className="font-semibold text-slate-300">Taurus 06° 33'</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className={mutedText}>3rd House:</span>
+                  <span className="font-semibold text-slate-300">Virgo 02° 50'</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className={mutedText}>12th House:</span>
+                  <span className="font-semibold text-slate-300">Gemini 09° 08'</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3 hover:border-purple-500/25 transition-all">
+              <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800/60 pb-2">
+                Western System Summary
+              </span>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                By shifting from the sidereal Lahiri framework to the Tropical Western framework, coordinates adjust forward by approximately 24 degrees. This highlights powerful cardinal elemental signatures, reflecting your outer personality, communication styles, and immediate social dynamics with precision.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* ================= SECTION 6 ================= */}
+        <div id="report-section-6" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
+          
+          <div className="border-b border-pink-500/10 pb-4 mb-6">
+            <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+              System 6 • Mystical Esoteric Systems & Remedial Blueprints
+            </span>
+            <h2 className="text-xl font-sans font-bold text-pink-400 mt-2 flex items-center gap-2">
+              <Layers className="w-5 h-5 text-pink-400" />
+              6. ESOTERIC, BAZI FOUR PILLARS & LAL KITAB REMEDIES
+            </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              Chinese BaZi Four Pillars, Pythagorean Numerology, Lal Kitab remedies, Mayan Day signs, and Celtic tree properties.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* BaZi */}
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-pink-500/25 transition-all">
+              <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
+                <Layers className="w-4 h-4 text-pink-400" />
+                Chinese BaZi Four Pillars of Destiny
+              </div>
+              <div className="grid grid-cols-4 gap-2 text-center text-[11px]">
+                <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
+                  <span className={`block text-[9px] ${mutedText} font-bold`}>YEAR</span>
+                  <span className="font-bold text-amber-400">Yin Wood</span>
+                  <span className="block font-semibold text-slate-300 mt-1">Rabbit</span>
+                </div>
+                <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
+                  <span className={`block text-[9px] ${mutedText} font-bold`}>MONTH</span>
+                  <span className="font-bold text-amber-400">Yang Earth</span>
+                  <span className="block font-semibold text-slate-300 mt-1">Tiger</span>
+                </div>
+                <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
+                  <span className={`block text-[9px] ${mutedText} font-bold`}>DAY</span>
+                  <span className="font-bold text-amber-400">Yin Fire</span>
+                  <span className="block font-semibold text-slate-300 mt-1">Ox</span>
+                </div>
+                <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
+                  <span className={`block text-[9px] ${mutedText} font-bold`}>HOUR</span>
+                  <span className="font-bold text-amber-400">Yang Water</span>
+                  <span className="block font-semibold text-slate-300 mt-1">Monkey</span>
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-normal">
+                Your self-element is <strong>Yin Fire</strong>, demonstrating intense curiosity, inner resilience, and radiant advisory warmth. Mapped beautifully with Rabbit and Tiger elements to expand natural life-force.
+              </p>
+            </div>
+
+            {/* Numerology */}
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-pink-500/25 transition-all">
+              <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
+                <Zap className="w-4 h-4 text-pink-400" />
+                Pythagorean Numerology Matrix
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                  <span className={mutedText}>Psychic/Birth Number:</span>
+                  <span className="font-extrabold text-amber-400 text-sm block mt-0.5">6 (Venus)</span>
+                  <span className="text-[10px] text-slate-400 block mt-1">Auspicious harmony, family dedication, artistic flow.</span>
+                </div>
+                <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                  <span className={mutedText}>Destiny/Life Path:</span>
+                  <span className="font-extrabold text-amber-400 text-sm block mt-0.5">2 (Moon)</span>
+                  <span className="text-[10px] text-slate-400 block mt-1">Empathy, diplomatic resolution, intuitive counseling.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
+            <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800/60 pb-2">
+              <Shield className="w-4 h-4 text-pink-400" />
+              Lal Kitab Remedial Prescriptions
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div className="p-3.5 rounded bg-rose-950/10 border border-rose-500/15">
+                <span className="font-bold text-rose-400 block">Venus Remedy (Lal Kitab House 7)</span>
+                <p className="text-[11px] text-slate-300 mt-1 leading-normal">
+                  Keep a small piece of unrefined solid silver or white marble in your pocket to stabilize relationship energy and bolster financial comfort.
+                </p>
+              </div>
+              <div className="p-3.5 rounded bg-amber-950/10 border border-amber-500/15">
+                <span className="font-bold text-amber-400 block">Jupiter Remedy (Lal Kitab House 11)</span>
+                <p className="text-[11px] text-slate-300 mt-1 leading-normal">
+                  Apply a small tilak of pure wet saffron or yellow turmeric on the forehead after bathing to invoke blessings of professional wisdom and fortune.
+                </p>
+              </div>
+              <div className="p-3.5 rounded bg-indigo-950/10 border border-indigo-500/15">
+                <span className="font-bold text-indigo-400 block">Saturn Remedy (Lal Kitab House 3)</span>
+                <p className="text-[11px] text-slate-300 mt-1 leading-normal">
+                  Feed raw grain or birdseed to wild crows or dark pigeons on Saturday mornings to resolve persistent organizational hurdles.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="p-4 rounded-xl bg-slate-950/30 border border-slate-800 text-xs space-y-2 hover:border-pink-500/25 transition-all">
+              <span className="font-bold text-slate-300 uppercase block tracking-wider">Mayan Day Sign Kin</span>
+              <p className="text-slate-400 leading-relaxed">
+                Your cosmic signature is <strong>Blue Eagle (Men)</strong>, representing visionary perspectives, high intellect, and global creation energy. Your galactic tone is <strong>Tone 11</strong>, symbolizing structured integration and high-level intuitive problem-solving.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-950/30 border border-slate-800 text-xs space-y-2 hover:border-pink-500/25 transition-all">
+              <span className="font-bold text-slate-300 uppercase block tracking-wider">Celtic Tree Astrology Sign</span>
+              <p className="text-slate-400 leading-relaxed">
+                Your sacred Celtic signature is the <strong>Birch Tree (The Achiever)</strong>. Birch personalities are ambitious, highly organized, and always seek to establish order, wisdom, and light in their natural environments.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* ================= SECTION 7 ================= */}
+        <div id="report-section-7" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
+          
+          <div className="border-b border-amber-500/10 pb-4 mb-6">
+            <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+              System 7 • Traditional Life Predictions & Daily Muhurta
+            </span>
+            <h2 className="text-xl font-sans font-bold text-amber-500 mt-2 flex items-center gap-2">
+              <Briefcase className="w-5 h-5 text-amber-500" />
+              7. LIFE DESTINY PATHWAYS & DAILY TRANSIT ALIGNMENTS
+            </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              Exhaustive predictive analysis mapping professional focus, wealth generation, marriage bliss, health, and current lunar transit.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Career */}
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3 hover:border-amber-500/25 transition-all">
+              <div className="flex items-center gap-1.5 text-indigo-400 font-bold text-xs uppercase tracking-wider">
+                <Briefcase className="w-4 h-4" />
+                Professional & Career Path
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {career.text}
+              </p>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {career.highlights.map((h, i) => (
+                  <span key={i} className="bg-indigo-500/10 text-indigo-400 text-[9px] px-2 py-0.5 rounded border border-indigo-500/20 font-bold">
+                    {h}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Finance */}
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3 hover:border-amber-500/25 transition-all">
+              <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-xs uppercase tracking-wider">
+                <DollarSign className="w-4 h-4" />
+                Finance & Wealth Dynamics
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {finance.text}
+              </p>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {finance.highlights.map((h, i) => (
+                  <span key={i} className="bg-emerald-500/10 text-emerald-400 text-[9px] px-2 py-0.5 rounded border border-emerald-500/20 font-bold">
+                    {h}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Marriage */}
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3 hover:border-amber-500/25 transition-all">
+              <div className="flex items-center gap-1.5 text-rose-400 font-bold text-xs uppercase tracking-wider">
+                <Heart className="w-4 h-4" />
+                Marriage & Relationship Harmony
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {marriage.text}
+              </p>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {marriage.highlights.map((h, i) => (
+                  <span key={i} className="bg-rose-500/10 text-rose-400 text-[9px] px-2 py-0.5 rounded border border-rose-500/20 font-bold">
+                    {h}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Health */}
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-3 hover:border-amber-500/25 transition-all">
+              <div className="flex items-center gap-1.5 text-teal-400 font-bold text-xs uppercase tracking-wider">
+                <Activity className="w-4 h-4" />
+                Health & Vitality Blueprint
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {health.text}
+              </p>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {health.highlights.map((h, i) => (
+                  <span key={i} className="bg-teal-500/10 text-teal-400 text-[9px] px-2 py-0.5 rounded border border-teal-500/20 font-bold">
+                    {h}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 p-5 rounded-xl bg-gradient-to-r from-amber-500/10 to-indigo-500/10 border border-amber-500/20 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-2">
+              <div className="space-y-0.5">
+                <span className="text-[10px] text-amber-500 font-bold uppercase tracking-wider">Daily Transit Alignment</span>
+                <h4 className="text-xs font-bold text-slate-200">Personalized Lunar Muhurta Guidelines</h4>
+              </div>
+              <span className="text-xs font-mono text-slate-400 bg-slate-950/50 px-2.5 py-1 rounded">
+                📅 {daily.date}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div className="space-y-1.5 p-3 rounded-lg bg-emerald-500/5 border border-emerald-500/10">
+                <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Highly Auspicious For
+                </span>
+                <ul className="space-y-1 text-[11px] text-slate-300">
+                  {daily.auspiciousFor.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-1">
+                      <span className="text-emerald-500 mt-0.5">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="space-y-1.5 p-3 rounded-lg bg-rose-500/5 border border-rose-500/10">
+                <span className="text-[10px] text-rose-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  Caution Advised For
+                </span>
+                <ul className="space-y-1 text-[11px] text-slate-300">
+                  {daily.cautionFor.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-1">
+                      <span className="text-rose-500 mt-0.5">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="p-4 rounded-lg bg-slate-950/30 border border-slate-800 space-y-2 text-[11px]">
+                <div className="flex justify-between">
+                  <span className={mutedText}>Active Transit Nakshatra:</span>
+                  <span className="font-bold text-slate-200">{daily.nakshatra}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className={mutedText}>Active Moon Tithi:</span>
+                  <span className="font-bold text-slate-200">{daily.tithi}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className={mutedText}>Auspicious Colors:</span>
+                  <span className="font-bold text-slate-200 text-right">{daily.luckyColor}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className={mutedText}>Lucky Number:</span>
+                  <span className="font-bold text-amber-500 font-mono">{daily.luckyNumber}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
