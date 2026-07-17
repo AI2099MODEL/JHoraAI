@@ -693,19 +693,6 @@ export default function App() {
       icon: Download
     },
     {
-      id: "transit_menu",
-      label: "Transit",
-      icon: RefreshCw,
-      submenus: [
-        { id: "current_gochara", label: "Current Gochara", description: "Live celestial positions." },
-        { id: "planet_ingress", label: "Planet Ingress", description: "Upcoming sign-change transits." },
-        { id: "transit_summary", label: "Transit Summary", description: "Astrological transit interpretation." },
-        { id: "panchanga", label: "Panchanga", description: "Tithi, Vara, Nakshatra, Yoga, and Karana." },
-        { id: "daily_muhurta", label: "Daily Muhurta", description: "Auspicious times (Choghadiya/Abhijit)." },
-        { id: "event_muhurta", label: "Event Muhurta", description: "Custom electional windows." }
-      ]
-    },
-    {
       id: "astro",
       label: "Astro",
       icon: Activity,
@@ -2485,7 +2472,7 @@ export default function App() {
                 )}
               </motion.div>
             </AnimatePresence>
-          ) : (activeMenu === "transit" || activeMenu === "transit_menu") ? (
+          ) : activeMenu === "transit" ? (
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeSubmenuId}

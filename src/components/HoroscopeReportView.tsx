@@ -16,6 +16,9 @@ import AstroChart from "./AstroChart";
 import { KPRulebook } from "../lib/rules/kpRulebook";
 import { apiFetch as fetchKpApi } from "../lib/api";
 import { MysticalSystemsView } from "./MysticalSystemsView";
+import TransitsTab from "./TransitsTab";
+import IngressTab from "./IngressTab";
+import HoroscopeDashboard from "./HoroscopeDashboard";
 
 interface PlanetData {
   name: string;
@@ -77,7 +80,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 }) => {
   const [compiling, setCompiling] = useState(false);
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
-  const [majorTab, setMajorTab] = useState<"advanced" | "jhora" | "kp" | "western" | "all">("advanced");
+  const [majorTab, setMajorTab] = useState<"advanced" | "jhora" | "transit" | "kp" | "western" | "all">("advanced");
+  const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
+  const [selectedVarga, setSelectedVarga] = useState<string>("D1");
+  const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
+  const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
   const [vedicSubTab, setVedicSubTab] = useState<string>("birthDetails");
   const [testName, setTestName] = useState<string>(activeUser?.name || "Nitin Jain");
   const [divisionalChartStyle, setDivisionalChartStyle] = useState<"north" | "south">("north");
@@ -1109,7 +1116,43 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         >
           Profile
         </button>
+        <button
+          onClick={() => setMajorTab("transit")}
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
+            majorTab === "transit"
+              ? "border-indigo-500 text-indigo-400 font-extrabold bg-indigo-500/10"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          Transit
+        </button>
       </div>
+
+      {/* Sub-tabs bar for Transit */}
+      {majorTab === "transit" && (
+        <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40">
+          {[
+            { id: "current_gochara", label: "Current Gochara" },
+            { id: "planet_ingress", label: "Planet Ingress" },
+            { id: "transit_summary", label: "Transit Summary" },
+            { id: "panchanga", label: "Panchanga" },
+            { id: "daily_muhurta", label: "Daily Muhurta" },
+            { id: "event_muhurta", label: "Event Muhurta" }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setTransitSubTab(tab.id)}
+              className={`px-2.5 py-1.5 text-[10px] font-mono rounded-md transition-all border text-center ${
+                transitSubTab === tab.id
+                  ? "bg-indigo-500/15 border-indigo-500/50 text-indigo-400 font-bold shadow-sm shadow-indigo-500/10"
+                  : "border-slate-800 bg-slate-900/30 text-slate-400 hover:text-slate-200 hover:bg-slate-900/50"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Sub-tabs bar for Profile - Dynamic Multitabs Grid */}
       {majorTab === "jhora" && (
@@ -1249,7 +1292,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         )}
         
         {/* ================= MULTI-SYSTEM LAYOUT (WITHOUT STICKY CHART RAIL TO PREVENT DISPLAY ERRORS AND OVERLAPS) ================= */}
-        {majorTab !== "advanced" && (
+        {majorTab !== "advanced" && majorTab !== "transit" && (
           <div className="space-y-6">
             {/* Sub-tab / System Specific Content Column */}
             <div className="w-full space-y-6">
@@ -4768,6 +4811,170 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {majorTab === "transit" && (
+        <div className="space-y-6">
+          {transitSubTab === "current_gochara" && (
+            astrologyData ? (
+              <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
+                <TransitsTab astrologyData={astrologyData} />
+              </div>
+            ) : (
+              <div className="text-center py-12 text-slate-400">
+                Please cast a horoscope first to view transits.
+              </div>
+            )
+          )}
+
+          {transitSubTab === "planet_ingress" && (
+            astrologyData ? (
+              <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
+                <IngressTab birthDate={astrologyData.birthDetails.date} />
+              </div>
+            ) : (
+              <div className="text-center py-12 text-slate-400">
+                Please cast a horoscope first to view ingress transits.
+              </div>
+            )
+          )}
+
+          {transitSubTab === "panchanga" && (
+            astrologyData ? (
+              <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
+                <HoroscopeDashboard
+                  astrologyData={astrologyData}
+                  activeSubTab="panchanga"
+                  setActiveSubTab={(tab) => {}}
+                  selectedVarga={selectedVarga}
+                  setSelectedVarga={setSelectedVarga}
+                  selectedBavPlanet={selectedBavPlanet}
+                  setSelectedBavPlanet={setSelectedBavPlanet}
+                  activeDashaSystem={activeDashaSystem}
+                  setActiveDashaSystem={setActiveDashaSystem}
+                  activeSubmenuId="panchanga"
+                />
+              </div>
+            ) : (
+              <div className="text-center py-12 text-slate-400">
+                Please cast a horoscope first to view Panchanga.
+              </div>
+            )
+          )}
+
+          {transitSubTab === "daily_muhurta" && (
+            astrologyData ? (
+              <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`} id="muhurtas-tab">
+                <div>
+                  <h3 className="text-lg font-sans font-medium flex items-center gap-2 text-slate-200">
+                    <Clock className="w-5 h-5 text-amber-500" />
+                    Daily Solar Muhurtas (Choghadiya)
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1 mb-6">
+                    Calculated based on local solar sunrise coordinates for the Cast date.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {Array.isArray(astrologyData.muhurtas) && astrologyData.muhurtas.map((m: any) => (
+                    <div
+                      key={m.name}
+                      className={`p-4 rounded-xl border flex flex-col justify-between h-32 ${
+                        m.isAuspicious
+                          ? m.name === "Abhijit Muhurta" || m.name === "Brahma Muhurta"
+                            ? "bg-amber-500/10 border-amber-500/40"
+                            : "bg-green-500/5 border-green-500/20"
+                          : "bg-rose-500/5 border-rose-500/20 opacity-75"
+                      }`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="text-xs font-bold text-white">{m.name}</h4>
+                          <span className="text-[10px] text-slate-400 block font-mono mt-0.5">
+                            {m.startTime} to {m.endTime}
+                          </span>
+                        </div>
+                        <span className={`text-[8px] uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
+                          m.isAuspicious ? "bg-green-500/20 text-green-400" : "bg-rose-500/20 text-rose-400"
+                        }`}>
+                          {m.isAuspicious ? "Auspicious" : "Avoid"}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-center mt-3 pt-2 border-t border-indigo-500/5">
+                        <span className="text-[9px] text-slate-400">Cosmic Rating:</span>
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: 5 }).map((_, idx) => (
+                            <span
+                              key={idx}
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                idx < m.score ? (m.isAuspicious ? "bg-amber-400" : "bg-rose-400") : "bg-slate-800"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-12 text-slate-400">
+                Please cast a horoscope first to view Daily Muhurtas.
+              </div>
+            )
+          )}
+
+          {transitSubTab === "event_muhurta" && (
+            <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
+              <h3 className="text-lg font-sans font-medium flex items-center gap-2 text-slate-200">
+                <Calendar className="w-5 h-5 text-amber-500" />
+                Event Muhurta Finder
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 mb-6">
+                Identify perfect planetary times for weddings, business registrations, or real estate acquisitions.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {["Wedding / Vivaha", "Business Launch", "Travel / Grahapravesh"].map((event) => (
+                  <div key={event} className={`p-4 rounded-xl border border-slate-800 bg-slate-900/40 flex flex-col justify-between h-40`}>
+                    <div>
+                      <span className="text-[9px] font-mono text-slate-500 uppercase">CATEGORY Template</span>
+                      <h4 className="text-xs font-bold text-amber-500 mt-1">{event}</h4>
+                      <p className="text-[11px] text-slate-400 mt-2">
+                        Analyzes Jupiter aspects and lunar houses to secure maximum blessings.
+                      </p>
+                    </div>
+                    <button 
+                      className="bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 font-mono text-[10px] font-bold py-1.5 rounded-lg uppercase mt-4"
+                    >
+                      Active Event Engine
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {transitSubTab === "transit_summary" && (
+            <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
+              <h3 className="text-lg font-sans font-medium flex items-center gap-2 text-slate-200">
+                <RefreshCw className="w-5 h-5 text-amber-500" />
+                Planetary Transit Interpretations
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 mb-6">
+                Evaluating continuous celestial transitions mapped relative to birth parameters.
+              </p>
+
+              <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/40 space-y-4">
+                <h4 className="text-xs font-bold font-mono text-slate-300 uppercase">Transit Synthesis</h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Saturn's transit represents heavy growth opportunities. Jupiter transit highlights expansion. Transits calculate using real-time ephemeris coordinates from Google Cloud JHora server.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
