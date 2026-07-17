@@ -1,6 +1,6 @@
 {
   "name": "JHora AI",
   "description": "Professional Vedic Astrology (Jyotish) AI with horoscope analysis, chart calculation, transits, dashas, and dynamic AI guidance.",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

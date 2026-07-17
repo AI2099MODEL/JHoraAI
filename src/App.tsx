@@ -179,6 +179,85 @@ export default function App() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [cachedList, setCachedList] = useState<CachedHoroscopeRecord[]>([]);
 
+  // Live GPS, current date and time states for top bar
+  const [currentDateTime, setCurrentDateTime] = useState<Date>(new Date());
+  const [headerGps, setHeaderGps] = useState<{
+    latitude: number | null;
+    longitude: number | null;
+    address: string | null;
+    loading: boolean;
+    error: string | null;
+  }>({
+    latitude: null,
+    longitude: null,
+    address: null,
+    loading: false,
+    error: null,
+  });
+
+  const fetchHeaderGps = () => {
+    if (!navigator.geolocation) {
+      setHeaderGps(prev => ({ ...prev, error: "Not supported" }));
+      return;
+    }
+    setHeaderGps(prev => ({ ...prev, loading: true, error: null }));
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        setHeaderGps(prev => ({
+          ...prev,
+          latitude: lat,
+          longitude: lon,
+          loading: true,
+        }));
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+          const data = await res.json();
+          const dispName = data.address 
+            ? `${data.address.city || data.address.town || data.address.village || 'Location'}, ${data.address.country || ''}`.replace(/,\s*,/g, ',').trim()
+            : `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+          
+          setHeaderGps({
+            latitude: lat,
+            longitude: lon,
+            address: dispName,
+            loading: false,
+            error: null,
+          });
+        } catch (e) {
+          setHeaderGps({
+            latitude: lat,
+            longitude: lon,
+            address: `${lat.toFixed(4)}°N, ${lon.toFixed(4)}°E`,
+            loading: false,
+            error: null,
+          });
+        }
+      },
+      (error) => {
+        setHeaderGps({
+          latitude: null,
+          longitude: null,
+          address: null,
+          loading: false,
+          error: error.message || "Permission denied",
+        });
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+    
+    fetchHeaderGps();
+    
+    return () => clearInterval(interval);
+  }, []);
+
   // Geocoding and auto-location states
   const [locationResults, setLocationResults] = useState<any[]>([]);
   const [searchingLocation, setSearchingLocation] = useState(false);
@@ -1188,22 +1267,52 @@ export default function App() {
             </div>
           )}
 
-          {/* Quick theme & data integrity toggles */}
-          <div className="flex items-center gap-2">
+          {/* GPS & Live DateTime Widget */}
+          <div className={`flex items-center gap-2 sm:gap-3 border rounded-xl px-2.5 py-1.5 text-xs ${
+            isDark ? "bg-slate-900/40 border-indigo-500/10" : "bg-neutral-50/80 border-neutral-200"
+          }`}>
+            {/* Date & Time */}
+            <div className="flex items-center gap-1 sm:gap-1.5 font-medium">
+              <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+              <span className={`hidden md:inline ${isDark ? "text-slate-300" : "text-neutral-700"}`}>
+                {currentDateTime.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              </span>
+              <span className={`hidden md:inline mx-1 text-slate-400 ${isDark ? "opacity-30" : "opacity-50"}`}>|</span>
+              <span className="font-mono text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider text-[11px] sm:text-xs">
+                {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+              </span>
+            </div>
+            
+            {/* Separator */}
+            <div className={`h-4 border-l ${isDark ? "border-indigo-500/15" : "border-neutral-200"}`} />
+            
+            {/* GPS Location */}
             <button
-              onClick={() => setProvenanceEnabled(!provenanceEnabled)}
-              className={`p-2 rounded-lg border text-xs font-mono font-bold uppercase transition-all cursor-pointer flex items-center gap-1 ${
-                provenanceEnabled 
-                  ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/30" 
-                  : isDark 
-                    ? "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200" 
-                    : "bg-neutral-100 border-neutral-200 text-neutral-600 hover:bg-neutral-200"
-              }`}
-              title="Show exact data integrity, raw json paths, and calculation confidence on all displays"
+              onClick={fetchHeaderGps}
+              className="flex items-center gap-1 sm:gap-1.5 hover:text-indigo-500 transition-colors cursor-pointer group shrink-0 animate-fade-in"
+              title="Click to refresh GPS location"
             >
-              <Info className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Provenance Info</span>
+              <MapPin className={`w-3.5 h-3.5 group-hover:scale-110 transition-transform ${
+                headerGps.loading ? "text-amber-500 animate-pulse" : "text-indigo-500"
+              }`} />
+              {headerGps.loading ? (
+                <span className="text-[10px] text-slate-400 animate-pulse hidden xs:inline">Acquiring...</span>
+              ) : headerGps.error ? (
+                <span className="text-[10px] text-rose-500 font-medium">GPS Off</span>
+              ) : headerGps.address ? (
+                <span className={`text-[11px] font-semibold tracking-tight truncate max-w-[100px] sm:max-w-[150px] ${isDark ? "text-slate-300" : "text-neutral-700"}`}>
+                  {headerGps.address}
+                </span>
+              ) : (
+                <span className="text-[10px] text-slate-400 group-hover:text-indigo-500">GPS</span>
+              )}
+              <RefreshCw className={`w-2.5 h-2.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity ${
+                headerGps.loading ? "animate-spin opacity-100" : ""
+              }`} />
             </button>
+          </div>
+
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setTheme(isDark ? "light" : "dark")}
               className={`p-2 rounded-lg border transition-all cursor-pointer ${
