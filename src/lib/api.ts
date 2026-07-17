@@ -2,6 +2,8 @@
  * Custom Fetch Helper to proxy requests safely in sandboxed environments and external deployments.
  */
 
+import { calculateAstrology } from "./astrology";
+
 const JHORA_API_URL = "https://jagannatha-hora-359167915530.europe-west1.run.app";
 
 const ZODIAC_SIGNS = [
@@ -17,8 +19,12 @@ const getBaseUrl = (): string => {
     // If we are on a standard dev or preview domain, or localhost, use relative local routing to hit our Express backend.
     if (hostname === 'localhost' || 
         hostname === '127.0.0.1' ||
+        hostname.includes('.run.app') ||
+        hostname.includes('aistudio') ||
+        hostname.includes('google') ||
         hostname.includes('ais-dev-') ||
-        hostname.includes('ais-pre-')) {
+        hostname.includes('ais-pre-') ||
+        hostname.startsWith('ais-')) {
       return '';
     }
     // Otherwise, we are on an external domain like Cloudflare, so we MUST use direct client-side routing.
@@ -50,12 +56,37 @@ export const apiFetch = async (input: RequestInfo | URL, init?: RequestInit): Pr
           body.place = body.location;
         }
         
-        const response = await window.fetch(`${JHORA_API_URL}/horoscope`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        return response;
+        try {
+          const response = await window.fetch(`${JHORA_API_URL}/horoscope`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+          });
+          if (!response.ok) {
+            throw new Error(`External status ${response.status}`);
+          }
+          return response;
+        } catch (fetchErr) {
+          console.warn("[CORS Router] Direct external fetch failed. Falling back to local astrology engine.", fetchErr);
+          const targetDate = body.date || new Date().toISOString().split("T")[0];
+          const targetTime = body.time || "12:00:00";
+          const latNum = Number(body.latitude) || 28.6139;
+          const lonNum = Number(body.longitude) || 77.2090;
+          const tzNum = Number(body.timezone) || 5.5;
+          const localData = calculateAstrology(
+            body.name || "Transit Sky",
+            targetDate,
+            targetTime,
+            body.place || "Query Location",
+            latNum,
+            lonNum,
+            tzNum
+          );
+          return new Response(JSON.stringify(localData), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
       }
 
       // 2. Marriage matchmaking
