@@ -455,7 +455,7 @@ export default function App() {
         favorites: [],
         history: [],
         settings: {
-          theme: "dark",
+          theme: "light",
           ayanamsa: "Lahiri (Chitra Paksha)",
           chartStyle: "north",
           language: "English",
@@ -485,7 +485,7 @@ export default function App() {
               favorites: [],
               history: [],
               settings: {
-                theme: "dark",
+                theme: "light",
                 ayanamsa: "Lahiri (Chitra Paksha)",
                 chartStyle: "north",
                 language: "English",
@@ -676,10 +676,10 @@ export default function App() {
 
   // Navigation configuration representing Phase 10 spec
   const MAIN_MENU_STRUCTURE: MainMenuNode[] = [
-    { id: "dashboard", label: "Birth", icon: Compass },
+    { id: "dashboard", label: "Dashboard", icon: Compass },
     {
       id: "ai_assistant",
-      label: "Ask",
+      label: "AI Assistant",
       icon: Sparkles
     },
     {

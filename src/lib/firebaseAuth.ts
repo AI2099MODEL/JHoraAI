@@ -356,7 +356,7 @@ export const AuthRepository = {
         favorites: [],
         history: [],
         settings: {
-          theme: "dark",
+          theme: "light",
           ayanamsa: "Lahiri (Chitra Paksha)",
           chartStyle: "north",
           language: "English",
