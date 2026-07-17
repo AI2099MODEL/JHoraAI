@@ -318,7 +318,17 @@ app.post("/api/jhora/gochara", async (req, res) => {
     // Try Primary Free Endpoint: Open Astrology API (Swiss Ephemeris Ports)
     try {
       const openAstrologyUrl = `https://openastrologyapi.com/planets?date=${targetDate}&time=${targetTime}&lat=${latNum}&lon=${lonNum}&tz=${tzNum}&ayanamsa=1`;
-      const response = await fetch(openAstrologyUrl, { signal: AbortSignal.timeout(4000) });
+      
+      let signal: any = undefined;
+      if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+        signal = AbortSignal.timeout(4000);
+      } else {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), 4000);
+        signal = controller.signal;
+      }
+
+      const response = await fetch(openAstrologyUrl, { signal });
       if (response.ok) {
         const data: any = await response.json();
         if (data && data.planets && Array.isArray(data.planets)) {
@@ -343,11 +353,11 @@ app.post("/api/jhora/gochara", async (req, res) => {
             .filter((p: any) => ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
 
           processedFromFreeApi = true;
-          console.log("[Level -1 Ingestion] Transit Gochara ingested successfully from Open Astrology API.");
+          console.log("[Transit System] Open Astrology API data ingested.");
         }
       }
     } catch (err: any) {
-      console.warn("Primary free Open Astrology API failed, trying Syntral Project fallback...", err.message);
+      console.log("[Transit System] Primary Open Astrology endpoint is offline, trying backup...");
     }
 
     // Try Secondary Free Endpoint: Syntral Project (Swiss Ephemeris Web API)
@@ -357,7 +367,17 @@ app.post("/api/jhora/gochara", async (req, res) => {
         const [hr, min] = targetTime.split(":");
         const hourDecimal = Number(hr) + (Number(min) || 0) / 60;
         const syntralUrl = `https://astral.syntral.co/positions?year=${yr}&month=${Number(mo)}&day=${Number(dy)}&hour=${hourDecimal}&system=placidus`;
-        const response = await fetch(syntralUrl, { signal: AbortSignal.timeout(4000) });
+        
+        let signal: any = undefined;
+        if (typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function") {
+          signal = AbortSignal.timeout(4000);
+        } else {
+          const controller = new AbortController();
+          setTimeout(() => controller.abort(), 4000);
+          signal = controller.signal;
+        }
+
+        const response = await fetch(syntralUrl, { signal });
         if (response.ok) {
           const data: any = await response.json();
           if (data && data.planets) {
@@ -381,17 +401,17 @@ app.post("/api/jhora/gochara", async (req, res) => {
               .filter((p: any) => ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
 
             processedFromFreeApi = true;
-            console.log("[Level -1 Ingestion] Transit Gochara ingested successfully from Syntral Project.");
+            console.log("[Transit System] Syntral API data ingested.");
           }
         }
       } catch (err: any) {
-        console.warn("Secondary Syntral API failed.", err.message);
+        console.log("[Transit System] Syntral endpoint is offline, trying backup...");
       }
     }
 
     // Resilient Fallback: JHora Horoscope API
     if (!processedFromFreeApi) {
-      console.info("[Ingress Fallback] Free APIs offline, falling back to JHora Transit Horoscope Proxy.");
+      console.log("[Transit System] Free APIs offline, aligning via JHora Transit Proxy.");
       const response = await fetch(`${JHORA_API_URL}/horoscope`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
