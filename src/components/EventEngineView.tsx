@@ -12,6 +12,62 @@ export interface EngineStep {
 }
 
 const DEFAULT_STEPS: EngineStep[] = [
+  {
+    id: "init_1",
+    stepNumber: "INIT 01",
+    module: "Birth Details Profile",
+    whatToDo: "Load birth chart profile details: Name, DOB, TOB, Place, Time Zone.",
+    referencedTable: "Birth Records / Profile Form State (`birthDetails`)"
+  },
+  {
+    id: "init_2",
+    stepNumber: "INIT 02",
+    module: "House Cusps Coordinates",
+    whatToDo: "Load astronomical coordinates for all 12 house cusps (Sign, Degree, Nakshatra, Sub).",
+    referencedTable: "House Cusps Coordinates Table (`cusps`)"
+  },
+  {
+    id: "init_3",
+    stepNumber: "INIT 03",
+    module: "Planetary Positions",
+    whatToDo: "Load planetary details for all planets: Sign, Degree, Nakshatra, Star Lord, Sub Lord.",
+    referencedTable: "Planetary Positions Table (`planets`)"
+  },
+  {
+    id: "init_4",
+    stepNumber: "INIT 04",
+    module: "Planetary House Positions",
+    whatToDo: "Map planets to their occupied houses in the Bhava Chalit chart (Planet → House mapping).",
+    referencedTable: "Planetary House Positions Map (`planetaryHousePositions`)"
+  },
+  {
+    id: "init_5",
+    stepNumber: "INIT 05",
+    module: "House Ownership Matrix",
+    whatToDo: "Retrieve the ruling sign lord (ownership) for each of the 12 houses.",
+    referencedTable: "House Lord Ownership Matrix Table"
+  },
+  {
+    id: "init_6",
+    stepNumber: "INIT 06",
+    module: "6-Fold Significators",
+    whatToDo: "Load the complete A–F significator vectors for all planets under stellar theory.",
+    referencedTable: "KP 6-Fold Significators Table (`significators`)"
+  },
+  {
+    id: "init_7",
+    stepNumber: "INIT 07",
+    module: "Cuspal Sub Lords (CSL) Matrix",
+    whatToDo: "Identify the Cuspal Sub Lord (CSL) for all 12 houses to serve as crucial event anchors.",
+    referencedTable: "Cuspal Sub Lords (CSL) Matrix Table"
+  },
+  {
+    id: "init_8",
+    stepNumber: "INIT 08",
+    module: "KP Strength Matrix",
+    whatToDo: "Retrieve the comprehensive planetary and house strengths, including overall Score and Grade.",
+    referencedTable: "KP Planets & Houses Strength Table (`kpStrengths`)"
+  },
   { 
     id: "1", 
     stepNumber: "STEP 01", 
@@ -135,7 +191,7 @@ export const EventEngineView: React.FC<EventEngineViewProps> = ({ isDark = true 
 
   // Load from local storage on mount
   useEffect(() => {
-    const saved = localStorage.getItem("jhora_event_engine_steps_v2");
+    const saved = localStorage.getItem("jhora_event_engine_steps_v3");
     if (saved) {
       try {
         setSteps(JSON.parse(saved));
@@ -150,7 +206,7 @@ export const EventEngineView: React.FC<EventEngineViewProps> = ({ isDark = true 
   // Save to local storage whenever steps change
   const saveSteps = (updatedSteps: EngineStep[]) => {
     setSteps(updatedSteps);
-    localStorage.setItem("jhora_event_engine_steps_v2", JSON.stringify(updatedSteps));
+    localStorage.setItem("jhora_event_engine_steps_v3", JSON.stringify(updatedSteps));
   };
 
   const handleReset = () => {
