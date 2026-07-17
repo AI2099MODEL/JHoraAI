@@ -64,6 +64,7 @@ export default function KpStellarDashboard({
   const [subLoading, setSubLoading] = useState<boolean>(false);
   const [subError, setSubError] = useState<string | null>(null);
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
+  const [sigTab, setSigTab] = useState<"planets" | "houses">("planets");
 
   const profileJson = useMemo(() => {
     if (!astrologyData) return null;
@@ -682,40 +683,111 @@ export default function KpStellarDashboard({
 
           {/* SIGNIFICATORS TAB */}
           {activeSubmenuId === "significators" && (
-            <div className="space-y-6 animate-fade-in">
-              {/* Planet Significators */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Object.keys(significatorsData?.significators || {}).map((planet) => {
-                    const sig = significatorsData.significators[planet];
-                    return (
-                      <div key={planet} className={`p-4 rounded-xl border ${cardStyle} space-y-3`}>
-                        <div className="flex justify-between items-center border-b border-slate-800/60 pb-1.5">
-                          <span className="font-bold text-slate-100">{planet}</span>
-                        </div>
-                        <div className="space-y-1.5 text-xs font-mono">
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">L1 (Star Occupant):</span>
-                            <span className="text-indigo-400 font-semibold">{sig.level1?.join(", ") || "—"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">L2 (Planet Occupant):</span>
-                            <span className="text-amber-500 font-semibold">{sig.level2?.join(", ") || "—"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">L3 (Star Owner):</span>
-                            <span className="text-emerald-400 font-semibold">{sig.level3?.join(", ") || "—"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">L4 (Planet Owner):</span>
-                            <span className="text-slate-300 font-semibold">{sig.level4?.join(", ") || "—"}</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+            <div className="space-y-6 animate-fade-in" id="kp-significators-tab">
+              {/* Inner Tab Selector */}
+              <div className="flex justify-center md:justify-start">
+                <div className="flex p-1 rounded-xl bg-slate-950/40 border border-slate-800/80 gap-1" id="kp-sig-toggle">
+                  <button
+                    onClick={() => setSigTab("planets")}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                      sigTab === "planets"
+                        ? "bg-indigo-600 text-white shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                    id="kp-sig-btn-planets"
+                  >
+                    Planet Significators
+                  </button>
+                  <button
+                    onClick={() => setSigTab("houses")}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                      sigTab === "houses"
+                        ? "bg-indigo-600 text-white shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                    id="kp-sig-btn-houses"
+                  >
+                    House Significators
+                  </button>
                 </div>
               </div>
+
+              {sigTab === "planets" ? (
+                <div className="space-y-4" id="kp-planet-sigs-panel">
+                  <div className="text-xs text-slate-400 leading-relaxed font-sans max-w-2xl bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/10">
+                    <p className="font-semibold text-indigo-400 mb-1">Planet Significators (Level 1–4):</p>
+                    Represents the houses signified by each planet based on stellar occupancy, planetary occupancy, stellar lordship, and planetary lordship.
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Object.keys(significatorsData?.planetSignificators || significatorsData?.significators || {}).map((planet) => {
+                      const sig = (significatorsData?.planetSignificators || significatorsData?.significators)?.[planet] || {};
+                      return (
+                        <div key={planet} className={`p-4 rounded-xl border ${cardStyle} space-y-3 hover:border-indigo-500/30 transition-all duration-200`}>
+                          <div className="flex justify-between items-center border-b border-slate-800/60 pb-1.5">
+                            <span className="font-bold text-slate-100">{planet}</span>
+                          </div>
+                          <div className="space-y-1.5 text-xs font-mono">
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L1 (Star Occupant):</span>
+                              <span className="text-indigo-400 font-semibold">{sig.level1?.length ? sig.level1.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L2 (Planet Occupant):</span>
+                              <span className="text-amber-500 font-semibold">{sig.level2?.length ? sig.level2.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L3 (Star Owner):</span>
+                              <span className="text-emerald-400 font-semibold">{sig.level3?.length ? sig.level3.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L4 (Planet Owner):</span>
+                              <span className="text-slate-300 font-semibold">{sig.level4?.length ? sig.level4.join(", ") : "—"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4" id="kp-house-sigs-panel">
+                  <div className="text-xs text-slate-400 leading-relaxed font-sans max-w-2xl bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/10">
+                    <p className="font-semibold text-indigo-400 mb-1">House Significators (Level 1–4):</p>
+                    Represents the planets that act as strong significators for each of the 12 houses (Bhavas), sorted by their level of strength.
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map((houseNum) => {
+                      const houseKeyStr = String(houseNum);
+                      const sig = (significatorsData?.houseSignificators || {})[houseKeyStr] || (significatorsData?.houseSignificators || {})[houseNum] || {};
+                      return (
+                        <div key={houseNum} className={`p-4 rounded-xl border ${cardStyle} space-y-3 hover:border-indigo-500/30 transition-all duration-200`}>
+                          <div className="flex justify-between items-center border-b border-slate-800/60 pb-1.5">
+                            <span className="font-bold text-slate-100">House {houseNum}</span>
+                          </div>
+                          <div className="space-y-1.5 text-xs font-mono">
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L1 (Star Occupant):</span>
+                              <span className="text-indigo-400 font-semibold">{sig.level1?.length ? sig.level1.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L2 (Planet Occupant):</span>
+                              <span className="text-amber-500 font-semibold">{sig.level2?.length ? sig.level2.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L3 (Star Owner):</span>
+                              <span className="text-emerald-400 font-semibold">{sig.level3?.length ? sig.level3.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L4 (Planet Owner):</span>
+                              <span className="text-slate-300 font-semibold">{sig.level4?.length ? sig.level4.join(", ") : "—"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
