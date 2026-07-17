@@ -216,7 +216,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     setTransitLoading(true);
     setTransitError(null);
     try {
-      const response = await fetch("/api/astrology/calculate", {
+      const response = await fetchKpApi("/api/astrology/calculate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -254,8 +254,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
     const hrs = String(currentDateTime.getHours()).padStart(2, '0');
     const mins = String(currentDateTime.getMinutes()).padStart(2, '0');
-    const secs = String(currentDateTime.getSeconds()).padStart(2, '0');
-    setTransitTime(`${hrs}:${mins}:${secs}`);
+    // Set seconds to 00 to avoid triggering a new fetch every single second
+    setTransitTime(`${hrs}:${mins}:00`);
   }, [currentDateTime]);
 
   // Synchronize transit coordinates with top bar headerGps if not custom
@@ -277,9 +277,15 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     }
   }, [headerGps, astrologyData, isCustomTransitPlace]);
 
-  // Fetch new calculations on transit coordinate/date/time change
+  // Fetch new calculations on transit coordinate/date/time change (debounced to avoid spamming)
   useEffect(() => {
-    fetchTransitAstroData();
+    if (!transitLatitude || !transitLongitude) return;
+
+    const delayDebounce = setTimeout(() => {
+      fetchTransitAstroData();
+    }, 1200);
+
+    return () => clearTimeout(delayDebounce);
   }, [transitDate, transitTime, transitLatitude, transitLongitude, transitTimezone]);
 
   // Dynamic solar muhurtas calculator
