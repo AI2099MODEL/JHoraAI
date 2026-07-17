@@ -2592,7 +2592,12 @@ export default function App() {
               >
                 {activeSubmenuId === "current_gochara" ? (
                   astrologyData ? (
-                    <TransitsTab astrologyData={astrologyData} />
+                    <TransitsTab 
+                      astrologyData={astrologyData} 
+                      transitLatitude={headerGps.latitude || undefined}
+                      transitLongitude={headerGps.longitude || undefined}
+                      transitTimezone={headerGps.latitude ? (new Date().getTimezoneOffset() / -60) : undefined}
+                    />
                   ) : (
                     <div className="text-center py-12">
                       Please cast a horoscope first to view this page.

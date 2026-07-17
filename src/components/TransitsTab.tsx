@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { RefreshCw, Calendar, Info, Layers, ArrowRight } from "lucide-react";
+import { RefreshCw, Calendar, Info, Layers, ArrowRight, Sparkles, MapPin, Clock } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
 
@@ -37,20 +37,81 @@ export default function TransitsTab({
   transitLongitude,
   transitTimezone
 }: TransitsTabProps) {
-  const [internalTransitDate, setInternalTransitDate] = useState<string>("2026-07-17");
+  // Helper to get local date (YYYY-MM-DD)
+  const getLocalDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Helper to get local time (HH:MM:SS)
+  const getLocalTimeString = () => {
+    const d = new Date();
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const seconds = String(d.getSeconds()).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  };
+
+  const [transitDate, setTransitDate] = useState<string>(propTransitDate || getLocalDateString());
+  const [transitTime, setTransitTime] = useState<string>(propTransitTime || getLocalTimeString());
+  const [lat, setLat] = useState<number>(transitLatitude !== undefined && transitLatitude !== null ? transitLatitude : astrologyData.birthDetails.latitude);
+  const [lng, setLng] = useState<number>(transitLongitude !== undefined && transitLongitude !== null ? transitLongitude : astrologyData.birthDetails.longitude);
+  const [tz, setTz] = useState<number>(transitTimezone !== undefined && transitTimezone !== null ? transitTimezone : astrologyData.birthDetails.timezone);
   const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
-
-  const transitDate = propTransitDate !== undefined ? propTransitDate : internalTransitDate;
-  const setTransitDate = propSetTransitDate !== undefined ? propSetTransitDate : setInternalTransitDate;
-
-  const lat = transitLatitude !== undefined ? transitLatitude : astrologyData.birthDetails.latitude;
-  const lng = transitLongitude !== undefined ? transitLongitude : astrologyData.birthDetails.longitude;
-  const tz = transitTimezone !== undefined ? transitTimezone : astrologyData.birthDetails.timezone;
-  const time = propTransitTime !== undefined ? propTransitTime : "12:00:00";
 
   const [transitPlanets, setTransitPlanets] = useState<TransitPlanet[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Sync props if they change
+  useEffect(() => {
+    if (propTransitDate) setTransitDate(propTransitDate);
+  }, [propTransitDate]);
+
+  useEffect(() => {
+    if (propTransitTime) setTransitTime(propTransitTime);
+  }, [propTransitTime]);
+
+  useEffect(() => {
+    if (transitLatitude !== undefined && transitLatitude !== null) {
+      setLat(transitLatitude);
+    }
+  }, [transitLatitude]);
+
+  useEffect(() => {
+    if (transitLongitude !== undefined && transitLongitude !== null) {
+      setLng(transitLongitude);
+    }
+  }, [transitLongitude]);
+
+  useEffect(() => {
+    if (transitTimezone !== undefined && transitTimezone !== null) {
+      setTz(transitTimezone);
+    }
+  }, [transitTimezone]);
+
+  const snapToPresent = () => {
+    const freshDate = getLocalDateString();
+    const freshTime = getLocalTimeString();
+    setTransitDate(freshDate);
+    setTransitTime(freshTime);
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLat(position.coords.latitude);
+          setLng(position.coords.longitude);
+          setTz(new Date().getTimezoneOffset() / -60);
+        },
+        (err) => {
+          console.error("GPS snapshot error:", err);
+        }
+      );
+    }
+  };
 
   const fetchTransits = async () => {
     setLoading(true);
@@ -61,7 +122,7 @@ export default function TransitsTab({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: astrologyData.birthDetails.date,
-          time: astrologyData.birthDetails.time,
+          time: transitTime,
           latitude: Number(lat),
           longitude: Number(lng),
           timezone: Number(tz),
@@ -89,7 +150,7 @@ export default function TransitsTab({
 
   useEffect(() => {
     fetchTransits();
-  }, [transitDate, lat, lng, tz, time]);
+  }, [transitDate, transitTime, lat, lng, tz]);
 
   const ZODIAC_SIGNS = [
     "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
@@ -149,10 +210,26 @@ export default function TransitsTab({
             </h3>
             <p className="text-xs text-slate-400 mt-1">
               Analyze current or future transiting planets overlaying the native's natal chart houses.
+              {lat && lng && (
+                <span className="block mt-1 text-[11px] text-amber-400/80 font-mono flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-amber-500" />
+                  Transit Location: {Number(lat).toFixed(4)}°N, {Number(lng).toFixed(4)}°E (TZ: {tz >= 0 ? `+${tz}` : tz})
+                </span>
+              )}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            {/* Snap to Present */}
+            <button
+              onClick={snapToPresent}
+              className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-500/30 shadow-md transition-all cursor-pointer"
+              title="Snap to present real-time and GPS location"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Use Present GPS & Time</span>
+            </button>
+
             {/* Target Transit Date */}
             <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-lg border border-indigo-500/15">
               <Calendar className="w-3.5 h-3.5 text-amber-500 ml-1.5" />
@@ -162,6 +239,19 @@ export default function TransitsTab({
                 onChange={(e) => setTransitDate(e.target.value)}
                 className="bg-transparent text-amber-300 text-xs font-semibold focus:outline-none cursor-pointer border-0 w-28 px-1"
                 id="transit-date-input"
+              />
+            </div>
+
+            {/* Target Transit Time */}
+            <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-lg border border-indigo-500/15">
+              <Clock className="w-3.5 h-3.5 text-amber-500 ml-1.5" />
+              <input
+                type="time"
+                step="1"
+                value={transitTime}
+                onChange={(e) => setTransitTime(e.target.value)}
+                className="bg-transparent text-amber-300 text-xs font-semibold focus:outline-none cursor-pointer border-0 w-24 px-1"
+                id="transit-time-input"
               />
             </div>
 
