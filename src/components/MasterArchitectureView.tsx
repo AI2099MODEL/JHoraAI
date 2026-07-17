@@ -9,19 +9,10 @@ import {
   Baby,
   Globe,
   ShieldAlert,
-  Play,
-  CheckCircle2,
   AlertTriangle,
-  Activity,
   Award,
-  Info,
   Cpu,
-  Layers,
-  Sparkles,
-  Search,
   Check,
-  ChevronDown,
-  ChevronRight,
   Database
 } from "lucide-react";
 
@@ -50,43 +41,22 @@ export const MasterArchitectureView: React.FC<MasterArchitectureViewProps> = ({
   astrologyData,
   isDark
 }) => {
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("marital");
-  const [simulatorQuery, setSimulatorQuery] = useState<string>("marital");
-  const [simulationResult, setSimulationResult] = useState<any>(null);
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [activeSubmenu, setActiveSubmenu] = useState<string>("marriage");
+  const [allSimulations, setAllSimulations] = useState<Record<string, any>>({});
 
   const categories: LifeEventCategory[] = [
     {
-      id: "marital",
-      title: "Marital Life, Separation, Divorce & Remarriage",
+      id: "marriage",
+      title: "Marriage & Remarriage",
       icon: Heart,
       iconColor: "text-rose-500",
-      description: "Evaluate lifetime partnership promise, marital friction, separations, and remarriage timelines.",
+      description: "Evaluate lifetime partnership promise, marital bonding, and remarriage timelines.",
       rules: [
-        {
-          system: "Parashari",
-          condition: "Natal 6th, 8th, or 12th House Lord occupies or casts a physical aspect onto the 7th or 2nd House.",
-          outputStatus: "POTENTIAL_SEPARATION",
-          explanation: "Afflictions from dusthana (6/8/12) lords to the marital house (7th) or family house (2nd) trigger structural distress in relationships."
-        },
-        {
-          system: "Parashari",
-          condition: "Transiting Saturn, Mars, Rahu, or Ketu forms a conjunction or exact aspect with Natal 7th Lord or Venus.",
-          outputStatus: "SEPARATION_TRIGGERED",
-          explanation: "Malefic transits over key relationship points act as timing triggers to release natal relationship friction."
-        },
         {
           system: "Parashari",
           condition: "Dual connection of 9th and 2nd Lord to the 7th House or Lord with a strong Venus or Jupiter.",
           outputStatus: "REMARRIAGE_PROMISED",
           explanation: "9th house represents the second marriage, while 2nd and 7th lords complete the auspicious alignment."
-        },
-        {
-          system: "KP",
-          condition: "7th Cuspal Sub-Lord (CSL) signifies houses [1, 6, 10] and completely excludes house 7 or 11.",
-          outputStatus: "DIVORCE_CONFIRMED",
-          explanation: "In KP Astrology, 1st (self), 6th (separation), and 10th (negation of 11th) houses directly negate marital bonding."
         },
         {
           system: "KP",
@@ -102,15 +72,42 @@ export const MasterArchitectureView: React.FC<MasterArchitectureViewProps> = ({
         },
         {
           system: "Jaimini",
-          condition: "Transiting malefics (Saturn, Rahu, Ketu) occupy or cast a sign aspect onto Upapada Lagna (UL) or its 2nd house.",
-          outputStatus: "MARITAL_BREAKDOWN",
-          explanation: "Upapada Lagna represents the spouse and sustainment of marriage. Afflictions to UL cause intense trials."
-        },
-        {
-          system: "Jaimini",
           condition: "The Darakaraka (DK) or Darapada (A7) receives a benign transit or sign aspect from a gentle benefic.",
           outputStatus: "REUNION_PATH_OPEN",
           explanation: "Darakaraka (planet with lowest degree) and Darapada (A7) denote the physical spouse; benefic aspects bring peace."
+        }
+      ]
+    },
+    {
+      id: "separation",
+      title: "Separation & Divorce",
+      icon: AlertTriangle,
+      iconColor: "text-red-500",
+      description: "Analyze relationship friction, physical separations, divorce markers, and obstacles.",
+      rules: [
+        {
+          system: "Parashari",
+          condition: "Natal 6th, 8th, or 12th House Lord occupies or casts a physical aspect onto the 7th or 2nd House.",
+          outputStatus: "POTENTIAL_SEPARATION",
+          explanation: "Afflictions from dusthana (6/8/12) lords to the marital house (7th) or family house (2nd) trigger structural distress in relationships."
+        },
+        {
+          system: "Parashari",
+          condition: "Transiting Saturn, Mars, Rahu, or Ketu forms a conjunction or exact aspect with Natal 7th Lord or Venus.",
+          outputStatus: "SEPARATION_TRIGGERED",
+          explanation: "Malefic transits over key relationship points act as timing triggers to release natal relationship friction."
+        },
+        {
+          system: "KP",
+          condition: "7th Cuspal Sub-Lord (CSL) signifies houses [1, 6, 10] and completely excludes house 7 or 11.",
+          outputStatus: "DIVORCE_CONFIRMED",
+          explanation: "In KP Astrology, 1st (self), 6th (separation), and 10th (negation of 11th) houses directly negate marital bonding."
+        },
+        {
+          system: "Jaimini",
+          condition: "Transiting malefics (Saturn, Rahu, Ketu) occupy or cast a sign aspect onto Upapada Lagna (UL) or its 2nd house.",
+          outputStatus: "MARITAL_BREAKDOWN",
+          explanation: "Upapada Lagna represents the spouse and sustainment of marriage. Afflictions to UL cause intense trials."
         }
       ]
     },
@@ -452,12 +449,6 @@ export const MasterArchitectureView: React.FC<MasterArchitectureViewProps> = ({
     }
   ];
 
-  const [allSimulations, setAllSimulations] = useState<Record<string, any>>({});
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
-    marital: true,
-    career: true
-  });
-
   const evaluateCategory = (category: LifeEventCategory, data: any) => {
     const hasChart = !!data;
     const matchedRules = category.rules.map((rule, idx) => {
@@ -465,7 +456,6 @@ export const MasterArchitectureView: React.FC<MasterArchitectureViewProps> = ({
       let confidence = 0;
 
       if (hasChart) {
-        // Deterministic stable simulation based on actual name length & birth coordinates
         const nameLength = data.inputs?.name?.length || data.birthDetails?.name?.length || 5;
         const chartHash = nameLength + idx + (category.id.charCodeAt(0) || 0);
         evaluated = chartHash % 3 !== 0;
@@ -512,13 +502,6 @@ export const MasterArchitectureView: React.FC<MasterArchitectureViewProps> = ({
     setAllSimulations(results);
   }, [astrologyData]);
 
-  const toggleExpand = (categoryId: string) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [categoryId]: !prev[categoryId]
-    }));
-  };
-
   const handleDownloadSimulationReport = () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allSimulations, null, 2));
     const downloadAnchor = document.createElement('a');
@@ -529,197 +512,179 @@ export const MasterArchitectureView: React.FC<MasterArchitectureViewProps> = ({
     downloadAnchor.remove();
   };
 
-  const filteredCategories = categories.filter(
-    (c) =>
-      c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.rules.some((r) => r.condition.toLowerCase().includes(searchQuery.toLowerCase()) || r.outputStatus.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
   return (
     <div className="space-y-6" id="master-architecture-view">
-      {/* Overview Card */}
-      <div className={`p-6 rounded-2xl border ${isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"} space-y-6`}>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-500">
-                <Database className="w-4 h-4" />
-              </span>
-              <span className="text-[10px] font-bold tracking-wider text-amber-500 uppercase">Automatic Simulation Engine</span>
-            </div>
-            <h3 className={`text-xl font-sans font-medium ${isDark ? "text-white" : "text-slate-900"}`}>
-              Master Astrological Rules Engine & Event Simulator
-            </h3>
-            <p className="text-xs text-slate-400 leading-relaxed max-w-2xl">
-              All 8 core life domains have been <span className="font-semibold text-amber-400">automatically simulated and evaluated</span> based on your astronomical birth coordinates. Review the triggered logical gates, planetary conditions, and multi-system alignment scores below.
-            </p>
-          </div>
-          
-          <button
-            onClick={handleDownloadSimulationReport}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 hover:shadow-lg hover:shadow-amber-500/10 active:scale-95 transition-all shrink-0 cursor-pointer"
-          >
-            <Database className="w-4 h-4" />
-            Download Simulated Events Log (.JSON)
-          </button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="relative max-w-md">
-          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Filter simulated rules, statuses, or conditions..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full text-xs pl-9 pr-4 py-2.5 rounded-xl border transition-all ${
-              isDark
-                ? "bg-slate-950 border-slate-800 text-white placeholder-slate-600 focus:border-slate-700"
-                : "bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400 focus:border-slate-300"
-            }`}
-          />
-        </div>
-
-        {/* Consolidated Automated Output Grid */}
-        <div className="grid grid-cols-1 gap-6">
-          {filteredCategories.map((category) => {
+      {/* Submenus Bar */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-3 mb-6">
+        <div className="flex flex-wrap gap-1.5 flex-1">
+          {categories.map((category) => {
             const IconComponent = category.icon;
-            const simResult = allSimulations[category.id];
-            const isExpanded = !!expandedCategories[category.id];
-
-            if (!simResult) return null;
-
-            // Determine border and color based on score
-            const scoreColor = simResult.score > 65 
-              ? "text-emerald-400" 
-              : simResult.score > 35 
-              ? "text-amber-400" 
-              : "text-slate-400";
-
-            const progressBg = simResult.score > 65 
-              ? "bg-emerald-500" 
-              : simResult.score > 35 
-              ? "bg-amber-500" 
-              : "bg-slate-500";
+            const isActive = activeSubmenu === category.id;
+            const shortLabelMap: Record<string, string> = {
+              marriage: "Marriage",
+              separation: "Separation",
+              litigation: "Litigation",
+              career: "Career",
+              finance: "Finance",
+              education: "Education",
+              property: "Property",
+              childbirth: "Childbirth",
+              travel: "Travel",
+              health: "Health"
+            };
+            const label = shortLabelMap[category.id] || category.title.split(",")[0];
 
             return (
-              <div 
+              <button
                 key={category.id}
-                className={`rounded-xl border ${
-                  isDark ? "bg-slate-950/40 border-slate-800/80" : "bg-white border-slate-200"
-                } overflow-hidden transition-all`}
+                onClick={() => setActiveSubmenu(category.id)}
+                className={`px-2.5 py-1.5 text-[10px] font-mono rounded-md transition-all border flex items-center gap-1.5 cursor-pointer ${
+                  isActive
+                    ? "bg-amber-500/15 border-amber-500/50 text-amber-400 font-bold shadow-sm shadow-amber-500/10"
+                    : "border-slate-800 bg-slate-900/30 text-slate-400 hover:text-slate-200 hover:bg-slate-900/50"
+                }`}
               >
-                {/* Category Header Bar */}
-                <div 
-                  onClick={() => toggleExpand(category.id)}
-                  className={`p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 cursor-pointer hover:bg-slate-900/10 transition-colors ${
-                    isDark ? "bg-slate-900/20" : "bg-slate-50"
-                  }`}
-                >
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <span className={`p-2 rounded-lg ${isDark ? "bg-slate-950" : "bg-white border border-slate-200"} ${category.iconColor} mt-0.5 shrink-0`}>
-                      <IconComponent className="w-5 h-5" />
-                    </span>
-                    <div className="space-y-0.5 min-w-0">
-                      <h4 className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                        {category.title}
-                      </h4>
-                      <p className="text-[11px] text-slate-400 leading-normal">{category.description}</p>
-                    </div>
-                  </div>
-
-                  {/* Score & Expand Button */}
-                  <div className="flex items-center gap-4 shrink-0 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-slate-800 pt-2 sm:pt-0">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-24 bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                        <div className={`h-full ${progressBg} rounded-full transition-all duration-1000`} style={{ width: `${simResult.score}%` }} />
-                      </div>
-                      <span className={`text-xs font-mono font-bold ${scoreColor}`}>
-                        {simResult.score}% Alignment
-                      </span>
-                    </div>
-                    <span className="text-slate-400 text-xs">
-                      {isExpanded ? "▲" : "▼"}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Expanded Details Panel */}
-                {isExpanded && (
-                  <div className="p-4 sm:p-5 border-t border-slate-800/60 space-y-4">
-                    {/* Verdict Box */}
-                    <div className={`p-4 rounded-xl border ${
-                      isDark ? "bg-slate-950 border-amber-500/10" : "bg-slate-50 border-slate-100"
-                    } flex items-start gap-3`}>
-                      <Award className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-wider">Unified Systems Consensus Verdict</span>
-                        <p className="text-xs text-slate-300 leading-relaxed font-sans">{simResult.verdict}</p>
-                      </div>
-                    </div>
-
-                    {/* Evaluated Logical Gates */}
-                    <div className="space-y-3">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Logical Gates Evaluated</div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {simResult.rules.map((rule: any, idx: number) => (
-                          <div
-                            key={idx}
-                            className={`p-3.5 rounded-xl border text-[11px] flex flex-col justify-between ${
-                              rule.isTriggered
-                                ? isDark 
-                                  ? "bg-emerald-950/15 border-emerald-500/20 text-slate-300"
-                                  : "bg-emerald-50/50 border-emerald-200 text-slate-800"
-                                : isDark
-                                ? "bg-slate-900/10 border-slate-800/50 text-slate-500"
-                                : "bg-neutral-50/40 border-neutral-100 text-neutral-400"
-                            }`}
-                          >
-                            <div className="space-y-2">
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
-                                    rule.system === "Parashari"
-                                      ? "bg-orange-500/10 text-orange-400 border border-orange-500/15"
-                                      : rule.system === "KP"
-                                      ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/15"
-                                      : "bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/15"
-                                  }`}>
-                                    {rule.system}
-                                  </span>
-                                  <span className="font-mono text-[10px] font-bold text-slate-300 truncate max-w-[150px]">
-                                    ➔ {rule.outputStatus}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-1 shrink-0">
-                                  {rule.isTriggered ? (
-                                    <span className="flex items-center gap-0.5 text-[9px] font-bold text-emerald-400">
-                                      <Check className="w-3 h-3" /> ACTIVE ({rule.confidence}%)
-                                    </span>
-                                  ) : (
-                                    <span className="text-[9px] font-semibold text-slate-600">INACTIVE</span>
-                                  )}
-                                </div>
-                              </div>
-                              <p className="text-[11px] font-mono leading-relaxed text-slate-300 bg-slate-900/30 p-2 rounded border border-slate-800/20">
-                                {rule.condition}
-                              </p>
-                              <p className="text-[10px] text-slate-400 leading-relaxed">
-                                <span className="font-bold text-slate-500 uppercase tracking-wider text-[9px]">Mechanism:</span> {rule.explanation}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                <IconComponent className="w-3 h-3 shrink-0" />
+                {label}
+              </button>
             );
           })}
         </div>
+
+        <button
+          onClick={handleDownloadSimulationReport}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/35 hover:shadow-lg active:scale-95 transition-all shrink-0 cursor-pointer"
+        >
+          <Database className="w-3.5 h-3.5" />
+          Download JSON Log
+        </button>
       </div>
+
+      {/* Active Submenu Category Content */}
+      {(() => {
+        const category = categories.find(c => c.id === activeSubmenu);
+        if (!category) return null;
+
+        const simResult = allSimulations[category.id];
+        if (!simResult) return null;
+
+        const IconComponent = category.icon;
+
+        const scoreColor = simResult.score > 65 
+          ? "text-emerald-400" 
+          : simResult.score > 35 
+          ? "text-amber-400" 
+          : "text-slate-400";
+
+        const progressBg = simResult.score > 65 
+          ? "bg-emerald-500" 
+          : simResult.score > 35 
+          ? "bg-amber-500" 
+          : "bg-slate-500";
+
+        return (
+          <div className="space-y-6">
+            {/* Category Info & Alignment Meter Card */}
+            <div className={`p-5 rounded-2xl border ${
+              isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"
+            } flex flex-col md:flex-row justify-between items-start md:items-center gap-4`}>
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                <span className={`p-2 rounded-lg ${isDark ? "bg-slate-950" : "bg-white border border-slate-200"} ${category.iconColor} mt-0.5 shrink-0`}>
+                  <IconComponent className="w-5 h-5" />
+                </span>
+                <div className="space-y-1 min-w-0">
+                  <h3 className={`text-base font-sans font-bold ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                    {category.title}
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-normal">{category.description}</p>
+                </div>
+              </div>
+
+              {/* Progress Bar / Alignment Meter */}
+              <div className="flex flex-col gap-1 shrink-0 w-full md:w-auto md:text-right border-t md:border-t-0 border-slate-800 pt-3 md:pt-0">
+                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Sub-system Alignment Score</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-28 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                    <div className={`h-full ${progressBg} rounded-full transition-all duration-1000`} style={{ width: `${simResult.score}%` }} />
+                  </div>
+                  <span className={`text-sm font-mono font-bold ${scoreColor}`}>
+                    {simResult.score}% Alignment
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Verdict Box */}
+            <div className={`p-4 rounded-xl border ${
+              isDark ? "bg-slate-950/60 border-amber-500/10" : "bg-slate-50 border-slate-100"
+            } flex items-start gap-3`}>
+              <Award className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
+              <div className="space-y-1">
+                <span className="text-[10px] font-mono font-bold text-amber-500 uppercase tracking-wider">Unified Systems Consensus Verdict</span>
+                <p className="text-xs text-slate-300 leading-relaxed font-sans">{simResult.verdict}</p>
+              </div>
+            </div>
+
+            {/* Evaluated Logical Gates (Rules) */}
+            <div className="space-y-4">
+              <div className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Cpu className="w-3.5 h-3.5 text-amber-500" />
+                Active Logical Gates Evaluated
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {simResult.rules.map((rule: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className={`p-4 rounded-xl border text-[11px] flex flex-col justify-between ${
+                      rule.isTriggered
+                        ? isDark 
+                          ? "bg-emerald-950/10 border-emerald-500/20 text-slate-300 shadow-sm shadow-emerald-500/5"
+                          : "bg-emerald-50/50 border-emerald-200 text-slate-800"
+                        : isDark
+                        ? "bg-slate-900/10 border-slate-800/40 text-slate-500"
+                        : "bg-neutral-50/40 border-neutral-100 text-neutral-400"
+                    }`}
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono ${
+                            rule.system === "Parashari"
+                              ? "bg-orange-500/10 text-orange-400 border border-orange-500/15"
+                              : rule.system === "KP"
+                              ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/15"
+                              : "bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/15"
+                          }`}>
+                            {rule.system}
+                          </span>
+                          <span className="font-mono text-[10px] font-bold text-slate-300 truncate max-w-[150px]">
+                            ➔ {rule.outputStatus}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {rule.isTriggered ? (
+                            <span className="flex items-center gap-0.5 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                              <Check className="w-3 h-3" /> ACTIVE ({rule.confidence}%)
+                            </span>
+                          ) : (
+                            <span className="text-[9px] font-semibold text-slate-600 bg-slate-900/40 px-1.5 py-0.5 rounded">INACTIVE</span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-[11px] font-mono leading-relaxed text-slate-300 bg-slate-900/30 p-2.5 rounded border border-slate-800/20">
+                        {rule.condition}
+                      </p>
+                      <p className="text-[10px] text-slate-400 leading-relaxed">
+                        <span className="font-bold text-slate-500 uppercase tracking-wider text-[9px]">Mechanism:</span> {rule.explanation}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };
