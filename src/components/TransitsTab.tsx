@@ -220,41 +220,6 @@ export default function TransitsTab({
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {/* Snap to Present */}
-            <button
-              onClick={snapToPresent}
-              className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-500/30 shadow-md transition-all cursor-pointer"
-              title="Snap to present real-time and GPS location"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Use Present GPS & Time</span>
-            </button>
-
-            {/* Target Transit Date */}
-            <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-lg border border-indigo-500/15">
-              <Calendar className="w-3.5 h-3.5 text-amber-500 ml-1.5" />
-              <input
-                type="date"
-                value={transitDate}
-                onChange={(e) => setTransitDate(e.target.value)}
-                className="bg-transparent text-amber-300 text-xs font-semibold focus:outline-none cursor-pointer border-0 w-28 px-1"
-                id="transit-date-input"
-              />
-            </div>
-
-            {/* Target Transit Time */}
-            <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-lg border border-indigo-500/15">
-              <Clock className="w-3.5 h-3.5 text-amber-500 ml-1.5" />
-              <input
-                type="time"
-                step="1"
-                value={transitTime}
-                onChange={(e) => setTransitTime(e.target.value)}
-                className="bg-transparent text-amber-300 text-xs font-semibold focus:outline-none cursor-pointer border-0 w-24 px-1"
-                id="transit-time-input"
-              />
-            </div>
-
             {/* Style Toggle */}
             <div className="bg-slate-950/80 p-1 rounded-lg border border-indigo-500/15 flex">
               <button

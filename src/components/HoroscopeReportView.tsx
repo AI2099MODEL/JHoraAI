@@ -71,6 +71,14 @@ interface HoroscopeReportViewProps {
   mapAstrologyDataToUserProfileJSON: (user: any, data: any) => any;
   setAstrologyData: (data: any) => void;
   isDark: boolean;
+  currentDateTime: Date;
+  headerGps: {
+    latitude: number | null;
+    longitude: number | null;
+    address: string | null;
+    loading: boolean;
+    error: string | null;
+  };
 }
 
 export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
@@ -78,7 +86,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   activeUser,
   mapAstrologyDataToUserProfileJSON,
   setAstrologyData,
-  isDark
+  isDark,
+  currentDateTime,
+  headerGps
 }) => {
   const [compiling, setCompiling] = useState(false);
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
@@ -234,16 +244,33 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     }
   };
 
-  // Automatically align default transit place to birth details whenever active user changes
+  // Synchronize transit date/time with top bar currentDateTime
   useEffect(() => {
-    if (astrologyData?.birthDetails) {
+    const yyyy = currentDateTime.getFullYear();
+    const mm = String(currentDateTime.getMonth() + 1).padStart(2, '0');
+    const dd = String(currentDateTime.getDate()).padStart(2, '0');
+    setTransitDate(`${yyyy}-${mm}-${dd}`);
+
+    const hrs = String(currentDateTime.getHours()).padStart(2, '0');
+    const mins = String(currentDateTime.getMinutes()).padStart(2, '0');
+    const secs = String(currentDateTime.getSeconds()).padStart(2, '0');
+    setTransitTime(`${hrs}:${mins}:${secs}`);
+  }, [currentDateTime]);
+
+  // Synchronize transit coordinates with top bar headerGps
+  useEffect(() => {
+    if (headerGps && headerGps.latitude !== null && headerGps.longitude !== null) {
+      setTransitLatitude(headerGps.latitude);
+      setTransitLongitude(headerGps.longitude);
+      setTransitPlace(headerGps.address || `${headerGps.latitude.toFixed(4)}°N, ${headerGps.longitude.toFixed(4)}°E`);
+      setTransitTimezone(new Date().getTimezoneOffset() / -60);
+    } else if (astrologyData?.birthDetails) {
       setTransitPlace(astrologyData.birthDetails.location || "New Delhi, India");
-      setTransitSearchQuery(astrologyData.birthDetails.location || "New Delhi, India");
       setTransitLatitude(astrologyData.birthDetails.latitude || 28.6139);
       setTransitLongitude(astrologyData.birthDetails.longitude || 77.2090);
       setTransitTimezone(astrologyData.birthDetails.timezone || 5.5);
     }
-  }, [astrologyData]);
+  }, [headerGps, astrologyData]);
 
   // Fetch new calculations on transit coordinate/date/time change
   useEffect(() => {
@@ -5228,120 +5255,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
       {majorTab === "transit" && (
         <div className="space-y-6">
-          {/* Transit moment configuration widget (Location, date & time selector) */}
-          <div className="p-5 rounded-2xl border border-indigo-500/15 bg-slate-900/40 backdrop-blur-md space-y-4">
-            <div className="flex items-center justify-between border-b border-indigo-500/10 pb-2">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-amber-500" />
-                <span className="text-xs font-mono font-bold text-amber-100 uppercase tracking-wider">
-                  Transit Parameters & Place Coordinates
-                </span>
-              </div>
-              {transitLoading ? (
-                <span className="text-[10px] font-mono text-amber-400 flex items-center gap-1.5 animate-pulse">
-                  <RefreshCw className="w-3 h-3 animate-spin text-amber-400" />
-                  Updating Transit Ephemeris...
-                </span>
-              ) : (
-                <span className="text-[10px] font-mono text-slate-400">
-                  Ephemeris: Swiss Engine • Lahiri Ayanamsa
-                </span>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-              {/* Date selection */}
-              <div className="md:col-span-3 flex flex-col gap-1.5">
-                <label className="text-[10px] font-mono text-slate-400 uppercase">Transit Date</label>
-                <div className="flex items-center gap-2 bg-slate-950/60 border border-slate-800 p-2.5 rounded-xl">
-                  <Calendar className="w-4 h-4 text-indigo-400 shrink-0" />
-                  <input
-                    type="date"
-                    value={transitDate}
-                    onChange={(e) => setTransitDate(e.target.value)}
-                    className="bg-transparent text-slate-200 text-xs font-medium focus:outline-none w-full border-0 cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              {/* Time selection */}
-              <div className="md:col-span-3 flex flex-col gap-1.5">
-                <label className="text-[10px] font-mono text-slate-400 uppercase">Transit Time</label>
-                <div className="flex items-center gap-2 bg-slate-950/60 border border-slate-800 p-2.5 rounded-xl">
-                  <Clock className="w-4 h-4 text-indigo-400 shrink-0" />
-                  <input
-                    type="time"
-                    value={transitTime.slice(0, 5)}
-                    onChange={(e) => setTransitTime(e.target.value + ":00")}
-                    className="bg-transparent text-slate-200 text-xs font-medium focus:outline-none w-full border-0 cursor-pointer"
-                  />
-                </div>
-              </div>
-
-              {/* Location selection */}
-              <div className="md:col-span-6 flex flex-col gap-1.5 relative">
-                <label className="text-[10px] font-mono text-slate-400 uppercase">Transit Place (Geocoded)</label>
-                <div className="flex items-center gap-2 bg-slate-950/60 border border-slate-800 p-2.5 rounded-xl">
-                  <MapPin className="w-4 h-4 text-amber-500 shrink-0" />
-                  <input
-                    type="text"
-                    value={transitSearchQuery}
-                    onChange={(e) => {
-                      setTransitSearchQuery(e.target.value);
-                      setShowTransitLocationDropdown(true);
-                    }}
-                    placeholder="Search transit place (e.g. London, Tokyo)..."
-                    className="bg-transparent text-slate-200 text-xs font-medium focus:outline-none w-full border-0"
-                  />
-                  {searchingTransitLocation && (
-                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-400" />
-                  )}
-                </div>
-
-                {/* Autocomplete drop-down */}
-                {showTransitLocationDropdown && transitLocationResults.length > 0 && (
-                  <div className="absolute top-[62px] left-0 right-0 bg-slate-950 border border-slate-800 rounded-xl max-h-[220px] overflow-y-auto z-50 divide-y divide-slate-900/60 shadow-2xl">
-                    {transitLocationResults.map((result, idx) => {
-                      const label = `${result.name}, ${result.admin1 ? result.admin1 + ', ' : ''}${result.country}`;
-                      return (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => {
-                            setTransitPlace(label);
-                            setTransitSearchQuery(label);
-                            setTransitLatitude(result.latitude);
-                            setTransitLongitude(result.longitude);
-                            const tzOffset = calculateTransitTimezoneOffset(result.timezone, transitDate);
-                            setTransitTimezone(tzOffset);
-                            setShowTransitLocationDropdown(false);
-                          }}
-                          className="w-full text-left p-3 hover:bg-slate-900 text-xs text-slate-300 hover:text-white transition-all flex items-center justify-between"
-                        >
-                          <span className="font-semibold">{label}</span>
-                          <span className="text-[9px] font-mono text-indigo-400">
-                            Lat: {result.latitude.toFixed(2)} | Lng: {result.longitude.toFixed(2)}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Coordinates feedback info-line */}
-            <div className="flex flex-wrap justify-between items-center text-[10px] font-mono text-slate-400 bg-slate-950/30 p-2.5 rounded-xl border border-slate-800/40">
-              <span className="flex items-center gap-1">
-                <Compass className="w-3.5 h-3.5 text-indigo-400" />
-                Active Coordinates: <strong className="text-slate-300">{transitLatitude.toFixed(4)}°N, {transitLongitude.toFixed(4)}°E</strong>
-              </span>
-              <span>
-                Local Offset: <strong className="text-slate-300">GMT {transitTimezone >= 0 ? `+${transitTimezone.toFixed(1)}` : transitTimezone.toFixed(1)}</strong>
-              </span>
-            </div>
-          </div>
-
           {transitSubTab === "current_gochara" && (
             astrologyData ? (
               <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>

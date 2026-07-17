@@ -1907,6 +1907,8 @@ export default function App() {
                   mapAstrologyDataToUserProfileJSON={mapAstrologyDataToUserProfileJSON}
                   setAstrologyData={setAstrologyData}
                   isDark={isDark}
+                  currentDateTime={currentDateTime}
+                  headerGps={headerGps}
                 />
 
               </motion.div>
