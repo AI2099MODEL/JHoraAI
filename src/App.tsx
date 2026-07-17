@@ -1794,6 +1794,9 @@ export default function App() {
                 {/* Traditional Horoscope Report (Main Default Presentation) */}
                 <HoroscopeReportView
                   astrologyData={astrologyData}
+                  activeUser={activeUser}
+                  mapAstrologyDataToUserProfileJSON={mapAstrologyDataToUserProfileJSON}
+                  setAstrologyData={setAstrologyData}
                   isDark={isDark}
                 />
 
