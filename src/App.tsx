@@ -2414,7 +2414,7 @@ export default function App() {
                       activeSubmenuId === "ashtakavarga" ? "ashtakavarga" :
                       activeSubmenuId === "yogas" ? "yogas" :
                       activeSubmenuId === "sahams" ? "saham" :
-                      activeSubmenuId === "doshas" ? "dashboard" :
+                      activeSubmenuId === "doshas" ? "yogas" :
                       activeSubmenuId === "vimshottari" || activeSubmenuId === "yogini" || activeSubmenuId === "ashtottari" ? "dashas" :
                       "dashboard"
                     }
@@ -2433,6 +2433,7 @@ export default function App() {
                       setActiveDashaSystem(system);
                       handleSubmenuSelect(system);
                     }}
+                    activeSubmenuId={activeSubmenuId}
                   />
                 ) : (
                   <div className="text-center py-12">
@@ -2508,6 +2509,7 @@ export default function App() {
                       setSelectedBavPlanet={setSelectedBavPlanet}
                       activeDashaSystem={activeDashaSystem}
                       setActiveDashaSystem={setActiveDashaSystem}
+                      activeSubmenuId={activeSubmenuId}
                     />
                   ) : (
                     <div className="text-center py-12">

@@ -13,6 +13,9 @@ interface AstroChartProps {
   vargaLagnas?: { [key: string]: number };
   lagnaSignIndex: number; // 0 to 11
   lagnaSignName: string;
+  defaultDivision?: string;
+  hideHeader?: boolean;
+  hideVargaSelector?: boolean;
 }
 
 const VARGAS_LIST = [
@@ -52,9 +55,12 @@ export default function AstroChart({
   vargaLagnas,
   lagnaSignIndex,
   lagnaSignName,
+  defaultDivision = "D1",
+  hideHeader = false,
+  hideVargaSelector = false,
 }: AstroChartProps) {
   const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
-  const [selectedDivision, setSelectedDivision] = useState<string>("D1");
+  const [selectedDivision, setSelectedDivision] = useState<string>(defaultDivision);
 
   // Determine active chart
   const getActiveChart = () => {
@@ -120,36 +126,74 @@ export default function AstroChart({
 
   return (
     <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-indigo-500/20 p-6 shadow-xl" id="astro-charts-container">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <h3 className="text-xl font-sans font-medium text-amber-100 flex items-center gap-2">
-            <Layers className="w-5 h-5 text-amber-500" />
-            Interactive Astrological Charts
-          </h3>
-          <p className="text-xs text-slate-400 mt-1">
-            Displaying planetary placements in rasi and Shodashavarga divisional views (D1 to D60).
-          </p>
-        </div>
-        
-        {/* Toggle Controls */}
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Varga Selector Dropdown */}
-          <div className="bg-slate-950/80 p-1.5 rounded-lg border border-indigo-500/15 flex items-center gap-2">
-            <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-wider pl-1.5">Varga:</span>
-            <select
-              value={selectedDivision}
-              onChange={(e) => setSelectedDivision(e.target.value)}
-              className="bg-slate-900 text-amber-300 text-xs font-semibold rounded px-2.5 py-1 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border border-indigo-500/10"
-              id="varga-select-dropdown"
-            >
-              {VARGAS_LIST.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.label}
-                </option>
-              ))}
-            </select>
-          </div>
+      {(!hideHeader || !hideVargaSelector) && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          {!hideHeader ? (
+            <div>
+              <h3 className="text-xl font-sans font-medium text-amber-100 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-amber-500" />
+                Interactive Astrological Charts
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Displaying planetary placements in rasi and Shodashavarga divisional views (D1 to D60).
+              </p>
+            </div>
+          ) : (
+            <div />
+          )}
+          
+          {/* Toggle Controls */}
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Varga Selector Dropdown */}
+            {!hideVargaSelector && (
+              <div className="bg-slate-950/80 p-1.5 rounded-lg border border-indigo-500/15 flex items-center gap-2">
+                <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-wider pl-1.5">Varga:</span>
+                <select
+                  value={selectedDivision}
+                  onChange={(e) => setSelectedDivision(e.target.value)}
+                  className="bg-slate-900 text-amber-300 text-xs font-semibold rounded px-2.5 py-1 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border border-indigo-500/10"
+                  id="varga-select-dropdown"
+                >
+                  {VARGAS_LIST.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
+            {/* Style Toggle */}
+            <div className="bg-slate-950/80 p-1 rounded-lg border border-indigo-500/15 flex">
+              <button
+                onClick={() => setChartStyle("north")}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                  chartStyle === "north"
+                    ? "bg-indigo-600 text-white shadow-md font-semibold"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+                id="btn-north-chart"
+              >
+                North Indian
+              </button>
+              <button
+                onClick={() => setChartStyle("south")}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                  chartStyle === "south"
+                    ? "bg-indigo-600 text-white shadow-md font-semibold"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+                id="btn-south-chart"
+              >
+                South Indian
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {hideHeader && hideVargaSelector && (
+        <div className="flex justify-end gap-3 mb-4">
           {/* Style Toggle */}
           <div className="bg-slate-950/80 p-1 rounded-lg border border-indigo-500/15 flex">
             <button
@@ -176,7 +220,7 @@ export default function AstroChart({
             </button>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* Render Chart */}

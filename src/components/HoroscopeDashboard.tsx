@@ -25,6 +25,7 @@ interface HoroscopeDashboardProps {
   setSelectedBavPlanet: (planet: string) => void;
   activeDashaSystem: "vimshottari" | "yogini" | "ashtottari";
   setActiveDashaSystem: (system: "vimshottari" | "yogini" | "ashtottari") => void;
+  activeSubmenuId?: string;
 }
 
 const ZODIAC_SIGNS = [
@@ -82,6 +83,7 @@ export default function HoroscopeDashboard({
   setSelectedBavPlanet,
   activeDashaSystem,
   setActiveDashaSystem,
+  activeSubmenuId,
 }: HoroscopeDashboardProps) {
 
   const getLordColor = (lord: string) => {
@@ -562,108 +564,116 @@ export default function HoroscopeDashboard({
           <div className="bg-slate-900/40 border border-indigo-500/10 rounded-2xl p-5">
             <h3 className="text-base font-semibold text-amber-200 flex items-center gap-2">
               <Zap className="w-5 h-5 text-amber-500 animate-pulse" />
-              Astrological Potencies: Shad Bala & Bhava Bala
+              {activeSubmenuId === "bhava_strength" ? "Astrological Potencies: Bhava Bala" :
+               activeSubmenuId === "planet_strength" ? "Astrological Potencies: Shad Bala" :
+               "Astrological Potencies: Shad Bala & Bhava Bala"}
             </h3>
             <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              Shad Bala represents the six-fold global strength of planets based on positional (Sthana), directional (Dig), temporal (Kala), motional (Cheshta), natural (Naisargika), and aspectual (Drig) forces. Bhava Bala measures the strength of the 12 houses to deliver their life themes.
+              {activeSubmenuId === "bhava_strength" ? "Bhava Bala measures the strength of the 12 houses to deliver their life themes. It evaluates house lords, aspects, and planetary occupancies." :
+               activeSubmenuId === "planet_strength" ? "Shad Bala represents the six-fold global strength of planets based on positional (Sthana), directional (Dig), temporal (Kala), motional (Cheshta), natural (Naisargika), and aspectual (Drig) forces." :
+               "Shad Bala represents the six-fold global strength of planets based on positional, directional, temporal, motional, natural, and aspectual forces. Bhava Bala measures the strength of the 12 houses to deliver their life themes."}
             </p>
           </div>
 
           {/* Shad Bala Grid */}
-          <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
-            <div className="border-b border-indigo-500/10 pb-3 flex justify-between items-center">
-              <div>
-                <h4 className="text-sm font-semibold text-slate-200">Planetary Shad Bala (Sixfold Potency)</h4>
-                <p className="text-[11px] text-slate-400 mt-0.5">Calculated in Shashtiamsas (Rupas). High ratio indicates strong planetary expression.</p>
+          {(!activeSubmenuId || activeSubmenuId === "planet_strength") && (
+            <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
+              <div className="border-b border-indigo-500/10 pb-3 flex justify-between items-center">
+                <div>
+                  <h4 className="text-sm font-semibold text-slate-200">Planetary Shad Bala (Sixfold Potency)</h4>
+                  <p className="text-[11px] text-slate-400 mt-0.5">Calculated in Shashtiamsas (Rupas). High ratio indicates strong planetary expression.</p>
+                </div>
+                <span className="text-[9px] font-mono font-bold bg-amber-500/10 text-amber-300 px-2 py-1 rounded border border-amber-500/20">Unit: Rupas</span>
               </div>
-              <span className="text-[9px] font-mono font-bold bg-amber-500/10 text-amber-300 px-2 py-1 rounded border border-amber-500/20">Unit: Rupas</span>
+
+              <div className="space-y-4">
+                {astrologyData.shadBala && Object.entries(astrologyData.shadBala).map(([pName, val]: [string, any]) => {
+                  const ratio = val.ratio || (val.total / val.required);
+                  const isStrong = ratio >= 1.0;
+                  return (
+                    <div key={pName} className="bg-slate-950/40 border border-slate-850 p-4 rounded-xl space-y-3 hover:border-indigo-500/10 transition-colors">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-xs font-bold text-white">{pName}</span>
+                          <span className={`text-[8px] font-mono uppercase font-bold tracking-wider px-1.5 py-0.5 rounded border ${
+                            isStrong 
+                              ? "bg-green-500/10 text-green-400 border-green-500/20" 
+                              : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                          }`}>
+                            {isStrong ? "Propitious (Strong)" : "Average"}
+                          </span>
+                        </div>
+                        <div className="text-[10px] font-mono text-slate-400">
+                          Total: <span className="text-amber-200 font-bold">{val.total || val.scored}</span> / Req: {val.required} <span className="text-slate-500">({ratio.toFixed(2)}x)</span>
+                        </div>
+                      </div>
+
+                      {/* Progress bar */}
+                      <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-900">
+                        <div 
+                          className={`h-full rounded-full transition-all duration-500 ${isStrong ? "bg-gradient-to-r from-emerald-500 to-teal-400" : "bg-gradient-to-r from-amber-500 to-orange-400"}`}
+                          style={{ width: `${Math.min(ratio * 50, 100)}%` }}
+                        />
+                      </div>
+
+                      {/* Breakdown components */}
+                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1 text-center">
+                        <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
+                          <span className="text-[7px] font-mono text-slate-500 block">Sthana (Pos)</span>
+                          <span className="text-[9px] font-mono font-bold text-slate-300">{val.sthanaBala || 120}</span>
+                        </div>
+                        <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
+                          <span className="text-[7px] font-mono text-slate-500 block">Dig (Dir)</span>
+                          <span className="text-[9px] font-mono font-bold text-slate-300">{val.digBala || 45}</span>
+                        </div>
+                        <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
+                          <span className="text-[7px] font-mono text-slate-500 block">Kala (Temp)</span>
+                          <span className="text-[9px] font-mono font-bold text-slate-300">{val.kalaBala || 180}</span>
+                        </div>
+                        <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
+                          <span className="text-[7px] font-mono text-slate-500 block">Cheshta (Mot)</span>
+                          <span className="text-[9px] font-mono font-bold text-slate-300">{val.cheshtaBala || 35}</span>
+                        </div>
+                        <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
+                          <span className="text-[7px] font-mono text-slate-500 block">Naisarg (Nat)</span>
+                          <span className="text-[9px] font-mono font-bold text-slate-300">{val.naisargikaBala || 60}</span>
+                        </div>
+                        <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
+                          <span className="text-[7px] font-mono text-slate-500 block">Drig (Aspect)</span>
+                          <span className="text-[9px] font-mono font-bold text-slate-300">{val.drigBala || -5}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-
-            <div className="space-y-4">
-              {astrologyData.shadBala && Object.entries(astrologyData.shadBala).map(([pName, val]: [string, any]) => {
-                const ratio = val.ratio || (val.total / val.required);
-                const isStrong = ratio >= 1.0;
-                return (
-                  <div key={pName} className="bg-slate-950/40 border border-slate-850 p-4 rounded-xl space-y-3 hover:border-indigo-500/10 transition-colors">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-xs font-bold text-white">{pName}</span>
-                        <span className={`text-[8px] font-mono uppercase font-bold tracking-wider px-1.5 py-0.5 rounded border ${
-                          isStrong 
-                            ? "bg-green-500/10 text-green-400 border-green-500/20" 
-                            : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                        }`}>
-                          {isStrong ? "Propitious (Strong)" : "Average"}
-                        </span>
-                      </div>
-                      <div className="text-[10px] font-mono text-slate-400">
-                        Total: <span className="text-amber-200 font-bold">{val.total || val.scored}</span> / Req: {val.required} <span className="text-slate-500">({ratio.toFixed(2)}x)</span>
-                      </div>
-                    </div>
-
-                    {/* Progress bar */}
-                    <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-900">
-                      <div 
-                        className={`h-full rounded-full transition-all duration-500 ${isStrong ? "bg-gradient-to-r from-emerald-500 to-teal-400" : "bg-gradient-to-r from-amber-500 to-orange-400"}`}
-                        style={{ width: `${Math.min(ratio * 50, 100)}%` }}
-                      />
-                    </div>
-
-                    {/* Breakdown components */}
-                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1 text-center">
-                      <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
-                        <span className="text-[7px] font-mono text-slate-500 block">Sthana (Pos)</span>
-                        <span className="text-[9px] font-mono font-bold text-slate-300">{val.sthanaBala || 120}</span>
-                      </div>
-                      <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
-                        <span className="text-[7px] font-mono text-slate-500 block">Dig (Dir)</span>
-                        <span className="text-[9px] font-mono font-bold text-slate-300">{val.digBala || 45}</span>
-                      </div>
-                      <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
-                        <span className="text-[7px] font-mono text-slate-500 block">Kala (Temp)</span>
-                        <span className="text-[9px] font-mono font-bold text-slate-300">{val.kalaBala || 180}</span>
-                      </div>
-                      <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
-                        <span className="text-[7px] font-mono text-slate-500 block">Cheshta (Mot)</span>
-                        <span className="text-[9px] font-mono font-bold text-slate-300">{val.cheshtaBala || 35}</span>
-                      </div>
-                      <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
-                        <span className="text-[7px] font-mono text-slate-500 block">Naisarg (Nat)</span>
-                        <span className="text-[9px] font-mono font-bold text-slate-300">{val.naisargikaBala || 60}</span>
-                      </div>
-                      <div className="bg-slate-900/50 p-1.5 rounded border border-slate-900/50">
-                        <span className="text-[7px] font-mono text-slate-500 block">Drig (Aspect)</span>
-                        <span className="text-[9px] font-mono font-bold text-slate-300">{val.drigBala || -5}</span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          )}
 
           {/* Bhava Bala Section */}
-          <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
-            <div className="border-b border-indigo-500/10 pb-3">
-              <h4 className="text-sm font-semibold text-slate-200">Bhava Bala (Twelve Houses Strength)</h4>
-              <p className="text-[11px] text-slate-400 mt-0.5">Aggregated strength and rank of houses representing life spheres (1st House: Health, 10th House: Career, etc.).</p>
-            </div>
+          {(!activeSubmenuId || activeSubmenuId === "bhava_strength") && (
+            <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
+              <div className="border-b border-indigo-500/10 pb-3">
+                <h4 className="text-sm font-semibold text-slate-200">Bhava Bala (Twelve Houses Strength)</h4>
+                <p className="text-[11px] text-slate-400 mt-0.5">Aggregated strength and rank of houses representing life spheres (1st House: Health, 10th House: Career, etc.).</p>
+              </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-              {astrologyData.bhavaBala && Object.entries(astrologyData.bhavaBala).map(([houseName, val]: [string, any]) => {
-                const rankText = val.rank === 1 ? "1st" : val.rank === 2 ? "2nd" : val.rank === 3 ? "3rd" : `${val.rank}th`;
-                return (
-                  <div key={houseName} className="bg-slate-950/40 border border-slate-850 p-3.5 rounded-xl text-center space-y-1.5 hover:border-indigo-500/30 transition-all">
-                    <span className="text-[9px] font-mono font-bold text-slate-400 block uppercase">{houseName}</span>
-                    <span className="text-xs font-black text-white block font-mono">{val.strengthShashtiamsas || val.strength} Sh</span>
-                    <div className="flex items-center justify-center gap-1.5 mt-1 border-t border-slate-900/40 pt-1.5">
-                      <span className="text-[8px] font-mono text-indigo-300 bg-indigo-500/15 px-1.5 py-0.5 rounded border border-indigo-500/15">Rank {rankText}</span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                {astrologyData.bhavaBala && Object.entries(astrologyData.bhavaBala).map(([houseName, val]: [string, any]) => {
+                  const rankText = val.rank === 1 ? "1st" : val.rank === 2 ? "2nd" : val.rank === 3 ? "3rd" : `${val.rank}th`;
+                  return (
+                    <div key={houseName} className="bg-slate-950/40 border border-slate-850 p-3.5 rounded-xl text-center space-y-1.5 hover:border-indigo-500/30 transition-all">
+                      <span className="text-[9px] font-mono font-bold text-slate-400 block uppercase">{houseName}</span>
+                      <span className="text-xs font-black text-white block font-mono">{val.strengthShashtiamsas || val.strength} Sh</span>
+                      <div className="flex items-center justify-center gap-1.5 mt-1 border-t border-slate-900/40 pt-1.5">
+                        <span className="text-[8px] font-mono text-indigo-300 bg-indigo-500/15 px-1.5 py-0.5 rounded border border-indigo-500/15">Rank {rankText}</span>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 
@@ -817,125 +827,137 @@ export default function HoroscopeDashboard({
       )}
 
       {/* Subtab 7: Yogas */}
-      {activeSubTab === "yogas" && (
-        <div className="space-y-6" id="subtab-yogas-content">
-          {/* Overview explanation */}
-          <div className="bg-slate-900/40 border border-indigo-500/10 rounded-2xl p-5">
-            <h4 className="text-sm font-semibold text-slate-200 mb-1 flex items-center gap-2">
-              <Award className="w-5 h-5 text-amber-500" />
-              Celestial Combinations (Yogas & Doshas)
-            </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Yogas represent highly specific configurations of planets that release auspicious and powerful karmic energies, granting intelligence, success, or resilience. Doshas represent critical imbalances calling for lifestyle refinements and conscious remedies.
-            </p>
-          </div>
+      {activeSubTab === "yogas" && (() => {
+        const showYogas = !activeSubmenuId || activeSubmenuId === "yogas";
+        const showDoshas = !activeSubmenuId || activeSubmenuId === "doshas";
+        return (
+          <div className="space-y-6" id="subtab-yogas-content">
+            {/* Overview explanation */}
+            <div className="bg-slate-900/40 border border-indigo-500/10 rounded-2xl p-5">
+              <h4 className="text-sm font-semibold text-slate-200 mb-1 flex items-center gap-2">
+                <Award className="w-5 h-5 text-amber-500" />
+                {activeSubmenuId === "yogas" ? "Auspicious Celestial Combinations (Yogas)" :
+                 activeSubmenuId === "doshas" ? "Astrological Challenges (Doshas)" :
+                 "Celestial Combinations (Yogas & Doshas)"}
+              </h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                {activeSubmenuId === "yogas" ? "Yogas represent highly specific configurations of planets that release auspicious and powerful karmic energies, granting intelligence, success, or resilience." :
+                 activeSubmenuId === "doshas" ? "Doshas represent critical imbalances calling for lifestyle refinements and conscious remedies to harmonize challenging planetary positions." :
+                 "Yogas represent highly specific configurations of planets that release auspicious and powerful karmic energies, granting intelligence, success, or resilience. Doshas represent critical imbalances calling for lifestyle refinements and conscious remedies."}
+              </p>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Yogas Side */}
-            <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
-              <h3 className="text-base font-semibold text-amber-400 border-b border-indigo-500/10 pb-3 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                Auspicious Astrological Yogas
-              </h3>
-              <div className="space-y-4 max-h-[550px] overflow-y-auto pr-1 scrollbar-thin">
-                {astrologyData.yogas.map((y) => (
-                  <div
-                    key={y.name}
-                    className={`p-4 rounded-xl border transition-all ${
-                      y.isPresent
-                        ? "bg-green-500/5 border-green-500/30 shadow-sm shadow-green-500/5"
-                        : "bg-slate-950/20 border-slate-800/80 opacity-60"
-                    }`}
-                  >
-                    <div className="flex justify-between items-center mb-1">
-                      <h4 className="text-xs font-bold text-white">{y.name}</h4>
-                      <span
-                        className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
+            <div className={`grid grid-cols-1 ${showYogas && showDoshas ? "md:grid-cols-2" : ""} gap-6`}>
+              {/* Yogas Side */}
+              {showYogas && (
+                <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
+                  <h3 className="text-base font-semibold text-amber-400 border-b border-indigo-500/10 pb-3 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-400" />
+                    Auspicious Astrological Yogas
+                  </h3>
+                  <div className="space-y-4 max-h-[550px] overflow-y-auto pr-1 scrollbar-thin">
+                    {astrologyData.yogas.map((y) => (
+                      <div
+                        key={y.name}
+                        className={`p-4 rounded-xl border transition-all ${
                           y.isPresent
-                            ? "bg-green-500/20 text-green-400"
-                            : "bg-slate-800 text-slate-500"
+                            ? "bg-green-500/5 border-green-500/30 shadow-sm shadow-green-500/5"
+                            : "bg-slate-950/20 border-slate-800/80 opacity-60"
                         }`}
                       >
-                        {y.isPresent ? "ACTIVE" : "INACTIVE"}
-                      </span>
+                        <div className="flex justify-between items-center mb-1">
+                          <h4 className="text-xs font-bold text-white">{y.name}</h4>
+                          <span
+                            className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
+                              y.isPresent
+                                ? "bg-green-500/20 text-green-400"
+                                : "bg-slate-800 text-slate-500"
+                            }`}
+                          >
+                            {y.isPresent ? "ACTIVE" : "INACTIVE"}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 block mb-2">{y.description}</span>
+                        <p className="text-[11px] text-slate-300 leading-relaxed">
+                          {y.explanation}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Doshas Side */}
+              {showDoshas && (
+                <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
+                  <h3 className="text-base font-semibold text-rose-400 border-b border-indigo-500/10 pb-3 flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-rose-400" />
+                    Astrological Challenges (Doshas)
+                  </h3>
+                  <div className="space-y-4 max-h-[550px] overflow-y-auto pr-1 scrollbar-thin">
+                    {/* Manglik */}
+                    <div className={`p-4 rounded-xl border transition-all ${
+                      astrologyData.doshas.manglik.isPresent
+                        ? "bg-rose-500/5 border-rose-500/30"
+                        : "bg-slate-950/20 border-slate-800/80"
+                    }`}>
+                      <div className="flex justify-between items-center mb-1">
+                        <h4 className="text-xs font-bold text-white">Manglik Dosha (Kuja Dosha)</h4>
+                        <span className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
+                          astrologyData.doshas.manglik.isPresent ? "bg-rose-500/25 text-rose-400" : "bg-green-500/20 text-green-400"
+                        }`}>
+                          {astrologyData.doshas.manglik.isPresent ? "PRESENT" : "ABSENT"}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed mt-2">
+                        {astrologyData.doshas.manglik.explanation}
+                      </p>
                     </div>
-                    <span className="text-[10px] text-slate-400 block mb-2">{y.description}</span>
-                    <p className="text-[11px] text-slate-300 leading-relaxed">
-                      {y.explanation}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
 
-            {/* Doshas Side */}
-            <div className="bg-slate-900/60 border border-indigo-500/20 rounded-2xl p-6 shadow-xl space-y-4">
-              <h3 className="text-base font-semibold text-rose-400 border-b border-indigo-500/10 pb-3 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-rose-400" />
-                Astrological Challenges (Doshas)
-              </h3>
-              <div className="space-y-4 max-h-[550px] overflow-y-auto pr-1 scrollbar-thin">
-                {/* Manglik */}
-                <div className={`p-4 rounded-xl border transition-all ${
-                  astrologyData.doshas.manglik.isPresent
-                    ? "bg-rose-500/5 border-rose-500/30"
-                    : "bg-slate-950/20 border-slate-800/80"
-                }`}>
-                  <div className="flex justify-between items-center mb-1">
-                    <h4 className="text-xs font-bold text-white">Manglik Dosha (Kuja Dosha)</h4>
-                    <span className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
-                      astrologyData.doshas.manglik.isPresent ? "bg-rose-500/25 text-rose-400" : "bg-green-500/20 text-green-400"
+                    {/* Kaal Sarp */}
+                    <div className={`p-4 rounded-xl border transition-all ${
+                      astrologyData.doshas.kaalSarp.isPresent
+                        ? "bg-rose-500/5 border-rose-500/30"
+                        : "bg-slate-950/20 border-slate-800/80"
                     }`}>
-                      {astrologyData.doshas.manglik.isPresent ? "PRESENT" : "ABSENT"}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 leading-relaxed mt-2">
-                    {astrologyData.doshas.manglik.explanation}
-                  </p>
-                </div>
+                      <div className="flex justify-between items-center mb-1">
+                        <h4 className="text-xs font-bold text-white">Kaal Sarp Dosha</h4>
+                        <span className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
+                          astrologyData.doshas.kaalSarp.isPresent ? "bg-rose-500/25 text-rose-400" : "bg-green-500/20 text-green-400"
+                        }`}>
+                          {astrologyData.doshas.kaalSarp.isPresent ? "PRESENT" : "ABSENT"}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed mt-2">
+                        {astrologyData.doshas.kaalSarp.explanation}
+                      </p>
+                    </div>
 
-                {/* Kaal Sarp */}
-                <div className={`p-4 rounded-xl border transition-all ${
-                  astrologyData.doshas.kaalSarp.isPresent
-                    ? "bg-rose-500/5 border-rose-500/30"
-                    : "bg-slate-950/20 border-slate-800/80"
-                }`}>
-                  <div className="flex justify-between items-center mb-1">
-                    <h4 className="text-xs font-bold text-white">Kaal Sarp Dosha</h4>
-                    <span className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
-                      astrologyData.doshas.kaalSarp.isPresent ? "bg-rose-500/25 text-rose-400" : "bg-green-500/20 text-green-400"
+                    {/* Sade Sati */}
+                    <div className={`p-4 rounded-xl border transition-all ${
+                      astrologyData.doshas.sadeSati.isPresent
+                        ? "bg-rose-500/5 border-rose-500/30"
+                        : "bg-slate-950/20 border-slate-800/80"
                     }`}>
-                      {astrologyData.doshas.kaalSarp.isPresent ? "PRESENT" : "ABSENT"}
-                    </span>
+                      <div className="flex justify-between items-center mb-1">
+                        <h4 className="text-xs font-bold text-white">Shani Sade Sati Cycle</h4>
+                        <span className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
+                          astrologyData.doshas.sadeSati.isPresent ? "bg-amber-500/25 text-amber-400" : "bg-green-500/20 text-green-400"
+                        }`}>
+                          {astrologyData.doshas.sadeSati.isPresent ? "ACTIVE" : "INACTIVE"}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 leading-relaxed mt-2">
+                        {astrologyData.doshas.sadeSati.explanation}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-[11px] text-slate-300 leading-relaxed mt-2">
-                    {astrologyData.doshas.kaalSarp.explanation}
-                  </p>
                 </div>
-
-                {/* Sade Sati */}
-                <div className={`p-4 rounded-xl border transition-all ${
-                  astrologyData.doshas.sadeSati.isPresent
-                    ? "bg-rose-500/5 border-rose-500/30"
-                    : "bg-slate-950/20 border-slate-800/80"
-                }`}>
-                  <div className="flex justify-between items-center mb-1">
-                    <h4 className="text-xs font-bold text-white">Shani Sade Sati Cycle</h4>
-                    <span className={`text-[8px] font-mono uppercase tracking-widest font-extrabold px-1.5 py-0.5 rounded ${
-                      astrologyData.doshas.sadeSati.isPresent ? "bg-amber-500/25 text-amber-400" : "bg-green-500/20 text-green-400"
-                    }`}>
-                      {astrologyData.doshas.sadeSati.isPresent ? "ACTIVE" : "INACTIVE"}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-300 leading-relaxed mt-2">
-                    {astrologyData.doshas.sadeSati.explanation}
-                  </p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Subtab: Sahams */}
       {activeSubTab === "saham" && (
