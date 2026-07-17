@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { 
   User, Calendar, Clock, MapPin, Compass, Moon, Sun, 
   BookOpen, Star, Briefcase, DollarSign, Heart, Activity, 
@@ -6,6 +6,7 @@ import {
   Download, RefreshCw, Award, Globe, Layers, Zap, Grid, LayoutDashboard
 } from "lucide-react";
 import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
+import { getAllCachedHoroscopes, CachedHoroscopeRecord } from "../lib/indexedDb";
 import AstroChart from "./AstroChart";
 
 interface PlanetData {
@@ -35,6 +36,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   isDark
 }) => {
   const [compiling, setCompiling] = useState(false);
+  const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
+  const [majorTab, setMajorTab] = useState<"jhora" | "kp" | "western" | "all">("jhora");
+
+  // Fetch all cached profiles on mount and sync with astrologyData
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const records = await getAllCachedHoroscopes();
+        setProfilesList(records);
+      } catch (err) {
+        console.error("Error fetching profiles in HoroscopeReportView:", err);
+      }
+    };
+    fetchProfiles();
+  }, [astrologyData]);
 
   // Map high-fidelity profile JSON dynamically on render
   const profileJson = useMemo(() => {
@@ -134,174 +150,107 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const astronomicalData = profileJson?.Astronomical || {};
   const nadiData = profileJson?.Nadi || {};
 
+  const predictions = profileJson?.Predictions || astrologyData?.predictions || {};
+  const career = predictions.career || { text: "Your professional life is guided by strong planetary aspects, indicating a stable path with steady progress.", highlights: ["Visionary Leadership", "Growth Mindset"] };
+  const finance = predictions.finance || { text: "Wealth and resource management are favorable, with potential for long-term investments and asset building.", highlights: ["Financial Security", "Asset Wealth"] };
+  const marriage = predictions.marriage || { text: "Relationships and partnerships are marked by harmony, mutual understanding, and supportive dynamics.", highlights: ["Marital Bliss", "Harmony"] };
+  const health = predictions.health || { text: "Your physical and mental well-being is robust, supported by positive transit alignments.", highlights: ["Vitality", "Inner Balance"] };
+  const daily = profileJson?.Daily_Transit || astrologyData?.daily || {
+    date: new Date().toLocaleDateString(),
+    auspiciousFor: ["Initiating new projects", "Spiritual practices", "Important meetings"],
+    cautionFor: ["Rash financial decisions", "Impulsive travel", "Heated debates"],
+    nakshatra: "Pushya",
+    tithi: "Purnima",
+    luckyColor: "Saffron & Cream",
+    luckyNumber: "9"
+  };
+
   // Standard lists
   const PLANET_ORDER = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
   const STANDARD_VARGAS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D16", "D20", "D24", "D27", "D30", "D40", "D45", "D60"];
   const ZODIAC_SIGNS_ABBR = ["Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi"];
   const ZODIAC_SIGNS_FULL = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
 
-  // Lifepaths
-  const getCareerPrediction = () => {
-    const sunPlanet = planets.find((p: PlanetData) => p.name === "Sun");
-    const jupPlanet = planets.find((p: PlanetData) => p.name === "Jupiter");
-    const satPlanet = planets.find((p: PlanetData) => p.name === "Saturn");
-    const ascSign = lagna.sign || "Cancer";
-
-    let text = `With your Ascendant rising in the sign of ${ascSign}, your professional path is driven by a strong sense of duty, administrative instinct, and natural authority. `;
-    if (sunPlanet) {
-      if (["Leo", "Aries", "Sagittarius"].includes(sunPlanet.sign)) {
-        text += "A powerful placement of the Sun in a fiery sign highlights your innate capacity to motivate others, take massive action, and excel in executive leadership roles. ";
-      } else {
-        text += "Your natal Sun's placement indicates an analytical, highly disciplined, and precision-oriented approach to your professional duties. ";
-      }
-    }
-    if (satPlanet) {
-      text += `Saturn's strategic alignment in the sign of ${satPlanet.sign} indicates that your primary career breakthroughs occur through sheer persistence, self-discipline, and dedicated focus. `;
-    }
-    if (jupPlanet) {
-      text += `Jupiter's placement in ${jupPlanet.sign} blesses you with deep vision, making you a highly respected mentor, advisor, or strategic consultant within your field. `;
-    }
-    return {
-      text,
-      highlights: ["Strategic Leadership", "Breakthroughs via patient execution", "Exceptional advisory potential"]
-    };
-  };
-
-  const getFinancePrediction = () => {
-    const venPlanet = planets.find((p: PlanetData) => p.name === "Venus");
-    const jupPlanet = planets.find((p: PlanetData) => p.name === "Jupiter");
-
-    let text = "Your financial journey is characterized by steady accumulation, structured planning, and prudent investments. ";
-    if (venPlanet) {
-      if (["Taurus", "Libra", "Pisces"].includes(venPlanet.sign)) {
-        text += "Venus being highly dignified in its home or exalted sign promises a luxurious lifestyle, artistic assets, and diverse wealth generation streams. ";
-      } else {
-        text += "Your Venus suggests that wealth and financial comfort are built by systematic budgeting and quality-centric asset choices. ";
-      }
-    }
-    if (jupPlanet) {
-      text += "Jupiter's positive gaze ensures that you attract generous abundance, particularly through consulting, tutoring, or ethical ventures. ";
-    }
-    return {
-      text,
-      highlights: ["Steady prosperity", "Auspicious asset growth", "Physical assets preferred"]
-    };
-  };
-
-  const getMarriagePrediction = () => {
-    const venPlanet = planets.find((p: PlanetData) => p.name === "Venus");
-    const jupPlanet = planets.find((p: PlanetData) => p.name === "Jupiter");
-
-    let text = "Your marriage and partnerships thrive on deep intellectual affinity, shared ethical standards, and high mutual respect. ";
-    if (venPlanet) {
-      text += `Venus placed in the sign of ${venPlanet.sign} indicates an intensely passionate, dedicated, and highly aesthetic connection to your partner. `;
-    }
-    if (jupPlanet) {
-      text += "Jupiter's blessing ensures that marriage is a major spiritual catalyst, bringing immense inner growth and social dignity. ";
-    }
-    return {
-      text,
-      highlights: ["Shared philosophical foundations", "Growth through committed union", "High mutual resilience"]
-    };
-  };
-
-  const getHealthPrediction = () => {
-    const sunPlanet = planets.find((p: PlanetData) => p.name === "Sun");
-    let text = "Your physical vitality is generally robust, supported by strong innate recuperative powers and steady endurance. ";
-    if (sunPlanet) {
-      text += "The Sun's placement blesses you with superb recovery capacity and strong cardiovascular strength. ";
-    }
-    text += "Pay careful attention to digestive rhythms, posture, and joint flexibility, especially during periods of extreme professional pressure. ";
-    return {
-      text,
-      highlights: ["Superb recovery capacity", "Regular movement is vital", "Pranayama brings immense peace"]
-    };
-  };
-
-  const getDailyPrediction = () => {
-    const moonNakshatra = panchanga?.nakshatra || "Rohini";
-    const tithi = panchanga?.tithi || "Ekadashi";
-
-    return {
-      date: new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }),
-      nakshatra: moonNakshatra,
-      tithi: tithi,
-      auspiciousFor: [
-        "Strategic client negotiations and long-term planning",
-        "Deep spiritual practices, meditation, or technical studies",
-        "Clearing pending administration tasks and financial audits"
-      ],
-      cautionFor: [
-        "Signing speculative high-risk commercial contracts",
-        "Engaging in trivial, repetitive arguments on past family matters",
-        "Overcommitting your schedule without checking structural blocks"
-      ],
-      luckyColor: "Royal Blue & Vibrant Gold",
-      luckyNumber: "7 and 3"
-    };
-  };
-
-  const career = getCareerPrediction();
-  const finance = getFinancePrediction();
-  const marriage = getMarriagePrediction();
-  const health = getHealthPrediction();
-  const daily = getDailyPrediction();
-
   return (
-    <div id="horoscope-report-root" className="space-y-8 pb-16">
+    <div id="horoscope-report-root" className="space-y-6 pb-16">
       {/* Visual Header / Cover with PDF download prominently placed in heading */}
       <div 
         id="horoscope-report-header-banner"
-        className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} relative overflow-hidden bg-gradient-to-br ${
+        className={`p-5 sm:p-6 rounded-2xl border ${cardStyle} relative overflow-hidden bg-gradient-to-br ${
           isDark 
             ? "from-slate-950 via-slate-900 to-indigo-950/40 border-slate-800" 
             : "from-amber-50/50 via-white to-amber-100/30 border-neutral-200"
-        } shadow-2xl`}
+        } shadow-xl`}
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/20 via-purple-500/15 to-indigo-500/25 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-10 left-10 w-48 h-48 bg-gradient-to-tr from-emerald-500/10 via-teal-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5 animate-pulse">
-                <Sparkles className="w-3.5 h-3.5" />
-                Comprehensive Multi-System Reading
+        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
+                <Sparkles className="w-3 h-3" />
+                Multi-System Reading
               </span>
-              <span className="bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5" />
-                32 Astrological Systems Unified
+              <span className="bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
+                <Layers className="w-3 h-3" />
+                All Systems Unified
               </span>
             </div>
             
             <div className="space-y-1">
-              <h1 className="text-2xl sm:text-3xl font-sans font-bold tracking-tight text-slate-800 dark:text-amber-100">
+              <h1 className="text-base sm:text-lg font-sans font-bold tracking-tight text-slate-800 dark:text-amber-100">
                 Traditional Horoscope & Multi-System Raw Data Log
               </h1>
-              <p className={`text-xs ${mutedText} flex items-center gap-1`}>
-                <MapPin className="w-4 h-4 text-amber-500" />
-                For {birthDetails.name || "Nitin Jain"} • Calculated at {birthDetails.location || "Dehradun, Uttarakhand, India"}
-              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-wrap">
+                <p className={`text-[11px] ${mutedText} flex items-center gap-1`}>
+                  <MapPin className="w-3.5 h-3.5 text-amber-500" />
+                  For {birthDetails.name || "Nitin Jain"} • Calculated at {birthDetails.location || "Dehradun, Uttarakhand, India"}
+                </p>
+                {profilesList.length > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-slate-400">•</span>
+                    <label className="text-[10px] font-bold text-slate-300">Switch Profile:</label>
+                    <select
+                      value={profilesList.find(p => p.name === (birthDetails.name || "Nitin Jain"))?.id || ""}
+                      onChange={(e) => {
+                        const selected = profilesList.find(p => p.id === e.target.value);
+                        if (selected) {
+                          setAstrologyData(selected.data);
+                        }
+                      }}
+                      className="bg-slate-900/90 border border-slate-700 text-slate-100 rounded px-2 py-0.5 text-[10px] focus:outline-none focus:ring-1 focus:ring-amber-500/50 cursor-pointer"
+                    >
+                      <option value="" disabled>-- Select a Profile --</option>
+                      {profilesList.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({p.date})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Golden Action: Download entire compiled raw & analytical PDF instantly */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 self-stretch xl:self-center">
+          {/* Download entire compiled raw & analytical PDF instantly */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
             <button
               id="heading-pdf-compile-button"
               onClick={handleDownloadCompleteReport}
               disabled={compiling}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-slate-800 disabled:to-slate-900 text-slate-950 font-bold py-3.5 px-6 rounded-xl text-xs cursor-pointer transition-all flex items-center justify-center gap-2.5 shadow-lg shadow-amber-500/30 hover:shadow-amber-500/45 shrink-0"
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-slate-800 disabled:to-slate-900 text-slate-950 font-bold py-2 px-4 rounded-lg text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/20 shrink-0"
             >
               {compiling ? (
                 <>
-                  <RefreshCw className="w-4 h-4 animate-spin text-slate-950" />
-                  Compiling 32 Astrological Systems...
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-950" />
+                  Compiling systems...
                 </>
               ) : (
                 <>
-                  <Download className="w-4 h-4 text-slate-950" />
-                  Download Complete 360° Analysis PDF Report
+                  <Download className="w-3.5 h-3.5 text-slate-950" />
+                  Download Complete 360° PDF Report
                 </>
               )}
             </button>
@@ -309,21 +258,66 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         </div>
       </div>
 
-      {/* Main Single-Scroll Stacked Content Container - Fully Detailed and Open by Default */}
-      <div className="space-y-8">
+      {/* Tabs bar for JHora, KP, Western, All Systems */}
+      <div className="border-b border-slate-800 flex gap-1 overflow-x-auto pb-px">
+        <button
+          onClick={() => setMajorTab("jhora")}
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
+            majorTab === "jhora"
+              ? "border-amber-500 text-amber-500 font-extrabold bg-slate-900/20"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          JHora (Vedic)
+        </button>
+        <button
+          onClick={() => setMajorTab("kp")}
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
+            majorTab === "kp"
+              ? "border-cyan-500 text-cyan-400 font-extrabold bg-slate-900/20"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          KP (Stellar)
+        </button>
+        <button
+          onClick={() => setMajorTab("western")}
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
+            majorTab === "western"
+              ? "border-purple-500 text-purple-400 font-extrabold bg-slate-900/20"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          Western (Tropical)
+        </button>
+        <button
+          onClick={() => setMajorTab("all")}
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
+            majorTab === "all"
+              ? "border-indigo-500 text-indigo-400 font-extrabold bg-slate-900/20"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          All Astro Systems
+        </button>
+      </div>
+
+      {/* Main Container */}
+      <div className="space-y-6">
         
         {/* ================= SYSTEM 1: BIRTH PARTICULARS & PANCHANGA ================= */}
-        <div id="report-section-1" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-amber-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 1 • Sidereal Vedic Luni-Solar Foundation
-            </span>
-            <h2 className="text-xl font-sans font-bold text-amber-500 mt-2 flex items-center gap-2">
-              <Globe className="w-5 h-5 text-amber-500" />
-              1. BIRTH PARTICULARS & PANCHANGA PILLARS
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-1" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-amber-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 1 • Sidereal Vedic Luni-Solar Foundation
+              </span>
+              <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
+                <Globe className="w-5 h-5 text-amber-500" />
+                1. BIRTH PARTICULARS & PANCHANGA PILLARS
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               High-precision geocentric variables computed using standard cosmic Ephemeris models.
             </p>
@@ -454,19 +448,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </div>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 2: VEDIC DIVISIONAL CHARTS & VARGAS MATRIX ================= */}
-        <div id="report-section-2" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-indigo-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 2 • Vedic Divisional Charts (Kundalis)
-            </span>
-            <h2 className="text-xl font-sans font-bold text-indigo-400 mt-2 flex items-center gap-2">
-              <Compass className="w-5 h-5 text-indigo-400" />
-              2. KUNDALI WHEELS & COMPLETE SHODASHAVARGA (20 VARGAS) MATRIX
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-2" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-indigo-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 2 • Vedic Divisional Charts (Kundalis)
+              </span>
+              <h2 className="text-sm font-bold text-indigo-400 mt-2 flex items-center gap-2">
+                <Compass className="w-5 h-5 text-indigo-400" />
+                2. KUNDALI WHEELS & COMPLETE SHODASHAVARGA (20 VARGAS) MATRIX
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               High-resolution mathematical division of houses mapping D1 (Rasi Natal Chart) and D9 (Navamsa Destiny Chart) side-by-side, plus the complete raw placements across all 20 vargas.
             </p>
@@ -623,19 +619,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </div>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 3: VEDIC PLANETARY POSITIONS ================= */}
-        <div id="report-section-3" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-emerald-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-emerald-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 3 • Geocentric Planetary Placements (Graha Sphutas)
-            </span>
-            <h2 className="text-xl font-sans font-bold text-emerald-400 mt-2 flex items-center gap-2">
-              <Grid className="w-5 h-5 text-emerald-400" />
-              3. PLANETARY PLACEMENTS, STELLAR COORDINATES & AVASTHAS
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-3" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-emerald-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-emerald-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 3 • Geocentric Planetary Placements (Graha Sphutas)
+              </span>
+              <h2 className="text-sm font-bold text-emerald-400 mt-2 flex items-center gap-2">
+                <Grid className="w-5 h-5 text-emerald-400" />
+                3. PLANETARY PLACEMENTS, STELLAR COORDINATES & AVASTHAS
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Precise coordinates, Nakshatras, subdivisions, combustion states, and triple-tiered physiological avasthas.
             </p>
@@ -712,19 +710,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </table>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 4: PLANETARY & BHAVA BALAS ================= */}
-        <div id="report-section-4" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-orange-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-orange-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-orange-500/15 text-orange-400 border border-orange-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 4 • Mathematical Balas & Strengths (ShadBala & Bhava)
-            </span>
-            <h2 className="text-xl font-sans font-bold text-orange-400 mt-2 flex items-center gap-2">
-              <Award className="w-5 h-5 text-orange-400" />
-              4. GRAHA SHADBALA MATRIX, ISHTA/KASHTA & BHAVA BALA
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-4" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-orange-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-orange-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-orange-500/15 text-orange-400 border border-orange-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 4 • Mathematical Balas & Strengths (ShadBala & Bhava)
+              </span>
+              <h2 className="text-sm font-bold text-orange-400 mt-2 flex items-center gap-2">
+                <Award className="w-5 h-5 text-orange-400" />
+                4. GRAHA SHADBALA MATRIX, ISHTA/KASHTA & BHAVA BALA
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Comprehensive 6-fold planetary strengths, Ishta Phala metrics, and house power coefficients.
             </p>
@@ -814,19 +814,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </div>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 5: ASHTAKAVARGA BINDUS MATRIX ================= */}
-        <div id="report-section-5" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-cyan-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 5 • Ashtakavarga Point Distribution (SAV & BAV Bindus)
-            </span>
-            <h2 className="text-xl font-sans font-bold text-cyan-400 mt-2 flex items-center gap-2">
-              <Grid className="w-5 h-5 text-cyan-400" />
-              5. SAMUDHAYA & BHINNA ASHTAKAVARGA BINDUS MATRIX
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-5" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-cyan-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 5 • Ashtakavarga Point Distribution (SAV & BAV Bindus)
+              </span>
+              <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
+                <Grid className="w-5 h-5 text-cyan-400" />
+                5. SAMUDHAYA & BHINNA ASHTAKAVARGA BINDUS MATRIX
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Comprehensive numerical grid containing individual planetary bindus (BAV) mapped across 12 signs, totaling the final Sarvashtakavarga (SAV) points.
             </p>
@@ -866,19 +868,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </table>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 6: PLANETARY ARGALAS ================= */}
-        <div id="report-section-6" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-pink-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 6 • Jaimini Planetary Argalas (Interveners)
-            </span>
-            <h2 className="text-xl font-sans font-bold text-pink-400 mt-2 flex items-center gap-2">
-              <Shield className="w-5 h-5 text-pink-400" />
-              6. HOUSE-WISE PLANETARY ARGALAS & OBSTRUCTIONS (VIRODHA)
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-6" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-pink-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 6 • Jaimini Planetary Argalas (Interveners)
+              </span>
+              <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-pink-400" />
+                6. HOUSE-WISE PLANETARY ARGALAS & OBSTRUCTIONS (VIRODHA)
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Sage Jaimini's framework of celestial energy interventions (Argalas) computed across all 12 houses to evaluate energy flow obstruction.
             </p>
@@ -942,19 +946,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </table>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 7: JAIMINI SUTRAS & CHARA DASHAS ================= */}
-        <div id="report-section-7" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-purple-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-purple-500/15 text-purple-400 border border-purple-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 7 • Jaimini Sutras (Karakas, Arudhas, & Chara Dashas)
-            </span>
-            <h2 className="text-xl font-sans font-bold text-purple-400 mt-2 flex items-center gap-2">
-              <Layers className="w-5 h-5 text-purple-400" />
-              7. JAIMINI SUTRA CHARA KARAKAS, ARUDHAS & TIMELINES
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-7" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-purple-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-purple-500/15 text-purple-400 border border-purple-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 7 • Jaimini Sutras (Karakas, Arudhas, & Chara Dashas)
+              </span>
+              <h2 className="text-sm font-bold text-purple-400 mt-2 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-purple-400" />
+                7. JAIMINI SUTRA CHARA KARAKAS, ARUDHAS & TIMELINES
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               High-degree sorting calculations for Chara Karakas, Swamsha signs, A1-A12 arudha padas, and Chara Dasha sequences.
             </p>
@@ -1027,19 +1033,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </div>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 8: KRISHNAMURTI PADDHATI (KP) ================= */}
-        <div id="report-section-8" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-cyan-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 8 • Krishnamurti Paddhati (KP Stellar Astrology)
-            </span>
-            <h2 className="text-xl font-sans font-bold text-cyan-400 mt-2 flex items-center gap-2">
-              <Star className="w-5 h-5 text-cyan-400" />
-              8. KP HOUSE CUSPS, STELLAR PLANETS & RULING PLANETS
-            </h2>
+        {(majorTab === "kp" || majorTab === "all") && (
+          <div id="report-section-8" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-cyan-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 8 • Krishnamurti Paddhati (KP Stellar Astrology)
+              </span>
+              <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
+                <Star className="w-5 h-5 text-cyan-400" />
+                8. KP HOUSE CUSPS, STELLAR PLANETS & RULING PLANETS
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               High-precision stellar sublord division of house cusps, planetary significators, and active dashas.
             </p>
@@ -1142,19 +1150,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </div>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 9: WESTERN TROPICAL ASTROLOGY ================= */}
-        <div id="report-section-9" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-purple-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-purple-500/15 text-purple-400 border border-purple-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 9 • Western Tropical Aspect Matrices
-            </span>
-            <h2 className="text-xl font-sans font-bold text-purple-400 mt-2 flex items-center gap-2">
-              <Globe className="w-5 h-5 text-purple-400" />
-              9. TROPICAL PLANETARY ASPECTS & PLACIDUS HOUSE CUSPS
-            </h2>
+        {(majorTab === "western" || majorTab === "all") && (
+          <div id="report-section-9" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-purple-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-purple-500/15 text-purple-400 border border-purple-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 9 • Western Tropical Aspect Matrices
+              </span>
+              <h2 className="text-sm font-bold text-purple-400 mt-2 flex items-center gap-2">
+                <Globe className="w-5 h-5 text-purple-400" />
+                9. TROPICAL PLANETARY ASPECTS & PLACIDUS HOUSE CUSPS
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Standard major aspect definitions, angular difference metrics, and 12 Placidus house boundaries.
             </p>
@@ -1241,19 +1251,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </div>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 10: ESOTERIC & ALTERNATIVE MYSTICAL SYSTEMS ================= */}
-        <div id="report-section-10" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-pink-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 10 • Mystical Esoteric Systems & Remedial Blueprints
-            </span>
-            <h2 className="text-xl font-sans font-bold text-pink-400 mt-2 flex items-center gap-2">
-              <Layers className="w-5 h-5 text-pink-400" />
-              10. ESOTERIC, BAZI FOUR PILLARS & LAL KITAB REMEDIES
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-10" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-pink-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 10 • Mystical Esoteric Systems & Remedial Blueprints
+              </span>
+              <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-pink-400" />
+                10. ESOTERIC, BAZI FOUR PILLARS & LAL KITAB REMEDIES
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Chinese BaZi Four Pillars, Pythagorean Numerology, Lal Kitab remedies, Mayan Day signs, and Celtic tree properties.
             </p>
@@ -1357,19 +1369,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </div>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 11: VIMSHOTTARI, YOGINI & ASHTOTTARI DASHAS ================= */}
-        <div id="report-section-11" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-teal-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-teal-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-teal-500/15 text-teal-400 border border-teal-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 11 • Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)
-            </span>
-            <h2 className="text-xl font-sans font-bold text-teal-400 mt-2 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-teal-400" />
-              11. VIMSHOTTARI, YOGINI & ASHTOTTARI DASHA CYCLES
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-11" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-teal-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-teal-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-teal-500/15 text-teal-400 border border-teal-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 11 • Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)
+              </span>
+              <h2 className="text-sm font-bold text-teal-400 mt-2 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-teal-400" />
+                11. VIMSHOTTARI, YOGINI & ASHTOTTARI DASHA CYCLES
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               The chronological sequence of planetary planetary dasha cycles computed on lunar longitudes, fully expanded.
             </p>
@@ -1448,19 +1462,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </div>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 12: YOGAS & DOSHAS ANALYSIS ================= */}
-        <div id="report-section-12" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-rose-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-rose-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-rose-500/15 text-rose-400 border border-rose-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 12 • Planetary Combinations & Afflictions (Yogas & Doshas)
-            </span>
-            <h2 className="text-xl font-sans font-bold text-rose-400 mt-2 flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-rose-400" />
-              12. VEIDIC RAJA/DHANA YOGAS & CELESTIAL DOSHAS
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-12" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-rose-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-rose-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-rose-500/15 text-rose-400 border border-rose-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 12 • Planetary Combinations & Afflictions (Yogas & Doshas)
+              </span>
+              <h2 className="text-sm font-bold text-rose-400 mt-2 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-rose-400" />
+                12. VEIDIC RAJA/DHANA YOGAS & CELESTIAL DOSHAS
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Comprehensive checklist of active auspicious combinations and major cosmic doshas present.
             </p>
@@ -1512,19 +1528,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </div>
           </div>
         </div>
+      )}
 
         {/* ================= SYSTEM 13: TRADITIONAL LIFE PATHWAYS ================= */}
-        <div id="report-section-13" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
-          
-          <div className="border-b border-amber-500/10 pb-4 mb-6">
-            <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-              System 13 • Traditional Life Predictions & Daily Muhurta
-            </span>
-            <h2 className="text-xl font-sans font-bold text-amber-500 mt-2 flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-amber-500" />
-              13. LIFE DESTINY PATHWAYS & DAILY TRANSIT ALIGNMENTS
-            </h2>
+        {(majorTab === "jhora" || majorTab === "all") && (
+          <div id="report-section-13" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-amber-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 13 • Traditional Life Predictions & Daily Muhurta
+              </span>
+              <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-amber-500" />
+                13. LIFE DESTINY PATHWAYS & DAILY TRANSIT ALIGNMENTS
+              </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Exhaustive predictive analysis mapping professional focus, wealth generation, marriage bliss, health, and current lunar transit.
             </p>
@@ -1667,6 +1685,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             </div>
           </div>
         </div>
+      )}
 
       </div>
     </div>
