@@ -22,6 +22,7 @@ import {
   FileText
 } from "lucide-react";
 import { apiFetch } from "../lib/api";
+import { calculateAstrology } from "../lib/astrology";
 import { motion, AnimatePresence } from "motion/react";
 import { jsPDF } from "jspdf";
 
@@ -171,9 +172,33 @@ export const UserProfileSubmenuView: React.FC<UserProfileSubmenuViewProps> = ({
           setTransitData(data);
         }
       } catch (err: any) {
+        console.warn("UserProfileSubmenuView transit fetch failed. Seamlessly calculating client-side fallback:", err);
         if (active) {
-          console.error("Error fetching transit details:", err);
-          setTransitError(err.message || "Unable to synchronize live transit API.");
+          try {
+            const localData = calculateAstrology(
+              "Transit Sky",
+              selectedTransitDate,
+              "12:00:00",
+              userDetails.location || "Query Location",
+              Number(userDetails.latitude) || 28.6139,
+              Number(userDetails.longitude) || 77.2090,
+              Number(userDetails.timezone) || 5.5
+            );
+            const planetsMapped = (localData?.planets || []).map((p: any) => ({
+              planet: p.name || "Unknown",
+              sign: p.sign || "Aries",
+              degree: Number(p.degree || 0) % 30,
+              starLord: p.lord || "Unknown",
+              subLord: "Unknown"
+            }));
+            setTransitData({
+              transitDate: selectedTransitDate,
+              planets: planetsMapped
+            });
+          } catch (localErr) {
+            console.error("Local transit fallback calculation failed:", localErr);
+            setTransitError(err.message || "Unable to synchronize live transit API.");
+          }
         }
       } finally {
         if (active) {
@@ -283,6 +308,14 @@ export const UserProfileSubmenuView: React.FC<UserProfileSubmenuViewProps> = ({
     const minutesDecimal = (absolute % 1) * 60;
     const m = Math.floor(minutesDecimal);
     return `${d.toString().padStart(2, "0")}°${m.toString().padStart(2, "0")}'`;
+  };
+
+  const getTransitPlanet = (name: string) => {
+    if (!transitData?.planets) return {};
+    if (Array.isArray(transitData.planets)) {
+      return transitData.planets.find((pl: any) => (pl.planet || pl.name || "").toLowerCase() === name.toLowerCase()) || {};
+    }
+    return transitData.planets[name] || transitData.planets[name.toLowerCase()] || {};
   };
 
   const handleExportPDF = () => {
@@ -770,7 +803,7 @@ export const UserProfileSubmenuView: React.FC<UserProfileSubmenuViewProps> = ({
 
       const name = p.name;
       const natalSign = p.sign || "Aries";
-      const transPlanet = transitData?.planets?.[name] || transitData?.planets?.[name.toLowerCase()] || {};
+      const transPlanet = getTransitPlanet(name);
       const transitSign = transPlanet.sign || natalSign;
       const isConjoined = natalSign === transitSign;
 
@@ -1364,7 +1397,7 @@ export const UserProfileSubmenuView: React.FC<UserProfileSubmenuViewProps> = ({
                       const natalSign = p.sign || "Aries";
 
                       // Fetch correspond transit sign
-                      const transPlanet = transitData?.planets?.[name] || transitData?.planets?.[name.toLowerCase()] || {};
+                      const transPlanet = getTransitPlanet(name);
                       const transitSign = transPlanet.sign || natalSign;
 
                       const isConjoined = natalSign === transitSign;

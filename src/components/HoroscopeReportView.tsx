@@ -26,6 +26,7 @@ import IngressTab from "./IngressTab";
 import HoroscopeDashboard from "./HoroscopeDashboard";
 import currentSkyJson from "../knowledgebase/checklist_engine/current_sky.json";
 import { mapJHoraResponseToAstrologyData } from "../lib/jhoraMapper";
+import { calculateAstrology } from "../lib/astrology";
 
 interface PlanetData {
   name: string;
@@ -269,8 +270,22 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       const mapped = mapJHoraResponseToAstrologyData(rawJson);
       setTransitAstroData(mapped);
     } catch (err: any) {
-      console.error("Transit calculation error:", err);
-      setTransitError(err.message || "An error occurred while fetching live transit data.");
+      console.warn("Transit calculation fetch failed. Falling back to high-integrity client-side local calculations:", err);
+      try {
+        const localData = calculateAstrology(
+          "Transit Sky",
+          transitDate,
+          transitTime,
+          transitPlace || "New Delhi, India",
+          Number(transitLatitude) || 28.6139,
+          Number(transitLongitude) || 77.2090,
+          Number(transitTimezone) || 5.5
+        );
+        setTransitAstroData(localData);
+      } catch (localErr: any) {
+        console.error("Local transit fallback calculation error:", localErr);
+        setTransitError(err.message || "An error occurred while fetching live transit data.");
+      }
     } finally {
       setTransitLoading(false);
     }
