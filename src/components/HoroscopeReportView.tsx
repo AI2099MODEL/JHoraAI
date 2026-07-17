@@ -4501,8 +4501,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                         </thead>
                         <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
                           {Array.from({ length: 12 }, (_, i) => i + 1).map((hNum) => {
-                            const houseKey = `House_${hNum}`;
-                            const sigObj = rawHouseSignificators[houseKey];
+                            const sigObj = rawHouseSignificators[`House_${hNum}`] || 
+                                           rawHouseSignificators[String(hNum)] || 
+                                           rawHouseSignificators[hNum] || 
+                                           rawHouseSignificators[`house_${hNum}`] || 
+                                           rawHouseSignificators[`House ${hNum}`];
                             
                             // Get unique planets from all 6 levels
                             const uniquePlanets = (() => {
@@ -4512,15 +4515,40 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                               }
                               if (typeof sigObj === "object") {
                                 const planets: string[] = [];
-                                const levels = ["level1", "level2", "level3", "level4", "level5", "level6"];
-                                for (const lvl of levels) {
-                                  const val = sigObj[lvl];
-                                  if (Array.isArray(val)) {
-                                    planets.push(...val.map((p: any) => String(p).trim()));
-                                  } else if (typeof val === "string" && val.trim() && val !== "—") {
-                                    planets.push(...val.split(",").map((p: any) => p.trim()));
+                                const sigKeys = Object.keys(sigObj);
+                                const levelPatterns = [
+                                  /level1|L1/i,
+                                  /level2|L2/i,
+                                  /level3|L3/i,
+                                  /level4|L4/i,
+                                  /level5|L5/i,
+                                  /level6|L6/i
+                                ];
+
+                                for (const pattern of levelPatterns) {
+                                  const matchingKey = sigKeys.find(k => pattern.test(k));
+                                  if (matchingKey) {
+                                    const val = sigObj[matchingKey];
+                                    if (Array.isArray(val)) {
+                                      planets.push(...val.map((p: any) => String(p).trim()));
+                                    } else if (typeof val === "string" && val.trim() && val !== "—") {
+                                      planets.push(...val.split(",").map((p: any) => p.trim()));
+                                    }
                                   }
                                 }
+
+                                // Fallback: collect from other string/array keys if empty
+                                if (planets.length === 0) {
+                                  for (const key of sigKeys) {
+                                    const val = sigObj[key];
+                                    if (Array.isArray(val)) {
+                                      planets.push(...val.map((p: any) => String(p).trim()));
+                                    } else if (typeof val === "string" && val.trim() && val !== "—" && val !== "No active significators") {
+                                      planets.push(...val.split(",").map((p: any) => p.trim()));
+                                    }
+                                  }
+                                }
+
                                 return Array.from(new Set(planets)).filter(p => p && p !== "—");
                               }
                               if (typeof sigObj === "string") {
