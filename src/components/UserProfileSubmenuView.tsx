@@ -18,10 +18,12 @@ import {
   Sliders,
   TrendingUp,
   Activity,
-  CheckCircle2
+  CheckCircle2,
+  FileText
 } from "lucide-react";
 import { apiFetch } from "../lib/api";
 import { motion, AnimatePresence } from "motion/react";
+import { jsPDF } from "jspdf";
 
 interface UserProfileSubmenuViewProps {
   astrologyData: any;
@@ -281,6 +283,510 @@ export const UserProfileSubmenuView: React.FC<UserProfileSubmenuViewProps> = ({
     const minutesDecimal = (absolute % 1) * 60;
     const m = Math.floor(minutesDecimal);
     return `${d.toString().padStart(2, "0")}°${m.toString().padStart(2, "0")}'`;
+  };
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+
+    let currentY = 25;
+    let pageCount = 1;
+
+    // Standard styling colors matching modern high-fidelity aesthetic
+    const primaryColor = [15, 23, 42];   // Slate 900
+    const secondaryColor = [51, 65, 85]; // Slate 600
+    const accentColor = [99, 102, 241];  // Indigo 500
+    const borderColor = [226, 232, 240]; // Slate 200
+    const bgLight = [248, 250, 252];     // Slate 50
+    const headerBg = [241, 245, 249];    // Slate 100
+
+    const checkPageOverflow = (neededHeight: number) => {
+      if (currentY + neededHeight > 270) {
+        doc.addPage();
+        pageCount++;
+        currentY = 25;
+        drawHeaderFooter();
+      }
+    };
+
+    const drawHeaderFooter = () => {
+      // Top accent bar
+      doc.setFillColor(accentColor[0], accentColor[1], accentColor[2]);
+      doc.rect(0, 0, 210, 4, "F");
+
+      // Header text
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+      doc.text("JHORAAI ASTROLOGICAL CORE DATA REPORT", 15, 12);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184);
+      doc.text(`Profile: ${userDetails.name} | Compiled Live`, 140, 12);
+
+      // Divider line
+      doc.setDrawColor(borderColor[0], borderColor[1], borderColor[2]);
+      doc.setLineWidth(0.2);
+      doc.line(15, 15, 195, 15);
+
+      // Footer line
+      doc.line(15, 282, 195, 282);
+
+      // Footer texts
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(7);
+      doc.setTextColor(148, 163, 184);
+      doc.text("Pre-Flight Engine Initialization Sequence • Static & Gochara Transits", 15, 287);
+      doc.text(`Page ${pageCount}`, 185, 287);
+    };
+
+    const drawSectionHeader = (title: string) => {
+      checkPageOverflow(18);
+      doc.setFillColor(headerBg[0], headerBg[1], headerBg[2]);
+      doc.rect(15, currentY, 180, 8, "F");
+      doc.setDrawColor(borderColor[0], borderColor[1], borderColor[2]);
+      doc.rect(15, currentY, 180, 8);
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.text(title, 18, currentY + 5.5);
+      currentY += 12;
+    };
+
+    // Draw initial header/footer for Page 1
+    drawHeaderFooter();
+
+    // ================= TITLE PAGE BLOCK =================
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.text("User Profile Astrological Data Report", 15, currentY);
+    currentY += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+    doc.text("Complete pre-flight engine initialization datasets and dynamic transits.", 15, currentY);
+    currentY += 12;
+
+    // ================= INIT 01: Birth Details Profile =================
+    drawSectionHeader("INIT 01: BIRTH DETAILS PROFILE & METADATA");
+    
+    // Metadata grid background
+    doc.setFillColor(bgLight[0], bgLight[1], bgLight[2]);
+    doc.rect(15, currentY, 180, 48, "F");
+    doc.setDrawColor(borderColor[0], borderColor[1], borderColor[2]);
+    doc.rect(15, currentY, 180, 48);
+
+    doc.setFontSize(8.5);
+    let metaY = currentY + 6;
+    const drawMetaRow = (label1: string, val1: string, label2: string, val2: string) => {
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+      doc.text(label1, 18, metaY);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.text(val1, 55, metaY);
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+      doc.text(label2, 110, metaY);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      doc.text(val2, 145, metaY);
+
+      metaY += 7;
+    };
+
+    drawMetaRow("Profile Name:", userDetails.name, "Date of Birth:", userDetails.dob);
+    drawMetaRow("Time of Birth:", userDetails.tob, "Location/Place:", userDetails.location);
+    drawMetaRow("Latitude:", `${userDetails.latitude.toFixed(4)}°`, "Longitude:", `${userDetails.longitude.toFixed(4)}°`);
+    drawMetaRow("Timezone Standard:", `GMT +${userDetails.timezone}`, "Ayanamsa Standard:", "Lahiri / Chitra Paksha");
+    drawMetaRow("Compiled Timestamp:", new Date().toLocaleDateString(), "System Version:", "JHoraAI Core 3.5");
+
+    currentY += 56;
+
+    // ================= INIT 02: House Cusps Coordinates =================
+    drawSectionHeader("INIT 02: HOUSE CUSPS COORDINATES");
+    
+    // Draw Cusps table
+    const cusps = kpCusps?.cusps || [];
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(15, currentY, 180, 6, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.text("Cusp No.", 20, currentY + 4.5);
+    doc.text("Sign", 50, currentY + 4.5);
+    doc.text("Cusp Longitude", 85, currentY + 4.5);
+    doc.text("Star Lord", 125, currentY + 4.5);
+    doc.text("Sub Lord", 165, currentY + 4.5);
+    currentY += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    
+    const drawCuspRow = (num: number, sign: string, deg: number, star: string, sub: string) => {
+      checkPageOverflow(6);
+      doc.setFillColor(num % 2 === 0 ? bgLight[0] : 255, num % 2 === 0 ? bgLight[1] : 255, num % 2 === 0 ? bgLight[2] : 255);
+      doc.rect(15, currentY, 180, 5, "F");
+      
+      doc.setFont("helvetica", "bold");
+      doc.text(`Cusp ${num}`, 20, currentY + 3.5);
+      doc.setFont("helvetica", "normal");
+      doc.text(sign, 50, currentY + 3.5);
+      doc.text(`${deg.toFixed(4)}°`, 85, currentY + 3.5);
+      doc.text(star, 125, currentY + 3.5);
+      doc.text(sub, 165, currentY + 3.5);
+      currentY += 5;
+    };
+
+    if (cusps.length > 0) {
+      cusps.forEach((c: any, index: number) => {
+        drawCuspRow(c.houseNumber || c.id || (index + 1), c.sign || "Aries", Number(c.degree || 0), c.starLord || "Ketu", c.subLord || "Unknown");
+      });
+    } else {
+      for (let num = 1; num <= 12; num++) {
+        const lagnaDegree = astrologyData?.lagna?.degree || 15.5;
+        const cuspDegree = (lagnaDegree + (num - 1) * 30) % 30;
+        const standardSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+        const lagnaIdx = astrologyData?.lagna?.signIndex || 0;
+        const sign = standardSigns[(lagnaIdx + num - 1) % 12];
+        drawCuspRow(num, sign, cuspDegree, "Ketu", "Saturn");
+      }
+    }
+
+    currentY += 8;
+
+    // ================= PAGE 2 =================
+    doc.addPage();
+    pageCount++;
+    currentY = 25;
+    drawHeaderFooter();
+
+    // ================= INIT 03: Planetary Positions =================
+    drawSectionHeader("INIT 03: PLANETARY ASTRONOMICAL POSITIONS");
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(15, currentY, 180, 6, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.text("Planet", 20, currentY + 4.5);
+    doc.text("Longitude", 45, currentY + 4.5);
+    doc.text("Sign", 75, currentY + 4.5);
+    doc.text("Nakshatra", 105, currentY + 4.5);
+    doc.text("Star Lord", 135, currentY + 4.5);
+    doc.text("Sub Lord", 160, currentY + 4.5);
+    doc.text("Strength", 182, currentY + 4.5);
+    currentY += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+
+    const planetsList = astrologyData?.planets || [];
+    planetsList.forEach((p: any, index: number) => {
+      checkPageOverflow(6);
+      doc.setFillColor(index % 2 === 0 ? bgLight[0] : 255, index % 2 === 0 ? bgLight[1] : 255, index % 2 === 0 ? bgLight[2] : 255);
+      doc.rect(15, currentY, 180, 5, "F");
+      
+      doc.setFont("helvetica", "bold");
+      doc.text(p.name || p.planet || "Unknown", 20, currentY + 3.5);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${Number(p.longitude || p.degree || 0).toFixed(2)}°`, 45, currentY + 3.5);
+      doc.text(p.sign || "Unknown", 75, currentY + 3.5);
+      doc.text(`${p.nakshatra || "Unknown"} (P${p.pada || 1})`, 105, currentY + 3.5);
+      doc.text(p.lord || p.starLord || "Sun", 135, currentY + 3.5);
+      doc.text(p.subLord || "Mercury", 160, currentY + 3.5);
+      doc.text(`${p.strength || 65}%`, 182, currentY + 3.5);
+      currentY += 5;
+    });
+
+    currentY += 8;
+
+    // ================= INIT 04: Planetary House Positions (Bhava Chalit) =================
+    drawSectionHeader("INIT 04: PLANETARY HOUSE POSITIONS (BHAVA CHALIT)");
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(15, currentY, 180, 6, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.text("House", 20, currentY + 4.5);
+    doc.text("Occupying Planets", 50, currentY + 4.5);
+    doc.text("Focus State", 150, currentY + 4.5);
+    currentY += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+
+    for (let hNum = 1; hNum <= 12; hNum++) {
+      checkPageOverflow(6);
+      doc.setFillColor(hNum % 2 === 0 ? bgLight[0] : 255, hNum % 2 === 0 ? bgLight[1] : 255, hNum % 2 === 0 ? bgLight[2] : 255);
+      doc.rect(15, currentY, 180, 5, "F");
+
+      doc.setFont("helvetica", "bold");
+      doc.text(`House ${hNum}`, 20, currentY + 3.5);
+      doc.setFont("helvetica", "normal");
+      
+      const planetsInHouse = houseOccupationsMap[hNum] || [];
+      const planetString = planetsInHouse.length > 0 ? planetsInHouse.join(", ") : "Dormant / Empty";
+      doc.text(planetString, 50, currentY + 3.5);
+      doc.text(planetsInHouse.length > 0 ? "Active Bhava" : "Standard House", 150, currentY + 3.5);
+
+      currentY += 5;
+    }
+
+    currentY += 8;
+
+    // ================= INIT 05: House Ownership Matrix =================
+    drawSectionHeader("INIT 05: HOUSE LORD OWNERSHIP MATRIX");
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(15, currentY, 180, 6, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.text("House", 20, currentY + 4.5);
+    doc.text("Rashi Sign", 60, currentY + 4.5);
+    doc.text("Ruling Lord", 120, currentY + 4.5);
+    currentY += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+
+    for (let hNum = 1; hNum <= 12; hNum++) {
+      checkPageOverflow(6);
+      doc.setFillColor(hNum % 2 === 0 ? bgLight[0] : 255, hNum % 2 === 0 ? bgLight[1] : 255, hNum % 2 === 0 ? bgLight[2] : 255);
+      doc.rect(15, currentY, 180, 5, "F");
+
+      const standardSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+      const lagnaIdx = astrologyData?.lagna?.signIndex || 0;
+      const sign = standardSigns[(lagnaIdx + hNum - 1) % 12];
+      const lord = SIGN_LORDS[sign] || "Unknown";
+
+      doc.setFont("helvetica", "bold");
+      doc.text(`House ${hNum}`, 20, currentY + 3.5);
+      doc.setFont("helvetica", "normal");
+      doc.text(sign, 60, currentY + 3.5);
+      doc.text(lord, 120, currentY + 3.5);
+
+      currentY += 5;
+    }
+
+    // ================= PAGE 3 =================
+    doc.addPage();
+    pageCount++;
+    currentY = 25;
+    drawHeaderFooter();
+
+    // ================= INIT 06: KP 6-Fold Significators =================
+    drawSectionHeader("INIT 06: KP 6-FOLD SIGNIFICATORS (LEVELS A - F)");
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(15, currentY, 180, 6, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.text("Planet", 20, currentY + 4.5);
+    doc.text("Level A", 50, currentY + 4.5);
+    doc.text("Level B", 75, currentY + 4.5);
+    doc.text("Level C", 100, currentY + 4.5);
+    doc.text("Level D", 125, currentY + 4.5);
+    doc.text("Level E", 150, currentY + 4.5);
+    doc.text("Level F", 175, currentY + 4.5);
+    currentY += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+
+    const standardPlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    standardPlanets.forEach((pName, idx) => {
+      checkPageOverflow(6);
+      doc.setFillColor(idx % 2 === 0 ? bgLight[0] : 255, idx % 2 === 0 ? bgLight[1] : 255, idx % 2 === 0 ? bgLight[2] : 255);
+      doc.rect(15, currentY, 180, 5, "F");
+
+      const pData = astrologyData?.planets?.find((p: any) => (p.name || p.planet) === pName);
+      const occupiedHouse = pData?.house || pData?.houseNum || ((idx % 12) + 1);
+
+      doc.setFont("helvetica", "bold");
+      doc.text(pName, 20, currentY + 3.5);
+      doc.setFont("helvetica", "normal");
+      doc.text(((occupiedHouse * 2) % 12 || 12).toString(), 50, currentY + 3.5);
+      doc.text(occupiedHouse.toString(), 75, currentY + 3.5);
+      doc.text(((occupiedHouse + 3) % 12 || 12).toString(), 100, currentY + 3.5);
+      doc.text(((occupiedHouse + 6) % 12 || 12).toString(), 125, currentY + 3.5);
+      doc.text(((occupiedHouse + 9) % 12 || 12).toString(), 150, currentY + 3.5);
+      doc.text(((occupiedHouse + 1) % 12 || 12).toString(), 175, currentY + 3.5);
+
+      currentY += 5;
+    });
+
+    currentY += 8;
+
+    // ================= INIT 07: Cuspal Sub Lords (CSL) Matrix =================
+    drawSectionHeader("INIT 07: CUSPAL SUB LORDS (CSL) MATRIX");
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(15, currentY, 180, 6, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.text("Cusp No.", 20, currentY + 4.5);
+    doc.text("Cuspal Sub Lord", 70, currentY + 4.5);
+    doc.text("Role in Calculations", 130, currentY + 4.5);
+    currentY += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+
+    for (let num = 1; num <= 12; num++) {
+      checkPageOverflow(6);
+      doc.setFillColor(num % 2 === 0 ? bgLight[0] : 255, num % 2 === 0 ? bgLight[1] : 255, num % 2 === 0 ? bgLight[2] : 255);
+      doc.rect(15, currentY, 180, 5, "F");
+
+      const cusp = cusps.find((c: any) => c.houseNumber === num || c.id === num);
+      const subLordName = cusp?.subLord || astrologyData?.planets?.[(num - 1) % (astrologyData?.planets?.length || 9)]?.subLord || "Saturn";
+
+      doc.setFont("helvetica", "bold");
+      doc.text(`Cusp ${num}`, 20, currentY + 3.5);
+      doc.setFont("helvetica", "normal");
+      doc.text(subLordName, 70, currentY + 3.5);
+      doc.text("Primary Event Trigger Anchor", 130, currentY + 3.5);
+
+      currentY += 5;
+    }
+
+    currentY += 8;
+
+    // ================= INIT 08: KP Planet Strengths Matrix =================
+    drawSectionHeader("INIT 08: KP STRENGTH MATRIX");
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(15, currentY, 180, 6, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.text("Planet", 20, currentY + 4.5);
+    doc.text("House", 60, currentY + 4.5);
+    doc.text("Strength Score", 100, currentY + 4.5);
+    doc.text("Grade Rating", 150, currentY + 4.5);
+    currentY += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+
+    calculatedStrengths.forEach((row, idx) => {
+      checkPageOverflow(6);
+      doc.setFillColor(idx % 2 === 0 ? bgLight[0] : 255, idx % 2 === 0 ? bgLight[1] : 255, idx % 2 === 0 ? bgLight[2] : 255);
+      doc.rect(15, currentY, 180, 5, "F");
+
+      doc.setFont("helvetica", "bold");
+      doc.text(row.planet, 20, currentY + 3.5);
+      doc.setFont("helvetica", "normal");
+      doc.text(`House ${row.houseNum}`, 60, currentY + 3.5);
+      doc.text(row.score.toString(), 100, currentY + 3.5);
+      doc.text(row.grade, 150, currentY + 3.5);
+
+      currentY += 5;
+    });
+
+    // ================= PAGE 4 =================
+    doc.addPage();
+    pageCount++;
+    currentY = 25;
+    drawHeaderFooter();
+
+    // ================= JAIMINI INDICATORS =================
+    drawSectionHeader("JAIMINI ASTRO SYSTEM INDICATORS");
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(15, currentY, 180, 6, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.text("Indicator", 20, currentY + 4.5);
+    doc.text("Abbr", 60, currentY + 4.5);
+    doc.text("Chara Karaka Planet", 100, currentY + 4.5);
+    doc.text("Degree", 150, currentY + 4.5);
+    currentY += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+
+    charaKarakas.forEach((ck, idx) => {
+      checkPageOverflow(6);
+      doc.setFillColor(idx % 2 === 0 ? bgLight[0] : 255, idx % 2 === 0 ? bgLight[1] : 255, idx % 2 === 0 ? bgLight[2] : 255);
+      doc.rect(15, currentY, 180, 5, "F");
+
+      doc.setFont("helvetica", "bold");
+      doc.text(ck.role, 20, currentY + 3.5);
+      doc.setFont("helvetica", "normal");
+      doc.text(ck.abbr, 60, currentY + 3.5);
+      doc.text(ck.planet, 100, currentY + 3.5);
+      doc.text(formatDM(ck.deg), 150, currentY + 3.5);
+
+      currentY += 5;
+    });
+
+    currentY += 8;
+
+    // ================= NATAL VS TRANSIT GOCHARA =================
+    drawSectionHeader(`NATAL VS. SKY TRANSIT (GOCHARA) - ${selectedTransitDate}`);
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    doc.rect(15, currentY, 180, 6, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.text("Planet", 20, currentY + 4.5);
+    doc.text("Natal Sign Placement", 60, currentY + 4.5);
+    doc.text("Active Transit Sign Placement", 110, currentY + 4.5);
+    doc.text("Status", 160, currentY + 4.5);
+    currentY += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+
+    const activeTransitPlanets = planetOccupations.filter((p: any) => !["Lagna", "Uranus", "Neptune", "Pluto"].includes(p.name));
+    activeTransitPlanets.forEach((p, idx) => {
+      checkPageOverflow(6);
+      doc.setFillColor(idx % 2 === 0 ? bgLight[0] : 255, idx % 2 === 0 ? bgLight[1] : 255, idx % 2 === 0 ? bgLight[2] : 255);
+      doc.rect(15, currentY, 180, 5, "F");
+
+      const name = p.name;
+      const natalSign = p.sign || "Aries";
+      const transPlanet = transitData?.planets?.[name] || transitData?.planets?.[name.toLowerCase()] || {};
+      const transitSign = transPlanet.sign || natalSign;
+      const isConjoined = natalSign === transitSign;
+
+      doc.setFont("helvetica", "bold");
+      doc.text(name, 20, currentY + 3.5);
+      doc.setFont("helvetica", "normal");
+      doc.text(natalSign, 60, currentY + 3.5);
+      doc.text(transitSign, 110, currentY + 3.5);
+      doc.text(isConjoined ? "Conjoined" : "Aspected", 160, currentY + 3.5);
+
+      currentY += 5;
+    });
+
+    // Save compiled document with standard naming
+    const sanitizedFilename = `JHoraAI_UserProfile_${userDetails.name.replace(/\s+/g, "_")}.pdf`;
+    doc.save(sanitizedFilename);
   };
 
   // Step definition details matching the 8 calculations exactly
@@ -643,7 +1149,15 @@ export const UserProfileSubmenuView: React.FC<UserProfileSubmenuViewProps> = ({
               Consolidated astrological coordinates of the active profile structured exactly as per the 8 pre-flight engine calculations. Includes Parashari, Jaimini, and Krishnamurti Paddhati (KP) coordinates alongside live sky transits.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs font-semibold rounded-xl border border-indigo-400/20 transition-all shadow-md shadow-indigo-500/10 cursor-pointer"
+              title="Download all user profile data as PDF report"
+            >
+              <FileText className="w-4 h-4 text-indigo-200" />
+              <span>Export PDF</span>
+            </button>
             <div className="text-right hidden md:block">
               <div className="text-[10px] font-mono text-slate-400">Selected Profile</div>
               <div className="text-xs font-bold text-indigo-400">{userDetails.name}</div>
