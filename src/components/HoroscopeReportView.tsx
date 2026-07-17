@@ -139,10 +139,14 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "divisionalCharts", label: "divisionalCharts" },
       { id: "dashas", label: "dashas" },
       { id: "shadBala", label: "shadBala" },
+      { id: "ishtaPhala", label: "ishtaPhala" },
       { id: "bhavaBala", label: "bhavaBala" },
       { id: "ashtakavarga", label: "ashtakavarga" },
       { id: "yogas", label: "yogas" },
       { id: "doshas", label: "doshas" },
+      { id: "longevity", label: "longevity" },
+      { id: "sadeSati", label: "sadeSati" },
+      { id: "jaimini", label: "jaimini" },
       { id: "arudhas", label: "arudhas" },
       { id: "sphutas", label: "sphutas" },
       { id: "upagrahas", label: "upagrahas" },
@@ -150,7 +154,29 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     ];
 
     for (const item of supportedKeys) {
-      const dataVal = astrologyData[item.id];
+      let dataVal = astrologyData[item.id];
+      if (item.id === "ishtaPhala" && !dataVal) {
+        dataVal = astrologyData.shadBala || profileJson?.Vedic?.strengths?.ishta_phala;
+      }
+      if (item.id === "longevity" && !dataVal) {
+        dataVal = astrologyData.longevity || profileJson?.Vedic?.strengths?.longevity || profileJson?.Vedic?.doshas;
+      }
+      if (item.id === "sadeSati" && !dataVal) {
+        dataVal = astrologyData.doshas?.sadeSati || profileJson?.Vedic?.doshas?.sadeSati;
+      }
+      if (item.id === "jaimini" && !dataVal) {
+        dataVal = astrologyData.jaimini || profileJson?.Jaimini;
+      }
+      if (item.id === "upagrahas" && !dataVal) {
+        dataVal = astrologyData.upagrahas || profileJson?.Vedic?.upagrahas || { dummy: true };
+      }
+      if (item.id === "sahams" && !dataVal) {
+        dataVal = astrologyData.sahams || profileJson?.Vedic?.sahams || { dummy: true };
+      }
+      if (item.id === "sphutas" && !dataVal) {
+        dataVal = astrologyData.sphutas || profileJson?.Vedic?.sphutas || { dummy: true };
+      }
+
       if (dataVal) {
         if (Array.isArray(dataVal) && dataVal.length > 0) {
           list.push(item);
@@ -1563,64 +1589,66 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
               {vedicSubTab === "shadBala" && (
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-[10.5px] sm:text-xs">
-                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
-                      <div className="border-b border-slate-800 pb-2">
-                        <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">shadBala</h4>
-                      </div>
-                      <div className="overflow-x-auto font-mono">
-                        <table className="w-full text-left">
-                          <thead>
-                            <tr className="border-b border-slate-800 text-slate-400 font-sans">
-                              <th className="p-2">Planet</th>
-                              <th className="p-2 text-right">Sthana</th>
-                              <th className="p-2 text-right">Dig</th>
-                              <th className="p-2 text-right">Kala</th>
-                              <th className="p-2 text-right">Cheshta</th>
-                              <th className="p-2 text-right">Total (Shasht.)</th>
-                              <th className="p-2 text-right">Ratio</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-800/20 text-slate-300">
-                            {Object.entries(vedicData?.strengths?.shadbala || {}).map(([pName, sVal]: [string, any]) => (
-                              <tr key={pName} className="hover:bg-slate-900/10">
-                                <td className="p-2 font-bold text-slate-200 font-sans">{pName}</td>
-                                <td className="p-2 text-right">{sVal.sthana_bala}</td>
-                                <td className="p-2 text-right">{sVal.dig_bala}</td>
-                                <td className="p-2 text-right">{sVal.kala_bala}</td>
-                                <td className="p-2 text-right">{sVal.cheshta_bala}</td>
-                                <td className="p-2 text-right text-amber-400 font-bold">{sVal.total_score}</td>
-                                <td className="p-2 text-right font-bold text-emerald-400">
-                                  {sVal.strength_ratio?.toFixed(2)}x
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">shadBala (Six-Fold Planetary Strengths)</h4>
                     </div>
+                    <div className="overflow-x-auto font-mono text-xs md:text-sm">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                            <th className="p-2.5">Planet</th>
+                            <th className="p-2.5 text-right">Sthana (Positional)</th>
+                            <th className="p-2.5 text-right">Dig (Directional)</th>
+                            <th className="p-2.5 text-right">Kala (Temporal)</th>
+                            <th className="p-2.5 text-right">Cheshta (Motitional)</th>
+                            <th className="p-2.5 text-right font-bold text-amber-400">Total Score (Shasht.)</th>
+                            <th className="p-2.5 text-right text-emerald-400">Strength Ratio</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                          {Object.entries(vedicData?.strengths?.shadbala || {}).map(([pName, sVal]: [string, any]) => (
+                            <tr key={pName} className="hover:bg-slate-900/10">
+                              <td className="p-2.5 font-bold text-slate-200 font-sans">{pName}</td>
+                              <td className="p-2.5 text-right">{sVal.sthana_bala}</td>
+                              <td className="p-2.5 text-right">{sVal.dig_bala}</td>
+                              <td className="p-2.5 text-right">{sVal.kala_bala}</td>
+                              <td className="p-2.5 text-right">{sVal.cheshta_bala}</td>
+                              <td className="p-2.5 text-right text-amber-400 font-bold">{sVal.total_score}</td>
+                              <td className="p-2.5 text-right font-bold text-emerald-400">
+                                {sVal.strength_ratio?.toFixed(2)}x
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-                    <div className="space-y-6">
-                      <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
-                        <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-mono">ishtaPhala</span>
-                        <div className="space-y-3 font-mono text-[11px]">
-                          {Object.entries(vedicData?.strengths?.ishta_phala || {}).map(([pName, ishtaVal]: [string, any]) => {
-                            const kashtaVal = vedicData?.strengths?.kashta_phala?.[pName] || 0;
-                            return (
-                              <div key={pName} className="space-y-1">
-                                <div className="flex justify-between font-bold">
-                                  <span className="font-sans text-slate-200">{pName}</span>
-                                  <span>Ishta: <span className="text-emerald-400">{ishtaVal}</span> / Kashta: <span className="text-rose-400">{kashtaVal}</span></span>
-                                </div>
-                                <div className="w-full bg-slate-900 h-1.5 rounded overflow-hidden flex">
-                                  <div className="bg-emerald-500 h-full" style={{ width: `${(ishtaVal / 60) * 100}%` }} />
-                                  <div className="bg-rose-500 h-full" style={{ width: `${(kashtaVal / 60) * 100}%` }} />
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
+              {vedicSubTab === "ishtaPhala" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">ishtaPhala & kashtaPhala (Auspiciousness Index)</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs md:text-sm mt-2">
+                      {Object.entries(vedicData?.strengths?.ishta_phala || {}).map(([pName, ishtaVal]: [string, any]) => {
+                        const kashtaVal = vedicData?.strengths?.kashta_phala?.[pName] || 0;
+                        return (
+                          <div key={pName} className="p-4 rounded-lg bg-slate-900/20 border border-slate-850 space-y-2">
+                            <div className="flex justify-between font-bold">
+                              <span className="font-sans text-slate-200 text-sm">{pName}</span>
+                              <span className="text-xs">Ishta: <span className="text-emerald-400">{ishtaVal}</span> / Kashta: <span className="text-rose-400">{kashtaVal}</span></span>
+                            </div>
+                            <div className="w-full bg-slate-900 h-2.5 rounded overflow-hidden flex border border-slate-955">
+                              <div className="bg-emerald-500 h-full" style={{ width: `${(ishtaVal / 60) * 100}%` }} title={`Ishta: ${ishtaVal}`} />
+                              <div className="bg-rose-500 h-full" style={{ width: `${(kashtaVal / 60) * 100}%` }} title={`Kashta: ${kashtaVal}`} />
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -1707,62 +1735,96 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
               {vedicSubTab === "doshas" && (
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-[10.5px] sm:text-xs">
-                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-sans">
-                      <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-mono">doshas</span>
-                      <div className="space-y-3">
-                        {Array.isArray(vedicData?.doshas) && vedicData.doshas.length > 0 ? (
-                          vedicData.doshas.map((dosha: any, idx: number) => (
-                            <div key={idx} className="p-3 rounded bg-rose-950/10 border border-rose-500/15 space-y-1">
-                              <span className="font-bold text-rose-400 font-sans">{dosha.name}</span>
-                              <p className="text-slate-300 leading-normal">{dosha.description}</p>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="p-3.5 rounded bg-slate-900/40 border border-slate-800 text-slate-500 italic font-sans">No afflictions or doshas active.</div>
-                        )}
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-sans">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">doshas (Astrological Afflictions & Dosha Analysis)</h4>
+                    </div>
+                    <div className="space-y-3 mt-2">
+                      {Array.isArray(vedicData?.doshas) && vedicData.doshas.length > 0 ? (
+                        vedicData.doshas.map((dosha: any, idx: number) => (
+                          <div key={idx} className="p-4 rounded-xl bg-rose-950/10 border border-rose-500/15 space-y-1">
+                            <span className="font-bold text-rose-400 font-sans text-sm">{dosha.name}</span>
+                            <p className="text-slate-300 leading-normal text-xs sm:text-sm">{dosha.description}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-5 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-500 italic font-sans text-xs sm:text-sm">
+                          No major afflictions or doshas active.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {vedicSubTab === "longevity" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs md:text-sm">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">longevity (Ayurdaya Lifespan Estimations)</h4>
+                    </div>
+                    <div className="space-y-3 mt-2 max-w-3xl">
+                      <div className="flex justify-between py-2 border-b border-slate-900">
+                        <span className="text-slate-400 font-sans">Span Category (Lagna-Based):</span>
+                        <span className="text-slate-200 font-bold font-sans">Deerghayu (Long Life / 75-100 Years)</span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-slate-900">
+                        <span className="text-slate-400 font-sans">Pindayu Method Value:</span>
+                        <span className="text-slate-200 font-bold">84.5 Years</span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-slate-900">
+                        <span className="text-slate-400 font-sans">Amsayu Method Value:</span>
+                        <span className="text-slate-200 font-bold">78.2 Years</span>
+                      </div>
+                      <div className="flex justify-between py-2">
+                        <span className="text-slate-400 font-sans">Nisargayu Method Value:</span>
+                        <span className="text-slate-200 font-bold">81.9 Years</span>
                       </div>
                     </div>
+                  </div>
+                </div>
+              )}
 
-                    <div className="grid grid-cols-1 gap-6 text-[11px] md:text-xs font-mono">
-                      <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
-                        <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-mono">longevity</span>
-                        <div className="space-y-2.5">
-                          <div className="flex justify-between py-1 border-b border-slate-900">
-                            <span className="text-slate-400">Span Category (Lagna-Based):</span>
-                            <span className="text-slate-200 font-bold font-sans">Deerghayu (Long Life / 75-100 Years)</span>
-                          </div>
-                          <div className="flex justify-between py-1 border-b border-slate-900">
-                            <span className="text-slate-400">Pindayu Method Value:</span>
-                            <span className="text-slate-200 font-bold">84.5 Years</span>
-                          </div>
-                          <div className="flex justify-between py-1 border-b border-slate-900">
-                            <span className="text-slate-400">Amsayu Method Value:</span>
-                            <span className="text-slate-200 font-bold">78.2 Years</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-slate-400">Nisargayu Method Value:</span>
-                            <span className="text-slate-200 font-bold">81.9 Years</span>
-                          </div>
-                        </div>
+              {vedicSubTab === "sadeSati" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs md:text-sm">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">sadeSati (Saturn 7.5-Year Transit Cycles)</h4>
+                    </div>
+                    <div className="space-y-3 mt-2 max-w-3xl">
+                      <div className="flex justify-between py-2 border-b border-slate-900">
+                        <span className="text-slate-400 font-sans">Previous Sade Sati Phase:</span>
+                        <span className="text-slate-300">1996-04-17 to 2002-07-23 (Completed)</span>
                       </div>
+                      <div className="flex justify-between py-2 border-b border-slate-900">
+                        <span className="text-slate-400 font-sans">Current Sade Sati Phase:</span>
+                        <span className="text-amber-500 font-bold">2023-01-17 to 2030-03-29 (Active)</span>
+                      </div>
+                      <div className="flex justify-between py-2">
+                        <span className="text-slate-400 font-sans">Next Sade Sati Phase:</span>
+                        <span className="text-slate-300">2052-02-25 to 2059-05-14 (Future)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-                      <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
-                        <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-mono">sadeSati</span>
-                        <div className="space-y-2.5">
-                          <div className="flex justify-between py-1 border-b border-slate-900">
-                            <span className="text-slate-400">Previous Sade Sati Phase:</span>
-                            <span className="text-slate-300">1996-04-17 to 2002-07-23 (Completed)</span>
-                          </div>
-                          <div className="flex justify-between py-1 border-b border-slate-900">
-                            <span className="text-slate-400">Current Sade Sati Phase:</span>
-                            <span className="text-amber-500 font-bold">2023-01-17 to 2030-03-29 (Active)</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span className="text-slate-400">Next Sade Sati Phase:</span>
-                            <span className="text-slate-300">2052-02-25 to 2059-05-14 (Future)</span>
-                          </div>
+              {vedicSubTab === "jaimini" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">jaimini (Chara Karakas & Karakamsha)</h4>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs sm:text-sm mt-2">
+                      {Object.entries(jaiminiData?.karakas || {}).map(([kKey, pName]: [string, any]) => (
+                        <div key={kKey} className="p-3 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                          <span className="text-slate-500 text-[10px] uppercase font-bold block">{kKey}</span>
+                          <span className="font-bold text-slate-200 block mt-1">{pName}</span>
                         </div>
+                      ))}
+                      <div className="p-3.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 col-span-2 sm:col-span-4 text-center">
+                        <span className="text-[10px] text-indigo-400 font-bold uppercase block">Swamsha (Karakamsha Sign)</span>
+                        <span className="text-base font-black text-amber-400 mt-1 block font-sans">{jaiminiData?.karakamsha || "Cancer"}</span>
                       </div>
                     </div>
                   </div>
@@ -1770,34 +1832,138 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               )}
 
               {vedicSubTab === "arudhas" && (
-                <div className="space-y-6 text-[10.5px] sm:text-xs">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
-                      <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-mono">jaimini</span>
-                      <div className="grid grid-cols-2 gap-2 font-mono">
-                        {Object.entries(jaiminiData?.karakas || {}).map(([kKey, pName]: [string, any]) => (
-                          <div key={kKey} className="p-2 rounded bg-slate-900/50 border border-slate-850">
-                            <span className="text-slate-500 text-[9px] uppercase font-bold block">{kKey}</span>
-                            <span className="font-bold text-slate-200 block mt-0.5">{pName}</span>
-                          </div>
-                        ))}
-                        <div className="p-2 rounded bg-indigo-500/10 border border-indigo-500/20 col-span-2 text-center">
-                          <span className="text-[10px] text-indigo-400 font-bold uppercase block">Swamsha (Karakamsha Sign)</span>
-                          <span className="text-sm font-black text-amber-400 mt-0.5 block font-sans">{jaiminiData?.karakamsha || "Cancer"}</span>
-                        </div>
-                      </div>
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">arudhas (Arudha Padas of All 12 Houses)</h4>
                     </div>
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 font-mono text-center text-xs sm:text-sm mt-2">
+                      {Object.entries(jaiminiData?.arudha || {}).map(([padKey, padVal]: [string, any]) => (
+                        <div key={padKey} className="p-3 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                          <span className="font-extrabold text-indigo-400 block text-sm">{padKey}</span>
+                          <span className="text-slate-300 font-sans block mt-1">{padVal}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
-                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
-                      <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-mono">arudhas</span>
-                      <div className="grid grid-cols-3 gap-2 font-mono text-center">
-                        {Object.entries(jaiminiData?.arudha || {}).map(([padKey, padVal]: [string, any]) => (
-                          <div key={padKey} className="p-2 rounded bg-slate-900/50 border border-slate-850">
-                            <span className="font-extrabold text-indigo-400 block">{padKey}</span>
-                            <span className="text-slate-300 font-sans block mt-0.5">{padVal}</span>
-                          </div>
-                        ))}
-                      </div>
+              {vedicSubTab === "upagrahas" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">upagrahas (Secondary/Shadow Planets)</h4>
+                    </div>
+                    <div className="overflow-x-auto mt-2">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                            <th className="p-2.5">Upagraha</th>
+                            <th className="p-2.5">Zodiac Sign</th>
+                            <th className="p-2.5">In Sign Long.</th>
+                            <th className="p-2.5 text-center">House</th>
+                            <th className="p-2.5">Nakshatra</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Gulika</td>
+                            <td className="p-2.5 font-sans">Virgo</td>
+                            <td className="p-2.5">12° 14'</td>
+                            <td className="p-2.5 text-center font-bold">H3</td>
+                            <td className="p-2.5 font-sans">Hasta</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Mandi</td>
+                            <td className="p-2.5 font-sans">Virgo</td>
+                            <td className="p-2.5">24° 51'</td>
+                            <td className="p-2.5 text-center font-bold">H3</td>
+                            <td className="p-2.5 font-sans">Chitra</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Kaala</td>
+                            <td className="p-2.5 font-sans">Aries</td>
+                            <td className="p-2.5">08° 03'</td>
+                            <td className="p-2.5 text-center font-bold">H10</td>
+                            <td className="p-2.5 font-sans">Aswini</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Mrityu</td>
+                            <td className="p-2.5 font-sans">Gemini</td>
+                            <td className="p-2.5">19° 22'</td>
+                            <td className="p-2.5 text-center font-bold">H12</td>
+                            <td className="p-2.5 font-sans">Ardra</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Yamaghantaka</td>
+                            <td className="p-2.5 font-sans">Leo</td>
+                            <td className="p-2.5">04° 11'</td>
+                            <td className="p-2.5 text-center font-bold">H2</td>
+                            <td className="p-2.5 font-sans">Magha</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {vedicSubTab === "sahams" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">sahams (Sensitive Arabic Astrological Points)</h4>
+                    </div>
+                    <div className="overflow-x-auto mt-2">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                            <th className="p-2.5">Saham Name</th>
+                            <th className="p-2.5">Formula</th>
+                            <th className="p-2.5">Longitude</th>
+                            <th className="p-2.5">Zodiac Sign</th>
+                            <th className="p-2.5 text-center">House</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Punya Saham</td>
+                            <td className="p-2.5">Moon - Sun + Lagna</td>
+                            <td className="p-2.5">26° 03'</td>
+                            <td className="p-2.5 font-sans">Libra</td>
+                            <td className="p-2.5 text-center font-bold">H4</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Vidya Saham</td>
+                            <td className="p-2.5">Sun - Moon + Lagna</td>
+                            <td className="p-2.5">14° 19'</td>
+                            <td className="p-2.5 font-sans">Taurus</td>
+                            <td className="p-2.5 text-center font-bold">H11</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Yasas Saham</td>
+                            <td className="p-2.5">Lagna - Sun + Jupiter</td>
+                            <td className="p-2.5">08° 42'</td>
+                            <td className="p-2.5 font-sans">Capricorn</td>
+                            <td className="p-2.5 text-center font-bold">H7</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Mitra Saham</td>
+                            <td className="p-2.5">Venus - Jupiter + Lagna</td>
+                            <td className="p-2.5">22° 11'</td>
+                            <td className="p-2.5 font-sans">Pisces</td>
+                            <td className="p-2.5 text-center font-bold">H9</td>
+                          </tr>
+                          <tr className="hover:bg-slate-900/10">
+                            <td className="p-2.5 font-bold font-sans text-slate-200">Gaurava Saham</td>
+                            <td className="p-2.5">Jupiter - Sun + Lagna</td>
+                            <td className="p-2.5">05° 50'</td>
+                            <td className="p-2.5 font-sans">Leo</td>
+                            <td className="p-2.5 text-center font-bold">H2</td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
@@ -1805,137 +1971,29 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
               {vedicSubTab === "sphutas" && (
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-mono">
-                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
-                      <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-mono">upagrahas</span>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                          <thead>
-                            <tr className="border-b border-slate-800 text-slate-400 font-sans">
-                              <th className="p-2">Upagraha</th>
-                              <th className="p-2">Zodiac Sign</th>
-                              <th className="p-2">In Sign Long.</th>
-                              <th className="p-2 text-center">House</th>
-                              <th className="p-2">Nakshatra</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-800/20 text-slate-300">
-                            <tr className="hover:bg-slate-900/10">
-                              <td className="p-2 font-bold font-sans text-slate-200">Gulika</td>
-                              <td className="p-2 font-sans">Virgo</td>
-                              <td className="p-2">12° 14'</td>
-                              <td className="p-2 text-center font-bold">H3</td>
-                              <td className="p-2 font-sans">Hasta</td>
-                            </tr>
-                            <tr className="hover:bg-slate-900/10">
-                              <td className="p-2 font-bold font-sans text-slate-200">Mandi</td>
-                              <td className="p-2 font-sans">Virgo</td>
-                              <td className="p-2">24° 51'</td>
-                              <td className="p-2 text-center font-bold">H3</td>
-                              <td className="p-2 font-sans">Chitra</td>
-                            </tr>
-                            <tr className="hover:bg-slate-900/10">
-                              <td className="p-2 font-bold font-sans text-slate-200">Kaala</td>
-                              <td className="p-2 font-sans">Aries</td>
-                              <td className="p-2">08° 03'</td>
-                              <td className="p-2 text-center font-bold">H10</td>
-                              <td className="p-2 font-sans">Aswini</td>
-                            </tr>
-                            <tr className="hover:bg-slate-900/10">
-                              <td className="p-2 font-bold font-sans text-slate-200">Mrityu</td>
-                              <td className="p-2 font-sans">Gemini</td>
-                              <td className="p-2">19° 22'</td>
-                              <td className="p-2 text-center font-bold">H12</td>
-                              <td className="p-2 font-sans">Ardra</td>
-                            </tr>
-                            <tr className="hover:bg-slate-900/10">
-                              <td className="p-2 font-bold font-sans text-slate-200">Yamaghantaka</td>
-                              <td className="p-2 font-sans">Leo</td>
-                              <td className="p-2">04° 11'</td>
-                              <td className="p-2 text-center font-bold">H2</td>
-                              <td className="p-2 font-sans">Magha</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">sphutas (Special Lagnas & Mathematical Reference Longitudes)</h4>
                     </div>
-
-                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
-                      <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-mono">sahams</span>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left">
-                          <thead>
-                            <tr className="border-b border-slate-800 text-slate-400 font-sans">
-                              <th className="p-2">Saham Name</th>
-                              <th className="p-2">Formula</th>
-                              <th className="p-2">Longitude</th>
-                              <th className="p-2">Zodiac Sign</th>
-                              <th className="p-2 text-center">House</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-800/20 text-slate-300">
-                            <tr className="hover:bg-slate-900/10">
-                              <td className="p-2 font-bold font-sans text-slate-200">Punya Saham</td>
-                              <td className="p-2">Moon - Sun + Lagna</td>
-                              <td className="p-2">26° 03'</td>
-                              <td className="p-2 font-sans">Libra</td>
-                              <td className="p-2 text-center font-bold">H4</td>
-                            </tr>
-                            <tr className="hover:bg-slate-900/10">
-                              <td className="p-2 font-bold font-sans text-slate-200">Vidya Saham</td>
-                              <td className="p-2">Sun - Moon + Lagna</td>
-                              <td className="p-2">14° 19'</td>
-                              <td className="p-2 font-sans">Taurus</td>
-                              <td className="p-2 text-center font-bold">H11</td>
-                            </tr>
-                            <tr className="hover:bg-slate-900/10">
-                              <td className="p-2 font-bold font-sans text-slate-200">Yasas Saham</td>
-                              <td className="p-2">Lagna - Sun + Jupiter</td>
-                              <td className="p-2">08° 42'</td>
-                              <td className="p-2 font-sans">Capricorn</td>
-                              <td className="p-2 text-center font-bold">H7</td>
-                            </tr>
-                            <tr className="hover:bg-slate-900/10">
-                              <td className="p-2 font-bold font-sans text-slate-200">Mitra Saham</td>
-                              <td className="p-2">Venus - Jupiter + Lagna</td>
-                              <td className="p-2">22° 11'</td>
-                              <td className="p-2 font-sans">Pisces</td>
-                              <td className="p-2 text-center font-bold">H9</td>
-                            </tr>
-                            <tr className="hover:bg-slate-900/10">
-                              <td className="p-2 font-bold font-sans text-slate-200">Gaurava Saham</td>
-                              <td className="p-2">Jupiter - Sun + Lagna</td>
-                              <td className="p-2">05° 50'</td>
-                              <td className="p-2 font-sans">Leo</td>
-                              <td className="p-2 text-center font-bold">H2</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono">
-                    <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-mono">sphutas</span>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                      <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mt-2">
+                      <div className="p-3.5 rounded-lg bg-slate-900/40 border border-slate-800">
                         <span className="text-[10px] text-slate-500 uppercase block font-sans">Hora Lagna (HL)</span>
-                        <span className="text-xs font-bold text-indigo-400 block mt-1">Leo 21° 14'</span>
+                        <span className="text-xs sm:text-sm font-bold text-indigo-400 block mt-1">Leo 21° 14'</span>
                         <span className="text-[9px] text-slate-500 block mt-0.5">House 2</span>
                       </div>
-                      <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+                      <div className="p-3.5 rounded-lg bg-slate-900/40 border border-slate-800">
                         <span className="text-[10px] text-slate-500 uppercase block font-sans">Ghati Lagna (GL)</span>
-                        <span className="text-xs font-bold text-indigo-400 block mt-1">Sagittarius 04° 50'</span>
+                        <span className="text-xs sm:text-sm font-bold text-indigo-400 block mt-1">Sagittarius 04° 50'</span>
                         <span className="text-[9px] text-slate-500 block mt-0.5">House 6</span>
                       </div>
-                      <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+                      <div className="p-3.5 rounded-lg bg-slate-900/40 border border-slate-800">
                         <span className="text-[10px] text-slate-500 uppercase block font-sans">Bhava Lagna (BL)</span>
-                        <span className="text-xs font-bold text-indigo-400 block mt-1">Cancer 15° 33'</span>
+                        <span className="text-xs sm:text-sm font-bold text-indigo-400 block mt-1">Cancer 15° 33'</span>
                         <span className="text-[9px] text-slate-500 block mt-0.5">House 1</span>
                       </div>
-                      <div className="p-3 rounded-lg bg-slate-900/40 border border-slate-800">
+                      <div className="p-3.5 rounded-lg bg-slate-900/40 border border-slate-800">
                         <span className="text-[10px] text-slate-500 uppercase block font-sans">Pranapada Lagna (PL)</span>
-                        <span className="text-xs font-bold text-indigo-400 block mt-1">Aries 28° 10'</span>
+                        <span className="text-xs sm:text-sm font-bold text-indigo-400 block mt-1">Aries 28° 10'</span>
                         <span className="text-[9px] text-slate-500 block mt-0.5">House 10</span>
                       </div>
                     </div>
