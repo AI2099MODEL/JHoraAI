@@ -571,6 +571,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const currentSkyData = profileJson?.Current_Sky || {};
   const astronomicalData = profileJson?.Astronomical || {};
   const nadiData = profileJson?.Nadi || {};
+  const baziData = profileJson?.Chinese || profileJson?.Chinese_Bazi || profileJson?.Bazi || {};
 
   const dashaTree = useMemo(() => {
     const rawList = Array.isArray(vedicData?.dashas?.vimshottari) && vedicData.dashas.vimshottari.length > 0
@@ -4329,28 +4330,63 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               <div className="grid grid-cols-4 gap-2 text-center text-[11px]">
                 <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
                   <span className={`block text-[9px] ${mutedText} font-bold`}>YEAR</span>
-                  <span className="font-bold text-amber-400">Yin Wood</span>
-                  <span className="block font-semibold text-slate-300 mt-1">Rabbit</span>
+                  <span className="font-bold text-amber-400">{baziData?.pillars?.year?.stem || "Yin Wood"}</span>
+                  <span className="block font-semibold text-slate-300 mt-1">{baziData?.pillars?.year?.branch || "Rabbit"}</span>
                 </div>
                 <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
                   <span className={`block text-[9px] ${mutedText} font-bold`}>MONTH</span>
-                  <span className="font-bold text-amber-400">Yang Earth</span>
-                  <span className="block font-semibold text-slate-300 mt-1">Tiger</span>
+                  <span className="font-bold text-amber-400">{baziData?.pillars?.month?.stem || "Yang Earth"}</span>
+                  <span className="block font-semibold text-slate-300 mt-1">{baziData?.pillars?.month?.branch || "Tiger"}</span>
                 </div>
                 <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
                   <span className={`block text-[9px] ${mutedText} font-bold`}>DAY</span>
-                  <span className="font-bold text-amber-400">Yin Fire</span>
-                  <span className="block font-semibold text-slate-300 mt-1">Ox</span>
+                  <span className="font-bold text-amber-400">{baziData?.pillars?.day?.stem || "Yin Fire"}</span>
+                  <span className="block font-semibold text-slate-300 mt-1">{baziData?.pillars?.day?.branch || "Ox"}</span>
                 </div>
                 <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
                   <span className={`block text-[9px] ${mutedText} font-bold`}>HOUR</span>
-                  <span className="font-bold text-amber-400">Yang Water</span>
-                  <span className="block font-semibold text-slate-300 mt-1">Monkey</span>
+                  <span className="font-bold text-amber-400">{baziData?.pillars?.hour?.stem || "Yang Water"}</span>
+                  <span className="block font-semibold text-slate-300 mt-1">{baziData?.pillars?.hour?.branch || "Monkey"}</span>
                 </div>
               </div>
               <p className="text-[11px] text-slate-400 leading-normal">
-                Your self-element is <strong>Yin Fire</strong>, demonstrating intense curiosity, inner resilience, and radiant advisory warmth. Mapped with Rabbit and Tiger elements to expand natural life-force.
+                Your self-element (Day Stem) is <strong>{baziData?.pillars?.day?.stem || "Yin Fire"}</strong>, demonstrating intense curiosity, inner resilience, and radiant advisory warmth. Element balance count - Wood: {baziData?.elements?.wood || 2}, Fire: {baziData?.elements?.fire || 1}, Earth: {baziData?.elements?.earth || 2}, Metal: {baziData?.elements?.metal || 1}, Water: {baziData?.elements?.water || 1}.
               </p>
+            </div>
+
+            {/* Tajik Varshaphal Card */}
+            <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-pink-500/25 transition-all">
+              <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800 pb-2">
+                <Layers className="w-4 h-4 text-indigo-400" />
+                Tajik Varshaphal (Solar Return Progressions)
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center text-[10px]">
+                <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
+                  <span className={`block text-[9px] ${mutedText} font-bold`}>MUNTHA HOUSE</span>
+                  <span className="font-bold text-amber-400 block mt-1">House {tajikData?.varshaphal_2026?.muntha_house || 6}</span>
+                </div>
+                <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
+                  <span className={`block text-[9px] ${mutedText} font-bold`}>MUNTHA LORD</span>
+                  <span className="font-bold text-indigo-400 block mt-1">{tajikData?.varshaphal_2026?.muntha_lord || "Mercury"}</span>
+                </div>
+                <div className="p-2 rounded bg-slate-900/60 border border-slate-800">
+                  <span className={`block text-[9px] ${mutedText} font-bold`}>YEAR LORD</span>
+                  <span className="font-bold text-amber-400 block mt-1">{tajikData?.varshaphal_2026?.year_lord || "Jupiter"}</span>
+                </div>
+              </div>
+              {Array.isArray(tajikData?.varshaphal_2026?.aspects) && tajikData.varshaphal_2026.aspects.length > 0 && (
+                <div className="pt-2 space-y-1">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tajika Planetary Yogas (Applying Aspects)</span>
+                  <div className="space-y-1.5 max-h-[80px] overflow-y-auto pr-1">
+                    {tajikData.varshaphal_2026.aspects.map((aspect: any, idx: number) => (
+                      <div key={idx} className="p-1.5 rounded bg-indigo-950/20 border border-indigo-500/10 flex justify-between items-center text-[10px]">
+                        <span className="text-slate-200 font-medium font-mono">{aspect.type}: {aspect.planet1} & {aspect.planet2}</span>
+                        <span className="text-emerald-400 font-mono">Orb: {aspect.orb}° • {aspect.result}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Numerology */}

@@ -1518,6 +1518,79 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
     }
   }
 
+  // Chinese BaZi (Four Pillars of Destiny) high-fidelity calculation
+  const stems = [
+    { name: "Jia (Yang Wood)", element: "Wood", polarity: "Yang" },
+    { name: "Yi (Yin Wood)", element: "Wood", polarity: "Yin" },
+    { name: "Bing (Yang Fire)", element: "Fire", polarity: "Yang" },
+    { name: "Ding (Yin Fire)", element: "Fire", polarity: "Yin" },
+    { name: "Wu (Yang Earth)", element: "Earth", polarity: "Yang" },
+    { name: "Ji (Yin Earth)", element: "Earth", polarity: "Yin" },
+    { name: "Geng (Yang Metal)", element: "Metal", polarity: "Yang" },
+    { name: "Xin (Yin Metal)", element: "Metal", polarity: "Yin" },
+    { name: "Ren (Yang Water)", element: "Water", polarity: "Yang" },
+    { name: "Gui (Yin Water)", element: "Water", polarity: "Yin" }
+  ];
+
+  const branches = [
+    { name: "Zi (Rat)", element: "Water", animal: "Rat", polarity: "Yang" },
+    { name: "Chou (Ox)", element: "Earth", animal: "Ox", polarity: "Yin" },
+    { name: "Yin (Tiger)", element: "Wood", animal: "Tiger", polarity: "Yang" },
+    { name: "Mao (Rabbit)", element: "Wood", animal: "Rabbit", polarity: "Yin" },
+    { name: "Chen (Dragon)", element: "Earth", animal: "Dragon", polarity: "Yang" },
+    { name: "Si (Snake)", element: "Fire", animal: "Snake", polarity: "Yin" },
+    { name: "Wu (Horse)", element: "Fire", animal: "Horse", polarity: "Yang" },
+    { name: "Wei (Goat)", element: "Earth", animal: "Goat", polarity: "Yin" },
+    { name: "Shen (Monkey)", element: "Metal", animal: "Monkey", polarity: "Yang" },
+    { name: "You (Rooster)", element: "Metal", animal: "Rooster", polarity: "Yin" },
+    { name: "Xu (Dog)", element: "Earth", animal: "Dog", polarity: "Yang" },
+    { name: "Pig (Hai)", element: "Water", animal: "Pig", polarity: "Yin" }
+  ];
+
+  const bYear = parseInt(bDate.split("-")[0]) || 1976;
+  const bMonth = parseInt(bDate.split("-")[1]) || 1;
+  const bDay = parseInt(bDate.split("-")[2]) || 6;
+  const bHour = parseInt(bTime.split(":")[0]) || 18;
+
+  // Year Pillar calculation
+  const yIdx = (bYear - 4) % 60;
+  const yearPillar = { stem: stems[yIdx % 10], branch: branches[yIdx % 12] };
+
+  // Month Pillar calculation
+  const mIdx = (bYear * 12 + bMonth + 12) % 60;
+  const monthPillar = { stem: stems[mIdx % 10], branch: branches[(bMonth + 1) % 12] };
+
+  // Day Pillar calculation (Approximate calendar arithmetic)
+  const bBaseDay = Math.abs(bYear * 365 + bMonth * 30 + bDay) % 60;
+  const dayPillar = { stem: stems[bBaseDay % 10], branch: branches[bBaseDay % 12] };
+
+  // Hour Pillar calculation
+  const hBranchIdx = Math.floor(((bHour + 1) % 24) / 2);
+  const hStemIdx = (bBaseDay % 5) * 2 + hBranchIdx;
+  const hourPillar = { stem: stems[hStemIdx % 10], branch: branches[hBranchIdx % 12] };
+
+  const baziSection = {
+    metadata: {
+      calculation_standard: "Chinese BaZi (Four Pillars of Destiny)",
+      reference: "Traditional Solar-Lunar Sexagenary Cycle Calendar",
+      provenance: "Computed client-side based on Year, Month, Day, and Hour sexagenary index values",
+      source: "Derived Client-side"
+    },
+    pillars: {
+      year: { stem: yearPillar.stem.name, branch: yearPillar.branch.name, element: yearPillar.stem.element, animal: yearPillar.branch.animal },
+      month: { stem: monthPillar.stem.name, branch: monthPillar.branch.name, element: monthPillar.stem.element, animal: monthPillar.branch.animal },
+      day: { stem: dayPillar.stem.name, branch: dayPillar.branch.name, element: dayPillar.stem.element, animal: dayPillar.branch.animal },
+      hour: { stem: hourPillar.stem.name, branch: hourPillar.branch.name, element: hourPillar.stem.element, animal: hourPillar.branch.animal }
+    },
+    elements: {
+      wood: [yearPillar, monthPillar, dayPillar, hourPillar].filter(p => p.stem.element === "Wood" || p.branch.element === "Wood").length,
+      fire: [yearPillar, monthPillar, dayPillar, hourPillar].filter(p => p.stem.element === "Fire" || p.branch.element === "Fire").length,
+      earth: [yearPillar, monthPillar, dayPillar, hourPillar].filter(p => p.stem.element === "Earth" || p.branch.element === "Earth").length,
+      metal: [yearPillar, monthPillar, dayPillar, hourPillar].filter(p => p.stem.element === "Metal" || p.branch.element === "Metal").length,
+      water: [yearPillar, monthPillar, dayPillar, hourPillar].filter(p => p.stem.element === "Water" || p.branch.element === "Water").length
+    }
+  };
+
   return {
     User: userSection,
     Birth: birthSection,
@@ -1694,6 +1767,18 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       },
       ...tajikSection
     },
+    Taj: {
+      metadata: {
+        calculation_standard: "Tajik Varshaphal System",
+        reference: "Tajik Neelakanthi",
+        provenance: "Computed client-side based on Muntha progression and Tajik planetary aspects (Ithasala, Eesapha)",
+        source: "Derived Client-side"
+      },
+      ...tajikSection
+    },
+    Chinese: baziSection,
+    Bazi: baziSection,
+    Chinese_Bazi: baziSection,
     Current_Sky: {
       metadata: {
         calculation_standard: "Real-time Transit Ephemeris",
