@@ -131,10 +131,18 @@ export default function TransitsTab({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to calculate transits");
+        let errMsg = "Failed to calculate transits";
+        try {
+          const errJson = await response.json();
+          if (errJson && errJson.error) errMsg = errJson.error;
+        } catch (e) {}
+        throw new Error(errMsg);
       }
 
       const data = await response.json();
+      if (data && data.error) {
+        throw new Error(data.error);
+      }
       if (data.planets) {
         setTransitPlanets(data.planets);
       } else {

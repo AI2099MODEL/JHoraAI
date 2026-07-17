@@ -26,6 +26,28 @@ app.use(express.json());
 
 const JHORA_API_URL = "https://jagannatha-hora-359167915530.europe-west1.run.app";
 
+// Deterministic Time-Window Cache Policy for Transit System & High-Frequency API Requests
+interface CacheEntry {
+  timestamp: number;
+  data: any;
+}
+
+const transitCache = new Map<string, CacheEntry>();
+const CACHE_VALIDITY_MS = 3600 * 1000; // 1 Hour
+
+function getTransitCacheKey(
+  date: string,
+  time: string,
+  lat: number,
+  lon: number,
+  extra: string = ""
+): string {
+  const hour = (time || "12:00:00").split(":")[0] || "12";
+  const roundedLat = Number(lat || 0).toFixed(1);
+  const roundedLon = Number(lon || 0).toFixed(1);
+  return `${date}_H${hour}_LAT${roundedLat}_LON${roundedLon}_${extra}`;
+}
+
 const ZODIAC_SIGNS = [
   "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
   "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
@@ -312,6 +334,14 @@ app.post("/api/jhora/gochara", async (req, res) => {
     const lonNum = Number(longitude) || 77.2090;
     const tzNum = Number(timezone) || 5.5;
 
+    // Check cache first
+    const cacheKey = getTransitCacheKey(targetDate, targetTime, latNum, lonNum, "gochara");
+    const cached = transitCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp < CACHE_VALIDITY_MS)) {
+      console.log(`[Cache System] Hit for Gochara: ${cacheKey}`);
+      return res.json(cached.data);
+    }
+
     let planets: any[] = [];
     let processedFromFreeApi = false;
 
@@ -330,7 +360,18 @@ app.post("/api/jhora/gochara", async (req, res) => {
 
       const response = await fetch(openAstrologyUrl, { signal });
       if (response.ok) {
-        const data: any = await response.json();
+        const text = await response.text();
+        let data: any = null;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          if (text.includes("Rate exceeded")) {
+            console.log("[Transit System] Open Astrology Rate exceeded, moving to backup...");
+          } else {
+            console.log("[Transit System] Open Astrology invalid JSON response:", text.slice(0, 50));
+          }
+        }
+
         if (data && data.planets && Array.isArray(data.planets)) {
           // Identify Ascendant to compute houses (1st cusp is the Ascendant)
           const ascLong = data.houses?.[0]?.cusp_degree ?? data.planets.find((p: any) => p.name === "Ascendant" || p.name === "Lagna")?.longitude ?? 0;
@@ -357,7 +398,7 @@ app.post("/api/jhora/gochara", async (req, res) => {
         }
       }
     } catch (err: any) {
-      console.log("[Transit System] Primary Open Astrology endpoint is offline, trying backup...");
+      console.log("[Transit System] Primary Open Astrology endpoint error/timeout, trying backup...");
     }
 
     // Try Secondary Free Endpoint: Syntral Project (Swiss Ephemeris Web API)
@@ -379,7 +420,14 @@ app.post("/api/jhora/gochara", async (req, res) => {
 
         const response = await fetch(syntralUrl, { signal });
         if (response.ok) {
-          const data: any = await response.json();
+          const text = await response.text();
+          let data: any = null;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            console.log("[Transit System] Syntral invalid JSON response:", text.slice(0, 50));
+          }
+
           if (data && data.planets) {
             const ascLong = data.houses?.cusps?.[0] || 0;
             const ascSignIdx = Math.floor(ascLong / 30) % 12;
@@ -405,7 +453,7 @@ app.post("/api/jhora/gochara", async (req, res) => {
           }
         }
       } catch (err: any) {
-        console.log("[Transit System] Syntral endpoint is offline, trying backup...");
+        console.log("[Transit System] Syntral endpoint error/timeout, trying backup...");
       }
     }
 
@@ -424,7 +472,18 @@ app.post("/api/jhora/gochara", async (req, res) => {
           place: "Transit Location"
         })
       });
-      const data: any = await response.json();
+
+      const text = await response.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        if (text.includes("Rate exceeded")) {
+          throw new Error("Astrology calculation rate limit exceeded. Please try again in an hour.");
+        }
+        throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
+      }
+
       const rasi = data.horoscope?.divisional_charts?.["D-1_rasi"] || {};
       const ascSign = rasi["Ascendant"]?.sign || "Aries";
       const ascSignIdx = ZODIAC_SIGNS.indexOf(ascSign);
@@ -441,10 +500,18 @@ app.post("/api/jhora/gochara", async (req, res) => {
       }).filter(p => p.name !== "Ascendant" && ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
     }
 
-    res.json({
+    const payload = {
       date: targetDate,
       planets
+    };
+
+    // Save to cache
+    transitCache.set(cacheKey, {
+      timestamp: Date.now(),
+      data: payload
     });
+
+    res.json(payload);
   } catch (error: any) {
     console.error("Gochara API error:", error);
     res.status(500).json({ error: error.message || "Failed to calculate Gochara transits." });
@@ -514,12 +581,50 @@ app.post("/api/astrology/calculate", async (req, res) => {
     if (!body.place && body.location) {
       body.place = body.location;
     }
+
+    const isTransitSky = body.name === "Transit Sky" || !body.name;
+    const targetDate = body.date || new Date().toISOString().split("T")[0];
+    const targetTime = body.time || "12:00:00";
+    const latNum = Number(body.latitude) || 28.6139;
+    const lonNum = Number(body.longitude) || 77.2090;
+
+    let cacheKey = "";
+    if (isTransitSky) {
+      cacheKey = getTransitCacheKey(targetDate, targetTime, latNum, lonNum, "calculate_transit");
+    } else {
+      // For birth charts/profiles, use a precise key
+      cacheKey = `profile_${body.name || "unnamed"}_${targetDate}_${targetTime}_LAT${latNum}_LON${lonNum}`;
+    }
+
+    const cached = transitCache.get(cacheKey);
+    if (cached && (Date.now() - cached.timestamp < CACHE_VALIDITY_MS)) {
+      console.log(`[Cache System] Hit for Calculate: ${cacheKey}`);
+      return res.json(cached.data);
+    }
+
     const response = await fetch(`${JHORA_API_URL}/horoscope`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
     });
-    const data = await response.json();
+
+    const text = await response.text();
+    let data: any = null;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      if (text.includes("Rate exceeded")) {
+        throw new Error("Astrology calculation rate limit exceeded. Please try again in an hour.");
+      }
+      throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
+    }
+
+    // Save to cache
+    transitCache.set(cacheKey, {
+      timestamp: Date.now(),
+      data
+    });
+
     res.json(data);
   } catch (error: any) {
     console.error("Astrology Calculate API error:", error);

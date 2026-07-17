@@ -231,10 +231,18 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to calculate live transit sky data (status: ${response.status})`);
+        let errMsg = `Failed to calculate live transit sky data (status: ${response.status})`;
+        try {
+          const errJson = await response.json();
+          if (errJson && errJson.error) errMsg = errJson.error;
+        } catch (e) {}
+        throw new Error(errMsg);
       }
 
       const rawJson = await response.json();
+      if (rawJson && rawJson.error) {
+        throw new Error(rawJson.error);
+      }
       const mapped = mapJHoraResponseToAstrologyData(rawJson);
       setTransitAstroData(mapped);
     } catch (err: any) {
