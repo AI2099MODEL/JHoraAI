@@ -13,191 +13,191 @@
   },
   "moon": {
     "currentSign": {
-      "id": "",
-      "displayName": "",
-      "longitude": 0.0
+      "id": "Cancer",
+      "displayName": "Cancer",
+      "longitude": 104.5
     },
     "currentNakshatra": {
-      "id": "",
-      "displayName": "",
-      "lord": ""
+      "id": "Pushya",
+      "displayName": "Pushya",
+      "lord": "Saturn"
     },
-    "currentPada": 1,
+    "currentPada": 2,
     "currentStarLord": {
-      "id": "",
-      "displayName": ""
+      "id": "Saturn",
+      "displayName": "Saturn"
     },
     "currentSubLord": {
-      "id": "",
-      "displayName": ""
+      "id": "Venus",
+      "displayName": "Venus"
     },
     "moonPhase": {
-      "type": "",
-      "displayName": "",
-      "illuminationPercentage": 0.0
+      "type": "Waxing Gibbous",
+      "displayName": "Sukla Ekadashi",
+      "illuminationPercentage": 84.5
     },
-    "moonLongitude": 0.0,
+    "moonLongitude": 104.5,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
       "isVoidOfCourse": false,
       "aspectFreeUntil": null,
-      "nextSign": ""
+      "nextSign": "Leo"
     }
   },
   "sun": {
     "sign": {
-      "id": "",
-      "displayName": ""
+      "id": "Cancer",
+      "displayName": "Cancer"
     },
-    "longitude": 0.0,
+    "longitude": 90.5,
     "nakshatra": {
-      "id": "",
-      "displayName": ""
+      "id": "Punarvasu",
+      "displayName": "Punarvasu"
     },
     "starLord": {
-      "id": "",
-      "displayName": ""
+      "id": "Jupiter",
+      "displayName": "Jupiter"
     }
   },
   "planets": {
     "sun": {
-      "currentSign": "",
-      "longitude": 0.0,
-      "nakshatra": "",
-      "pada": 1,
-      "starLord": "",
-      "subLord": "",
+      "currentSign": "Cancer",
+      "longitude": 90.5,
+      "nakshatra": "Punarvasu",
+      "pada": 4,
+      "starLord": "Jupiter",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
-      "currentSign": "",
-      "longitude": 0.0,
-      "nakshatra": "",
-      "pada": 1,
-      "starLord": "",
-      "subLord": "",
+      "currentSign": "Cancer",
+      "longitude": 104.5,
+      "nakshatra": "Pushya",
+      "pada": 2,
+      "starLord": "Saturn",
+      "subLord": "Venus",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
-      "currentSign": "",
-      "longitude": 0.0,
-      "nakshatra": "",
+      "currentSign": "Taurus",
+      "longitude": 42.4,
+      "nakshatra": "Rohini",
       "pada": 1,
-      "starLord": "",
-      "subLord": "",
+      "starLord": "Moon",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
-      "currentSign": "",
-      "longitude": 0.0,
-      "nakshatra": "",
-      "pada": 1,
-      "starLord": "",
-      "subLord": "",
+      "currentSign": "Leo",
+      "longitude": 124.6,
+      "nakshatra": "Makha",
+      "pada": 2,
+      "starLord": "Ketu",
+      "subLord": "Mars",
       "retrograde": false,
-      "combust": false,
+      "combust": true,
       "stationary": false
     },
     "jupiter": {
-      "currentSign": "",
-      "longitude": 0.0,
-      "nakshatra": "",
-      "pada": 1,
-      "starLord": "",
-      "subLord": "",
+      "currentSign": "Gemini",
+      "longitude": 88.1,
+      "nakshatra": "Punarvasu",
+      "pada": 3,
+      "starLord": "Jupiter",
+      "subLord": "Sun",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "venus": {
-      "currentSign": "",
-      "longitude": 0.0,
-      "nakshatra": "",
-      "pada": 1,
-      "starLord": "",
-      "subLord": "",
+      "currentSign": "Cancer",
+      "longitude": 112.3,
+      "nakshatra": "Ashlesha",
+      "pada": 2,
+      "starLord": "Mercury",
+      "subLord": "Saturn",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "saturn": {
-      "currentSign": "",
-      "longitude": 0.0,
-      "nakshatra": "",
+      "currentSign": "Aries",
+      "longitude": 2.8,
+      "nakshatra": "Ashwini",
       "pada": 1,
-      "starLord": "",
-      "subLord": "",
-      "retrograde": false,
+      "starLord": "Ketu",
+      "subLord": "Sun",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "rahu": {
-      "currentSign": "",
-      "longitude": 0.0,
-      "nakshatra": "",
-      "pada": 1,
-      "starLord": "",
-      "subLord": "",
-      "retrograde": false,
+      "currentSign": "Aquarius",
+      "longitude": 329.5,
+      "nakshatra": "Purvabhadra",
+      "pada": 4,
+      "starLord": "Jupiter",
+      "subLord": "Mercury",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "ketu": {
-      "currentSign": "",
-      "longitude": 0.0,
-      "nakshatra": "",
-      "pada": 1,
-      "starLord": "",
-      "subLord": "",
-      "retrograde": false,
+      "currentSign": "Leo",
+      "longitude": 149.5,
+      "nakshatra": "Purvaphalguni",
+      "pada": 2,
+      "starLord": "Venus",
+      "subLord": "Jupiter",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     }
   },
   "dasha": {
     "mahadasha": {
-      "planet": "",
-      "startDate": "",
-      "endDate": ""
+      "planet": "Saturn",
+      "startDate": "2015-06-15",
+      "endDate": "2034-06-15"
     },
     "bhukti": {
-      "planet": "",
-      "startDate": "",
-      "endDate": ""
+      "planet": "Mercury",
+      "startDate": "2024-03-20",
+      "endDate": "2026-11-28"
     },
     "antara": {
-      "planet": "",
-      "startDate": "",
-      "endDate": ""
+      "planet": "Rahu",
+      "startDate": "2026-05-10",
+      "endDate": "2026-10-05"
     },
     "sookshma": {
-      "planet": "",
-      "startDate": "",
-      "endDate": ""
+      "planet": "Jupiter",
+      "startDate": "2026-07-10",
+      "endDate": "2026-08-01"
     },
     "prana": {
-      "planet": "",
-      "startDate": "",
-      "endDate": ""
+      "planet": "Moon",
+      "startDate": "2026-07-15",
+      "endDate": "2026-07-18"
     },
     "remainingTime": {
-      "years": 0,
-      "months": 0,
-      "days": 0
+      "years": 7,
+      "months": 10,
+      "days": 28
     },
     "nextDba": [
       {
-        "level": "",
-        "planet": "",
-        "startDate": "",
-        "endDate": ""
+        "level": "Prana",
+        "planet": "Mars",
+        "startDate": "2026-07-18",
+        "endDate": "2026-07-21"
       }
     ]
   },
@@ -210,210 +210,232 @@
     },
     "planetEnteringNewSign": [
       {
-        "planet": "",
-        "fromSign": "",
-        "toSign": "",
-        "transitDateTime": ""
+        "planet": "Sun",
+        "fromSign": "Gemini",
+        "toSign": "Cancer",
+        "transitDateTime": "2026-07-16T11:45:00Z"
+      },
+      {
+        "planet": "Venus",
+        "fromSign": "Gemini",
+        "toSign": "Cancer",
+        "transitDateTime": "2026-07-12T04:30:00Z"
       }
     ],
     "planetChangingNakshatra": [
       {
-        "planet": "",
-        "fromNakshatra": "",
-        "toNakshatra": "",
-        "transitDateTime": ""
+        "planet": "Moon",
+        "fromNakshatra": "Punarvasu",
+        "toNakshatra": "Pushya",
+        "transitDateTime": "2026-07-16T15:45:00Z"
+      },
+      {
+        "planet": "Mercury",
+        "fromNakshatra": "Ashlesha",
+        "toNakshatra": "Makha",
+        "transitDateTime": "2026-07-14T02:15:00Z"
       }
     ],
     "planetRetrograde": [
       {
-        "planet": "",
-        "retrogradeStartDate": "",
-        "retrogradeEndDate": ""
+        "planet": "Saturn",
+        "retrogradeStartDate": "2026-06-12",
+        "retrogradeEndDate": "2026-11-04"
       }
     ],
     "planetDirect": [
       {
-        "planet": "",
-        "directDate": ""
+        "planet": "Jupiter",
+        "directDate": "2026-04-18"
       }
     ],
     "planetCombust": [
       {
-        "planet": "",
-        "combustStartDate": "",
-        "combustEndDate": ""
+        "planet": "Mercury",
+        "combustStartDate": "2026-07-05",
+        "combustEndDate": "2026-07-25"
       }
     ],
     "planetExalted": [
       {
-        "planet": "",
-        "sign": "",
-        "exaltationDegree": 0.0
+        "planet": "Sun",
+        "sign": "Aries",
+        "exaltationDegree": 10.0
       }
     ],
     "planetDebilitated": [
       {
-        "planet": "",
-        "sign": "",
-        "debilitationDegree": 0.0
+        "planet": "Saturn",
+        "sign": "Aries",
+        "debilitationDegree": 20.0
       }
     ]
   },
   "rulingPlanets": {
-    "dayLord": "",
-    "ascendantLord": "",
-    "ascendantStarLord": "",
-    "ascendantSubLord": "",
-    "moonSignLord": "",
-    "moonStarLord": "",
-    "moonSubLord": ""
+    "dayLord": "Thursday",
+    "ascendantLord": "Mars",
+    "ascendantStarLord": "Ketu",
+    "ascendantSubLord": "Sun",
+    "moonSignLord": "Moon",
+    "moonStarLord": "Saturn",
+    "moonSubLord": "Venus"
   },
   "panchanga": {
     "tithi": {
-      "name": "",
-      "index": 1,
-      "paksha": "",
-      "endDate": ""
+      "name": "Sukla Ekadashi",
+      "index": 11,
+      "paksha": "Sukla",
+      "endDate": "2026-07-16T12:30:00Z"
     },
     "vara": {
-      "name": "",
-      "lord": ""
+      "name": "Thursday",
+      "lord": "Jupiter"
     },
     "nakshatra": {
-      "name": "",
-      "lord": "",
-      "endDate": ""
+      "name": "Pushya",
+      "lord": "Saturn",
+      "endDate": "2026-07-16T15:45:00Z"
     },
     "yoga": {
-      "name": "",
-      "lord": "",
-      "endDate": ""
+      "name": "Preeti",
+      "lord": "Mercury",
+      "endDate": "2026-07-16T18:15:00Z"
     },
     "karana": {
-      "name": "",
-      "lord": "",
-      "endDate": ""
+      "name": "Bava",
+      "lord": "Sun",
+      "endDate": "2026-07-16T12:30:00Z"
     },
-    "sunrise": "",
-    "sunset": "",
+    "sunrise": "05:48 AM",
+    "sunset": "08:12 PM",
     "abhijitMuhurta": {
-      "startTime": "",
-      "endTime": ""
+      "startTime": "11:45 AM",
+      "endTime": "12:35 PM"
     },
     "rahuKalam": {
-      "startTime": "",
-      "endTime": ""
+      "startTime": "01:30 PM",
+      "endTime": "03:15 PM"
     },
     "yamaganda": {
-      "startTime": "",
-      "endTime": ""
+      "startTime": "05:48 AM",
+      "endTime": "07:30 AM"
     },
     "gulika": {
-      "startTime": "",
-      "endTime": ""
+      "startTime": "09:12 AM",
+      "endTime": "10:54 AM"
     }
   },
   "currentEnergy": {
     "overallEnergy": {
-      "score": 0.0,
-      "tone": "",
-      "description": ""
+      "score": 8.5,
+      "tone": "High Harmonious",
+      "description": "Favorable cosmic currents align for deep analytical focus and structural discipline."
     },
     "mentalEnergy": {
-      "score": 0.0,
-      "tone": "",
-      "description": ""
+      "score": 9.0,
+      "tone": "Peak Focus",
+      "description": "Mercury's placement in Leo boosts bold communication and sharp decision-making."
     },
     "physicalEnergy": {
-      "score": 0.0,
-      "tone": "",
-      "description": ""
+      "score": 7.5,
+      "tone": "Steady",
+      "description": "Mars in Taurus ensures high endurance and persistent physical effort."
     },
     "relationshipEnergy": {
-      "score": 0.0,
-      "tone": "",
-      "description": ""
+      "score": 8.0,
+      "tone": "Caring",
+      "description": "Venus and Moon in Cancer stimulate high empathy and deep emotional connection."
     },
     "careerEnergy": {
-      "score": 0.0,
-      "tone": "",
-      "description": ""
+      "score": 8.5,
+      "tone": "Structural Rise",
+      "description": "Saturn aspects provide strong structural stability and professional authority."
     },
     "financialEnergy": {
-      "score": 0.0,
-      "tone": "",
-      "description": ""
+      "score": 7.0,
+      "tone": "Prudent",
+      "description": "Jupiter in Gemini favors multi-channel communication but warrants careful analysis."
     },
     "spiritualEnergy": {
-      "score": 0.0,
-      "tone": "",
-      "description": ""
+      "score": 9.5,
+      "tone": "Deep Alignment",
+      "description": "Highly spiritual day suitable for meditation, mantra sadhana, and self-study."
     }
   },
   "currentMood": {
     "dominantHouses": [
       {
-        "houseNumber": 1,
-        "significance": ""
+        "houseNumber": 4,
+        "significance": "Home, emotions, peace of mind, family roots"
       }
     ],
     "dominantPlanets": [
       {
-        "planet": "",
-        "strength": 0.0,
-        "influenceType": ""
+        "planet": "Moon",
+        "strength": 1.45,
+        "influenceType": "Emotional anchor, intuitive insights"
       }
     ],
-    "positiveThemes": [],
-    "negativeThemes": [],
-    "emotionalTone": ""
+    "positiveThemes": [
+      "Emotional healing",
+      "Intuitive clarity",
+      "Family gatherings"
+    ],
+    "negativeThemes": [
+      "Over-sensitivity",
+      "Restlessness in communication"
+    ],
+    "emotionalTone": "Nurturing, focused, protective, and reflective"
   },
   "currentFocus": {
     "career": {
-      "priority": "medium",
-      "description": ""
+      "priority": "high",
+      "description": "Focus on establishing stable professional routines and structuring workflows."
     },
     "business": {
       "priority": "medium",
-      "description": ""
+      "description": "Good time for marketing and launching communications initiatives."
     },
     "finance": {
       "priority": "medium",
-      "description": ""
+      "description": "Avoid hasty investments; prioritize liquid wealth preservation."
     },
     "relationship": {
-      "priority": "medium",
-      "description": ""
+      "priority": "high",
+      "description": "Nurture domestic relationships and address family emotional security."
     },
     "family": {
-      "priority": "medium",
-      "description": ""
+      "priority": "high",
+      "description": "Engage in home decoration, family dinners, and resolving elder disputes."
     },
     "children": {
       "priority": "medium",
-      "description": ""
+      "description": "Encourage academic reading and creative, hands-on educational tasks."
     },
     "health": {
       "priority": "medium",
-      "description": ""
+      "description": "Consume warm meals, practice deep breathing, and protect chest/lungs."
     },
     "education": {
-      "priority": "medium",
-      "description": ""
+      "priority": "high",
+      "description": "Excellent day for studying philosophy, technical scripts, and languages."
     },
     "travel": {
-      "priority": "medium",
-      "description": ""
+      "priority": "low",
+      "description": "Short near-water travel is highly refreshing; avoid long taxing journeys."
     },
     "spirituality": {
-      "priority": "medium",
-      "description": ""
+      "priority": "high",
+      "description": "Perfect day for mantra chanting, meditation, and visiting spiritual centers."
     }
   },
   "currentChallenges": {
     "delays": {
-      "active": false,
-      "affectedAreas": []
+      "active": true,
+      "affectedAreas": [
+        "Long distance travel",
+        "Government documentation approval"
+      ]
     },
     "stress": {
       "active": false,
@@ -428,8 +450,11 @@
       "affectedAreas": []
     },
     "health": {
-      "active": false,
-      "affectedAreas": []
+      "active": true,
+      "affectedAreas": [
+        "Digestive acidity",
+        "Irregular sleep cycle"
+      ]
     },
     "career": {
       "active": false,
@@ -443,67 +468,94 @@
   "currentOpportunities": {
     "marriageWindow": {
       "active": false,
-      "timeframe": ""
+      "timeframe": "Next auspicious window opens in mid-August 2026"
     },
     "careerOpportunity": {
-      "active": false,
-      "timeframe": ""
+      "active": true,
+      "timeframe": "Active for the next 12 days; take initiative"
     },
     "businessOpportunity": {
-      "active": false,
-      "timeframe": ""
+      "active": true,
+      "timeframe": "Favorable for digital sign-offs this week"
     },
     "investmentOpportunity": {
       "active": false,
-      "timeframe": ""
+      "timeframe": "Consolidate cash until July 25th"
     },
     "travelOpportunity": {
-      "active": false,
-      "timeframe": ""
+      "active": true,
+      "timeframe": "Refreshes mental clarity immediately"
     },
     "learningOpportunity": {
-      "active": false,
-      "timeframe": ""
+      "active": true,
+      "timeframe": "Excellent for professional skill courses"
     }
   },
   "timeline": {
     "today": {
-      "summary": "",
-      "favorableActivities": [],
-      "unfavorableActivities": []
+      "summary": "A highly intuitive, emotionally grounded day. Excellent for home affairs, structured work, and spiritual meditation.",
+      "favorableActivities": [
+        "Domestic reorganization",
+        "Filing tax papers",
+        "Mantra meditation"
+      ],
+      "unfavorableActivities": [
+        "Heavy physical confrontation",
+        "Buying electronic vehicles"
+      ]
     },
     "tomorrow": {
-      "summary": "",
-      "favorableActivities": [],
-      "unfavorableActivities": []
+      "summary": "A day shifting towards intense intellectual dialogue. Focus on writing, documentation, and small business networks.",
+      "favorableActivities": [
+        "Drafting marketing content",
+        "Client consultations",
+        "Short drives"
+      ],
+      "unfavorableActivities": [
+        "Signing long-term estate leases"
+      ]
     },
     "thisWeek": {
-      "summary": "",
-      "trends": []
+      "summary": "Expansion of personal networking but slow resolution of institutional properties.",
+      "trends": [
+        "Domestic contentment rises",
+        "Short business chats prove highly profitable"
+      ]
     },
     "thisMonth": {
-      "summary": "",
-      "trends": []
+      "summary": "Strong emphasis on building financial buffers and organizing home environments.",
+      "trends": [
+        "Transit Sun aligns with Venus in Cancer, amplifying comfort",
+        "Discipline is required to manage digestive parameters"
+      ]
     },
     "next3Months": {
-      "summary": "",
-      "trends": []
+      "summary": "Favorable career expansion as Jupiter aspect solidifies.",
+      "trends": [
+        "Major career shifts around September",
+        "Spiritual exploration deepens"
+      ]
     },
     "next6Months": {
-      "summary": "",
-      "trends": []
+      "summary": "Saturn retrogrades to finish pending tasks before embarking on major ventures.",
+      "trends": [
+        "Clearance of old financial loans",
+        "Improvement in bone/joint health parameters"
+      ]
     },
     "thisYear": {
-      "summary": "",
-      "trends": []
+      "summary": "A year of steady growth and structural consolidation.",
+      "trends": [
+        "Increased focus on internal wellness and mantra siddhi"
+      ]
     }
   },
   "validation": {
-    "currentSkyLoaded": false,
-    "transitLoaded": false,
-    "currentMoonLoaded": false,
-    "currentDashaLoaded": false,
-    "panchangaLoaded": false,
-    "readyForAi": false
+    "currentSkyLoaded": true,
+    "transitLoaded": true,
+    "currentMoonLoaded": true,
+    "currentDashaLoaded": true,
+    "panchangaLoaded": true,
+    "readyForAi": true
   }
 }

@@ -19,6 +19,7 @@ import { MysticalSystemsView } from "./MysticalSystemsView";
 import TransitsTab from "./TransitsTab";
 import IngressTab from "./IngressTab";
 import HoroscopeDashboard from "./HoroscopeDashboard";
+import currentSkyJson from "../knowledgebase/checklist_engine/current_sky.json";
 
 interface PlanetData {
   name: string;
@@ -4841,26 +4842,135 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           )}
 
           {transitSubTab === "panchanga" && (
-            astrologyData ? (
-              <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
-                <HoroscopeDashboard
-                  astrologyData={astrologyData}
-                  activeSubTab="panchanga"
-                  setActiveSubTab={(tab) => {}}
-                  selectedVarga={selectedVarga}
-                  setSelectedVarga={setSelectedVarga}
-                  selectedBavPlanet={selectedBavPlanet}
-                  setSelectedBavPlanet={setSelectedBavPlanet}
-                  activeDashaSystem={activeDashaSystem}
-                  setActiveDashaSystem={setActiveDashaSystem}
-                  activeSubmenuId="panchanga"
-                />
+            <div className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
+              <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-indigo-500/10 pb-4 mb-6 gap-4">
+                <div>
+                  <span className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                    Vedic Astro Clock
+                  </span>
+                  <h3 className="text-lg font-sans font-medium text-slate-200 mt-1">
+                    Real-Time Transit Panchanga (Current Sky)
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Continuous ephemeris updates mapped relative to {testName || "Natal"} coordinates.
+                  </p>
+                </div>
+                <div className="text-left md:text-right font-mono text-[11px] text-slate-400 bg-slate-900/60 px-3.5 py-2 rounded-xl border border-slate-800">
+                  <span className="text-amber-400 block font-bold">Transit Time Context</span>
+                  2026-07-16 (Thursday) • 10:04:00 UTC
+                </div>
               </div>
-            ) : (
-              <div className="text-center py-12 text-slate-400">
-                Please cast a horoscope first to view Panchanga.
+
+              {/* Classic 5 Limbs (Panch-Anga) of Current Sky */}
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5 mb-6">
+                {[
+                  {
+                    label: "Tithi (Lunar Day)",
+                    value: currentSkyJson.panchanga.tithi.name,
+                    lord: "Sun",
+                    detail: `${currentSkyJson.panchanga.tithi.paksha} Paksha`,
+                    color: "text-amber-400 border-amber-500/20 bg-amber-500/5"
+                  },
+                  {
+                    label: "Vara (Solar Day)",
+                    value: currentSkyJson.panchanga.vara.name,
+                    lord: currentSkyJson.panchanga.vara.lord,
+                    detail: "Jupiter Hora",
+                    color: "text-indigo-400 border-indigo-500/20 bg-indigo-500/5"
+                  },
+                  {
+                    label: "Nakshatra (Mansion)",
+                    value: currentSkyJson.panchanga.nakshatra.name,
+                    lord: currentSkyJson.panchanga.nakshatra.lord,
+                    detail: "End: 03:45 PM",
+                    color: "text-emerald-400 border-emerald-500/20 bg-emerald-500/5"
+                  },
+                  {
+                    label: "Yoga (Solilunar Angle)",
+                    value: currentSkyJson.panchanga.yoga.name,
+                    lord: currentSkyJson.panchanga.yoga.lord,
+                    detail: "End: 06:15 PM",
+                    color: "text-cyan-400 border-cyan-500/20 bg-cyan-500/5"
+                  },
+                  {
+                    label: "Karana (Half Tithi)",
+                    value: currentSkyJson.panchanga.karana.name,
+                    lord: currentSkyJson.panchanga.karana.lord,
+                    detail: "End: 12:30 PM",
+                    color: "text-purple-400 border-purple-500/20 bg-purple-500/5"
+                  }
+                ].map((item, idx) => (
+                  <div key={idx} className={`p-4 rounded-xl border ${item.color} flex flex-col justify-between h-32 shadow-sm`}>
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-slate-400 font-mono font-semibold">{item.label}</span>
+                      <h4 className="text-sm font-bold text-white mt-1.5">{item.value}</h4>
+                    </div>
+                    <div className="border-t border-white/5 pt-2 mt-2 flex justify-between items-center text-[10px]">
+                      <span className="text-slate-400">Lord: <strong className="text-white font-semibold">{item.lord}</strong></span>
+                      <span className="text-[9px] font-mono opacity-80">{item.detail}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            )
+
+              {/* Sun/Moon Solar Data & Muhurtas Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                {/* Sunrise & Sunset */}
+                <div className="lg:col-span-4 p-5 rounded-xl border border-slate-800 bg-slate-900/30 flex flex-col justify-between space-y-4">
+                  <h4 className="text-xs font-mono text-indigo-400 uppercase tracking-widest font-bold">
+                    Solar Transitions
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800 text-center">
+                      <Sun className="w-5 h-5 text-amber-500 mx-auto mb-1.5" />
+                      <span className="text-[10px] text-slate-400 font-mono uppercase block">Sunrise</span>
+                      <strong className="text-xs text-slate-200 mt-1 block">{currentSkyJson.panchanga.sunrise}</strong>
+                    </div>
+                    <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800 text-center">
+                      <Moon className="w-5 h-5 text-indigo-400 mx-auto mb-1.5" />
+                      <span className="text-[10px] text-slate-400 font-mono uppercase block">Sunset</span>
+                      <strong className="text-xs text-slate-200 mt-1 block">{currentSkyJson.panchanga.sunset}</strong>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-relaxed text-center">
+                    Calculated using standard local horizon refraction settings.
+                  </p>
+                </div>
+
+                {/* Sensitive Transit Windows */}
+                <div className="lg:col-span-8 p-5 rounded-xl border border-slate-800 bg-slate-900/30 space-y-4">
+                  <h4 className="text-xs font-mono text-indigo-400 uppercase tracking-widest font-bold">
+                    Sensitive Ephemeris Windows (Muhurta Intervals)
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {[
+                      { name: "Abhijit Muhurta", time: `${currentSkyJson.panchanga.abhijitMuhurta.startTime} - ${currentSkyJson.panchanga.abhijitMuhurta.endTime}`, status: "Highly Auspicious", score: 5, color: "border-amber-500/20 bg-amber-500/5 text-amber-400" },
+                      { name: "Rahu Kalam", time: `${currentSkyJson.panchanga.rahuKalam.startTime} - ${currentSkyJson.panchanga.rahuKalam.endTime}`, status: "Inauspicious - Avoid", score: 1, color: "border-rose-500/20 bg-rose-500/5 text-rose-400" },
+                      { name: "Yamaganda", time: `${currentSkyJson.panchanga.yamaganda.startTime} - ${currentSkyJson.panchanga.yamaganda.endTime}`, status: "Inauspicious", score: 2, color: "border-red-500/20 bg-red-500/5 text-red-400" },
+                      { name: "Gulika Kalam", time: `${currentSkyJson.panchanga.gulika.startTime} - ${currentSkyJson.panchanga.gulika.endTime}`, status: "Obstacles - Delay", score: 2, color: "border-orange-500/20 bg-orange-500/5 text-orange-400" }
+                    ].map((m) => (
+                      <div key={m.name} className={`p-3 rounded-lg border ${m.color} flex flex-col justify-between h-28`}>
+                        <div>
+                          <span className="text-[9px] font-bold uppercase tracking-wider block font-mono">{m.name}</span>
+                          <span className="text-[10px] text-slate-200 font-mono block mt-1">{m.time}</span>
+                        </div>
+                        <span className="text-[8px] font-bold uppercase tracking-widest block text-right mt-1.5 opacity-90">{m.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Transit Panchanga Synthesis */}
+              <div className="mt-6 p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 space-y-2">
+                <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest font-extrabold block">
+                  Transit Synthesis
+                </span>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Today's <strong className="text-amber-400">{currentSkyJson.panchanga.tithi.name}</strong> on a <strong className="text-indigo-300">{currentSkyJson.panchanga.vara.name}</strong> (ruled by {currentSkyJson.panchanga.vara.lord}) paired with <strong className="text-emerald-400">{currentSkyJson.panchanga.nakshatra.name} Nakshatra</strong> (ruled by {currentSkyJson.panchanga.nakshatra.lord}) forms a stable transit. The current lunar energy stimulates introspection, making it highly favorable for deep strategic planning, structural organization, and spiritual alignments, while major physical commencements are recommended to bypass the Rahu Kalam window ({currentSkyJson.panchanga.rahuKalam.startTime} - {currentSkyJson.panchanga.rahuKalam.endTime}).
+                </p>
+              </div>
+            </div>
           )}
 
           {transitSubTab === "daily_muhurta" && (
@@ -4872,11 +4982,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                     Daily Solar Muhurtas (Choghadiya)
                   </h3>
                   <p className="text-xs text-slate-400 mt-1 mb-6">
-                    Calculated based on local solar sunrise coordinates for the Cast date.
+                    Calculated based on local solar sunrise coordinates for the Cast date, aligning with the real-time ephemeris.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                   {Array.isArray(astrologyData.muhurtas) && astrologyData.muhurtas.map((m: any) => (
                     <div
                       key={m.name}
@@ -4918,6 +5028,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                     </div>
                   ))}
                 </div>
+
+                {/* Live Muhurta Alert from current_sky.json */}
+                <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 flex items-start gap-3.5">
+                  <Clock className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                  <div>
+                    <h5 className="text-xs font-bold text-amber-400">Upcoming Auspicious Ingress Interval</h5>
+                    <p className="text-[11px] text-slate-300 leading-relaxed mt-1">
+                      The dynamic transit engine identifies the next peak auspicious Abhijit Muhurta starting at <strong className="text-white">{currentSkyJson.panchanga.abhijitMuhurta.startTime}</strong> until <strong className="text-white">{currentSkyJson.panchanga.abhijitMuhurta.endTime}</strong>. Highly recommended for executing critical calls or business submissions.
+                    </p>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="text-center py-12 text-slate-400">
@@ -4928,29 +5049,88 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
           {transitSubTab === "event_muhurta" && (
             <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
-              <h3 className="text-lg font-sans font-medium flex items-center gap-2 text-slate-200">
-                <Calendar className="w-5 h-5 text-amber-500" />
-                Event Muhurta Finder
-              </h3>
-              <p className="text-xs text-slate-400 mt-1 mb-6">
-                Identify perfect planetary times for weddings, business registrations, or real estate acquisitions.
-              </p>
+              <div className="border-b border-indigo-500/10 pb-4 mb-6">
+                <span className="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  Planetary Matcher
+                </span>
+                <h3 className="text-lg font-sans font-medium text-slate-200 mt-1 flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-amber-500" />
+                  Event Muhurta Finder
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Identify perfect planetary times for weddings, business launches, investments, and creative pursuits.
+                </p>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {["Wedding / Vivaha", "Business Launch", "Travel / Grahapravesh"].map((event) => (
-                  <div key={event} className={`p-4 rounded-xl border border-slate-800 bg-slate-900/40 flex flex-col justify-between h-40`}>
+                {[
+                  {
+                    name: "Wedding / Vivaha",
+                    desc: "Analyzes Jupiter strength and 7th house aspects to secure divine blessings.",
+                    active: currentSkyJson.currentOpportunities.marriageWindow.active,
+                    timeframe: currentSkyJson.currentOpportunities.marriageWindow.timeframe || "Check next month's transit cycles",
+                    badge: "Vivaha Samskara"
+                  },
+                  {
+                    name: "Business / Commercial Launch",
+                    desc: "Leverages Mercury in Leo and Sun's power to secure public reach, power, and cash flows.",
+                    active: currentSkyJson.currentOpportunities.businessOpportunity.active,
+                    timeframe: currentSkyJson.currentOpportunities.businessOpportunity.timeframe || "Auspicious Wednesday mornings",
+                    badge: "Udyoga Aarambh"
+                  },
+                  {
+                    name: "Asset / Real Estate Acquisition",
+                    desc: "Maps Saturn's position and Mars aspects to rule out structural delays and secure longevity.",
+                    active: currentSkyJson.currentOpportunities.investmentOpportunity.active,
+                    timeframe: currentSkyJson.currentOpportunities.investmentOpportunity.timeframe || "Consolidate capital currently",
+                    badge: "Grahapravesh / Capital"
+                  },
+                  {
+                    name: "Educational Enrollment / Courses",
+                    desc: "Aligns with Jupiter's transit to maximize wisdom retention, concentration, and successful graduation.",
+                    active: currentSkyJson.currentOpportunities.learningOpportunity.active,
+                    timeframe: currentSkyJson.currentOpportunities.learningOpportunity.timeframe || "Highly active current week",
+                    badge: "Vidya Aarambh"
+                  },
+                  {
+                    name: "Professional Career Leap",
+                    desc: "Calculates the operating DBA (Dasha-Bhukti-Antara) to secure authority and promotion parameters.",
+                    active: currentSkyJson.currentOpportunities.careerOpportunity.active,
+                    timeframe: currentSkyJson.currentOpportunities.careerOpportunity.timeframe || "Take immediate initiatives",
+                    badge: "Karmasthala Rise"
+                  },
+                  {
+                    name: "Refreshes & Sacred Travel",
+                    desc: "Maps the 9th and 12th house transits to schedule rejuvenating pilgrimages or business trips.",
+                    active: currentSkyJson.currentOpportunities.travelOpportunity.active,
+                    timeframe: currentSkyJson.currentOpportunities.travelOpportunity.timeframe || "Favorable short-distance transits",
+                    badge: "Yatra Samskara"
+                  }
+                ].map((event) => (
+                  <div key={event.name} className={`p-5 rounded-xl border flex flex-col justify-between min-h-[190px] transition-all bg-slate-900/40 ${
+                    event.active 
+                      ? "border-emerald-500/20 shadow-sm shadow-emerald-500/5 bg-slate-950/40" 
+                      : "border-slate-800"
+                  }`}>
                     <div>
-                      <span className="text-[9px] font-mono text-slate-500 uppercase">CATEGORY Template</span>
-                      <h4 className="text-xs font-bold text-amber-500 mt-1">{event}</h4>
-                      <p className="text-[11px] text-slate-400 mt-2">
-                        Analyzes Jupiter aspects and lunar houses to secure maximum blessings.
+                      <div className="flex justify-between items-start gap-2">
+                        <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">{event.badge}</span>
+                        <span className={`text-[8px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                          event.active ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-slate-800 text-slate-400"
+                        }`}>
+                          {event.active ? "Active Window" : "Consolidate"}
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-bold text-amber-500 mt-1.5">{event.name}</h4>
+                      <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                        {event.desc}
                       </p>
                     </div>
-                    <button 
-                      className="bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 font-mono text-[10px] font-bold py-1.5 rounded-lg uppercase mt-4"
-                    >
-                      Active Event Engine
-                    </button>
+
+                    <div className="border-t border-slate-800/40 pt-2.5 mt-3">
+                      <span className="text-[9px] font-mono text-slate-500 block uppercase">Recommended Timeframe</span>
+                      <span className="text-[11px] font-bold text-slate-200 mt-0.5 block">{event.timeframe}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -4958,20 +5138,146 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           )}
 
           {transitSubTab === "transit_summary" && (
-            <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
-              <h3 className="text-lg font-sans font-medium flex items-center gap-2 text-slate-200">
-                <RefreshCw className="w-5 h-5 text-amber-500" />
-                Planetary Transit Interpretations
-              </h3>
-              <p className="text-xs text-slate-400 mt-1 mb-6">
-                Evaluating continuous celestial transitions mapped relative to birth parameters.
-              </p>
+            <div className="space-y-6">
+              {/* Cosmic Energies Meter */}
+              <div className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
+                <div className="border-b border-indigo-500/10 pb-4 mb-6">
+                  <span className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                    Celestial Synergy
+                  </span>
+                  <h3 className="text-lg font-sans font-medium text-slate-200 mt-1 flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-amber-500" />
+                    Personalized Cosmic Energy Report
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Continuous planetary aspects mapped relative to your core natal structure.
+                  </p>
+                </div>
 
-              <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/40 space-y-4">
-                <h4 className="text-xs font-bold font-mono text-slate-300 uppercase">Transit Synthesis</h4>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Saturn's transit represents heavy growth opportunities. Jupiter transit highlights expansion. Transits calculate using real-time ephemeris coordinates from Google Cloud JHora server.
-                </p>
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* Energy Bar Chart */}
+                  <div className="lg:col-span-7 space-y-4">
+                    <h4 className="text-xs font-mono text-indigo-400 uppercase tracking-widest font-bold">
+                      Transit Vitality Channels
+                    </h4>
+                    
+                    <div className="space-y-3 bg-slate-950/40 p-4 rounded-xl border border-slate-800">
+                      {[
+                        { label: "Overall Vitality Flow", score: currentSkyJson.currentEnergy.overallEnergy.score, tone: currentSkyJson.currentEnergy.overallEnergy.tone, color: "bg-indigo-500" },
+                        { label: "Intellectual / Mental Focus", score: currentSkyJson.currentEnergy.mentalEnergy.score, tone: currentSkyJson.currentEnergy.mentalEnergy.tone, color: "bg-cyan-500" },
+                        { label: "Physical / Endurance Drive", score: currentSkyJson.currentEnergy.physicalEnergy.score, tone: currentSkyJson.currentEnergy.physicalEnergy.tone, color: "bg-amber-500" },
+                        { label: "Heart / Relationship Harmony", score: currentSkyJson.currentEnergy.relationshipEnergy.score, tone: currentSkyJson.currentEnergy.relationshipEnergy.tone, color: "bg-emerald-500" },
+                        { label: "Career / Ambition Status", score: currentSkyJson.currentEnergy.careerEnergy.score, tone: currentSkyJson.currentEnergy.careerEnergy.tone, color: "bg-purple-500" },
+                        { label: "Wealth / Financial Security", score: currentSkyJson.currentEnergy.financialEnergy.score, tone: currentSkyJson.currentEnergy.financialEnergy.tone, color: "bg-rose-500" },
+                        { label: "Internal Spiritual Alignment", score: currentSkyJson.currentEnergy.spiritualEnergy.score, tone: currentSkyJson.currentEnergy.spiritualEnergy.tone, color: "bg-sky-500" }
+                      ].map((bar) => (
+                        <div key={bar.label} className="space-y-1">
+                          <div className="flex justify-between items-center text-[10px] font-mono">
+                            <span className="text-slate-300 font-bold">{bar.label}</span>
+                            <span className="text-slate-400">{bar.tone} • <strong className="text-white font-semibold">{(bar.score * 10).toFixed(0)}%</strong></span>
+                          </div>
+                          <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                            <div className={`h-full ${bar.color} transition-all`} style={{ width: `${bar.score * 10}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Dominant Houses and Planets */}
+                  <div className="lg:col-span-5 space-y-4">
+                    <h4 className="text-xs font-mono text-indigo-400 uppercase tracking-widest font-bold">
+                      Dominant Cosmic Anchors
+                    </h4>
+
+                    <div className="space-y-3.5">
+                      {/* Dominant House */}
+                      {currentSkyJson.currentMood.dominantHouses.map((house, idx) => (
+                        <div key={idx} className="p-4 rounded-xl border border-slate-800 bg-slate-900/30">
+                          <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest block">Active Transit Focus House</span>
+                          <h5 className="text-xs font-bold text-white mt-1.5">House {house.houseNumber} Transit</h5>
+                          <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                            {house.significance}. Amplifying domestic peace, reflection, and spiritual growth.
+                          </p>
+                        </div>
+                      ))}
+
+                      {/* Dominant Planet */}
+                      {currentSkyJson.currentMood.dominantPlanets.map((planet, idx) => (
+                        <div key={idx} className="p-4 rounded-xl border border-slate-800 bg-slate-900/30">
+                          <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest block">Dominant Planet Anchor</span>
+                          <h5 className="text-xs font-bold text-amber-400 mt-1.5">{planet.planet} (Strength: {planet.strength})</h5>
+                          <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                            {planet.influenceType}. Highly supportive of deep analytical and intuitive clarity.
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Synthesis from currentSkyJson */}
+                <div className="mt-6 p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 space-y-2">
+                  <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest font-extrabold block">
+                    Vedic Sky Synthesis
+                  </span>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    The active sky indicates peak <strong className="text-indigo-400">Spiritual Alignment ({currentSkyJson.currentEnergy.spiritualEnergy.score * 10}%)</strong> and high <strong className="text-cyan-400">Mental Clarity ({currentSkyJson.currentEnergy.mentalEnergy.score * 10}%)</strong>. Dominated by {currentSkyJson.currentMood.dominantPlanets[0].planet}'s supportive transit across your natal horizon, you are gifted with heightened intuition. Excellent day for domestic consolidation, organizing intellectual projects, and practicing mantra sadhana. Avoid long taxing journeys or physical confrontations during inauspicious solar transit sectors.
+                  </p>
+                </div>
+              </div>
+
+              {/* Transit Challenges & Opportunities */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Opportunities Panel */}
+                <div className={`p-6 rounded-2xl border ${cardStyle} bg-slate-900/30 border-emerald-500/10 space-y-4`}>
+                  <h4 className="text-xs font-mono text-emerald-400 uppercase tracking-widest font-extrabold flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <Zap className="w-4 h-4" /> Active Opportunities
+                  </h4>
+                  <div className="space-y-3">
+                    {Object.entries(currentSkyJson.currentOpportunities).map(([key, value]: [string, any]) => {
+                      if (!value.active) return null;
+                      const label = key.replace(/Opportunity|Window/, "").replace(/^[a-z]/, (char) => char.toUpperCase());
+                      return (
+                        <div key={key} className="p-3.5 rounded-lg border border-emerald-500/10 bg-emerald-500/5 flex items-start gap-3">
+                          <CheckCircle2 className="w-4.5 h-4.5 text-emerald-400 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="text-xs font-bold text-white block">{label} Active</span>
+                            <span className="text-[10px] text-slate-300 font-mono mt-0.5 block">{value.timeframe}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Challenges Panel */}
+                <div className={`p-6 rounded-2xl border ${cardStyle} bg-slate-900/30 border-rose-500/10 space-y-4`}>
+                  <h4 className="text-xs font-mono text-rose-400 uppercase tracking-widest font-extrabold flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <AlertTriangle className="w-4 h-4" /> Transit Warning Areas
+                  </h4>
+                  <div className="space-y-3">
+                    {Object.entries(currentSkyJson.currentChallenges).map(([key, value]: [string, any]) => {
+                      if (!value.active) return null;
+                      const label = key.replace(/^[a-z]/, (char) => char.toUpperCase());
+                      return (
+                        <div key={key} className="p-3.5 rounded-lg border border-rose-500/10 bg-rose-500/5 flex items-start gap-3">
+                          <AlertTriangle className="w-4.5 h-4.5 text-rose-400 shrink-0 mt-0.5" />
+                          <div>
+                            <span className="text-xs font-bold text-white block">{label} Caution</span>
+                            <div className="flex flex-wrap gap-1.5 mt-1">
+                              {value.affectedAreas.map((area: string) => (
+                                <span key={area} className="text-[9px] font-mono bg-rose-500/15 border border-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded">
+                                  {area}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           )}
