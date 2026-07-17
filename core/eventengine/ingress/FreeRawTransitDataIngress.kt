@@ -9,6 +9,7 @@ data class FreeRawTransitDataIngress(
     val observationLocation: GeoLocation,
     val planetLongitudes: EnumMap<Planet, Double>,
     val planetSpeeds: EnumMap<Planet, Double>,
+    val chartPointLongitudes: EnumMap<ChartPoint, Double>,
     val houseCusps: HouseCusps,
     val houseSystem: HouseSystem,
     val ayanamsaType: AyanamsaType,
@@ -48,21 +49,21 @@ data class FreeRawTransitDataIngress(
         }
 
         // Ascendant validation
-        if (!planetLongitudes.containsKey(Planet.ASCENDANT)) {
+        if (!chartPointLongitudes.containsKey(ChartPoint.ASCENDANT)) {
             throw IngressContractViolationException("Missing longitude entry for Ascendant")
         }
-        val ascendantLong = planetLongitudes[Planet.ASCENDANT] ?: throw IngressContractViolationException("Null Ascendant value")
+        val ascendantLong = chartPointLongitudes[ChartPoint.ASCENDANT] ?: throw IngressContractViolationException("Null Ascendant value")
         if (ascendantLong < 0.0 || ascendantLong >= 360.0) {
             throw IngressContractViolationException("Invalid Ascendant longitude ($ascendantLong)")
         }
 
-        // MC validation
-        if (!planetLongitudes.containsKey(Planet.MC)) {
-            throw IngressContractViolationException("Missing longitude entry for Medium Coeli (MC)")
+        // Midheaven validation
+        if (!chartPointLongitudes.containsKey(ChartPoint.MIDHEAVEN)) {
+            throw IngressContractViolationException("Missing longitude entry for Midheaven")
         }
-        val mcLong = planetLongitudes[Planet.MC] ?: throw IngressContractViolationException("Null MC value")
-        if (mcLong < 0.0 || mcLong >= 360.0) {
-            throw IngressContractViolationException("Invalid MC longitude ($mcLong)")
+        val midheavenLong = chartPointLongitudes[ChartPoint.MIDHEAVEN] ?: throw IngressContractViolationException("Null Midheaven value")
+        if (midheavenLong < 0.0 || midheavenLong >= 360.0) {
+            throw IngressContractViolationException("Invalid Midheaven longitude ($midheavenLong)")
         }
     }
 }

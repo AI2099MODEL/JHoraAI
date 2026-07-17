@@ -3,14 +3,11 @@ package core.eventengine.ingress
 enum class HouseSystem {
     PLACIDUS,
     KOCH,
-    PORPHYRIUS,
+    PORPHYRY,
     REGIOMONTANUS,
     CAMPANUS,
-    EQUAL_HOUSE,
-    VEHLO_EQUAL,
+    EQUAL,
     WHOLE_SIGN,
-    MERIDIAN,
-    AZIMUTHAL,
-    POLICH_PAGE,
-    ALCABITIUS
+    SRIPATI,
+    KP
 }

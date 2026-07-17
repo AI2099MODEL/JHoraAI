@@ -9,7 +9,5 @@ enum class Planet {
     VENUS,
     SATURN,
     RAHU,
-    KETU,
-    ASCENDANT,
-    MC
+    KETU
 }

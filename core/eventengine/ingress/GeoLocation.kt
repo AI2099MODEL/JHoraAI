@@ -5,6 +5,7 @@ data class GeoLocation(
     val district: String?,
     val state: String?,
     val country: String,
+    val postalCode: String?,
     val latitude: Double,
     val longitude: Double,
     val altitude: Double,

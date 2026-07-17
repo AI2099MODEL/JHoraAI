@@ -11,6 +11,7 @@ class EphemerisDataCollectorTest {
         district = "Ujjain",
         state = "Madhya Pradesh",
         country = "India",
+        postalCode = "456001",
         latitude = 23.1760,
         longitude = 75.7885,
         altitude = 511.0,
@@ -33,8 +34,6 @@ class EphemerisDataCollectorTest {
             put(Planet.SATURN, 340.9)
             put(Planet.RAHU, 15.3)
             put(Planet.KETU, 195.3)
-            put(Planet.ASCENDANT, 52.1)
-            put(Planet.MC, 142.1)
         }
 
         val speeds = EnumMap<Planet, Double>(Planet::class.java).apply {
@@ -47,8 +46,11 @@ class EphemerisDataCollectorTest {
             put(Planet.SATURN, 0.03)
             put(Planet.RAHU, -0.05)
             put(Planet.KETU, -0.05)
-            put(Planet.ASCENDANT, 361.0)
-            put(Planet.MC, 361.0)
+        }
+
+        val chartPoints = EnumMap<ChartPoint, Double>(ChartPoint::class.java).apply {
+            put(ChartPoint.ASCENDANT, 52.1)
+            put(ChartPoint.MIDHEAVEN, 142.1)
         }
 
         val cusps = HouseCusps(List(12) { i -> (i * 30.0 + 52.1) % 360.0 })
@@ -60,6 +62,7 @@ class EphemerisDataCollectorTest {
             observationLocation = stubLocation,
             planetLongitudes = longitudes,
             planetSpeeds = speeds,
+            chartPointLongitudes = chartPoints,
             houseCusps = cusps,
             houseSystem = HouseSystem.PLACIDUS,
             ayanamsaType = AyanamsaType.KRISHNAMURTI,
