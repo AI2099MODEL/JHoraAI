@@ -4379,13 +4379,13 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   <div className="space-y-6 animate-fade-in">
                     <div className="flex justify-between items-center border-b border-cyan-500/10 pb-2">
                       <h3 className="text-sm font-bold text-cyan-400">KP Astrological Significators</h3>
-                      <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-0.5 rounded font-mono font-bold uppercase">4-Level strength</span>
+                      <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-0.5 rounded font-mono font-bold uppercase">6-Level strength</span>
                     </div>
                     
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 text-xs">
                       <div className="space-y-3">
                         <span className="text-xs font-bold text-amber-500 block uppercase tracking-wider font-mono">
-                          Planetary Significators (Graha Signals)
+                          Planetary Significators (Graha Signals - 6-Fold)
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {Object.entries(rawPlanetSignificators).map(([planet, sig]: [string, any]) => (
@@ -4410,6 +4410,14 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                   <span className="text-slate-500">L4 (Planet Owner):</span>
                                   <span className="text-slate-300 font-semibold">{Array.isArray(sig.level4) ? sig.level4.join(", ") : sig.level4 || "—"}</span>
                                 </div>
+                                <div className="flex justify-between">
+                                  <span className="text-slate-500">L5 (Sub Occupant):</span>
+                                  <span className="text-fuchsia-400 font-semibold">{Array.isArray(sig.level5) ? sig.level5.join(", ") : sig.level5 || "—"}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-slate-500">L6 (Sub Owner):</span>
+                                  <span className="text-cyan-400 font-semibold">{Array.isArray(sig.level6) ? sig.level6.join(", ") : sig.level6 || "—"}</span>
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -4418,27 +4426,54 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
                       <div className="space-y-3">
                         <span className="text-xs font-bold text-amber-500 block uppercase tracking-wider font-mono">
-                          House Significators (Bhava Signals)
+                          House Significators (Bhava Signals - 6-Fold)
                         </span>
-                        <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-                          <table className="w-full text-left text-xs font-mono">
-                            <thead>
-                              <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800">
-                                <th className="p-2.5">House / Bhava</th>
-                                <th className="p-2.5">Active Planets (Strength order)</th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-800/20 text-slate-300">
-                              {Object.entries(rawHouseSignificators).map(([house, sigs]: [string, any]) => (
-                                <tr key={house} className="hover:bg-slate-900/10">
-                                  <td className="p-2.5 font-bold text-cyan-400">{house.replace("House_", "House ")}</td>
-                                  <td className="p-2.5 font-semibold text-slate-200">
-                                    {Array.isArray(sigs) ? sigs.join(", ") : String(sigs)}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {Object.entries(rawHouseSignificators).map(([house, sig]: [string, any]) => {
+                            const houseNum = house.replace("House_", "");
+                            return (
+                              <div key={house} className={`p-3 rounded-xl border border-slate-800 bg-slate-950/20 space-y-2`}>
+                                <div className="flex justify-between items-center border-b border-slate-800 pb-1">
+                                  <span className="font-bold text-cyan-400 text-xs">House {houseNum}</span>
+                                </div>
+                                <div className="space-y-1 text-[11px] font-mono text-slate-300">
+                                  {sig && typeof sig === 'object' && !Array.isArray(sig) ? (
+                                    <>
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">L1 (Star Occupant):</span>
+                                        <span className="text-indigo-400 font-semibold">{Array.isArray(sig.level1) ? sig.level1.join(", ") : sig.level1 || "—"}</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">L2 (Planet Occupant):</span>
+                                        <span className="text-amber-500 font-semibold">{Array.isArray(sig.level2) ? sig.level2.join(", ") : sig.level2 || "—"}</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">L3 (Star Owner):</span>
+                                        <span className="text-emerald-400 font-semibold">{Array.isArray(sig.level3) ? sig.level3.join(", ") : sig.level3 || "—"}</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">L4 (Planet Owner):</span>
+                                        <span className="text-slate-300 font-semibold">{Array.isArray(sig.level4) ? sig.level4.join(", ") : sig.level4 || "—"}</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">L5 (Sub Occupant):</span>
+                                        <span className="text-fuchsia-400 font-semibold">{Array.isArray(sig.level5) ? sig.level5.join(", ") : sig.level5 || "—"}</span>
+                                      </div>
+                                      <div className="flex justify-between">
+                                        <span className="text-slate-500">L6 (Sub Owner):</span>
+                                        <span className="text-cyan-400 font-semibold">{Array.isArray(sig.level6) ? sig.level6.join(", ") : sig.level6 || "—"}</span>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <div className="flex justify-between">
+                                      <span className="text-slate-500">Active Planets:</span>
+                                      <span className="text-slate-200 font-semibold">{Array.isArray(sig) ? sig.join(", ") : String(sig) || "—"}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     </div>
