@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { 
   AlertTriangle, 
   CheckCircle, 
@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { apiFetch as fetch } from "../lib/api";
 import { KPRulebook, KPRule } from "../lib/rules/kpRulebook";
+import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
 
 interface KpStellarDashboardProps {
   astrologyData: any;
@@ -64,11 +65,20 @@ export default function KpStellarDashboard({
   const [subError, setSubError] = useState<string | null>(null);
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
 
+  const profileJson = useMemo(() => {
+    if (!astrologyData) return null;
+    try {
+      return mapAstrologyDataToUserProfileJSON(null, astrologyData);
+    } catch (e) {
+      console.error("Error mapping astrology data to profile json in KpStellarDashboard:", e);
+      return null;
+    }
+  }, [astrologyData]);
+
+  const kpData = useMemo(() => profileJson?.KP || {}, [profileJson]);
+
   const evaluateRule = (ruleId: string): { status: "PASSED" | "FAILS" | "INCONCLUSIVE", details: string, matchPercent: number } => {
-    if (!astrologyData) return { status: "INCONCLUSIVE", details: "No astrology data casted yet.", matchPercent: 0 };
-    
-    const kpData = astrologyData.KP;
-    if (!kpData) return { status: "INCONCLUSIVE", details: "KP data not present in current profile.", matchPercent: 0 };
+    if (!kpData || Object.keys(kpData).length === 0) return { status: "INCONCLUSIVE", details: "KP data not present in current profile.", matchPercent: 0 };
 
     switch (ruleId) {
       case "KP_MAR_01": {
@@ -297,6 +307,16 @@ export default function KpStellarDashboard({
     };
   }, [activeSubmenuId, healthStatus, astrologyData, transitDate]);
 
+  // Reset KP subtab caches when switching profiles/astrologyData changes to align data to the user profile
+  useEffect(() => {
+    setChartData(null);
+    setCuspData(null);
+    setSignificatorsData(null);
+    setDashaData(null);
+    setTransitData(null);
+    setHoraryData(null);
+  }, [astrologyData]);
+
   // Handle manual trigger for Horary
   const handleCalculateHorary = async () => {
     setSubLoading(true);
@@ -310,6 +330,37 @@ export default function KpStellarDashboard({
       setSubLoading(false);
     }
   };
+
+  // Format dates for display
+  const formatDashaDateStr = (dateStr: string | Date) => {
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+    } catch (e) {
+      return String(dateStr);
+    }
+  };
+
+  const dashaTree = useMemo(() => {
+    const rawDashas = astrologyData?.dashas || [];
+    return rawDashas.map((d: any) => ({
+      planet: d.lord,
+      startTime: formatDashaDateStr(d.startDate),
+      endTime: formatDashaDateStr(d.endDate),
+      nested: d.subPeriods ? d.subPeriods.map((c: any) => ({
+        planet: c.lord,
+        endTime: formatDashaDateStr(c.endDate)
+      })) : []
+    }));
+  }, [astrologyData]);
+
+  const finalDashaList = useMemo(() => {
+    const isFallback = dashaData?.dashas?.some((d: any) => d.planet === "Rahu" && d.startTime === "2018-10-15");
+    if (!dashaData || isFallback || !dashaData.dashas || dashaData.dashas.length === 0) {
+      return dashaTree;
+    }
+    return dashaData.dashas;
+  }, [dashaData, dashaTree]);
 
   // Styling Variables
   const containerStyle = isDarkTheme
@@ -714,7 +765,7 @@ export default function KpStellarDashboard({
           {activeSubmenuId === "kp_dasha" && (
             <div className="space-y-4 animate-fade-in">
               <div className="space-y-3">
-                {(dashaData?.dashas || []).slice(0, 5).map((d: any, idx: number) => (
+                {(finalDashaList || []).slice(0, 5).map((d: any, idx: number) => (
                   <div key={idx} className={`p-4 rounded-xl border ${cardStyle} flex flex-col md:flex-row md:items-center justify-between gap-4`}>
                     <div>
                       <span className="px-2.5 py-1 bg-indigo-500/10 text-indigo-400 rounded-lg text-xs font-bold font-mono">

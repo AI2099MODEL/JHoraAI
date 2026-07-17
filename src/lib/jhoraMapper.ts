@@ -1472,6 +1472,52 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
     schema_version: "v2.0"
   };
 
+  // Find currently operating dasha period from high-integrity dynamic calculations (for profile alignment)
+  const dashaNow = new Date();
+  let currentMaha = null;
+  let currentBhukti = null;
+  let currentAntara = null;
+  let currentMahaStart = "";
+  let currentMahaEnd = "";
+
+  if (Array.isArray(data.dashas) && data.dashas.length > 0) {
+    const activeM = data.dashas.find((m: any) => {
+      const s = new Date(m.startDate);
+      const e = new Date(m.endDate);
+      return dashaNow >= s && dashaNow <= e;
+    }) || data.dashas[0];
+
+    if (activeM) {
+      currentMaha = activeM.lord;
+      currentMahaStart = activeM.startDate;
+      currentMahaEnd = activeM.endDate;
+
+      if (Array.isArray(activeM.subPeriods) && activeM.subPeriods.length > 0) {
+        const activeB = activeM.subPeriods.find((b: any) => {
+          const s = new Date(b.startDate);
+          const e = new Date(b.endDate);
+          return dashaNow >= s && dashaNow <= e;
+        }) || activeM.subPeriods[0];
+
+        if (activeB) {
+          currentBhukti = activeB.lord;
+
+          if (Array.isArray(activeB.subPeriods) && activeB.subPeriods.length > 0) {
+            const activeA = activeB.subPeriods.find((a: any) => {
+              const s = new Date(a.startDate);
+              const e = new Date(a.endDate);
+              return dashaNow >= s && dashaNow <= e;
+            }) || activeB.subPeriods[0];
+
+            if (activeA) {
+              currentAntara = activeA.lord;
+            }
+          }
+        }
+      }
+    }
+  }
+
   return {
     User: userSection,
     Birth: birthSection,
@@ -1542,13 +1588,13 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       planet_significators: data.kpSignificators?.planetSignificators || {},
       ruling_planets: kpRulingPlanets,
       dba: {
-        mahadasha: data.kpDasha?.dashas?.[0]?.planet || data.dashas?.[0]?.lord || null,
-        bhukti: data.kpDasha?.dashas?.[0]?.nested?.[0]?.planet || data.dashas?.[0]?.subPeriods?.[0]?.lord || null,
-        antara: data.kpDasha?.dashas?.[0]?.nested?.[0]?.nested?.[0]?.planet || null,
+        mahadasha: currentMaha || data.kpDasha?.dashas?.[0]?.planet || data.dashas?.[0]?.lord || null,
+        bhukti: currentBhukti || data.kpDasha?.dashas?.[0]?.nested?.[0]?.planet || data.dashas?.[0]?.subPeriods?.[0]?.lord || null,
+        antara: currentAntara || data.kpDasha?.dashas?.[0]?.nested?.[0]?.nested?.[0]?.planet || null,
         sookshma: null,
         prana: null,
-        start_date: data.kpDasha?.dashas?.[0]?.startTime || data.dashas?.[0]?.startDate || "",
-        end_date: data.kpDasha?.dashas?.[0]?.endTime || data.dashas?.[0]?.endDate || ""
+        start_date: currentMahaStart || data.kpDasha?.dashas?.[0]?.startTime || data.dashas?.[0]?.startDate || "",
+        end_date: currentMahaEnd || data.kpDasha?.dashas?.[0]?.endTime || data.dashas?.[0]?.endDate || ""
       },
       horary: null,
       Raw_API: {
@@ -1562,13 +1608,13 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       },
       Derived: {
         dba: {
-          mahadasha: data.kpDasha?.dashas?.[0]?.planet || data.dashas?.[0]?.lord || null,
-          bhukti: data.kpDasha?.dashas?.[0]?.nested?.[0]?.planet || data.dashas?.[0]?.subPeriods?.[0]?.lord || null,
-          antara: data.kpDasha?.dashas?.[0]?.nested?.[0]?.nested?.[0]?.planet || null,
+          mahadasha: currentMaha || data.kpDasha?.dashas?.[0]?.planet || data.dashas?.[0]?.lord || null,
+          bhukti: currentBhukti || data.kpDasha?.dashas?.[0]?.nested?.[0]?.planet || data.dashas?.[0]?.subPeriods?.[0]?.lord || null,
+          antara: currentAntara || data.kpDasha?.dashas?.[0]?.nested?.[0]?.nested?.[0]?.planet || null,
           sookshma: null,
           prana: null,
-          start_date: data.kpDasha?.dashas?.[0]?.startTime || data.dashas?.[0]?.startDate || "",
-          end_date: data.kpDasha?.dashas?.[0]?.endTime || data.dashas?.[0]?.endDate || ""
+          start_date: currentMahaStart || data.kpDasha?.dashas?.[0]?.startTime || data.dashas?.[0]?.startDate || "",
+          end_date: currentMahaEnd || data.kpDasha?.dashas?.[0]?.endTime || data.dashas?.[0]?.endDate || ""
         }
       }
     },

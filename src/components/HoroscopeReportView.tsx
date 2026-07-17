@@ -109,6 +109,16 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [kpHoraryQuestion, setKpHoraryQuestion] = useState<string>("Will my current business venture succeed in this dasha period?");
   const [selectedKpRuleId, setSelectedKpRuleId] = useState<string | null>("KP_MAR_01");
 
+  // Reset KP subtab state caches when switching profiles/astrologyData changes to align data to the user profile
+  useEffect(() => {
+    setKpCuspData(null);
+    setKpChartData(null);
+    setKpSignificatorsData(null);
+    setKpDashaData(null);
+    setKpTransitData(null);
+    setKpHoraryData(null);
+  }, [astrologyData]);
+
   // Fetch all cached profiles on mount and sync with astrologyData
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -189,7 +199,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "lalkitab", label: "lalkitab*" },
       { id: "gemstones", label: "gemstones*" },
       { id: "numerology", label: "numerology*" },
-      { id: "mysticalSystems", label: "mysticalSystems*" }
+      { id: "mysticalSystems", label: "mysticalSystems*" },
+      { id: "kp_cusps", label: "kpCusps*" },
+      { id: "kp_planet_analysis", label: "kpPlanets*" },
+      { id: "kp_significators", label: "kpSignificators*" },
+      { id: "kp_ruling_planets", label: "kpRulingPlanets*" },
+      { id: "kp_dasha", label: "kpDasha*" },
+      { id: "kp_rulebook", label: "kpRulebook*" },
+      { id: "kp_transit", label: "kpTransit*" },
+      { id: "kp_horary", label: "kpHorary*" },
+      { id: "westernTropical", label: "westernTropical*" },
+      { id: "allAstroSystems", label: "allAstroSystems*" }
     ];
 
     for (const item of supportedKeys) {
@@ -216,6 +236,15 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         dataVal = { dummy: true };
       }
       if (item.id === "mysticalSystems" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id.startsWith("kp_") && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "westernTropical" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "allAstroSystems" && !dataVal) {
         dataVal = { dummy: true };
       }
       if (item.id === "ishtaPhala" && !dataVal) {
@@ -305,10 +334,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   };
 
   const evaluateReportKpRule = (ruleId: string): { status: "PASSED" | "FAILS" | "INCONCLUSIVE", details: string, matchPercent: number } => {
-    if (!astrologyData) return { status: "INCONCLUSIVE", details: "No astrology data casted yet.", matchPercent: 0 };
-    
-    const kpData = astrologyData.KP;
-    if (!kpData) return { status: "INCONCLUSIVE", details: "KP data not present in current profile.", matchPercent: 0 };
+    const kpData = profileJson?.KP;
+    if (!kpData || Object.keys(kpData).length === 0) return { status: "INCONCLUSIVE", details: "KP data not present in current profile.", matchPercent: 0 };
 
     switch (ruleId) {
       case "KP_MAR_01": {
@@ -411,7 +438,13 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   };
 
   useEffect(() => {
-    if (majorTab !== "kp" || !astrologyData) return;
+    if (vedicSubTab.startsWith("kp_")) {
+      setKpSubTab(vedicSubTab as any);
+    }
+  }, [vedicSubTab]);
+
+  useEffect(() => {
+    if ((majorTab !== "jhora" || !vedicSubTab.startsWith("kp_")) || !astrologyData) return;
 
     let active = true;
     async function loadActiveKPData() {
@@ -451,7 +484,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     return () => {
       active = false;
     };
-  }, [kpSubTab, majorTab, astrologyData, kpTransitDate]);
+  }, [kpSubTab, majorTab, astrologyData, kpTransitDate, vedicSubTab]);
 
   // Background Automatic PDF Compiler
   useEffect(() => {
@@ -688,23 +721,24 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     return kpSignificatorsData?.houseSignificators || kpData?.house_significators || {};
   }, [kpSignificatorsData, kpData]);
 
-  const dashaDisplayList = useMemo(() => {
-    const rawDashaList = kpDashaData?.dashas || (kpData?.dba ? [
-      { planet: kpData.dba.mahadasha, startTime: "Active", endTime: "Current Period", nested: [{ planet: kpData.dba.bhukti, endTime: "Active Subperiod" }] }
-    ] : []);
-    if (rawDashaList.length > 0) return rawDashaList;
-    return dashaTree.map((d: any) => ({
-      planet: d.lord,
-      startTime: d.start.toLocaleDateString(),
-      endTime: d.end.toLocaleDateString(),
-      nested: d.antars ? d.antars.map((c: any) => ({ planet: c.lord, endTime: c.end.toLocaleDateString() })) : []
-    }));
-  }, [kpDashaData, kpData, dashaTree]);
-
   // Helper formatting for Date
   const formatDashaDate = (d: Date) => {
     return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
   };
+
+  const dashaDisplayList = useMemo(() => {
+    const isFallback = kpDashaData?.dashas?.some((d: any) => d.planet === "Rahu" && d.startTime === "2018-10-15");
+    const rawDashaList = (!kpDashaData || isFallback) ? [] : (kpDashaData?.dashas || (kpData?.dba ? [
+      { planet: kpData.dba.mahadasha, startTime: "Active", endTime: "Current Period", nested: [{ planet: kpData.dba.bhukti, endTime: "Active Subperiod" }] }
+    ] : []));
+    if (rawDashaList.length > 0) return rawDashaList;
+    return dashaTree.map((d: any) => ({
+      planet: d.lord,
+      startTime: formatDashaDate(d.start),
+      endTime: formatDashaDate(d.end),
+      nested: d.antars ? d.antars.map((c: any) => ({ planet: c.lord, endTime: formatDashaDate(c.end) })) : []
+    }));
+  }, [kpDashaData, kpData, dashaTree]);
 
   // Auto-select active dasha periods based on current time
   useEffect(() => {
@@ -963,6 +997,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     }
   };
 
+  const showAllAstroSystems = majorTab === "jhora" && vedicSubTab === "allAstroSystems";
+
   return (
     <div id="horoscope-report-root" className="space-y-6 pb-16">
       {/* Visual Header / Cover with PDF download prominently placed in heading */}
@@ -1050,7 +1086,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         </div>
       </div>
 
-      {/* Tabs bar for JHora, KP, Western, All Systems */}
+      {/* Tabs bar for Advanced, Profile */}
       <div className="border-b border-slate-800 flex gap-1 overflow-x-auto pb-px">
         <button
           onClick={() => setMajorTab("advanced")}
@@ -1070,41 +1106,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
-          JHora (Vedic)
-        </button>
-        <button
-          onClick={() => setMajorTab("kp")}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
-            majorTab === "kp"
-              ? "border-cyan-500 text-cyan-400 font-extrabold bg-slate-900/20"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          KP (Stellar)
-        </button>
-        <button
-          onClick={() => setMajorTab("western")}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
-            majorTab === "western"
-              ? "border-purple-500 text-purple-400 font-extrabold bg-slate-900/20"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          Western (Tropical)
-        </button>
-        <button
-          onClick={() => setMajorTab("all")}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
-            majorTab === "all"
-              ? "border-indigo-500 text-indigo-400 font-extrabold bg-slate-900/20"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          All Astro Systems
+          Profile
         </button>
       </div>
 
-      {/* Sub-tabs bar for JHora (Vedic) - Dynamic Multitabs Grid */}
+      {/* Sub-tabs bar for Profile - Dynamic Multitabs Grid */}
       {majorTab === "jhora" && (
         <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40">
           {availableVedicTabs.map((tab) => (
@@ -1114,25 +1120,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               className={`px-2.5 py-1.5 text-[10px] font-mono rounded-md transition-all border text-center ${
                 vedicSubTab === tab.id
                   ? "bg-amber-500/15 border-amber-500/50 text-amber-400 font-bold shadow-sm shadow-amber-500/10"
-                  : "border-slate-800 bg-slate-900/30 text-slate-400 hover:text-slate-200 hover:bg-slate-900/50"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Sub-tabs bar for KP Stellar - Dynamic Multitabs Grid */}
-      {majorTab === "kp" && (
-        <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40">
-          {kpSubTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setKpSubTab(tab.id)}
-              className={`px-2.5 py-1.5 text-[10px] font-mono rounded-md transition-all border text-center ${
-                kpSubTab === tab.id
-                  ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold shadow-sm shadow-cyan-500/10"
                   : "border-slate-800 bg-slate-900/30 text-slate-400 hover:text-slate-200 hover:bg-slate-900/50"
               }`}
             >
@@ -2854,7 +2841,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         )}
 
         {/* ================= SYSTEM 1: BIRTH PARTICULARS & PANCHANGA ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-1" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
             
@@ -2999,7 +2986,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 2: VEDIC DIVISIONAL CHARTS & VARGAS MATRIX ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-2" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl" />
             
@@ -3176,7 +3163,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 3: VEDIC PLANETARY POSITIONS ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-3" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-emerald-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl" />
             
@@ -3267,7 +3254,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 4: PLANETARY & BHAVA BALAS ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-4" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-orange-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl" />
             
@@ -3371,7 +3358,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 5: ASHTAKAVARGA BINDUS MATRIX ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-5" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
@@ -3425,7 +3412,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 6: PLANETARY ARGALAS ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-6" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
@@ -3503,7 +3490,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 7: JAIMINI SUTRAS & CHARA DASHAS ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-7" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
             
@@ -3590,7 +3577,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 8: KRISHNAMURTI PADDHATI (KP) ================= */}
-        {(majorTab === "kp" || majorTab === "all") && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab.startsWith("kp_"))) && (
           <div id="report-section-8" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
@@ -3603,11 +3590,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 8. KP STELLAR COSMIC SIGNALS & DASHAS
               </h2>
               <p className={`text-xs ${mutedText} mt-1`}>
-                High-precision stellar sublord division of house cusps, planetary significators, active dashas, rulebook evaluations, transits, and horary resolutions.
+                High-precision stellar sublord division of house houses, planetary significators, active dashas, rulebook evaluations, transits, and horary resolutions.
               </p>
             </div>
 
-            {majorTab === "all" ? (
+            {vedicSubTab === "allAstroSystems" ? (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 text-xs">
                 {/* KP 12 Cusps */}
                 <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4">
@@ -4214,7 +4201,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         )}
 
         {/* ================= SYSTEM 9: WESTERN TROPICAL ASTROLOGY ================= */}
-        {(majorTab === "western" || majorTab === "all") && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "westernTropical")) && (
           <div id="report-section-9" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
             
@@ -4315,7 +4302,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 10: ESOTERIC & ALTERNATIVE MYSTICAL SYSTEMS ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-10" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
@@ -4433,7 +4420,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 11: VIMSHOTTARI, YOGINI & ASHTOTTARI DASHAS ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-11" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-teal-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full blur-2xl" />
             
@@ -4526,7 +4513,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 12: YOGAS & DOSHAS ANALYSIS ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-12" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-rose-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl" />
             
@@ -4592,7 +4579,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 13: TRADITIONAL LIFE PATHWAYS ================= */}
-        {majorTab === "all" && (
+        {showAllAstroSystems && (
           <div id="report-section-13" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
             
