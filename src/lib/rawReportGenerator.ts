@@ -378,18 +378,61 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
     drawSectionTitle("SAMUDHAYA ASHTAKAVARGA CHARTS", "JHORA");
     const strengths = vedic.strengths || {};
     const ashtakavarga = strengths.ashtakavarga || {};
-    const planets = Object.keys(ashtakavarga);
 
-    if (planets.length > 0) {
-      const rows = planets.map(pName => {
-        const scores = ashtakavarga[pName] || [];
+    let bav: { [key: string]: number[] } = {};
+    if (ashtakavarga.bav && typeof ashtakavarga.bav === "object") {
+      bav = ashtakavarga.bav;
+    } else if (ashtakavarga.planets && typeof ashtakavarga.planets === "object") {
+      bav = ashtakavarga.planets;
+    } else {
+      const possiblePlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+      possiblePlanets.forEach(p => {
+        if (Array.isArray(ashtakavarga[p])) {
+          bav[p] = ashtakavarga[p];
+        }
+      });
+    }
+
+    let sav: number[] = [];
+    if (Array.isArray(ashtakavarga.sav)) {
+      sav = ashtakavarga.sav;
+    } else if (Array.isArray(ashtakavarga.sarvashtakavarga)) {
+      sav = ashtakavarga.sarvashtakavarga;
+    } else {
+      sav = Array(12).fill(0);
+      Object.values(bav).forEach((scores: any) => {
+        if (Array.isArray(scores)) {
+          for (let i = 0; i < 12; i++) {
+            sav[i] += Number(scores[i] || 0);
+          }
+        }
+      });
+    }
+
+    const rows: any[] = [];
+    const planetsList = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    planetsList.forEach(pName => {
+      const scores = bav[pName];
+      if (Array.isArray(scores) && scores.length === 12) {
         const total = scores.reduce((a: number, b: number) => a + b, 0);
-        return [
+        rows.push([
           pName,
           ...scores.map(String),
           String(total)
-        ];
-      });
+        ]);
+      }
+    });
+
+    if (sav && sav.length === 12) {
+      const savTotal = sav.reduce((a: number, b: number) => a + b, 0);
+      rows.push([
+        "SAV",
+        ...sav.map(String),
+        String(savTotal)
+      ]);
+    }
+
+    if (rows.length > 0) {
       drawTable(
         ["Planet", "Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi", "Total"],
         rows,
