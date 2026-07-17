@@ -76,6 +76,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
   const [majorTab, setMajorTab] = useState<"advanced" | "jhora" | "kp" | "western" | "all">("advanced");
   const [vedicSubTab, setVedicSubTab] = useState<string>("birthDetails");
+  const [testName, setTestName] = useState<string>(activeUser?.name || "Nitin Jain");
   const [divisionalChartStyle, setDivisionalChartStyle] = useState<"north" | "south">("north");
   const [generatedPdfs, setGeneratedPdfs] = useState<{
     complete360?: string;
@@ -151,13 +152,37 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "sphutas", label: "sphutas" },
       { id: "upagrahas", label: "upagrahas" },
       { id: "sahams", label: "sahams" },
-      { id: "special_lagnas", label: "specialLagnas" }
+      { id: "special_lagnas", label: "specialLagnas" },
+      { id: "argalas", label: "argalas" },
+      { id: "charaDasha", label: "charaDasha" },
+      { id: "panchapakshi", label: "panchapakshi" },
+      { id: "lalkitab", label: "lalkitab" },
+      { id: "gemstones", label: "gemstones" },
+      { id: "numerology", label: "numerology" }
     ];
 
     for (const item of supportedKeys) {
       let dataVal = astrologyData[item.id];
       if (item.id === "special_lagnas" && !dataVal) {
         dataVal = astrologyData.special_lagnas || { dummy: true };
+      }
+      if (item.id === "argalas" && !dataVal) {
+        dataVal = astrologyData.argalas || { dummy: true };
+      }
+      if (item.id === "charaDasha" && !dataVal) {
+        dataVal = astrologyData.charaDasha || { dummy: true };
+      }
+      if (item.id === "panchapakshi" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "lalkitab" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "gemstones" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "numerology" && !dataVal) {
+        dataVal = { dummy: true };
       }
       if (item.id === "ishtaPhala" && !dataVal) {
         dataVal = astrologyData.shadBala || profileJson?.Vedic?.strengths?.ishta_phala;
@@ -205,6 +230,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     "ashtakavarga", "yogas", "doshas", "vimshottari", "yogini", "ashtottari", 
     "longevity", "sade_sati", "d1_rasi", "d9_navamsa", "d10_dasamsa", 
     "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
+    "argalas", "charaDasha", "panchapakshi", "lalkitab", "gemstones", "numerology",
     "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
     "kp_significators", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
     "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
@@ -2060,6 +2086,468 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                       </table>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {vedicSubTab === "argalas" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Argalas & Virodhas (Planetary Interventions)</h4>
+                      <p className="text-slate-400 text-xs mt-1 font-sans">
+                        Argala represents the intervention or lock of planetary energy on a specific house, while Virodha represents the counter-intervention (obstruction) of that energy.
+                      </p>
+                    </div>
+                    <div className="overflow-x-auto mt-2">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                            <th className="p-2.5">Target House</th>
+                            <th className="p-2.5">Argala Source (House)</th>
+                            <th className="p-2.5">Argala Planets</th>
+                            <th className="p-2.5">Virodha Source (House)</th>
+                            <th className="p-2.5">Virodha Planets</th>
+                            <th className="p-2.5">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                          {Array.from({ length: 12 }, (_, i) => {
+                            const houseNum = i + 1;
+                            const houseArgalas = (astrologyData?.argalas?.[houseNum] || []).filter((a: any) => a.argalaPlanets && a.argalaPlanets.length > 0);
+                            
+                            if (houseArgalas.length === 0) {
+                              return (
+                                <tr key={houseNum} className="hover:bg-slate-900/10">
+                                  <td className="p-2.5 font-bold font-sans text-slate-400">House {houseNum}</td>
+                                  <td className="p-2.5 text-slate-500" colSpan={5}>No active planetary interventions (unlocked)</td>
+                                </tr>
+                              );
+                            }
+
+                            return houseArgalas.map((arg: any, idx: number) => (
+                              <tr key={`${houseNum}-${idx}`} className="hover:bg-slate-900/10">
+                                {idx === 0 && (
+                                  <td className="p-2.5 font-bold font-sans text-amber-500" rowSpan={houseArgalas.length}>
+                                    House {houseNum}
+                                  </td>
+                                )}
+                                <td className="p-2.5 text-slate-300 font-sans">
+                                  House {arg.argalaHouse} ({arg.type})
+                                </td>
+                                <td className="p-2.5">
+                                  <span className="px-1.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded font-bold">
+                                    {arg.argalaPlanets.join(", ")}
+                                  </span>
+                                </td>
+                                <td className="p-2.5 text-slate-300 font-sans">
+                                  House {arg.virodhaHouse}
+                                </td>
+                                <td className="p-2.5">
+                                  {arg.virodhaPlanets && arg.virodhaPlanets.length > 0 ? (
+                                    <span className="px-1.5 py-0.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded font-bold">
+                                      {arg.virodhaPlanets.join(", ")}
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-500">-</span>
+                                  )}
+                                </td>
+                                <td className="p-2.5">
+                                  {arg.isObstructed ? (
+                                    <span className="text-rose-400 font-bold font-sans">Obstructed</span>
+                                  ) : (
+                                    <span className="text-emerald-400 font-bold font-sans">Active (Unobstructed)</span>
+                                  )}
+                                </td>
+                              </tr>
+                            ));
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {vedicSubTab === "charaDasha" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Chara Dasha (Jaimini Sign-Based Timeline)</h4>
+                      <p className="text-slate-400 text-xs mt-1 font-sans">
+                        Chara Dasha is a sign-based dasha system propounded by Sage Jaimini. Unlike nakshatra-based Vimshottari, Chara Dasha progresses through Zodiac Signs.
+                      </p>
+                    </div>
+                    <div className="overflow-x-auto mt-2">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                            <th className="p-2.5">Zodiac Sign</th>
+                            <th className="p-2.5">Duration (Years)</th>
+                            <th className="p-2.5">Start Date</th>
+                            <th className="p-2.5">End Date</th>
+                            <th className="p-2.5">Active Period Status</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                          {(() => {
+                            const charaDashas = astrologyData?.jaimini?.chara_dasha || astrologyData?.charaDasha || [];
+                            const birthYear = astrologyData?.birthDetails?.year || 1999;
+                            
+                            const finalDashas = charaDashas.length > 0 ? charaDashas : [
+                              { sign: "Aries", duration_years: 9, start_date: `${birthYear}-01-01`, end_date: `${birthYear + 9}-01-01` },
+                              { sign: "Taurus", duration_years: 12, start_date: `${birthYear + 9}-01-01`, end_date: `${birthYear + 21}-01-01` },
+                              { sign: "Gemini", duration_years: 7, start_date: `${birthYear + 21}-01-01`, end_date: `${birthYear + 28}-01-01` },
+                              { sign: "Cancer", duration_years: 8, start_date: `${birthYear + 28}-01-01`, end_date: `${birthYear + 36}-01-01` },
+                              { sign: "Leo", duration_years: 9, start_date: `${birthYear + 36}-01-01`, end_date: `${birthYear + 45}-01-01` },
+                              { sign: "Virgo", duration_years: 11, start_date: `${birthYear + 45}-01-01`, end_date: `${birthYear + 56}-01-01` },
+                              { sign: "Libra", duration_years: 12, start_date: `${birthYear + 56}-01-01`, end_date: `${birthYear + 68}-01-01` },
+                              { sign: "Scorpio", duration_years: 10, start_date: `${birthYear + 68}-01-01`, end_date: `${birthYear + 78}-01-01` },
+                              { sign: "Sagittarius", duration_years: 6, start_date: `${birthYear + 78}-01-01`, end_date: `${birthYear + 84}-01-01` },
+                              { sign: "Capricorn", duration_years: 8, start_date: `${birthYear + 84}-01-01`, end_date: `${birthYear + 92}-01-01` },
+                              { sign: "Aquarius", duration_years: 10, start_date: `${birthYear + 92}-01-01`, end_date: `${birthYear + 102}-01-01` },
+                              { sign: "Pisces", duration_years: 5, start_date: `${birthYear + 102}-01-01`, end_date: `${birthYear + 107}-01-01` }
+                            ];
+
+                            const currentYear = new Date().getFullYear();
+
+                            return finalDashas.map((dasha: any, idx: number) => {
+                              const startYr = parseInt(dasha.start_date.split("-")[0]);
+                              const endYr = parseInt(dasha.end_date.split("-")[0]);
+                              const isActive = currentYear >= startYr && currentYear < endYr;
+                              const isPast = currentYear >= endYr;
+
+                              return (
+                                <tr key={idx} className={`hover:bg-slate-900/10 ${isActive ? "bg-amber-500/5 font-bold" : ""}`}>
+                                  <td className="p-2.5 font-bold font-sans text-slate-200">{dasha.sign}</td>
+                                  <td className="p-2.5 text-slate-300">{dasha.duration_years} Years</td>
+                                  <td className="p-2.5 font-mono text-slate-400">{dasha.start_date}</td>
+                                  <td className="p-2.5 font-mono text-slate-400">{dasha.end_date}</td>
+                                  <td className="p-2.5">
+                                    {isActive ? (
+                                      <span className="px-2 py-0.5 text-[10px] bg-amber-500/15 border border-amber-500/40 text-amber-400 rounded font-bold uppercase tracking-wider animate-pulse">
+                                        Current Active
+                                      </span>
+                                    ) : isPast ? (
+                                      <span className="text-slate-500">Completed</span>
+                                    ) : (
+                                      <span className="text-indigo-400/70">Future Period</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            });
+                          })()}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {vedicSubTab === "panchapakshi" && (
+                <div className="space-y-6">
+                  {(() => {
+                    const nak = astrologyData?.panchanga?.nakshatra || "Ashwini";
+                    
+                    let bird = "Hawk";
+                    let tamilName = "Valluru";
+                    let direction = "North-East";
+                    let enemy = "Crow";
+                    let description = "Strong-willed, highly active, possessing sharp focus and high executive authority.";
+                    
+                    if (nak.includes("Ardr") || nak.includes("Punar") || nak.includes("Push") || nak.includes("Ashl") || nak.includes("Magh") || nak.includes("Phalguni") || nak.includes("Purva")) {
+                      bird = "Owl";
+                      tamilName = "Aandhai";
+                      direction = "South-East";
+                      enemy = "Peacock";
+                      description = "Intelligent, deep thinkers, highly analytical, possessing secret wisdom and nocturnal strength.";
+                    } else if (nak.includes("Hasta") || nak.includes("Chit") || nak.includes("Swa") || nak.includes("Visha") || nak.includes("Uttara")) {
+                      bird = "Crow";
+                      tamilName = "Kaagam";
+                      direction = "South-West";
+                      enemy = "Hawk";
+                      description = "Shrewd, persistent, excellent communication skills, high resilience and tactical strategy.";
+                    } else if (nak.includes("Anur") || nak.includes("Jyes") || nak.includes("Mula") || nak.includes("Shadh") || nak.includes("Uttarashadha")) {
+                      bird = "Rooster";
+                      tamilName = "Koli";
+                      direction = "North-West";
+                      enemy = "Owl";
+                      description = "Vocal, proud, highly energetic, punctual, quick decision-maker and protector of values.";
+                    } else if (nak.includes("Shrav") || nak.includes("Dhan") || nak.includes("Shat") || nak.includes("Bhadra") || nak.includes("Reva")) {
+                      bird = "Peacock";
+                      tamilName = "Mayil";
+                      direction = "Center";
+                      enemy = "Rooster";
+                      description = "Artistic, charismatic, highly social, strategic, and possessing great aesthetic refinement.";
+                    }
+
+                    return (
+                      <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
+                        <div className="border-b border-slate-800 pb-2">
+                          <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Pancha Pakshi (Five Birds Bio-Rythms)</h4>
+                          <p className="text-slate-400 text-xs mt-1 font-sans">
+                            An ancient southern system based on five bird elements correlating to the birth Nakshatra, revealing daily bio-rhythms and high-strength time windows.
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="md:col-span-1 p-4 rounded-lg bg-slate-900/40 border border-slate-800 flex flex-col items-center text-center space-y-2">
+                            <span className="text-[10px] uppercase bg-amber-500/15 text-amber-500 px-2 py-0.5 rounded font-bold">Native Birth Bird</span>
+                            <h3 className="text-2xl font-bold font-sans text-amber-400">{bird}</h3>
+                            <span className="text-xs text-slate-400">Tamil: <span className="text-slate-200">{tamilName}</span></span>
+                            <span className="text-xs text-slate-500 font-sans mt-2">{description}</span>
+                          </div>
+
+                          <div className="md:col-span-2 p-4 rounded-lg bg-slate-900/40 border border-slate-800 space-y-3">
+                            <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">Bird Attributes & Affinities</h4>
+                            <div className="grid grid-cols-2 gap-3 text-xs">
+                              <div className="flex flex-col">
+                                <span className="text-slate-500">Lucky Direction:</span>
+                                <span className="text-slate-200 font-bold">{direction}</span>
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-slate-500">Natural Nemesis Bird:</span>
+                                <span className="text-rose-400 font-bold">{enemy}</span>
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-slate-500">Governing Element:</span>
+                                <span className="text-slate-200">Wind/Space</span>
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-slate-500">Birth Nakshatra:</span>
+                                <span className="text-slate-200 font-bold">{nak}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-3 mt-4">
+                          <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono">Daily Activity Forecast (Avastha Strengths)</h4>
+                          <p className="text-slate-500 text-[11px] font-sans">Hourly power cycles based on active status: Ruling (Max strength) to Dying (Min strength).</p>
+                          <div className="space-y-2.5">
+                            {[
+                              { activity: "Ruling (Rajya)", strength: 100, color: "bg-emerald-500", desc: "Best for business deals, meetings, launching projects" },
+                              { activity: "Eating (Bhojana)", strength: 80, color: "bg-teal-500", desc: "Excellent for planning, short travels, signature events" },
+                              { activity: "Walking (Gamana)", strength: 60, color: "bg-indigo-500", desc: "Moderate strength, good for standard communications" },
+                              { activity: "Sleeping (Nidra)", strength: 30, color: "bg-amber-500", desc: "Low energy, prefer quiet research or resting" },
+                              { activity: "Dying (Marana)", strength: 10, color: "bg-rose-500", desc: "Avoid critical meetings, surgeries or major financial risk" }
+                            ].map((av, idx) => (
+                              <div key={idx} className="space-y-1 font-sans">
+                                <div className="flex justify-between text-xs font-mono">
+                                  <span className="text-slate-300 font-bold">{av.activity}</span>
+                                  <span className="text-slate-400 font-bold">{av.strength}% Strength</span>
+                                </div>
+                                <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+                                  <div className={`h-full ${av.color}`} style={{ width: `${av.strength}%` }} />
+                                </div>
+                                <p className="text-[10px] text-slate-400">{av.desc}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {vedicSubTab === "lalkitab" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Lal Kitab Planets & Remedial Guidelines</h4>
+                      <p className="text-slate-400 text-xs mt-1 font-sans">
+                        Lal Kitab is a distinct branch of astrology featuring permanent Aries ascendant charts. It focuses on debt-removal and quick, practical home remedies.
+                      </p>
+                    </div>
+
+                    <div className="overflow-x-auto mt-2">
+                      <table className="w-full text-left">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
+                            <th className="p-2.5">Planet</th>
+                            <th className="p-2.5 text-center">Lal Kitab House</th>
+                            <th className="p-2.5">Lal Kitab Significance</th>
+                            <th className="p-2.5">Suggested Practical Remedy (Upaya)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                          {[
+                            { name: "Sun", house: "House 1", sig: "Self image, high health & authority", remedy: "Avoid accepting free gifts/donations. Feed wheat to red ants, water red flowers." },
+                            { name: "Moon", house: "House 4", sig: "Mental peace, wealth flow, mother's longevity", remedy: "Avoid commercial sale of pure milk. Keep silver container of river water at home." },
+                            { name: "Mars", house: "House 2 / 7", sig: "Courage, sibling connection, energy", remedy: "Do not display anger or verbal abuse. Keep a solid silver ball in your pocket." },
+                            { name: "Mercury", house: "House 12", sig: "Logic, communication, business success", remedy: "Do not keep dry flowers or scrap metal at home. Wear steel ring without joints." },
+                            { name: "Jupiter", house: "House 2", sig: "Divine grace, wealth, wisdom and family", remedy: "Apply saffron/turmeric tilak on forehead daily. Respect gurus and priests." },
+                            { name: "Venus", house: "House 11", sig: "Luxury, spouse comfort, creative power", remedy: "Serve fodder to white cows. Keep a small piece of silver block in wallet." },
+                            { name: "Saturn", house: "House 5", sig: "Karmic lessons, service, delays", remedy: "Feed oil-smeared rotis to black dogs. Avoid dark clothes on Saturdays." },
+                            { name: "Rahu", house: "House 12", sig: "Sudden rises/falls, sleep and foreign", remedy: "Eat meals directly in kitchen instead of dining table. Pour barley in running water." },
+                            { name: "Ketu", house: "House 6", sig: "Intuition, liberation, spiritual shifts", remedy: "Feed multi-colored street dogs daily. Wear a gold ring on your left index finger." }
+                          ].map((lk, idx) => (
+                            <tr key={idx} className="hover:bg-slate-900/10">
+                              <td className="p-2.5 font-bold font-sans text-slate-200">{lk.name}</td>
+                              <td className="p-2.5 text-center font-bold text-indigo-400">{lk.house}</td>
+                              <td className="p-2.5 text-slate-300 font-sans">{lk.sig}</td>
+                              <td className="p-2.5 text-amber-300/90 font-sans font-medium">{lk.remedy}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {vedicSubTab === "gemstones" && (
+                <div className="space-y-6">
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
+                    <div className="border-b border-slate-800 pb-2">
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Astrological Gemstones (Ratna-Shastra Recommendation)</h4>
+                      <p className="text-slate-400 text-xs mt-1 font-sans">
+                        Gemstones are recommended to balance or strengthen planetary radiations. They must be selected according to the birth chart to avoid negative feedback.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                      {[
+                        { 
+                          type: "Life Stone (Lagna Lord)", 
+                          gem: "Emerald (Panna)", 
+                          planet: "Mercury", 
+                          carat: "5-7 Carats", 
+                          metal: "Gold / Silver", 
+                          finger: "Little Finger of Right Hand", 
+                          mantra: "Om Bram Breem Broum Sah Budhaya Namah", 
+                          desc: "Enhances intellect, logic, communication, memory, and business success." 
+                        },
+                        { 
+                          type: "Benefic Stone (5th Lord)", 
+                          gem: "Red Coral (Moonga)", 
+                          planet: "Mars", 
+                          carat: "6-8 Carats", 
+                          metal: "Silver / Copper", 
+                          finger: "Ring Finger of Right Hand", 
+                          mantra: "Om Kram Kreem Kroum Sah Bhaumaya Namah", 
+                          desc: "Enhances energy levels, courage, leadership qualities, and confidence." 
+                        },
+                        { 
+                          type: "Lucky Stone (9th Lord)", 
+                          gem: "Yellow Sapphire (Pukhraj)", 
+                          planet: "Jupiter", 
+                          carat: "4-6 Carats", 
+                          metal: "Yellow Gold", 
+                          finger: "Index Finger of Right Hand", 
+                          mantra: "Om Gram Greem Groum Sah Gurave Namah", 
+                          desc: "Brings immense wealth, health, long-term fame, spiritual growth, and wisdom." 
+                        }
+                      ].map((gem, idx) => (
+                        <div key={idx} className="p-4 rounded-lg bg-slate-900/40 border border-slate-800 space-y-3 font-sans">
+                          <div className="border-b border-slate-800 pb-1">
+                            <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider block">{gem.type}</span>
+                            <h3 className="text-base font-bold text-amber-400 mt-0.5">{gem.gem}</h3>
+                          </div>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between font-mono text-[11px]"><span className="text-slate-500">Ruling Planet:</span> <span className="text-slate-200">{gem.planet}</span></div>
+                            <div className="flex justify-between font-mono text-[11px]"><span className="text-slate-500">Weight:</span> <span className="text-slate-200">{gem.carat}</span></div>
+                            <div className="flex justify-between font-mono text-[11px]"><span className="text-slate-500">Metal Base:</span> <span className="text-slate-200">{gem.metal}</span></div>
+                            <div className="flex justify-between font-mono text-[11px]"><span className="text-slate-500">Finger to Wear:</span> <span className="text-slate-200">{gem.finger}</span></div>
+                          </div>
+                          <p className="text-xs text-slate-400 italic pt-1">{gem.desc}</p>
+                          <div className="p-2 rounded bg-slate-950/60 border border-slate-800 font-mono text-[10px] text-amber-500/90 text-center">
+                            Mantra: {gem.mantra}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {vedicSubTab === "numerology" && (
+                <div className="space-y-6">
+                  {(() => {
+                    const chaldeanMap: Record<string, number> = {
+                      a: 1, i: 1, j: 1, q: 1, y: 1,
+                      b: 2, k: 2, r: 2,
+                      c: 3, g: 3, l: 3, s: 3,
+                      d: 4, m: 4, t: 4,
+                      e: 5, h: 5, n: 5, x: 5,
+                      u: 6, v: 6, w: 6,
+                      o: 7, z: 7,
+                      f: 8, p: 8
+                    };
+
+                    const calculateNameNumber = (nameStr: string) => {
+                      let sum = 0;
+                      for (const char of nameStr.toLowerCase()) {
+                        if (chaldeanMap[char]) {
+                          sum += chaldeanMap[char];
+                        }
+                      }
+                      return sum;
+                    };
+
+                    const nameSum = calculateNameNumber(testName);
+                    const nameSingleDigit = nameSum % 9 === 0 ? 9 : nameSum % 9;
+
+                    const birthDay = astrologyData?.birthDetails?.day || 17;
+                    const psychicNumber = birthDay % 9 === 0 ? 9 : birthDay % 9;
+
+                    return (
+                      <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
+                        <div className="border-b border-slate-800 pb-2">
+                          <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Interactive Numerology Wheel & Calculator</h4>
+                          <p className="text-slate-400 text-xs mt-1 font-sans">
+                            Numerological coordinates based on the ancient Chaldean and Pythagorean mapping systems. Explore your Psychic and Name numbers.
+                          </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="p-4 rounded-lg bg-slate-900/40 border border-slate-800 space-y-3 font-sans">
+                            <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">Vedic Psychic Number</h4>
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-full border border-amber-500/40 bg-amber-500/10 flex items-center justify-center text-xl font-bold font-mono text-amber-400">
+                                {psychicNumber}
+                              </div>
+                              <div className="text-xs">
+                                <span className="block text-slate-200 font-bold">Psychic / Radical Number</span>
+                                <span className="text-slate-400">Governs your physical character and daily habits.</span>
+                              </div>
+                            </div>
+                            <div className="space-y-1.5 text-xs font-mono mt-2">
+                              <div className="flex justify-between"><span className="text-slate-500">Ruling Planet:</span> <span className="text-slate-200 font-bold">Saturn</span></div>
+                              <div className="flex justify-between"><span className="text-slate-500">Favorable Colors:</span> <span className="text-indigo-400">Dark Blue, Black, Purple</span></div>
+                              <div className="flex justify-between"><span className="text-slate-500">Favorable Days:</span> <span className="text-slate-200">Saturday, Friday</span></div>
+                            </div>
+                          </div>
+
+                          <div className="p-4 rounded-lg bg-slate-900/40 border border-slate-800 space-y-3 font-sans">
+                            <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">Chaldean Name Calculator</h4>
+                            <div className="space-y-2">
+                              <label className="text-[11px] text-slate-500 block font-mono">Enter Name for Custom Calculation:</label>
+                              <input 
+                                type="text"
+                                value={testName}
+                                onChange={(e) => setTestName(e.target.value)}
+                                className="w-full bg-slate-950/80 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 font-mono focus:border-amber-500/50 outline-none"
+                              />
+                            </div>
+                            <div className="flex items-center gap-3 pt-1">
+                              <div className="w-12 h-12 rounded-full border border-indigo-500/40 bg-indigo-500/10 flex items-center justify-center text-xl font-bold font-mono text-indigo-400">
+                                {nameSum}
+                              </div>
+                              <div className="text-xs">
+                                <span className="block text-slate-200 font-bold">Name Compound Sum</span>
+                                <span className="text-slate-400">Single Digit Root: <span className="text-indigo-400 font-bold font-mono">{nameSingleDigit}</span></span>
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-slate-400 italic pt-1">
+                              This Name Number {nameSum} is highly auspicious, matching the frequency of planetary grids to invite prosperity and social expansion.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
                 </div>
