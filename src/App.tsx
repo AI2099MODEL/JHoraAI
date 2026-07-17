@@ -84,6 +84,7 @@ import { UnifiedEvidenceView } from "./components/UnifiedEvidenceView";
 import { AIRelationshipExpert } from "./components/AIRelationshipExpert";
 import { RelationshipReportGenerator } from "./components/RelationshipReportGenerator";
 import { RawDataPdfGenerator } from "./components/RawDataPdfGenerator";
+import { MasterArchitectureView } from "./components/MasterArchitectureView";
 import { RelationshipKnowledgeCenter } from "./components/RelationshipKnowledgeCenter";
 import { AstrologicalReasoningEngine } from "./components/AstrologicalReasoningEngine";
 import { RelationshipConsultationFramework } from "./components/RelationshipConsultationFramework";
@@ -1783,6 +1784,12 @@ export default function App() {
                       Extract and analyze raw, uncompiled metrics from JHora, KP, Western, and Mystical systems. Download all systems' complete data to train AI and build robust profiles.
                     </p>
                   </div>
+
+                  {/* Master Rules Engine Reference Analysis */}
+                  <MasterArchitectureView
+                    astrologyData={astrologyData}
+                    isDark={isDark}
+                  />
 
                   {/* Dynamic Raw Astro Submenu Data PDF Generator */}
                   <RawDataPdfGenerator
