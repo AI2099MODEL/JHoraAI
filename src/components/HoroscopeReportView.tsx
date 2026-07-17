@@ -2005,6 +2005,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             {eventsSubTab === "engine" && (
               <EventEngineView
                 isDark={isDark}
+                astrologyData={astrologyData}
               />
             )}
             {eventsSubTab === "event_muhurta" && (
