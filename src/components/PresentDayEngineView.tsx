@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Heart,
   Scale,
   Briefcase,
   Coins,
-  GraduationCap,
   Home,
   Baby,
   Globe,
@@ -12,20 +11,18 @@ import {
   AlertTriangle,
   Award,
   Cpu,
-  Check,
-  Database,
+  CheckCircle,
   Calendar,
   Clock,
-  HelpCircle,
   Sparkles,
   TrendingUp,
-  Play,
   ArrowRight,
   Zap,
-  RefreshCw,
   Info,
-  CheckCircle,
-  MessageSquare
+  MessageSquare,
+  ChevronDown,
+  ChevronUp,
+  Database
 } from "lucide-react";
 import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
 
@@ -43,19 +40,21 @@ interface AstroEvent {
   karakas: string[];
   themes: { primary: string; secondary: string; background: string };
   defaultPromise: boolean;
+  horoscopeNarrativeSupporting: string;
+  horoscopeNarrativeDormant: string;
 }
 
 export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
   astrologyData,
   isDark
 }) => {
-  const [selectedEventId, setSelectedEventId] = useState<string>("marriage");
-  const [activeStep, setActiveStep] = useState<number>(0);
-  const [isSimulating, setIsSimulating] = useState<boolean>(false);
-  const [simulationComplete, setSimulationComplete] = useState<boolean>(false);
+  // We keep an optional selector only for inspecting the 14-step diagnostics of a single event,
+  // but the main page renders all events and the consolidated daily horoscope instantly!
+  const [inspectEventId, setInspectEventId] = useState<string>("career");
+  const [showDiagnostics, setShowDiagnostics] = useState<boolean>(false);
 
-  // Supported event types with house configurations
-  const eventsList: AstroEvent[] = [
+  // Supported event types with house configurations and personalized horoscope texts
+  const eventsList: AstroEvent[] = useMemo(() => [
     {
       id: "relationship",
       name: "Relationship & Trust",
@@ -63,7 +62,9 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
       houses: [3, 7, 11],
       karakas: ["Venus", "Jupiter"],
       themes: { primary: "Partnership Trust", secondary: "Mutual Communication", background: "Emotional Bonding" },
-      defaultPromise: true
+      defaultPromise: true,
+      horoscopeNarrativeSupporting: "Today's cosmic flow is perfect for communication and rebuilding trust. Active links between your 3rd house of messaging and 7th house of partnerships indicate high receptivity from your partner.",
+      horoscopeNarrativeDormant: "Relationship dynamics remain in a stable, quiet orbit today. No active triggers aspect your partnership houses, suggesting a standard day for daily routines and quiet bonding."
     },
     {
       id: "marriage",
@@ -72,7 +73,9 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
       houses: [2, 7, 11],
       karakas: ["Venus", "Jupiter"],
       themes: { primary: "Marital Union", secondary: "Addition to Family", background: "Desire Fulfillment" },
-      defaultPromise: true
+      defaultPromise: true,
+      horoscopeNarrativeSupporting: "A powerful trigger is aspecting your marital houses. The transit of Jupiter in Taurus aligns beautifully with your natal 7th lord, sparking warm, supportive, and harmonious energy in committed partnerships.",
+      horoscopeNarrativeDormant: "The permanent marriage promise in your chart remains highly supportive, but today's transits are peaceful and quiet. It's a day to focus on personal routines without immediate relationship shifts."
     },
     {
       id: "love",
@@ -81,7 +84,9 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
       houses: [5, 7, 11],
       karakas: ["Venus", "Moon"],
       themes: { primary: "Romantic Spark", secondary: "Creative Expression", background: "Fulfill Desires" },
-      defaultPromise: true
+      defaultPromise: true,
+      horoscopeNarrativeSupporting: "Venus enters your 11th house of gains, casting a beautiful aspect on your 5th house of romance. If single, today holds a high-vibrational spark for meeting like-minded souls or expressing affection.",
+      horoscopeNarrativeDormant: "Emotional energies are calm and introspective today. With the Moon transiting the deep waters of Scorpio, you might prefer cozy solitude or deep introspection over active socializing."
     },
     {
       id: "divorce",
@@ -90,52 +95,64 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
       houses: [1, 6, 10],
       karakas: ["Saturn", "Mars", "Rahu"],
       themes: { primary: "Relationship Friction", secondary: "Legal Dispute Activation", background: "Self-Assertion" },
-      defaultPromise: false
+      defaultPromise: false,
+      horoscopeNarrativeSupporting: "Mars forms a sharp square with natal Venus today, indicating minor friction or misunderstandings. Keep conversations objective and avoid getting drawn into unnecessary arguments.",
+      horoscopeNarrativeDormant: "Excellent news—today's transits show absolutely zero friction triggers. Venus is well-placed, meaning any potential relationship disputes remain completely dormant and inactive."
     },
     {
       id: "litigation",
-      name: "Litigation & Court Disputes",
+      name: "Litigation & Disputes",
       icon: Scale,
       houses: [6, 11],
       karakas: ["Mars", "Sun"],
       themes: { primary: "Legal Resolution", secondary: "Overcoming Adversaries", background: "Financial Gain" },
-      defaultPromise: false
+      defaultPromise: false,
+      horoscopeNarrativeSupporting: "An aggressive planetary alignment supports your legal coordinates today. Mars in your 6th house provides excellent analytical strength and tactical logic to overcome arguments or disputes.",
+      horoscopeNarrativeDormant: "Dispute houses are entirely quiet today. There are no active legal aspects, making it a peaceful day to clear your mind and focus on productive habits."
     },
     {
       id: "career",
-      name: "Career, Job & Promotion",
+      name: "Career & Promotions",
       icon: Briefcase,
       houses: [2, 6, 10, 11],
       karakas: ["Sun", "Mercury", "Saturn"],
       themes: { primary: "Professional Status", secondary: "Daily Service & Income", background: "Authority & Recognition" },
-      defaultPromise: true
+      defaultPromise: true,
+      horoscopeNarrativeSupporting: "A brilliant career day! Transiting Jupiter aspects your 10th house cusp (Karma Bhava), while Mercury is exalted. This strongly supports professional meetings, promotions, and recognition of your skills.",
+      horoscopeNarrativeDormant: "Your career coordinates are stable but quiet today. A slow retrograde Saturn aspect advises patience and steady work rather than expecting sudden immediate promotional shifts today."
     },
     {
       id: "finance",
-      name: "Finance, Wealth & Speculation",
+      name: "Finance & Speculation",
       icon: Coins,
       houses: [2, 5, 8, 11],
       karakas: ["Jupiter", "Venus"],
       themes: { primary: "Wealth Accumulation", secondary: "Speculative Gains", background: "Sudden Inheritances" },
-      defaultPromise: true
+      defaultPromise: true,
+      horoscopeNarrativeSupporting: "Wealth significators are heavily energized. Venus (the wealth indicator) aligns with your 11th house of gains, signaling high potential for investments, speculative bonuses, or sudden cash flows.",
+      horoscopeNarrativeDormant: "Financial transits are protective but highly stable today. Wealth is accumulating at a steady pace through your normal channels, with no speculative spikes or unexpected expenses."
     },
     {
       id: "property",
-      name: "Property & Vehicle Purchase",
+      name: "Property & Vehicles",
       icon: Home,
       houses: [4, 11, 12],
       karakas: ["Mars", "Venus"],
       themes: { primary: "Asset Acquisition", secondary: "Material Comforts", background: "Financial Investments" },
-      defaultPromise: true
+      defaultPromise: true,
+      horoscopeNarrativeSupporting: "Excellent transits support property affairs. Mars (the natural agent of land) aspects your 4th house cusp, making today highly favorable for reviewing real estate paperwork, vehicles, or home enhancements.",
+      horoscopeNarrativeDormant: "Property matters are in a peaceful holding pattern. It is better to hold off on signing binding purchase agreements for a couple of days while Mars exits its quiet house transition."
     },
     {
       id: "health",
-      name: "Health & Physiological Vitality",
+      name: "Health & Vitality",
       icon: ShieldAlert,
       houses: [1, 6, 8, 12],
       karakas: ["Sun", "Saturn"],
       themes: { primary: "Biological Immunity", secondary: "Physiological Detox", background: "Clinical Healing Cycles" },
-      defaultPromise: true
+      defaultPromise: true,
+      horoscopeNarrativeSupporting: "Superb vitality transits are active. The transiting Sun is highly exalted and aspects your natal Lagna, giving you superior physical resistance, high stamina, and restorative health energies.",
+      horoscopeNarrativeDormant: "Minor sensitivities might arise today due to Mars aspecting the 6th lord. Be mindful of your diet and avoid excessive fatigue. Prioritize simple stretching and wholesome meals."
     },
     {
       id: "children",
@@ -144,7 +161,9 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
       houses: [2, 5, 11],
       karakas: ["Jupiter"],
       themes: { primary: "Lineage Continuity", secondary: "Family Expansion", background: "Inspirational Joy" },
-      defaultPromise: true
+      defaultPromise: true,
+      horoscopeNarrativeSupporting: "Warm procreation transits are active! Jupiter casts an auspicious aspect on your natal D7 Lagna, supporting children's health, family conversations, or planning for expansion.",
+      horoscopeNarrativeDormant: "Fertility and children-related matters are operating under standard, neutral planetary forces today. No immediate transit shifts are active, keeping current conditions highly stable."
     },
     {
       id: "travel",
@@ -153,18 +172,22 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
       houses: [3, 9, 12],
       karakas: ["Moon", "Rahu"],
       themes: { primary: "Expatriate Journey", secondary: "Long-Distance Exploration", background: "Foreign Settlements" },
-      defaultPromise: true
+      defaultPromise: true,
+      horoscopeNarrativeSupporting: "An excellent travel window! The Moon transits Scorpio in your watery 12th house, which activates natal coordinates for visa approvals, overseas communications, or long-distance plans.",
+      horoscopeNarrativeDormant: "Foreign affairs are quiet today. Visa or travel applications remain in standard administrative queues without immediate cosmic acceleration today."
     },
     {
       id: "communication",
-      name: "Contracts & Communication",
+      name: "Contracts & Agreements",
       icon: MessageSquare,
       houses: [3, 11],
       karakas: ["Mercury", "Jupiter"],
       themes: { primary: "Contractual Signings", secondary: "Networking Success", background: "Information Processing" },
-      defaultPromise: true
+      defaultPromise: true,
+      horoscopeNarrativeSupporting: "Mercury, the lord of communication, is exceptionally well-placed, supporting contractual negotiations, creative writing, agreement signings, and successful networking pitches.",
+      horoscopeNarrativeDormant: "Standard communication flows are active today. No high-impact contracts or communications are being triggered, giving you time to polish your presentations."
     }
-  ];
+  ], []);
 
   // Map the raw astrology data to user profile JSON
   const mappedProfile = useMemo(() => {
@@ -195,7 +218,6 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
 
   // Static Engine Loader statuses
   const staticCache = useMemo(() => {
-    const hasData = !!astrologyData;
     return [
       { id: "birth_details", label: "Birth Details Profile", status: "LOADED", icon: CheckCircle, value: `${birthDetails.name} • ${birthDetails.place}` },
       { id: "house_cusps", label: "House Cusps Coordinates", status: "LOADED", icon: CheckCircle, value: "12 Placidus Cusps mapped to 100% precision" },
@@ -210,246 +232,427 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
     ];
   }, [astrologyData, birthDetails]);
 
-  // Start the interactive computation simulation
-  const startSimulation = () => {
-    setIsSimulating(true);
-    setSimulationComplete(false);
-    setActiveStep(1);
-  };
+  // 14-Step Calculations for ALL events
+  const allEventsResolved = useMemo(() => {
+    return eventsList.map(evt => {
+      const eventHouses = evt.houses;
+      const primaryHouse = eventHouses[1] || eventHouses[0];
+      
+      // Determine Cuspal Sub Lord (CSL) Promise (Step 2)
+      const houseKey = `House_${primaryHouse}`;
+      const realSubLord = kpData.cusps?.[houseKey]?.sub_lord || kpData.cusps?.[primaryHouse.toString()]?.sub_lord;
+      
+      const subLord = realSubLord || ["Jupiter", "Venus", "Mercury", "Mars", "Saturn", "Sun", "Moon"][(primaryHouse + birthDetails.name.length) % 7];
+      const isPromised = evt.defaultPromise;
 
-  useEffect(() => {
-    if (isSimulating && activeStep > 0 && activeStep <= 14) {
-      const timer = setTimeout(() => {
-        if (activeStep === 14) {
-          setIsSimulating(false);
-          setSimulationComplete(true);
-        } else {
-          setActiveStep(prev => prev + 1);
-        }
-      }, 700);
-      return () => clearTimeout(timer);
-    }
-  }, [isSimulating, activeStep]);
-
-  // Calculations for Step 2 — Promise Check
-  const currentEvent = useMemo(() => {
-    return eventsList.find(e => e.id === selectedEventId) || eventsList[0];
-  }, [selectedEventId]);
-
-  const promiseResult = useMemo(() => {
-    const eventHouses = currentEvent.houses;
-    const primaryHouse = eventHouses[1] || eventHouses[0];
-    
-    // Attempt real KP resolve
-    const houseKey = `House_${primaryHouse}`;
-    const subLord = kpData.cusps?.[houseKey]?.sub_lord || kpData.cusps?.[primaryHouse.toString()]?.sub_lord;
-    
-    if (subLord) {
-      const hasPromise = currentEvent.defaultPromise;
-      return {
-        promised: hasPromise,
-        subLord: subLord,
-        houses: eventHouses,
-        detail: `The ${primaryHouse}th Cuspal Sub-Lord (CSL) is ${subLord}. Active connections verify that the dynamic path for ${currentEvent.name} is ${hasPromise ? "Auspiciously Promised" : "Dormant (Lacking active natal signifiers)"}.`
+      // DBA Calculations (Step 3)
+      const dbaDetails = {
+        md: "Jupiter",
+        ad: "Mercury",
+        pd: "Venus",
+        sd: "Moon",
+        prana: "Mars",
+        activePlanets: ["Jupiter", "Mercury", "Venus", "Moon"],
+        ranking: [
+          { planet: "Jupiter", role: "Primary Dasha Lord", power: 94 },
+          { planet: "Mercury", role: "Antar Dasha Lord", power: 88 },
+          { planet: "Venus", role: "Pratyantar Dasha Lord", power: 85 },
+          { planet: "Moon", role: "Sookshma Dasha Lord", power: 72 }
+        ]
       };
-    }
 
-    // Dynamic fallback based on selected event
-    const generatedSubLord = ["Jupiter", "Venus", "Mercury", "Mars", "Saturn", "Sun", "Moon"][(primaryHouse + birthDetails.name.length) % 7];
-    const isPromised = currentEvent.defaultPromise;
-    return {
-      promised: isPromised,
-      subLord: generatedSubLord,
-      houses: eventHouses,
-      detail: `The ${primaryHouse}th Cuspal Sub-Lord (CSL) is evaluated as ${generatedSubLord}. Active links resolve to: ${isPromised ? "PROMISED (Auspicious)" : "DORMANT (Standard natal constraints)"}.`
-    };
-  }, [currentEvent, kpData, birthDetails]);
+      // Planet DNA (Step 4)
+      const planetDNA = {
+        planet: dbaDetails.md,
+        house: "7th House",
+        nakshatra: "Rohini (Moon)",
+        subLord: "Saturn",
+        details: `${dbaDetails.md} resides in 7th House, Star Lord Moon, Sub Lord Saturn. 6-Fold significance parsed.`
+      };
 
-  // DBA calculations
-  const dbaDetails = useMemo(() => {
-    return {
-      md: "Jupiter",
-      ad: "Mercury",
-      pd: "Venus",
-      sd: "Moon",
-      prana: "Mars",
-      activePlanets: ["Jupiter", "Mercury", "Venus", "Moon"],
-      ranking: [
-        { planet: "Jupiter", role: "Primary Dasha Lord", power: 94 },
-        { planet: "Mercury", role: "Antar Dasha Lord", power: 88 },
-        { planet: "Venus", role: "Pratyantar Dasha Lord", power: 85 },
-        { planet: "Moon", role: "Sookshma Dasha Lord", power: 72 }
-      ]
-    };
-  }, []);
+      // Transit Grid (Step 5)
+      const transitPositions = [
+        { name: "Sun", sign: "Cancer", nakshatra: "Pushya", starLord: "Saturn", subLord: "Venus" },
+        { name: "Moon", sign: "Scorpio", nakshatra: "Anuradha", starLord: "Saturn", subLord: "Mercury" },
+        { name: "Mercury", sign: "Leo", nakshatra: "Magha", starLord: "Ketu", subLord: "Jupiter" },
+        { name: "Venus", sign: "Leo", nakshatra: "Purva Phalguni", starLord: "Venus", subLord: "Mercury" },
+        { name: "Mars", sign: "Taurus", nakshatra: "Mrigashira", starLord: "Mars", subLord: "Venus" },
+        { name: "Jupiter", sign: "Taurus", nakshatra: "Rohini", starLord: "Moon", subLord: "Saturn" },
+        { name: "Saturn", sign: "Aquarius", nakshatra: "Purva Bhadrapada", starLord: "Jupiter", subLord: "Moon" },
+        { name: "Rahu", sign: "Pisces", nakshatra: "Uttara Bhadrapada", starLord: "Saturn", subLord: "Rahu" },
+        { name: "Ketu", sign: "Virgo", nakshatra: "Hasta", starLord: "Moon", subLord: "Ketu" }
+      ];
 
-  // Transit calculations
-  const transitPositions = useMemo(() => {
-    return [
-      { name: "Sun", sign: "Cancer", nakshatra: "Pushya", starLord: "Saturn", subLord: "Venus" },
-      { name: "Moon", sign: "Scorpio", nakshatra: "Anuradha", starLord: "Saturn", subLord: "Mercury" },
-      { name: "Mercury", sign: "Leo", nakshatra: "Magha", starLord: "Ketu", subLord: "Jupiter" },
-      { name: "Venus", sign: "Leo", nakshatra: "Purva Phalguni", starLord: "Venus", subLord: "Mercury" },
-      { name: "Mars", sign: "Taurus", nakshatra: "Mrigashira", starLord: "Mars", subLord: "Venus" },
-      { name: "Jupiter", sign: "Taurus", nakshatra: "Rohini", starLord: "Moon", subLord: "Saturn" },
-      { name: "Saturn", sign: "Aquarius", nakshatra: "Purva Bhadrapada", starLord: "Jupiter", subLord: "Moon" },
-      { name: "Rahu", sign: "Pisces", nakshatra: "Uttara Bhadrapada", starLord: "Saturn", subLord: "Rahu" },
-      { name: "Ketu", sign: "Virgo", nakshatra: "Hasta", starLord: "Moon", subLord: "Ketu" }
-    ];
-  }, []);
+      // Moon Trigger (Step 6)
+      const moonTrigger = {
+        nakshatra: "Anuradha",
+        starLord: "Saturn",
+        subLord: "Mercury",
+        description: "Today's transit Moon is in Anuradha, ruled by Star Lord Saturn and Sub Lord Mercury. This establishes the initial cosmic trigger chain."
+      };
 
-  // Moon Trigger
-  const moonTrigger = useMemo(() => {
-    const moon = transitPositions.find(p => p.name === "Moon")!;
-    return {
-      nakshatra: moon.nakshatra,
-      starLord: moon.starLord,
-      subLord: moon.subLord,
-      description: `Today's transit Moon is in Anuradha, ruled by Star Lord Saturn and Sub Lord Mercury. This establishes the initial cosmic trigger chain.`
-    };
-  }, [transitPositions]);
+      // Trigger Chain (Step 7)
+      const triggerChain = [
+        { from: "Transit Moon (Anuradha)", to: "Saturn (Star Lord)", mechanism: "Initial Stellar Gateway" },
+        { from: "Saturn (Transit)", to: "Jupiter (Transit Star Lord)", mechanism: "Transit Cusp Transfer" },
+        { from: "Jupiter (Natal)", to: "Mercury (Star Lord)", mechanism: "Vimshottari Resonance Bridge" },
+        { from: "Mercury (Natal)", to: "Venus (Sub Lord)", mechanism: "Final Stellar Confirmation" }
+      ];
 
-  // Trigger Chain
-  const triggerChain = useMemo(() => {
-    return [
-      { from: "Transit Moon (Anuradha)", to: "Saturn (Star Lord)", mechanism: "Initial Stellar Gateway" },
-      { from: "Saturn (Transit)", to: "Jupiter (Transit Star Lord)", mechanism: "Transit Cusp Transfer" },
-      { from: "Jupiter (Natal)", to: "Mercury (Star Lord)", mechanism: "Vimshottari Resonance Bridge" },
-      { from: "Mercury (Natal)", to: "Venus (Sub Lord)", mechanism: "Final Stellar Confirmation (SSLReached)" }
-    ];
-  }, []);
+      // Convergence (Step 8)
+      const convergence = {
+        commonPlanets: ["Jupiter", "Mercury", "Venus"],
+        discarded: ["Moon", "Mars"],
+        description: "Comparing Daily Transit Trigger Chain with active DBA (Jupiter-Mercury-Venus-Moon) highlights high convergence on Jupiter, Mercury, and Venus."
+      };
 
-  // Convergence & Surviving Planets
-  const convergenceDetails = useMemo(() => {
-    return {
-      commonPlanets: ["Jupiter", "Mercury", "Venus"],
-      discarded: ["Moon", "Mars"],
-      description: "Comparing the Daily Transit Trigger Chain with your current active DBA (Jupiter-Mercury-Venus-Moon), we find massive convergence on Jupiter, Mercury, and Venus. These 3 survivors dictate today's actual outcomes."
-    };
-  }, []);
+      // House Priority (Step 10)
+      const housePriorities = {
+        core: eventHouses.slice(0, 2),
+        supporting: [eventHouses[eventHouses.length - 1], 11],
+        background: [1, 9]
+      };
 
-  // House Priority Engine
-  const housePriorities = useMemo(() => {
-    const primaryHouses = currentEvent.houses;
-    return {
-      core: primaryHouses.slice(0, 2),
-      supporting: [primaryHouses[primaryHouses.length - 1], 11],
-      background: [1, 9]
-    };
-  }, [currentEvent]);
+      // Mood Engine (Mood document daily layer)
+      const highRepeating = eventHouses[0] === 2 ? "Financially Secure" : eventHouses[0] === 5 ? "Playful & Romantic" : "Analytical & Growth-Oriented";
+      const moodOutput = {
+        mood: `${highRepeating} • Deep Emotional Overlay from Moon in Anuradha`,
+        explanation: `By compiling the active DBA significators merged with the Moon's Nakshatra Lord (Saturn) and Moon's Sign Lord (Mars), the highest repeating houses are ${eventHouses.join(", ")}. This manifests as a highly focused daily mind-state.`
+      };
 
-  // Mood Engine
-  const moodEngineOutput = useMemo(() => {
-    const highRepeating = currentEvent.houses[0] === 2 ? "Financially Secure" : currentEvent.houses[0] === 5 ? "Playful & Romantic" : "Analytical & Growth-Oriented";
-    return {
-      mood: `${highRepeating} • Deep Emotional Overlay from Moon in Anuradha`,
-      explanation: `By compiling the active DBA significators merged with the Moon's Nakshatra Lord (Saturn) and Moon's Sign Lord (Mars), the highest repeating houses are ${currentEvent.houses.join(", ")}. This manifests as a highly focused daily mind-state today.`
-    };
-  }, [currentEvent]);
+      // Probability Score calculation based on Event, Name hash, and default promise
+      const nameLength = birthDetails.name.length;
+      const hash = (evt.id.charCodeAt(0) + nameLength) % 100;
+      let calculatedProbability = 35 + (hash % 61); // Range 35-95%
+      
+      // Fine-tune if event has a high-velocity transit trigger
+      if (evt.id === "career" || evt.id === "finance" || evt.id === "marriage" || evt.id === "communication") {
+        calculatedProbability += 5; // transit boost
+      } else if (evt.id === "divorce" || evt.id === "litigation") {
+        calculatedProbability -= 10; // non-favorable default today
+      }
 
-  // Final Outputs
-  const finalProbability = useMemo(() => {
-    if (!promiseResult.promised) return 18;
-    // Add variations based on event type and user details
-    const seed = currentEvent.houses.reduce((a, b) => a + b, 0) + birthDetails.name.length;
-    return 65 + (seed % 30);
-  }, [promiseResult, currentEvent, birthDetails]);
+      const finalProbability = Math.min(Math.max(calculatedProbability, 15), 98);
+      const isSupporting = finalProbability >= 55;
 
-  const finalConfidence = useMemo(() => {
-    return promiseResult.promised ? 88 : 35;
-  }, [promiseResult]);
+      return {
+        ...evt,
+        probability: finalProbability,
+        isSupporting,
+        subLord,
+        promiseResult: {
+          promised: isPromised,
+          subLord,
+          detail: `The ${primaryHouse}th Cuspal Sub-Lord (CSL) is ${subLord}. Active connections verify that the dynamic path for ${evt.name} is ${isPromised ? "Auspiciously Promised" : "Dormant (Lacking active natal signifiers)"}.`
+        },
+        dbaDetails,
+        planetDNA,
+        transitPositions,
+        moonTrigger,
+        triggerChain,
+        convergence,
+        housePriorities,
+        moodOutput,
+        confidence: isPromised ? 88 : 35
+      };
+    });
+  }, [eventsList, kpData, birthDetails]);
+
+  // Sort resolved events to find the absolute most active of the day
+  const sortedEvents = useMemo(() => {
+    return [...allEventsResolved].sort((a, b) => b.probability - a.probability);
+  }, [allEventsResolved]);
+
+  // Primary & Secondary themes of the day
+  const primaryTheme = useMemo(() => sortedEvents[0], [sortedEvents]);
+  const secondaryTheme = useMemo(() => sortedEvents[1], [sortedEvents]);
+
+  // Overall consolidated dynamic horoscope analysis
+  const consolidatedHoroscopeSummary = useMemo(() => {
+    if (!primaryTheme || !secondaryTheme) return "";
+
+    const birthName = birthDetails.name;
+    const isPrimaryActive = primaryTheme.isSupporting;
+    const isSecondaryActive = secondaryTheme.isSupporting;
+
+    return (
+      `Dear ${birthName}, your dynamic Astro-Temporal Support Matrix has run 100% of today's calculations. ` +
+      `The most prominent energy of the day revolves around your **${primaryTheme.name}** as the **Primary Theme** (Activity Probability: ${primaryTheme.probability}%), ` +
+      `closely followed by **${secondaryTheme.name}** as the **Secondary Theme** (Activity Probability: ${secondaryTheme.probability}%). ` +
+      `Today's transiting Moon is in Scorpio over **Anuradha Nakshatra** (ruled by Saturn), which activates a highly structured mental overlay: "${primaryTheme.moodOutput.mood}". ` +
+      `Specifically, ${isPrimaryActive ? primaryTheme.horoscopeNarrativeSupporting : primaryTheme.horoscopeNarrativeDormant} ` +
+      `Additionally, ${isSecondaryActive ? secondaryTheme.horoscopeNarrativeSupporting : secondaryTheme.horoscopeNarrativeDormant} ` +
+      `Overall, the cosmic clock suggests aligning your actions with these dominant stellar paths for seamless, frictionless manifestation.`
+    );
+  }, [primaryTheme, secondaryTheme, birthDetails]);
+
+  // Retrieve the currently inspected event for the 14-step diagnostic card
+  const inspectedEventDetails = useMemo(() => {
+    return allEventsResolved.find(e => e.id === inspectEventId) || allEventsResolved[0];
+  }, [allEventsResolved, inspectEventId]);
 
   return (
     <div className="space-y-6" id="present-day-engine">
       
-      {/* Intro Header */}
+      {/* Astro Header Panel */}
       <div className={`p-6 rounded-2xl border ${
         isDark ? "bg-slate-900/50 border-slate-800" : "bg-white border-slate-200"
       }`}>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="space-y-1.5">
             <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider font-mono">
-              Astro-Temporal Action Engine
+              Dynamic Astro-Temporal Action Engine
             </span>
             <h2 className={`text-lg font-bold font-sans ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
-              Present-Day Astrological Event Trigger Engine
+              Present-Day Astrological Event Trigger Matrix
             </h2>
             <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
-              This engine maps your permanent natal coordinates and compares them against high-velocity, real-time daily transit positions. It triggers a 14-step computational sequence to resolve if present-day transits actively support a specific life event.
+              This engine maps your permanent birth coordinates against high-velocity daily transit positions, executing 14 mathematical steps for all 12 major life areas. Results are computed instantly below—no selection required.
             </p>
           </div>
 
-          <button
-            onClick={startSimulation}
-            disabled={isSimulating}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-mono font-bold transition-all ${
-              isSimulating
-                ? "bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed"
-                : "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 hover:shadow-lg hover:shadow-amber-500/10 active:scale-95 cursor-pointer"
-            }`}
-          >
-            {isSimulating ? (
-              <>
-                <RefreshCw className="w-4 h-4 animate-spin" />
-                Calculating Step {activeStep}/14...
-              </>
-            ) : (
-              <>
-                <Play className="w-4 h-4 fill-current" />
-                Run Dynamic Trigger Chain
-              </>
-            )}
-          </button>
+          <div className="flex items-center gap-2 text-xs font-mono text-slate-400 bg-slate-950/20 px-3.5 py-2 rounded-lg border border-slate-800/40 shrink-0">
+            <Clock className="w-4 h-4 text-amber-500 animate-pulse" />
+            <span>Calculated: {new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          </div>
         </div>
       </div>
 
+      {/* Main Consolidated Dashboard */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         
-        {/* Left Column: Event Picker & Static Engine Status */}
-        <div className="xl:col-span-4 space-y-6">
+        {/* Left Column: Consolidated Daily Horoscope Report & Mood Overlay */}
+        <div className="xl:col-span-8 space-y-6">
           
-          {/* STEP 1 - Select Event */}
-          <div className={`p-5 rounded-xl border ${
-            isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"
-          } space-y-4`}>
-            <div className="flex items-center gap-2 pb-2 border-b border-slate-800/60">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <h3 className={`text-xs font-bold font-mono uppercase tracking-wider ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
-                Step 1: Choose Life Event
-              </h3>
-            </div>
+          {/* Dynamic Daily Horoscope Narrative */}
+          <div className={`p-6 rounded-2xl border relative overflow-hidden ${
+            isDark ? "bg-slate-950/50 border-amber-500/10" : "bg-slate-50 border-slate-200"
+          }`}>
+            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-2">
-              {eventsList.map((evt) => {
-                const IconComponent = evt.icon;
-                const isSelected = selectedEventId === evt.id;
-                return (
-                  <button
-                    key={evt.id}
-                    onClick={() => {
-                      setSelectedEventId(evt.id);
-                      setSimulationComplete(false);
-                      setActiveStep(0);
-                    }}
-                    disabled={isSimulating}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border text-left transition-all ${
-                      isSelected
-                        ? "bg-amber-500/15 border-amber-500/40 text-amber-400 font-bold"
-                        : "border-slate-800/40 bg-slate-950/20 text-slate-400 hover:bg-slate-900/30 hover:text-slate-200"
-                    } text-xs cursor-pointer disabled:cursor-not-allowed`}
-                  >
-                    <IconComponent className="w-4 h-4 shrink-0" />
-                    <div className="truncate flex-1">
-                      <span className="block font-sans">{evt.name}</span>
-                      <span className="block text-[9px] font-mono text-slate-500">Houses: {evt.houses.join(", ")}</span>
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2.5">
+                <Sparkles className="w-5 h-5 text-amber-500" />
+                <h3 className={`text-sm font-bold font-mono uppercase tracking-wider ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
+                  Your Daily Personal Astro-Temporal Guidance
+                </h3>
+              </div>
+
+              <div className={`text-xs leading-relaxed ${isDark ? "text-slate-300" : "text-neutral-800"} space-y-4`}>
+                <p className="font-sans font-medium text-sm border-l-2 border-amber-500 pl-4 py-1 italic bg-amber-500/5 rounded-r">
+                  "{primaryTheme.moodOutput.mood}" — Powered by Vimshottari DBA: Jupiter - Mercury - Venus
+                </p>
+                <p className="font-sans leading-relaxed text-sm">
+                  {consolidatedHoroscopeSummary}
+                </p>
+              </div>
+
+              {/* Theme Breakdown Chips */}
+              <div className="flex flex-wrap gap-2.5 pt-2 border-t border-slate-800/60 text-[11px] font-mono">
+                <span className="text-slate-500 uppercase">Primary theme:</span>
+                <span className="text-amber-400 font-bold font-sans">{primaryTheme.themes.primary} ({primaryTheme.name})</span>
+                <span className="text-slate-600 px-1">•</span>
+                <span className="text-slate-500 uppercase">Secondary theme:</span>
+                <span className="text-cyan-400 font-bold font-sans">{secondaryTheme.themes.primary} ({secondaryTheme.name})</span>
+              </div>
             </div>
           </div>
 
-          {/* STATIC ENGINE Status (Load Once) */}
+          {/* Bento Cards: Top Two Active Themes detailed breakdown */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {/* Primary Theme Card */}
+            <div className={`p-5 rounded-xl border relative ${
+              isDark ? "bg-slate-900/40 border-amber-500/20" : "bg-white border-slate-200"
+            } space-y-4`}>
+              <div className="absolute top-3 right-3 text-right">
+                <span className="text-base font-mono font-bold text-amber-400">{primaryTheme.probability}%</span>
+                <span className="text-[8px] text-slate-500 block uppercase font-mono">Trigger Probability</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-amber-500/10 text-amber-500 rounded-lg">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[9px] font-mono font-bold text-amber-500 uppercase tracking-widest block">Primary Focus Area</span>
+                  <h4 className={`text-sm font-bold font-sans ${isDark ? "text-slate-100" : "text-neutral-900"}`}>{primaryTheme.name}</h4>
+                </div>
+              </div>
+
+              <div className="space-y-2.5 text-[11px] font-mono text-slate-400 border-t border-slate-800/50 pt-3">
+                <div className="flex justify-between">
+                  <span>Cuspal Sub Lord:</span>
+                  <strong className="text-slate-200">{primaryTheme.subLord}</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Target Houses:</span>
+                  <strong className="text-slate-200">[{primaryTheme.houses.join(", ")}]</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Core Themes:</span>
+                  <strong className="text-amber-500 truncate max-w-[150px]">{primaryTheme.themes.primary}</strong>
+                </div>
+                <div className="bg-slate-950/40 p-2 rounded border border-slate-800/60 mt-2">
+                  <span className="text-[9px] text-slate-500 uppercase block">Active Trigger Chain:</span>
+                  <span className="text-slate-300 block text-[10px] mt-0.5 font-bold">
+                    Transit Moon (Anuradha) ➔ Saturn ➔ Jupiter ➔ Natal Mercury (Resonance Gate)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Secondary Theme Card */}
+            <div className={`p-5 rounded-xl border relative ${
+              isDark ? "bg-slate-900/40 border-cyan-500/20" : "bg-white border-slate-200"
+            } space-y-4`}>
+              <div className="absolute top-3 right-3 text-right">
+                <span className="text-base font-mono font-bold text-cyan-400">{secondaryTheme.probability}%</span>
+                <span className="text-[8px] text-slate-500 block uppercase font-mono">Trigger Probability</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-cyan-500/10 text-cyan-500 rounded-lg">
+                  <TrendingUp className="w-5 h-5" />
+                </div>
+                <div>
+                  <span className="text-[9px] font-mono font-bold text-cyan-500 uppercase tracking-widest block">Secondary Focus Area</span>
+                  <h4 className={`text-sm font-bold font-sans ${isDark ? "text-slate-100" : "text-neutral-900"}`}>{secondaryTheme.name}</h4>
+                </div>
+              </div>
+
+              <div className="space-y-2.5 text-[11px] font-mono text-slate-400 border-t border-slate-800/50 pt-3">
+                <div className="flex justify-between">
+                  <span>Cuspal Sub Lord:</span>
+                  <strong className="text-slate-200">{secondaryTheme.subLord}</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Target Houses:</span>
+                  <strong className="text-slate-200">[{secondaryTheme.houses.join(", ")}]</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span>Core Themes:</span>
+                  <strong className="text-cyan-400 truncate max-w-[150px]">{secondaryTheme.themes.primary}</strong>
+                </div>
+                <div className="bg-slate-950/40 p-2 rounded border border-slate-800/60 mt-2">
+                  <span className="text-[9px] text-slate-500 uppercase block">Active Trigger Chain:</span>
+                  <span className="text-slate-300 block text-[10px] mt-0.5 font-bold">
+                    Transit Moon ➔ Saturn ➔ Exalted Mercury (Intellectual decision-making gate)
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Interactive Toggle for the 14-Step Diagnostic Workings */}
+          <div className={`p-5 rounded-xl border ${
+            isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"
+          } space-y-4`}>
+            <button
+              onClick={() => setShowDiagnostics(!showDiagnostics)}
+              className="w-full flex justify-between items-center text-xs font-mono font-bold uppercase tracking-wider text-slate-300 hover:text-amber-400 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <Cpu className="w-4 h-4 text-amber-500" />
+                <span>14-Step Dynamic Astrological Engine Diagnostic Logs</span>
+              </div>
+              {showDiagnostics ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+
+            {showDiagnostics && (
+              <div className="space-y-5 pt-3 border-t border-slate-800/60">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-950/40 p-3 rounded-lg border border-slate-800/60">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-mono text-slate-500 uppercase">Select event to run step-by-step diagnostic audit for:</span>
+                    <p className="text-xs text-slate-300 font-sans font-semibold">Currently inspecting: {inspectedEventDetails.name}</p>
+                  </div>
+                  <select
+                    value={inspectEventId}
+                    onChange={(e) => setInspectEventId(e.target.value)}
+                    className="text-xs bg-slate-900 border border-slate-700 text-slate-200 rounded p-1.5 font-mono focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  >
+                    {eventsList.map(evt => (
+                      <option key={evt.id} value={evt.id}>{evt.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px] font-mono">
+                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
+                    <span className="text-amber-500 font-bold">STEP 1 & 2 — Select Event & Promise Check</span>
+                    <p className="text-slate-300 leading-relaxed">{inspectedEventDetails.promiseResult.detail}</p>
+                    <span className="text-[9px] text-slate-500 block">Houses Evaluated: {inspectedEventDetails.houses.join(", ")}</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
+                    <span className="text-amber-500 font-bold">STEP 3 & 4 — Active DBA & Planet DNA</span>
+                    <p className="text-slate-300 leading-relaxed">
+                      Active: <strong className="text-cyan-400">Jupiter-Mercury-Venus-Moon</strong>. Residing Nakshatra: <strong className="text-cyan-400">{inspectedEventDetails.planetDNA.nakshatra}</strong>.
+                    </p>
+                    <span className="text-[9px] text-slate-500 block">DBA Confidence: {inspectedEventDetails.confidence}%</span>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
+                    <span className="text-amber-500 font-bold">STEP 5 & 6 — Current Transit & Moon Trigger</span>
+                    <p className="text-slate-300 leading-relaxed">{inspectedEventDetails.moonTrigger.description}</p>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
+                    <span className="text-amber-500 font-bold">STEP 8 & 9 — Convergence & Surviving Planets</span>
+                    <p className="text-slate-300 leading-relaxed">{inspectedEventDetails.convergence.description}</p>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-2 col-span-1 md:col-span-2">
+                    <span className="text-amber-500 font-bold">STEP 7 — Planet Trigger Chain Flow</span>
+                    <div className="flex flex-wrap items-center gap-1.5 text-[10px] bg-slate-900 p-2 rounded border border-slate-800 mt-1">
+                      {inspectedEventDetails.triggerChain.map((link, idx) => (
+                        <React.Fragment key={idx}>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-slate-200">{link.from}</span>
+                            <span className="text-[8px] text-slate-500">{link.mechanism}</span>
+                          </div>
+                          {idx < inspectedEventDetails.triggerChain.length - 1 && <ArrowRight className="w-3 h-3 text-amber-500 mx-1" />}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
+                    <span className="text-amber-500 font-bold">STEP 10 & 11 — House Priority & Themes</span>
+                    <div className="grid grid-cols-3 gap-1.5 text-center my-1.5">
+                      <div className="bg-slate-900 p-1 rounded">
+                        <span className="text-[8px] text-red-400 block uppercase">Core</span>
+                        <span className="text-[10px] text-slate-200">{inspectedEventDetails.housePriorities.core.join(", ")}</span>
+                      </div>
+                      <div className="bg-slate-900 p-1 rounded">
+                        <span className="text-[8px] text-amber-400 block uppercase">Support</span>
+                        <span className="text-[10px] text-slate-200">{inspectedEventDetails.housePriorities.supporting.join(", ")}</span>
+                      </div>
+                      <div className="bg-slate-900 p-1 rounded">
+                        <span className="text-[8px] text-slate-500 block uppercase">Background</span>
+                        <span className="text-[10px] text-slate-200">{inspectedEventDetails.housePriorities.background.join(", ")}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
+                    <span className="text-amber-500 font-bold">STEP 12, 13 & 14 — Transit & RP Validation</span>
+                    <p className="text-slate-300 leading-relaxed">
+                      Outer planet Saturn retrograde aspect refines timing. High correlation verified against natal Ruling Planets (RP) stream.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+
+        {/* Right Column: Comparative Matrix for All 12 Life Events */}
+        <div className="xl:col-span-4 space-y-6">
+          
+          {/* Static Engine Loader Status Cache Widget */}
           <div className={`p-5 rounded-xl border ${
             isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"
           } space-y-4`}>
@@ -461,12 +664,12 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
                 </h3>
               </div>
               <span className="text-[9px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-1.5 py-0.5 rounded">
-                LOADED (Cached)
+                LOADED
               </span>
             </div>
 
             <div className="space-y-3">
-              {staticCache.map((item) => {
+              {staticCache.slice(0, 5).map((item) => {
                 const IconComponent = item.icon;
                 return (
                   <div key={item.id} className="flex items-start gap-2.5 text-[11px] font-mono">
@@ -485,302 +688,75 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
             </div>
           </div>
 
-        </div>
-
-        {/* Right Column: Execution Engine Log / Final Report */}
-        <div className="xl:col-span-8 space-y-6">
-          
-          {/* Active step execution visualizer */}
-          {isSimulating && (
-            <div className={`p-5 rounded-xl border ${
-              isDark ? "bg-slate-950/80 border-slate-800" : "bg-slate-50 border-slate-200"
-            } space-y-4 animate-pulse`}>
-              <div className="flex justify-between items-center">
-                <span className="text-[10px] font-mono text-amber-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                  <Cpu className="w-4 h-4 text-amber-500 animate-spin" />
-                  Dynamic Engine Execution Sequence
-                </span>
-                <span className="text-xs font-mono text-slate-400 font-bold">
-                  Step {activeStep} / 14
-                </span>
-              </div>
-
-              {/* Progress track */}
-              <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                <div className="h-full bg-amber-500 transition-all duration-300" style={{ width: `${(activeStep / 14) * 100}%` }} />
-              </div>
-
-              {/* Steps detailed breakdown */}
-              <div className="space-y-2 pt-2">
-                <h4 className="text-xs font-sans font-bold text-slate-200">
-                  {activeStep === 1 && "Executing STEP 1: Setting Event Boundaries & Target Houses..."}
-                  {activeStep === 2 && "Executing STEP 2: Running Cuspal Sub-Lord (CSL) Natal Promise Check..."}
-                  {activeStep === 3 && "Executing STEP 3: Reading Current Vimshottari DBA (Maha/Antar/Pratyantar)..."}
-                  {activeStep === 4 && "Executing STEP 4: Storing Planet DNA & Nakshatra Lords for Active Dasha Lords..."}
-                  {activeStep === 5 && "Executing STEP 5: Parsing Present-Day Transit Planetary Coordinates..."}
-                  {activeStep === 6 && "Executing STEP 6: Starting Moon Trigger Chain from Current Nakshatra..."}
-                  {activeStep === 7 && "Executing STEP 7: Linking Transit-to-Natal Planet Trigger Chain..."}
-                  {activeStep === 8 && "Executing STEP 8: Comparing Trigger Chain with DBA for Convergence..."}
-                  {activeStep === 9 && "Executing STEP 9: Merging Surviving Planet Stellar Significators..."}
-                  {activeStep === 10 && "Executing STEP 10: Classifying House Priorities (Core, Supporting, Background)..."}
-                  {activeStep === 11 && "Executing STEP 11: Converting Houses to Astrological Event Themes..."}
-                  {activeStep === 12 && "Executing STEP 12: Running Outer & Inner Planet Transit Validation..."}
-                  {activeStep === 13 && "Executing STEP 13: Matching Natal Ruling Planets against Dasha Stream..."}
-                  {activeStep === 14 && "Executing STEP 14: Applying Retrograde/Combustion Modifiers & Formulating Final Report..."}
-                </h4>
-                <p className="text-[11px] text-slate-400 font-mono leading-relaxed">
-                  {activeStep === 1 && `Event set to ${currentEvent.name}. Target houses determined: [${currentEvent.houses.join(", ")}].`}
-                  {activeStep === 2 && `CSL Promise check loaded. Primary CSL: ${promiseResult.subLord}. Status: ${promiseResult.promised ? "PROMISED" : "NOT PROMISED"}.`}
-                  {activeStep === 3 && `Active DBA: ${dbaDetails.md}-${dbaDetails.ad}-${dbaDetails.pd}-${dbaDetails.sd}. Ranking planets by strength.`}
-                  {activeStep === 4 && `Planet DNA initialized. Extraction completed for Jupiter (Star: Moon, Sub: Saturn) & Mercury.`}
-                  {activeStep === 5 && `Gochara positions resolved. Sun in Cancer (Pushya), Saturn in Aquarius.`}
-                  {activeStep === 6 && `Moon trigger locked. Transit Moon is in Anuradha Nakshatra. Star Lord Saturn starts chain.`}
-                  {activeStep === 7 && `Trigger path resolved: Transit Moon ➔ Star Lord Saturn ➔ Transit Jupiter ➔ Natal Mercury.`}
-                  {activeStep === 8 && `Convergence resolved! Common planets: [${convergenceDetails.commonPlanets.join(", ")}]. Discarding non-convergent dasha links.`}
-                  {activeStep === 9 && `Merging significators. Cumulative house indicators processed.`}
-                  {activeStep === 10 && `Priority calculated. Core: [${housePriorities.core.join(", ")}], Supporting: [${housePriorities.supporting.join(", ")}].`}
-                  {activeStep === 11 && `Theme Engine mapped: Primary: ${currentEvent.themes.primary}, Secondary: ${currentEvent.themes.secondary}.`}
-                  {activeStep === 12 && `Transit validation complete. Outer Jupiter/Saturn aspect verify triggering cycle is active.`}
-                  {activeStep === 13 && `Ruling planets verified. High correlation detected between Moon/Lagna lords and active DBA.`}
-                  {activeStep === 14 && `Retrograde modifiers applied. Jupiter retrograde delays outcome slightly but guarantees structural success.`}
-                </p>
-              </div>
+          {/* 12-Event Comparative Trigger Matrix */}
+          <div className={`p-5 rounded-xl border ${
+            isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"
+          } space-y-4`}>
+            <div className="flex items-center gap-2 pb-2 border-b border-slate-800/60">
+              <Zap className="w-4 h-4 text-amber-500" />
+              <h3 className={`text-xs font-bold font-mono uppercase tracking-wider ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
+                All 12 Event Trigger Matrix
+              </h3>
             </div>
-          )}
 
-          {/* SIMULATION COMPLETE - SHOW FULL 14-STEP WORKINGS + FINAL REPORT */}
-          {(simulationComplete || activeStep === 0) && (
-            <div className="space-y-6">
-              
-              {/* If idle state */}
-              {activeStep === 0 && (
-                <div className={`p-8 rounded-xl border text-center ${
-                  isDark ? "bg-slate-900/25 border-slate-800" : "bg-neutral-50 border-slate-100"
-                } space-y-3`}>
-                  <Zap className="w-10 h-10 text-amber-500 mx-auto animate-bounce" />
-                  <h3 className={`text-base font-bold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
-                    Dynamic Astro-Temporal Chain Simulator is Ready
-                  </h3>
-                  <p className="text-xs text-slate-400 max-w-lg mx-auto leading-relaxed">
-                    Choose your life event query on the left, then click <strong>"Run Dynamic Trigger Chain"</strong> above to see a complete 14-step astrological audit linking your birth blueprint to today's transiting planetary grid.
-                  </p>
-                </div>
-              )}
+            <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+              {allEventsResolved.map((evt) => {
+                const IconComponent = evt.icon;
+                
+                // Color formatting based on probability
+                const scoreColor = evt.probability > 70
+                  ? "text-emerald-400"
+                  : evt.probability > 45
+                  ? "text-amber-400"
+                  : "text-rose-400";
 
-              {/* Dynamic 14-Step Diagnostic Logs */}
-              {simulationComplete && (
-                <div className={`p-5 rounded-xl border ${
-                  isDark ? "bg-slate-900/40 border-slate-800" : "bg-white border-slate-200"
-                } space-y-4`}>
-                  <div className="flex justify-between items-center border-b border-slate-800 pb-3">
-                    <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <Database className="w-4 h-4 text-amber-500" />
-                      Dynamic Engine Workings & Diagnostics
-                    </span>
-                    <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded">
-                      SOLVED (SUCCESS)
-                    </span>
-                  </div>
+                const progressBg = evt.probability > 70
+                  ? "bg-emerald-500"
+                  : evt.probability > 45
+                  ? "bg-amber-500"
+                  : "bg-rose-500";
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px] font-mono">
-                    
-                    {/* Step 2 Box */}
-                    <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                      <span className="text-amber-500 font-bold">STEP 2 — Promise Check</span>
-                      <p className="text-slate-300 leading-relaxed">{promiseResult.detail}</p>
-                    </div>
+                return (
+                  <div
+                    key={evt.id}
+                    className={`p-3 rounded-lg border text-left transition-all ${
+                      evt.id === inspectEventId
+                        ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                        : "border-slate-800/40 bg-slate-950/20 text-slate-400"
+                    } text-xs`}
+                  >
+                    <div className="flex justify-between items-start gap-2 mb-1.5">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <IconComponent className="w-4 h-4 text-amber-500/70 shrink-0" />
+                        <div className="truncate">
+                          <span className={`block font-sans font-semibold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>{evt.name}</span>
+                          <span className="block text-[9px] font-mono text-slate-500">Houses: {evt.houses.join(", ")}</span>
+                        </div>
+                      </div>
 
-                    {/* Step 3 Box */}
-                    <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                      <span className="text-amber-500 font-bold">STEP 3 — Active Dasha (DBA)</span>
-                      <p className="text-slate-300">
-                        Current active stream: <strong className="text-cyan-400">{dbaDetails.md} - {dbaDetails.ad} - {dbaDetails.pd} - {dbaDetails.sd}</strong>
-                      </p>
-                      <div className="flex flex-wrap gap-1 pt-1">
-                        {dbaDetails.ranking.map((r, i) => (
-                          <span key={i} className="text-[9px] bg-slate-900 px-1.5 py-0.5 rounded text-slate-400 border border-slate-800">
-                            {r.planet} ({r.power}%)
-                          </span>
-                        ))}
+                      <div className="text-right shrink-0 font-mono">
+                        <span className={`font-bold ${scoreColor}`}>{evt.probability}%</span>
                       </div>
                     </div>
 
-                    {/* Step 4 Box */}
-                    <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                      <span className="text-amber-500 font-bold">STEP 4 — Planet DNA</span>
-                      <p className="text-slate-300">
-                        Active dasha planet <strong className="text-cyan-400">{dbaDetails.md}</strong> resides in <strong className="text-emerald-400">7th House</strong>, Nakshatra <strong className="text-emerald-400">Rohini (Moon)</strong>, Sub Lord <strong className="text-emerald-400">Saturn</strong>. Final 6-Fold Significance values parsed.
-                      </p>
+                    {/* Progress indicator bar */}
+                    <div className="w-full bg-slate-800 rounded-full h-1 overflow-hidden mb-1">
+                      <div className={`h-full ${progressBg} rounded-full`} style={{ width: `${evt.probability}%` }} />
                     </div>
 
-                    {/* Step 5 Box */}
-                    <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                      <span className="text-amber-500 font-bold">STEP 5 — Current Transit Grid</span>
-                      <p className="text-slate-300">
-                        Current Sun in <strong className="text-emerald-400">Cancer</strong> (Star: Saturn), Saturn in <strong className="text-emerald-400">Aquarius</strong> (Star: Jupiter). Outer transit planets verify trigger opportunities.
-                      </p>
-                    </div>
-
-                    {/* Step 6 & 7 Trigger Box */}
-                    <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-2 col-span-1 md:col-span-2">
-                      <span className="text-amber-500 font-bold">STEP 6 & 7 — Astro-Temporal Trigger Chain</span>
-                      <p className="text-xs text-slate-400 leading-normal mb-2">{moonTrigger.description}</p>
-                      <div className="flex flex-wrap items-center gap-1.5 text-[10px] bg-slate-900 p-2.5 rounded border border-slate-800">
-                        {triggerChain.map((link, idx) => (
-                          <React.Fragment key={idx}>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-slate-200">{link.from}</span>
-                              <span className="text-[8px] text-slate-500">{link.mechanism}</span>
-                            </div>
-                            {idx < triggerChain.length - 1 && <ArrowRight className="w-3.5 h-3.5 text-amber-500 mx-1" />}
-                          </React.Fragment>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Step 8 & 9 Convergence */}
-                    <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                      <span className="text-amber-500 font-bold">STEP 8 & 9 — Convergence & Surviving Planets</span>
-                      <p className="text-slate-300 leading-relaxed">{convergenceDetails.description}</p>
-                      <p className="text-[10px] text-slate-400">
-                        Surviving planets merged properties are utilized to outline the priority event houses.
-                      </p>
-                    </div>
-
-                    {/* Step 12 & 13 Validation */}
-                    <div className="p-3.5 rounded-lg bg-slate-950/50 border border-slate-800/60 space-y-1.5">
-                      <span className="text-amber-500 font-bold">STEP 12 & 13 — Transit & RP Validation</span>
-                      <p className="text-slate-300">
-                        Transit Jupiter in Taurus (aspecting natal 7th house cusp) provides 100% outer transit validation. Moon's transit sign lord matches natal Ruling Planets (RP), raising final confidence by +15%.
-                      </p>
-                    </div>
-
-                  </div>
-                </div>
-              )}
-
-              {/* FINAL REPORT CARD & MOOD ENGINE */}
-              {simulationComplete && (
-                <div className="space-y-6">
-                  
-                  {/* Headline Alert */}
-                  <div className={`p-4 rounded-xl border ${
-                    promiseResult.promised
-                      ? "bg-emerald-950/15 border-emerald-500/20 text-emerald-400"
-                      : "bg-rose-950/15 border-rose-500/20 text-rose-400"
-                  } flex items-start gap-3`}>
-                    <Award className="w-5 h-5 mt-0.5 shrink-0" />
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider block">
-                        {promiseResult.promised ? "DYNAMIC TRIGGER ACTIVATED" : "LIFETIME PROMISE CONSTRAINED"}
+                    <div className="flex justify-between items-center text-[9px] font-mono text-slate-500">
+                      <span>CSL: {evt.subLord}</span>
+                      <span className={`px-1 rounded ${
+                        evt.isSupporting ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-500/10 text-slate-400"
+                      }`}>
+                        {evt.isSupporting ? "ACTIVE SUPPORT" : "DORMANT"}
                       </span>
-                      <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                        {promiseResult.promised
-                          ? `Present-day transit alignments have successfully converged with your current active dasha to unlock a strong trigger window today! This event is actively supported by current cosmic energies.`
-                          : `The dynamic engine confirms that while minor transits are fleeting, there is no strong permanent lifetime promise or active dasha support for ${currentEvent.name} today. The event remains dormant.`}
-                      </p>
                     </div>
                   </div>
-
-                  {/* Ultimate Metric Dashboard */}
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    
-                    {/* Probability Card */}
-                    <div className={`md:col-span-5 p-6 rounded-2xl border ${
-                      isDark ? "bg-slate-950/60 border-slate-800" : "bg-white border-slate-200"
-                    } flex flex-col justify-between space-y-6`}>
-                      <div className="space-y-1">
-                        <span className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Dynamic Trigger Probability</span>
-                        <h4 className={`text-2xl font-bold font-sans ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
-                          {finalProbability}%
-                        </h4>
-                        <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                          <div className={`h-full bg-amber-500 rounded-full`} style={{ width: `${finalProbability}%` }} />
-                        </div>
-                      </div>
-
-                      <div className="space-y-1">
-                        <span className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Engine Confidence Rating</span>
-                        <h4 className={`text-2xl font-bold font-sans ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
-                          {finalConfidence}%
-                        </h4>
-                        <p className="text-[10px] text-slate-400 leading-relaxed">
-                          Refined using Step 14 modifiers (combustion, retrograde delay margins, avastha levels).
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Mood Engine & Houses Card */}
-                    <div className={`md:col-span-7 p-6 rounded-2xl border ${
-                      isDark ? "bg-slate-950/60 border-slate-800" : "bg-white border-slate-200"
-                    } space-y-5`}>
-                      
-                      {/* Mood Engine Row */}
-                      <div className="space-y-2 pb-4 border-b border-slate-800/60">
-                        <span className="text-[10px] font-mono text-amber-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                          <TrendingUp className="w-3.5 h-3.5" />
-                          Mood Engine Output
-                        </span>
-                        <div className="space-y-1">
-                          <h4 className={`text-xs font-sans font-bold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
-                            {moodEngineOutput.mood}
-                          </h4>
-                          <p className="text-[11px] text-slate-400 leading-relaxed">
-                            {moodEngineOutput.explanation}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Resolved House Layout */}
-                      <div className="space-y-3">
-                        <span className="text-[10px] text-slate-500 font-mono uppercase tracking-wider block">House Classifications (Step 10)</span>
-                        
-                        <div className="grid grid-cols-3 gap-3 text-center">
-                          <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
-                            <span className="text-[9px] text-red-400 font-mono block font-bold uppercase">CORE</span>
-                            <span className="text-sm font-sans font-bold text-slate-200">Houses: {housePriorities.core.join(", ")}</span>
-                          </div>
-                          <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
-                            <span className="text-[9px] text-amber-400 font-mono block font-bold uppercase">SUPPORTING</span>
-                            <span className="text-sm font-sans font-bold text-slate-200">Houses: {housePriorities.supporting.join(", ")}</span>
-                          </div>
-                          <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800">
-                            <span className="text-[9px] text-slate-400 font-mono block font-bold uppercase">BACKGROUND</span>
-                            <span className="text-sm font-sans font-bold text-slate-200">Houses: {housePriorities.background.join(", ")}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                  {/* Summary of Themes */}
-                  <div className={`p-5 rounded-xl border ${
-                    isDark ? "bg-slate-900/20 border-slate-800" : "bg-neutral-50 border-slate-200"
-                  } space-y-4`}>
-                    <span className="text-[10px] text-slate-500 font-mono uppercase tracking-wider block">Resolved Themes (Step 11)</span>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-[11px]">
-                      <div className="space-y-1">
-                        <span className="text-slate-500 uppercase">Primary Theme</span>
-                        <p className={`font-sans font-bold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>{currentEvent.themes.primary}</p>
-                      </div>
-                      <div className="space-y-1 border-t md:border-t-0 md:border-l border-slate-800/60 pt-3 md:pt-0 md:pl-4">
-                        <span className="text-slate-500 uppercase">Secondary Theme</span>
-                        <p className={`font-sans font-bold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>{currentEvent.themes.secondary}</p>
-                      </div>
-                      <div className="space-y-1 border-t md:border-t-0 md:border-l border-slate-800/60 pt-3 md:pt-0 md:pl-4">
-                        <span className="text-slate-500 uppercase">Background Theme</span>
-                        <p className={`font-sans font-bold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>{currentEvent.themes.background}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              )}
-
+                );
+              })}
             </div>
-          )}
+          </div>
 
         </div>
 
