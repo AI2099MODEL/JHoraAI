@@ -13,6 +13,7 @@ import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelati
 import { generateRelationshipPDF } from "../lib/relationshipReportGenerator";
 import { MasterArchitectureView } from "./MasterArchitectureView";
 import { PresentDayEngineView } from "./PresentDayEngineView";
+import { EventEngineView } from "./EventEngineView";
 import RulesTerminal from "./RulesTerminal";
 import EventBookView from "./EventBookView";
 import AstroChart from "./AstroChart";
@@ -97,7 +98,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
   const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("present");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
-  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "rules" | "event_book" | "event_muhurta" | "current_events">("present_day");
+  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "rules" | "event_book" | "event_muhurta" | "current_events" | "engine">("present_day");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
   const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
@@ -1893,6 +1894,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             { id: "present_day", label: "Present Day Engine" },
             { id: "rules", label: "Astrological Rules" },
             { id: "event_book", label: "Event Book" },
+            { id: "engine", label: "Engine" },
             { id: "event_muhurta", label: "Event Muhurta Finder" },
             { id: "current_events", label: "Space Weather Alerts" }
           ].map((tab) => (
@@ -1997,6 +1999,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             {eventsSubTab === "event_book" && (
               <EventBookView
                 astrologyData={astrologyData}
+                isDark={isDark}
+              />
+            )}
+            {eventsSubTab === "engine" && (
+              <EventEngineView
                 isDark={isDark}
               />
             )}
