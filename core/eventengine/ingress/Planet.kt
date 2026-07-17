@@ -9,5 +9,9 @@ enum class Planet {
     VENUS,
     SATURN,
     RAHU,
-    KETU
+    KETU;
+
+    companion object {
+        val ALL = values()
+    }
 }
