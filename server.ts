@@ -302,41 +302,124 @@ app.post("/api/jhora/marriage-match", async (req, res) => {
   }
 });
 
-// Endpoint to run transit calculations (Gochara) using official JHora API
+// Endpoint to run transit calculations (Gochara) using 100% free uncalculated raw endpoints with JHora fallback
 app.post("/api/jhora/gochara", async (req, res) => {
   try {
     const { date, time, latitude, longitude, timezone, target_date } = req.body;
     const targetDate = target_date || date || "2026-07-15";
     const targetTime = time || "12:00:00";
+    const latNum = Number(latitude) || 28.6139;
+    const lonNum = Number(longitude) || 77.2090;
+    const tzNum = Number(timezone) || 5.5;
 
-    const response = await fetch(`${JHORA_API_URL}/horoscope`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        date: targetDate,
-        time: targetTime,
-        latitude: Number(latitude),
-        longitude: Number(longitude),
-        timezone: Number(timezone),
-        place: "Transit Location"
-      })
-    });
-    const data: any = await response.json();
-    
-    const rasi = data.horoscope?.divisional_charts?.["D-1_rasi"] || {};
-    const ascSign = rasi["Ascendant"]?.sign || "Aries";
-    const ascSignIdx = ZODIAC_SIGNS.indexOf(ascSign);
+    let planets: any[] = [];
+    let processedFromFreeApi = false;
 
-    const planets = Object.entries(rasi).map(([pName, pVal]: [string, any]) => {
-      const signIdx = ZODIAC_SIGNS.indexOf(pVal.sign);
-      return {
-        name: pName,
-        sign: pVal.sign,
-        degree: pVal.longitude,
-        house: (signIdx - ascSignIdx + 12) % 12 + 1,
-        longitude: signIdx * 30 + pVal.longitude
-      };
-    }).filter(p => p.name !== "Ascendant" && ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
+    // Try Primary Free Endpoint: Open Astrology API (Swiss Ephemeris Ports)
+    try {
+      const openAstrologyUrl = `https://openastrologyapi.com/planets?date=${targetDate}&time=${targetTime}&lat=${latNum}&lon=${lonNum}&tz=${tzNum}&ayanamsa=1`;
+      const response = await fetch(openAstrologyUrl, { signal: AbortSignal.timeout(4000) });
+      if (response.ok) {
+        const data: any = await response.json();
+        if (data && data.planets && Array.isArray(data.planets)) {
+          // Identify Ascendant to compute houses (1st cusp is the Ascendant)
+          const ascLong = data.houses?.[0]?.cusp_degree ?? data.planets.find((p: any) => p.name === "Ascendant" || p.name === "Lagna")?.longitude ?? 0;
+          const ascSignIdx = Math.floor(ascLong / 30) % 12;
+
+          // Programmatically filter out third-party aspects, combustion, dignity
+          // Keep only raw planetary name, sign, degree, house, longitude and speed
+          planets = data.planets
+            .map((p: any) => {
+              const signIdx = Math.floor(p.longitude / 30) % 12;
+              return {
+                name: p.name || p.planet || "Unknown",
+                sign: ZODIAC_SIGNS[signIdx],
+                degree: p.longitude % 30,
+                house: (signIdx - ascSignIdx + 12) % 12 + 1,
+                longitude: p.longitude,
+                speed: p.speed || 0
+              };
+            })
+            .filter((p: any) => ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
+
+          processedFromFreeApi = true;
+          console.log("[Level -1 Ingestion] Transit Gochara ingested successfully from Open Astrology API.");
+        }
+      }
+    } catch (err: any) {
+      console.warn("Primary free Open Astrology API failed, trying Syntral Project fallback...", err.message);
+    }
+
+    // Try Secondary Free Endpoint: Syntral Project (Swiss Ephemeris Web API)
+    if (!processedFromFreeApi) {
+      try {
+        const [yr, mo, dy] = targetDate.split("-");
+        const [hr, min] = targetTime.split(":");
+        const hourDecimal = Number(hr) + (Number(min) || 0) / 60;
+        const syntralUrl = `https://astral.syntral.co/positions?year=${yr}&month=${Number(mo)}&day=${Number(dy)}&hour=${hourDecimal}&system=placidus`;
+        const response = await fetch(syntralUrl, { signal: AbortSignal.timeout(4000) });
+        if (response.ok) {
+          const data: any = await response.json();
+          if (data && data.planets) {
+            const ascLong = data.houses?.cusps?.[0] || 0;
+            const ascSignIdx = Math.floor(ascLong / 30) % 12;
+
+            planets = Object.entries(data.planets)
+              .map(([pName, pVal]: [string, any]) => {
+                const nameFormatted = pName.charAt(0).toUpperCase() + pName.slice(1);
+                const long = pVal.longitude || 0;
+                const signIdx = Math.floor(long / 30) % 12;
+                return {
+                  name: nameFormatted,
+                  sign: ZODIAC_SIGNS[signIdx],
+                  degree: long % 30,
+                  house: (signIdx - ascSignIdx + 12) % 12 + 1,
+                  longitude: long,
+                  speed: pVal.speed || 0
+                };
+              })
+              .filter((p: any) => ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
+
+            processedFromFreeApi = true;
+            console.log("[Level -1 Ingestion] Transit Gochara ingested successfully from Syntral Project.");
+          }
+        }
+      } catch (err: any) {
+        console.warn("Secondary Syntral API failed.", err.message);
+      }
+    }
+
+    // Resilient Fallback: JHora Horoscope API
+    if (!processedFromFreeApi) {
+      console.info("[Ingress Fallback] Free APIs offline, falling back to JHora Transit Horoscope Proxy.");
+      const response = await fetch(`${JHORA_API_URL}/horoscope`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: targetDate,
+          time: targetTime,
+          latitude: latNum,
+          longitude: lonNum,
+          timezone: tzNum,
+          place: "Transit Location"
+        })
+      });
+      const data: any = await response.json();
+      const rasi = data.horoscope?.divisional_charts?.["D-1_rasi"] || {};
+      const ascSign = rasi["Ascendant"]?.sign || "Aries";
+      const ascSignIdx = ZODIAC_SIGNS.indexOf(ascSign);
+
+      planets = Object.entries(rasi).map(([pName, pVal]: [string, any]) => {
+        const signIdx = ZODIAC_SIGNS.indexOf(pVal.sign);
+        return {
+          name: pName,
+          sign: pVal.sign,
+          degree: pVal.longitude,
+          house: (signIdx - ascSignIdx + 12) % 12 + 1,
+          longitude: signIdx * 30 + pVal.longitude
+        };
+      }).filter(p => p.name !== "Ascendant" && ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
+    }
 
     res.json({
       date: targetDate,
