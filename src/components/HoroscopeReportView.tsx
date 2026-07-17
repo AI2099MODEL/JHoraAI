@@ -1834,6 +1834,16 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       {/* Tabs bar for Advanced, Profile */}
       <div className="border-b border-slate-800 flex gap-1 overflow-x-auto pb-px">
         <button
+          onClick={() => setMajorTab("advanced")}
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
+            majorTab === "advanced"
+              ? "border-amber-500 text-amber-500 font-extrabold bg-slate-900/20"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          Predictions
+        </button>
+        <button
           onClick={() => setMajorTab("present")}
           className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
             majorTab === "present"
@@ -1957,6 +1967,16 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
       {/* Main Container */}
       <div className="space-y-6">
+
+        {/* ================= PREDICTIONS WORKSPACE (RULEBOOK EVALUATION) ================= */}
+        {majorTab === "advanced" && (
+          <div className="space-y-6 animate-fade-in">
+            <MasterArchitectureView
+              astrologyData={astrologyData}
+              isDark={isDark}
+            />
+          </div>
+        )}
 
         {/* ================= EVENTS DYNAMIC WORKSPACE ================= */}
         {majorTab === "present" && (
