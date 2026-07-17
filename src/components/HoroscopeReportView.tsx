@@ -343,6 +343,209 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     }
   }, [activeUser, astrologyData, mapAstrologyDataToUserProfileJSON]);
 
+  // Safe Fallback structures in case transitAstroData is loading/unavailable
+  const activePanchanga = useMemo(() => {
+    if (transitAstroData?.panchanga) {
+      return {
+        tithi: transitAstroData.panchanga.tithi || { name: "Sukla Ekadashi", paksha: "Sukla", lord: "Sun" },
+        vara: transitAstroData.panchanga.vara || { name: "Friday", lord: "Venus" },
+        nakshatra: transitAstroData.panchanga.nakshatra || { name: "Ardra", lord: "Rahu" },
+        yoga: transitAstroData.panchanga.yoga || { name: "Preeti", lord: "Mercury" },
+        karana: transitAstroData.panchanga.karana || { name: "Bava", lord: "Sun" },
+        sunrise: transitAstroData.panchanga.sunrise || "05:42 AM",
+        sunset: transitAstroData.panchanga.sunset || "06:55 PM",
+      };
+    }
+    return {
+      tithi: { name: currentSkyJson.panchanga.tithi.name, paksha: currentSkyJson.panchanga.tithi.paksha, lord: "Sun" },
+      vara: { name: currentSkyJson.panchanga.vara.name, lord: currentSkyJson.panchanga.vara.lord },
+      nakshatra: { name: currentSkyJson.panchanga.nakshatra.name, lord: currentSkyJson.panchanga.nakshatra.lord },
+      yoga: { name: currentSkyJson.panchanga.yoga.name, lord: currentSkyJson.panchanga.yoga.lord },
+      karana: { name: currentSkyJson.panchanga.karana.name, lord: currentSkyJson.panchanga.karana.lord },
+      sunrise: currentSkyJson.panchanga.sunrise,
+      sunset: currentSkyJson.panchanga.sunset,
+    };
+  }, [transitAstroData]);
+
+  const activeWindows = useMemo(() => {
+    return [
+      { name: "Abhijit Muhurta", time: `${computedMuhurtas.abhijit.start} - ${computedMuhurtas.abhijit.end}`, status: "Highly Auspicious", score: 5, color: "border-amber-500/20 bg-amber-500/5 text-amber-400" },
+      { name: "Rahu Kalam", time: `${computedMuhurtas.rahuKalam.start} - ${computedMuhurtas.rahuKalam.end}`, status: "Inauspicious - Avoid", score: 1, color: "border-rose-500/20 bg-rose-500/5 text-rose-400" },
+      { name: "Yamaganda", time: `${computedMuhurtas.yamaganda.start} - ${computedMuhurtas.yamaganda.end}`, status: "Inauspicious", score: 2, color: "border-red-500/20 bg-red-500/5 text-red-400" },
+      { name: "Gulika Kalam", time: `${computedMuhurtas.gulika.start} - ${computedMuhurtas.gulika.end}`, status: "Obstacles - Delay", score: 2, color: "border-orange-500/20 bg-orange-500/5 text-orange-400" }
+    ];
+  }, [computedMuhurtas]);
+
+  const dynamicEventOpportunity = useMemo(() => {
+    const nak = activePanchanga.nakshatra.name.toLowerCase();
+    
+    const marriageActive = ["rohini", "anuradha", "revati", "mrigashira", "hasta", "swati", "uttara phalguni", "uttara ashadha", "uttara bhadrapada"].some(n => nak.includes(n));
+    const businessActive = ["pushya", "shravana", "hasta", "chitra", "swati", "revati", "aswini", "punarvasu"].some(n => nak.includes(n));
+    const investmentActive = ["rohini", "uttara phalguni", "uttara ashadha", "uttara bhadrapada", "shravana", "dhanishta", "shatabhisha"].some(n => nak.includes(n));
+    const learningActive = ["hasta", "pushya", "mrigashira", "chitra", "anuradha", "revati", "aswini"].some(n => nak.includes(n));
+    const careerActive = ["krittika", "uttara phalguni", "uttara ashadha", "rohini", "pushya", "magha"].some(n => nak.includes(n));
+    const travelActive = ["aswini", "punarvasu", "pushya", "hasta", "anuradha", "mula", "shravana", "revati"].some(n => nak.includes(n));
+
+    return {
+      marriageWindow: {
+        active: marriageActive,
+        timeframe: marriageActive ? `Peak auspicious wedding muhurta today under ${activePanchanga.nakshatra.name}` : "Plan for next favorable Nakshatra cycle"
+      },
+      businessOpportunity: {
+        active: businessActive,
+        timeframe: businessActive ? `Auspicious commerce yoga under ${activePanchanga.nakshatra.name}` : "Avoid launching ventures under current constellation"
+      },
+      investmentOpportunity: {
+        active: investmentActive,
+        timeframe: investmentActive ? "Favorable wealth accumulation transit" : "Defer critical asset settlements temporarily"
+      },
+      learningOpportunity: {
+        active: learningActive,
+        timeframe: learningActive ? "Peak concentration and enrollment window" : "Auspicious for reviews, defer registration"
+      },
+      careerOpportunity: {
+        active: careerActive,
+        timeframe: careerActive ? "Excellent authority alignment, initiate leap" : "Perform internal consolidation, defer proposal"
+      },
+      travelOpportunity: {
+        active: travelActive,
+        timeframe: travelActive ? "Auspicious physical transit; low hazard" : "Consolidate locally, protect health parameters"
+      }
+    };
+  }, [activePanchanga]);
+
+  const dynamicEnergy = useMemo(() => {
+    if (!transitAstroData?.planets) {
+      return {
+        overall: { score: currentSkyJson.currentEnergy.overallEnergy.score, tone: currentSkyJson.currentEnergy.overallEnergy.tone },
+        mental: { score: currentSkyJson.currentEnergy.mentalEnergy.score, tone: currentSkyJson.currentEnergy.mentalEnergy.tone },
+        physical: { score: currentSkyJson.currentEnergy.physicalEnergy.score, tone: currentSkyJson.currentEnergy.physicalEnergy.tone },
+        relationship: { score: currentSkyJson.currentEnergy.relationshipEnergy.score, tone: currentSkyJson.currentEnergy.relationshipEnergy.tone },
+        career: { score: currentSkyJson.currentEnergy.careerEnergy.score, tone: currentSkyJson.currentEnergy.careerEnergy.tone },
+        financial: { score: currentSkyJson.currentEnergy.financialEnergy.score, tone: currentSkyJson.currentEnergy.financialEnergy.tone },
+        spiritual: { score: currentSkyJson.currentEnergy.spiritualEnergy.score, tone: currentSkyJson.currentEnergy.spiritualEnergy.tone }
+      };
+    }
+
+    const findPlanetHouse = (name: string): number => {
+      const p = transitAstroData.planets.find((pl: any) => pl.name === name);
+      return p ? Number(p.house) || 1 : 1;
+    };
+
+    const sunHouse = findPlanetHouse("Sun");
+    const mercHouse = findPlanetHouse("Mercury");
+    const marsHouse = findPlanetHouse("Mars");
+    const venHouse = findPlanetHouse("Venus");
+    const jupHouse = findPlanetHouse("Jupiter");
+    const satHouse = findPlanetHouse("Saturn");
+    const moonHouse = findPlanetHouse("Moon");
+
+    let overallVal = 6.5;
+    if ([1, 3, 6, 10, 11].includes(sunHouse)) overallVal += 2.0;
+    if ([8, 12].includes(sunHouse)) overallVal -= 1.5;
+
+    let mentalVal = 6.0;
+    if ([1, 4, 5, 10, 11].includes(mercHouse)) mentalVal += 2.5;
+    if ([6, 8, 12].includes(mercHouse)) mentalVal -= 1.0;
+
+    let physicalVal = 5.5;
+    if ([3, 6, 10, 11].includes(marsHouse)) physicalVal += 3.0;
+    if ([8, 12].includes(marsHouse)) physicalVal -= 1.5;
+
+    let relationshipVal = 6.5;
+    if ([1, 4, 5, 7, 9, 11].includes(venHouse)) relationshipVal += 2.0;
+    if ([6, 8, 12].includes(venHouse)) relationshipVal -= 1.5;
+
+    let careerVal = 7.0;
+    if ([1, 5, 9, 10, 11].includes(jupHouse)) careerVal += 1.5;
+    if ([3, 6, 10, 11].includes(satHouse)) careerVal += 1.0;
+
+    let financialVal = 6.0;
+    if ([2, 5, 9, 11, 1].includes(moonHouse)) financialVal += 2.5;
+    if ([6, 8, 12].includes(moonHouse)) financialVal -= 1.5;
+
+    let spiritualVal = 7.0;
+    if ([5, 8, 9, 12].includes(moonHouse)) spiritualVal += 1.5;
+
+    const clamp = (val: number) => Math.max(1, Math.min(10, val));
+    const getTone = (val: number) => {
+      if (val >= 8.5) return "Peak Ascent";
+      if (val >= 7.2) return "Strong / Robust";
+      if (val >= 5.5) return "Balanced";
+      return "Subdued / Vulnerable";
+    };
+
+    return {
+      overall: { score: clamp(overallVal) / 10, tone: getTone(overallVal) },
+      mental: { score: clamp(mentalVal) / 10, tone: getTone(mentalVal) },
+      physical: { score: clamp(physicalVal) / 10, tone: getTone(physicalVal) },
+      relationship: { score: clamp(relationshipVal) / 10, tone: getTone(relationshipVal) },
+      career: { score: clamp(careerVal) / 10, tone: getTone(careerVal) },
+      financial: { score: clamp(financialVal) / 10, tone: getTone(financialVal) },
+      spiritual: { score: clamp(spiritualVal) / 10, tone: getTone(spiritualVal) }
+    };
+  }, [transitAstroData]);
+
+  const dynamicMood = useMemo(() => {
+    if (!transitAstroData?.planets) {
+      return {
+        dominantHouses: [{ houseNumber: 4, significance: "Domestic Harmony & Spiritual Peace" }],
+        dominantPlanets: [{ planet: "Jupiter", strength: "9.2/10", influenceType: "Wisdom Expansion & Good Fortune" }]
+      };
+    }
+
+    const houseCounts: { [key: number]: number } = {};
+    transitAstroData.planets.forEach((p: any) => {
+      const h = Number(p.house) || 1;
+      houseCounts[h] = (houseCounts[h] || 0) + 1;
+    });
+
+    let maxHouse = 1;
+    let maxCount = 0;
+    Object.keys(houseCounts).forEach((hKey) => {
+      const h = Number(hKey);
+      if (houseCounts[h] > maxCount) {
+        maxCount = houseCounts[h];
+        maxHouse = h;
+      }
+    });
+
+    const houseSignificances: { [key: number]: string } = {
+      1: "Self-expression, Vitality & Physical Horizon",
+      2: "Wealth consolidation, Family and Speech clarity",
+      3: "Courage, short journeys and communication focus",
+      4: "Domestic peace, emotional sanctuary & self-care",
+      5: "Creative intelligence, children & speculation",
+      6: "Health checkups, routine work & discipline",
+      7: "Relationships, negotiations & partnerships",
+      8: "Transformation, joint finances & mysticism",
+      9: "Higher wisdom, long journeys & philosophy",
+      10: "Career authority, leadership & status rise",
+      11: "Gains, friendships, goals and financial network",
+      12: "Subconscious reflections, sleep & spiritual release"
+    };
+
+    const dominantPlanetsList = transitAstroData.planets.map((p: any) => {
+      const exaltationPoints: { [key: string]: string } = {
+        Sun: "Aries", Moon: "Taurus", Mars: "Capricorn", Mercury: "Virgo",
+        Jupiter: "Cancer", Venus: "Pisces", Saturn: "Libra"
+      };
+      let strength = 7.5;
+      if (p.sign === exaltationPoints[p.name]) strength += 2.0;
+      if (p.name === "Jupiter" || p.name === "Venus") strength += 0.5;
+      return {
+        planet: p.name,
+        strength: `${strength.toFixed(1)}/10`,
+        influenceType: p.name === "Sun" ? "Vitality & Focus" : p.name === "Moon" ? "Emotional Balance" : p.name === "Mercury" ? "Intellectual Clarity" : p.name === "Venus" ? "Aesthetic & Harmony" : p.name === "Jupiter" ? "Fortune & Philosophy" : p.name === "Saturn" ? "Discipline & Patience" : "Intense Insights"
+      };
+    }).sort((a: any, b: any) => parseFloat(b.strength) - parseFloat(a.strength));
+
+    return {
+      dominantHouses: [{ houseNumber: maxHouse, significance: houseSignificances[maxHouse] || "Cosmic consolidation" }],
+      dominantPlanets: [dominantPlanetsList[0] || { planet: "Jupiter", strength: "8.5/10", influenceType: "Expansion & Philosophy" }]
+    };
+  }, [transitAstroData]);
+
   // Fallbacks from raw astrologyData (safe destructuring fallback if data is null)
   const { 
     birthDetails = {}, 
@@ -1198,208 +1401,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     }
   };
 
-  // Safe Fallback structures in case transitAstroData is loading/unavailable
-  const activePanchanga = useMemo(() => {
-    if (transitAstroData?.panchanga) {
-      return {
-        tithi: transitAstroData.panchanga.tithi || { name: "Sukla Ekadashi", paksha: "Sukla", lord: "Sun" },
-        vara: transitAstroData.panchanga.vara || { name: "Friday", lord: "Venus" },
-        nakshatra: transitAstroData.panchanga.nakshatra || { name: "Ardra", lord: "Rahu" },
-        yoga: transitAstroData.panchanga.yoga || { name: "Preeti", lord: "Mercury" },
-        karana: transitAstroData.panchanga.karana || { name: "Bava", lord: "Sun" },
-        sunrise: transitAstroData.panchanga.sunrise || "05:42 AM",
-        sunset: transitAstroData.panchanga.sunset || "06:55 PM",
-      };
-    }
-    return {
-      tithi: { name: currentSkyJson.panchanga.tithi.name, paksha: currentSkyJson.panchanga.tithi.paksha, lord: "Sun" },
-      vara: { name: currentSkyJson.panchanga.vara.name, lord: currentSkyJson.panchanga.vara.lord },
-      nakshatra: { name: currentSkyJson.panchanga.nakshatra.name, lord: currentSkyJson.panchanga.nakshatra.lord },
-      yoga: { name: currentSkyJson.panchanga.yoga.name, lord: currentSkyJson.panchanga.yoga.lord },
-      karana: { name: currentSkyJson.panchanga.karana.name, lord: currentSkyJson.panchanga.karana.lord },
-      sunrise: currentSkyJson.panchanga.sunrise,
-      sunset: currentSkyJson.panchanga.sunset,
-    };
-  }, [transitAstroData]);
 
-  const activeWindows = useMemo(() => {
-    return [
-      { name: "Abhijit Muhurta", time: `${computedMuhurtas.abhijit.start} - ${computedMuhurtas.abhijit.end}`, status: "Highly Auspicious", score: 5, color: "border-amber-500/20 bg-amber-500/5 text-amber-400" },
-      { name: "Rahu Kalam", time: `${computedMuhurtas.rahuKalam.start} - ${computedMuhurtas.rahuKalam.end}`, status: "Inauspicious - Avoid", score: 1, color: "border-rose-500/20 bg-rose-500/5 text-rose-400" },
-      { name: "Yamaganda", time: `${computedMuhurtas.yamaganda.start} - ${computedMuhurtas.yamaganda.end}`, status: "Inauspicious", score: 2, color: "border-red-500/20 bg-red-500/5 text-red-400" },
-      { name: "Gulika Kalam", time: `${computedMuhurtas.gulika.start} - ${computedMuhurtas.gulika.end}`, status: "Obstacles - Delay", score: 2, color: "border-orange-500/20 bg-orange-500/5 text-orange-400" }
-    ];
-  }, [computedMuhurtas]);
-
-  const dynamicEventOpportunity = useMemo(() => {
-    const nak = activePanchanga.nakshatra.name.toLowerCase();
-    
-    const marriageActive = ["rohini", "anuradha", "revati", "mrigashira", "hasta", "swati", "uttara phalguni", "uttara ashadha", "uttara bhadrapada"].some(n => nak.includes(n));
-    const businessActive = ["pushya", "shravana", "hasta", "chitra", "swati", "revati", "aswini", "punarvasu"].some(n => nak.includes(n));
-    const investmentActive = ["rohini", "uttara phalguni", "uttara ashadha", "uttara bhadrapada", "shravana", "dhanishta", "shatabhisha"].some(n => nak.includes(n));
-    const learningActive = ["hasta", "pushya", "mrigashira", "chitra", "anuradha", "revati", "aswini"].some(n => nak.includes(n));
-    const careerActive = ["krittika", "uttara phalguni", "uttara ashadha", "rohini", "pushya", "magha"].some(n => nak.includes(n));
-    const travelActive = ["aswini", "punarvasu", "pushya", "hasta", "anuradha", "mula", "shravana", "revati"].some(n => nak.includes(n));
-
-    return {
-      marriageWindow: {
-        active: marriageActive,
-        timeframe: marriageActive ? `Peak auspicious wedding muhurta today under ${activePanchanga.nakshatra.name}` : "Plan for next favorable Nakshatra cycle"
-      },
-      businessOpportunity: {
-        active: businessActive,
-        timeframe: businessActive ? `Auspicious commerce yoga under ${activePanchanga.nakshatra.name}` : "Avoid launching ventures under current constellation"
-      },
-      investmentOpportunity: {
-        active: investmentActive,
-        timeframe: investmentActive ? "Favorable wealth accumulation transit" : "Defer critical asset settlements temporarily"
-      },
-      learningOpportunity: {
-        active: learningActive,
-        timeframe: learningActive ? "Peak concentration and enrollment window" : "Auspicious for reviews, defer registration"
-      },
-      careerOpportunity: {
-        active: careerActive,
-        timeframe: careerActive ? "Excellent authority alignment, initiate leap" : "Perform internal consolidation, defer proposal"
-      },
-      travelOpportunity: {
-        active: travelActive,
-        timeframe: travelActive ? "Auspicious physical transit; low hazard" : "Consolidate locally, protect health parameters"
-      }
-    };
-  }, [activePanchanga]);
-
-  const dynamicEnergy = useMemo(() => {
-    if (!transitAstroData?.planets) {
-      return {
-        overall: { score: currentSkyJson.currentEnergy.overallEnergy.score, tone: currentSkyJson.currentEnergy.overallEnergy.tone },
-        mental: { score: currentSkyJson.currentEnergy.mentalEnergy.score, tone: currentSkyJson.currentEnergy.mentalEnergy.tone },
-        physical: { score: currentSkyJson.currentEnergy.physicalEnergy.score, tone: currentSkyJson.currentEnergy.physicalEnergy.tone },
-        relationship: { score: currentSkyJson.currentEnergy.relationshipEnergy.score, tone: currentSkyJson.currentEnergy.relationshipEnergy.tone },
-        career: { score: currentSkyJson.currentEnergy.careerEnergy.score, tone: currentSkyJson.currentEnergy.careerEnergy.tone },
-        financial: { score: currentSkyJson.currentEnergy.financialEnergy.score, tone: currentSkyJson.currentEnergy.financialEnergy.tone },
-        spiritual: { score: currentSkyJson.currentEnergy.spiritualEnergy.score, tone: currentSkyJson.currentEnergy.spiritualEnergy.tone }
-      };
-    }
-
-    const findPlanetHouse = (name: string): number => {
-      const p = transitAstroData.planets.find((pl: any) => pl.name === name);
-      return p ? Number(p.house) || 1 : 1;
-    };
-
-    const sunHouse = findPlanetHouse("Sun");
-    const mercHouse = findPlanetHouse("Mercury");
-    const marsHouse = findPlanetHouse("Mars");
-    const venHouse = findPlanetHouse("Venus");
-    const jupHouse = findPlanetHouse("Jupiter");
-    const satHouse = findPlanetHouse("Saturn");
-    const moonHouse = findPlanetHouse("Moon");
-
-    let overallVal = 6.5;
-    if ([1, 3, 6, 10, 11].includes(sunHouse)) overallVal += 2.0;
-    if ([8, 12].includes(sunHouse)) overallVal -= 1.5;
-
-    let mentalVal = 6.0;
-    if ([1, 4, 5, 10, 11].includes(mercHouse)) mentalVal += 2.5;
-    if ([6, 8, 12].includes(mercHouse)) mentalVal -= 1.0;
-
-    let physicalVal = 5.5;
-    if ([3, 6, 10, 11].includes(marsHouse)) physicalVal += 3.0;
-    if ([8, 12].includes(marsHouse)) physicalVal -= 1.5;
-
-    let relationshipVal = 6.5;
-    if ([1, 4, 5, 7, 9, 11].includes(venHouse)) relationshipVal += 2.0;
-    if ([6, 8, 12].includes(venHouse)) relationshipVal -= 1.5;
-
-    let careerVal = 7.0;
-    if ([1, 5, 9, 10, 11].includes(jupHouse)) careerVal += 1.5;
-    if ([3, 6, 10, 11].includes(satHouse)) careerVal += 1.0;
-
-    let financialVal = 6.0;
-    if ([2, 5, 9, 11, 1].includes(moonHouse)) financialVal += 2.5;
-    if ([6, 8, 12].includes(moonHouse)) financialVal -= 1.5;
-
-    let spiritualVal = 7.0;
-    if ([5, 8, 9, 12].includes(moonHouse)) spiritualVal += 1.5;
-
-    const clamp = (val: number) => Math.max(1, Math.min(10, val));
-    const getTone = (val: number) => {
-      if (val >= 8.5) return "Peak Ascent";
-      if (val >= 7.2) return "Strong / Robust";
-      if (val >= 5.5) return "Balanced";
-      return "Subdued / Vulnerable";
-    };
-
-    return {
-      overall: { score: clamp(overallVal) / 10, tone: getTone(overallVal) },
-      mental: { score: clamp(mentalVal) / 10, tone: getTone(mentalVal) },
-      physical: { score: clamp(physicalVal) / 10, tone: getTone(physicalVal) },
-      relationship: { score: clamp(relationshipVal) / 10, tone: getTone(relationshipVal) },
-      career: { score: clamp(careerVal) / 10, tone: getTone(careerVal) },
-      financial: { score: clamp(financialVal) / 10, tone: getTone(financialVal) },
-      spiritual: { score: clamp(spiritualVal) / 10, tone: getTone(spiritualVal) }
-    };
-  }, [transitAstroData]);
-
-  const dynamicMood = useMemo(() => {
-    if (!transitAstroData?.planets) {
-      return {
-        dominantHouses: [{ houseNumber: 4, significance: "Domestic Harmony & Spiritual Peace" }],
-        dominantPlanets: [{ planet: "Jupiter", strength: "9.2/10", influenceType: "Wisdom Expansion & Good Fortune" }]
-      };
-    }
-
-    const houseCounts: { [key: number]: number } = {};
-    transitAstroData.planets.forEach((p: any) => {
-      const h = Number(p.house) || 1;
-      houseCounts[h] = (houseCounts[h] || 0) + 1;
-    });
-
-    let maxHouse = 1;
-    let maxCount = 0;
-    Object.keys(houseCounts).forEach((hKey) => {
-      const h = Number(hKey);
-      if (houseCounts[h] > maxCount) {
-        maxCount = houseCounts[h];
-        maxHouse = h;
-      }
-    });
-
-    const houseSignificances: { [key: number]: string } = {
-      1: "Self-expression, Vitality & Physical Horizon",
-      2: "Wealth consolidation, Family and Speech clarity",
-      3: "Courage, short journeys and communication focus",
-      4: "Domestic peace, emotional sanctuary & self-care",
-      5: "Creative intelligence, children & speculation",
-      6: "Health checkups, routine work & discipline",
-      7: "Relationships, negotiations & partnerships",
-      8: "Transformation, joint finances & mysticism",
-      9: "Higher wisdom, long journeys & philosophy",
-      10: "Career authority, leadership & status rise",
-      11: "Gains, friendships, goals and financial network",
-      12: "Subconscious reflections, sleep & spiritual release"
-    };
-
-    const dominantPlanetsList = transitAstroData.planets.map((p: any) => {
-      const exaltationPoints: { [key: string]: string } = {
-        Sun: "Aries", Moon: "Taurus", Mars: "Capricorn", Mercury: "Virgo",
-        Jupiter: "Cancer", Venus: "Pisces", Saturn: "Libra"
-      };
-      let strength = 7.5;
-      if (p.sign === exaltationPoints[p.name]) strength += 2.0;
-      if (p.name === "Jupiter" || p.name === "Venus") strength += 0.5;
-      return {
-        planet: p.name,
-        strength: `${strength.toFixed(1)}/10`,
-        influenceType: p.name === "Sun" ? "Vitality & Focus" : p.name === "Moon" ? "Emotional Balance" : p.name === "Mercury" ? "Intellectual Clarity" : p.name === "Venus" ? "Aesthetic & Harmony" : p.name === "Jupiter" ? "Fortune & Philosophy" : p.name === "Saturn" ? "Discipline & Patience" : "Intense Insights"
-      };
-    }).sort((a: any, b: any) => parseFloat(b.strength) - parseFloat(a.strength));
-
-    return {
-      dominantHouses: [{ houseNumber: maxHouse, significance: houseSignificances[maxHouse] || "Cosmic consolidation" }],
-      dominantPlanets: [dominantPlanetsList[0] || { planet: "Jupiter", strength: "8.5/10", influenceType: "Expansion & Philosophy" }]
-    };
-  }, [transitAstroData]);
 
   const showAllAstroSystems = majorTab === "jhora" && vedicSubTab === "allAstroSystems";
 
