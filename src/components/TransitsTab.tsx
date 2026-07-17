@@ -10,6 +10,13 @@ import { apiFetch as fetch } from "../lib/api";
 
 interface TransitsTabProps {
   astrologyData: AstrologyData;
+  transitDate?: string;
+  setTransitDate?: (d: string) => void;
+  transitTime?: string;
+  transitPlace?: string;
+  transitLatitude?: number;
+  transitLongitude?: number;
+  transitTimezone?: number;
 }
 
 interface TransitPlanet {
@@ -20,13 +27,30 @@ interface TransitPlanet {
   longitude: number;
 }
 
-export default function TransitsTab({ astrologyData }: TransitsTabProps) {
-  const [transitDate, setTransitDate] = useState<string>("2026-07-15");
-  const [transitTime, setTransitTime] = useState<string>("12:00");
+export default function TransitsTab({ 
+  astrologyData,
+  transitDate: propTransitDate,
+  setTransitDate: propSetTransitDate,
+  transitTime: propTransitTime,
+  transitPlace,
+  transitLatitude,
+  transitLongitude,
+  transitTimezone
+}: TransitsTabProps) {
+  const [internalTransitDate, setInternalTransitDate] = useState<string>("2026-07-17");
+  const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
+
+  const transitDate = propTransitDate !== undefined ? propTransitDate : internalTransitDate;
+  const setTransitDate = propSetTransitDate !== undefined ? propSetTransitDate : setInternalTransitDate;
+
+  const lat = transitLatitude !== undefined ? transitLatitude : astrologyData.birthDetails.latitude;
+  const lng = transitLongitude !== undefined ? transitLongitude : astrologyData.birthDetails.longitude;
+  const tz = transitTimezone !== undefined ? transitTimezone : astrologyData.birthDetails.timezone;
+  const time = propTransitTime !== undefined ? propTransitTime : "12:00:00";
+
   const [transitPlanets, setTransitPlanets] = useState<TransitPlanet[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
 
   const fetchTransits = async () => {
     setLoading(true);
@@ -38,9 +62,9 @@ export default function TransitsTab({ astrologyData }: TransitsTabProps) {
         body: JSON.stringify({
           date: astrologyData.birthDetails.date,
           time: astrologyData.birthDetails.time,
-          latitude: astrologyData.birthDetails.latitude,
-          longitude: astrologyData.birthDetails.longitude,
-          timezone: astrologyData.birthDetails.timezone,
+          latitude: Number(lat),
+          longitude: Number(lng),
+          timezone: Number(tz),
           target_date: transitDate,
         }),
       });
@@ -65,7 +89,7 @@ export default function TransitsTab({ astrologyData }: TransitsTabProps) {
 
   useEffect(() => {
     fetchTransits();
-  }, [transitDate]);
+  }, [transitDate, lat, lng, tz, time]);
 
   const ZODIAC_SIGNS = [
     "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",

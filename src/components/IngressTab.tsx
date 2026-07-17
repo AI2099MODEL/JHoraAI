@@ -20,8 +20,16 @@ interface IngressEvent {
 }
 
 export default function IngressTab({ birthDate }: IngressTabProps) {
-  const [fromDate, setFromDate] = useState<string>("2026-07-15");
-  const [toDate, setToDate] = useState<string>("2027-07-15");
+  const [fromDate, setFromDate] = useState<string>(() => {
+    const localStr = new Date().toLocaleDateString("en-CA");
+    return localStr || "2026-07-17";
+  });
+  const [toDate, setToDate] = useState<string>(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    const localStr = d.toLocaleDateString("en-CA");
+    return localStr || "2027-07-17";
+  });
   const [selectedPlanets, setSelectedPlanets] = useState<string[]>(["Saturn", "Jupiter", "Rahu", "Ketu"]);
   const [events, setEvents] = useState<IngressEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
