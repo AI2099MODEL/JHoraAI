@@ -495,6 +495,10 @@ app.post("/api/jhora/gochara", async (req, res) => {
           })
         });
 
+        if (!response.ok) {
+          throw new Error(`Remote JHora server returned status ${response.status}`);
+        }
+
         const text = await response.text();
         let data: any = null;
         try {
@@ -504,6 +508,10 @@ app.post("/api/jhora/gochara", async (req, res) => {
             throw new Error("Astrology calculation rate limit exceeded. Please try again in an hour.");
           }
           throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
+        }
+
+        if (data && (data.error || data.detail || !data.horoscope)) {
+          throw new Error(`Remote JHora server returned error payload: ${JSON.stringify(data.error || data.detail || data)}`);
         }
 
         const rasi = data.horoscope?.divisional_charts?.["D-1_rasi"] || {};
@@ -520,8 +528,8 @@ app.post("/api/jhora/gochara", async (req, res) => {
             longitude: signIdx * 30 + pVal.longitude
           };
         }).filter(p => p.name !== "Ascendant" && ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
-      } catch (fallbackErr) {
-        console.log("[Transit System] Remote JHora Horoscope fallback active, seamlessly calculating locally.");
+      } catch (fallbackErr: any) {
+        console.log(`[Transit System] Remote JHora Horoscope fallback active (${fallbackErr.message}), seamlessly calculating locally.`);
         const localData = calculateAstrology(
           "Transit Sky",
           targetDate,
@@ -546,11 +554,13 @@ app.post("/api/jhora/gochara", async (req, res) => {
       planets
     };
 
-    // Save to cache
-    transitCache.set(cacheKey, {
-      timestamp: Date.now(),
-      data: payload
-    });
+    // Save to cache only if we have planets computed successfully and no errors
+    if (planets && planets.length > 0) {
+      transitCache.set(cacheKey, {
+        timestamp: Date.now(),
+        data: payload
+      });
+    }
 
     res.json(payload);
   } catch (error: any) {
@@ -651,6 +661,10 @@ app.post("/api/astrology/calculate", async (req, res) => {
         body: JSON.stringify(body)
       });
 
+      if (!response.ok) {
+        throw new Error(`Remote JHora server returned status ${response.status}`);
+      }
+
       const text = await response.text();
       try {
         data = JSON.parse(text);
@@ -660,8 +674,12 @@ app.post("/api/astrology/calculate", async (req, res) => {
         }
         throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
       }
-    } catch (fetchErr) {
-      console.log("[Astro Engine] Remote JHora API fetch bypassed or unavailable. Seamlessly using local engine calculation.");
+
+      if (data && (data.error || data.detail || !data.horoscope)) {
+        throw new Error(`Remote JHora server returned error payload: ${JSON.stringify(data.error || data.detail || data)}`);
+      }
+    } catch (fetchErr: any) {
+      console.log(`[Astro Engine] Remote JHora API fetch bypassed or unavailable (${fetchErr.message}). Seamlessly using local engine calculation.`);
       const tzNum = Number(body.timezone) || 5.5;
       const localData = calculateAstrology(
         body.name || "Transit Sky",
@@ -675,11 +693,13 @@ app.post("/api/astrology/calculate", async (req, res) => {
       data = localData;
     }
 
-    // Save to cache
-    transitCache.set(cacheKey, {
-      timestamp: Date.now(),
-      data
-    });
+    // Save to cache only if it's a valid, non-error object
+    if (data && !data.error && !data.detail) {
+      transitCache.set(cacheKey, {
+        timestamp: Date.now(),
+        data
+      });
+    }
 
     res.json(data);
   } catch (error: any) {

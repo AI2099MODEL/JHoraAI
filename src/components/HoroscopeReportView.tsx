@@ -224,10 +224,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           name: "Transit Sky",
           date: transitDate,
           time: transitTime,
-          location: transitPlace,
-          latitude: Number(transitLatitude),
-          longitude: Number(transitLongitude),
-          timezone: Number(transitTimezone)
+          location: transitPlace || "New Delhi, India",
+          place: transitPlace || "New Delhi, India",
+          latitude: Number(transitLatitude) || 28.6139,
+          longitude: Number(transitLongitude) || 77.2090,
+          timezone: Number(transitTimezone) || 5.5
         })
       });
 
