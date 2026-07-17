@@ -141,6 +141,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [transitAstroData, setTransitAstroData] = useState<any>(null);
   const [transitLoading, setTransitLoading] = useState<boolean>(false);
   const [transitError, setTransitError] = useState<string | null>(null);
+  const [isCustomTransitPlace, setIsCustomTransitPlace] = useState<boolean>(false);
 
   // Transit geocoding state variables
   const [transitSearchQuery, setTransitSearchQuery] = useState<string>("");
@@ -257,20 +258,24 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     setTransitTime(`${hrs}:${mins}:${secs}`);
   }, [currentDateTime]);
 
-  // Synchronize transit coordinates with top bar headerGps
+  // Synchronize transit coordinates with top bar headerGps if not custom
   useEffect(() => {
-    if (headerGps && headerGps.latitude !== null && headerGps.longitude !== null) {
-      setTransitLatitude(headerGps.latitude);
-      setTransitLongitude(headerGps.longitude);
-      setTransitPlace(headerGps.address || `${headerGps.latitude.toFixed(4)}°N, ${headerGps.longitude.toFixed(4)}°E`);
-      setTransitTimezone(new Date().getTimezoneOffset() / -60);
-    } else if (astrologyData?.birthDetails) {
-      setTransitPlace(astrologyData.birthDetails.location || "New Delhi, India");
-      setTransitLatitude(astrologyData.birthDetails.latitude || 28.6139);
-      setTransitLongitude(astrologyData.birthDetails.longitude || 77.2090);
-      setTransitTimezone(astrologyData.birthDetails.timezone || 5.5);
+    if (!isCustomTransitPlace) {
+      if (headerGps && headerGps.latitude !== null && headerGps.longitude !== null) {
+        setTransitLatitude(headerGps.latitude);
+        setTransitLongitude(headerGps.longitude);
+        setTransitPlace(headerGps.address || `${headerGps.latitude.toFixed(4)}°N, ${headerGps.longitude.toFixed(4)}°E`);
+        setTransitSearchQuery(headerGps.address || `${headerGps.latitude.toFixed(4)}°N, ${headerGps.longitude.toFixed(4)}°E`);
+        setTransitTimezone(new Date().getTimezoneOffset() / -60);
+      } else if (astrologyData?.birthDetails) {
+        setTransitPlace(astrologyData.birthDetails.location || "New Delhi, India");
+        setTransitSearchQuery(astrologyData.birthDetails.location || "New Delhi, India");
+        setTransitLatitude(astrologyData.birthDetails.latitude || 28.6139);
+        setTransitLongitude(astrologyData.birthDetails.longitude || 77.2090);
+        setTransitTimezone(astrologyData.birthDetails.timezone || 5.5);
+      }
     }
-  }, [headerGps, astrologyData]);
+  }, [headerGps, astrologyData, isCustomTransitPlace]);
 
   // Fetch new calculations on transit coordinate/date/time change
   useEffect(() => {
@@ -1448,87 +1453,128 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
   return (
     <div id="horoscope-report-root" className="space-y-6 pb-16">
-      {/* Visual Header / Cover with PDF download prominently placed in heading */}
+      {/* Visual Header / Cover with Profile and Geocoded Transit Place controls */}
       <div 
         id="horoscope-report-header-banner"
-        className={`p-5 sm:p-6 rounded-2xl border ${cardStyle} relative overflow-hidden bg-gradient-to-br ${
+        className={`p-4 rounded-2xl border ${cardStyle} relative overflow-hidden bg-gradient-to-r ${
           isDark 
-            ? "from-slate-950 via-slate-900 to-indigo-950/40 border-slate-800" 
-            : "from-amber-50/50 via-white to-amber-100/30 border-neutral-200"
-        } shadow-xl`}
+            ? "from-slate-950 via-slate-900 to-slate-950 border-slate-800" 
+            : "from-amber-50/40 via-white to-amber-50/20 border-neutral-200"
+        } shadow-md`}
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-amber-500/20 via-purple-500/15 to-indigo-500/25 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-10 left-10 w-48 h-48 bg-gradient-to-tr from-emerald-500/10 via-teal-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
-                <Sparkles className="w-3 h-3" />
-                Multi-System Reading
-              </span>
-              <span className="bg-indigo-500/20 text-indigo-400 border border-indigo-500/40 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
-                <Layers className="w-3 h-3" />
-                All Systems Unified
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          {/* Left: Profile switch */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-indigo-400" />
+              <span className="text-xs font-mono font-bold text-indigo-300 uppercase tracking-wider">
+                Profile:
               </span>
             </div>
             
-            <div className="space-y-1">
-              <h1 className="text-base sm:text-lg font-sans font-bold tracking-tight text-slate-800 dark:text-amber-100">
-                Traditional Horoscope & Multi-System Raw Data Log
-              </h1>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-wrap">
-                <p className={`text-[11px] ${mutedText} flex items-center gap-1`}>
-                  <MapPin className="w-3.5 h-3.5 text-amber-500" />
-                  For {birthDetails.name || "Nitin Jain"} • Calculated at {birthDetails.location || "Dehradun, Uttarakhand, India"}
-                </p>
-                {profilesList.length > 0 && (
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-slate-400">•</span>
-                    <label className="text-[10px] font-bold text-slate-300">Switch Profile:</label>
-                    <select
-                      value={profilesList.find(p => p.name === (birthDetails.name || "Nitin Jain"))?.id || ""}
-                      onChange={(e) => {
-                        const selected = profilesList.find(p => p.id === e.target.value);
-                        if (selected) {
-                          setAstrologyData(selected.data);
-                        }
-                      }}
-                      className="bg-slate-900/90 border border-slate-700 text-slate-100 rounded px-2 py-0.5 text-[10px] focus:outline-none focus:ring-1 focus:ring-amber-500/50 cursor-pointer"
-                    >
-                      <option value="" disabled>-- Select a Profile --</option>
-                      {profilesList.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name} ({p.date})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
+            {profilesList.length > 0 ? (
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={profilesList.find(p => p.name === (birthDetails.name || "Nitin Jain"))?.id || ""}
+                  onChange={(e) => {
+                    const selected = profilesList.find(p => p.id === e.target.value);
+                    if (selected) {
+                      setAstrologyData(selected.data);
+                    }
+                  }}
+                  className="bg-slate-900/90 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500/50 cursor-pointer font-medium"
+                >
+                  <option value="" disabled>-- Select a Profile --</option>
+                  {profilesList.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.date})
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
+            ) : (
+              <span className="text-xs text-slate-400 italic">No profiles cached</span>
+            )}
           </div>
 
-          {/* Download entire compiled raw & analytical PDF instantly */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
-            <button
-              id="heading-pdf-compile-button"
-              onClick={handleDownloadCompleteReport}
-              disabled={compiling}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 disabled:from-slate-800 disabled:to-slate-900 text-slate-950 font-bold py-2 px-4 rounded-lg text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/20 shrink-0"
-            >
-              {compiling ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-950" />
-                  Compiling systems...
-                </>
-              ) : (
-                <>
-                  <Download className="w-3.5 h-3.5 text-slate-950" />
-                  Download Complete 360° PDF Report
-                </>
+          {/* Right: Transit Location geocoder input */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 relative shrink-0 min-w-[280px] sm:min-w-[420px]">
+            <div className="flex items-center justify-between w-full sm:w-auto gap-2">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-amber-500 animate-pulse" />
+                <span className="text-xs font-mono font-bold text-amber-200 uppercase tracking-wider">
+                  Transit Place
+                </span>
+              </div>
+              
+              {/* GPS reset / active status badge */}
+              <button
+                type="button"
+                onClick={() => setIsCustomTransitPlace(false)}
+                disabled={!isCustomTransitPlace}
+                className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase transition-all ${
+                  isCustomTransitPlace 
+                    ? "bg-slate-800 hover:bg-amber-500/20 text-slate-400 hover:text-amber-400 border border-slate-700 cursor-pointer" 
+                    : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold"
+                }`}
+                title={isCustomTransitPlace ? "Click to reset to live GPS from top bar" : "Aligned with real-time GPS coordinates"}
+              >
+                <Compass className={`w-3 h-3 ${!isCustomTransitPlace ? "animate-spin text-emerald-400" : ""}`} />
+                <span>{isCustomTransitPlace ? "Reset to GPS" : "GPS Active"}</span>
+              </button>
+            </div>
+
+            <div className="flex-1 relative w-full">
+              <div className="flex items-center gap-1.5 bg-slate-950/80 border border-slate-800 rounded-lg px-2.5 py-1 w-full">
+                <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <input
+                  type="text"
+                  value={transitSearchQuery}
+                  onChange={(e) => {
+                    setTransitSearchQuery(e.target.value);
+                    setShowTransitLocationDropdown(true);
+                  }}
+                  placeholder="Search custom transit location..."
+                  className="bg-transparent text-slate-200 text-xs font-medium focus:outline-none w-full border-0 p-0"
+                />
+                {searchingTransitLocation && (
+                  <RefreshCw className="w-3 h-3 animate-spin text-slate-400" />
+                )}
+              </div>
+
+              {/* Autocomplete drop-down */}
+              {showTransitLocationDropdown && transitLocationResults.length > 0 && (
+                <div className="absolute top-[34px] left-0 right-0 bg-slate-950 border border-slate-800 rounded-lg max-h-[180px] overflow-y-auto z-50 divide-y divide-slate-900 shadow-2xl">
+                  {transitLocationResults.map((result, idx) => {
+                    const label = `${result.name}, ${result.admin1 ? result.admin1 + ', ' : ''}${result.country}`;
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setTransitPlace(label);
+                          setTransitSearchQuery(label);
+                          setTransitLatitude(result.latitude);
+                          setTransitLongitude(result.longitude);
+                          const tzOffset = calculateTransitTimezoneOffset(result.timezone, transitDate);
+                          setTransitTimezone(tzOffset);
+                          setIsCustomTransitPlace(true);
+                          setShowTransitLocationDropdown(false);
+                        }}
+                        className="w-full text-left p-2.5 hover:bg-slate-900 text-[11px] text-slate-300 hover:text-white transition-all flex items-center justify-between"
+                      >
+                        <span className="font-semibold truncate pr-2">{label}</span>
+                        <span className="text-[9px] font-mono text-indigo-400 shrink-0">
+                          {result.latitude.toFixed(2)}°N, {result.longitude.toFixed(2)}°E
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               )}
-            </button>
+            </div>
           </div>
         </div>
       </div>
