@@ -213,58 +213,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     };
   }, [astrologyData, profileJson]);
 
-  if (!astrologyData) {
-    return (
-      <div 
-        id="horoscope-report-empty" 
-        className="text-center py-16 rounded-2xl bg-slate-950/20 border border-dashed border-slate-800 text-slate-500 text-xs"
-      >
-        <User className="w-12 h-12 text-slate-600 mx-auto mb-3 opacity-50" />
-        <h3 className="text-sm font-bold text-slate-400 mb-1">No Active Astrological Profile Loaded</h3>
-        <p className="max-w-md mx-auto px-4">
-          Please load an existing profile or compute a new chart from the main dashboard to unlock this professional Traditional Horoscope Report.
-        </p>
-      </div>
-    );
-  }
-
-  const handleDownloadCompleteReport = async () => {
-    try {
-      setCompiling(true);
-      const doc = generateRawAstrologyPDF(profileJson || astrologyData, {
-        profileName: profileJson?.User?.profile_name || birthDetails.name || "Vedic Native",
-        submenus: allSubmenuIds
-      });
-      doc.save(`Complete_360_Astrological_Systems_Report_${Date.now()}.pdf`);
-    } catch (err: any) {
-      console.error("Failed to compile complete PDF:", err);
-      alert("Failed to compile complete PDF: " + err.message);
-    } finally {
-      setCompiling(false);
-    }
-  };
-
-  const cardStyle = isDark
-    ? "bg-slate-950/45 border-slate-800 text-slate-100"
-    : "bg-white border-neutral-200 text-neutral-900 shadow-sm";
-
-  const mutedText = isDark ? "text-slate-400" : "text-neutral-500";
-  const borderStyle = isDark ? "border-slate-800/60" : "border-neutral-200";
-  const tableHeaderStyle = isDark ? "bg-slate-900/60 text-slate-300" : "bg-neutral-100 text-neutral-700";
-  const tableRowStyle = isDark ? "hover:bg-slate-900/20" : "hover:bg-neutral-50";
-
-  const formatDegree = (longitude: number) => {
-    const deg = Math.floor(longitude % 30);
-    const min = Math.floor((longitude % 1) * 60);
-    return `${deg}° ${min}'`;
-  };
-
-  const format360Degree = (longitude: number) => {
-    const deg = Math.floor(longitude);
-    const min = Math.floor((longitude % 1) * 60);
-    return `${deg}° ${min}'`;
-  };
-
   // Safe Extraction of live profile data mapped from API
   const vedicData = profileJson?.Vedic || {};
   const kpData = profileJson?.KP || {};
@@ -441,6 +389,58 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       setSelectedSookshmaIdx(0);
     }
   }, [dashaTree]);
+
+  if (!astrologyData) {
+    return (
+      <div 
+        id="horoscope-report-empty" 
+        className="text-center py-16 rounded-2xl bg-slate-950/20 border border-dashed border-slate-800 text-slate-500 text-xs"
+      >
+        <User className="w-12 h-12 text-slate-600 mx-auto mb-3 opacity-50" />
+        <h3 className="text-sm font-bold text-slate-400 mb-1">No Active Astrological Profile Loaded</h3>
+        <p className="max-w-md mx-auto px-4">
+          Please load an existing profile or compute a new chart from the main dashboard to unlock this professional Traditional Horoscope Report.
+        </p>
+      </div>
+    );
+  }
+
+  const handleDownloadCompleteReport = async () => {
+    try {
+      setCompiling(true);
+      const doc = generateRawAstrologyPDF(profileJson || astrologyData, {
+        profileName: profileJson?.User?.profile_name || birthDetails.name || "Vedic Native",
+        submenus: allSubmenuIds
+      });
+      doc.save(`Complete_360_Astrological_Systems_Report_${Date.now()}.pdf`);
+    } catch (err: any) {
+      console.error("Failed to compile complete PDF:", err);
+      alert("Failed to compile complete PDF: " + err.message);
+    } finally {
+      setCompiling(false);
+    }
+  };
+
+  const cardStyle = isDark
+    ? "bg-slate-950/45 border-slate-800 text-slate-100"
+    : "bg-white border-neutral-200 text-neutral-900 shadow-sm";
+
+  const mutedText = isDark ? "text-slate-400" : "text-neutral-500";
+  const borderStyle = isDark ? "border-slate-800/60" : "border-neutral-200";
+  const tableHeaderStyle = isDark ? "bg-slate-900/60 text-slate-300" : "bg-neutral-100 text-neutral-700";
+  const tableRowStyle = isDark ? "hover:bg-slate-900/20" : "hover:bg-neutral-50";
+
+  const formatDegree = (longitude: number) => {
+    const deg = Math.floor(longitude % 30);
+    const min = Math.floor((longitude % 1) * 60);
+    return `${deg}° ${min}'`;
+  };
+
+  const format360Degree = (longitude: number) => {
+    const deg = Math.floor(longitude);
+    const min = Math.floor((longitude % 1) * 60);
+    return `${deg}° ${min}'`;
+  };
 
   const predictions = profileJson?.Predictions || astrologyData?.predictions || {};
   const career = predictions.career || { text: "Your professional life is guided by strong planetary aspects, indicating a stable path with steady progress.", highlights: ["Visionary Leadership", "Growth Mindset"] };
