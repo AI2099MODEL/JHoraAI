@@ -12,6 +12,7 @@ import { generateAstrologyPDF } from "../lib/pdfGenerator";
 import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelationshipEvidenceEngine";
 import { generateRelationshipPDF } from "../lib/relationshipReportGenerator";
 import { MasterArchitectureView } from "./MasterArchitectureView";
+import { PresentDayEngineView } from "./PresentDayEngineView";
 import AstroChart from "./AstroChart";
 import { KPRulebook } from "../lib/rules/kpRulebook";
 import { apiFetch as fetchKpApi } from "../lib/api";
@@ -92,7 +93,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 }) => {
   const [compiling, setCompiling] = useState(false);
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
-  const [majorTab, setMajorTab] = useState<"advanced" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("advanced");
+  const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("advanced");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
@@ -1606,6 +1607,16 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           Advanced System
         </button>
         <button
+          onClick={() => setMajorTab("present")}
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
+            majorTab === "present"
+              ? "border-amber-500 text-amber-500 font-extrabold bg-slate-900/20"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          Present
+        </button>
+        <button
           onClick={() => setMajorTab("jhora")}
           className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
             majorTab === "jhora"
@@ -1701,6 +1712,16 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           <div className="space-y-6">
             {/* Simulated Rules Engine */}
             <MasterArchitectureView
+              astrologyData={astrologyData}
+              isDark={isDark}
+            />
+          </div>
+        )}
+
+        {/* ================= PRESENT DAY DYNAMIC ACTION ENGINE ================= */}
+        {majorTab === "present" && (
+          <div className="space-y-6">
+            <PresentDayEngineView
               astrologyData={astrologyData}
               isDark={isDark}
             />
