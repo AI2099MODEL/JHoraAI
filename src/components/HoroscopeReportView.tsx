@@ -15,6 +15,7 @@ import { MasterArchitectureView } from "./MasterArchitectureView";
 import AstroChart from "./AstroChart";
 import { KPRulebook } from "../lib/rules/kpRulebook";
 import { apiFetch as fetchKpApi } from "../lib/api";
+import { MysticalSystemsView } from "./MysticalSystemsView";
 
 interface PlanetData {
   name: string;
@@ -145,6 +146,18 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     dashas = []
   } = astrologyData || {};
 
+  const nativeInputs = useMemo(() => {
+    return {
+      name: birthDetails.name || activeUser?.name || "Nitin Jain",
+      date: birthDetails.date || "1976-01-06",
+      time: birthDetails.time || "18:40:00",
+      latitude: Number(birthDetails.latitude || 30.3165),
+      longitude: Number(birthDetails.longitude || 78.0322),
+      timezone: Number(birthDetails.timezone || 5.5),
+      location: birthDetails.location || "Dehradun, India"
+    };
+  }, [birthDetails, activeUser]);
+
   const availableVedicTabs = useMemo(() => {
     const list: Array<{ id: string; label: string }> = [];
     if (!astrologyData) return list;
@@ -155,27 +168,28 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "planets", label: "planets" },
       { id: "panchanga", label: "panchanga" },
       { id: "divisionalCharts", label: "divisionalCharts" },
-      { id: "dashas", label: "dashas" },
-      { id: "shadBala", label: "shadBala" },
-      { id: "ishtaPhala", label: "ishtaPhala" },
-      { id: "bhavaBala", label: "bhavaBala" },
-      { id: "ashtakavarga", label: "ashtakavarga" },
-      { id: "yogas", label: "yogas" },
-      { id: "doshas", label: "doshas" },
-      { id: "longevity", label: "longevity" },
-      { id: "sadeSati", label: "sadeSati" },
-      { id: "jaimini", label: "jaimini" },
-      { id: "arudhas", label: "arudhas" },
-      { id: "sphutas", label: "sphutas" },
-      { id: "upagrahas", label: "upagrahas" },
-      { id: "sahams", label: "sahams" },
-      { id: "special_lagnas", label: "specialLagnas" },
-      { id: "argalas", label: "argalas" },
-      { id: "charaDasha", label: "charaDasha" },
-      { id: "panchapakshi", label: "panchapakshi" },
-      { id: "lalkitab", label: "lalkitab" },
-      { id: "gemstones", label: "gemstones" },
-      { id: "numerology", label: "numerology" }
+      { id: "dashas", label: "dashas*" },
+      { id: "shadBala", label: "shadBala*" },
+      { id: "ishtaPhala", label: "ishtaPhala*" },
+      { id: "bhavaBala", label: "bhavaBala*" },
+      { id: "ashtakavarga", label: "ashtakavarga*" },
+      { id: "yogas", label: "yogas*" },
+      { id: "doshas", label: "doshas*" },
+      { id: "longevity", label: "longevity*" },
+      { id: "sadeSati", label: "sadeSati*" },
+      { id: "jaimini", label: "jaimini*" },
+      { id: "arudhas", label: "arudhas*" },
+      { id: "sphutas", label: "sphutas*" },
+      { id: "upagrahas", label: "upagrahas*" },
+      { id: "sahams", label: "sahams*" },
+      { id: "special_lagnas", label: "specialLagnas*" },
+      { id: "argalas", label: "argalas*" },
+      { id: "charaDasha", label: "charaDasha*" },
+      { id: "panchapakshi", label: "panchapakshi*" },
+      { id: "lalkitab", label: "lalkitab*" },
+      { id: "gemstones", label: "gemstones*" },
+      { id: "numerology", label: "numerology*" },
+      { id: "mysticalSystems", label: "mysticalSystems*" }
     ];
 
     for (const item of supportedKeys) {
@@ -199,6 +213,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         dataVal = { dummy: true };
       }
       if (item.id === "numerology" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "mysticalSystems" && !dataVal) {
         dataVal = { dummy: true };
       }
       if (item.id === "ishtaPhala" && !dataVal) {
@@ -234,7 +251,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       }
     }
     return list;
-  }, [astrologyData]);
+  }, [astrologyData, profileJson, birthDetails, activeUser]);
 
   useEffect(() => {
     if (availableVedicTabs.length > 0 && !availableVedicTabs.some(t => t.id === vedicSubTab)) {
@@ -2458,21 +2475,24 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                         <tbody className="divide-y divide-slate-800/20 text-slate-300">
                           {(() => {
                             const charaDashas = astrologyData?.jaimini?.chara_dasha || astrologyData?.charaDasha || [];
-                            const birthYear = astrologyData?.birthDetails?.year || 1999;
+                            const birthDateStr = birthDetails.date || "1976-01-06";
+                            const [bYr, bMon, bDay] = birthDateStr.split("-");
+                            const birthYear = parseInt(bYr) || 1976;
+                            const suffix = `-${bMon || "01"}-${bDay || "06"}`;
                             
                             const finalDashas = charaDashas.length > 0 ? charaDashas : [
-                              { sign: "Aries", duration_years: 9, start_date: `${birthYear}-01-01`, end_date: `${birthYear + 9}-01-01` },
-                              { sign: "Taurus", duration_years: 12, start_date: `${birthYear + 9}-01-01`, end_date: `${birthYear + 21}-01-01` },
-                              { sign: "Gemini", duration_years: 7, start_date: `${birthYear + 21}-01-01`, end_date: `${birthYear + 28}-01-01` },
-                              { sign: "Cancer", duration_years: 8, start_date: `${birthYear + 28}-01-01`, end_date: `${birthYear + 36}-01-01` },
-                              { sign: "Leo", duration_years: 9, start_date: `${birthYear + 36}-01-01`, end_date: `${birthYear + 45}-01-01` },
-                              { sign: "Virgo", duration_years: 11, start_date: `${birthYear + 45}-01-01`, end_date: `${birthYear + 56}-01-01` },
-                              { sign: "Libra", duration_years: 12, start_date: `${birthYear + 56}-01-01`, end_date: `${birthYear + 68}-01-01` },
-                              { sign: "Scorpio", duration_years: 10, start_date: `${birthYear + 68}-01-01`, end_date: `${birthYear + 78}-01-01` },
-                              { sign: "Sagittarius", duration_years: 6, start_date: `${birthYear + 78}-01-01`, end_date: `${birthYear + 84}-01-01` },
-                              { sign: "Capricorn", duration_years: 8, start_date: `${birthYear + 84}-01-01`, end_date: `${birthYear + 92}-01-01` },
-                              { sign: "Aquarius", duration_years: 10, start_date: `${birthYear + 92}-01-01`, end_date: `${birthYear + 102}-01-01` },
-                              { sign: "Pisces", duration_years: 5, start_date: `${birthYear + 102}-01-01`, end_date: `${birthYear + 107}-01-01` }
+                              { sign: "Aries", duration_years: 9, start_date: `${birthYear}${suffix}`, end_date: `${birthYear + 9}${suffix}` },
+                              { sign: "Taurus", duration_years: 12, start_date: `${birthYear + 9}${suffix}`, end_date: `${birthYear + 21}${suffix}` },
+                              { sign: "Gemini", duration_years: 7, start_date: `${birthYear + 21}${suffix}`, end_date: `${birthYear + 28}${suffix}` },
+                              { sign: "Cancer", duration_years: 8, start_date: `${birthYear + 28}${suffix}`, end_date: `${birthYear + 36}${suffix}` },
+                              { sign: "Leo", duration_years: 9, start_date: `${birthYear + 36}${suffix}`, end_date: `${birthYear + 45}${suffix}` },
+                              { sign: "Virgo", duration_years: 11, start_date: `${birthYear + 45}${suffix}`, end_date: `${birthYear + 56}${suffix}` },
+                              { sign: "Libra", duration_years: 12, start_date: `${birthYear + 56}${suffix}`, end_date: `${birthYear + 68}${suffix}` },
+                              { sign: "Scorpio", duration_years: 10, start_date: `${birthYear + 68}${suffix}`, end_date: `${birthYear + 78}${suffix}` },
+                              { sign: "Sagittarius", duration_years: 6, start_date: `${birthYear + 78}${suffix}`, end_date: `${birthYear + 84}${suffix}` },
+                              { sign: "Capricorn", duration_years: 8, start_date: `${birthYear + 84}${suffix}`, end_date: `${birthYear + 92}${suffix}` },
+                              { sign: "Aquarius", duration_years: 10, start_date: `${birthYear + 92}${suffix}`, end_date: `${birthYear + 102}${suffix}` },
+                              { sign: "Pisces", duration_years: 5, start_date: `${birthYear + 102}${suffix}`, end_date: `${birthYear + 107}${suffix}` }
                             ];
 
                             const currentYear = new Date().getFullYear();
@@ -2815,6 +2835,16 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                       </div>
                     );
                   })()}
+                </div>
+              )}
+
+              {vedicSubTab === "mysticalSystems" && (
+                <div className="space-y-6">
+                  <MysticalSystemsView
+                    nativeInputs={nativeInputs}
+                    isDark={isDark}
+                    astrologyData={astrologyData}
+                  />
                 </div>
               )}
                 </div>
