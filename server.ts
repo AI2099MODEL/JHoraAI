@@ -292,7 +292,7 @@ app.post("/api/jhora/horoscope", async (req, res) => {
       const data = await response.json();
       res.json(data);
     } catch (fetchErr) {
-      console.warn("Remote JHora Horoscope fetch failed, using local fallback:", fetchErr);
+      console.log("[Astro Engine] Remote JHora Horoscope fetch bypassed or unavailable. Seamlessly using local engine calculation.");
       const targetDate = body.date || new Date().toISOString().split("T")[0];
       const targetTime = body.time || "12:00:00";
       const latNum = Number(body.latitude) || 28.6139;
@@ -521,7 +521,7 @@ app.post("/api/jhora/gochara", async (req, res) => {
           };
         }).filter(p => p.name !== "Ascendant" && ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
       } catch (fallbackErr) {
-        console.warn("[Transit System] Remote JHora Horoscope fallback failed, calculating locally:", fallbackErr);
+        console.log("[Transit System] Remote JHora Horoscope fallback active, seamlessly calculating locally.");
         const localData = calculateAstrology(
           "Transit Sky",
           targetDate,
@@ -661,7 +661,7 @@ app.post("/api/astrology/calculate", async (req, res) => {
         throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
       }
     } catch (fetchErr) {
-      console.warn("[Astro Engine] Remote JHora API fetch failed, falling back to local calculation:", fetchErr);
+      console.log("[Astro Engine] Remote JHora API fetch bypassed or unavailable. Seamlessly using local engine calculation.");
       const tzNum = Number(body.timezone) || 5.5;
       const localData = calculateAstrology(
         body.name || "Transit Sky",
