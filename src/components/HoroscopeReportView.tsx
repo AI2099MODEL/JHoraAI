@@ -1632,9 +1632,20 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40">
           {[
             { id: "current_gochara", label: "Current Gochara" },
+            { id: "current_dasha", label: "Current Dasha" },
+            { id: "current_transits", label: "Current Transits" },
+            { id: "panchanga", label: "Current Panchanga" },
+            { id: "current_strengths", label: "Current Strengths" },
+            { id: "current_yogas", label: "Current Yogas" },
+            { id: "current_doshas", label: "Current Doshas" },
+            { id: "current_aspects", label: "Current Aspects" },
+            { id: "house_activation", label: "House Activation" },
+            { id: "current_nakshatra", label: "Current Nakshatra" },
+            { id: "sensitive_points", label: "Sensitive Points" },
+            { id: "current_events", label: "Current Events" },
+            { id: "transit_timeline", label: "Transit Timeline" },
             { id: "planet_ingress", label: "Planet Ingress" },
             { id: "transit_summary", label: "Transit Summary" },
-            { id: "panchanga", label: "Panchanga" },
             { id: "daily_muhurta", label: "Daily Muhurta" },
             { id: "event_muhurta", label: "Event Muhurta" }
           ].map((tab) => (
@@ -5315,7 +5326,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
       {majorTab === "transit" && (
         <div className="space-y-6">
-          {transitSubTab === "current_gochara" && (
+          {[
+            "current_gochara", "current_dasha", "current_transits", "current_strengths", 
+            "current_yogas", "current_doshas", "current_aspects", "house_activation", 
+            "current_nakshatra", "sensitive_points", "current_events", "transit_timeline"
+          ].includes(transitSubTab) && (
             astrologyData ? (
               <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
                 <TransitsTab 
@@ -5327,6 +5342,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   transitLatitude={transitLatitude}
                   transitLongitude={transitLongitude}
                   transitTimezone={transitTimezone}
+                  subTab={transitSubTab}
                 />
               </div>
             ) : (

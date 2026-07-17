@@ -21,6 +21,7 @@ interface TransitsTabProps {
   transitLatitude?: number;
   transitLongitude?: number;
   transitTimezone?: number;
+  subTab?: string;
 }
 
 interface TransitPlanet {
@@ -90,7 +91,8 @@ export default function TransitsTab({
   transitPlace,
   transitLatitude,
   transitLongitude,
-  transitTimezone
+  transitTimezone,
+  subTab: propSubTab
 }: TransitsTabProps) {
   const getLocalDateString = () => {
     const d = new Date();
@@ -108,7 +110,9 @@ export default function TransitsTab({
   const [lng, setLng] = useState<number>(transitLongitude !== undefined && transitLongitude !== null ? transitLongitude : astrologyData.birthDetails.longitude);
   const [tz, setTz] = useState<number>(transitTimezone !== undefined && transitTimezone !== null ? transitTimezone : astrologyData.birthDetails.timezone);
   const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
-  const [subTab, setSubTab] = useState<string>("current_gochara");
+  const [subTabState, setSubTabState] = useState<string>("current_gochara");
+  const subTab = propSubTab || subTabState;
+  const setSubTab = propSubTab ? () => {} : setSubTabState;
 
   const [transitPlanets, setTransitPlanets] = useState<TransitPlanet[]>([]);
   const [transitAstroData, setTransitAstroData] = useState<any | null>(null);
@@ -914,28 +918,30 @@ export default function TransitsTab({
       </div>
 
       {/* 13 Horizontal Scrollable Submenus */}
-      <div className="bg-slate-950/65 rounded-xl border border-indigo-500/10 p-2 shadow-inner">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
-          {SUB_TABS.map((tab) => {
-            const Icon = tab.icon;
-            const isSelected = subTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setSubTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-all border ${
-                  isSelected
-                    ? "bg-indigo-600/20 border-indigo-500/50 text-amber-300 font-bold"
-                    : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/30"
-                }`}
-              >
-                <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-amber-400 animate-pulse" : "text-slate-500"}`} />
-                {tab.name}
-              </button>
-            );
-          })}
+      {!propSubTab && (
+        <div className="bg-slate-950/65 rounded-xl border border-indigo-500/10 p-2 shadow-inner">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+            {SUB_TABS.map((tab) => {
+              const Icon = tab.icon;
+              const isSelected = subTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setSubTab(tab.id)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-all border ${
+                    isSelected
+                      ? "bg-indigo-600/20 border-indigo-500/50 text-amber-300 font-bold"
+                      : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/30"
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-amber-400 animate-pulse" : "text-slate-500"}`} />
+                  {tab.name}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {loading ? (
         <div className="flex flex-col items-center justify-center h-[300px]">
