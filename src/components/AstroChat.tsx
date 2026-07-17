@@ -292,16 +292,7 @@ export default function AstroChat({ astrologyData }: AstroChatProps) {
             </div>
           </div>
 
-          <div className="flex justify-between items-center px-1 text-[10px] text-slate-500">
-            <div className="flex items-center gap-2 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800/80">
-              <span className="font-semibold text-slate-400">Evaluation Target Age:</span>
-              <input
-                type="number"
-                value={targetAge}
-                onChange={(e) => setTargetAge(Math.max(1, parseInt(e.target.value) || 28))}
-                className="w-12 px-1.5 py-0.5 rounded border border-slate-700 bg-slate-950 text-white font-bold text-center text-[10px]"
-              />
-            </div>
+          <div className="flex justify-end items-center px-1 text-[10px] text-slate-500">
             <span>Press <kbd className="bg-slate-800 px-1 py-0.5 rounded text-slate-400 font-mono text-[9px]">Enter</kbd> to submit query.</span>
           </div>
         </form>
