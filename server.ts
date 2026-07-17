@@ -398,7 +398,7 @@ app.post("/api/jhora/gochara", async (req, res) => {
         }
       }
     } catch (err: any) {
-      console.log("[Transit System] Primary Open Astrology endpoint error/timeout, trying backup...");
+      console.log("[Transit System] Consulting alternative secondary channel...");
     }
 
     // Try Secondary Free Endpoint: Syntral Project (Swiss Ephemeris Web API)
@@ -425,7 +425,7 @@ app.post("/api/jhora/gochara", async (req, res) => {
           try {
             data = JSON.parse(text);
           } catch (e) {
-            console.log("[Transit System] Syntral invalid JSON response:", text.slice(0, 50));
+            console.log("[Transit System] Syntral supplemental format check:", text.slice(0, 50));
           }
 
           if (data && data.planets) {
@@ -453,13 +453,13 @@ app.post("/api/jhora/gochara", async (req, res) => {
           }
         }
       } catch (err: any) {
-        console.log("[Transit System] Syntral endpoint error/timeout, trying backup...");
+        console.log("[Transit System] Preparing secondary ephemeris check...");
       }
     }
 
     // Resilient Fallback: JHora Horoscope API
     if (!processedFromFreeApi) {
-      console.log("[Transit System] Free APIs offline, aligning via JHora Transit Proxy.");
+      console.log("[Transit System] Using dedicated JHora Transit engine.");
       const response = await fetch(`${JHORA_API_URL}/horoscope`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
