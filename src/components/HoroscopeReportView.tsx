@@ -667,6 +667,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "kp_cusps", label: "kpCusps*" },
       { id: "kp_planet_analysis", label: "kpPlanets*" },
       { id: "kp_significators", label: "kpSignificators*" },
+      { id: "kp_houses_significators", label: "kpHouses*" },
       { id: "kp_ruling_planets", label: "kpRulingPlanets*" },
       { id: "kp_dasha", label: "kpDasha*" },
       { id: "kp_rulebook", label: "kpRulebook*" },
@@ -759,7 +760,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
     "argalas", "charaDasha", "panchapakshi", "lalkitab", "gemstones", "numerology",
     "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
-    "kp_significators", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
+    "kp_significators", "kp_houses_significators", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
     "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
     "eso_nadi", "eso_lalkitab", "eso_varshaphala", "eso_bazi", "eso_numerology", "eso_celtic", "eso_mayan"
   ];
@@ -768,6 +769,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     { id: "kp_cusps", label: "KP House Cusps" },
     { id: "kp_planet_analysis", label: "Planet Analysis" },
     { id: "kp_significators", label: "Significators" },
+    { id: "kp_houses_significators", label: "Houses & Unique Significators" },
     { id: "kp_ruling_planets", label: "Ruling Planets" },
     { id: "kp_dasha", label: "KP Dasha" },
     { id: "kp_rulebook", label: "KP Rulebook" },
@@ -921,7 +923,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         } else if (kpSubTab === "kp_planet_analysis" && !kpChartData) {
           const chart = await fetchReportKpData("/api/kp/chart");
           if (active && chart) setKpChartData(chart);
-        } else if (kpSubTab === "kp_significators" && !kpSignificatorsData) {
+        } else if ((kpSubTab === "kp_significators" || kpSubTab === "kp_houses_significators") && !kpSignificatorsData) {
           const sigs = await fetchReportKpData("/api/kp/significators");
           if (active && sigs) setKpSignificatorsData(sigs);
         } else if (kpSubTab === "kp_dasha" && !kpDashaData) {
@@ -4476,6 +4478,97 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                           })}
                         </div>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* KP Houses & Unique Significators Tab Content */}
+                {kpSubTab === "kp_houses_significators" && (
+                  <div className="space-y-6 animate-fade-in">
+                    <div className="flex justify-between items-center border-b border-cyan-500/10 pb-2">
+                      <h3 className="text-sm font-bold text-cyan-400">KP Houses & Unique Significator Planets</h3>
+                      <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-0.5 rounded font-mono font-bold uppercase">6-Fold Aggregated</span>
+                    </div>
+
+                    <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono">
+                            <th className="p-3.5 w-1/4">House / Bhava</th>
+                            <th className="p-3.5 w-1/3">Significator Planets (6-Fold Unique)</th>
+                            <th className="p-3.5">Significance / Meaning of House</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map((hNum) => {
+                            const houseKey = `House_${hNum}`;
+                            const sigObj = rawHouseSignificators[houseKey];
+                            
+                            // Get unique planets from all 6 levels
+                            const uniquePlanets = (() => {
+                              if (!sigObj) return [];
+                              if (Array.isArray(sigObj)) {
+                                return Array.from(new Set(sigObj.map((p: any) => String(p).trim()))).filter(Boolean);
+                              }
+                              if (typeof sigObj === "object") {
+                                const planets: string[] = [];
+                                const levels = ["level1", "level2", "level3", "level4", "level5", "level6"];
+                                for (const lvl of levels) {
+                                  const val = sigObj[lvl];
+                                  if (Array.isArray(val)) {
+                                    planets.push(...val.map((p: any) => String(p).trim()));
+                                  } else if (typeof val === "string" && val.trim() && val !== "—") {
+                                    planets.push(...val.split(",").map((p: any) => p.trim()));
+                                  }
+                                }
+                                return Array.from(new Set(planets)).filter(p => p && p !== "—");
+                              }
+                              if (typeof sigObj === "string") {
+                                return sigObj.split(",").map((p: any) => p.trim()).filter(p => p && p !== "—");
+                              }
+                              return [];
+                            })();
+
+                            const houseInfo = {
+                              1: { name: "1st House (Ascendant / Tanu Bhava)", meaning: "Represents the self, physical body, appearance, overall vitality, temperament, and path of life." },
+                              2: { name: "2nd House (Dhana Bhava)", meaning: "Represents wealth, family, speech, primary education, facial features, right eye, and assets." },
+                              3: { name: "3rd House (Sahaja Bhava)", meaning: "Represents courage, siblings, communication, writing, short travels, intelligence, hands, and initiative." },
+                              4: { name: "4th House (Sukha Bhava)", meaning: "Represents mother, home, vehicles, happiness, basic education, land, general peace, and chest." },
+                              5: { name: "5th House (Putra Bhava)", meaning: "Represents children, intellect, creativity, romance, speculation, past life merits, and stomach." },
+                              6: { name: "6th House (Shatru Bhava)", meaning: "Represents enemies, debts, diseases, competition, service, daily routine, litigation, and lower abdomen." },
+                              7: { name: "7th House (Yuvati Bhava)", meaning: "Represents marriage, spouse, partnerships, business relations, public interaction, and foreign travels." },
+                              8: { name: "8th House (Randhra Bhava)", meaning: "Represents longevity, sudden events, hidden things, inheritance, mysticism, obstacles, and research." },
+                              9: { name: "9th House (Dharma Bhava)", meaning: "Represents fortune, father, guru, higher education, long journeys, religion, righteousness, and thighs." },
+                              10: { name: "10th House (Karma Bhava)", meaning: "Represents career, profession, status, reputation, public life, authority, father's status, and knees." },
+                              11: { name: "11th House (Labha Bhava)", meaning: "Represents gains, desires fulfillment, friends, elder siblings, income sources, and general success." },
+                              12: { name: "12th House (Vyaya Bhava)", meaning: "Represents losses, liberation (moksha), foreign land, expenditure, dreams, sleep, and feet." }
+                            }[hNum] || { name: `House ${hNum}`, meaning: "Signification of the house according to KP astrology principles." };
+
+                            return (
+                              <tr key={hNum} className="hover:bg-slate-900/10 font-sans">
+                                <td className="p-3.5 font-bold text-cyan-400 font-mono text-xs">{houseInfo.name}</td>
+                                <td className="p-3.5">
+                                  {uniquePlanets.length > 0 ? (
+                                    <div className="flex flex-wrap gap-1.5">
+                                      {uniquePlanets.map((planet) => (
+                                        <span
+                                          key={planet}
+                                          className="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20"
+                                        >
+                                          {planet}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <span className="text-slate-500 italic font-mono text-xs">No active significators</span>
+                                  )}
+                                </td>
+                                <td className="p-3.5 text-xs text-slate-300 leading-relaxed">{houseInfo.meaning}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}

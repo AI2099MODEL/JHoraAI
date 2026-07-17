@@ -707,7 +707,18 @@ export default function KpStellarDashboard({
                     }`}
                     id="kp-sig-btn-houses"
                   >
-                    House Significators
+                    6-Level House Details
+                  </button>
+                  <button
+                    onClick={() => setSigTab("houses_unique")}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                      sigTab === "houses_unique"
+                        ? "bg-indigo-600 text-white shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                    id="kp-sig-btn-houses-unique"
+                  >
+                    Houses & Unique Significators
                   </button>
                 </div>
               </div>
@@ -757,7 +768,7 @@ export default function KpStellarDashboard({
                     })}
                   </div>
                 </div>
-              ) : (
+              ) : sigTab === "houses" ? (
                 <div className="space-y-4" id="kp-house-sigs-panel">
                   <div className="text-xs text-slate-400 leading-relaxed font-sans max-w-2xl bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/10">
                     <p className="font-semibold text-indigo-400 mb-1">House Significators (6-Fold Table):</p>
@@ -801,6 +812,94 @@ export default function KpStellarDashboard({
                         </div>
                       );
                     })}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4" id="kp-houses-unique-panel">
+                  <div className="text-xs text-slate-400 leading-relaxed font-sans max-w-2xl bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/10">
+                    <p className="font-semibold text-indigo-400 mb-1">Houses & Unique Significators (6-Fold Aggregated):</p>
+                    Represents each of the 12 houses (Bhavas) mapped to its complete list of unique significator planets compiled from all 6 astrological strength levels, along with the standard significance of each house.
+                  </div>
+
+                  <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono">
+                          <th className="p-3.5 w-1/4">House / Bhava</th>
+                          <th className="p-3.5 w-1/3">Significator Planets (6-Fold Unique)</th>
+                          <th className="p-3.5">Significance / Meaning of House</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((hNum) => {
+                          const houseKeyStr = String(hNum);
+                          const sigObj = (significatorsData?.houseSignificators || {})[houseKeyStr] || (significatorsData?.houseSignificators || {})[hNum] || {};
+                          
+                          // Get unique planets from all 6 levels
+                          const uniquePlanets = (() => {
+                            if (!sigObj) return [];
+                            if (Array.isArray(sigObj)) {
+                              return Array.from(new Set(sigObj.map((p: any) => String(p).trim()))).filter(Boolean);
+                            }
+                            if (typeof sigObj === "object") {
+                              const planets: string[] = [];
+                              const levels = ["level1", "level2", "level3", "level4", "level5", "level6"];
+                              for (const lvl of levels) {
+                                const val = sigObj[lvl];
+                                if (Array.isArray(val)) {
+                                  planets.push(...val.map((p: any) => String(p).trim()));
+                                } else if (typeof val === "string" && val.trim() && val !== "—") {
+                                  planets.push(...val.split(",").map((p: any) => p.trim()));
+                                }
+                              }
+                              return Array.from(new Set(planets)).filter(p => p && p !== "—");
+                            }
+                            if (typeof sigObj === "string") {
+                              return sigObj.split(",").map((p: any) => p.trim()).filter(p => p && p !== "—");
+                            }
+                            return [];
+                          })();
+
+                          const houseInfo = {
+                            1: { name: "1st House (Ascendant / Tanu Bhava)", meaning: "Represents the self, physical body, appearance, overall vitality, temperament, and path of life." },
+                            2: { name: "2nd House (Dhana Bhava)", meaning: "Represents wealth, family, speech, primary education, facial features, right eye, and assets." },
+                            3: { name: "3rd House (Sahaja Bhava)", meaning: "Represents courage, siblings, communication, writing, short travels, intelligence, hands, and initiative." },
+                            4: { name: "4th House (Sukha Bhava)", meaning: "Represents mother, home, vehicles, happiness, basic education, land, general peace, and chest." },
+                            5: { name: "5th House (Putra Bhava)", meaning: "Represents children, intellect, creativity, romance, speculation, past life merits, and stomach." },
+                            6: { name: "6th House (Shatru Bhava)", meaning: "Represents enemies, debts, diseases, competition, service, daily routine, litigation, and lower abdomen." },
+                            7: { name: "7th House (Yuvati Bhava)", meaning: "Represents marriage, spouse, partnerships, business relations, public interaction, and foreign travels." },
+                            8: { name: "8th House (Randhra Bhava)", meaning: "Represents longevity, sudden events, hidden things, inheritance, mysticism, obstacles, and research." },
+                            9: { name: "9th House (Dharma Bhava)", meaning: "Represents fortune, father, guru, higher education, long journeys, religion, righteousness, and thighs." },
+                            10: { name: "10th House (Karma Bhava)", meaning: "Represents career, profession, status, reputation, public life, authority, father's status, and knees." },
+                            11: { name: "11th House (Labha Bhava)", meaning: "Represents gains, desires fulfillment, friends, elder siblings, income sources, and general success." },
+                            12: { name: "12th House (Vyaya Bhava)", meaning: "Represents losses, liberation (moksha), foreign land, expenditure, dreams, sleep, and feet." }
+                          }[hNum] || { name: `House ${hNum}`, meaning: "Signification of the house according to KP astrology principles." };
+
+                          return (
+                            <tr key={hNum} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0">
+                              <td className="p-3.5 font-bold text-cyan-400 font-mono text-xs">{houseInfo.name}</td>
+                              <td className="p-3.5">
+                                {uniquePlanets.length > 0 ? (
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {uniquePlanets.map((planet) => (
+                                      <span
+                                        key={planet}
+                                        className="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
+                                      >
+                                        {planet}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="text-slate-500 italic font-mono text-xs">No active significators</span>
+                                )}
+                              </td>
+                              <td className="p-3.5 text-xs text-slate-300 leading-relaxed">{houseInfo.meaning}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               )}
