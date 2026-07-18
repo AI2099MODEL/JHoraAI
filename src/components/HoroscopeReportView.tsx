@@ -4583,63 +4583,148 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 </div>
               )}
 
-              {vedicSubTab === "special_lagnas" && (
-                <div className="space-y-6">
-                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
-                    <div className="border-b border-slate-800 pb-2">
-                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">special_lagnas (Hora, Ghati, and Bhava Ascendants)</h4>
-                    </div>
-                    <div className="overflow-x-auto mt-2">
-                      <table className="w-full text-left">
-                        <thead>
-                          <tr className="border-b border-slate-800 text-slate-400 font-sans">
-                            <th className="p-2.5">Lagna Type</th>
-                            <th className="p-2.5">Stellar Coordinates</th>
-                            <th className="p-2.5">Zodiac Sign</th>
-                            <th className="p-2.5 text-center">House</th>
-                            <th className="p-2.5">Formula Principle</th>
-                            <th className="p-2.5">Status</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800/20 text-slate-300">
-                          <tr className="hover:bg-slate-900/10">
-                            <td className="p-2.5 font-bold font-sans text-slate-200">Hora Lagna (HL)</td>
-                            <td className="p-2.5">12° 11'</td>
-                            <td className="p-2.5 font-sans">Libra</td>
-                            <td className="p-2.5 text-center font-bold">H2</td>
-                            <td className="p-2.5">Calculated based on sunrise for assets/wealth</td>
-                            <td className="p-2.5 text-emerald-400">Stable</td>
-                          </tr>
-                          <tr className="hover:bg-slate-900/10">
-                            <td className="p-2.5 font-bold font-sans text-slate-200">Ghati Lagna (GL)</td>
-                            <td className="p-2.5">24° 50'</td>
-                            <td className="p-2.5 font-sans">Scorpio</td>
-                            <td className="p-2.5 text-center font-bold">H6</td>
-                            <td className="p-2.5">Calculated based on sunrise for power/fame</td>
-                            <td className="p-2.5 text-indigo-400 font-bold">Strong</td>
-                          </tr>
-                          <tr className="hover:bg-slate-900/10">
-                            <td className="p-2.5 font-bold font-sans text-slate-200">Bhava Lagna (BL)</td>
-                            <td className="p-2.5">05° 12'</td>
-                            <td className="p-2.5 font-sans">Pisces</td>
-                            <td className="p-2.5 text-center font-bold">H1</td>
-                            <td className="p-2.5">Instantaneous ascendant longitude at exact birth moment</td>
-                            <td className="p-2.5 text-amber-400">Precise</td>
-                          </tr>
-                          <tr className="hover:bg-slate-900/10">
-                            <td className="p-2.5 font-bold font-sans text-slate-200">Pranapada Lagna (PL)</td>
-                            <td className="p-2.5">28° 10'</td>
-                            <td className="p-2.5 font-sans">Aries</td>
-                            <td className="p-2.5 text-center font-bold">H10</td>
-                            <td className="p-2.5">Vital life force connection coordinate</td>
-                            <td className="p-2.5 text-rose-400">Active</td>
-                          </tr>
-                        </tbody>
-                      </table>
+              {vedicSubTab === "special_lagnas" && (() => {
+                const specialLagnas = astrologyData?.special_lagnas || {};
+
+                const parseCoordinate = (coordStr: string) => {
+                  if (!coordStr) return { longitude: "XX° XX'", sign: "N/A" };
+                  const trimmed = coordStr.trim();
+                  const parts = trimmed.split(/\s+/);
+                  if (parts.length >= 2) {
+                    const sign = parts[0];
+                    const longitude = parts.slice(1).join(" ");
+                    return { longitude, sign };
+                  }
+                  return { longitude: trimmed, sign: "N/A" };
+                };
+
+                const rawHL = specialLagnas?.hora_lagna?.longitude || specialLagnas?.hora_lagna || "Libra 12° 11'";
+                const rawGL = specialLagnas?.ghati_lagna?.longitude || specialLagnas?.ghati_lagna || "Scorpio 24° 50'";
+                const rawBL = specialLagnas?.bhava_lagna?.longitude || specialLagnas?.bhava_lagna || "Leo 05° 12'";
+                const rawPL = specialLagnas?.pranapada_lagna?.longitude || specialLagnas?.pranapada_lagna || "Aries 28° 10'";
+
+                const parsedHL = parseCoordinate(rawHL);
+                const parsedGL = parseCoordinate(rawGL);
+                const parsedBL = parseCoordinate(rawBL);
+                const parsedPL = parseCoordinate(rawPL);
+
+                const lagnas = [
+                  {
+                    name: "Hora Lagna (HL)",
+                    longitude: parsedHL.longitude,
+                    sign: specialLagnas?.hora_lagna?.sign || parsedHL.sign,
+                    house: specialLagnas?.hora_lagna?.house || "H2",
+                    basis: "Derived from sunrise using Hora progression",
+                    use: "Wealth, assets and financial prosperity"
+                  },
+                  {
+                    name: "Ghati Lagna (GL)",
+                    longitude: parsedGL.longitude,
+                    sign: specialLagnas?.ghati_lagna?.sign || parsedGL.sign,
+                    house: specialLagnas?.ghati_lagna?.house || "H6",
+                    basis: "Derived from sunrise using Ghati progression",
+                    use: "Power, authority, fame and influence"
+                  },
+                  {
+                    name: "Bhava Lagna (BL)",
+                    longitude: parsedBL.longitude,
+                    sign: specialLagnas?.bhava_lagna?.sign || parsedBL.sign,
+                    house: specialLagnas?.bhava_lagna?.house || "H1",
+                    basis: "Derived from elapsed time after sunrise",
+                    use: "Physical life and worldly affairs"
+                  },
+                  {
+                    name: "Pranapada Lagna (PL)",
+                    longitude: parsedPL.longitude,
+                    sign: specialLagnas?.pranapada_lagna?.sign || parsedPL.sign,
+                    house: specialLagnas?.pranapada_lagna?.house || "H10",
+                    basis: "Classical Pranapada calculation",
+                    use: "Vitality, personality and life force"
+                  }
+                ];
+
+                // Dynamically include any additional Special Lagnas if available in JHora
+                const knownKeys = ["hora_lagna", "horalagna", "ghati_lagna", "ghatilagna", "bhava_lagna", "bhavalagna", "pranapada_lagna", "pranapadalagna"];
+                Object.entries(specialLagnas).forEach(([key, val]: [string, any]) => {
+                  const lowerKey = key.toLowerCase().replace(/_/g, "");
+                  if (knownKeys.includes(lowerKey)) return;
+                  
+                  let name = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+                  if (!name.endsWith("Lagna")) name = name + " Lagna";
+
+                  let basis = "Calculated by JHora";
+                  let use = "Special astrological significations";
+
+                  if (lowerKey === "indulagna") {
+                    basis = "Calculated from 9th lords from Lagna and Moon";
+                    use = "Wealth, fortune and prosperity";
+                  } else if (lowerKey === "srilagna") {
+                    basis = "Derived using the portion of Moon's nakshatra";
+                    use = "Prosperity, abundance and material success";
+                  } else if (lowerKey === "varnadalagna") {
+                    basis = "Calculated from Lagna and Hora Lagna positions";
+                    use = "Social status, reputation and Jaimini analysis";
+                  }
+
+                  const rawVal = typeof val === "object" && val !== null ? val.longitude || "" : String(val);
+                  const parsed = parseCoordinate(rawVal);
+
+                  const longitude = parsed.longitude;
+                  const sign = typeof val === "object" && val !== null ? val.sign || parsed.sign : parsed.sign;
+                  const house = typeof val === "object" && val !== null ? val.house || "N/A" : "N/A";
+
+                  if (longitude && longitude !== "XX° XX'") {
+                    lagnas.push({
+                      name,
+                      longitude,
+                      sign,
+                      house,
+                      basis,
+                      use
+                    });
+                  }
+                });
+
+                return (
+                  <div className="space-y-6">
+                    <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
+                      <div className="border-b border-slate-800 pb-2">
+                        <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Special Lagnas (Pure Computational Database)</h4>
+                      </div>
+                      <div className="overflow-x-auto mt-2">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className="border-b border-slate-800 text-slate-400 font-sans text-xs font-bold uppercase tracking-wider">
+                              <th className="p-2.5">Lagna Type</th>
+                              <th className="p-2.5">Longitude</th>
+                              <th className="p-2.5">Zodiac Sign</th>
+                              <th className="p-2.5 text-center">House</th>
+                              <th className="p-2.5">Calculation Basis</th>
+                              <th className="p-2.5">Primary Use</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                            {lagnas.map((lagna, idx) => (
+                              <tr key={`${lagna.name}-${idx}`} className="hover:bg-slate-900/10">
+                                <td className="p-2.5 font-bold font-sans text-slate-200">{lagna.name}</td>
+                                <td className="p-2.5 text-indigo-400 font-mono font-bold">{lagna.longitude}</td>
+                                <td className="p-2.5 font-sans">{lagna.sign}</td>
+                                <td className="p-2.5 text-center font-bold">
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300">
+                                    {lagna.house}
+                                  </span>
+                                </td>
+                                <td className="p-2.5 text-slate-400 font-sans text-[11px] leading-relaxed">{lagna.basis}</td>
+                                <td className="p-2.5 text-amber-400/80 font-sans text-[11px] leading-relaxed">{lagna.use}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {vedicSubTab === "argalas" && (
                 <div className="space-y-6">

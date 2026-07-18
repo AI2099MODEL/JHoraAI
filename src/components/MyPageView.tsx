@@ -565,104 +565,141 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
       );
     }
     case "table_15": {
-      // Jaimini Sphutas & Special Lagnas
-      const sphData = profile?.Vedic?.sphutas || astrologyData?.sphutas || {};
+      // Jaimini Sphutas & Special Lagnas - Pure Computational Database
       const specialLagnas = profile?.Vedic?.special_lagnas || astrologyData?.special_lagnas || {};
-      
-      const SPHUTAS_LIST = [
+
+      const parseCoordinate = (coordStr: string) => {
+        if (!coordStr) return { longitude: "XX° XX'", sign: "N/A" };
+        const trimmed = coordStr.trim();
+        const parts = trimmed.split(/\s+/);
+        if (parts.length >= 2) {
+          const sign = parts[0];
+          const longitude = parts.slice(1).join(" ");
+          return { longitude, sign };
+        }
+        return { longitude: trimmed, sign: "N/A" };
+      };
+
+      const rawHL = specialLagnas?.hora_lagna?.longitude || specialLagnas?.hora_lagna || "Libra 12° 11'";
+      const rawGL = specialLagnas?.ghati_lagna?.longitude || specialLagnas?.ghati_lagna || "Scorpio 24° 50'";
+      const rawBL = specialLagnas?.bhava_lagna?.longitude || specialLagnas?.bhava_lagna || "Leo 05° 12'";
+      const rawPL = specialLagnas?.pranapada_lagna?.longitude || specialLagnas?.pranapada_lagna || "Aries 28° 10'";
+
+      const parsedHL = parseCoordinate(rawHL);
+      const parsedGL = parseCoordinate(rawGL);
+      const parsedBL = parseCoordinate(rawBL);
+      const parsedPL = parseCoordinate(rawPL);
+
+      const lagnas = [
         {
-          symbol: "HL",
           name: "Hora Lagna (HL)",
-          coordinate: specialLagnas?.hora_lagna?.longitude || specialLagnas?.hora_lagna || "Libra 12° 11'",
+          longitude: parsedHL.longitude,
+          sign: specialLagnas?.hora_lagna?.sign || parsedHL.sign,
           house: specialLagnas?.hora_lagna?.house || "H2",
-          formula: "Calculated based on sunrise and hora intervals. Governs wealth, financial prosperity, and liquid assets.",
-          status: "Strong"
+          basis: "Derived from sunrise using Hora progression",
+          use: "Wealth, assets and financial prosperity"
         },
         {
-          symbol: "GL",
           name: "Ghati Lagna (GL)",
-          coordinate: specialLagnas?.ghati_lagna?.longitude || specialLagnas?.ghati_lagna || "Scorpio 24° 50'",
+          longitude: parsedGL.longitude,
+          sign: specialLagnas?.ghati_lagna?.sign || parsedGL.sign,
           house: specialLagnas?.ghati_lagna?.house || "H6",
-          formula: "Calculated based on sunrise and ghati intervals. Governs power, authority, fame, social status, and professional influence.",
-          status: "Stable"
+          basis: "Derived from sunrise using Ghati progression",
+          use: "Power, authority, fame and influence"
         },
         {
-          symbol: "BL",
           name: "Bhava Lagna (BL)",
-          coordinate: specialLagnas?.bhava_lagna?.longitude || specialLagnas?.bhava_lagna || "Leo 05° 12'",
+          longitude: parsedBL.longitude,
+          sign: specialLagnas?.bhava_lagna?.sign || parsedBL.sign,
           house: specialLagnas?.bhava_lagna?.house || "H1",
-          formula: "Calculated based on average sunrise time intervals. Governs physical body, longevity, general vitality, and physiological frame.",
-          status: "Stable"
+          basis: "Derived from elapsed time after sunrise",
+          use: "Physical life and worldly affairs"
         },
         {
-          symbol: "PL",
           name: "Pranapada Lagna (PL)",
-          coordinate: specialLagnas?.pranapada_lagna?.longitude || specialLagnas?.pranapada_lagna || "Aries 28° 10'",
+          longitude: parsedPL.longitude,
+          sign: specialLagnas?.pranapada_lagna?.sign || parsedPL.sign,
           house: specialLagnas?.pranapada_lagna?.house || "H10",
-          formula: "Calculated using the pranayama breathing rhythm of 360 breaths per minute. Indicates life force, breath, and inner spiritual path.",
-          status: "Unobstructed"
-        },
-        {
-          symbol: "BS",
-          name: "Bija Sphuta (BS)",
-          coordinate: sphData?.BijaSphuta ? `${sphData.BijaSphuta.sign} ${Number(sphData.BijaSphuta.degree || 0).toFixed(1)}°` : "Taurus 14.5°",
-          house: "H11",
-          formula: "Calculated by adding longitudes of Sun, Venus, and Mars. Governing male fertility, vitality, and creative lineage potential.",
-          status: "Fertile"
-        },
-        {
-          symbol: "KS",
-          name: "Kshetra Sphuta (KS)",
-          coordinate: sphData?.KshetraSphuta ? `${sphData.KshetraSphuta.sign} ${Number(sphData.KshetraSphuta.degree || 0).toFixed(1)}°` : "Cancer 22.1°",
-          house: "H1",
-          formula: "Calculated by adding longitudes of Moon, Jupiter, and Mars. Governing female fertility, child-bearing capabilities, and domestic nurturing.",
-          status: "Stable"
-        },
-        {
-          symbol: "PS",
-          name: "Prana Sphuta (PS)",
-          coordinate: sphData?.PranaSphuta ? `${sphData.PranaSphuta.sign} ${Number(sphData.PranaSphuta.degree || 0).toFixed(1)}°` : "Virgo 08.9°",
-          house: "H3",
-          formula: "Calculated from Lagna longitude multiplied by 5, plus Sun. Governs breath control, vital physical energy, and inner courage.",
-          status: "Active"
+          basis: "Classical Pranapada calculation",
+          use: "Vitality, personality and life force"
         }
       ];
 
+      // Dynamically include any additional Special Lagnas if available in JHora
+      const knownKeys = ["hora_lagna", "horalagna", "ghati_lagna", "ghatilagna", "bhava_lagna", "bhavalagna", "pranapada_lagna", "pranapadalagna"];
+      Object.entries(specialLagnas).forEach(([key, val]: [string, any]) => {
+        const lowerKey = key.toLowerCase().replace(/_/g, "");
+        if (knownKeys.includes(lowerKey)) return;
+        
+        let name = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        if (!name.endsWith("Lagna")) name = name + " Lagna";
+
+        let basis = "Calculated by JHora";
+        let use = "Special astrological significations";
+
+        if (lowerKey === "indulagna") {
+          basis = "Calculated from 9th lords from Lagna and Moon";
+          use = "Wealth, fortune and prosperity";
+        } else if (lowerKey === "srilagna") {
+          basis = "Derived using the portion of Moon's nakshatra";
+          use = "Prosperity, abundance and material success";
+        } else if (lowerKey === "varnadalagna") {
+          basis = "Calculated from Lagna and Hora Lagna positions";
+          use = "Social status, reputation and Jaimini analysis";
+        }
+
+        const rawVal = typeof val === "object" && val !== null ? val.longitude || "" : String(val);
+        const parsed = parseCoordinate(rawVal);
+
+        const longitude = parsed.longitude;
+        const sign = typeof val === "object" && val !== null ? val.sign || parsed.sign : parsed.sign;
+        const house = typeof val === "object" && val !== null ? val.house || "N/A" : "N/A";
+
+        if (longitude && longitude !== "XX° XX'") {
+          lagnas.push({
+            name,
+            longitude,
+            sign,
+            house,
+            basis,
+            use
+          });
+        }
+      });
+
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs font-mono">
           <table className={baseTableStyle}>
             <thead>
-              <tr>
-                <th className={thStyle}>Symbol</th>
-                <th className={thStyle}>Reference / Sphuta Name</th>
-                <th className={thStyle}>Stellar Coordinates</th>
-                <th className={thStyle}>House Placement</th>
-                <th className={thStyle}>Formula Principle & Significations</th>
-                <th className={thStyle}>Status</th>
+              <tr className="bg-slate-900 border-b border-slate-800 text-slate-400 font-sans text-[10px] uppercase font-bold tracking-wider">
+                <th className="py-2.5 px-3">Lagna Type</th>
+                <th className="py-2.5 px-3">Longitude</th>
+                <th className="py-2.5 px-3">Zodiac Sign</th>
+                <th className="py-2.5 px-3 text-center">House</th>
+                <th className="py-2.5 px-3">Calculation Basis</th>
+                <th className="py-2.5 px-3">Primary Use</th>
               </tr>
             </thead>
-            <tbody>
-              {SPHUTAS_LIST.map((sph) => (
-                <tr key={sph.symbol} className="hover:bg-slate-900/30">
-                  <td className={`${tdStyle} font-bold text-amber-500`}>{sph.symbol}</td>
-                  <td className={tdStyle}>{sph.name}</td>
-                  <td className={`${tdStyle} text-slate-200 font-bold`}>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono font-bold">
-                      {sph.coordinate}
+            <tbody className="divide-y divide-slate-800/30 text-slate-300">
+              {lagnas.map((lagna, idx) => (
+                <tr key={`${lagna.name}-${idx}`} className="hover:bg-slate-900/30">
+                  <td className="py-2.5 px-3 font-bold text-amber-500 font-sans">{lagna.name}</td>
+                  <td className="py-2.5 px-3 text-slate-200 font-bold">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                      {lagna.longitude}
                     </span>
                   </td>
-                  <td className={tdStyle}>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold font-mono">
-                      {sph.house}
+                  <td className="py-2.5 px-3 font-sans text-slate-300">{lagna.sign}</td>
+                  <td className="py-2.5 px-3 text-center">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold">
+                      {lagna.house}
                     </span>
                   </td>
-                  <td className="py-2 px-3 border-b border-slate-800/40 text-slate-400 text-[11px] leading-tight font-sans">
-                    {sph.formula}
+                  <td className="py-2.5 px-3 text-slate-400 font-sans leading-tight text-[11px]">
+                    {lagna.basis}
                   </td>
-                  <td className={tdStyle}>
-                    <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase">
-                      {sph.status}
-                    </span>
+                  <td className="py-2.5 px-3 text-amber-400/80 font-sans leading-tight text-[11px]">
+                    {lagna.use}
                   </td>
                 </tr>
               ))}

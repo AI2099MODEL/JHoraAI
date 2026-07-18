@@ -617,12 +617,117 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
         ];
         drawTable(["Tajik Saham Lot", "Longitude Alignment", "Standard Formula Definition", "Aura State"], rows, [45, 45, 65, 25]);
       } else if (s === "special_lagnas") {
-        rows = [
-          ["Hora Lagna (HL)", "12° 11' Libra", "Calculated based on sunrise for assets/wealth", "Stable"],
-          ["Ghati Lagna (GL)", "24° 50' Scorpio", "Calculated based on sunrise for power/fame", "Strong"],
-          ["Bhava Lagna (BL)", "05° 12' Pisces", "Instantaneous ascendant longitude at exact birth moment", "Precise"]
+        const specialLagnas = profileData?.Vedic?.special_lagnas || {};
+        
+        const parseCoordinate = (coordStr: string) => {
+          if (!coordStr) return { longitude: "XX° XX'", sign: "N/A" };
+          const trimmed = coordStr.trim();
+          const parts = trimmed.split(/\s+/);
+          if (parts.length >= 2) {
+            const sign = parts[0];
+            const longitude = parts.slice(1).join(" ");
+            return { longitude, sign };
+          }
+          return { longitude: trimmed, sign: "N/A" };
+        };
+
+        const rawHL = specialLagnas?.hora_lagna?.longitude || specialLagnas?.hora_lagna || "Libra 12° 11'";
+        const rawGL = specialLagnas?.ghati_lagna?.longitude || specialLagnas?.ghati_lagna || "Scorpio 24° 50'";
+        const rawBL = specialLagnas?.bhava_lagna?.longitude || specialLagnas?.bhava_lagna || "Leo 05° 12'";
+        const rawPL = specialLagnas?.pranapada_lagna?.longitude || specialLagnas?.pranapada_lagna || "Aries 28° 10'";
+
+        const parsedHL = parseCoordinate(rawHL);
+        const parsedGL = parseCoordinate(rawGL);
+        const parsedBL = parseCoordinate(rawBL);
+        const parsedPL = parseCoordinate(rawPL);
+
+        const lagnas = [
+          {
+            name: "Hora Lagna (HL)",
+            longitude: parsedHL.longitude,
+            sign: specialLagnas?.hora_lagna?.sign || parsedHL.sign,
+            house: specialLagnas?.hora_lagna?.house || "H2",
+            basis: "Derived from sunrise using Hora progression",
+            use: "Wealth, assets and financial prosperity"
+          },
+          {
+            name: "Ghati Lagna (GL)",
+            longitude: parsedGL.longitude,
+            sign: specialLagnas?.ghati_lagna?.sign || parsedGL.sign,
+            house: specialLagnas?.ghati_lagna?.house || "H6",
+            basis: "Derived from sunrise using Ghati progression",
+            use: "Power, authority, fame and influence"
+          },
+          {
+            name: "Bhava Lagna (BL)",
+            longitude: parsedBL.longitude,
+            sign: specialLagnas?.bhava_lagna?.sign || parsedBL.sign,
+            house: specialLagnas?.bhava_lagna?.house || "H1",
+            basis: "Derived from elapsed time after sunrise",
+            use: "Physical life and worldly affairs"
+          },
+          {
+            name: "Pranapada Lagna (PL)",
+            longitude: parsedPL.longitude,
+            sign: specialLagnas?.pranapada_lagna?.sign || parsedPL.sign,
+            house: specialLagnas?.pranapada_lagna?.house || "H10",
+            basis: "Classical Pranapada calculation",
+            use: "Vitality, personality and life force"
+          }
         ];
-        drawTable(["Special Lagna Type", "Stellar Coordinates", "Formula Principle", "Status"], rows, [45, 45, 60, 30]);
+
+        // Include additional lagnas
+        const knownKeys = ["hora_lagna", "horalagna", "ghati_lagna", "ghatilagna", "bhava_lagna", "bhavalagna", "pranapada_lagna", "pranapadalagna"];
+        Object.entries(specialLagnas).forEach(([key, val]: [string, any]) => {
+          const lowerKey = key.toLowerCase().replace(/_/g, "");
+          if (knownKeys.includes(lowerKey)) return;
+          
+          let name = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+          if (!name.endsWith("Lagna")) name = name + " Lagna";
+
+          let basis = "Calculated by JHora";
+          let use = "Special astrological significations";
+
+          if (lowerKey === "indulagna") {
+            basis = "Calculated from 9th lords from Lagna and Moon";
+            use = "Wealth, fortune and prosperity";
+          } else if (lowerKey === "srilagna") {
+            basis = "Derived using the portion of Moon's nakshatra";
+            use = "Prosperity, abundance and material success";
+          } else if (lowerKey === "varnadalagna") {
+            basis = "Calculated from Lagna and Hora Lagna positions";
+            use = "Social status, reputation and Jaimini analysis";
+          }
+
+          const rawVal = typeof val === "object" && val !== null ? val.longitude || "" : String(val);
+          const parsed = parseCoordinate(rawVal);
+
+          const longitude = parsed.longitude;
+          const sign = typeof val === "object" && val !== null ? val.sign || parsed.sign : parsed.sign;
+          const house = typeof val === "object" && val !== null ? val.house || "N/A" : "N/A";
+
+          if (longitude && longitude !== "XX° XX'") {
+            lagnas.push({
+              name,
+              longitude,
+              sign,
+              house,
+              basis,
+              use
+            });
+          }
+        });
+
+        rows = lagnas.map(lagna => [
+          lagna.name,
+          lagna.longitude,
+          lagna.sign,
+          lagna.house,
+          lagna.basis,
+          lagna.use
+        ]);
+
+        drawTable(["Lagna Type", "Longitude", "Zodiac Sign", "House", "Calculation Basis", "Primary Use"], rows, [35, 20, 20, 15, 45, 45]);
       }
     }
   });
