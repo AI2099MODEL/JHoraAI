@@ -67,7 +67,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
     }
   }
 
-  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_13", "table_14", "table_15", "table_16"].includes(tableId)) return null;
+  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_10", "table_13", "table_14", "table_15", "table_16"].includes(tableId)) return null;
   
   const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
   const thStyle = "py-2 px-3 bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider";
@@ -194,7 +194,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
         </div>
       );
     case "table_14": {
-      const arudhas = data || profile?.Jaimini?.arudha || profile?.Vedic?.arudha || {};
+      const arudhas = data || astrologyData?.jaimini?.arudha || astrologyData?.horoscope?.arudhas || astrologyData?.arudhas || profile?.Jaimini?.arudha || profile?.Vedic?.arudha || {};
       const arudhaKeys = Object.keys(arudhas).length > 0 ? Object.keys(arudhas) : ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11", "A12"];
       
       const ARUDHA_LABELS: Record<string, string> = {
@@ -246,7 +246,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
       );
     }
     case "table_10": {
-      const argalas = data || profile?.Jaimini?.argala || profile?.Vedic?.argala || astrologyData?.jaimini?.argala || astrologyData?.horoscope?.argalas || {};
+      const argalas = data || astrologyData?.argalas || profile?.Vedic?.argalas || profile?.Jaimini?.argala || profile?.Vedic?.argala || astrologyData?.jaimini?.argala || astrologyData?.horoscope?.argalas || {};
       const houseEntries = Array.from({ length: 12 }, (_, i) => String(i + 1));
       return (
         <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
@@ -426,7 +426,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
       );
     }
     case "table_16": {
-      const shadbala = data || profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || {};
+      const shadbala = data || astrologyData?.vedic?.strengths?.shadbala || astrologyData?.strengths?.shadbala || profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || {};
       const planets = Object.keys(shadbala).length > 0 ? Object.keys(shadbala) : ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
       return (
         <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
