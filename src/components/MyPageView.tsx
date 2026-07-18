@@ -59,6 +59,21 @@ export function MyPageView({
   const [generatedData, setGeneratedData] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [age, setAge] = useState<{ years: number; months: number; days: number } | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("overview");
+
+  const tabs = [
+    { id: "overview", label: "Soul Blueprint" },
+    { id: "daily", label: "Daily Analysis" },
+    { id: "future", label: "Future Analysis" },
+    { id: "transits", label: "Transits Analysis" },
+    { id: "vedic", label: "Vedic Data" },
+    { id: "jaimini", label: "Jaimini Data" },
+    { id: "kp", label: "KP Data" },
+    { id: "lalkitab", label: "Lalkitab" },
+    { id: "chinese", label: "Chinese" },
+    { id: "tajik", label: "Tajik" },
+    { id: "western", label: "Western" },
+  ];
 
   // Fetch the active profile from server Users/userprofile.json
   const fetchProfile = async () => {
@@ -258,168 +273,211 @@ export function MyPageView({
         </div>
       )}
 
-      {/* SECOND SECTION: SOUL BLUEPRINT SYNTHESIS (INSTANT STATIC LOAD) */}
-      <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-3`}>
-        <div className="flex items-center gap-2">
-          <div className="p-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-            <Sparkles className="w-3.5 h-3.5" />
-          </div>
-          <h3 className={`text-xs font-bold uppercase tracking-wider font-sans text-amber-500`}>
-            Soul Blueprint Synthesis
-          </h3>
-        </div>
-        <p className={`text-xs leading-relaxed ${textStyle} italic opacity-95`}>
-          "{soulSynthesisSummary}"
-        </p>
-      </div>
-
-      {/* SECTIONED AI GENERATED READINGS */}
-      <AnimatePresence mode="wait">
-        {generatedData && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="space-y-6"
+      {/* Submenu Astrological Tabs */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-2 pt-1 -mx-2 px-2 scrollbar-thin scrollbar-thumb-slate-500/20 scrollbar-track-transparent">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold tracking-wider uppercase border transition-all whitespace-nowrap cursor-pointer select-none shrink-0 ${
+              activeTab === tab.id
+                ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm shadow-amber-500/10"
+                : "bg-slate-500/5 text-slate-400 border-slate-500/10 hover:bg-slate-500/10 hover:text-slate-300"
+            }`}
           >
-            {/* Generated Grid Sections */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {generatedData.sections?.map((section: any, idx: number) => {
-                const IconComponent = IconMap[section.icon] || Sparkles;
-                return (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className={`p-6 rounded-2xl border ${containerStyle} flex flex-col justify-between space-y-4 shadow-md`}
-                  >
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                          <IconComponent className="w-5 h-5" />
-                        </div>
-                        <h4 className={`text-base font-bold font-sans ${textStyle}`}>
-                          {section.title}
-                        </h4>
-                      </div>
-                      <p className={`text-xs leading-relaxed ${textMutedStyle}`}>
-                        {section.content}
-                      </p>
-                    </div>
-
-                    {section.remedy && (
-                      <div className="pt-4 border-t border-slate-500/10 bg-amber-500/5 -mx-6 -mb-6 p-4 rounded-b-2xl">
-                        <p className={`text-[10px] uppercase font-mono text-amber-500 mb-1 font-bold`}>
-                          Alignment Remedy
-                        </p>
-                        <p className={`text-[11px] font-sans ${textStyle}`}>
-                          {section.remedy}
-                        </p>
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* OFFLINE BLUEPRINT DASHBOARD SECTION */}
-      <div className="space-y-6">
-        <h3 className={`text-lg font-bold font-sans ${textStyle} flex items-center gap-2`}>
-          <Activity className="w-5 h-5 text-amber-500" /> Offline Astronomical & Vedic Parameters
-        </h3>
-
-        {/* Section 1: Astronomical alignments */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-          <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-            <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Lunar Phase</span>
-            <p className={`text-xs font-semibold ${textStyle}`}>{moonPhase}</p>
-          </div>
-          <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-            <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Lunar Month</span>
-            <p className={`text-xs font-semibold ${textStyle}`}>{lunarMonth}</p>
-          </div>
-          <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-            <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Solar Month</span>
-            <p className={`text-xs font-semibold ${textStyle}`}>{solarMonth}</p>
-          </div>
-          <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-            <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Ritu (Season)</span>
-            <p className={`text-xs font-semibold ${textStyle}`}>{season}</p>
-          </div>
-          <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-            <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Samvatsara (Year)</span>
-            <p className={`text-xs font-semibold ${textStyle}`}>{yearName}</p>
-          </div>
-        </div>
-
-        {/* Section 2: Ascendant Profile */}
-        <div className={`p-5 rounded-2xl border ${containerStyle} space-y-4`}>
-          <h4 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
-            Lagna (Ascendant) Profile
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-              <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Ascendant Sign</span>
-              <p className={`text-base font-bold ${textStyle}`}>{ascendantSign}</p>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-              <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Nakshatra</span>
-              <p className={`text-base font-bold ${textStyle}`}>{ascendantNakshatra}</p>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-              <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Nakshatra Lord</span>
-              <p className={`text-base font-bold ${textStyle}`}>{ascendantNakLord}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Section 3: Detailed Planetary States */}
-        {profile?.Vedic?.planets && (
-          <div className={`p-5 rounded-2xl border ${containerStyle} space-y-4`}>
-            <h4 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
-              Planetary Dignities & States (Awasthas)
-            </h4>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-500/10 text-[10px] uppercase font-mono text-amber-500">
-                    <th className="pb-3 pr-4">Planet</th>
-                    <th className="pb-3 px-4">Sign</th>
-                    <th className="pb-3 px-4">Degree</th>
-                    <th className="pb-3 px-4">House</th>
-                    <th className="pb-3 px-4">Dignity</th>
-                    <th className="pb-3 px-4">Baladi State</th>
-                    <th className="pb-3 pl-4">Conscious State</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-500/10 text-xs">
-                  {Object.entries(profile.Vedic.planets).map(([name, planet]: [string, any]) => (
-                    <tr key={name} className="hover:bg-slate-500/5">
-                      <td className={`py-3 pr-4 font-bold ${textStyle}`}>{name}</td>
-                      <td className={`py-3 px-4 ${textStyle}`}>{planet.sign || "N/A"}</td>
-                      <td className={`py-3 px-4 font-mono ${textStyle}`}>
-                        {planet.degree !== undefined ? `${planet.degree}° ${planet.minute || 0}'` : "N/A"}
-                      </td>
-                      <td className={`py-3 px-4 font-mono ${textStyle}`}>{planet.house || "N/A"}</td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-500`}>
-                          {planet.dignity || "Neutral"}
-                        </span>
-                      </td>
-                      <td className={`py-3 px-4 ${textStyle}`}>{planet.state?.baladi || "N/A"}</td>
-                      <td className={`py-3 pl-4 ${textStyle}`}>{planet.state?.jagrat || "N/A"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+            {tab.label}
+          </button>
+        ))}
       </div>
+
+      {activeTab === "overview" ? (
+        <div className="space-y-4">
+          {/* SECOND SECTION: SOUL BLUEPRINT SYNTHESIS (INSTANT STATIC LOAD) */}
+          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-3`}>
+            <div className="flex items-center gap-2">
+              <div className="p-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                <Sparkles className="w-3.5 h-3.5" />
+              </div>
+              <h3 className={`text-xs font-bold uppercase tracking-wider font-sans text-amber-500`}>
+                Soul Blueprint Synthesis
+              </h3>
+            </div>
+            <p className={`text-xs leading-relaxed ${textStyle} italic opacity-95`}>
+              "{soulSynthesisSummary}"
+            </p>
+          </div>
+
+          {/* SECTIONED AI GENERATED READINGS */}
+          <AnimatePresence mode="wait">
+            {generatedData && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-6"
+              >
+                {/* Generated Grid Sections */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {generatedData.sections?.map((section: any, idx: number) => {
+                    const IconComponent = IconMap[section.icon] || Sparkles;
+                    return (
+                      <motion.div
+                        key={idx}
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className={`p-6 rounded-2xl border ${containerStyle} flex flex-col justify-between space-y-4 shadow-md`}
+                      >
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                              <IconComponent className="w-5 h-5" />
+                            </div>
+                            <h4 className={`text-base font-bold font-sans ${textStyle}`}>
+                              {section.title}
+                            </h4>
+                          </div>
+                          <p className={`text-xs leading-relaxed ${textMutedStyle}`}>
+                            {section.content}
+                          </p>
+                        </div>
+
+                        {section.remedy && (
+                          <div className="pt-4 border-t border-slate-500/10 bg-amber-500/5 -mx-6 -mb-6 p-4 rounded-b-2xl">
+                            <p className={`text-[10px] uppercase font-mono text-amber-500 mb-1 font-bold`}>
+                              Alignment Remedy
+                            </p>
+                            <p className={`text-[11px] font-sans ${textStyle}`}>
+                              {section.remedy}
+                            </p>
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* OFFLINE BLUEPRINT DASHBOARD SECTION */}
+          <div className="space-y-6">
+            <h3 className={`text-lg font-bold font-sans ${textStyle} flex items-center gap-2`}>
+              <Activity className="w-5 h-5 text-amber-500" /> Offline Astronomical & Vedic Parameters
+            </h3>
+
+            {/* Section 1: Astronomical alignments */}
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+              <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
+                <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Lunar Phase</span>
+                <p className={`text-xs font-semibold ${textStyle}`}>{moonPhase}</p>
+              </div>
+              <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
+                <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Lunar Month</span>
+                <p className={`text-xs font-semibold ${textStyle}`}>{lunarMonth}</p>
+              </div>
+              <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
+                <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Solar Month</span>
+                <p className={`text-xs font-semibold ${textStyle}`}>{solarMonth}</p>
+              </div>
+              <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
+                <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Ritu (Season)</span>
+                <p className={`text-xs font-semibold ${textStyle}`}>{season}</p>
+              </div>
+              <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
+                <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Samvatsara (Year)</span>
+                <p className={`text-xs font-semibold ${textStyle}`}>{yearName}</p>
+              </div>
+            </div>
+
+            {/* Section 2: Ascendant Profile */}
+            <div className={`p-5 rounded-2xl border ${containerStyle} space-y-4`}>
+              <h4 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
+                Lagna (Ascendant) Profile
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
+                  <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Ascendant Sign</span>
+                  <p className={`text-base font-bold ${textStyle}`}>{ascendantSign}</p>
+                </div>
+                <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
+                  <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Nakshatra</span>
+                  <p className={`text-base font-bold ${textStyle}`}>{ascendantNakshatra}</p>
+                </div>
+                <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
+                  <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Nakshatra Lord</span>
+                  <p className={`text-base font-bold ${textStyle}`}>{ascendantNakLord}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Detailed Planetary States */}
+            {profile?.Vedic?.planets && (
+              <div className={`p-5 rounded-2xl border ${containerStyle} space-y-4`}>
+                <h4 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
+                  Planetary Dignities & States (Awasthas)
+                </h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-500/10 text-[10px] uppercase font-mono text-amber-500">
+                        <th className="pb-3 pr-4">Planet</th>
+                        <th className="pb-3 px-4">Sign</th>
+                        <th className="pb-3 px-4">Degree</th>
+                        <th className="pb-3 px-4">House</th>
+                        <th className="pb-3 px-4">Dignity</th>
+                        <th className="pb-3 px-4">Baladi State</th>
+                        <th className="pb-3 pl-4">Conscious State</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-500/10 text-xs">
+                      {Object.entries(profile.Vedic.planets).map(([name, planet]: [string, any]) => (
+                        <tr key={name} className="hover:bg-slate-500/5">
+                          <td className={`py-3 pr-4 font-bold ${textStyle}`}>{name}</td>
+                          <td className={`py-3 px-4 ${textStyle}`}>{planet.sign || "N/A"}</td>
+                          <td className={`py-3 px-4 font-mono ${textStyle}`}>
+                            {planet.degree !== undefined ? `${planet.degree}° ${planet.minute || 0}'` : "N/A"}
+                          </td>
+                          <td className={`py-3 px-4 font-mono ${textStyle}`}>{planet.house || "N/A"}</td>
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-500`}>
+                              {planet.dignity || "Neutral"}
+                            </span>
+                          </td>
+                          <td className={`py-3 px-4 ${textStyle}`}>{planet.state?.baladi || "N/A"}</td>
+                          <td className={`py-3 pl-4 ${textStyle}`}>{planet.state?.jagrat || "N/A"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`p-8 rounded-xl border ${cardStyle} shadow-sm flex flex-col items-center justify-center text-center space-y-4 min-h-[240px]`}
+        >
+          <div className="p-3 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+            <Sparkles className="w-6 h-6 animate-pulse" />
+          </div>
+          <div className="space-y-1">
+            <h4 className={`text-base font-bold font-sans ${textStyle}`}>
+              {tabs.find(t => t.id === activeTab)?.label} Engine Initialized
+            </h4>
+            <p className={`text-xs ${textMutedStyle} max-w-md`}>
+              The specialized {tabs.find(t => t.id === activeTab)?.label} parameters and calculations for <strong>{userName}</strong> are prepared. Live calculations and dynamic interpretations are ready for alignment updates.
+            </p>
+          </div>
+          <div className="px-3 py-1 rounded bg-slate-500/15 border border-slate-500/10 text-[10px] font-mono tracking-wider text-amber-500 uppercase">
+            No Data Generated Yet
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }
