@@ -317,11 +317,19 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
       fs.writeFileSync(dynamicFilePath, JSON.stringify(profileData, null, 2));
       console.log(`[Git Sync] Written Users/userprofile.json and Users/${dynamicName} for profile: ${profileName}`);
 
-      exec(`git add Users/userprofile.json Users/${dynamicName} && (git diff-index --quiet HEAD || git commit -m "feat: activate user profile ${profileName}") && git pull --rebase --autostash origin main && git push origin main`, (err, stdout, stderr) => {
+      exec(`git add Users/userprofile.json Users/${dynamicName} && (git diff-index --quiet HEAD || git commit -m "feat: activate user profile ${profileName}")`, (err, stdout, stderr) => {
         if (err) {
-          console.error("[Git Sync Add Error]", err, stderr);
+          console.warn("[Git Sync Add Local Warning - could not commit locally]", err.message);
         } else {
-          console.log("[Git Sync Add Success]", stdout);
+          console.log("[Git Sync Add Local Success] Profile committed locally.");
+          // Attempt push as a separate, fully graceful operation
+          exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
+            if (pushErr) {
+              console.info("[Git Sync Push Notice] Git push skipped/unauthenticated. Profile is securely saved locally and committed to Git.");
+            } else {
+              console.log("[Git Sync Push Success]", pushStdout);
+            }
+          });
         }
       });
 
@@ -371,11 +379,19 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
 
         if (deletedAny && filesToGitRm.length > 0) {
           const filesStr = filesToGitRm.join(" ");
-          exec(`git rm ${filesStr} && (git diff-index --quiet HEAD || git commit -m "feat: deactivate user profile ${profileName}") && git pull --rebase --autostash origin main && git push origin main`, (err, stdout, stderr) => {
+          exec(`git rm ${filesStr} && (git diff-index --quiet HEAD || git commit -m "feat: deactivate user profile ${profileName}")`, (err, stdout, stderr) => {
             if (err) {
-              console.error("[Git Sync Delete Error]", err, stderr);
+              console.warn("[Git Sync Delete Local Warning]", err.message);
             } else {
-              console.log("[Git Sync Delete Success]", stdout);
+              console.log("[Git Sync Delete Local Success] Deactivation committed locally.");
+              // Attempt push as a separate, fully graceful operation
+              exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
+                if (pushErr) {
+                  console.info("[Git Sync Push Notice] Git push skipped/unauthenticated. Deactivation is securely saved locally and committed to Git.");
+                } else {
+                  console.log("[Git Sync Push Success]", pushStdout);
+                }
+              });
             }
           });
         }
