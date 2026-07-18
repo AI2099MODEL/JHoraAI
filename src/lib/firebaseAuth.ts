@@ -435,21 +435,3 @@ export const AuthManager = {
     SessionManager.clearSession();
   }
 };
-
-let cachedGoogleAccessToken: string | null = null;
-
-export function getCachedGoogleAccessToken(): string | null {
-  if (cachedGoogleAccessToken) return cachedGoogleAccessToken;
-  const session = SessionManager.getLocalSession();
-  return session?.accessToken || null;
-}
-
-export function setCachedGoogleAccessToken(token: string | null): void {
-  cachedGoogleAccessToken = token;
-  const session = SessionManager.getLocalSession();
-  if (session) {
-    session.accessToken = token || undefined;
-    localStorage.setItem("jhora_auth_session", JSON.stringify(session));
-  }
-}
-

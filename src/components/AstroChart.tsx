@@ -16,7 +16,6 @@ interface AstroChartProps {
   defaultDivision?: string;
   hideHeader?: boolean;
   hideVargaSelector?: boolean;
-  chartStyle?: "north" | "south";
 }
 
 const VARGAS_LIST = [
@@ -59,8 +58,8 @@ export default function AstroChart({
   defaultDivision = "D1",
   hideHeader = false,
   hideVargaSelector = false,
-  chartStyle = "north",
 }: AstroChartProps) {
+  const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
   const [selectedDivision, setSelectedDivision] = useState<string>(defaultDivision);
 
   // Determine active chart
@@ -164,6 +163,61 @@ export default function AstroChart({
               </div>
             )}
 
+            {/* Style Toggle */}
+            <div className="bg-slate-950/80 p-1 rounded-lg border border-indigo-500/15 flex">
+              <button
+                onClick={() => setChartStyle("north")}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                  chartStyle === "north"
+                    ? "bg-indigo-600 text-white shadow-md font-semibold"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+                id="btn-north-chart"
+              >
+                North Indian
+              </button>
+              <button
+                onClick={() => setChartStyle("south")}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                  chartStyle === "south"
+                    ? "bg-indigo-600 text-white shadow-md font-semibold"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+                id="btn-south-chart"
+              >
+                South Indian
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {hideHeader && hideVargaSelector && (
+        <div className="flex justify-end gap-3 mb-4">
+          {/* Style Toggle */}
+          <div className="bg-slate-950/80 p-1 rounded-lg border border-indigo-500/15 flex">
+            <button
+              onClick={() => setChartStyle("north")}
+              className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                chartStyle === "north"
+                  ? "bg-indigo-600 text-white shadow-md font-semibold"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+              id="btn-north-chart"
+            >
+              North Indian
+            </button>
+            <button
+              onClick={() => setChartStyle("south")}
+              className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                chartStyle === "south"
+                  ? "bg-indigo-600 text-white shadow-md font-semibold"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+              id="btn-south-chart"
+            >
+              South Indian
+            </button>
           </div>
         </div>
       )}

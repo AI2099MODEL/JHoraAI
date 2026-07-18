@@ -12,12 +12,6 @@ import { generateAstrologyPDF } from "../lib/pdfGenerator";
 import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelationshipEvidenceEngine";
 import { generateRelationshipPDF } from "../lib/relationshipReportGenerator";
 import { MasterArchitectureView } from "./MasterArchitectureView";
-import { PresentDayEngineView } from "./PresentDayEngineView";
-import { FinalResultsView } from "./FinalResultsView";
-import { EventEngineView } from "./EventEngineView";
-import { UserProfileSubmenuView } from "./UserProfileSubmenuView";
-import RulesTerminal from "./RulesTerminal";
-import EventBookView from "./EventBookView";
 import AstroChart from "./AstroChart";
 import { KPRulebook } from "../lib/rules/kpRulebook";
 import { apiFetch as fetchKpApi } from "../lib/api";
@@ -27,7 +21,6 @@ import IngressTab from "./IngressTab";
 import HoroscopeDashboard from "./HoroscopeDashboard";
 import currentSkyJson from "../knowledgebase/checklist_engine/current_sky.json";
 import { mapJHoraResponseToAstrologyData } from "../lib/jhoraMapper";
-import { calculateAstrology } from "../lib/astrology";
 
 interface PlanetData {
   name: string;
@@ -45,54 +38,8 @@ const PLANET_YEARS: Record<string, number> = {
   Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
 };
 
-function parseSafeDate(str: any): Date {
-  if (!str) return new Date();
-  if (str instanceof Date) return str;
-  const s = String(str).trim();
-  if (s.includes("T")) {
-    return new Date(s);
-  }
-  const parts = s.split(/\s+/);
-  const datePart = parts[0];
-  const timePart = parts[1] || "00:00:00";
-  
-  const dParts = datePart.split("-");
-  const tParts = timePart.split(":");
-  
-  const year = parseInt(dParts[0], 10);
-  const month = parseInt(dParts[1], 10) - 1;
-  const day = parseInt(dParts[2], 10);
-  
-  const hours = parseInt(tParts[0], 10) || 0;
-  const minutes = parseInt(tParts[1], 10) || 0;
-  const seconds = parseInt(tParts[2], 10) || 0;
-  
-  if (isNaN(year) || isNaN(month) || isNaN(day)) {
-    return new Date(s); // Fallback
-  }
-  return new Date(year, month, day, hours, minutes, seconds);
-}
-
-function normPlanetName(name: string): string {
-  const clean = String(name || "").trim().split(" ")[0].trim();
-  const map: Record<string, string> = {
-    "Sury": "Sun", "Surya": "Sun", "Sun": "Sun",
-    "Chandra": "Moon", "Moon": "Moon",
-    "Kuja": "Mars", "Mars": "Mars",
-    "Budha": "Mercury", "Mercury": "Mercury",
-    "Guru": "Jupiter", "Jupiter": "Jupiter",
-    "Sukra": "Venus", "Venus": "Venus",
-    "Sani": "Saturn", "Saturn": "Saturn",
-    "Rahu": "Rahu", "Raagu": "Rahu", "Rhaago": "Rahu",
-    "Ketu": "Ketu", "Kethu": "Ketu"
-  };
-  return map[clean] || clean;
-}
-
 function getSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> {
-  const cleanLord = normPlanetName(parentLord);
-
-  const startIndex = PLANETS_CYCLE.indexOf(cleanLord);
+  const startIndex = PLANETS_CYCLE.indexOf(parentLord);
   if (startIndex === -1) return [];
   
   const totalParentMs = parentEnd.getTime() - parentStart.getTime();
@@ -118,93 +65,11 @@ function getSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): 
   return list;
 }
 
-function getYoginiSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> {
-  const rawWord = String(parentLord || "").trim().split(" ")[0].trim();
-  const normalizedPlanet = normPlanetName(rawWord);
-  
-  const planetMap: Record<string, string> = {
-    "Moon": "Mangala", "Sun": "Pingala", "Jupiter": "Dhanya", "Mars": "Bhramari",
-    "Mercury": "Bhadrika", "Saturn": "Ulka", "Venus": "Siddha", "Rahu": "Sankata"
-  };
-  
-  const cleanLord = planetMap[normalizedPlanet] || normalizedPlanet;
-  
-  const YOGINI_CYCLE = ["Mangala", "Pingala", "Dhanya", "Bhramari", "Bhadrika", "Ulka", "Siddha", "Sankata"];
-  const YOGINI_YEARS: Record<string, number> = {
-    Mangala: 1, Pingala: 2, Dhanya: 3, Bhramari: 4, Bhadrika: 5, Ulka: 6, Siddha: 7, Sankata: 8
-  };
-  const YOGINI_LORDS: Record<string, string> = {
-    Mangala: "Moon", Pingala: "Sun", Dhanya: "Jupiter", Bhramari: "Mars", Bhadrika: "Mercury", Ulka: "Saturn", Siddha: "Venus", Sankata: "Rahu"
-  };
-
-  const startIndex = YOGINI_CYCLE.indexOf(cleanLord);
-  if (startIndex === -1) return [];
-  
-  const totalParentMs = parentEnd.getTime() - parentStart.getTime();
-  const list: Array<{ lord: string; start: Date; end: Date }> = [];
-  let currentStartMs = parentStart.getTime();
-  
-  for (let i = 0; i < 8; i++) {
-    const yName = YOGINI_CYCLE[(startIndex + i) % 8];
-    const yLord = YOGINI_LORDS[yName];
-    const years = YOGINI_YEARS[yName];
-    const share = years / 36;
-    const durationMs = totalParentMs * share;
-    const currentEndMs = currentStartMs + durationMs;
-    
-    list.push({
-      lord: `${yName} (${yLord})`,
-      start: new Date(currentStartMs),
-      end: new Date(currentEndMs)
-    });
-    
-    currentStartMs = currentEndMs;
-  }
-  
-  return list;
-}
-
-function getAshtottariSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> {
-  const cleanLord = normPlanetName(parentLord);
-  
-  const ASHTOTTARI_CYCLE = ["Sun", "Moon", "Mars", "Mercury", "Saturn", "Jupiter", "Rahu", "Venus"];
-  const ASHTOTTARI_YEARS: Record<string, number> = {
-    Sun: 6, Moon: 15, Mars: 8, Mercury: 17, Saturn: 10, Jupiter: 19, Rahu: 12, Venus: 21
-  };
-
-  const startIndex = ASHTOTTARI_CYCLE.indexOf(cleanLord);
-  if (startIndex === -1) return [];
-  
-  const totalParentMs = parentEnd.getTime() - parentStart.getTime();
-  const list: Array<{ lord: string; start: Date; end: Date }> = [];
-  let currentStartMs = parentStart.getTime();
-  
-  for (let i = 0; i < 8; i++) {
-    const lord = ASHTOTTARI_CYCLE[(startIndex + i) % 8];
-    const years = ASHTOTTARI_YEARS[lord];
-    const share = years / 108;
-    const durationMs = totalParentMs * share;
-    const currentEndMs = currentStartMs + durationMs;
-    
-    list.push({
-      lord,
-      start: new Date(currentStartMs),
-      end: new Date(currentEndMs)
-    });
-    
-    currentStartMs = currentEndMs;
-  }
-  
-  return list;
-}
-
 interface HoroscopeReportViewProps {
   astrologyData: any;
   activeUser: any;
   mapAstrologyDataToUserProfileJSON: (user: any, data: any) => any;
   setAstrologyData: (data: any) => void;
-  onLoadProfile?: (record: CachedHoroscopeRecord) => void;
-  onLoadProfileByName?: (name: string) => void;
   isDark: boolean;
   currentDateTime: Date;
   headerGps: {
@@ -214,7 +79,6 @@ interface HoroscopeReportViewProps {
     loading: boolean;
     error: string | null;
   };
-  chartStyle?: "north" | "south";
 }
 
 export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
@@ -222,22 +86,18 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   activeUser,
   mapAstrologyDataToUserProfileJSON,
   setAstrologyData,
-  onLoadProfile,
-  onLoadProfileByName,
   isDark,
   currentDateTime,
-  headerGps,
-  chartStyle = "north" as "north" | "south"
+  headerGps
 }) => {
   const [compiling, setCompiling] = useState(false);
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
-  const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("present");
+  const [majorTab, setMajorTab] = useState<"advanced" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("advanced");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
-  const [eventsSubTab, setEventsSubTab] = useState<"final_results" | "present_day" | "rules" | "event_book" | "event_muhurta" | "current_events" | "engine">("final_results");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
   const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
-  const [vedicSubTab, setVedicSubTab] = useState<string>("table_1");
+  const [vedicSubTab, setVedicSubTab] = useState<string>("birthDetails");
   const [testName, setTestName] = useState<string>(activeUser?.name || "Nitin Jain");
   const [divisionalChartStyle, setDivisionalChartStyle] = useState<"north" | "south">("north");
   const [generatedPdfs, setGeneratedPdfs] = useState<{
@@ -252,23 +112,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [selectedAntarIdx, setSelectedAntarIdx] = useState<number | null>(null);
   const [selectedPratyantarIdx, setSelectedPratyantarIdx] = useState<number | null>(null);
   const [selectedSookshmaIdx, setSelectedSookshmaIdx] = useState<number | null>(null);
-  const [selectedPranaIdx, setSelectedPranaIdx] = useState<number | null>(null);
-
-  const [selectedYoginiMahaIdx, setSelectedYoginiMahaIdx] = useState<number | null>(null);
-  const [selectedYoginiAntarIdx, setSelectedYoginiAntarIdx] = useState<number | null>(null);
-  const [selectedYoginiPratyantarIdx, setSelectedYoginiPratyantarIdx] = useState<number | null>(null);
-  const [selectedYoginiSookshmaIdx, setSelectedYoginiSookshmaIdx] = useState<number | null>(null);
-  const [selectedYoginiPranaIdx, setSelectedYoginiPranaIdx] = useState<number | null>(null);
-
-  const [selectedAshtottariMahaIdx, setSelectedAshtottariMahaIdx] = useState<number | null>(null);
-  const [selectedAshtottariAntarIdx, setSelectedAshtottariAntarIdx] = useState<number | null>(null);
-  const [selectedAshtottariPratyantarIdx, setSelectedAshtottariPratyantarIdx] = useState<number | null>(null);
-  const [selectedAshtottariSookshmaIdx, setSelectedAshtottariSookshmaIdx] = useState<number | null>(null);
-  const [selectedAshtottariPranaIdx, setSelectedAshtottariPranaIdx] = useState<number | null>(null);
 
   // KP Subtabs state variables
   const [kpSubTab, setKpSubTab] = useState<string>("kp_cusps");
-  const [jaiminiSubTab, setJaiminiSubTab] = useState<string>("jaimini");
   const [kpCuspData, setKpCuspData] = useState<any>(null);
   const [kpChartData, setKpChartData] = useState<any>(null);
   const [kpSignificatorsData, setKpSignificatorsData] = useState<any>(null);
@@ -281,22 +127,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [kpHoraryNumber, setKpHoraryNumber] = useState<number>(1);
   const [kpHoraryQuestion, setKpHoraryQuestion] = useState<string>("Will my current business venture succeed in this dasha period?");
   const [selectedKpRuleId, setSelectedKpRuleId] = useState<string | null>("KP_MAR_01");
-
-  // KP Planet Strength Table state variables
-  const [kpStrengthPlanetFilter, setKpStrengthPlanetFilter] = useState<string>("All");
-  const [kpStrengthHouseFilter, setKpStrengthHouseFilter] = useState<string>("All");
-  const [kpStrengthSortField, setKpStrengthSortField] = useState<"planet" | "houseNum" | "count" | "score" | "grade">("planet");
-  const [kpStrengthSortOrder, setKpStrengthSortOrder] = useState<"asc" | "desc">("asc");
-
-  // Configurable KP priorities/weights state
-  const [kpWeights, setKpWeights] = useState({
-    L1: 5.0,
-    L2: 4.0,
-    L3: 3.0,
-    L4: 2.0,
-    L5: 1.0,
-    L6: 0.5
-  });
 
   // Dynamic Transit settings & calculations state variables
   const [transitDate, setTransitDate] = useState<string>(() => {
@@ -393,11 +223,10 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           name: "Transit Sky",
           date: transitDate,
           time: transitTime,
-          location: transitPlace || "New Delhi, India",
-          place: transitPlace || "New Delhi, India",
-          latitude: Number(transitLatitude) || 28.6139,
-          longitude: Number(transitLongitude) || 77.2090,
-          timezone: Number(transitTimezone) || 5.5
+          location: transitPlace,
+          latitude: Number(transitLatitude),
+          longitude: Number(transitLongitude),
+          timezone: Number(transitTimezone)
         })
       });
 
@@ -417,22 +246,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       const mapped = mapJHoraResponseToAstrologyData(rawJson);
       setTransitAstroData(mapped);
     } catch (err: any) {
-      console.warn("Transit calculation fetch failed. Falling back to high-integrity client-side local calculations:", err);
-      try {
-        const localData = calculateAstrology(
-          "Transit Sky",
-          transitDate,
-          transitTime,
-          transitPlace || "New Delhi, India",
-          Number(transitLatitude) || 28.6139,
-          Number(transitLongitude) || 77.2090,
-          Number(transitTimezone) || 5.5
-        );
-        setTransitAstroData(localData);
-      } catch (localErr: any) {
-        console.error("Local transit fallback calculation error:", localErr);
-        setTransitError(err.message || "An error occurred while fetching live transit data.");
-      }
+      console.error("Transit calculation error:", err);
+      setTransitError(err.message || "An error occurred while fetching live transit data.");
     } finally {
       setTransitLoading(false);
     }
@@ -821,20 +636,12 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     if (!astrologyData) return list;
 
     const supportedKeys = [
-      { id: "table_1", label: "Table 1" },
-      { id: "table_2", label: "Table 2" },
-      { id: "table_3", label: "Table 3" },
-      { id: "table_4", label: "Table 4" },
-      { id: "table_5", label: "Table 5" },
-      { id: "table_6", label: "Table 6" },
-      { id: "table_7", label: "Table 7" },
-      { id: "table_8", label: "Table 8" },
-      { id: "table_9", label: "Table 9" },
-      { id: "table_10", label: "Table 10" },
-      { id: "table_11", label: "Table 11" },
-      { id: "table_12", label: "Table 12" },
+      { id: "birthDetails", label: "birthDetails" },
+      { id: "lagna", label: "lagna" },
+      { id: "planets", label: "planets" },
       { id: "panchanga", label: "panchanga" },
       { id: "divisionalCharts", label: "divisionalCharts" },
+      { id: "dashas", label: "dashas*" },
       { id: "shadBala", label: "shadBala*" },
       { id: "ishtaPhala", label: "ishtaPhala*" },
       { id: "bhavaBala", label: "bhavaBala*" },
@@ -859,8 +666,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "kp_cusps", label: "kpCusps*" },
       { id: "kp_planet_analysis", label: "kpPlanets*" },
       { id: "kp_significators", label: "kpSignificators*" },
-      { id: "kp_houses_significators", label: "kpHouses*" },
-      { id: "kp_planet_to_house", label: "kpPlanetToHouse*" },
       { id: "kp_ruling_planets", label: "kpRulingPlanets*" },
       { id: "kp_dasha", label: "kpDasha*" },
       { id: "kp_rulebook", label: "kpRulebook*" },
@@ -872,42 +677,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
     for (const item of supportedKeys) {
       let dataVal = astrologyData[item.id];
-      if (item.id === "table_1") {
-        dataVal = { dummy: true };
-      }
-      if (item.id === "table_2") {
-        dataVal = astrologyData.planets || { dummy: true };
-      }
-      if (item.id === "table_3") {
-        dataVal = astrologyData.dashas || { dummy: true };
-      }
-      if (item.id === "table_4") {
-        dataVal = { dummy: true };
-      }
-      if (item.id === "table_5") {
-        dataVal = { dummy: true };
-      }
-      if (item.id === "table_6") {
-        dataVal = { dummy: true };
-      }
-      if (item.id === "table_7") {
-        dataVal = { dummy: true };
-      }
-      if (item.id === "table_8") {
-        dataVal = { dummy: true };
-      }
-      if (item.id === "table_9") {
-        dataVal = { dummy: true };
-      }
-      if (item.id === "table_10") {
-        dataVal = { dummy: true };
-      }
-      if (item.id === "table_11") {
-        dataVal = { dummy: true };
-      }
-      if (item.id === "table_12") {
-        dataVal = { dummy: true };
-      }
       if (item.id === "special_lagnas" && !dataVal) {
         dataVal = astrologyData.special_lagnas || { dummy: true };
       }
@@ -989,7 +758,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
     "argalas", "charaDasha", "panchapakshi", "lalkitab", "gemstones", "numerology",
     "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
-    "kp_significators", "kp_houses_significators", "kp_planet_to_house", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
+    "kp_significators", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
     "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
     "eso_nadi", "eso_lalkitab", "eso_varshaphala", "eso_bazi", "eso_numerology", "eso_celtic", "eso_mayan"
   ];
@@ -998,8 +767,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     { id: "kp_cusps", label: "KP House Cusps" },
     { id: "kp_planet_analysis", label: "Planet Analysis" },
     { id: "kp_significators", label: "Significators" },
-    { id: "kp_houses_significators", label: "Houses & Unique Significators" },
-    { id: "kp_planet_to_house", label: "Planet to House Mappings" },
     { id: "kp_ruling_planets", label: "Ruling Planets" },
     { id: "kp_dasha", label: "KP Dasha" },
     { id: "kp_rulebook", label: "KP Rulebook" },
@@ -1153,7 +920,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         } else if (kpSubTab === "kp_planet_analysis" && !kpChartData) {
           const chart = await fetchReportKpData("/api/kp/chart");
           if (active && chart) setKpChartData(chart);
-        } else if ((kpSubTab === "kp_significators" || kpSubTab === "kp_houses_significators" || kpSubTab === "kp_planet_to_house") && !kpSignificatorsData) {
+        } else if (kpSubTab === "kp_significators" && !kpSignificatorsData) {
           const sigs = await fetchReportKpData("/api/kp/significators");
           if (active && sigs) setKpSignificatorsData(sigs);
         } else if (kpSubTab === "kp_dasha" && !kpDashaData) {
@@ -1207,7 +974,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         // 3. Marriage Promise
         const evidence = calculateUnifiedRelationshipEvidence(astrologyData, undefined, 28);
         const doc3 = generateRelationshipPDF({
-          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Nitin",
+          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Native",
           partnerName: "Auspicious Partner",
           reportType: "Marriage Promise Report",
           reportOption: "Professional",
@@ -1220,7 +987,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
         // 4. Partner Diagnostics
         const doc4 = generateRelationshipPDF({
-          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Nitin",
+          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Native",
           partnerName: "Auspicious Partner",
           reportType: "Complete Relationship Report",
           reportOption: "Professional",
@@ -1280,8 +1047,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       const mLord = m.lord || m.lordName || "Unknown";
       const mStart = m.start_date || m.startDate || m.startTime || "";
       const mEnd = m.end_date || m.endDate || m.endTime || "";
-      const mStartDate = mStart ? parseSafeDate(mStart) : new Date();
-      const mEndDate = mEnd ? parseSafeDate(mEnd) : new Date(mStartDate.getFullYear() + (PLANET_YEARS[mLord] || 10), mStartDate.getMonth(), mStartDate.getDate());
+      const mStartDate = mStart ? new Date(mStart) : new Date();
+      const mEndDate = mEnd ? new Date(mEnd) : new Date(mStartDate.getFullYear() + (PLANET_YEARS[mLord] || 10), mStartDate.getMonth(), mStartDate.getDate());
 
       // Get level 2 (Antar)
       let antarList = m.children || m.subPeriods || [];
@@ -1291,10 +1058,10 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
       const antars = antarList.map((a: any) => {
         const aLord = a.lord || "Unknown";
-        const aStart = a.start_date || a.startDate || a.startTime || a.start || "";
-        const aEnd = a.end_date || a.endDate || a.endTime || a.end || "";
-        const aStartDate = aStart ? parseSafeDate(aStart) : null;
-        const aEndDate = aEnd ? parseSafeDate(aEnd) : null;
+        const aStart = a.start_date || a.startDate || a.startTime || "";
+        const aEnd = a.end_date || a.endDate || a.endTime || "";
+        const aStartDate = aStart ? new Date(aStart) : null;
+        const aEndDate = aEnd ? new Date(aEnd) : null;
         
         const start = aStartDate || new Date();
         const end = aEndDate || new Date();
@@ -1307,10 +1074,10 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
         const pratyantars = pratyantarList.map((p: any) => {
           const pLord = p.lord || "Unknown";
-          const pStart = p.start_date || p.startDate || p.startTime || p.start || "";
-          const pEnd = p.end_date || p.endDate || p.endTime || p.end || "";
-          const pStartDate = pStart ? parseSafeDate(pStart) : null;
-          const pEndDate = pEnd ? parseSafeDate(pEnd) : null;
+          const pStart = p.start_date || p.startDate || p.startTime || "";
+          const pEnd = p.end_date || p.endDate || p.endTime || "";
+          const pStartDate = pStart ? new Date(pStart) : null;
+          const pEndDate = pEnd ? new Date(pEnd) : null;
           
           const pStartReal = pStartDate || new Date();
           const pEndReal = pEndDate || new Date();
@@ -1323,10 +1090,10 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
           const sookshmas = sookshmaList.map((s: any) => {
             const sLord = s.lord || "Unknown";
-            const sStart = s.start_date || s.startDate || s.startTime || s.start || "";
-            const sEnd = s.end_date || s.endDate || s.endTime || s.end || "";
-            const sStartDate = sStart ? parseSafeDate(sStart) : null;
-            const sEndDate = sEnd ? parseSafeDate(sEnd) : null;
+            const sStart = s.start_date || s.startDate || s.startTime || "";
+            const sEnd = s.end_date || s.endDate || s.endTime || "";
+            const sStartDate = sStart ? new Date(sStart) : null;
+            const sEndDate = sEnd ? new Date(sEnd) : null;
             
             const sStartReal = sStartDate || new Date();
             const sEndReal = sEndDate || new Date();
@@ -1339,13 +1106,13 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
             const pranas = pranaList.map((pr: any) => {
               const prLord = pr.lord || "Unknown";
-              const prStart = pr.start_date || pr.startDate || pr.startTime || pr.start || "";
-              const prEnd = pr.end_date || pr.endDate || pr.endTime || pr.end || "";
+              const prStart = pr.start_date || pr.startDate || pr.startTime || "";
+              const prEnd = pr.end_date || pr.endDate || pr.endTime || "";
               
               return {
                 lord: prLord,
-                start: prStart ? parseSafeDate(prStart) : new Date(),
-                end: prEnd ? parseSafeDate(prEnd) : new Date()
+                start: prStart ? new Date(prStart) : new Date(),
+                end: prEnd ? new Date(prEnd) : new Date()
               };
             });
 
@@ -1382,383 +1149,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     });
   }, [vedicData, dashas]);
 
-  const yoginiDashaTree = useMemo(() => {
-    const rawList = Array.isArray(vedicData?.dashas?.yogini) && vedicData.dashas.yogini.length > 0
-      ? vedicData.dashas.yogini
-      : (Array.isArray(astrologyData?.additionalDashas?.yogini) ? astrologyData.additionalDashas.yogini : []);
-
-    if (rawList.length === 0) return [];
-
-    return rawList.map((m: any) => {
-      const mLord = m.lord || m.lordName || "Unknown";
-      const mStart = m.start_date || m.startDate || m.startTime || "";
-      const mEnd = m.end_date || m.endDate || m.endTime || "";
-      const mStartDate = mStart ? parseSafeDate(mStart) : new Date();
-      
-      const cleanLord = mLord.split(" ")[0];
-      const YOGINI_YEARS: Record<string, number> = {
-        Mangala: 1, Pingala: 2, Dhanya: 3, Bhramari: 4, Bhadrika: 5, Ulka: 6, Siddha: 7, Sankata: 8
-      };
-      const mEndDate = mEnd ? parseSafeDate(mEnd) : new Date(mStartDate.getFullYear() + (YOGINI_YEARS[cleanLord] || 5), mStartDate.getMonth(), mStartDate.getDate());
-
-      // Get level 2 (Antar)
-      let antarList = m.children || m.subPeriods || [];
-      if (antarList.length === 0) {
-        antarList = getYoginiSubPeriods(mLord, mStartDate, mEndDate);
-      }
-
-      const antars = antarList.map((a: any) => {
-        const aLord = a.lord || "Unknown";
-        const aStart = a.start_date || a.startDate || a.startTime || a.start || "";
-        const aEnd = a.end_date || a.endDate || a.endTime || a.end || "";
-        const aStartDate = aStart ? parseSafeDate(aStart) : null;
-        const aEndDate = aEnd ? parseSafeDate(aEnd) : null;
-        
-        const start = aStartDate || new Date();
-        const end = aEndDate || new Date();
-
-        // Get level 3 (Pratyantar)
-        let pratyantarList = a.children || a.subPeriods || [];
-        if (pratyantarList.length === 0) {
-          pratyantarList = getYoginiSubPeriods(aLord, start, end);
-        }
-
-        const pratyantars = pratyantarList.map((p: any) => {
-          const pLord = p.lord || "Unknown";
-          const pStart = p.start_date || p.startDate || p.startTime || p.start || "";
-          const pEnd = p.end_date || p.endDate || p.endTime || p.end || "";
-          const pStartDate = pStart ? parseSafeDate(pStart) : null;
-          const pEndDate = pEnd ? parseSafeDate(pEnd) : null;
-          
-          const pStartReal = pStartDate || new Date();
-          const pEndReal = pEndDate || new Date();
-
-          // Get level 4 (Sookshma)
-          let sookshmaList = p.children || p.subPeriods || [];
-          if (sookshmaList.length === 0) {
-            sookshmaList = getYoginiSubPeriods(pLord, pStartReal, pEndReal);
-          }
-
-          const sookshmas = sookshmaList.map((s: any) => {
-            const sLord = s.lord || "Unknown";
-            const sStart = s.start_date || s.startDate || s.startTime || s.start || "";
-            const sEnd = s.end_date || s.endDate || s.endTime || s.end || "";
-            const sStartDate = sStart ? parseSafeDate(sStart) : null;
-            const sEndDate = sEnd ? parseSafeDate(sEnd) : null;
-            
-            const sStartReal = sStartDate || new Date();
-            const sEndReal = sEndDate || new Date();
-
-            // Get level 5 (Prana)
-            let pranaList = s.children || s.subPeriods || [];
-            if (pranaList.length === 0) {
-              pranaList = getYoginiSubPeriods(sLord, sStartReal, sEndReal);
-            }
-
-            const pranas = pranaList.map((pr: any) => {
-              const prLord = pr.lord || "Unknown";
-              const prStart = pr.start_date || pr.startDate || pr.startTime || pr.start || "";
-              const prEnd = pr.end_date || pr.endDate || pr.endTime || pr.end || "";
-              
-              return {
-                lord: prLord,
-                start: prStart ? parseSafeDate(prStart) : new Date(),
-                end: prEnd ? parseSafeDate(prEnd) : new Date()
-              };
-            });
-
-            return {
-              lord: sLord,
-              start: sStartReal,
-              end: sEndReal,
-              pranas
-            };
-          });
-
-          return {
-            lord: pLord,
-            start: pStartReal,
-            end: pEndReal,
-            sookshmas
-          };
-        });
-
-        return {
-          lord: aLord,
-          start,
-          end,
-          pratyantars
-        };
-      });
-
-      return {
-        lord: mLord,
-        start: mStartDate,
-        end: mEndDate,
-        antars
-      };
-    });
-  }, [vedicData, astrologyData]);
-
-  const ashtottariDashaTree = useMemo(() => {
-    const rawList = Array.isArray(vedicData?.dashas?.ashtottari) && vedicData.dashas.ashtottari.length > 0
-      ? vedicData.dashas.ashtottari
-      : (Array.isArray(astrologyData?.additionalDashas?.ashtottari) ? astrologyData.additionalDashas.ashtottari : []);
-
-    if (rawList.length === 0) return [];
-
-    return rawList.map((m: any) => {
-      const mLord = m.lord || m.lordName || "Unknown";
-      const mStart = m.start_date || m.startDate || m.startTime || "";
-      const mEnd = m.end_date || m.endDate || m.endTime || "";
-      const mStartDate = mStart ? parseSafeDate(mStart) : new Date();
-      
-      const ASHTOTTARI_YEARS: Record<string, number> = {
-        Sun: 6, Moon: 15, Mars: 8, Mercury: 17, Saturn: 10, Jupiter: 19, Rahu: 12, Venus: 21
-      };
-      const cleanLord = mLord.split(" ")[0];
-      const mEndDate = mEnd ? parseSafeDate(mEnd) : new Date(mStartDate.getFullYear() + (ASHTOTTARI_YEARS[cleanLord] || 10), mStartDate.getMonth(), mStartDate.getDate());
-
-      // Get level 2 (Antar)
-      let antarList = m.children || m.subPeriods || [];
-      if (antarList.length === 0) {
-        antarList = getAshtottariSubPeriods(mLord, mStartDate, mEndDate);
-      }
-
-      const antars = antarList.map((a: any) => {
-        const aLord = a.lord || "Unknown";
-        const aStart = a.start_date || a.startDate || a.startTime || "";
-        const aEnd = a.end_date || a.endDate || a.endTime || "";
-        const aStartDate = aStart ? parseSafeDate(aStart) : null;
-        const aEndDate = aEnd ? parseSafeDate(aEnd) : null;
-        
-        const start = aStartDate || new Date();
-        const end = aEndDate || new Date();
-
-        // Get level 3 (Pratyantar)
-        let pratyantarList = a.children || a.subPeriods || [];
-        if (pratyantarList.length === 0) {
-          pratyantarList = getAshtottariSubPeriods(aLord, start, end);
-        }
-
-        const pratyantars = pratyantarList.map((p: any) => {
-          const pLord = p.lord || "Unknown";
-          const pStart = p.start_date || p.startDate || p.startTime || "";
-          const pEnd = p.end_date || p.endDate || p.endTime || "";
-          const pStartDate = pStart ? parseSafeDate(pStart) : null;
-          const pEndDate = pEnd ? parseSafeDate(pEnd) : null;
-          
-          const pStartReal = pStartDate || new Date();
-          const pEndReal = pEndDate || new Date();
-
-          // Get level 4 (Sookshma)
-          let sookshmaList = p.children || p.subPeriods || [];
-          if (sookshmaList.length === 0) {
-            sookshmaList = getAshtottariSubPeriods(pLord, pStartReal, pEndReal);
-          }
-
-          const sookshmas = sookshmaList.map((s: any) => {
-            const sLord = s.lord || "Unknown";
-            const sStart = s.start_date || s.startDate || s.startTime || "";
-            const sEnd = s.end_date || s.endDate || s.endTime || "";
-            const sStartDate = sStart ? parseSafeDate(sStart) : null;
-            const sEndDate = sEnd ? parseSafeDate(sEnd) : null;
-            
-            const sStartReal = sStartDate || new Date();
-            const sEndReal = sEndDate || new Date();
-
-            // Get level 5 (Prana)
-            let pranaList = s.children || s.subPeriods || [];
-            if (pranaList.length === 0) {
-              pranaList = getAshtottariSubPeriods(sLord, sStartReal, sEndReal);
-            }
-
-            const pranas = pranaList.map((pr: any) => {
-              const prLord = pr.lord || "Unknown";
-              const prStart = pr.start_date || pr.startDate || pr.startTime || "";
-              const prEnd = pr.end_date || pr.endDate || pr.endTime || "";
-              
-              return {
-                lord: prLord,
-                start: prStart ? parseSafeDate(prStart) : new Date(),
-                end: prEnd ? parseSafeDate(prEnd) : new Date()
-              };
-            });
-
-            return {
-              lord: sLord,
-              start: sStartReal,
-              end: sEndReal,
-              pranas
-            };
-          });
-
-          return {
-            lord: pLord,
-            start: pStartReal,
-            end: pEndReal,
-            sookshmas
-          };
-        });
-
-        return {
-          lord: aLord,
-          start,
-          end,
-          pratyantars
-        };
-      });
-
-      return {
-        lord: mLord,
-        start: mStartDate,
-        end: mEndDate,
-        antars
-      };
-    });
-  }, [vedicData, astrologyData]);
-
-  // Auto-sync Vimshottari to current time
-  useEffect(() => {
-    if (dashaTree && dashaTree.length > 0) {
-      const now = new Date();
-      const mIdx = dashaTree.findIndex(m => now >= m.start && now <= m.end);
-      if (mIdx !== -1) {
-        setSelectedMahaIdx(mIdx);
-        const m = dashaTree[mIdx];
-        const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
-        if (aIdx !== -1) {
-          setSelectedAntarIdx(aIdx);
-          const a = m.antars[aIdx];
-          const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
-          if (pIdx !== -1) {
-            setSelectedPratyantarIdx(pIdx);
-            const p = a.pratyantars[pIdx];
-            const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
-            if (sIdx !== -1) {
-              setSelectedSookshmaIdx(sIdx);
-              const s = p.sookshmas[sIdx];
-              const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
-              setSelectedPranaIdx(prIdx !== -1 ? prIdx : 0);
-            } else {
-              setSelectedSookshmaIdx(0);
-              setSelectedPranaIdx(0);
-            }
-          } else {
-            setSelectedPratyantarIdx(0);
-            setSelectedSookshmaIdx(0);
-            setSelectedPranaIdx(0);
-          }
-        } else {
-          setSelectedAntarIdx(0);
-          setSelectedPratyantarIdx(0);
-          setSelectedSookshmaIdx(0);
-          setSelectedPranaIdx(0);
-        }
-      } else {
-        setSelectedMahaIdx(0);
-        setSelectedAntarIdx(0);
-        setSelectedPratyantarIdx(0);
-        setSelectedSookshmaIdx(0);
-        setSelectedPranaIdx(0);
-      }
-    }
-  }, [dashaTree]);
-
-  // Auto-sync Yogini to current time
-  useEffect(() => {
-    if (yoginiDashaTree && yoginiDashaTree.length > 0) {
-      const now = new Date();
-      const mIdx = yoginiDashaTree.findIndex(m => now >= m.start && now <= m.end);
-      if (mIdx !== -1) {
-        setSelectedYoginiMahaIdx(mIdx);
-        const m = yoginiDashaTree[mIdx];
-        const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
-        if (aIdx !== -1) {
-          setSelectedYoginiAntarIdx(aIdx);
-          const a = m.antars[aIdx];
-          const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
-          if (pIdx !== -1) {
-            setSelectedYoginiPratyantarIdx(pIdx);
-            const p = a.pratyantars[pIdx];
-            const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
-            if (sIdx !== -1) {
-              setSelectedYoginiSookshmaIdx(sIdx);
-              const s = p.sookshmas[sIdx];
-              const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
-              setSelectedYoginiPranaIdx(prIdx !== -1 ? prIdx : 0);
-            } else {
-              setSelectedYoginiSookshmaIdx(0);
-              setSelectedYoginiPranaIdx(0);
-            }
-          } else {
-            setSelectedYoginiPratyantarIdx(0);
-            setSelectedYoginiSookshmaIdx(0);
-            setSelectedYoginiPranaIdx(0);
-          }
-        } else {
-          setSelectedYoginiAntarIdx(0);
-          setSelectedYoginiPratyantarIdx(0);
-          setSelectedYoginiSookshmaIdx(0);
-          setSelectedYoginiPranaIdx(0);
-        }
-      } else {
-        setSelectedYoginiMahaIdx(0);
-        setSelectedYoginiAntarIdx(0);
-        setSelectedYoginiPratyantarIdx(0);
-        setSelectedYoginiSookshmaIdx(0);
-        setSelectedYoginiPranaIdx(0);
-      }
-    }
-  }, [yoginiDashaTree]);
-
-  // Auto-sync Ashtottari to current time
-  useEffect(() => {
-    if (ashtottariDashaTree && ashtottariDashaTree.length > 0) {
-      const now = new Date();
-      const mIdx = ashtottariDashaTree.findIndex(m => now >= m.start && now <= m.end);
-      if (mIdx !== -1) {
-        setSelectedAshtottariMahaIdx(mIdx);
-        const m = ashtottariDashaTree[mIdx];
-        const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
-        if (aIdx !== -1) {
-          setSelectedAshtottariAntarIdx(aIdx);
-          const a = m.antars[aIdx];
-          const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
-          if (pIdx !== -1) {
-            setSelectedAshtottariPratyantarIdx(pIdx);
-            const p = a.pratyantars[pIdx];
-            const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
-            if (sIdx !== -1) {
-              setSelectedAshtottariSookshmaIdx(sIdx);
-              const s = p.sookshmas[sIdx];
-              const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
-              setSelectedAshtottariPranaIdx(prIdx !== -1 ? prIdx : 0);
-            } else {
-              setSelectedAshtottariSookshmaIdx(0);
-              setSelectedAshtottariPranaIdx(0);
-            }
-          } else {
-            setSelectedAshtottariPratyantarIdx(0);
-            setSelectedAshtottariSookshmaIdx(0);
-            setSelectedAshtottariPranaIdx(0);
-          }
-        } else {
-          setSelectedAshtottariAntarIdx(0);
-          setSelectedAshtottariPratyantarIdx(0);
-          setSelectedAshtottariSookshmaIdx(0);
-          setSelectedAshtottariPranaIdx(0);
-        }
-      } else {
-        setSelectedAshtottariMahaIdx(0);
-        setSelectedAshtottariAntarIdx(0);
-        setSelectedAshtottariPratyantarIdx(0);
-        setSelectedAshtottariSookshmaIdx(0);
-        setSelectedAshtottariPranaIdx(0);
-      }
-    }
-  }, [ashtottariDashaTree]);
-
   const rawCuspsList = useMemo(() => {
     return kpCuspData?.cusps || (kpData?.cusps ? Object.entries(kpData.cusps).map(([k, v]: [string, any]) => ({
       houseNumber: Number(k.replace("House_", "")) || 1,
@@ -1794,222 +1184,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const rawHouseSignificators = useMemo(() => {
     return kpSignificatorsData?.houseSignificators || kpData?.house_significators || {};
   }, [kpSignificatorsData, kpData]);
-
-  const planetPortfolios: Record<string, string> = {
-    "Sun": "Vitality, authority, father, carrier of soul, government service, status, heart, and general success.",
-    "Moon": "Mind, mother, emotions, liquids, changes, mental peace, left eye, and public interaction.",
-    "Mars": "Energy, courage, brothers, land, real estate, physical strength, surgery, and conflict.",
-    "Mercury": "Intellect, speech, business, education, communication, green color, analytical ability, and writing.",
-    "Jupiter": "Guru, wisdom, wealth, children, husband (for females), spirituality, expansion, liver, and fortune.",
-    "Venus": "Spouse, marriage, vehicles, luxury, arts, relationships, beauty, semen, and material comfort.",
-    "Saturn": "Longevity, labor, service, delays, sorrow, land/mines, teeth/bones, discipline, and hard work.",
-    "Rahu": "Material desires, sudden events, paternal grandfather, foreign travels, obsession, and illusions.",
-    "Ketu": "Moksha (liberation), maternal grandfather, isolation, spiritual detachment, occult sciences, and research."
-  };
-
-  const planetToHouseMap = useMemo(() => {
-    const map: Record<string, { houseNum: number; levels: string[] }[]> = {};
-    const standardPlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
-    
-    standardPlanets.forEach(p => {
-      map[p] = [];
-    });
-
-    const levelsDef = [
-      { keyPattern: /level1|L1/i, label: "L1" },
-      { keyPattern: /level2|L2/i, label: "L2" },
-      { keyPattern: /level3|L3/i, label: "L3" },
-      { keyPattern: /level4|L4/i, label: "L4" },
-      { keyPattern: /level5|L5/i, label: "L5" },
-      { keyPattern: /level6|L6/i, label: "L6" }
-    ];
-
-    for (let hNum = 1; hNum <= 12; hNum++) {
-      const sigObj = rawHouseSignificators[`House_${hNum}`] || 
-                     rawHouseSignificators[String(hNum)] || 
-                     rawHouseSignificators[hNum] || 
-                     rawHouseSignificators[`house_${hNum}`] || 
-                     rawHouseSignificators[`House ${hNum}`];
-      
-      if (!sigObj) continue;
-
-      if (Array.isArray(sigObj)) {
-        sigObj.forEach((p: any) => {
-          const pStr = String(p).trim();
-          if (!pStr || pStr === "—" || pStr === "No active significators") return;
-          
-          let matchedPlanet = pStr;
-          const matchStd = standardPlanets.find(std => std.toLowerCase() === pStr.toLowerCase());
-          if (matchStd) matchedPlanet = matchStd;
-
-          if (!map[matchedPlanet]) map[matchedPlanet] = [];
-          let houseEntry = map[matchedPlanet].find(entry => entry.houseNum === hNum);
-          if (!houseEntry) {
-            houseEntry = { houseNum: hNum, levels: [] };
-            map[matchedPlanet].push(houseEntry);
-          }
-        });
-      } else if (typeof sigObj === "object") {
-        const sigKeys = Object.keys(sigObj);
-        levelsDef.forEach((def) => {
-          const matchingKey = sigKeys.find(k => def.keyPattern.test(k));
-          if (matchingKey) {
-            const val = sigObj[matchingKey];
-            let planetsInLevel: string[] = [];
-            if (Array.isArray(val)) {
-              planetsInLevel = val.map((p: any) => String(p).trim());
-            } else if (typeof val === "string" && val.trim() && val !== "—") {
-              planetsInLevel = val.split(",").map((p: any) => p.trim());
-            }
-
-            planetsInLevel.forEach((p) => {
-              if (!p || p === "—" || p === "No active significators") return;
-              
-              let matchedPlanet = p;
-              const matchStd = standardPlanets.find(std => std.toLowerCase() === p.toLowerCase());
-              if (matchStd) matchedPlanet = matchStd;
-
-              if (!map[matchedPlanet]) map[matchedPlanet] = [];
-              let houseEntry = map[matchedPlanet].find(entry => entry.houseNum === hNum);
-              if (!houseEntry) {
-                houseEntry = { houseNum: hNum, levels: [] };
-                map[matchedPlanet].push(houseEntry);
-              }
-              if (!houseEntry.levels.includes(def.label)) {
-                houseEntry.levels.push(def.label);
-              }
-            });
-          }
-        });
-      } else if (typeof sigObj === "string") {
-        const planetsInLevel = sigObj.split(",").map((p: any) => p.trim());
-        planetsInLevel.forEach((p) => {
-          if (!p || p === "—" || p === "No active significators") return;
-          
-          let matchedPlanet = p;
-          const matchStd = standardPlanets.find(std => std.toLowerCase() === p.toLowerCase());
-          if (matchStd) matchedPlanet = matchStd;
-
-          if (!map[matchedPlanet]) map[matchedPlanet] = [];
-          let houseEntry = map[matchedPlanet].find(entry => entry.houseNum === hNum);
-          if (!houseEntry) {
-            houseEntry = { houseNum: hNum, levels: [] };
-            map[matchedPlanet].push(houseEntry);
-          }
-        });
-      }
-    }
-
-    return map;
-  }, [rawHouseSignificators]);
-
-  // 1. Significator Matrix (Planet, House, L1-L6 flags, Evidence Count)
-  const significatorMatrix = useMemo(() => {
-    const matrix: {
-      planet: string;
-      houseNum: number;
-      L1: boolean;
-      L2: boolean;
-      L3: boolean;
-      L4: boolean;
-      L5: boolean;
-      L6: boolean;
-      count: number;
-    }[] = [];
-
-    Object.entries(planetToHouseMap as any).forEach(([planet, houseEntries]: [string, any]) => {
-      houseEntries.forEach((entry: any) => {
-        const L1 = entry.levels.includes("L1");
-        const L2 = entry.levels.includes("L2");
-        const L3 = entry.levels.includes("L3");
-        const L4 = entry.levels.includes("L4");
-        const L5 = entry.levels.includes("L5");
-        const L6 = entry.levels.includes("L6");
-        const count = entry.levels.length;
-
-        matrix.push({
-          planet,
-          houseNum: entry.houseNum,
-          L1,
-          L2,
-          L3,
-          L4,
-          L5,
-          L6,
-          count
-        });
-      });
-    });
-
-    return matrix;
-  }, [planetToHouseMap]);
-
-  // 2. KP Weight Engine (Reads matrix, applies priorities, computes score and grade)
-  const planetStrengthRows = useMemo(() => {
-    return significatorMatrix.map((row) => {
-      const score =
-        (row.L1 ? kpWeights.L1 : 0) +
-        (row.L2 ? kpWeights.L2 : 0) +
-        (row.L3 ? kpWeights.L3 : 0) +
-        (row.L4 ? kpWeights.L4 : 0) +
-        (row.L5 ? kpWeights.L5 : 0) +
-        (row.L6 ? kpWeights.L6 : 0);
-
-      let grade = "Low";
-      if (score >= 9.0) grade = "Very High";
-      else if (score >= 5.0) grade = "High";
-      else if (score >= 2.0) grade = "Medium";
-
-      // Reconstruct levels for backward-compatibility with UI render
-      const levels: string[] = [];
-      if (row.L1) levels.push("L1");
-      if (row.L2) levels.push("L2");
-      if (row.L3) levels.push("L3");
-      if (row.L4) levels.push("L4");
-      if (row.L5) levels.push("L5");
-      if (row.L6) levels.push("L6");
-
-      return {
-        ...row,
-        score,
-        grade,
-        levels
-      };
-    });
-  }, [significatorMatrix, kpWeights]);
-
-  const filteredAndSortedPlanetStrength = useMemo(() => {
-    let result = [...planetStrengthRows];
-
-    // Filter by Planet
-    if (kpStrengthPlanetFilter !== "All") {
-      result = result.filter(r => r.planet === kpStrengthPlanetFilter);
-    }
-
-    // Filter by House
-    if (kpStrengthHouseFilter !== "All") {
-      const houseNum = parseInt(kpStrengthHouseFilter.replace("House ", ""));
-      result = result.filter(r => r.houseNum === houseNum);
-    }
-
-    // Sort
-    result.sort((a, b) => {
-      let valA: any = a[kpStrengthSortField];
-      let valB: any = b[kpStrengthSortField];
-
-      if (typeof valA === "string") {
-        return kpStrengthSortOrder === "asc"
-          ? valA.localeCompare(valB)
-          : valB.localeCompare(valA);
-      } else {
-        return kpStrengthSortOrder === "asc"
-          ? valA - valB
-          : valB - valA;
-      }
-    });
-
-    return result;
-  }, [planetStrengthRows, kpStrengthPlanetFilter, kpStrengthHouseFilter, kpStrengthSortField, kpStrengthSortOrder]);
 
   // Helper formatting for Date
   const formatDashaDate = (d: Date) => {
@@ -2314,46 +1488,29 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               </span>
             </div>
             
-            <div className="flex items-center gap-1.5">
-              <select
-                value={
-                  birthDetails?.name === "Nitin"
-                    ? "Nitin"
-                    : profilesList.find(p => 
-                        p.name === birthDetails?.name && 
-                        p.date === birthDetails?.date && 
-                        p.time === birthDetails?.time
-                      )?.id || 
-                      profilesList.find(p => p.name === birthDetails?.name)?.id || 
-                      "Nitin"
-                }
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === "Nitin") {
-                    if (onLoadProfileByName) {
-                      onLoadProfileByName("Nitin");
-                    }
-                  } else {
-                    const selected = profilesList.find(p => p.id === val);
+            {profilesList.length > 0 ? (
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={profilesList.find(p => p.name === (birthDetails.name || "Nitin Jain"))?.id || ""}
+                  onChange={(e) => {
+                    const selected = profilesList.find(p => p.id === e.target.value);
                     if (selected) {
-                      if (onLoadProfile) {
-                        onLoadProfile(selected);
-                      } else {
-                        setAstrologyData(selected.data);
-                      }
+                      setAstrologyData(selected.data);
                     }
-                  }
-                }}
-                className="bg-slate-900/90 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500/50 cursor-pointer font-medium font-sans"
-              >
-                <option value="Nitin">Nitin (Default)</option>
-                {profilesList.filter(p => p.name !== "Nitin").map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} ({p.date})
-                  </option>
-                ))}
-              </select>
-            </div>
+                  }}
+                  className="bg-slate-900/90 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500/50 cursor-pointer font-medium"
+                >
+                  <option value="" disabled>-- Select a Profile --</option>
+                  {profilesList.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.date})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <span className="text-xs text-slate-400 italic">No profiles cached</span>
+            )}
           </div>
 
           {/* Right: Transit Location geocoder input */}
@@ -2436,43 +1593,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         </div>
       </div>
 
-      {/* API Capture & AI Calculation Architecture Banner */}
-      <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/20 text-[10px] leading-relaxed font-mono space-y-2 md:space-y-0 md:flex md:flex-col md:gap-1.5">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-amber-400 font-bold uppercase tracking-wider bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded text-[8px]">Astrological Captures</span>
-          <span className="text-slate-300">
-            Traditional data computed & captured via <strong className="text-indigo-400 font-sans">Jagannatha Hora (JHora) Astronomical Service</strong> & the server-side <strong className="text-indigo-400 font-sans">Vedic Astro API</strong> (<code className="text-slate-400">/api/astrology/calculate</code>).
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className="text-cyan-400 font-bold uppercase tracking-wider bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded text-[8px]">AI Reasoning & Summaries</span>
-          <span className="text-slate-300">
-            Personal summaries, readings, & consultation answers are processed & calculated using the server-side <strong className="text-cyan-400 font-sans">Gemini API</strong> (<code className="text-slate-400">/api/astrology/ai-analyze</code> & <code className="text-slate-400">/api/user-profile/generate-summary</code>).
-          </span>
-        </div>
-      </div>
-
       {/* Tabs bar for Advanced, Profile */}
       <div className="border-b border-slate-800 flex gap-1 overflow-x-auto pb-px">
         <button
           onClick={() => setMajorTab("advanced")}
           className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
             majorTab === "advanced"
-              ? "border-amber-500 text-amber-500 font-extrabold bg-slate-900/20"
+              ? "border-indigo-500 text-indigo-400 font-extrabold bg-indigo-500/10"
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
-          Predictions
-        </button>
-        <button
-          onClick={() => setMajorTab("present")}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
-            majorTab === "present"
-              ? "border-amber-500 text-amber-500 font-extrabold bg-slate-900/20"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          Events
+          Advanced System
         </button>
         <button
           onClick={() => setMajorTab("jhora")}
@@ -2505,33 +1636,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           Reports
         </button>
       </div>
-
-      {/* Sub-tabs bar for Events */}
-      {majorTab === "present" && (
-        <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40 animate-fade-in">
-          {[
-            { id: "final_results", label: "Final Results" },
-            { id: "present_day", label: "Present Day Engine" },
-            { id: "rules", label: "Astrological Rules" },
-            { id: "event_book", label: "Event Book" },
-            { id: "engine", label: "Engine" },
-            { id: "event_muhurta", label: "Event Muhurta Finder" },
-            { id: "current_events", label: "Space Weather Alerts" }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setEventsSubTab(tab.id as any)}
-              className={`px-2.5 py-1.5 text-[10px] font-mono rounded-md transition-all border text-center ${
-                eventsSubTab === tab.id
-                  ? "bg-amber-500/15 border-amber-500/50 text-amber-400 font-bold shadow-sm shadow-amber-500/10"
-                  : "border-slate-800 bg-slate-900/30 text-slate-400 hover:text-slate-200 hover:bg-slate-900/50"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      )}
 
       {/* Sub-tabs bar for Transit */}
       {majorTab === "transit" && (
@@ -2592,146 +1696,14 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       {/* Main Container */}
       <div className="space-y-6">
 
-        {/* ================= PREDICTIONS WORKSPACE (RULEBOOK EVALUATION) ================= */}
+        {/* ================= ADVANCED SYSTEM: REFERENCE & AUTOMATED SIMULATIONS ================= */}
         {majorTab === "advanced" && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-6">
+            {/* Simulated Rules Engine */}
             <MasterArchitectureView
               astrologyData={astrologyData}
               isDark={isDark}
             />
-          </div>
-        )}
-
-        {/* ================= EVENTS DYNAMIC WORKSPACE ================= */}
-        {majorTab === "present" && (
-          <div className="space-y-6 animate-fade-in">
-            {eventsSubTab === "final_results" && (
-              <FinalResultsView
-                astrologyData={astrologyData}
-                isDark={isDark}
-              />
-            )}
-            {eventsSubTab === "present_day" && (
-              <PresentDayEngineView
-                astrologyData={astrologyData}
-                isDark={isDark}
-              />
-            )}
-            {eventsSubTab === "rules" && (
-              <RulesTerminal
-                isDarkTheme={isDark}
-              />
-            )}
-            {eventsSubTab === "event_book" && (
-              <EventBookView
-                astrologyData={astrologyData}
-                isDark={isDark}
-              />
-            )}
-            {eventsSubTab === "engine" && (
-              <EventEngineView
-                isDark={isDark}
-                astrologyData={astrologyData}
-              />
-            )}
-            {eventsSubTab === "event_muhurta" && (
-              <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
-                <div className="border-b border-indigo-500/10 pb-4 mb-6">
-                  <span className="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                    Planetary Matcher
-                  </span>
-                  <h3 className="text-lg font-sans font-medium text-slate-200 mt-1 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-amber-500" />
-                    Event Muhurta Finder
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Identify perfect planetary times for weddings, business launches, investments, and creative pursuits.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {[
-                    {
-                      name: "Wedding / Vivaha",
-                      desc: "Analyzes Jupiter strength and 7th house aspects to secure divine blessings.",
-                      active: dynamicEventOpportunity.marriageWindow.active,
-                      timeframe: dynamicEventOpportunity.marriageWindow.timeframe,
-                      badge: "Vivaha Samskara"
-                    },
-                    {
-                      name: "Business / Commercial Launch",
-                      desc: "Leverages Mercury and Sun's power to secure public reach, power, and cash flows.",
-                      active: dynamicEventOpportunity.businessOpportunity.active,
-                      timeframe: dynamicEventOpportunity.businessOpportunity.timeframe,
-                      badge: "Udyoga Aarambh"
-                    },
-                    {
-                      name: "Asset / Real Estate Acquisition",
-                      desc: "Maps Saturn's position and Mars aspects to rule out structural delays and secure longevity.",
-                      active: dynamicEventOpportunity.investmentOpportunity.active,
-                      timeframe: dynamicEventOpportunity.investmentOpportunity.timeframe,
-                      badge: "Grahapravesh / Capital"
-                    },
-                    {
-                      name: "Educational Enrollment / Courses",
-                      desc: "Aligns with Jupiter's transit to maximize wisdom retention, concentration, and successful graduation.",
-                      active: dynamicEventOpportunity.learningOpportunity.active,
-                      timeframe: dynamicEventOpportunity.learningOpportunity.timeframe,
-                      badge: "Vidya Aarambh"
-                    },
-                    {
-                      name: "Professional Career Leap",
-                      desc: "Calculates the operating DBA (Dasha-Bhukti-Antara) to secure authority and promotion parameters.",
-                      active: dynamicEventOpportunity.careerOpportunity.active,
-                      timeframe: dynamicEventOpportunity.careerOpportunity.timeframe,
-                      badge: "Karmasthala Rise"
-                    },
-                    {
-                      name: "Refreshes & Sacred Travel",
-                      desc: "Maps the 9th and 12th house transits to schedule rejuvenating pilgrimages or business trips.",
-                      active: dynamicEventOpportunity.travelOpportunity.active,
-                      timeframe: dynamicEventOpportunity.travelOpportunity.timeframe,
-                      badge: "Yatra Samskara"
-                    }
-                  ].map((event) => (
-                    <div key={event.name} className={`p-5 rounded-xl border flex flex-col justify-between min-h-[190px] transition-all bg-slate-900/40 ${
-                      event.active 
-                        ? "border-emerald-500/20 shadow-sm shadow-emerald-500/5 bg-slate-950/40" 
-                        : "border-slate-800"
-                    }`}>
-                      <div>
-                        <div className="flex justify-between items-start gap-2">
-                          <span className="text-[9px] font-mono text-slate-500 uppercase tracking-widest block">{event.badge}</span>
-                          <span className={`text-[8px] font-bold uppercase px-1.5 py-0.5 rounded ${
-                            event.active ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-slate-800 text-slate-400"
-                          }`}>
-                            {event.active ? "Active Window" : "Consolidate"}
-                          </span>
-                        </div>
-                        <h4 className="text-xs font-bold text-amber-500 mt-1.5">{event.name}</h4>
-                        <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                          {event.desc}
-                        </p>
-                      </div>
-
-                      <div className="border-t border-slate-800/40 pt-2.5 mt-3">
-                        <span className="text-[9px] font-mono text-slate-500 block uppercase">Recommended Timeframe</span>
-                        <span className="text-[11px] font-bold text-slate-200 mt-0.5 block">{event.timeframe}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {eventsSubTab === "current_events" && (
-              <div className={`p-6 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15`}>
-                <TransitsTab 
-                  astrologyData={astrologyData}
-                  subTab="current_events"
-                  chartStyle={chartStyle}
-                />
-              </div>
-            )}
           </div>
         )}
 
@@ -2851,127 +1823,118 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             <div className="w-full space-y-6">
               {majorTab === "jhora" && (
                 <div className="space-y-6">
-                  {vedicSubTab === "table_1" && (
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                      {/* Birth Details Block */}
-                      {birthDetails && Object.keys(birthDetails).length > 0 && (
-                        <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
-                          <div className="border-b border-slate-800 pb-2 flex flex-wrap items-center justify-between gap-2">
-                            <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 1: Birth Details (Birth Particulars)</h3>
-                            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (birthDetails)</span>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Full Name:</span>
-                              <span className="text-slate-100 font-bold">{birthDetails.name || activeUser?.name || "Nitin Jain"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Date of Birth:</span>
-                              <span className="text-slate-200">{birthDetails.date || "1976-01-06"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Time of Birth:</span>
-                              <span className="text-slate-200">{birthDetails.time || "18:40:00"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Birth Location:</span>
-                              <span className="text-slate-200 font-sans">{birthDetails.location || "Dehradun, India"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Latitude:</span>
-                              <span className="text-slate-200">{Number(birthDetails.latitude || 30.3165).toFixed(4)}° N</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Longitude:</span>
-                              <span className="text-slate-200">{Number(birthDetails.longitude || 78.0322).toFixed(4)}° E</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Julian Day Number:</span>
-                              <span className="text-slate-200">{astronomicalData?.julian_day_number || "2442784.277778"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Sidereal Time (LST):</span>
-                              <span className="text-slate-200">{astronomicalData?.sidereal_time || "12:14:15"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Ayanamsa Reference:</span>
-                              <span className="text-slate-200 font-sans">{birthDetails.ayanamsa || "Lahiri Ayanamsa"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Ayanamsa Value:</span>
-                              <span className="text-slate-200">{Number(birthDetails.ayanamsaDegree || 23.5512).toFixed(4)}°</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Obliquity of Ecliptic:</span>
-                              <span className="text-slate-200">{astronomicalData?.obliquity || "23° 26' 27\""}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Place ID:</span>
-                              <span className="text-slate-200 overflow-hidden text-ellipsis whitespace-nowrap max-w-[180px]" title={birthDetails.placeId}>{birthDetails.placeId || "ChIJuS_v16Lp_zMRwXnL-4E_P-s"}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                  {vedicSubTab === "birthDetails" && birthDetails && Object.keys(birthDetails).length > 0 && (
+                <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h3 className="font-bold text-amber-400 uppercase tracking-wider">birthDetails (Birth Particulars)</h3>
+                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Full Name:</span>
+                    <span className="text-slate-100 font-bold">{birthDetails.name || activeUser?.name || "Nitin Jain"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Date of Birth:</span>
+                    <span className="text-slate-200">{birthDetails.date || "1976-01-06"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Time of Birth:</span>
+                    <span className="text-slate-200">{birthDetails.time || "18:40:00"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Birth Location:</span>
+                    <span className="text-slate-200 font-sans">{birthDetails.location || "Dehradun, India"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Latitude:</span>
+                    <span className="text-slate-200">{Number(birthDetails.latitude || 30.3165).toFixed(4)}° N</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Longitude:</span>
+                    <span className="text-slate-200">{Number(birthDetails.longitude || 78.0322).toFixed(4)}° E</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Julian Day Number:</span>
+                    <span className="text-slate-200">{astronomicalData?.julian_day_number || "2442784.277778"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Sidereal Time (LST):</span>
+                    <span className="text-slate-200">{astronomicalData?.sidereal_time || "12:14:15"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Ayanamsa Reference:</span>
+                    <span className="text-slate-200 font-sans">{birthDetails.ayanamsa || "Lahiri Ayanamsa"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Ayanamsa Value:</span>
+                    <span className="text-slate-200">{Number(birthDetails.ayanamsaDegree || 23.5512).toFixed(4)}°</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Obliquity of Ecliptic:</span>
+                    <span className="text-slate-200">{astronomicalData?.obliquity || "23° 26' 27\""}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Place ID:</span>
+                    <span className="text-slate-200 overflow-hidden text-ellipsis whitespace-nowrap max-w-[180px]" title={birthDetails.placeId}>{birthDetails.placeId || "ChIJuS_v16Lp_zMRwXnL-4E_P-s"}</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
-                      {/* Lagna Block */}
-                      {lagna && Object.keys(lagna).length > 0 && (
-                        <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
-                          <div className="border-b border-slate-800 pb-2 flex flex-wrap items-center justify-between gap-2">
-                            <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 1: Lagna Details (Ascendant Coordinates)</h3>
-                            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (ascendant)</span>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Zodiac Sign (Lagna):</span>
-                              <span className="text-slate-100 font-bold font-sans">{lagna.sign || "Cancer"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Longitude (In Sign):</span>
-                              <span className="text-slate-200">{lagna.degree ? formatDegree(lagna.degree) : "00° 00'"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Exact 360° Longitude:</span>
-                              <span className="text-slate-200">{lagna.longitude ? format360Degree(lagna.longitude) : "00° 00'"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Nakshatra:</span>
-                              <span className="text-slate-200 font-sans">{lagna.nakshatra || "Pushya"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Nakshatra Pada:</span>
-                              <span className="text-slate-200 font-bold">{lagna.pada || 2}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Nakshatra Lord (Ruler):</span>
-                              <span className="text-slate-200 font-sans">{vedicData?.ascendant?.nakshatra_lord || "Saturn"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Sub-Lord (KP):</span>
-                              <span className="text-slate-200 font-sans">{vedicData?.ascendant?.sub_lord || "Mercury"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Sub-Sub-Lord (KP):</span>
-                              <span className="text-slate-200 font-sans">{vedicData?.ascendant?.sub_sub_lord || "Rahu"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Lagna Lord (Ruler of Sign):</span>
-                              <span className="text-slate-200 font-sans">{vedicData?.ascendant?.lagna_lord || "Moon"}</span>
-                            </div>
-                            <div className="flex justify-between py-1 border-b border-slate-900/60">
-                              <span className="text-slate-400">Lagna Lord Placement:</span>
-                              <span className="text-slate-200 font-sans">{vedicData?.ascendant?.lagna_lord_house || "House 11"}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+              {vedicSubTab === "lagna" && lagna && Object.keys(lagna).length > 0 && (
+                <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">lagna</h3>
+                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Zodiac Sign (Lagna):</span>
+                    <span className="text-slate-100 font-bold font-sans">{lagna.sign || "Cancer"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Longitude (In Sign):</span>
+                    <span className="text-slate-200">{lagna.degree ? formatDegree(lagna.degree) : "00° 00'"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Exact 360° Longitude:</span>
+                    <span className="text-slate-200">{lagna.longitude ? format360Degree(lagna.longitude) : "00° 00'"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Nakshatra:</span>
+                    <span className="text-slate-200 font-sans">{lagna.nakshatra || "Pushya"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Nakshatra Pada:</span>
+                    <span className="text-slate-200 font-bold">{lagna.pada || 2}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Nakshatra Lord (Ruler):</span>
+                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.nakshatra_lord || "Saturn"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Sub-Lord (KP):</span>
+                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.sub_lord || "Mercury"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Sub-Sub-Lord (KP):</span>
+                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.sub_sub_lord || "Rahu"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Lagna Lord (Ruler of Sign):</span>
+                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.lagna_lord || "Moon"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-900/60">
+                    <span className="text-slate-400">Lagna Lord Placement:</span>
+                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.lagna_lord_house || "House 11"}</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
-              {vedicSubTab === "table_2" && planets && planets.length > 0 && (
+              {vedicSubTab === "planets" && planets && planets.length > 0 && (
                 <div className="space-y-4 p-4 rounded-xl border border-slate-800 bg-slate-950/40 text-[11px] md:text-xs">
-                  <div className="border-b border-slate-800 pb-2 flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 2: KP Graha, Nakshatra and Pada</h3>
-                    <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (planets)</span>
+                  <div className="border-b border-slate-800 pb-2">
+                    <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">planets</h3>
                   </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -3023,13 +1986,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                       })}
                     </tbody>
                   </table>
-                </div>
-
-                <div className="mt-4 p-4 rounded-lg bg-slate-900/50 border border-slate-800/80">
-                  <h4 className="text-amber-400 font-bold text-xs uppercase tracking-wider mb-2 font-sans">Table 2: Data Provenance & Analysis Summary</h4>
-                  <p className="text-slate-300 text-xs leading-relaxed font-sans">
-                    Every parameter displayed in this grid binds to a single source of truth. The raw planetary longitude, sign, house placements, nakshatras, and retrograde/combust coordinates are retrieved in real-time from the authoritative <strong>Dehradun JHora Rest Server Endpoint (/api/jhora/horoscope)</strong>. Sub-lords, Nakshatra rulers, and Sub-Sub-lords are derived dynamically by executing calculations from the <strong>KP Stellar Division Engine</strong> against the exact Placidus cuspal coordinates to maintain extreme multi-system precision.
-                  </p>
                 </div>
               </div>
             )}
@@ -3171,23 +2127,20 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               </div>
             )}
 
-              {vedicSubTab === "table_3" && ((dashas && dashas.length > 0) || (astrologyData?.additionalDashas?.yogini && astrologyData.additionalDashas.yogini.length > 0)) && (
+              {vedicSubTab === "dashas" && ((dashas && dashas.length > 0) || (astrologyData?.additionalDashas?.yogini && astrologyData.additionalDashas.yogini.length > 0)) && (
                 <div className="space-y-6 text-[10.5px] sm:text-xs">
                   {/* Active Pathway Header & Selection Tracker */}
                   <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/50 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-900 pb-2">
-                      <div className="w-full">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
-                            <Clock className="w-4 h-4 text-amber-400" />
-                            Table 3: Vimshottari Dasha Timeline (To Prana)
-                          </h4>
-                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (dashas.vimshottari)</span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 font-sans mt-0.5">
-                          Interactive down to minutes: click any period to drill down. Yellow items are currently active.
-                        </p>
-                      </div>
+                      <div>
+                        <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
+                          <Clock className="w-4 h-4 text-amber-400" />
+                          dashas
+                        </h4>
+                      <p className="text-[10px] text-slate-400 font-sans mt-0.5">
+                        Interactive down to minutes: click any period to drill down. Yellow items are currently active.
+                      </p>
+                    </div>
                     <button
                       onClick={() => {
                         if (dashaTree.length === 0) return;
@@ -3205,15 +2158,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                               setSelectedPratyantarIdx(pIdx);
                               const p = a.pratyantars[pIdx];
                               const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
-                              if (sIdx !== -1) {
-                                setSelectedSookshmaIdx(sIdx);
-                                const s = p.sookshmas[sIdx];
-                                const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
-                                setSelectedPranaIdx(prIdx !== -1 ? prIdx : 0);
-                              } else {
-                                setSelectedSookshmaIdx(0);
-                                setSelectedPranaIdx(0);
-                              }
+                              setSelectedSookshmaIdx(sIdx !== -1 ? sIdx : 0);
                             }
                           }
                         }
@@ -3262,10 +2207,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                 if (selectedSookshmaIdx !== null && p.sookshmas[selectedSookshmaIdx]) {
                                   const s = p.sookshmas[selectedSookshmaIdx];
                                   path += ` ➔ ${s.lord}`;
-                                  if (selectedPranaIdx !== null && s.pranas && s.pranas[selectedPranaIdx]) {
-                                    const pr = s.pranas[selectedPranaIdx];
-                                    path += ` ➔ ${pr.lord}`;
-                                  }
                                 }
                               }
                             }
@@ -3297,7 +2238,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                               setSelectedAntarIdx(0);
                               setSelectedPratyantarIdx(0);
                               setSelectedSookshmaIdx(0);
-                              setSelectedPranaIdx(0);
                             }}
                             className={`p-2 rounded cursor-pointer transition-all border text-left ${
                               isActive
@@ -3338,7 +2278,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                 setSelectedAntarIdx(idx);
                                 setSelectedPratyantarIdx(0);
                                 setSelectedSookshmaIdx(0);
-                                setSelectedPranaIdx(0);
                               }}
                               className={`p-2 rounded cursor-pointer transition-all border text-left ${
                                 isActive
@@ -3381,7 +2320,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                               onClick={() => {
                                 setSelectedPratyantarIdx(idx);
                                 setSelectedSookshmaIdx(0);
-                                setSelectedPranaIdx(0);
                               }}
                               className={`p-2 rounded cursor-pointer transition-all border text-left ${
                                 isActive
@@ -3421,10 +2359,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                           return (
                             <div
                               key={idx}
-                              onClick={() => {
-                                setSelectedSookshmaIdx(idx);
-                                setSelectedPranaIdx(0);
-                              }}
+                              onClick={() => setSelectedSookshmaIdx(idx)}
                               className={`p-2 rounded cursor-pointer transition-all border text-left ${
                                 isActive
                                   ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
@@ -3459,17 +2394,13 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                         dashaTree[selectedMahaIdx].antars[selectedAntarIdx].pratyantars[selectedPratyantarIdx].sookshmas[selectedSookshmaIdx].pranas.map((pr: any, idx: number) => {
                           const now = new Date();
                           const isActive = now >= pr.start && now <= pr.end;
-                          const isSelected = selectedPranaIdx === idx;
                           return (
                             <div
                               key={idx}
-                              onClick={() => setSelectedPranaIdx(idx)}
-                              className={`p-2 rounded border text-left cursor-pointer transition-all ${
+                              className={`p-2 rounded border text-left ${
                                 isActive
                                   ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                  : isSelected
-                                  ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                  : "border-slate-800/20 bg-slate-900/10 text-slate-400 hover:bg-slate-900/20 hover:text-slate-300"
+                                  : "border-slate-800/20 bg-slate-900/10 text-slate-400"
                               }`}
                             >
                               <div className="flex justify-between items-center">
@@ -3526,647 +2457,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               </div>
             )}
 
-              {vedicSubTab === "table_4" && yoginiDashaTree && yoginiDashaTree.length > 0 && (
-                <div className="space-y-6 text-[10.5px] sm:text-xs">
-                  {/* Active Pathway Header & Selection Tracker */}
-                  <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/50 space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-900 pb-2">
-                      <div className="w-full">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
-                            <Clock className="w-4 h-4 text-amber-400" />
-                            Table 4: Yogini Dasha Timeline (36-Year Cycle)
-                          </h4>
-                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (dashas.yogini)</span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 font-sans mt-0.5">
-                          Interactive 5-level Yogini dasha hierarchy. Click any period to drill down. Yellow items are currently active.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          if (yoginiDashaTree.length === 0) return;
-                          const now = new Date();
-                          const mIdx = yoginiDashaTree.findIndex(m => now >= m.start && now <= m.end);
-                          if (mIdx !== -1) {
-                            setSelectedYoginiMahaIdx(mIdx);
-                            const m = yoginiDashaTree[mIdx];
-                            const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
-                            if (aIdx !== -1) {
-                              setSelectedYoginiAntarIdx(aIdx);
-                              const a = m.antars[aIdx];
-                              const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
-                              if (pIdx !== -1) {
-                                setSelectedYoginiPratyantarIdx(pIdx);
-                                const p = a.pratyantars[pIdx];
-                                const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
-                                if (sIdx !== -1) {
-                                  setSelectedYoginiSookshmaIdx(sIdx);
-                                  const s = p.sookshmas[sIdx];
-                                  const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
-                                  setSelectedYoginiPranaIdx(prIdx !== -1 ? prIdx : 0);
-                                } else {
-                                  setSelectedYoginiSookshmaIdx(0);
-                                  setSelectedYoginiPranaIdx(0);
-                                }
-                              }
-                            }
-                          }
-                        }}
-                        className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded hover:bg-amber-500/20 transition-all font-sans"
-                      >
-                        ⚡ Sync to Active Timeline
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-                      <div className="p-2.5 rounded bg-slate-900/60 border border-slate-850/80 space-y-1">
-                        <span className="text-[9px] uppercase font-bold text-slate-500 font-sans block">Current Active Timeline Path:</span>
-                        <span className="font-bold text-amber-400 tracking-wide text-[11px]">
-                          {(() => {
-                            if (yoginiDashaTree.length === 0) return "No data available";
-                            const now = new Date();
-                            const m = yoginiDashaTree.find(x => now >= x.start && now <= x.end);
-                            if (!m) return "Outside computed cycle";
-                            const a = m.antars.find(x => now >= x.start && now <= x.end);
-                            if (!a) return m.lord;
-                            const p = a.pratyantars.find(x => now >= x.start && now <= x.end);
-                            if (!p) return `${m.lord} ➔ ${a.lord}`;
-                            const s = p.sookshmas.find(x => now >= x.start && now <= x.end);
-                            if (!s) return `${m.lord} ➔ ${a.lord} ➔ ${p.lord}`;
-                            const pr = s.pranas.find(x => now >= x.start && now <= x.end);
-                            if (!pr) return `${m.lord} ➔ ${a.lord} ➔ ${p.lord} ➔ ${s.lord}`;
-                            return `${m.lord} ➔ ${a.lord} ➔ ${p.lord} ➔ ${s.lord} ➔ ${pr.lord}`;
-                          })()}
-                        </span>
-                      </div>
-
-                      <div className="p-2.5 rounded bg-slate-900/60 border border-slate-850/80 space-y-1">
-                        <span className="text-[9px] uppercase font-bold text-slate-500 font-sans block">Currently Selected Focus:</span>
-                        <span className="font-bold text-indigo-400 tracking-wide text-[11px]">
-                          {selectedYoginiMahaIdx !== null && yoginiDashaTree[selectedYoginiMahaIdx] ? (
-                            (() => {
-                              const m = yoginiDashaTree[selectedYoginiMahaIdx];
-                              let path = m.lord;
-                              if (selectedYoginiAntarIdx !== null && m.antars[selectedYoginiAntarIdx]) {
-                                const a = m.antars[selectedYoginiAntarIdx];
-                                path += ` ➔ ${a.lord}`;
-                                if (selectedYoginiPratyantarIdx !== null && a.pratyantars[selectedYoginiPratyantarIdx]) {
-                                  const p = a.pratyantars[selectedYoginiPratyantarIdx];
-                                  path += ` ➔ ${p.lord}`;
-                                  if (selectedYoginiSookshmaIdx !== null && p.sookshmas[selectedYoginiSookshmaIdx]) {
-                                    const s = p.sookshmas[selectedYoginiSookshmaIdx];
-                                    path += ` ➔ ${s.lord}`;
-                                    if (selectedYoginiPranaIdx !== null && s.pranas && s.pranas[selectedYoginiPranaIdx]) {
-                                      const pr = s.pranas[selectedYoginiPranaIdx];
-                                      path += ` ➔ ${pr.lord}`;
-                                    }
-                                  }
-                                }
-                              }
-                              return path;
-                            })()
-                          ) : "Select a row below to inspect periods"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Column Layout */}
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-3 h-[420px] overflow-hidden">
-                    {/* LEVEL 1 */}
-                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
-                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
-                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 1: Maha</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
-                        {yoginiDashaTree.map((m: any, idx: number) => {
-                          const now = new Date();
-                          const isActive = now >= m.start && now <= m.end;
-                          const isSelected = selectedYoginiMahaIdx === idx;
-                          return (
-                            <div
-                              key={idx}
-                              onClick={() => {
-                                setSelectedYoginiMahaIdx(idx);
-                                setSelectedYoginiAntarIdx(0);
-                                setSelectedYoginiPratyantarIdx(0);
-                                setSelectedYoginiSookshmaIdx(0);
-                                setSelectedYoginiPranaIdx(0);
-                              }}
-                              className={`p-2 rounded cursor-pointer transition-all border text-left ${
-                                isActive
-                                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                  : isSelected
-                                  ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                  : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
-                              }`}
-                            >
-                              <div className="flex justify-between items-center">
-                                <span className="font-bold font-sans text-xs">{m.lord}</span>
-                                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
-                              </div>
-                              <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
-                                Until {formatDashaDate(m.end)}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* LEVEL 2 */}
-                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
-                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
-                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 2: Antar</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
-                        {selectedYoginiMahaIdx !== null && yoginiDashaTree[selectedYoginiMahaIdx] ? (
-                          yoginiDashaTree[selectedYoginiMahaIdx].antars.map((a: any, idx: number) => {
-                            const now = new Date();
-                            const isActive = now >= a.start && now <= a.end;
-                            const isSelected = selectedYoginiAntarIdx === idx;
-                            return (
-                              <div
-                                key={idx}
-                                onClick={() => {
-                                  setSelectedYoginiAntarIdx(idx);
-                                  setSelectedYoginiPratyantarIdx(0);
-                                  setSelectedYoginiSookshmaIdx(0);
-                                  setSelectedYoginiPranaIdx(0);
-                                }}
-                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
-                                  isActive
-                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                    : isSelected
-                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
-                                }`}
-                              >
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold font-sans text-xs">{a.lord}</span>
-                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
-                                </div>
-                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
-                                  Until {formatDashaDate(a.end)}
-                                </div>
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Mahadasha</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* LEVEL 3 */}
-                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
-                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
-                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 3: Pratyantar</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
-                        {selectedYoginiMahaIdx !== null && selectedYoginiAntarIdx !== null && yoginiDashaTree[selectedYoginiMahaIdx]?.antars[selectedYoginiAntarIdx] ? (
-                          yoginiDashaTree[selectedYoginiMahaIdx].antars[selectedYoginiAntarIdx].pratyantars.map((p: any, idx: number) => {
-                            const now = new Date();
-                            const isActive = now >= p.start && now <= p.end;
-                            const isSelected = selectedYoginiPratyantarIdx === idx;
-                            return (
-                              <div
-                                key={idx}
-                                onClick={() => {
-                                  setSelectedYoginiPratyantarIdx(idx);
-                                  setSelectedYoginiSookshmaIdx(0);
-                                  setSelectedYoginiPranaIdx(0);
-                                }}
-                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
-                                  isActive
-                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                    : isSelected
-                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
-                                }`}
-                              >
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold font-sans text-[11px]">{p.lord}</span>
-                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
-                                </div>
-                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
-                                  Until {formatDashaDate(p.end)}
-                                </div>
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Antardasha</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* LEVEL 4 */}
-                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
-                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
-                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 4: Sookshma</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
-                        {selectedYoginiMahaIdx !== null && selectedYoginiAntarIdx !== null && selectedYoginiPratyantarIdx !== null && yoginiDashaTree[selectedYoginiMahaIdx]?.antars[selectedYoginiAntarIdx]?.pratyantars[selectedYoginiPratyantarIdx] ? (
-                          yoginiDashaTree[selectedYoginiMahaIdx].antars[selectedYoginiAntarIdx].pratyantars[selectedYoginiPratyantarIdx].sookshmas.map((s: any, idx: number) => {
-                            const now = new Date();
-                            const isActive = now >= s.start && now <= s.end;
-                            const isSelected = selectedYoginiSookshmaIdx === idx;
-                            return (
-                              <div
-                                key={idx}
-                                onClick={() => {
-                                  setSelectedYoginiSookshmaIdx(idx);
-                                  setSelectedYoginiPranaIdx(0);
-                                }}
-                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
-                                  isActive
-                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                    : isSelected
-                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
-                                }`}
-                              >
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold font-sans text-[11px]">{s.lord}</span>
-                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
-                                </div>
-                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
-                                  Until {formatDashaDate(s.end)}
-                                </div>
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Pratyantar</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* LEVEL 5 */}
-                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
-                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
-                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 5: Prana</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
-                        {selectedYoginiMahaIdx !== null && selectedYoginiAntarIdx !== null && selectedYoginiPratyantarIdx !== null && selectedYoginiSookshmaIdx !== null && yoginiDashaTree[selectedYoginiMahaIdx]?.antars[selectedYoginiAntarIdx]?.pratyantars[selectedYoginiPratyantarIdx]?.sookshmas[selectedYoginiSookshmaIdx] ? (
-                          yoginiDashaTree[selectedYoginiMahaIdx].antars[selectedYoginiAntarIdx].pratyantars[selectedYoginiPratyantarIdx].sookshmas[selectedYoginiSookshmaIdx].pranas.map((pr: any, idx: number) => {
-                            const now = new Date();
-                            const isActive = now >= pr.start && now <= pr.end;
-                            const isSelected = selectedYoginiPranaIdx === idx;
-                            return (
-                              <div
-                                key={idx}
-                                onClick={() => setSelectedYoginiPranaIdx(idx)}
-                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
-                                  isActive
-                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                    : isSelected
-                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
-                                }`}
-                              >
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold font-sans text-[11px]">{pr.lord}</span>
-                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
-                                </div>
-                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
-                                  Until {formatDashaDate(pr.end)}
-                                </div>
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Sookshma</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {vedicSubTab === "table_5" && ashtottariDashaTree && ashtottariDashaTree.length > 0 && (
-                <div className="space-y-6 text-[10.5px] sm:text-xs">
-                  {/* Active Pathway Header & Selection Tracker */}
-                  <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/50 space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-900 pb-2">
-                      <div className="w-full">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
-                            <Clock className="w-4 h-4 text-amber-400" />
-                            Table 5: Ashtottari Dasha Timeline (108-Year Cycle)
-                          </h4>
-                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (dashas.ashtottari)</span>
-                        </div>
-                        <p className="text-[10px] text-slate-400 font-sans mt-0.5">
-                          Interactive 5-level Ashtottari dasha hierarchy. Click any period to drill down. Yellow items are currently active.
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          if (ashtottariDashaTree.length === 0) return;
-                          const now = new Date();
-                          const mIdx = ashtottariDashaTree.findIndex(m => now >= m.start && now <= m.end);
-                          if (mIdx !== -1) {
-                            setSelectedAshtottariMahaIdx(mIdx);
-                            const m = ashtottariDashaTree[mIdx];
-                            const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
-                            if (aIdx !== -1) {
-                              setSelectedAshtottariAntarIdx(aIdx);
-                              const a = m.antars[aIdx];
-                              const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
-                              if (pIdx !== -1) {
-                                setSelectedAshtottariPratyantarIdx(pIdx);
-                                const p = a.pratyantars[pIdx];
-                                const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
-                                if (sIdx !== -1) {
-                                  setSelectedAshtottariSookshmaIdx(sIdx);
-                                  const s = p.sookshmas[sIdx];
-                                  const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
-                                  setSelectedAshtottariPranaIdx(prIdx !== -1 ? prIdx : 0);
-                                } else {
-                                  setSelectedAshtottariSookshmaIdx(0);
-                                  setSelectedAshtottariPranaIdx(0);
-                                }
-                              }
-                            }
-                          }
-                        }}
-                        className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded hover:bg-amber-500/20 transition-all font-sans"
-                      >
-                        ⚡ Sync to Active Timeline
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-                      <div className="p-2.5 rounded bg-slate-900/60 border border-slate-850/80 space-y-1">
-                        <span className="text-[9px] uppercase font-bold text-slate-500 font-sans block">Current Active Timeline Path:</span>
-                        <span className="font-bold text-amber-400 tracking-wide text-[11px]">
-                          {(() => {
-                            if (ashtottariDashaTree.length === 0) return "No data available";
-                            const now = new Date();
-                            const m = ashtottariDashaTree.find(x => now >= x.start && x.end);
-                            if (!m) return "Outside computed cycle";
-                            const a = m.antars.find(x => now >= x.start && x.end);
-                            if (!a) return m.lord;
-                            const p = a.pratyantars.find(x => now >= x.start && x.end);
-                            if (!p) return `${m.lord} ➔ ${a.lord}`;
-                            const s = p.sookshmas.find(x => now >= x.start && x.end);
-                            if (!s) return `${m.lord} ➔ ${a.lord} ➔ ${p.lord}`;
-                            const pr = s.pranas.find(x => now >= x.start && x.end);
-                            if (!pr) return `${m.lord} ➔ ${a.lord} ➔ ${p.lord} ➔ ${s.lord}`;
-                            return `${m.lord} ➔ ${a.lord} ➔ ${p.lord} ➔ ${s.lord} ➔ ${pr.lord}`;
-                          })()}
-                        </span>
-                      </div>
-
-                      <div className="p-2.5 rounded bg-slate-900/60 border border-slate-850/80 space-y-1">
-                        <span className="text-[9px] uppercase font-bold text-slate-500 font-sans block">Currently Selected Focus:</span>
-                        <span className="font-bold text-indigo-400 tracking-wide text-[11px]">
-                          {selectedAshtottariMahaIdx !== null && ashtottariDashaTree[selectedAshtottariMahaIdx] ? (
-                            (() => {
-                              const m = ashtottariDashaTree[selectedAshtottariMahaIdx];
-                              let path = m.lord;
-                              if (selectedAshtottariAntarIdx !== null && m.antars[selectedAshtottariAntarIdx]) {
-                                const a = m.antars[selectedAshtottariAntarIdx];
-                                path += ` ➔ ${a.lord}`;
-                                if (selectedAshtottariPratyantarIdx !== null && a.pratyantars[selectedAshtottariPratyantarIdx]) {
-                                  const p = a.pratyantars[selectedAshtottariPratyantarIdx];
-                                  path += ` ➔ ${p.lord}`;
-                                  if (selectedAshtottariSookshmaIdx !== null && p.sookshmas[selectedAshtottariSookshmaIdx]) {
-                                    const s = p.sookshmas[selectedAshtottariSookshmaIdx];
-                                    path += ` ➔ ${s.lord}`;
-                                    if (selectedAshtottariPranaIdx !== null && s.pranas && s.pranas[selectedAshtottariPranaIdx]) {
-                                      const pr = s.pranas[selectedAshtottariPranaIdx];
-                                      path += ` ➔ ${pr.lord}`;
-                                    }
-                                  }
-                                }
-                              }
-                              return path;
-                            })()
-                          ) : "Select a row below to inspect periods"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Column Layout */}
-                  <div className="grid grid-cols-1 md:grid-cols-5 gap-3 h-[420px] overflow-hidden">
-                    {/* LEVEL 1 */}
-                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
-                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
-                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 1: Maha</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
-                        {ashtottariDashaTree.map((m: any, idx: number) => {
-                          const now = new Date();
-                          const isActive = now >= m.start && now <= m.end;
-                          const isSelected = selectedAshtottariMahaIdx === idx;
-                          return (
-                            <div
-                              key={idx}
-                              onClick={() => {
-                                setSelectedAshtottariMahaIdx(idx);
-                                setSelectedAshtottariAntarIdx(0);
-                                setSelectedAshtottariPratyantarIdx(0);
-                                setSelectedAshtottariSookshmaIdx(0);
-                                setSelectedAshtottariPranaIdx(0);
-                              }}
-                              className={`p-2 rounded cursor-pointer transition-all border text-left ${
-                                isActive
-                                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                  : isSelected
-                                  ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                  : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
-                              }`}
-                            >
-                              <div className="flex justify-between items-center">
-                                <span className="font-bold font-sans text-xs">{m.lord}</span>
-                                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
-                              </div>
-                              <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
-                                Until {formatDashaDate(m.end)}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* LEVEL 2 */}
-                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
-                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
-                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 2: Antar</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
-                        {selectedAshtottariMahaIdx !== null && ashtottariDashaTree[selectedAshtottariMahaIdx] ? (
-                          ashtottariDashaTree[selectedAshtottariMahaIdx].antars.map((a: any, idx: number) => {
-                            const now = new Date();
-                            const isActive = now >= a.start && now <= a.end;
-                            const isSelected = selectedAshtottariAntarIdx === idx;
-                            return (
-                              <div
-                                key={idx}
-                                onClick={() => {
-                                  setSelectedAshtottariAntarIdx(idx);
-                                  setSelectedAshtottariPratyantarIdx(0);
-                                  setSelectedAshtottariSookshmaIdx(0);
-                                  setSelectedAshtottariPranaIdx(0);
-                                }}
-                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
-                                  isActive
-                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                    : isSelected
-                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
-                                }`}
-                              >
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold font-sans text-xs">{a.lord}</span>
-                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
-                                </div>
-                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
-                                  Until {formatDashaDate(a.end)}
-                                </div>
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Mahadasha</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* LEVEL 3 */}
-                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
-                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
-                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 3: Pratyantar</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
-                        {selectedAshtottariMahaIdx !== null && selectedAshtottariAntarIdx !== null && ashtottariDashaTree[selectedAshtottariMahaIdx]?.antars[selectedAshtottariAntarIdx] ? (
-                          ashtottariDashaTree[selectedAshtottariMahaIdx].antars[selectedAshtottariAntarIdx].pratyantars.map((p: any, idx: number) => {
-                            const now = new Date();
-                            const isActive = now >= p.start && now <= p.end;
-                            const isSelected = selectedAshtottariPratyantarIdx === idx;
-                            return (
-                              <div
-                                key={idx}
-                                onClick={() => {
-                                  setSelectedAshtottariPratyantarIdx(idx);
-                                  setSelectedAshtottariSookshmaIdx(0);
-                                  setSelectedAshtottariPranaIdx(0);
-                                }}
-                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
-                                  isActive
-                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                    : isSelected
-                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
-                                }`}
-                              >
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold font-sans text-[11px]">{p.lord}</span>
-                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
-                                </div>
-                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
-                                  Until {formatDashaDate(p.end)}
-                                </div>
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Antardasha</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* LEVEL 4 */}
-                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
-                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
-                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 4: Sookshma</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
-                        {selectedAshtottariMahaIdx !== null && selectedAshtottariAntarIdx !== null && selectedAshtottariPratyantarIdx !== null && ashtottariDashaTree[selectedAshtottariMahaIdx]?.antars[selectedAshtottariAntarIdx]?.pratyantars[selectedAshtottariPratyantarIdx] ? (
-                          ashtottariDashaTree[selectedAshtottariMahaIdx].antars[selectedAshtottariAntarIdx].pratyantars[selectedAshtottariPratyantarIdx].sookshmas.map((s: any, idx: number) => {
-                            const now = new Date();
-                            const isActive = now >= s.start && now <= s.end;
-                            const isSelected = selectedAshtottariSookshmaIdx === idx;
-                            return (
-                              <div
-                                key={idx}
-                                onClick={() => {
-                                  setSelectedAshtottariSookshmaIdx(idx);
-                                  setSelectedAshtottariPranaIdx(0);
-                                }}
-                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
-                                  isActive
-                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                    : isSelected
-                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
-                                }`}
-                              >
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold font-sans text-[11px]">{s.lord}</span>
-                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
-                                </div>
-                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
-                                  Until {formatDashaDate(s.end)}
-                                </div>
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Pratyantar</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* LEVEL 5 */}
-                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
-                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
-                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 5: Prana</span>
-                      </div>
-                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
-                        {selectedAshtottariMahaIdx !== null && selectedAshtottariAntarIdx !== null && selectedAshtottariPratyantarIdx !== null && selectedAshtottariSookshmaIdx !== null && ashtottariDashaTree[selectedAshtottariMahaIdx]?.antars[selectedAshtottariAntarIdx]?.pratyantars[selectedAshtottariPratyantarIdx]?.sookshmas[selectedAshtottariSookshmaIdx] ? (
-                          ashtottariDashaTree[selectedAshtottariMahaIdx].antars[selectedAshtottariAntarIdx].pratyantars[selectedAshtottariPratyantarIdx].sookshmas[selectedAshtottariSookshmaIdx].pranas.map((pr: any, idx: number) => {
-                            const now = new Date();
-                            const isActive = now >= pr.start && now <= pr.end;
-                            const isSelected = selectedAshtottariPranaIdx === idx;
-                            return (
-                              <div
-                                key={idx}
-                                onClick={() => setSelectedAshtottariPranaIdx(idx)}
-                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
-                                  isActive
-                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                    : isSelected
-                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
-                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
-                                }`}
-                              >
-                                <div className="flex justify-between items-center">
-                                  <span className="font-bold font-sans text-[11px]">{pr.lord}</span>
-                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
-                                </div>
-                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
-                                  Until {formatDashaDate(pr.end)}
-                                </div>
-                              </div>
-                            );
-                          })
-                        ) : (
-                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Sookshma</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-                  {vedicSubTab === "shadBala" && (
+              {vedicSubTab === "shadBala" && (
                 <div className="space-y-6">
                   <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
                     <div className="border-b border-slate-800 pb-2">
@@ -5297,7 +3588,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 defaultDivision="D1"
                 hideHeader={true}
                 hideVargaSelector={true}
-                chartStyle={chartStyle}
               />
             </div>
 
@@ -5315,7 +3605,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 defaultDivision="D9"
                 hideHeader={true}
                 hideVargaSelector={true}
-                chartStyle={chartStyle}
               />
               <div className="absolute top-2 right-2 text-[9px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 font-bold">
                 D9 Navamsa
@@ -5692,25 +3981,22 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 6: PLANETARY ARGALAS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_10")) && (
+        {showAllAstroSystems && (
           <div id="report-section-6" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-pink-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                  System 6 • Jaimini Planetary Argalas & Obstructions • Table 10
-                </span>
-                <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-pink-400" />
-                  Table 10 - JAIMINI HOUSE-WISE PLANETARY ARGALAS & OBSTRUCTIONS
-                </h2>
-                <p className={`text-xs ${mutedText} mt-1`}>
-                  Sage Jaimini's framework of celestial energy interventions (Argalas) computed across all 12 houses to evaluate energy flow obstruction.
-                </p>
-              </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (argalas)</span>
-            </div>
+            <div className="border-b border-pink-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 6 • Jaimini Planetary Argalas (Interveners)
+              </span>
+              <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-pink-400" />
+                6. HOUSE-WISE PLANETARY ARGALAS & OBSTRUCTIONS (VIRODHA)
+              </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              Sage Jaimini's framework of celestial energy interventions (Argalas) computed across all 12 houses to evaluate energy flow obstruction.
+            </p>
+          </div>
 
           <div className="overflow-x-auto rounded-xl border border-slate-800 text-xs">
             <table className="w-full text-left">
@@ -5859,57 +4145,23 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         </div>
       )}
 
-        {/* ================= SYSTEM 7 (KP): KRISHNAMURTI PADDHATI (KP) ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_6")) && (
-          <div id="report-section-7_kp" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
+        {/* ================= SYSTEM 8: KRISHNAMURTI PADDHATI (KP) ================= */}
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab.startsWith("kp_"))) && (
+          <div id="report-section-8" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-cyan-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                  System 7 • Krishnamurti Paddhati (KP Stellar Astrology) • Table 6
-                </span>
-                <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
-                  <Star className="w-5 h-5 text-cyan-400" />
-                  Table 6 - KP STELLAR COSMIC SIGNALS & DASHAS
-                </h2>
-                <p className={`text-xs ${mutedText} mt-1`}>
-                  High-precision stellar sublord division of house houses, planetary significators, active dashas, rulebook evaluations, transits, and horary resolutions.
-                </p>
-              </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">KP Astro API Suite: /api/kp/cusps & /api/kp/chart</span>
+            <div className="border-b border-cyan-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 8 • Krishnamurti Paddhati (KP Stellar Astrology)
+              </span>
+              <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
+                <Star className="w-5 h-5 text-cyan-400" />
+                8. KP STELLAR COSMIC SIGNALS & DASHAS
+              </h2>
+              <p className={`text-xs ${mutedText} mt-1`}>
+                High-precision stellar sublord division of house houses, planetary significators, active dashas, rulebook evaluations, transits, and horary resolutions.
+              </p>
             </div>
-
-            {!showAllAstroSystems && (
-              <div className="flex flex-wrap gap-1.5 mb-6 border-b border-cyan-500/10 pb-4">
-                {[
-                  { id: "kp_cusps", label: "KP House Cusps" },
-                  { id: "kp_planet_analysis", label: "Planet Analysis" },
-                  { id: "kp_significators", label: "Significators" },
-                  { id: "kp_houses_significators", label: "Houses & Unique Significators" },
-                  { id: "kp_ruling_planets", label: "Ruling Planets" },
-                  { id: "kp_dasha", label: "KP Dasha" },
-                  { id: "kp_rulebook", label: "KP Rulebook" },
-                  { id: "kp_transit", label: "KP Transit" },
-                  { id: "kp_horary", label: "KP Horary" }
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      setKpSubTab(tab.id as any);
-                      setVedicSubTab("table_6");
-                    }}
-                    className={`px-2.5 py-1.5 text-[10px] font-mono rounded-md transition-all border text-center ${
-                      kpSubTab === tab.id
-                        ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
-                        : "border-slate-800 bg-slate-900/30 text-slate-400 hover:text-slate-200"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-            )}
 
             {vedicSubTab === "allAstroSystems" ? (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 text-xs">
@@ -6106,13 +4358,13 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   <div className="space-y-6 animate-fade-in">
                     <div className="flex justify-between items-center border-b border-cyan-500/10 pb-2">
                       <h3 className="text-sm font-bold text-cyan-400">KP Astrological Significators</h3>
-                      <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-0.5 rounded font-mono font-bold uppercase">6-Level strength</span>
+                      <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-0.5 rounded font-mono font-bold uppercase">4-Level strength</span>
                     </div>
                     
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 text-xs">
                       <div className="space-y-3">
                         <span className="text-xs font-bold text-amber-500 block uppercase tracking-wider font-mono">
-                          Planetary Significators (Graha Signals - 6-Fold)
+                          Planetary Significators (Graha Signals)
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           {Object.entries(rawPlanetSignificators).map(([planet, sig]: [string, any]) => (
@@ -6137,14 +4389,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                   <span className="text-slate-500">L4 (Planet Owner):</span>
                                   <span className="text-slate-300 font-semibold">{Array.isArray(sig.level4) ? sig.level4.join(", ") : sig.level4 || "—"}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-500">L5 (Sub Occupant):</span>
-                                  <span className="text-fuchsia-400 font-semibold">{Array.isArray(sig.level5) ? sig.level5.join(", ") : sig.level5 || "—"}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-slate-500">L6 (Sub Owner):</span>
-                                  <span className="text-cyan-400 font-semibold">{Array.isArray(sig.level6) ? sig.level6.join(", ") : sig.level6 || "—"}</span>
-                                </div>
                               </div>
                             </div>
                           ))}
@@ -6153,603 +4397,28 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
                       <div className="space-y-3">
                         <span className="text-xs font-bold text-amber-500 block uppercase tracking-wider font-mono">
-                          House Significators (Bhava Signals - 6-Fold)
+                          House Significators (Bhava Signals)
                         </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {Object.entries(rawHouseSignificators).map(([house, sig]: [string, any]) => {
-                            const houseNum = house.replace("House_", "");
-                            return (
-                              <div key={house} className={`p-3 rounded-xl border border-slate-800 bg-slate-950/20 space-y-2`}>
-                                <div className="flex justify-between items-center border-b border-slate-800 pb-1">
-                                  <span className="font-bold text-cyan-400 text-xs">House {houseNum}</span>
-                                </div>
-                                <div className="space-y-1 text-[11px] font-mono text-slate-300">
-                                  {sig && typeof sig === 'object' && !Array.isArray(sig) ? (
-                                    <>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">L1 (Star Occupant):</span>
-                                        <span className="text-indigo-400 font-semibold">{Array.isArray(sig.level1) ? sig.level1.join(", ") : sig.level1 || "—"}</span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">L2 (Planet Occupant):</span>
-                                        <span className="text-amber-500 font-semibold">{Array.isArray(sig.level2) ? sig.level2.join(", ") : sig.level2 || "—"}</span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">L3 (Star Owner):</span>
-                                        <span className="text-emerald-400 font-semibold">{Array.isArray(sig.level3) ? sig.level3.join(", ") : sig.level3 || "—"}</span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">L4 (Planet Owner):</span>
-                                        <span className="text-slate-300 font-semibold">{Array.isArray(sig.level4) ? sig.level4.join(", ") : sig.level4 || "—"}</span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">L5 (Sub Occupant):</span>
-                                        <span className="text-fuchsia-400 font-semibold">{Array.isArray(sig.level5) ? sig.level5.join(", ") : sig.level5 || "—"}</span>
-                                      </div>
-                                      <div className="flex justify-between">
-                                        <span className="text-slate-500">L6 (Sub Owner):</span>
-                                        <span className="text-cyan-400 font-semibold">{Array.isArray(sig.level6) ? sig.level6.join(", ") : sig.level6 || "—"}</span>
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <div className="flex justify-between">
-                                      <span className="text-slate-500">Active Planets:</span>
-                                      <span className="text-slate-200 font-semibold">{Array.isArray(sig) ? sig.join(", ") : String(sig) || "—"}</span>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* KP Houses & Unique Significators Tab Content */}
-                {kpSubTab === "kp_houses_significators" && (
-                  <div className="space-y-6 animate-fade-in">
-                    <div className="flex justify-between items-center border-b border-cyan-500/10 pb-2">
-                      <h3 className="text-sm font-bold text-cyan-400">KP Houses & Unique Significator Planets</h3>
-                      <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-0.5 rounded font-mono font-bold uppercase">6-Fold Aggregated</span>
-                    </div>
-
-                    <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-                      <table className="w-full text-left text-xs">
-                        <thead>
-                          <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono">
-                            <th className="p-3.5 w-1/4">House / Bhava</th>
-                            <th className="p-3.5 w-1/3">Significator Planets (6-Fold Unique)</th>
-                            <th className="p-3.5">Significance / Meaning of House</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
-                          {Array.from({ length: 12 }, (_, i) => i + 1).map((hNum) => {
-                            const sigObj = rawHouseSignificators[`House_${hNum}`] || 
-                                           rawHouseSignificators[String(hNum)] || 
-                                           rawHouseSignificators[hNum] || 
-                                           rawHouseSignificators[`house_${hNum}`] || 
-                                           rawHouseSignificators[`House ${hNum}`];
-                            
-                            // Get unique planets from all 6 levels
-                            const uniquePlanets = (() => {
-                              if (!sigObj) return [];
-                              if (Array.isArray(sigObj)) {
-                                return Array.from(new Set(sigObj.map((p: any) => String(p).trim()))).filter(Boolean);
-                              }
-                              if (typeof sigObj === "object") {
-                                const planets: string[] = [];
-                                const sigKeys = Object.keys(sigObj);
-                                const levelPatterns = [
-                                  /level1|L1/i,
-                                  /level2|L2/i,
-                                  /level3|L3/i,
-                                  /level4|L4/i,
-                                  /level5|L5/i,
-                                  /level6|L6/i
-                                ];
-
-                                for (const pattern of levelPatterns) {
-                                  const matchingKey = sigKeys.find(k => pattern.test(k));
-                                  if (matchingKey) {
-                                    const val = sigObj[matchingKey];
-                                    if (Array.isArray(val)) {
-                                      planets.push(...val.map((p: any) => String(p).trim()));
-                                    } else if (typeof val === "string" && val.trim() && val !== "—") {
-                                      planets.push(...val.split(",").map((p: any) => p.trim()));
-                                    }
-                                  }
-                                }
-
-                                // Fallback: collect from other string/array keys if empty
-                                if (planets.length === 0) {
-                                  for (const key of sigKeys) {
-                                    const val = sigObj[key];
-                                    if (Array.isArray(val)) {
-                                      planets.push(...val.map((p: any) => String(p).trim()));
-                                    } else if (typeof val === "string" && val.trim() && val !== "—" && val !== "No active significators") {
-                                      planets.push(...val.split(",").map((p: any) => p.trim()));
-                                    }
-                                  }
-                                }
-
-                                return Array.from(new Set(planets)).filter(p => p && p !== "—");
-                              }
-                              if (typeof sigObj === "string") {
-                                return sigObj.split(",").map((p: any) => p.trim()).filter(p => p && p !== "—");
-                              }
-                              return [];
-                            })();
-
-                            const houseInfo = {
-                              1: { name: "1st House (Ascendant / Tanu Bhava)", meaning: "Represents the self, physical body, appearance, overall vitality, temperament, and path of life." },
-                              2: { name: "2nd House (Dhana Bhava)", meaning: "Represents wealth, family, speech, primary education, facial features, right eye, and assets." },
-                              3: { name: "3rd House (Sahaja Bhava)", meaning: "Represents courage, siblings, communication, writing, short travels, intelligence, hands, and initiative." },
-                              4: { name: "4th House (Sukha Bhava)", meaning: "Represents mother, home, vehicles, happiness, basic education, land, general peace, and chest." },
-                              5: { name: "5th House (Putra Bhava)", meaning: "Represents children, intellect, creativity, romance, speculation, past life merits, and stomach." },
-                              6: { name: "6th House (Shatru Bhava)", meaning: "Represents enemies, debts, diseases, competition, service, daily routine, litigation, and lower abdomen." },
-                              7: { name: "7th House (Yuvati Bhava)", meaning: "Represents marriage, spouse, partnerships, business relations, public interaction, and foreign travels." },
-                              8: { name: "8th House (Randhra Bhava)", meaning: "Represents longevity, sudden events, hidden things, inheritance, mysticism, obstacles, and research." },
-                              9: { name: "9th House (Dharma Bhava)", meaning: "Represents fortune, father, guru, higher education, long journeys, religion, righteousness, and thighs." },
-                              10: { name: "10th House (Karma Bhava)", meaning: "Represents career, profession, status, reputation, public life, authority, father's status, and knees." },
-                              11: { name: "11th House (Labha Bhava)", meaning: "Represents gains, desires fulfillment, friends, elder siblings, income sources, and general success." },
-                              12: { name: "12th House (Vyaya Bhava)", meaning: "Represents losses, liberation (moksha), foreign land, expenditure, dreams, sleep, and feet." }
-                            }[hNum] || { name: `House ${hNum}`, meaning: "Signification of the house according to KP astrology principles." };
-
-                            return (
-                              <tr key={hNum} className="hover:bg-slate-900/10 font-sans">
-                                <td className="p-3.5 font-bold text-cyan-400 font-mono text-xs">{houseInfo.name}</td>
-                                <td className="p-3.5">
-                                  {uniquePlanets.length > 0 ? (
-                                    <div className="flex flex-wrap gap-1.5">
-                                      {uniquePlanets.map((planet) => (
-                                        <span
-                                          key={planet}
-                                          className="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20"
-                                        >
-                                          {planet}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  ) : (
-                                    <span className="text-slate-500 italic font-mono text-xs">No active significators</span>
-                                  )}
-                                </td>
-                                <td className="p-3.5 text-xs text-slate-300 leading-relaxed">{houseInfo.meaning}</td>
+                        <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                          <table className="w-full text-left text-xs font-mono">
+                            <thead>
+                              <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800">
+                                <th className="p-2.5">House / Bhava</th>
+                                <th className="p-2.5">Active Planets (Strength order)</th>
                               </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {kpSubTab === "kp_planet_to_house" && (
-                  <div className="space-y-6 animate-fade-in">
-                    {/* Reverse lookup: Planet to House significators */}
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center pb-2">
-                        <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono">Planet to House Significator Mappings</h4>
-                        <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2 py-0.5 rounded font-mono font-bold uppercase">Reverse Lookup</span>
-                      </div>
-
-                      <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-                        <table className="w-full text-left text-xs">
-                          <thead>
-                            <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono">
-                              <th className="p-3.5 w-1/4">Planet</th>
-                              <th className="p-3.5 w-1/2">Signified Houses & Strength Levels</th>
-                              <th className="p-3.5">General Significations & Portfolio</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
-                            {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map((planet) => {
-                              const houses = planetToHouseMap[planet] || [];
-                              const sortedHouses = [...houses].sort((a, b) => a.houseNum - b.houseNum);
-
-                              return (
-                                <tr key={planet} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0">
-                                  <td className="p-3.5 font-bold text-cyan-400 font-mono text-xs">{planet}</td>
-                                  <td className="p-3.5">
-                                    {sortedHouses.length > 0 ? (
-                                      <div className="flex flex-wrap gap-2">
-                                        {sortedHouses.map((item) => (
-                                          <span
-                                            key={item.houseNum}
-                                            className="text-[10px] px-2.5 py-1 rounded-md font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center gap-1"
-                                          >
-                                            <span className="font-bold text-cyan-400">H{item.houseNum}</span>
-                                            {item.levels.length > 0 && (
-                                              <span className="text-slate-400 text-[9px]">({item.levels.join(", ")})</span>
-                                            )}
-                                          </span>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <span className="text-slate-500 italic font-mono text-xs">No signified houses</span>
-                                    )}
-                                  </td>
-                                  <td className="p-3.5 text-xs text-slate-400 leading-relaxed">
-                                    {planetPortfolios[planet] || "Astrological significations according to Vedic and KP astrology principles."}
+                            </thead>
+                            <tbody className="divide-y divide-slate-800/20 text-slate-300">
+                              {Object.entries(rawHouseSignificators).map(([house, sigs]: [string, any]) => (
+                                <tr key={house} className="hover:bg-slate-900/10">
+                                  <td className="p-2.5 font-bold text-cyan-400">{house.replace("House_", "House ")}</td>
+                                  <td className="p-2.5 font-semibold text-slate-200">
+                                    {Array.isArray(sigs) ? sigs.join(", ") : String(sigs)}
                                   </td>
                                 </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-
-                    {/* KP Planet Strength Evaluation Section */}
-                    <div className="space-y-5 pt-6 border-t border-slate-800/40">
-                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2">
-                        <div>
-                          <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                            <Star className="w-4 h-4 text-amber-500 fill-amber-500/10" />
-                            KP Planet Strength Evaluation &amp; Priorities
-                          </h4>
-                          <p className="text-[11px] text-slate-400 mt-1">
-                            Evaluating 6-fold planet strength. Refactored to map a Significator Matrix and execute the separate KP Weight Engine.
-                          </p>
-                        </div>
-                        <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-1 rounded-full font-mono font-bold uppercase shrink-0">
-                          ⭐ Configurable Weight Engine
-                        </span>
-                      </div>
-
-                      {/* KP Weight Engine Interactive Configuration */}
-                      <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-900/25 space-y-3.5">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-2.5">
-                          <div>
-                            <span className="text-[9px] font-mono text-cyan-400 font-bold uppercase tracking-wider">Weight Matrix Controller</span>
-                            <h5 className="text-xs font-bold text-slate-200 mt-0.5">Customize KP Level Priorities</h5>
-                          </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            <button
-                              onClick={() => setKpWeights({ L1: 5.0, L2: 4.0, L3: 3.0, L4: 2.0, L5: 1.0, L6: 0.5 })}
-                              className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
-                            >
-                              Classical Preset
-                            </button>
-                            <button
-                              onClick={() => setKpWeights({ L1: 1.0, L2: 1.0, L3: 1.0, L4: 1.0, L5: 1.0, L6: 1.0 })}
-                              className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
-                            >
-                              Equal Weights Preset
-                            </button>
-                            <button
-                              onClick={() => setKpWeights({ L1: 6.0, L2: 2.0, L3: 4.0, L4: 1.0, L5: 3.0, L6: 0.5 })}
-                              className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
-                            >
-                              Stellar Preset
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                          {[
-                            { key: "L1", desc: "Star Occupant" },
-                            { key: "L2", desc: "Cusp Occupant" },
-                            { key: "L3", desc: "Star Owner" },
-                            { key: "L4", desc: "Cusp Lord" },
-                            { key: "L5", desc: "Sub Occupant" },
-                            { key: "L6", desc: "Sub Owner" }
-                          ].map((item) => {
-                            const k = item.key as keyof typeof kpWeights;
-                            return (
-                              <div key={k} className="p-2.5 rounded-lg bg-slate-950/50 border border-slate-800/80 flex flex-col justify-between space-y-2">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-[10px] font-bold text-slate-300 font-mono">{k}</span>
-                                  <span className="text-[10px] font-bold text-cyan-400 font-mono bg-cyan-500/10 px-1.5 py-0.2 rounded border border-cyan-500/10">
-                                    {kpWeights[k].toFixed(1)}
-                                  </span>
-                                </div>
-                                <div className="text-[9px] text-slate-400 font-medium truncate">{item.desc}</div>
-                                <input
-                                  type="range"
-                                  min="0"
-                                  max="10"
-                                  step="0.5"
-                                  value={kpWeights[k]}
-                                  onChange={(e) => setKpWeights(prev => ({ ...prev, [k]: parseFloat(e.target.value) }))}
-                                  className="w-full accent-cyan-500 cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
-                                />
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Filters & Statistics Summary Grid */}
-                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
-                        {/* Filters Column */}
-                        <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {/* Planet Filter */}
-                          <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-slate-400 uppercase font-bold">Filter Planet</label>
-                            <select
-                              value={kpStrengthPlanetFilter}
-                              onChange={(e) => setKpStrengthPlanetFilter(e.target.value)}
-                              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
-                            >
-                              <option value="All">All Planets</option>
-                              {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map(p => (
-                                <option key={p} value={p}>{p}</option>
                               ))}
-                            </select>
-                          </div>
-
-                          {/* House Filter */}
-                          <div className="space-y-1">
-                            <label className="text-[10px] font-mono text-slate-400 uppercase font-bold">Filter House</label>
-                            <select
-                              value={kpStrengthHouseFilter}
-                              onChange={(e) => setKpStrengthHouseFilter(e.target.value)}
-                              className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
-                            >
-                              <option value="All">All Houses</option>
-                              {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
-                                <option key={h} value={`House ${h}`}>House {h}</option>
-                              ))}
-                            </select>
-                          </div>
-
-                          {/* Reset Filters Button */}
-                          <div className="flex items-end">
-                            <button
-                              onClick={() => {
-                                setKpStrengthPlanetFilter("All");
-                                setKpStrengthHouseFilter("All");
-                                setKpStrengthSortField("planet");
-                                setKpStrengthSortOrder("asc");
-                              }}
-                              className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-slate-700 font-mono transition-colors cursor-pointer"
-                            >
-                              Clear Filters
-                            </button>
-                          </div>
+                            </tbody>
+                          </table>
                         </div>
-
-                        {/* Summary Metrics Panel */}
-                        <div className="lg:col-span-4 bg-slate-900/40 border border-slate-800/60 rounded-xl p-2.5 flex justify-around text-center">
-                          <div>
-                            <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Total Evaluated</div>
-                            <div className="text-sm font-bold font-mono text-cyan-400 mt-0.5">
-                              {filteredAndSortedPlanetStrength.length}
-                            </div>
-                          </div>
-                          <div className="border-l border-slate-800 h-8 self-center"></div>
-                          <div>
-                            <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Very High/High</div>
-                            <div className="text-sm font-bold font-mono text-emerald-400 mt-0.5">
-                              {filteredAndSortedPlanetStrength.filter(r => r.grade === "Very High" || r.grade === "High").length}
-                            </div>
-                          </div>
-                          <div className="border-l border-slate-800 h-8 self-center"></div>
-                          <div>
-                            <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Medium/Low</div>
-                            <div className="text-sm font-bold font-mono text-amber-500 mt-0.5">
-                              {filteredAndSortedPlanetStrength.filter(r => r.grade === "Medium" || r.grade === "Low").length}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Interactive Data Table */}
-                      <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-                        <table className="w-full text-left text-xs border-collapse">
-                          <thead>
-                            <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono select-none">
-                              {/* Clickable headers */}
-                              <th 
-                                className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors"
-                                onClick={() => {
-                                  if (kpStrengthSortField === "planet") {
-                                    setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                                  } else {
-                                    setKpStrengthSortField("planet");
-                                    setKpStrengthSortOrder("asc");
-                                  }
-                                }}
-                              >
-                                <div className="flex items-center gap-1">
-                                  Planet
-                                  {kpStrengthSortField === "planet" && (
-                                    <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
-                                  )}
-                                </div>
-                              </th>
-                              <th 
-                                className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors"
-                                onClick={() => {
-                                  if (kpStrengthSortField === "houseNum") {
-                                    setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                                  } else {
-                                    setKpStrengthSortField("houseNum");
-                                    setKpStrengthSortOrder("asc");
-                                  }
-                                }}
-                              >
-                                <div className="flex items-center gap-1">
-                                  House / Bhava
-                                  {kpStrengthSortField === "houseNum" && (
-                                    <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
-                                  )}
-                                </div>
-                              </th>
-                              <th className="p-3 text-center">L1</th>
-                              <th className="p-3 text-center">L2</th>
-                              <th className="p-3 text-center">L3</th>
-                              <th className="p-3 text-center">L4</th>
-                              <th className="p-3 text-center">L5</th>
-                              <th className="p-3 text-center">L6</th>
-                              <th 
-                                className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
-                                onClick={() => {
-                                  if (kpStrengthSortField === "count") {
-                                    setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                                  } else {
-                                    setKpStrengthSortField("count");
-                                    setKpStrengthSortOrder("desc");
-                                  }
-                                }}
-                              >
-                                <div className="flex items-center justify-center gap-1">
-                                  Count
-                                  {kpStrengthSortField === "count" && (
-                                    <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
-                                  )}
-                                </div>
-                              </th>
-                              <th 
-                                className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
-                                onClick={() => {
-                                  if (kpStrengthSortField === "score") {
-                                    setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                                  } else {
-                                    setKpStrengthSortField("score");
-                                    setKpStrengthSortOrder("desc");
-                                  }
-                                }}
-                              >
-                                <div className="flex items-center justify-center gap-1">
-                                  Score
-                                  {kpStrengthSortField === "score" && (
-                                    <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
-                                  )}
-                                </div>
-                              </th>
-                              <th 
-                                className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
-                                onClick={() => {
-                                  if (kpStrengthSortField === "grade") {
-                                    setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                                  } else {
-                                    setKpStrengthSortField("grade");
-                                    setKpStrengthSortOrder("desc");
-                                  }
-                                }}
-                              >
-                                <div className="flex items-center justify-center gap-1">
-                                  Strength Grade
-                                  {kpStrengthSortField === "grade" && (
-                                    <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
-                                  )}
-                                </div>
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
-                            {filteredAndSortedPlanetStrength.length > 0 ? (
-                              filteredAndSortedPlanetStrength.map((row, index) => {
-                                const houseSanskritMap: Record<number, string> = {
-                                  1: "Ascendant (Tanu)",
-                                  2: "Wealth (Dhana)",
-                                  3: "Siblings (Sahaja)",
-                                  4: "Home & Comfort (Sukha)",
-                                  5: "Progeny & Intellect (Putra)",
-                                  6: "Debts & Enemies (Shatru)",
-                                  7: "Spouse & Partnership (Yuvati)",
-                                  8: "Longevity (Randhra)",
-                                  9: "Fortune & Dharma (Dharma)",
-                                  10: "Career & Status (Karma)",
-                                  11: "Gains & Wishes (Labha)",
-                                  12: "Losses & Moksha (Vyaya)"
-                                };
-
-                                return (
-                                  <tr key={`${row.planet}-${row.houseNum}-${index}`} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0 transition-colors">
-                                    {/* Planet Column */}
-                                    <td className="p-3 font-bold text-cyan-300 font-mono text-xs">
-                                      <div className="flex items-center gap-1.5">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                                        {row.planet}
-                                      </div>
-                                    </td>
-                                    {/* House Column */}
-                                    <td className="p-3 text-xs text-slate-200">
-                                      <span className="font-mono font-bold text-slate-300 bg-slate-900 px-1.5 py-0.5 rounded mr-1.5">H{row.houseNum}</span>
-                                      <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">{houseSanskritMap[row.houseNum] || `House ${row.houseNum}`}</span>
-                                    </td>
-                                    {/* L1 - L6 Column */}
-                                    <td className="p-3 text-center text-xs">
-                                      {row.L1 ? (
-                                        <span className="text-emerald-400 font-extrabold" title="L1 Active">✅</span>
-                                      ) : (
-                                        <span className="text-slate-700" title="L1 Inactive">❌</span>
-                                      )}
-                                    </td>
-                                    <td className="p-3 text-center text-xs">
-                                      {row.L2 ? (
-                                        <span className="text-emerald-400 font-extrabold" title="L2 Active">✅</span>
-                                      ) : (
-                                        <span className="text-slate-700" title="L2 Inactive">❌</span>
-                                      )}
-                                    </td>
-                                    <td className="p-3 text-center text-xs">
-                                      {row.L3 ? (
-                                        <span className="text-emerald-400 font-extrabold" title="L3 Active">✅</span>
-                                      ) : (
-                                        <span className="text-slate-700" title="L3 Inactive">❌</span>
-                                      )}
-                                    </td>
-                                    <td className="p-3 text-center text-xs">
-                                      {row.L4 ? (
-                                        <span className="text-emerald-400 font-extrabold" title="L4 Active">✅</span>
-                                      ) : (
-                                        <span className="text-slate-700" title="L4 Inactive">❌</span>
-                                      )}
-                                    </td>
-                                    <td className="p-3 text-center text-xs">
-                                      {row.L5 ? (
-                                        <span className="text-emerald-400 font-extrabold" title="L5 Active">✅</span>
-                                      ) : (
-                                        <span className="text-slate-700" title="L5 Inactive">❌</span>
-                                      )}
-                                    </td>
-                                    <td className="p-3 text-center text-xs">
-                                      {row.L6 ? (
-                                        <span className="text-emerald-400 font-extrabold" title="L6 Active">✅</span>
-                                      ) : (
-                                        <span className="text-slate-700" title="L6 Inactive">❌</span>
-                                      )}
-                                    </td>
-                                    {/* Evidence Count Column */}
-                                    <td className="p-3 font-mono text-xs font-bold text-slate-300 text-center">
-                                      {row.count}
-                                    </td>
-                                    {/* Score Column */}
-                                    <td className="p-3 font-mono text-xs font-extrabold text-cyan-400 text-center bg-cyan-500/5">
-                                      {row.score.toFixed(1)}
-                                    </td>
-                                    {/* Strength Grade Column */}
-                                    <td className="p-3 text-center">
-                                      <span className={`text-[10px] px-2.5 py-1 rounded-full font-mono font-bold uppercase tracking-wider shadow-sm border ${
-                                        row.grade === "Very High"
-                                          ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-                                          : row.grade === "High"
-                                          ? "bg-teal-500/15 text-teal-400 border-teal-500/30"
-                                          : row.grade === "Medium"
-                                          ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
-                                          : "bg-rose-500/15 text-rose-400 border-rose-500/30"
-                                      }`}>
-                                        {row.grade}
-                                      </span>
-                                    </td>
-                                  </tr>
-                                );
-                              })
-                            ) : (
-                              <tr>
-                                <td colSpan={11} className="p-8 text-center text-slate-500 italic font-mono text-xs">
-                                  No records found matching the specified filters.
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
                       </div>
                     </div>
                   </div>
@@ -6855,16 +4524,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                             >
                               <div className="flex justify-between items-center w-full">
                                 <span className="text-[10px] font-mono text-indigo-400 font-semibold">{rule.id}</span>
-                                <div className="flex items-center gap-1.5">
-                                  <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold border ${
-                                    rule.type === "Transit" 
-                                      ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/15" 
-                                      : "bg-teal-500/10 text-teal-400 border-teal-500/15"
-                                  }`}>{rule.type}</span>
-                                  <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
-                                    evalRes.status === "PASSED" ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"
-                                  }`}>{evalRes.status}</span>
-                                </div>
+                                <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded uppercase font-bold ${
+                                  evalRes.status === "PASSED" ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"
+                                }`}>{evalRes.status}</span>
                               </div>
                               <span className="text-xs font-bold text-slate-200 line-clamp-1">{rule.name}</span>
                             </button>
@@ -7107,469 +4769,23 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           </div>
         )}
 
-        {/* ================= SYSTEM 8: PLANET TO HOUSE SIGNIFICATOR MAPPINGS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_7")) && (
-          <div id="report-section-8" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
-            
-            <div className="border-b border-cyan-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                  System 8 • Planet to House Significator Mappings • Table 7
-                </span>
-                <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
-                  <Star className="w-5 h-5 text-cyan-400" />
-                  Table 7 - PLANET TO HOUSE SIGNIFICATOR MAPPINGS
-                </h2>
-                <p className={`text-xs ${mutedText} mt-1`}>
-                  Complete reverse-lookup of planetary significator levels mapped back to the 12 bhavas/houses, with custom-weighted 6-fold KP strength evaluation, priorities, and grading metrics.
-                </p>
-              </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">KP Astro API Suite: /api/kp/significators</span>
-            </div>
-
-            <div className="space-y-6">
-              {/* Reverse lookup: Planet to House significators */}
-              <div className="space-y-4">
-                <div className="flex justify-between items-center pb-2">
-                  <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono">Planet to House Significator Mappings</h4>
-                  <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-0.5 rounded font-mono font-bold uppercase">Reverse Lookup</span>
-                </div>
-
-                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono">
-                        <th className="p-3.5 w-1/4">Planet</th>
-                        <th className="p-3.5 w-1/2">Signified Houses & Strength Levels</th>
-                        <th className="p-3.5">General Significations & Portfolio</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
-                      {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map((planet) => {
-                        const houses = planetToHouseMap[planet] || [];
-                        const sortedHouses = [...houses].sort((a, b) => a.houseNum - b.houseNum);
-
-                        return (
-                          <tr key={planet} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0">
-                            <td className="p-3.5 font-bold text-cyan-400 font-mono text-xs">{planet}</td>
-                            <td className="p-3.5">
-                              {sortedHouses.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                  {sortedHouses.map((item) => (
-                                    <span
-                                      key={item.houseNum}
-                                      className="text-[10px] px-2.5 py-1 rounded-md font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center gap-1"
-                                    >
-                                      <span className="font-bold text-cyan-400">H{item.houseNum}</span>
-                                      {item.levels.length > 0 && (
-                                        <span className="text-slate-400 text-[9px]">({item.levels.join(", ")})</span>
-                                      )}
-                                    </span>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className="text-slate-500 italic font-mono text-xs">No signified houses</span>
-                              )}
-                            </td>
-                            <td className="p-3.5 text-xs text-slate-400 leading-relaxed">
-                              {planetPortfolios[planet] || "Astrological significations according to Vedic and KP astrology principles."}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* KP Planet Strength Evaluation Section */}
-              <div className="space-y-5 pt-6 border-t border-slate-800/40">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2">
-                  <div>
-                    <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                      <Star className="w-4 h-4 text-amber-500 fill-amber-500/10" />
-                      KP Planet Strength Evaluation &amp; Priorities
-                    </h4>
-                    <p className="text-[11px] text-slate-400 mt-1">
-                      Evaluating 6-fold planet strength. Refactored to map a Significator Matrix and execute the separate KP Weight Engine.
-                    </p>
-                  </div>
-                  <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-1 rounded-full font-mono font-bold uppercase shrink-0">
-                    ⭐ Configurable Weight Engine
-                  </span>
-                </div>
-
-                {/* KP Weight Engine Interactive Configuration */}
-                <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-900/25 space-y-3.5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-2.5">
-                    <div>
-                      <span className="text-[9px] font-mono text-cyan-400 font-bold uppercase tracking-wider">Weight Matrix Controller</span>
-                      <h5 className="text-xs font-bold text-slate-200 mt-0.5">Customize KP Level Priorities</h5>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      <button
-                        onClick={() => setKpWeights({ L1: 5.0, L2: 4.0, L3: 3.0, L4: 2.0, L5: 1.0, L6: 0.5 })}
-                        className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
-                      >
-                        Classical Preset
-                      </button>
-                      <button
-                        onClick={() => setKpWeights({ L1: 1.0, L2: 1.0, L3: 1.0, L4: 1.0, L5: 1.0, L6: 1.0 })}
-                        className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
-                      >
-                        Equal Weights Preset
-                      </button>
-                      <button
-                        onClick={() => setKpWeights({ L1: 6.0, L2: 2.0, L3: 4.0, L4: 1.0, L5: 3.0, L6: 0.5 })}
-                        className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
-                      >
-                        Stellar Preset
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                    {[
-                      { key: "L1", desc: "Star Occupant" },
-                      { key: "L2", desc: "Cusp Occupant" },
-                      { key: "L3", desc: "Star Owner" },
-                      { key: "L4", desc: "Cusp Lord" },
-                      { key: "L5", desc: "Sub Occupant" },
-                      { key: "L6", desc: "Sub Owner" }
-                    ].map((item) => {
-                      const k = item.key as keyof typeof kpWeights;
-                      return (
-                        <div key={k} className="p-2.5 rounded-lg bg-slate-950/50 border border-slate-800/80 flex flex-col justify-between space-y-2">
-                          <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-bold text-slate-300 font-mono">{k}</span>
-                            <span className="text-[10px] font-bold text-cyan-400 font-mono bg-cyan-500/10 px-1.5 py-0.2 rounded border border-cyan-500/10">
-                              {kpWeights[k].toFixed(1)}
-                            </span>
-                          </div>
-                          <div className="text-[9px] text-slate-400 font-medium truncate">{item.desc}</div>
-                          <input
-                            type="range"
-                            min="0"
-                            max="10"
-                            step="0.5"
-                            value={kpWeights[k]}
-                            onChange={(e) => setKpWeights(prev => ({ ...prev, [k]: parseFloat(e.target.value) }))}
-                            className="w-full accent-cyan-500 cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Filters & Statistics Summary Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
-                  {/* Filters Column */}
-                  <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {/* Planet Filter */}
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase font-bold">Filter Planet</label>
-                      <select
-                        value={kpStrengthPlanetFilter}
-                        onChange={(e) => setKpStrengthPlanetFilter(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
-                      >
-                        <option value="All">All Planets</option>
-                        {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map(p => (
-                          <option key={p} value={p}>{p}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* House Filter */}
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-mono text-slate-400 uppercase font-bold">Filter House</label>
-                      <select
-                        value={kpStrengthHouseFilter}
-                        onChange={(e) => setKpStrengthHouseFilter(e.target.value)}
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
-                      >
-                        <option value="All">All Houses</option>
-                        {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
-                          <option key={h} value={`House ${h}`}>House {h}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    {/* Reset Filters Button */}
-                    <div className="flex items-end">
-                      <button
-                        onClick={() => {
-                          setKpStrengthPlanetFilter("All");
-                          setKpStrengthHouseFilter("All");
-                          setKpStrengthSortField("planet");
-                          setKpStrengthSortOrder("asc");
-                        }}
-                        className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-slate-700 font-mono transition-colors cursor-pointer"
-                      >
-                        Clear Filters
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Summary Metrics Panel */}
-                  <div className="lg:col-span-4 bg-slate-900/40 border border-slate-800/60 rounded-xl p-2.5 flex justify-around text-center">
-                    <div>
-                      <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Total Evaluated</div>
-                      <div className="text-sm font-bold font-mono text-cyan-400 mt-0.5">
-                        {filteredAndSortedPlanetStrength.length}
-                      </div>
-                    </div>
-                    <div className="border-l border-slate-800 h-8 self-center"></div>
-                    <div>
-                      <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Very High/High</div>
-                      <div className="text-sm font-bold font-mono text-emerald-400 mt-0.5">
-                        {filteredAndSortedPlanetStrength.filter(r => r.grade === "Very High" || r.grade === "High").length}
-                      </div>
-                    </div>
-                    <div className="border-l border-slate-800 h-8 self-center"></div>
-                    <div>
-                      <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Medium/Low</div>
-                      <div className="text-sm font-bold font-mono text-amber-500 mt-0.5">
-                        {filteredAndSortedPlanetStrength.filter(r => r.grade === "Medium" || r.grade === "Low").length}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Interactive Data Table */}
-                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono select-none">
-                        <th 
-                          className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors"
-                          onClick={() => {
-                            if (kpStrengthSortField === "planet") {
-                              setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                            } else {
-                              setKpStrengthSortField("planet");
-                              setKpStrengthSortOrder("asc");
-                            }
-                          }}
-                        >
-                          <div className="flex items-center gap-1">
-                            Planet
-                            {kpStrengthSortField === "planet" && (
-                              <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
-                            )}
-                          </div>
-                        </th>
-                        <th 
-                          className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors"
-                          onClick={() => {
-                            if (kpStrengthSortField === "houseNum") {
-                              setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                            } else {
-                              setKpStrengthSortField("houseNum");
-                              setKpStrengthSortOrder("asc");
-                            }
-                          }}
-                        >
-                          <div className="flex items-center gap-1">
-                            House / Bhava
-                            {kpStrengthSortField === "houseNum" && (
-                              <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
-                            )}
-                          </div>
-                        </th>
-                        <th className="p-3 text-center">L1</th>
-                        <th className="p-3 text-center">L2</th>
-                        <th className="p-3 text-center">L3</th>
-                        <th className="p-3 text-center">L4</th>
-                        <th className="p-3 text-center">L5</th>
-                        <th className="p-3 text-center">L6</th>
-                        <th 
-                          className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
-                          onClick={() => {
-                            if (kpStrengthSortField === "count") {
-                              setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                            } else {
-                              setKpStrengthSortField("count");
-                              setKpStrengthSortOrder("desc");
-                            }
-                          }}
-                        >
-                          <div className="flex items-center justify-center gap-1">
-                            Count
-                            {kpStrengthSortField === "count" && (
-                              <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
-                            )}
-                          </div>
-                        </th>
-                        <th 
-                          className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
-                          onClick={() => {
-                            if (kpStrengthSortField === "score") {
-                              setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                            } else {
-                              setKpStrengthSortField("score");
-                              setKpStrengthSortOrder("desc");
-                            }
-                          }}
-                        >
-                          <div className="flex items-center justify-center gap-1">
-                            Score
-                            {kpStrengthSortField === "score" && (
-                              <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
-                            )}
-                          </div>
-                        </th>
-                        <th 
-                          className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
-                          onClick={() => {
-                            if (kpStrengthSortField === "grade") {
-                              setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
-                            } else {
-                              setKpStrengthSortField("grade");
-                              setKpStrengthSortOrder("desc");
-                            }
-                          }}
-                        >
-                          <div className="flex items-center justify-center gap-1">
-                            Strength Grade
-                            {kpStrengthSortField === "grade" && (
-                              <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
-                            )}
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
-                      {filteredAndSortedPlanetStrength.length > 0 ? (
-                        filteredAndSortedPlanetStrength.map((row, index) => {
-                          const houseSanskritMap: Record<number, string> = {
-                            1: "Ascendant (Tanu)",
-                            2: "Wealth (Dhana)",
-                            3: "Siblings (Sahaja)",
-                            4: "Home & Comfort (Sukha)",
-                            5: "Progeny & Intellect (Putra)",
-                            6: "Debts & Enemies (Shatru)",
-                            7: "Spouse & Partnership (Yuvati)",
-                            8: "Longevity (Randhra)",
-                            9: "Fortune & Dharma (Dharma)",
-                            10: "Career & Status (Karma)",
-                            11: "Gains & Wishes (Labha)",
-                            12: "Losses & Moksha (Vyaya)"
-                          };
-
-                          return (
-                            <tr key={`${row.planet}-${row.houseNum}-${index}`} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0 transition-colors">
-                              <td className="p-3 font-bold text-cyan-300 font-mono text-xs">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                                  {row.planet}
-                                </div>
-                              </td>
-                              <td className="p-3 text-xs text-slate-200">
-                                <span className="font-mono font-bold text-slate-300 bg-slate-900 px-1.5 py-0.5 rounded mr-1.5">H{row.houseNum}</span>
-                                <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">{houseSanskritMap[row.houseNum] || `House ${row.houseNum}`}</span>
-                              </td>
-                              <td className="p-3 text-center text-xs">
-                                {row.L1 ? (
-                                  <span className="text-emerald-400 font-extrabold" title="L1 Active">✅</span>
-                                ) : (
-                                  <span className="text-slate-700" title="L1 Inactive">❌</span>
-                                )}
-                              </td>
-                              <td className="p-3 text-center text-xs">
-                                {row.L2 ? (
-                                  <span className="text-emerald-400 font-extrabold" title="L2 Active">✅</span>
-                                ) : (
-                                  <span className="text-slate-700" title="L2 Inactive">❌</span>
-                                )}
-                              </td>
-                              <td className="p-3 text-center text-xs">
-                                {row.L3 ? (
-                                  <span className="text-emerald-400 font-extrabold" title="L3 Active">✅</span>
-                                ) : (
-                                  <span className="text-slate-700" title="L3 Inactive">❌</span>
-                                )}
-                              </td>
-                              <td className="p-3 text-center text-xs">
-                                {row.L4 ? (
-                                  <span className="text-emerald-400 font-extrabold" title="L4 Active">✅</span>
-                                ) : (
-                                  <span className="text-slate-700" title="L4 Inactive">❌</span>
-                                )}
-                              </td>
-                              <td className="p-3 text-center text-xs">
-                                {row.L5 ? (
-                                  <span className="text-emerald-400 font-extrabold" title="L5 Active">✅</span>
-                                ) : (
-                                  <span className="text-slate-700" title="L5 Inactive">❌</span>
-                                )}
-                              </td>
-                              <td className="p-3 text-center text-xs">
-                                {row.L6 ? (
-                                  <span className="text-emerald-400 font-extrabold" title="L6 Active">✅</span>
-                                ) : (
-                                  <span className="text-slate-700" title="L6 Inactive">❌</span>
-                                )}
-                              </td>
-                              <td className="p-3 font-mono text-xs font-bold text-slate-300 text-center">
-                                {row.count}
-                              </td>
-                              <td className="p-3 font-mono text-xs font-extrabold text-cyan-400 text-center bg-cyan-500/5">
-                                {row.score.toFixed(1)}
-                              </td>
-                              <td className="p-3 text-center">
-                                <span className={`text-[10px] px-2.5 py-1 rounded-full font-mono font-bold uppercase tracking-wider shadow-sm border ${
-                                  row.grade === "Very High"
-                                    ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-                                    : row.grade === "High"
-                                    ? "bg-teal-500/15 text-teal-400 border-teal-500/30"
-                                    : row.grade === "Medium"
-                                    ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
-                                    : "bg-rose-500/15 text-rose-400 border-rose-500/30"
-                                }`}>
-                                  {row.grade}
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan={11} className="p-8 text-center text-slate-500 italic font-mono text-xs">
-                            No records found matching the specified filters.
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* ================= SYSTEM 9: WESTERN TROPICAL ASTROLOGY ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_8")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "westernTropical")) && (
           <div id="report-section-9" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-purple-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span className="text-[10px] bg-purple-500/15 text-purple-400 border border-purple-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                  System 9 • Western Tropical Aspect Matrices • Table 8
-                </span>
-                <h2 className="text-sm font-bold text-purple-400 mt-2 flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-purple-400" />
-                  Table 8 - TROPICAL PLANETARY ASPECTS & PLACIDUS HOUSE CUSPS
-                </h2>
-                <p className={`text-xs ${mutedText} mt-1`}>
-                  Standard major aspect definitions, angular difference metrics, and 12 Placidus house boundaries.
-                </p>
-              </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (western)</span>
-            </div>
+            <div className="border-b border-purple-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-purple-500/15 text-purple-400 border border-purple-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 9 • Western Tropical Aspect Matrices
+              </span>
+              <h2 className="text-sm font-bold text-purple-400 mt-2 flex items-center gap-2">
+                <Globe className="w-5 h-5 text-purple-400" />
+                9. TROPICAL PLANETARY ASPECTS & PLACIDUS HOUSE CUSPS
+              </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              Standard major aspect definitions, angular difference metrics, and 12 Placidus house boundaries.
+            </p>
+          </div>
 
           <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-purple-500/25 transition-all">
             <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800/60 pb-2">
@@ -7655,25 +4871,22 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 10: ESOTERIC & ALTERNATIVE MYSTICAL SYSTEMS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_9")) && (
+        {showAllAstroSystems && (
           <div id="report-section-10" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-pink-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                  System 10 • Mystical Esoteric Systems & Remedial Blueprints • Table 9
-                </span>
-                <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
-                  <Layers className="w-5 h-5 text-pink-400" />
-                  Table 9 - ESOTERIC, BAZI FOUR PILLARS & LAL KITAB REMEDIES
-                </h2>
-                <p className={`text-xs ${mutedText} mt-1`}>
-                  Chinese BaZi Four Pillars, Pythagorean Numerology, Lal Kitab remedies, Mayan Day signs, and Celtic tree properties.
-                </p>
-              </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (mysticalSystems)</span>
-            </div>
+            <div className="border-b border-pink-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 10 • Mystical Esoteric Systems & Remedial Blueprints
+              </span>
+              <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-pink-400" />
+                10. ESOTERIC, BAZI FOUR PILLARS & LAL KITAB REMEDIES
+              </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              Chinese BaZi Four Pillars, Pythagorean Numerology, Lal Kitab remedies, Mayan Day signs, and Celtic tree properties.
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* BaZi */}
@@ -7821,7 +5034,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               </span>
               <h2 className="text-sm font-bold text-teal-400 mt-2 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-teal-400" />
-                VIMSHOTTARI, YOGINI & ASHTOTTARI DASHA CYCLES
+                11. VIMSHOTTARI, YOGINI & ASHTOTTARI DASHA CYCLES
               </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               The chronological sequence of planetary planetary dasha cycles computed on lunar longitudes, fully expanded.
@@ -7904,25 +5117,22 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 12: YOGAS & DOSHAS ANALYSIS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_11")) && (
+        {showAllAstroSystems && (
           <div id="report-section-12" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-rose-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-rose-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span className="text-[10px] bg-rose-500/15 text-rose-400 border border-rose-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                  System 12 • Planetary Combinations & Afflictions (Yogas & Doshas) • Table 11
-                </span>
-                <h2 className="text-sm font-bold text-rose-400 mt-2 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-rose-400" />
-                  Table 11 - VEDIC RAJA/DHANA YOGAS & CELESTIAL DOSHAS
-                </h2>
-                <p className={`text-xs ${mutedText} mt-1`}>
-                  Comprehensive checklist of active auspicious combinations and major cosmic doshas present.
-                </p>
-              </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (yogas & doshas)</span>
-            </div>
+            <div className="border-b border-rose-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-rose-500/15 text-rose-400 border border-rose-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 12 • Planetary Combinations & Afflictions (Yogas & Doshas)
+              </span>
+              <h2 className="text-sm font-bold text-rose-400 mt-2 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-rose-400" />
+                12. VEIDIC RAJA/DHANA YOGAS & CELESTIAL DOSHAS
+              </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              Comprehensive checklist of active auspicious combinations and major cosmic doshas present.
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
             {/* Yogas */}
@@ -7973,25 +5183,22 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 13: TRADITIONAL LIFE PATHWAYS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_12")) && (
+        {showAllAstroSystems && (
           <div id="report-section-13" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-amber-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                  System 13 • Traditional Life Predictions & Daily Muhurta • Table 12
-                </span>
-                <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
-                  <Briefcase className="w-5 h-5 text-amber-500" />
-                  Table 12 - LIFE DESTINY PATHWAYS & DAILY TRANSIT ALIGNMENTS
-                </h2>
-                <p className={`text-xs ${mutedText} mt-1`}>
-                  Exhaustive predictive analysis mapping professional focus, wealth generation, marriage bliss, health, and current lunar transit.
-                </p>
-              </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (predictions & muhurta)</span>
-            </div>
+            <div className="border-b border-amber-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 13 • Traditional Life Predictions & Daily Muhurta
+              </span>
+              <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-amber-500" />
+                13. LIFE DESTINY PATHWAYS & DAILY TRANSIT ALIGNMENTS
+              </h2>
+            <p className={`text-xs ${mutedText} mt-1`}>
+              Exhaustive predictive analysis mapping professional focus, wealth generation, marriage bliss, health, and current lunar transit.
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Career */}
@@ -8151,7 +5358,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   transitLongitude={transitLongitude}
                   transitTimezone={transitTimezone}
                   subTab={transitSubTab}
-                  chartStyle={chartStyle}
                 />
               </div>
             ) : (

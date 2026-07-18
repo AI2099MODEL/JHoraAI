@@ -1,191 +1,104 @@
-# JHora AI Master Evaluation & Astrology Rules Handbook
-
-Welcome to the **Master Evaluation Handbook**, the authoritative index, registry, and rulebook for JHora AI's unified astrological engines. This document serves as the ground truth of data structures, provenances, and evaluation gates.
-
-> **Execution Directive:** This handbook stores only the indices, data schema, structural logic, and rule conditions. Individual user data is stored dynamically within separate files in the `Users/` directory (e.g., `userprofile.json` representing the active profile). The client dashboard dynamically reads and populates these values based on the active session profile.
+# 📘 MASTER ASTROLOGICAL EVALUATION HANDBOOK
+## Unified Rules Engine Architecture (Parashari, KP, and Jaimini Systems)
 
 ---
 
-## I. ASTROLOGICAL DATA INDEX & REGISTRY
+### ℹ️ DOCUMENT PURPOSE
+This document is the absolute system baseline reference text. It converts static native profiles and dynamic live transit parameters into deterministic logic gate statuses across all significant human life events.
 
-This index catalogs the primary data tables, variables, and calculation schemas dynamically populated by the JHora calculation engines.
+### 1️⃣ MARITAL LIFE, SEPARATION, DIVORCE & REMARRIAGE
+*   **Parashari (Vedic) Rules:**
+    *   `Condition:` Natal 6th, 8th, or 12th House Lord occupies or casts a physical aspect onto the 7th or 2nd House. ➔ **Output Status:** `POTENTIAL_SEPARATION`
+    *   `Condition:` Transiting Saturn, Mars, Rahu, or Ketu forms a conjunction or exact aspect with Natal 7th Lord or Venus. ➔ **Output Status:** `SEPARATION_TRIGGERED`
+    *   `Condition:` Dual connection of 9th and 2nd Lord to the 7th House or Lord with a strong Venus or Jupiter. ➔ **Output Status:** `REMARRIAGE_PROMISED`
+*   **KP Binary System Rules:**
+    *   `Condition:` 7th Cuspal Sub-Lord (CSL) signifies houses [1, 6, 10] and completely excludes house 7 or 11. ➔ **Output Status:** `DIVORCE_CONFIRMED`
+    *   `Condition:` 7th Cuspal Sub-Lord (CSL) signifies houses [2, 7, 11] and completely excludes houses 1, 6, 10. ➔ **Output Status:** `REUNION_CONFIRMED`
+    *   `Condition:` 9th Cuspal Sub-Lord (CSL) signifies houses [2, 7, 11] during an active second-marriage evaluation. ➔ **Output Status:** `REMARRIAGE_CONFIRMED`
+*   **Jaimini System Rules:**
+    *   `Condition:` Transiting malefics (Saturn, Rahu, Ketu) occupy or cast a sign aspect onto the Upapada Lagna (UL) or its 2nd house. ➔ **Output Status:** `MARITAL_BREAKDOWN`
+    *   `Condition:` The Darakaraka (DK) or Darapada (A7) receives a benign transit or sign aspect from a gentle benefic. ➔ **Output Status:** `REUNION_PATH_OPEN`
 
-### 100. Evaluation Data Index & Birth Registry
-* **Registry Source File:** `/Users/userprofile.json` (Active selected profile payload)
-* **Primary Information Source:** **Dashboard Page** (User birth inputs: Date, Time, Place/Coordinates, and selected Ayanamsa)
-* **Status:** Dynamically populated based on active selected profile session.
+### 2️⃣ LEGAL DISPUTES, LITIGATION & COURT DECREES
+*   **Parashari (Vedic) Rules:**
+    *   `Condition:` Natal 6th House Lord is placed in a quadrant (Kendra) with Mars, or 6th Lord is structurally stronger than 7th Lord. ➔ **Output Status:** `NATIVE_HAS_ENDURANCE`
+    *   `Condition:` Natal 5th House (judgment) and 9th House (justice) Lords are un-afflicted and linked to active Dasha. ➔ **Output Status:** `DEFINITIVE_JUDGMENT`
+    *   `Condition:` Transiting Mars or Sun forms a close degree conjunction or aspect (0°, 90°, 180°) with 6th Lord or Bhukti Lord. ➔ **Output Status:** `DECREE_DATE_TRIGGER`
+*   **KP Binary System Rules:**
+    *   `Condition:` 6th Cuspal Sub-Lord (CSL) signifies houses 6, 11. ➔ **Output Status:** `LITIGATION_VICTORY`
+    *   `Condition:` 6th Cuspal Sub-Lord (CSL) signifies houses 5, 8, 12. ➔ **Output Status:** `LITIGATION_LOSS`
+    *   `Condition:` 11th Cuspal Sub-Lord (CSL) links heavily to houses 1, 6, 11. ➔ **Output Status:** `DECREE_FAVORS_NATIVE`
+    *   `Condition:` Transiting Moon constellation and sign match active elements in the calculated KP Ruling Planets (RP) list. ➔ **Output Status:** `EXACT_DAY_LOCK`
+*   **Jaimini System Rules:**
+    *   `Condition:` The longitudinal degree of the Atmakaraka (AK) is greater than the Gnatikaraka (GK) [AK > GK]. ➔ **Output Status:** `OPPONENT_DEFEATED`
 
-#### Table 1: Birth Details & Lagna (Ascendant Coordinates)
-This table represents the layout schema of the primary birth particulars and lagna (ascendant) coordinates. The engine maps these parameters as the absolute mathematical foundation for divisional chart calculations, dasha timelines, and planetary transits.
+### 3️⃣ CAREER, JOBS, BUSINESS & PROFESSIONAL PROMOTIONS
+*   **Parashari (Vedic) Rules:**
+    *   `Condition:` Natal 10th Lord is exalted, in Kendra/Trikona, or forms a relationship with the 1st or 6th Lord. ➔ **Output Status:** `CAREER_STABILITY`
+    *   `Condition:` Sun or Mars holds directional strength (Dig Bala) in the 10th House, free from deep affliction. ➔ **Output Status:** `PROMOTION_PROMISED`
+    *   `Condition:` Mutual connection, sign exchange (Parivartana), or conjunction between the 7th Lord and 10th Lord. ➔ **Output Status:** `BUSINESS_VENTURE_PROMISED`
+*   **KP Binary System Rules:**
+    *   `Condition:` 10th or 6th Cuspal Sub-Lord (CSL) signifies houses 2, 6, 10, 11. ➔ **Output Status:** `JOB_PROCUREMENT`
+    *   `Condition:` 10th Cuspal Sub-Lord (CSL) signifies houses [6, 10, 11] and completely excludes houses 5, 8, 12. ➔ **Output Status:** `PROMOTION_CONFIRMED`
+    *   `Condition:` 7th Cuspal Sub-Lord (CSL) signifies houses [2, 7, 10, 11] and excludes houses 5, 6, 8, 12. ➔ **Output Status:** `BUSINESS_VIABILITY`
+    *   `Condition:` 10th Cuspal Sub-Lord (CSL) signifies houses [5, 8, 12] or [10] is severely broken. ➔ **Output Status:** `JOB_LOSS_OR_CHANGE`
+*   **Jaimini System Rules:**
+    *   `Condition:` Sign of Karakamsha (or 10th house from it) receives benign planetary aspects or contains Amatyakaraka (AmK). ➔ **Output Status:** `HIGH_PROFESSIONAL_STATUS`
 
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Profile Name** | `string` | **Dashboard Page** / Selected Profile | Loaded dynamically from selected profile (`User.profile_name`) |
-| **User Email** | `string` | **Dashboard Page** / Active Session | Loaded dynamically from selected profile session (`User.email`) |
-| **Birth Date** | `string (YYYY-MM-DD)` | **Dashboard Page** Input Form | Loaded dynamically from birth parameters (`Birth.date`) |
-| **Birth Time** | `string (HH:MM:SS)` | **Dashboard Page** Input Form | Loaded dynamically from birth parameters (`Birth.time`) |
-| **Latitude** | `float` | **Dashboard Page** GPS Resolver | Geographical coordinates mapped via city database lookup (`Birth.latitude`) |
-| **Longitude** | `float` | **Dashboard Page** GPS Resolver | Geographical coordinates mapped via city database lookup (`Birth.longitude`) |
-| **Timezone** | `float` | **Dashboard Page** Coordinate Mapping| Local UTC timezone offset derived during calculation (`Birth.timezone`) |
-| **Place** | `string` | **Dashboard Page** Input Form | Resolved location name from geographical coordinates database (`Birth.place`) |
-| **Ayanamsa** | `string` | **Dashboard Page** Settings | Calculation mode standard selected by user (e.g., Lahiri) (`Birth.ayanamsa`) |
-| **Julian Day Number**| `string` | Calculated (from Table 1 Date/Time) | Derived mathematically from UTC birth moment timestamp (`Birth.julian_day_number`) |
-| **Sidereal Time** | `string` | Calculated (from Table 1 Lat/Lon/Time) | Calculated Local Sidereal Time for birth coordinates (`Birth.local_sidereal_time`) |
-| **Obliquity** | `string` | Calculated (from Ephemeris) | Obliquity of the ecliptic derived for Julian epoch (`Birth.obliquity`) |
-| **Ephemeris Used** | `string` | Background Library | Calculation engine background source (`Birth.ephemeris_used`) |
-| **House System** | `string` | **Dashboard Page** Settings | Structural house division rules applied (e.g., Placidus / KP Cusps) |
-| **Zodiac Sign (Lagna)** | `string` | Calculated (from Birth Parameters) | Sign rising on eastern horizon (`Vedic.ascendant.sign`) |
-| **Lagna Longitude (In Sign)** | `string` | Calculated (from Birth Parameters) | Ascendant degree within zodiac sign (`Vedic.ascendant.degree`, `minute`, `second`) |
-| **Lagna 360° Longitude** | `float` | Calculated (from Birth Parameters) | Exact 360-degree celestial longitude of ascendant (`Vedic.ascendant.longitude_360`) |
-| **Lagna Nakshatra** | `string` | Calculated (from Birth Parameters) | Nakshatra containing the ascendant degree (`Vedic.ascendant.nakshatra`) |
-| **Lagna Nakshatra Pada** | `int` | Calculated (from Birth Parameters) | Nakshatra quarter of the ascendant (`Vedic.ascendant.pada`) |
-| **Lagna Nakshatra Lord** | `string` | Calculated (from Birth Parameters) | Planetary ruler of the ascendant nakshatra (`Vedic.ascendant.nakshatra_lord`) |
+### 4️⃣ FINANCE, WEALTH ACCUMULATION & SUDDEN WINDFALLS
+*   **Parashari (Vedic) Rules:**
+    *   `Condition:` Mutual connections, aspects, or exchanges between 2nd, 5th, 9th, and 11th House Lords. ➔ **Output Status:** `WEALTH_PROMISED`
+    *   `Condition:` 8th or 11th House Lord placed in 2nd, 8th, or 11th House under benefic aspect without combustion. ➔ **Output Status:** `SUDDEN_WINDFALL`
+*   **KP Binary System Rules:**
+    *   `Condition:` 2nd or 11th Cuspal Sub-Lord (CSL) signifies houses 2, 6, 11. ➔ **Output Status:** `FINANCIAL_INFLOW`
+    *   `Condition:` 11th Cuspal Sub-Lord (CSL) signifies houses 2, 5, 8, 11. ➔ **Output Status:** `SPECULATIVE_WINDFALL`
+    *   `Condition:` 2nd Cuspal Sub-Lord (CSL) signifies houses [5, 8, 12] and excludes houses 2, 11. ➔ **Output Status:** `FINANCIAL_LOSS_DEBT`
+*   **Jaimini System Rules:**
+    *   `Condition:` Co-alignment or conjunction of Atmakaraka (AK) and Dhanakaraka in the 1st, 2nd, or 11th house counted from Arudha Lagna (AL). ➔ **Output Status:** `MONETARY_AFFLUENCE`
 
-#### Table 2: KP Graha, Nakshatra and Pada (Planetary Coordinates)
-This table indexes the coordinates, nakshatras, padas, star-lords, sub-lords, and sub-sub-lords of all primary natal planets.
-* **Primary Information Source / Info Origin:** JHora REST API Server endpoint (`/api/jhora/horoscope`) & KP Stellar Division Engine.
-* **Logic & Provenance Source:** Raw planet coordinates are retrieved directly from the JHora engine, while sub-lords and sub-sub-lords are derived using KP Placidus stellar division equations against the exact coordinates.
+### 5️⃣ EDUCATION, ACADEMIC ACHIEVEMENTS & COMPETITIVE EXAMS
+*   **Parashari (Vedic) Rules:**
+    *   `Condition:` 4th, 5th, and 9th House Lords un-afflicted, exalted, or in Kendra/Trikona. Mercury and Jupiter strong. ➔ **Output Status:** `ACADEMIC_EXCELLENCE`
+*   **KP Binary System Rules:**
+    *   `Condition:` 4th or 9th Cuspal Sub-Lord (CSL) signifies houses 4, 9, 11. ➔ **Output Status:** `EDUCATION_PROGRESS`
+    *   `Condition:` 6th Cuspal Sub-Lord (CSL) signifies houses [6, 11] under active exam query context. ➔ **Output Status:** `COMPETITIVE_EXAM_SUCCESS`
+    *   `Condition:` 4th Cuspal Sub-Lord (CSL) signifies houses 3, 5, 8, 12. ➔ **Output Status:** `BREAK_IN_EDUCATION`
+*   **Jaimini System Rules:**
+    *   `Condition:` Amatyakaraka (AmK) placed in a favorable sign from Atmakaraka (AK) or receives direct sign aspect from Mercury/Jupiter. ➔ **Output Status:** `SCHOLASTIC_HONOURS`
 
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Graha Name** | `string` | JHora Raw API | Name of the primary celestial body (`Vedic.planets.[Planet].name`) |
-| **Zodiac Sign** | `string` | JHora Raw API | Rasi sign containing the planet (`Vedic.planets.[Planet].sign`) |
-| **Longitude (In Sign)** | `string` | JHora Raw API | Coordinate degree, minute, and second within the sign (`Vedic.planets.[Planet].longitude_formatted`) |
-| **360° Longitude** | `float` | JHora Raw API | Celestial longitude in 360-degree coordinates (`Vedic.planets.[Planet].longitude`) |
-| **House Placement** | `int` | JHora Raw API | House position in the rasi chart (`Vedic.planets.[Planet].house`) |
-| **Nakshatra** | `string` | JHora Raw API | Asterism division (1 to 27) of the planet (`Vedic.planets.[Planet].nakshatra`) |
-| **Nakshatra Pada** | `int` | JHora Raw API | Asterism quarter (1 to 4) of the planet (`Vedic.planets.[Planet].pada`) |
-| **Nakshatra Lord** | `string` | Nakshatra Ruler Map | Planetary ruler of the nakshatra (`Vedic.planets.[Planet].nakshatra_lord`) |
-| **Sub Lord** | `string` | KP Stellar Division Engine | Krishnamurti Paddhati sub-lord ruler (`KP.planets.[Planet].sub_lord`) |
-| **Sub-Sub Lord** | `string` | KP Stellar Division Engine | Krishnamurti Paddhati sub-sub-lord ruler (`KP.planets.[Planet].sub_sub_lord`) |
-| **Retrograde (Y/N)** | `boolean` | JHora Raw API | Indicates if the planet is in retrograde motion (`Vedic.planets.[Planet].is_retrograde`) |
-| **Combust (Y/N)** | `boolean` | JHora Raw API | Indicates if the planet is combust with the Sun (`Vedic.planets.[Planet].is_combust`) |
-| **Dignity** | `string` | Dignities Engine | Planetary dignity (Exalted, Own, Moolatrikona, Friendly, Enemy, Debilitated) (`Vedic.planets.[Planet].dignity`) |
-| **Avasthas** | `string` | Baladi/Jagrat/Deepta Avasthas | Calculated planetary age, alertness, and mood states (`Vedic.planets.[Planet].state`) |
+### 6️⃣ REAL ESTATE, PROPERTY & VEHICLE ACQUISITION
+*   **Parashari (Vedic) Rules:**
+    *   `Condition:` 4th House Lord strong. Mars un-afflicted (property/land) or Venus un-afflicted (automobiles/vehicles). ➔ **Output Status:** `ASSET_ACQUISITION`
+*   **KP Binary System Rules:**
+    *   `Condition:` 4th Cuspal Sub-Lord (CSL) signifies houses 4, 11, 12. ➔ **Output Status:** `PROPERTY_PURCHASE`
+    *   `Condition:` 4th Cuspal Sub-Lord (CSL) signifies houses 3, 8, 12. ➔ **Output Status:** `PROPERTY_SALE_OR_LOSS`
+*   **Jaimini System Rules:**
+    *   `Condition:` Benefic planets like Venus or Moon occupy or aspect the 4th house counted from the Karakamsha. ➔ **Output Status:** `VEHICLE_PROPERTY_LUXURY`
 
-#### Table 3: Vimshottari Dasha Timeline (To Prana)
-This table indexes the calculated multi-tiered dasha progression timelines down to Prana level (Maha -> Antar -> Pratyantar -> Sookshma -> Prana).
-* **Primary Information Source / Info Origin:** JHora REST API Server endpoint (`/api/jhora/horoscope`) & Dasha Engine.
-* **Logic & Provenance Source:** Nested dasha intervals based on stellar division ratios from birth Moon coordinate.
+### 7️⃣ CHILDBIRTH, PROCREATION & FAMILY EXPANSION
+*   **Parashari (Vedic) Rules:**
+    *   `Condition:` 5th House Lord strong. Jupiter (Putrakaraka) well-placed in natal and Saptamsha (D7) charts. ➔ **Output Status:** `PROCREATION_PROMISED`
+*   **KP Binary System Rules:**
+    *   `Condition:` 5th Cuspal Sub-Lord (CSL) signifies houses [2, 5, 11] and completely avoids houses 1, 4, 10. ➔ **Output Status:** `CHILDBIRTH_CONFIRMED`
+    *   `Condition:` 5th Cuspal Sub-Lord (CSL) signifies houses 1, 4, 8, 12. ➔ **Output Status:** `MEDICAL_COMPLICATIONS`
+*   **Jaimini System Rules:**
+    *   `Condition:` Favorable transits of Jupiter or Venus over the natal position or sign aspects of the Putrakaraka (PK). ➔ **Output Status:** `LINEAGE_EXPANSION`
 
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Mahadasha (Level 1)**| `string` | JHora / Derived | 1st-level Vimshottari dasha ruler and bounds (`Vedic.dashas.vimshottari.[Maha].lord`) |
-| **Antardasha (Level 2)** | `string` | JHora / Derived | 2nd-level sub-period ruler and bounds (`Vedic.dashas.vimshottari.[Maha].[Antar].lord`) |
-| **Pratyantar (Level 3)** | `string` | Derived | 3rd-level sub-period ruler and bounds (`Vedic.dashas.vimshottari.[Maha].[Antar].[Pratyantar].lord`) |
-| **Sookshma (Level 4)** | `string` | Derived | 4th-level sub-period ruler and bounds (`Vedic.dashas.vimshottari.[Maha].[Antar].[Pratyantar].[Sookshma].lord`) |
-| **Prana (Level 5)** | `string` | Derived | 5th-level sub-period ruler and bounds (`Vedic.dashas.vimshottari.[Maha].[Antar].[Pratyantar].[Sookshma].[Prana].lord`) |
+### 8️⃣ FOREIGN TRAVEL, VISAS & OVERSEAS SETTLEMENT
+*   **Parashari (Vedic) Rules:**
+    *   `Condition:` 9th or 12th House Lord placed in movable signs or watery signs. ➔ **Output Status:** `FOREIGN_TRAVEL_PROMISED`
+*   **KP Binary System Rules:**
+    *   `Condition:` 12th or 9th Cuspal Sub-Lord (CSL) signifies houses 3, 9, 12. ➔ **Output Status:** `VISA_TRAVEL_APPROVAL`
+    *   `Condition:` 4th Cuspal Sub-Lord (CSL) signifies houses [4, 9, 12] during active settlement queries. ➔ **Output Status:** `PERMANENT_FOREIGN_RESIDENCY`
+*   **Jaimini System Rules:**
+    *   `Condition:` Atmakaraka (AK) or running Chara Dasha sign heavily connected to the 12th house or 12th lord from natal Lagna. ➔ **Output Status:** `EXPATRIATE_LIFECYCLE`
 
-#### Table 3: Astronomical Alignment Parameters
-This table indexes the calculated astronomical parameters from the ephemeris.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Julian Day** | `string` | Astronomical Calculation Engine | Derived dynamically from UTC birth moment timestamp (`Astronomical.julian_day_number`) |
-| **Sidereal Time** | `string` | Local Sidereal Meridian | Derived dynamically from longitude and UTC birth time (`Astronomical.sidereal_time`) |
-| **Obliquity** | `string` | Ecliptic inclination | Obliquity of the ecliptic derived for Julian epoch (`Astronomical.obliquity`) |
-| **Sunrise / Sunset** | `string` | Solar Horizon calculation | Calculated solar rise and set times for coordinates (`Astronomical.sunrise` / `sunset`) |
-| **Moon Phase** | `string` | Tithi calculation | Angular distance of Moon from Sun at birth (`Astronomical.moon_phase`) |
-
-#### Table 4: Ashtakavarga Bindus
-This table indexes the calculated Ashtakavarga Bindus (both planetary BAV and Sarvashtakavarga SAV).
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **SAV Bindus** | `array` | Ashtakavarga Engine | 12 rasis' samudhaya bindus (`Vedic.ashtakavarga.sarvashtakavarga`) |
-
-#### Table 5: Shadbala Strengths
-This table indexes calculated planetary strengths in Shadbala rupas.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Shadbala Rupas** | `float` | Shadbala Engine | 7 planets' positional, temporal, directional, motional, and aspectual strengths |
-
-#### Table 6: KP System Cusps & Planets (KP Engine)
-This table indexes the Krishnamurti Paddhati stellar, sub, and sub-sub significators.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Cuspal Sub-Lord** | `string` | KP Stellar Division Engine | Sub-lord of Placidus house cusps 1 to 12 (`KP.cusps.[House].sub_lord`) |
-| **Planet Sub-Lord** | `string` | KP Stellar Division Engine | Sub-lord of natal planetary placements (`KP.planets.[Planet].sub_lord`) |
-
-#### Table 7: Planet to House Significator Mappings (KP Reverse Lookup)
-This table indexes planetary significator levels mapped back to the 12 bhavas/houses.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Significators** | `array` | KP Significator Engine | Houses signified by planets under KP rules (`KP.planet_significators`) |
-
-#### Table 8: Tropical Western Chart & Aspects (Western Engine)
-This table indexes Tropical Western astrology planets, cusps, and aspects.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Tropical Positions**| `object` | Ptolemaic Western Projection | Planets/cusps projected onto Tropical zodiac (`Western.planets` / `cusps`) |
-| **Aspects & Orbs** | `array` | Aspect Angle Engine | Calculated aspects with exact orb angles (`Western.aspects`) |
-
-#### Table 9: Esoteric & Alternative Mystical Systems (BaZi & Lal Kitab)
-This table indexes Chinese Sexagenary cycle parameters and Lal Kitab house translations / remedies.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Pillars** | `object` | Chinese BaZi Calendar Engine | Stems and branches mapped to birth date-time (`Chinese.pillars`) |
-| **Pucca Ghar** | `string` | Lal Kitab Translation | Planet placements translated to Aries-Ascendant house mapping (`Lal_Kitab.houses`) |
-| **Remedies** | `object` | Lal Kitab Traditional Book | Specific planetary remedies for natal positions (`Lal_Kitab.remedies`) |
-
-#### Table 10: Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)
-This table indexes the chronological sequence of planetary dasha cycles computed on lunar longitudes.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Vimshottari Timeline**| `array` | Dasha Engine | Multi-tiered Vimshottari periods |
-| **Yogini Timeline** | `array` | Dasha Engine | Cyclic Yogini timelines |
-| **Ashtottari Timeline** | `array` | Dasha Engine | Ashtottari timelines |
-
-#### Table 11: Vedic Raja/Dhana Yogas & Celestial Doshas
-This table indexes active auspicious combinations and major cosmic doshas present.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Active Yogas** | `array` | Yogas Evaluation Engine | Auspicious planetary formations |
-| **Active Doshas** | `array` | Doshas Evaluation Engine | Inauspicious planetary afflictions |
-
-#### Table 12: Traditional Life Predictions & Daily Muhurta
-This table indexes predictive destiny analysis and the current transit-based daily muhurta.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Destiny Pathways** | `object` | Predictive Synthesis Engine | Life forecasts across key domains (Career, Wealth, Health, Marriage) |
-| **Transit Muhurta** | `object` | Transit Engine | Daily auspicious and inauspicious hours based on lunar transits |
-
-#### Table 13: Jaimini Parameters & Dashas (Jaimini Engine)
-This table indexes the Jaimini karakas, arudhas, and Chara Dashas.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Chara Karakas** | `object` | Jaimini Rank Engine | Planetary rankings by degree (Atmakaraka to Darakaraka) (`Jaimini.karakas`) |
-| **Arudha Padas** | `object` | Pada Projection Engine | Arudha houses calculated relative to house lords (`Jaimini.arudha`) |
-| **Chara Dashas** | `array` | Jaimini Dasha Engine | Sign-based dasha progression sequence and durations (`Jaimini.chara_dasha`) |
-
----
-
-## II. ASTROLOGICAL RULES & LOGIC GATES
-
-The JHora AI Astrological Engine evaluates these logic gates against Table 1 and our natal planetary coordinate matrices.
-
-### 200. Core Relationship Promise Rules
-* **Vedic Rules:**
-  * Condition: Venus is in Friendly Sign -> Output Status: Supportive Relationship Spark
-  * Condition: Jupiter aspects 7th House -> Output Status: Relationship Protection & Divine Accord
-  * Condition: 7th Lord in Dusthana House (6th/8th/12th) -> Output Status: Karmic Relationship Delays
-
-* **KP Stellar Rules:**
-  * Condition: 7th Cuspal Sub-Lord signifies 2nd, 7th, 11th houses -> Output Status: Positive Marriage Promise (KP_DEC_PROMISE_01)
-  * Condition: 7th Cuspal Sub-Lord signifies 1st, 6th, 10th houses -> Output Status: Career Focus Over Relationship
-  * Condition: 7th Cuspal Sub-Lord signifies 4th, 10th, 12th houses -> Output Status: Obstacles and Detachment
-
-### 300. Dasha & Transit Activation Rules
-* **Timeline Rules:**
-  * Condition: Active Vimshottari Mahadasha Lord is friend of 7th Lord -> Output Status: Auspicious Relationship Window Open
-  * Condition: Saturn transit aspects Natal 7th Cusp -> Output Status: Reality-Check and Constructive Relationship Duty
-  * Condition: Jupiter transit aspects Natal 7th Lord -> Output Status: Auspicious Celestial Alignment (Go-Ahead)
+### 9️⃣ HEALTH, DISEASE DIAGNOSTICS & HOSPITALISATION
+*   **Parashari (Vedic) Rules:**
+    *   `Condition:` 6th, 8th, or 12th House Lords afflict the 1st House or its Lord. Sun or Moon structurally weak. ➔ **Output Status:** `HEALTH_VULNERABILITY`
+*   **KP Binary System Rules:**
+    *   `Condition:` 6th Cuspal Sub-Lord (CSL) signifies houses [1, 6, 8, 12] and excludes 5, 11. ➔ **Output Status:** `DISEASE_MANIFESTATION`
+    *   `Condition:` 6th Cuspal Sub-Lord (CSL) signifies houses [8, 12] without any connection to house 5, 11. ➔ **Output Status:** `HOSPITALISATION_SURGERY`
+    *   `Condition:` 6th Cuspal Sub-Lord (CSL) signifies houses 5, 11. ➔ **Output Status:** `QUICK_MEDICAL_RECOVERY`
+*   **Jaimini System Rules:**
+    *   `Condition:` Gnatikaraka (GK) directly afflicts Atmakaraka (AK) or occupies 1st or 8th house from Arudha Lagna (AL). ➔ **Output Status:** `CHRONIC_PHYSICAL_AILMENT`

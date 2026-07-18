@@ -60,8 +60,6 @@ export interface KpPlanetSignificators {
       level2: number[]; // Planet in occupant
       level3: number[]; // Planet in star of owner
       level4: number[]; // Planet owner
-      level5: number[]; // Planet in star of sub-lord of cusp
-      level6: number[]; // Planet as cusp sub-lord
     };
   };
 }
@@ -73,8 +71,6 @@ export interface KpHouseSignificators {
       level2: string[]; // Planets occupying house
       level3: string[]; // Planets in star of owner of house
       level4: string[]; // Planets owning house
-      level5: string[]; // Planets in star of sub-lord of cusp
-      level6: string[]; // Planets as cusp sub-lord
     };
   };
 }

@@ -6,7 +6,6 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
-import { exec } from "child_process";
 import nodemailer from "nodemailer";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
@@ -24,8 +23,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use(express.json());
 
 const JHORA_API_URL = "https://jagannatha-hora-359167915530.europe-west1.run.app";
 
@@ -244,308 +242,6 @@ app.post("/api/user-profile/save", async (req, res) => {
   }
 });
 
-function getProfileFileName(profileData: any, fallbackName: string): string {
-  // 1. Username
-  const rawUser = profileData?.User?.profile_name || fallbackName;
-  const username = rawUser.toLowerCase().replace(/[^a-z0-9]/g, "");
-
-  // 2. DOB (format: DDMMYYYY)
-  const rawDob = profileData?.Birth?.date || "";
-  let dob = "00000000";
-  if (rawDob) {
-    const cleanedDob = rawDob.replace(/[^0-9]/g, "");
-    if (rawDob.includes("-") && rawDob.split("-")[0].length === 4) {
-      const parts = rawDob.split("-");
-      dob = parts[2].padStart(2, '0') + parts[1].padStart(2, '0') + parts[0];
-    } else {
-      dob = cleanedDob;
-    }
-  }
-
-  // 3. Place
-  const rawPlace = profileData?.Birth?.place || "";
-  const place = rawPlace ? rawPlace.split(",")[0].trim().toLowerCase().replace(/[^a-z0-9]/g, "") : "unknown";
-
-  // 4. Birthtime (format: hhmmAM/PM)
-  const rawTime = profileData?.Birth?.time || "";
-  let birthtime = "0000am";
-  if (rawTime) {
-    const hasAmPm = /([ap]m)/i.test(rawTime);
-    if (hasAmPm) {
-      const match = rawTime.match(/(\d+):(\d+)\s*([ap]m)/i);
-      if (match) {
-        const hh = match[1].padStart(2, '0');
-        const mm = match[2].padStart(2, '0');
-        const ampm = match[3].toUpperCase();
-        birthtime = `${hh}${mm}${ampm}`;
-      }
-    } else {
-      const timeParts = rawTime.split(":");
-      if (timeParts.length >= 2) {
-        let hh = parseInt(timeParts[0], 10);
-        const mm = timeParts[1].padStart(2, '0');
-        const isPm = hh >= 12;
-        const ampm = isPm ? "PM" : "AM";
-        if (hh > 12) {
-          hh -= 12;
-        } else if (hh === 0) {
-          hh = 12;
-        }
-        const hhStr = hh.toString().padStart(2, '0');
-        birthtime = `${hhStr}${mm}${ampm}`;
-      }
-    }
-  }
-
-  return `${username}${dob}${place}${birthtime}.json`;
-}
-
-// Helper to handle git synchronization on the server
-async function syncProfileToGithub(action: "add" | "delete", profileName: string, profileData?: any) {
-  try {
-    const usersDir = path.join(process.cwd(), "Users");
-    const filePath = path.join(usersDir, "userprofile.json");
-
-    if (action === "add") {
-      if (!fs.existsSync(usersDir)) {
-        fs.mkdirSync(usersDir, { recursive: true });
-      }
-
-      const dynamicName = getProfileFileName(profileData, profileName);
-      const dynamicFilePath = path.join(usersDir, dynamicName);
-
-      fs.writeFileSync(filePath, JSON.stringify(profileData, null, 2));
-      fs.writeFileSync(dynamicFilePath, JSON.stringify(profileData, null, 2));
-      console.log(`[Git Sync] Written Users/userprofile.json and Users/${dynamicName} for profile: ${profileName}`);
-
-      exec(`git add Users/userprofile.json Users/${dynamicName} && (git diff-index --quiet HEAD || git commit -m "feat: activate user profile ${profileName}")`, (err, stdout, stderr) => {
-        if (err) {
-          console.warn("[Git Sync Add Local Warning - could not commit locally]", err.message);
-        } else {
-          console.log("[Git Sync Add Local Success] Profile committed locally.");
-          // Attempt push as a separate, fully graceful operation
-          exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
-            if (pushErr) {
-              console.info("[Git Sync Push Notice] Git push skipped/unauthenticated. Profile is securely saved locally and committed to Git.");
-            } else {
-              console.log("[Git Sync Push Success]", pushStdout);
-            }
-          });
-        }
-      });
-
-    } else if (action === "delete") {
-      if (fs.existsSync(usersDir)) {
-        const files = fs.readdirSync(usersDir);
-        let deletedAny = false;
-        const filesToGitRm: string[] = [];
-
-        for (const file of files) {
-          if (file.endsWith(".json") && file !== "userprofile.json") {
-            const fPath = path.join(usersDir, file);
-            try {
-              const content = fs.readFileSync(fPath, "utf-8");
-              const parsed = JSON.parse(content);
-              if (parsed?.User?.profile_name === profileName) {
-                fs.unlinkSync(fPath);
-                filesToGitRm.push(`Users/${file}`);
-                deletedAny = true;
-                console.log(`[Git Sync] Deleted Users/${file} because profile ${profileName} was deleted.`);
-              }
-            } catch (e) {
-              console.error(`Error processing file ${file} during deletion check:`, e);
-            }
-          }
-        }
-
-        if (fs.existsSync(filePath)) {
-          let isMatching = false;
-          try {
-            const content = fs.readFileSync(filePath, "utf-8");
-            const parsed = JSON.parse(content);
-            if (parsed?.User?.profile_name === profileName) {
-              isMatching = true;
-            }
-          } catch (e) {
-            console.error("Failed to parse userprofile.json during deletion check:", e);
-          }
-
-          if (isMatching) {
-            fs.unlinkSync(filePath);
-            filesToGitRm.push("Users/userprofile.json");
-            deletedAny = true;
-            console.log(`[Git Sync] Deleted Users/userprofile.json because active profile ${profileName} was deleted.`);
-          }
-        }
-
-        if (deletedAny && filesToGitRm.length > 0) {
-          const filesStr = filesToGitRm.join(" ");
-          exec(`git rm ${filesStr} && (git diff-index --quiet HEAD || git commit -m "feat: deactivate user profile ${profileName}")`, (err, stdout, stderr) => {
-            if (err) {
-              console.warn("[Git Sync Delete Local Warning]", err.message);
-            } else {
-              console.log("[Git Sync Delete Local Success] Deactivation committed locally.");
-              // Attempt push as a separate, fully graceful operation
-              exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
-                if (pushErr) {
-                  console.info("[Git Sync Push Notice] Git push skipped/unauthenticated. Deactivation is securely saved locally and committed to Git.");
-                } else {
-                  console.log("[Git Sync Push Success]", pushStdout);
-                }
-              });
-            }
-          });
-        }
-      }
-    }
-  } catch (error) {
-    console.error("[syncProfileToGithub Error]", error);
-  }
-}
-
-// Endpoint to act upon user profile JSON on github / Users folder
-app.post("/api/user-profile/act", async (req, res) => {
-  try {
-    const { action, profileName, profileData } = req.body;
-    if (!action || !profileName) {
-      return res.status(400).json({ error: "Missing action or profileName" });
-    }
-
-    if (action === "add" && !profileData) {
-      return res.status(400).json({ error: "Missing profileData for add action" });
-    }
-
-    // Trigger git sync asynchronously to not block the frontend
-    syncProfileToGithub(action, profileName, profileData);
-
-    res.json({ success: true, message: `Profile action '${action}' triggered and syncing asynchronously.` });
-  } catch (err: any) {
-    console.error("Error in /api/user-profile/act endpoint:", err);
-    res.status(500).json({ error: err.message || "Failed to process profile action." });
-  }
-});
-
-// Endpoint to index an astrological table, update user profile and master handbook metadata, and sync with GitHub
-app.post("/api/user-profile/index-table", async (req, res) => {
-  try {
-    const { tableId, tableName, profileName, tableData } = req.body;
-    if (!tableId || !tableName) {
-      return res.status(400).json({ error: "Missing tableId or tableName" });
-    }
-
-    const usersDir = path.join(process.cwd(), "Users");
-    const profilePath = path.join(usersDir, "userprofile.json");
-    let profile: any = {};
-
-    if (fs.existsSync(profilePath)) {
-      try {
-        const content = fs.readFileSync(profilePath, "utf-8");
-        profile = JSON.parse(content);
-      } catch (err) {
-        console.error("Failed to parse userprofile.json:", err);
-      }
-    }
-
-    if (!profile.User) {
-      profile.User = {};
-    }
-
-    if (!profile.User.indexedTables) {
-      profile.User.indexedTables = {};
-    }
-
-    // Save/update indexed table with metadata and raw user table data
-    profile.User.indexedTables[tableId] = {
-      tableName,
-      indexedAt: new Date().toISOString(),
-      data: tableData,
-    };
-
-    // Save active profile to Users/userprofile.json
-    fs.writeFileSync(profilePath, JSON.stringify(profile, null, 2));
-
-    // Also save to dynamic profile file
-    const fallbackName = profileName || profile?.User?.profile_name || "Seeker";
-    const dynamicName = getProfileFileName(profile, fallbackName);
-    const dynamicFilePath = path.join(usersDir, dynamicName);
-    fs.writeFileSync(dynamicFilePath, JSON.stringify(profile, null, 2));
-
-    console.log(`[Table Index] Saved table ${tableId} to user profile.`);
-
-    // Update master_astro_handbook.md with metadata for index
-    const handbookPath = path.join(process.cwd(), "documents", "master_astro_handbook.md");
-    if (fs.existsSync(handbookPath)) {
-      let handbookContent = fs.readFileSync(handbookPath, "utf-8");
-      
-      const tableNum = tableId.replace("table_", "");
-      const headerRegex = new RegExp(`(#### Table ${tableNum}:[^\n]+)`);
-      
-      if (headerRegex.test(handbookContent)) {
-        const indexMetadataLine = `\n* **Index Status:** Indexed for **${fallbackName}** on ${new Date().toISOString().split('T')[0]}`;
-        
-        const statusRegex = new RegExp(`(#### Table ${tableNum}:[^\n]+)\\s*\\* \\*\\*Index Status:\\*\\*[^\n]+`);
-        
-        if (statusRegex.test(handbookContent)) {
-          handbookContent = handbookContent.replace(statusRegex, `$1${indexMetadataLine}`);
-        } else {
-          handbookContent = handbookContent.replace(headerRegex, `$1${indexMetadataLine}`);
-        }
-        
-        fs.writeFileSync(handbookPath, handbookContent);
-        console.log(`[Table Index] Updated master_astro_handbook.md for Table ${tableNum}`);
-      }
-    }
-
-    // Git Operations: commit and push
-    exec(`git add Users/userprofile.json Users/${dynamicName} documents/master_astro_handbook.md && (git diff-index --quiet HEAD || git commit -m "feat: index ${tableId} for profile ${fallbackName}")`, (err, stdout, stderr) => {
-      if (err) {
-        console.warn("[Table Index Git Commit Warning]", err.message);
-      } else {
-        console.log("[Table Index Git Commit Success]");
-        // Push main to origin
-        exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
-          if (pushErr) {
-            console.error("[Table Index Git Push Warning]", pushErr.message);
-          } else {
-            console.log("[Table Index Git Push Success]", pushStdout);
-          }
-        });
-      }
-    });
-
-    res.json({ success: true, message: `Table '${tableName}' indexed successfully.` });
-  } catch (err: any) {
-    console.error("Error in /api/user-profile/index-table:", err);
-    res.status(500).json({ error: err.message || "Failed to index table." });
-  }
-});
-
-// Endpoint to retrieve active user profile JSON from disk
-app.get("/api/user-profile/get", async (req, res) => {
-  try {
-    const filePath = path.join(process.cwd(), "Users", "userprofile.json");
-    if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, "utf-8");
-      const parsed = JSON.parse(content);
-      return res.json(parsed);
-    }
-    // Fallback to local data dir if git file isn't created yet
-    const localFilePath = path.join(process.cwd(), "data", "user_profiles.json");
-    if (fs.existsSync(localFilePath)) {
-      const localContent = fs.readFileSync(localFilePath, "utf-8");
-      const localProfiles = JSON.parse(localContent);
-      const firstProfile = Object.values(localProfiles)[0];
-      if (firstProfile) {
-        return res.json(firstProfile);
-      }
-    }
-    res.status(404).json({ error: "No user profile found" });
-  } catch (err: any) {
-    console.error("Error in /api/user-profile/get endpoint:", err);
-    res.status(500).json({ error: err.message || "Failed to retrieve user profile." });
-  }
-});
-
 // ==========================================
 // API Endpoints (Pure Gateway Proxies)
 // ==========================================
@@ -596,7 +292,7 @@ app.post("/api/jhora/horoscope", async (req, res) => {
       const data = await response.json();
       res.json(data);
     } catch (fetchErr) {
-      console.log("[Astro Engine] Remote JHora Horoscope fetch bypassed or unavailable. Seamlessly using local engine calculation.");
+      console.warn("Remote JHora Horoscope fetch failed, using local fallback:", fetchErr);
       const targetDate = body.date || new Date().toISOString().split("T")[0];
       const targetTime = body.time || "12:00:00";
       const latNum = Number(body.latitude) || 28.6139;
@@ -799,10 +495,6 @@ app.post("/api/jhora/gochara", async (req, res) => {
           })
         });
 
-        if (!response.ok) {
-          throw new Error(`Remote JHora server returned status ${response.status}`);
-        }
-
         const text = await response.text();
         let data: any = null;
         try {
@@ -812,10 +504,6 @@ app.post("/api/jhora/gochara", async (req, res) => {
             throw new Error("Astrology calculation rate limit exceeded. Please try again in an hour.");
           }
           throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
-        }
-
-        if (data && (data.error || data.detail || !data.horoscope)) {
-          throw new Error(`Remote JHora server returned error payload: ${JSON.stringify(data.error || data.detail || data)}`);
         }
 
         const rasi = data.horoscope?.divisional_charts?.["D-1_rasi"] || {};
@@ -832,8 +520,8 @@ app.post("/api/jhora/gochara", async (req, res) => {
             longitude: signIdx * 30 + pVal.longitude
           };
         }).filter(p => p.name !== "Ascendant" && ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].includes(p.name));
-      } catch (fallbackErr: any) {
-        console.log(`[Transit System] Remote JHora Horoscope fallback active (${fallbackErr.message}), seamlessly calculating locally.`);
+      } catch (fallbackErr) {
+        console.warn("[Transit System] Remote JHora Horoscope fallback failed, calculating locally:", fallbackErr);
         const localData = calculateAstrology(
           "Transit Sky",
           targetDate,
@@ -858,13 +546,11 @@ app.post("/api/jhora/gochara", async (req, res) => {
       planets
     };
 
-    // Save to cache only if we have planets computed successfully and no errors
-    if (planets && planets.length > 0) {
-      transitCache.set(cacheKey, {
-        timestamp: Date.now(),
-        data: payload
-      });
-    }
+    // Save to cache
+    transitCache.set(cacheKey, {
+      timestamp: Date.now(),
+      data: payload
+    });
 
     res.json(payload);
   } catch (error: any) {
@@ -965,10 +651,6 @@ app.post("/api/astrology/calculate", async (req, res) => {
         body: JSON.stringify(body)
       });
 
-      if (!response.ok) {
-        throw new Error(`Remote JHora server returned status ${response.status}`);
-      }
-
       const text = await response.text();
       try {
         data = JSON.parse(text);
@@ -978,12 +660,8 @@ app.post("/api/astrology/calculate", async (req, res) => {
         }
         throw new Error(`Invalid response from astrology server: ${text.slice(0, 100)}`);
       }
-
-      if (data && (data.error || data.detail || !data.horoscope)) {
-        throw new Error(`Remote JHora server returned error payload: ${JSON.stringify(data.error || data.detail || data)}`);
-      }
-    } catch (fetchErr: any) {
-      console.log(`[Astro Engine] Remote JHora API fetch bypassed or unavailable (${fetchErr.message}). Seamlessly using local engine calculation.`);
+    } catch (fetchErr) {
+      console.warn("[Astro Engine] Remote JHora API fetch failed, falling back to local calculation:", fetchErr);
       const tzNum = Number(body.timezone) || 5.5;
       const localData = calculateAstrology(
         body.name || "Transit Sky",
@@ -997,110 +675,16 @@ app.post("/api/astrology/calculate", async (req, res) => {
       data = localData;
     }
 
-    // Save to cache only if it's a valid, non-error object
-    if (data && !data.error && !data.detail) {
-      transitCache.set(cacheKey, {
-        timestamp: Date.now(),
-        data
-      });
-    }
+    // Save to cache
+    transitCache.set(cacheKey, {
+      timestamp: Date.now(),
+      data
+    });
 
     res.json(data);
   } catch (error: any) {
     console.error("Astrology Calculate API error:", error);
     res.status(500).json({ error: error.message || "Failed to calculate astrology." });
-  }
-});
-
-// Backend Autoagent synchronization and profile check endpoint
-app.post("/api/astrology/autoagent-sync", async (req, res) => {
-  try {
-    const { profile, currentSteps } = req.body;
-    if (!profile) {
-      return res.status(400).json({ error: "Profile particulars are required for autoagent verification." });
-    }
-
-    const { name, date, time, latitude, longitude, timezone, location } = profile;
-    const targetDate = date || new Date().toISOString().split("T")[0];
-    const targetTime = time || "12:00:00";
-    const latNum = Number(latitude) || 28.6139;
-    const lonNum = Number(longitude) || 77.2090;
-
-    // Check if astrosystem is already updated and cached for this profile
-    const cacheKey = `profile_${name || "unnamed"}_${targetDate}_${targetTime}_LAT${latNum}_LON${lonNum}`;
-    const cached = transitCache.get(cacheKey);
-
-    if (cached && (Date.now() - cached.timestamp < CACHE_VALIDITY_MS)) {
-      console.log(`[Autoagent] Astrosystem data for profile "${name}" is already up-to-date and verified.`);
-      return res.json({
-        status: "up-to-date",
-        updated: false,
-        message: `Astrosystem data for profile "${name}" is already up-to-date. Sync bypassed.`,
-        stepsChecked: currentSteps ? currentSteps.length : 0,
-        cachedAt: new Date(cached.timestamp).toLocaleTimeString()
-      });
-    }
-
-    console.log(`[Autoagent] Profile mismatch or cache miss. Syncing and recalculating astrosystem for "${name}"...`);
-    
-    // Perform calculation and save to cache
-    const tzNum = Number(timezone) || 5.5;
-    let data: any = null;
-    
-    try {
-      // Try fetching from official JHora backend
-      const response = await fetch(`${JHORA_API_URL}/horoscope`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          date: targetDate,
-          time: targetTime,
-          latitude: latNum,
-          longitude: lonNum,
-          timezone: tzNum,
-          place: location || "Query Location"
-        })
-      });
-
-      if (response.ok) {
-        data = await response.json();
-      }
-    } catch (e) {
-      console.log(`[Autoagent] Remote fetch bypassed or failed, calculating using local engine.`);
-    }
-
-    if (!data) {
-      data = calculateAstrology(
-        name || "Transit Sky",
-        targetDate,
-        targetTime,
-        location || "Query Location",
-        latNum,
-        lonNum,
-        tzNum
-      );
-    }
-
-    // Save newly calculated data to the transit cache
-    if (data && !data.error && !data.detail) {
-      transitCache.set(cacheKey, {
-        timestamp: Date.now(),
-        data
-      });
-    }
-
-    return res.json({
-      status: "updated",
-      updated: true,
-      message: `Astrosystem data for profile "${name}" updated and cached successfully by backend Autoagent.`,
-      stepsChecked: currentSteps ? currentSteps.length : 0,
-      timestamp: new Date().toLocaleTimeString()
-    });
-
-  } catch (error: any) {
-    console.error("[Autoagent Engine Error]:", error);
-    res.status(500).json({ error: error.message || "Failed to execute autoagent synchronization." });
   }
 });
 
@@ -1443,97 +1027,6 @@ To harmonize any planetary imbalances, consider the following traditional measur
   }
 });
 
-// Endpoint to generate sectioned personalized My Page reading using server-side Gemini API
-app.post("/api/user-profile/generate-summary", async (req, res) => {
-  try {
-    const ai = getGeminiClient();
-    let profileData = req.body.profile;
-
-    if (!profileData) {
-      // Fallback: Read from Users/userprofile.json
-      const filePath = path.join(process.cwd(), "Users", "userprofile.json");
-      if (fs.existsSync(filePath)) {
-        const content = fs.readFileSync(filePath, "utf-8");
-        profileData = JSON.parse(content);
-      } else {
-        return res.status(400).json({ error: "Profile data is required or must be synchronized first." });
-      }
-    }
-
-    // Construct a concise, informative prompt for Gemini using the structured user profile
-    const userName = profileData.User?.profile_name || "Seeker";
-    const birthDate = profileData.Birth?.date || "Unknown";
-    const birthPlace = profileData.Birth?.place || "Unknown";
-    const moonPhase = profileData.Astronomical?.moon_phase || "Unknown";
-    const ascendantSign = profileData.Vedic?.ascendant?.sign || "Unknown";
-    const ascendantNakshatra = profileData.Vedic?.ascendant?.nakshatra || "Unknown";
-
-    const planetsList = profileData.Vedic?.planets 
-      ? Object.entries(profileData.Vedic.planets)
-          .map(([name, p]: [string, any]) => `- ${name}: in ${p.sign}, House ${p.house}, Nakshatra ${p.nakshatra}, State: ${p.state?.baladi || "N/A"}`)
-          .join("\n")
-      : "No planet placements available";
-
-    const prompt = `
-You are an expert Vedic astrologer and counselor. Generate a deeply personal, inspiring, and sectioned soul blueprint reading for ${userName}, born on ${birthDate} at ${birthPlace}.
-Key particulars of their chart:
-- Ascendant (Lagna): ${ascendantSign} in ${ascendantNakshatra} Nakshatra
-- Lunar Phase (Tithi): ${moonPhase}
-- Planetary Placements:
-${planetsList}
-
-Synthesize these configurations into 4 distinct, meaningful, and comprehensive sections:
-1. Core Soul Archetype & Personality: Deep dive into their ascendant, moon phase, and prominent planetary alignments.
-2. Karmic Cycles & Life Path: What lessons and patterns do their house placements and planetary states (awasthas) indicate?
-3. Prosperity, Career & Life Purpose: What fields of creation, service, or wealth align with their chart?
-4. Spiritual Practices & Remedies: Actionable daily practices, meditative focal points, or remedies for balance.
-
-Use the requested JSON schema. Choose appropriate icons for each section from: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'.
-    `;
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            summary: {
-              type: Type.STRING,
-              description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
-            },
-            sections: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
-                  content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
-                  remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
-                  icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
-                },
-                required: ["title", "content", "remedy", "icon"]
-              }
-            }
-          },
-          required: ["summary", "sections"]
-        }
-      }
-    });
-
-    if (!response.text) {
-      throw new Error("Empty response from Gemini API.");
-    }
-
-    const result = JSON.parse(response.text.trim());
-    res.json(result);
-  } catch (err: any) {
-    console.error("Error in /api/user-profile/generate-summary:", err);
-    res.status(500).json({ error: err.message || "Failed to generate personalized page content." });
-  }
-});
-
 // Endpoint for AI Relationship Expert (Phase 14)
 app.post("/api/astrology/ai-relationship-expert", async (req, res) => {
   const { evidence, question, history } = req.body;
@@ -1838,162 +1331,76 @@ Synthesize a professional, beautifully structured consultation. Return a JSON ma
 app.post("/api/astrology/master-ask", async (req, res) => {
   const { astrologyData, question, history, targetAge } = req.body;
 
-  // 1. Read users json file (userprofile.json) from disk for precise, fast, and secure context
-  const filePath = path.join(process.cwd(), "Users", "userprofile.json");
-  let userProfile: any = null;
-  if (fs.existsSync(filePath)) {
-    try {
-      const content = fs.readFileSync(filePath, "utf-8");
-      userProfile = JSON.parse(content);
-    } catch (err) {
-      console.error("Failed to parse userprofile.json in master-ask:", err);
-    }
-  }
-
-  // Merge incoming astrologyData from request body with loaded profile from disk for maximum high-fidelity input
-  const mergedProfile = {
-    ...(userProfile || {}),
-    ...(astrologyData || {})
-  };
-
   try {
+    const openai = getOpenAIClient(req);
+
     const formattedHistory = (history || [])
       .map((h: any) => `${h.sender === "user" ? "User" : "Astrologer"}: ${h.text}`)
       .join("\n");
 
-    const userName = mergedProfile.User?.profile_name || "Seeker";
-    const userEmail = mergedProfile.User?.email || "guest@jhora.ai";
-    const soulSynthesis = mergedProfile.User?.SoulSynthesis || "None cached yet.";
-    const birthDate = mergedProfile.Birth?.date || "Unknown";
-    const birthTime = mergedProfile.Birth?.time || "Unknown";
-    const birthPlace = mergedProfile.Birth?.place || "Unknown";
-    
-    // Extract key Vedic and Astronomical metrics
-    const moonPhase = mergedProfile.Astronomical?.moon_phase || "Unknown";
-    const ascendantSign = mergedProfile.Vedic?.ascendant?.sign || "Unknown";
-    const ascendantNakshatra = mergedProfile.Vedic?.ascendant?.nakshatra || "Unknown";
-    const season = mergedProfile.Astronomical?.season || "Unknown";
-    const yearName = mergedProfile.Astronomical?.year_name || "Unknown";
-
     const systemInstruction = `You are JHoraAI's Master AI Astrologer, the unified intelligence core of the entire application.
 You are directly connected to all 7 relationship systems (Vedic, KP, Jaimini, Nadi, Lal Kitab, Tajik, Western), the Unified Evidence and Decision Engines, the Astrological Reasoning Engine, and the Knowledge Center.
-You have direct, full-read access to the user's static profile JSON and their custom "Soul Blueprint Synthesis" page data.
-Use the active birth profile, dasha periods, planetary coordinates, and evaluation age to answer their questions with complete precision and deep empathetic insight.
-Return your response structured in a clean JSON format matching the schema.`;
+
+LAWS OF CELESTIAL ANALYSIS:
+1. Automatically detect the user's intent. For example:
+   - "When will I marry?" -> Load Timeline, KP, Vedic, Jaimini, Nadi, Tajik, Decisions.
+   - "Why marriage delay?" -> Load Delay, Saturn, DBA, Transits, Rules, Knowledge Center.
+   - "Explain spouse." -> Load Spouse traits, Decisions, Knowledge Center.
+2. Formulate your conversational reply using elegant markdown. CITE specific decision codes and rule IDs in brackets (e.g. [KP_DEC_PROMISE_01], [System: Vedic]) where applicable to maintain rigorous tracing integrity.
+3. Chat memory is active: reference previous decisions or reports if present in the history.
+4. Internet tool integration: Use Google Search ONLY for current dates, planetary ephemeris, legal/divorce laws, psychology/counseling literature, historical cases, or astronomy definitions. Never let search override calculated mathematical rules.
+5. KNOWLEDGE ACQUISITION ENGINES: Analyze the conversation. If a new insight, counseling pattern, user correction, or research detail is discovered, populate "candidateKnowledge" with classification, source, index category, and confidence level. Otherwise, keep it null.
+
+You MUST respond in a clean JSON format matching the schema provided. No markdown backticks wrapper around the JSON in the response. Return raw JSON text.`;
 
     const userPrompt = `
-You are consulting for logged-in user: ${userName} (${userEmail}).
-Birth MOMENT details: Born on ${birthDate} at ${birthTime} in ${birthPlace}.
-Astronomical Metrics: Moon Phase (Tithi): ${moonPhase}, Season: ${season}, Vedic Year: ${yearName}.
-Ascendant (Lagna): ${ascendantSign} in ${ascendantNakshatra} Nakshatra.
+Birth Details & Current Calculation Data:
+${astrologyData ? JSON.stringify(astrologyData, null, 2) : "No birth details configured."}
 
-SOUL BLUEPRINT SYNTHESIS (Page Data):
-"${soulSynthesis}"
-
-Full Nested Astrological Profile Data (Natal coordinates, houses, Dashas, aspects):
-${JSON.stringify(mergedProfile, null, 2)}
+Selected Target Evaluation Age: ${targetAge || 28}
 
 Active Dialogue History:
 ${formattedHistory || "None."}
 
-Current User Message / Question:
+Current User Message:
 "${question || "Hello, analyze my chart."}"
 
-Selected Target Evaluation Age: ${targetAge || 28}
-
-LAWS OF CELESTIAL ANALYSIS:
-1. Deeply read the user's nested JSON profile (above) and their "Soul Blueprint Synthesis" page data.
-2. Formulate your conversational response with elegant, reassuring, professional counseling-style markdown.
-3. Automatically detect the user's query intent. Cite specific decision codes (e.g. [KP_DEC_PROMISE_01], [VEDIC_DEC_DELAY_01]) or rule IDs in brackets where appropriate to maintain high tracing integrity.
-4. If a new counseling pattern or user-offered correction is discovered in their message, populate candidateKnowledge with categorization. Otherwise, leave it empty or null.
+Synthesize a professional response. Return a JSON matching the requested schema.
 `;
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemInstruction },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.3,
+        response_format: { type: "json_object" }
+      });
 
-    const ai = getGeminiClient();
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: userPrompt,
-      config: {
-        systemInstruction,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            reply: {
-              type: Type.STRING,
-              description: "The main conversational response to the user's question, styled elegantly with clean markdown."
-            },
-            intentDetected: {
-              type: Type.OBJECT,
-              properties: {
-                intent: { type: Type.STRING },
-                loadedSystems: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
-                },
-                loadedRulebooks: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
-                },
-                loadedEvidence: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
-                },
-                loadedDecisions: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
-                },
-                confidence: { type: Type.INTEGER }
-              },
-              required: ["intent", "loadedSystems", "loadedRulebooks", "loadedEvidence", "loadedDecisions", "confidence"]
-            },
-            candidateKnowledge: {
-              type: Type.OBJECT,
-              properties: {
-                classification: { type: Type.STRING },
-                source: { type: Type.STRING },
-                category: { type: Type.STRING },
-                confidence: { type: Type.INTEGER }
-              }
-            }
-          },
-          required: ["reply", "intentDetected"]
-        }
+      const text = response.choices[0]?.message?.content || "{}";
+      const output = JSON.parse(text);
+      res.json(output);
+    } catch (apiErr: any) {
+      let keyNotice = "";
+      if (apiErr.message?.includes("No OpenAI API key found")) {
+        console.info("OpenAI API key not provided for master-ask; using local synthesis fallback.");
+        keyNotice = "⚠️ **ChatGPT API Key Missing**: Please set your personal ChatGPT/OpenAI API key in the Settings panel (top-right corner ⚙️) to unlock live GPT-4o-mini readings!\n\n*(Currently running on JHora local high-fidelity rules engine fallback)*\n\n";
+      } else {
+        console.warn("OpenAI API error during Master Ask, using high-fidelity local JSON synthesis fallback:", apiErr);
       }
-    });
 
-    const text = response.text || "{}";
-    const output = JSON.parse(text);
-    res.json(output);
-  } catch (apiErr: any) {
-    console.error("Gemini API error during Master Ask:", apiErr);
-    
-    // High-fidelity local fallback using the active user profile data to make it extremely personalized and responsive
-    const q = (question || "").toLowerCase();
-    const userName = mergedProfile?.User?.profile_name || "Nitin";
-    const birthDate = mergedProfile?.Birth?.date || "1976-01-06";
-    const birthPlace = mergedProfile?.Birth?.place || "Dehradun";
-    const soulSynthesis = mergedProfile?.User?.SoulSynthesis || "";
+      // Detect query intent from question
+      const q = (question || "").toLowerCase();
+      let detectedIntent = "Marriage Promise";
+      let matchedSys = ["Vedic", "KP", "Jaimini"];
+      let matchedRules = ["VEDIC_RULE_PROMISE", "KP_RULE_SUB_LORD"];
+      let replyText = keyNotice;
 
-    let detectedIntent = "General Chart Consultation";
-    let matchedSys = ["Vedic", "KP"];
-    let matchedRules = ["VEDIC_RULE_PROMISE", "KP_RULE_SUB_LORD"];
-    let replyText = "";
-
-    if (apiErr.message?.includes("GEMINI_API_KEY environment variable is required") || apiErr.message?.includes("API key")) {
-      replyText += `⚠️ **Gemini API Key Notice**: Please set your personal \`GEMINI_API_KEY\` in the Settings panel (top-right corner ⚙️) to activate full real-time conversations. In the meantime, here is your high-fidelity offline synthesis from your calculated profile:\n\n`;
-    } else {
-      replyText += `⚠️ **Celestial Session Interrupted** (using offline local synthesis fallback):\n\n`;
-    }
-
-    if (soulSynthesis) {
-      replyText += `### Active Soul Blueprint Synthesis\n*"${soulSynthesis}"*\n\n`;
-    }
-
-    if (q.includes("delay") || q.includes("when") || q.includes("time")) {
-      detectedIntent = "Marriage Delay & Timings";
-      matchedSys = ["Vedic", "KP", "Dashas", "Transits"];
-      matchedRules = ["VEDIC_RULE_DELAY", "KP_CUSP_7", "DASHA_TIMING_RULE"];
-      replyText += `Based on your query regarding relationship timings and delay, JHoraAI has cross-evaluated the birth coordinates for **${userName}** (born **${birthDate}** in **${birthPlace}**).
+      if (q.includes("delay") || q.includes("when") || q.includes("time")) {
+        detectedIntent = "Marriage Delay & Timings";
+        matchedSys = ["Vedic", "KP", "Dashas", "Transits"];
+        matchedRules = ["VEDIC_RULE_DELAY", "KP_CUSP_7", "DASHA_TIMING_RULE"];
+        replyText = `Based on your query regarding relationship timings and delay, the JHoraAI multi-system engine has cross-evaluated your Vimshottari Dasha cycles and transits. 
 
 ### Multi-System Synthesis [System: Vedic, System: KP]
 1. **KP Cuspal Sub-Lord**: The 7th cusp sub-lord is highly supportive, confirming marriage promise [KP_DEC_PROMISE_01].
@@ -2002,11 +1409,11 @@ LAWS OF CELESTIAL ANALYSIS:
 
 ### Actionable Guidance & Remedies
 To dissolve temporary delay blocks, consider chanting 'Om Shukraya Namah' on Fridays, and practicing mindful patience. This is a highly auspicious timeline for personal growth.`;
-    } else if (q.includes("spouse") || q.includes("partner") || q.includes("wife") || q.includes("husband")) {
-      detectedIntent = "Spouse Profile & Character";
-      matchedSys = ["Vedic", "Jaimini", "Western"];
-      matchedRules = ["7TH_HOUSE_SIGN", "DARA_KARAKA_RULE", "WESTERN_SYNASTRY"];
-      replyText += `Regarding partner traits for **${userName}**, the JHoraAI engines have analyzed the 7th house lord, the Dara Karaka, and key planetary signposts in your D1 and D9 charts.
+      } else if (q.includes("spouse") || q.includes("partner") || q.includes("wife") || q.includes("husband")) {
+        detectedIntent = "Spouse Profile & Character";
+        matchedSys = ["Vedic", "Jaimini", "Western"];
+        matchedRules = ["7TH_HOUSE_SIGN", "DARA_KARAKA_RULE", "WESTERN_SYNASTRY"];
+        replyText = `Regarding your partner's profile and traits, the JHoraAI engines have analyzed the 7th house lord, the Dara Karaka, and key planetary signposts in your D1 and D9 charts.
 
 ### Partner Characteristics [System: Vedic, System: Jaimini]
 1. **Physical & Character Traits**: Your spouse is indicated to be intellectually vibrant, highly supportive, and deeply compassionate [VEDIC_DEC_SPOUSE_01].
@@ -2014,11 +1421,11 @@ To dissolve temporary delay blocks, consider chanting 'Om Shukraya Namah' on Fri
 3. **Soul Connection**: Your Dara Karaka planet confirms a deep spiritual bond with high compatibility [JAIMINI_DEC_SPOUSE_01].
 
 Focus on nurturing a communicative and respectful atmosphere to let this partnership flourish naturally.`;
-    } else if (q.includes("remedy") || q.includes("mantra") || q.includes("gem") || q.includes("dosha")) {
-      detectedIntent = "Astrological Remedies & Dosha Clearing";
-      matchedSys = ["Vedic", "Lal Kitab"];
-      matchedRules = ["VEDIC_REMEDY_RULE", "LAL_KITAB_DEBT"];
-      replyText += `To harmonize planetary energies and clear any active celestial doshas, here are your personalized JHoraAI remedial protocols for **${userName}**:
+      } else if (q.includes("remedy") || q.includes("mantra") || q.includes("gem") || q.includes("dosha")) {
+        detectedIntent = "Astrological Remedies & Dosha Clearing";
+        matchedSys = ["Vedic", "Lal Kitab"];
+        matchedRules = ["VEDIC_REMEDY_RULE", "LAL_KITAB_DEBT"];
+        replyText = `To harmonize planetary energies and clear any active celestial doshas, here are your personalized JHoraAI remedial protocols:
 
 ### Remedial Protocols [System: Vedic, System: Lal Kitab]
 1. **Vedic Mantra**: Chant *Om Namah Shivaya* daily 108 times to neutralize Saturn's delays and gain spiritual clarity [VEDIC_DEC_REMEDY_01].
@@ -2026,31 +1433,33 @@ Focus on nurturing a communicative and respectful atmosphere to let this partner
 3. **Gemstone Guidance**: If recommended by a personal counselor, wearing a high-quality Pearl or Yellow Sapphire under appropriate conditions can boost supportive energies.
 
 Perform these remedies with complete devotion and clear intent for positive transformation.`;
-    } else {
-      replyText += `### Strategic Insights [System: Vedic, System: KP]
-- **Birth Resonance**: Welcome, **${userName}**. Based on your birth details (**${birthDate}** at **${birthPlace}**), your chart demonstrates solid life path vitality with active planetary yogas.
+      } else {
+        detectedIntent = "General Chart Consultation";
+        replyText = `Welcome to your Master AI Astrologer consultation. Based on your birth details, your chart demonstrates solid life path vitality with active planetary yogas.
+
+### Strategic Insights [System: Vedic, System: KP]
 - **Lagna Resonance**: Your Ascendant lord is placed in a supportive sector, granting you natural resilience and charisma.
 - **Relationship Harmony**: Your 7th house has a stable energetic balance, indicating that patient, honest dialogs will always bring peace.
 - **Career Growth**: Professional indicators are highly promising. Keep your focus on discipline and high moral standards.
 
 Please ask me any specific question about Marriage Delay, Spouse traits, Timings, or Remedies to explore your chart in greater depth!`;
+      }
+
+      const fallbackOutput = {
+        reply: replyText,
+        intentDetected: {
+          intent: detectedIntent,
+          loadedSystems: matchedSys,
+          loadedRulebooks: matchedRules,
+          loadedEvidence: ["VEDIC_EVIDENCE_MATCH", "KP_EVIDENCE_MATCH"],
+          loadedDecisions: ["DEC_PROMISE_01", "DEC_DELAY_01"],
+          confidence: 85
+        },
+        candidateKnowledge: null
+      };
+
+      res.json(fallbackOutput);
     }
-
-    const fallbackOutput = {
-      reply: replyText,
-      intentDetected: {
-        intent: detectedIntent,
-        loadedSystems: matchedSys,
-        loadedRulebooks: matchedRules,
-        loadedEvidence: ["VEDIC_EVIDENCE_MATCH", "KP_EVIDENCE_MATCH"],
-        loadedDecisions: ["DEC_PROMISE_01", "DEC_DELAY_01"],
-        confidence: 85
-      },
-      candidateKnowledge: null
-    };
-
-    res.json(fallbackOutput);
-  }
 });
 
 // ==========================================

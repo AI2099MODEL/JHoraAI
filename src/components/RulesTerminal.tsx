@@ -68,25 +68,20 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
 
     const cleanCondition = (raw: string) => {
       let text = raw.trim();
-      let lastText = "";
-      while (text !== lastText) {
-        lastText = text;
-        text = text.replace(/^[\s*\-]*\+?\s*/, "");
-        text = text.replace(/^`?Condition:`?\s*/i, "");
-        text = text.replace(/^[\s`*]+/g, "").replace(/[\s`*]+$/g, "");
-      }
+      // Remove leading bullet characters
+      text = text.replace(/^[\s*\-]*\+?\s*/, "");
+      // Remove Condition prefix (with or without backticks)
+      text = text.replace(/^`?Condition:`?\s*/i, "");
       return text.trim();
     };
 
     const cleanStatus = (raw: string) => {
       let text = raw.trim();
-      let lastText = "";
-      while (text !== lastText) {
-        lastText = text;
-        text = text.replace(/^[\s`*]+/g, "").replace(/[\s`*]+$/g, "");
-        text = text.replace(/^Output\s+Status\s*:?\s*/i, "");
-        text = text.replace(/^[\s`*]+/g, "").replace(/[\s`*]+$/g, "");
-      }
+      text = text.replace(/^`?Output Status:`?\s*/i, "");
+      // Remove bold wrappers
+      text = text.replace(/^\*\*|\*\*$/g, "");
+      // Remove backtick wrappers
+      text = text.replace(/^`|`$/g, "");
       return text.trim();
     };
 
@@ -194,10 +189,6 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
     setError(null);
     try {
       const res = await fetch("/api/astrology/rules-handbook");
-      const contentType = res.headers.get("content-type") || "";
-      if (!contentType.includes("application/json")) {
-        throw new Error("Server returned non-JSON response (" + contentType + "). Please verify the server is fully started.");
-      }
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       
@@ -229,10 +220,6 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
         body: JSON.stringify({ content: mdContent })
       });
 
-      const contentType = res.headers.get("content-type") || "";
-      if (!contentType.includes("application/json")) {
-        throw new Error("Server returned non-JSON response (" + contentType + "). Failed to save changes.");
-      }
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
@@ -507,19 +494,16 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
                 <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left">
                   <thead className="bg-slate-50 dark:bg-slate-900/80">
                     <tr>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/6">
+                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/5">
                         System
                       </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/8">
-                        Type
-                      </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-5/12">
+                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/2">
                         Logical Condition / Trigger Gate
                       </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/6">
+                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/5">
                         Target Output Status
                       </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center w-1/12">
+                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center w-1/10">
                         Actions
                       </th>
                     </tr>
@@ -527,8 +511,6 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
                   <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-950/40">
                     {section.rules.map((rule) => {
                       const isEditing = editingRuleId === rule.id;
-                      const isTransitRule = rule.condition.toLowerCase().includes("transit") || rule.condition.toLowerCase().includes("gochara");
-                      const ruleTypeLabel = isTransitRule ? "Transit" : "Natal";
 
                       return (
                         <tr 
@@ -549,17 +531,6 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
                                 {rule.system}
                               </span>
                             )}
-                          </td>
-
-                          {/* Type column */}
-                          <td className="px-4 py-3">
-                            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase tracking-wider border ${
-                              isTransitRule 
-                                ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" 
-                                : "bg-teal-500/10 text-teal-400 border-teal-500/20"
-                            }`}>
-                              {ruleTypeLabel}
-                            </span>
                           </td>
 
                           {/* Logical Condition column */}

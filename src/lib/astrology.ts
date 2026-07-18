@@ -726,7 +726,7 @@ export function calculateAstrology(
   let yoginiCurrentDate = new Date(birthDate);
 
   let yIndex = yoginiStartIndex;
-  for (let i = 0; i < 32; i++) { // 4 cycles of 36 years = 144 years to cover active age ranges
+  for (let i = 0; i < 16; i++) {
     const yName = yoginiNames[yIndex];
     const yLord = yoginiLords[yIndex];
     const rawYears = yoginiYears[yIndex];
@@ -746,30 +746,16 @@ export function calculateAstrology(
     yIndex = (yIndex + 1) % 8;
   }
 
-  const ashtottariLords = ["Sun", "Moon", "Mars", "Mercury", "Saturn", "Jupiter", "Rahu", "Venus"];
-  const ashtottariYearsMap: Record<string, number> = { "Sun": 6, "Moon": 15, "Mars": 8, "Mercury": 17, "Saturn": 10, "Jupiter": 19, "Rahu": 12, "Venus": 21 };
-  
-  const ASHTOTTARI_MAP = [
-    "Venus", "Venus", // 0, 1 (Ashwini, Bharani)
-    "Sun", "Sun", "Sun", // 2, 3, 4 (Krittika, Rohini, Mrigashira)
-    "Moon", "Moon", "Moon", "Moon", // 5, 6, 7, 8 (Ardra to Ashlesha)
-    "Mars", "Mars", "Mars", // 9, 10, 11 (Magha to Uttara Phalguni)
-    "Mercury", "Mercury", "Mercury", "Mercury", // 12, 13, 14, 15 (Hasta to Vishakha)
-    "Saturn", "Saturn", "Saturn", // 16, 17, 18 (Anuradha, Jyeshtha, Moola)
-    "Jupiter", "Jupiter", "Jupiter", // 19, 20, 21 (Purva Ashadha, Uttar Ashadha, Shravana)
-    "Rahu", "Rahu", "Rahu", // 22, 23, 24 (Dhanishta, Shatabhisha, Purva Bhadrapada)
-    "Venus", "Venus" // 25, 26 (Uttara Bhadrapada, Revati)
-  ];
-  
-  const startLord = ASHTOTTARI_MAP[moonNakshatraIndex] || "Sun";
-  const ashtottariStartIndex = ashtottariLords.indexOf(startLord);
+  const ashtottariLords = ["Rahu", "Sun", "Moon", "Mars", "Mercury", "Saturn", "Jupiter", "Venus"];
+  const ashtottariYears = [12, 6, 15, 8, 17, 10, 19, 21];
+  const ashtottariStartIndex = moonNakshatraIndex % 8;
   const ashtottariDashas: DashaPeriod[] = [];
   let ashtottariCurrentDate = new Date(birthDate);
 
   let aIndex = ashtottariStartIndex;
-  for (let i = 0; i < 16; i++) { // 2 cycles = 216 years to cover multiple lifetimes beautifully
+  for (let i = 0; i < 8; i++) {
     const aLord = ashtottariLords[aIndex];
-    const rawYears = ashtottariYearsMap[aLord];
+    const rawYears = ashtottariYears[aIndex];
     const years = i === 0 ? rawYears * (1 - elapsedInNakshatra) : rawYears;
     const aStartDate = new Date(ashtottariCurrentDate);
     const aEndDate = new Date(ashtottariCurrentDate);

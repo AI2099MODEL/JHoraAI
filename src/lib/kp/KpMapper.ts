@@ -87,9 +87,7 @@ export class KpMapper {
         level1: Array.isArray(pData.level1) ? pData.level1.map(Number) : [],
         level2: Array.isArray(pData.level2) ? pData.level2.map(Number) : [],
         level3: Array.isArray(pData.level3) ? pData.level3.map(Number) : [],
-        level4: Array.isArray(pData.level4) ? pData.level4.map(Number) : [],
-        level5: Array.isArray(pData.level5) ? pData.level5.map(Number) : [],
-        level6: Array.isArray(pData.level6) ? pData.level6.map(Number) : []
+        level4: Array.isArray(pData.level4) ? pData.level4.map(Number) : []
       };
     });
 
@@ -107,9 +105,7 @@ export class KpMapper {
         level1: Array.isArray(hData.level1) ? hData.level1.map(String) : [],
         level2: Array.isArray(hData.level2) ? hData.level2.map(String) : [],
         level3: Array.isArray(hData.level3) ? hData.level3.map(String) : [],
-        level4: Array.isArray(hData.level4) ? hData.level4.map(String) : [],
-        level5: Array.isArray(hData.level5) ? hData.level5.map(String) : [],
-        level6: Array.isArray(hData.level6) ? hData.level6.map(String) : []
+        level4: Array.isArray(hData.level4) ? hData.level4.map(String) : []
       };
     });
 

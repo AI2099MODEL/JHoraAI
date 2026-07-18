@@ -62,16 +62,13 @@ export default function UpdateNotification() {
     try {
       const response = await fetch("/update.json?t=" + Date.now());
       if (response.ok) {
-        const contentType = response.headers.get("content-type") || "";
-        if (contentType.includes("application/json")) {
-          const manifest = await response.json();
-          // Check local storage for cached manifest version code or compare current version 1.0.0
-          const currentVersion = "1.0.0";
-          if (manifest.version !== currentVersion) {
-            console.log("Website Auto Update: New version manifest detected!", manifest.version);
-            if (registration) {
-              registration.update();
-            }
+        const manifest = await response.json();
+        // Check local storage for cached manifest version code or compare current version 1.0.0
+        const currentVersion = "1.0.0";
+        if (manifest.version !== currentVersion) {
+          console.log("Website Auto Update: New version manifest detected!", manifest.version);
+          if (registration) {
+            registration.update();
           }
         }
       }

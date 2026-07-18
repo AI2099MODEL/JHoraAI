@@ -22,7 +22,6 @@ interface TransitsTabProps {
   transitLongitude?: number;
   transitTimezone?: number;
   subTab?: string;
-  chartStyle?: "north" | "south";
 }
 
 interface TransitPlanet {
@@ -93,8 +92,7 @@ export default function TransitsTab({
   transitLatitude,
   transitLongitude,
   transitTimezone,
-  subTab: propSubTab,
-  chartStyle = "north"
+  subTab: propSubTab
 }: TransitsTabProps) {
   const getLocalDateString = () => {
     const d = new Date();
@@ -111,6 +109,7 @@ export default function TransitsTab({
   const [lat, setLat] = useState<number>(transitLatitude !== undefined && transitLatitude !== null ? transitLatitude : astrologyData.birthDetails.latitude);
   const [lng, setLng] = useState<number>(transitLongitude !== undefined && transitLongitude !== null ? transitLongitude : astrologyData.birthDetails.longitude);
   const [tz, setTz] = useState<number>(transitTimezone !== undefined && transitTimezone !== null ? transitTimezone : astrologyData.birthDetails.timezone);
+  const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
   const [subTabState, setSubTabState] = useState<string>("current_gochara");
   const subTab = propSubTab || subTabState;
   const setSubTab = propSubTab ? () => {} : setSubTabState;
@@ -891,6 +890,29 @@ export default function TransitsTab({
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            {/* Style Toggle */}
+            <div className="bg-slate-950/80 p-1 rounded-lg border border-indigo-500/15 flex">
+              <button
+                onClick={() => setChartStyle("north")}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                  chartStyle === "north"
+                    ? "bg-indigo-600 text-white shadow-md font-semibold"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                North
+              </button>
+              <button
+                onClick={() => setChartStyle("south")}
+                className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                  chartStyle === "south"
+                    ? "bg-indigo-600 text-white shadow-md font-semibold"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                South
+              </button>
+            </div>
           </div>
         </div>
       </div>

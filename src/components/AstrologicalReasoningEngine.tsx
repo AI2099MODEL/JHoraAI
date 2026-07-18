@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Brain,
   AlertTriangle,
@@ -20,10 +20,7 @@ import {
   ChevronRight,
   User,
   Activity,
-  AlertCircle,
-  Database,
-  Check,
-  Play
+  AlertCircle
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { calculateUnifiedRelationshipEvidence, UnifiedEvidenceItem } from "../lib/rules/unifiedRelationshipEvidenceEngine";
@@ -31,42 +28,14 @@ import { calculateUnifiedRelationshipEvidence, UnifiedEvidenceItem } from "../li
 interface AstrologicalReasoningEngineProps {
   astrologyData: AstrologyData;
   isDark: boolean;
-  syncStatus?: {
-    status: string;
-    handbookRuleCount: number;
-    eventCount: number;
-    lastSynced: string | null;
-    logs: string[];
-  };
-  onSyncNow?: () => void;
 }
 
 export const AstrologicalReasoningEngine: React.FC<AstrologicalReasoningEngineProps> = ({
   astrologyData,
-  isDark,
-  syncStatus,
-  onSyncNow
+  isDark
 }) => {
   const [selectedTopic, setSelectedTopic] = useState<string>("Marriage Promise");
   const [targetAge, setTargetAge] = useState<number>(28);
-  const [engineSteps, setEngineSteps] = useState<any[]>([]);
-
-  // Load steps dynamically and keep synchronized in real-time
-  useEffect(() => {
-    const loadSteps = () => {
-      const saved = localStorage.getItem("jhora_event_engine_steps_v4");
-      if (saved) {
-        try {
-          setEngineSteps(JSON.parse(saved));
-        } catch (e) {
-          console.error("Failed to parse event engine steps:", e);
-        }
-      }
-    };
-    loadSteps();
-    window.addEventListener("jhora_steps_updated", loadSteps);
-    return () => window.removeEventListener("jhora_steps_updated", loadSteps);
-  }, []);
 
   // Compute live unified evidence
   const liveEvidence = useMemo(() => {
@@ -264,95 +233,6 @@ export const AstrologicalReasoningEngine: React.FC<AstrologicalReasoningEnginePr
           <Cpu className="w-4 h-4 text-indigo-400" />
           Real-time Audit Engine Ready
         </div>
-      </div>
-
-      {/* Automated Astro Sync & Alignment Dashboard */}
-      <div className={`p-5 rounded-xl border ${isDark ? "bg-slate-950/70 border-indigo-500/20" : "bg-indigo-50/20 border-indigo-200/50"} space-y-4`}>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="relative">
-              <Zap className="w-5 h-5 text-indigo-500 animate-pulse" />
-              <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full ${syncStatus?.status === "success" ? "bg-emerald-500" : syncStatus?.status === "syncing" ? "bg-amber-500 animate-ping" : "bg-slate-500"} border border-slate-950`} />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold tracking-tight">Automated Astro Sync & Alignment Dashboard</h4>
-              <p className="text-[11px] text-slate-400">Verifies data integrity and re-scans active astroengines upon profile switch.</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-400 px-2.5 py-1 rounded border border-indigo-500/20">
-              STATUS: {syncStatus?.status?.toUpperCase() || "SUCCESS"}
-            </span>
-            {onSyncNow && (
-              <button
-                onClick={onSyncNow}
-                className="flex items-center gap-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-500 transition-colors px-3 py-1.5 rounded-lg text-white"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${syncStatus?.status === "syncing" ? "animate-spin" : ""}`} />
-                Sync Now
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-          <div className={`p-3 rounded-lg border ${isDark ? "bg-slate-900/50 border-slate-800" : "bg-white border-neutral-200"} flex items-center gap-3`}>
-            <Database className="w-5 h-5 text-indigo-400" />
-            <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Evaluation Handbook</span>
-              <span className="text-xs font-bold">{syncStatus?.handbookRuleCount || 45} Active Rules Scanned</span>
-            </div>
-          </div>
-          <div className={`p-3 rounded-lg border ${isDark ? "bg-slate-900/50 border-slate-800" : "bg-white border-neutral-200"} flex items-center gap-3`}>
-            <Layers className="w-5 h-5 text-indigo-400" />
-            <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">KP Event Book</span>
-              <span className="text-xs font-bold">{syncStatus?.eventCount || 64} Marriage Events Synced</span>
-            </div>
-          </div>
-          <div className={`p-3 rounded-lg border ${isDark ? "bg-slate-900/50 border-slate-800" : "bg-white border-neutral-200"} flex items-center gap-3`}>
-            <Cpu className="w-5 h-5 text-indigo-400" />
-            <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Active Engine Steps</span>
-              <span className="text-xs font-bold">{engineSteps.length || 12} Phases Synced</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Active Steps Sync Verification Checklist */}
-        {engineSteps.length > 0 && (
-          <div className={`p-3 rounded-lg border ${isDark ? "bg-slate-900/30 border-slate-800" : "bg-neutral-50 border-neutral-200"} space-y-2`}>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Active Engine Synchronization Pipeline</span>
-            <div className="flex flex-wrap gap-2">
-              {engineSteps.slice(0, 8).map((step, idx) => (
-                <div key={step.id} className="flex items-center gap-1 text-[10px] font-mono bg-indigo-500/5 border border-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded">
-                  <Check className="w-3 h-3 text-emerald-400" />
-                  <span>{step.id}: Synced</span>
-                </div>
-              ))}
-              {engineSteps.length > 8 && (
-                <div className="text-[10px] font-mono bg-slate-800 text-slate-400 px-2 py-0.5 rounded">
-                  +{engineSteps.length - 8} more steps
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Scan Logs Area */}
-        {syncStatus?.logs && syncStatus.logs.length > 0 && (
-          <div className="space-y-1.5">
-            <span className="text-[10px] font-mono font-bold text-slate-400 uppercase block">Recent Sync Log Stream:</span>
-            <div className="p-3 bg-slate-950 rounded-lg border border-slate-900 max-h-32 overflow-y-auto font-mono text-[10px] text-slate-300 space-y-1">
-              {syncStatus.logs.map((log, idx) => (
-                <div key={idx} className="leading-relaxed select-text border-l border-indigo-500/30 pl-2">
-                  {log}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Target Selector Bar */}

@@ -8,7 +8,6 @@ export interface KPRule {
   contradicting_evidence: string[];
   priority: number; // 1 (Highest) to 5 (Lowest)
   exceptions: string[];
-  type: "Natal" | "Transit";
   output: {
     category: "Marriage" | "Career" | "Finance" | "Health" | "DBA" | "Ruling_Planets" | "General";
     significance: "Positive" | "Negative" | "Neutral" | "Highly_Auspicious" | "Caution";
@@ -42,7 +41,6 @@ export const KPRulebook: KPRule[] = [
     exceptions: [
       "If the Star Lord signifies 6 and 10, but the Sub Lord of the 7th CSL is Jupiter/Venus and is connected to 11, marriage happens but with delay or initial hurdles."
     ],
-    type: "Natal",
     output: {
       category: "Marriage",
       significance: "Positive",
@@ -73,7 +71,6 @@ export const KPRulebook: KPRule[] = [
     exceptions: [
       "If the Star Lord signifies 5 and 8, but connects to 11, it indicates successful research-based profession, occult science, or turnaround consulting."
     ],
-    type: "Natal",
     output: {
       category: "Career",
       significance: "Positive",
@@ -104,7 +101,6 @@ export const KPRulebook: KPRule[] = [
     exceptions: [
       "If the Star Lord is connected to House 8 and House 11, it indicates unexpected windfall, inheritance, or success in lottery and speculative investments."
     ],
-    type: "Natal",
     output: {
       category: "Finance",
       significance: "Positive",
@@ -132,7 +128,6 @@ export const KPRulebook: KPRule[] = [
     exceptions: [
       "Even if 6th CSL connects to 6, 8, 12, the presence of strong Jupiter or Sun aspects on the ascendant CSL mitigates chronic outcomes."
     ],
-    type: "Natal",
     output: {
       category: "Health",
       significance: "Caution",
@@ -161,7 +156,6 @@ export const KPRulebook: KPRule[] = [
     exceptions: [
       "If the Mahadasha is extremely negative but the current Bhukti Lord is a strong natural benefic signifying 11, the event occurs but requires immense effort."
     ],
-    type: "Natal",
     output: {
       category: "DBA",
       significance: "Positive",
@@ -191,7 +185,6 @@ export const KPRulebook: KPRule[] = [
     exceptions: [
       "Rahu and Ketu can represent nodes of the Ruling Planets, taking over the role of any planet they aspect or whose sign they occupy."
     ],
-    type: "Transit",
     output: {
       category: "Ruling_Planets",
       significance: "Positive",

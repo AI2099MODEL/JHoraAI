@@ -46,7 +46,7 @@ export const RawDataPdfGenerator: React.FC<RawDataPdfGeneratorProps> = ({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name: "Nitin",
+            name: "Native",
             date: "1976-01-06",
             time: "18:40:00",
             place: "Dehradun, Uttarakhand, India",
