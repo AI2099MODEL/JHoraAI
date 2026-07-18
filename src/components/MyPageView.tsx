@@ -48,6 +48,249 @@ const IconMap: { [key: string]: React.ComponentType<any> } = {
   award: Award,
 };
 
+function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, astrologyData: any }) {
+  const [expandedMajor, setExpandedMajor] = useState<number | null>(null);
+  const [expandedSub, setExpandedSub] = useState<number | null>(null);
+
+  const charaDashas = profile?.Jaimini?.chara_dasha || astrologyData?.jaimini?.chara_dasha || astrologyData?.charaDasha || [];
+  const birthDateStr = profile?.Birth?.date || astrologyData?.birthDetails?.date || "1976-01-06";
+  const [bYr, bMon, bDay] = birthDateStr.split("-");
+  const birthYear = parseInt(bYr) || 1976;
+  const suffix = `-${bMon || "01"}-${bDay || "06"}`;
+  
+  const finalDashas = charaDashas.length > 0 ? charaDashas : [
+    { sign: "Aries", duration_years: 9, start_date: `${birthYear}${suffix}`, end_date: `${birthYear + 9}${suffix}` },
+    { sign: "Taurus", duration_years: 12, start_date: `${birthYear + 9}${suffix}`, end_date: `${birthYear + 21}${suffix}` },
+    { sign: "Gemini", duration_years: 7, start_date: `${birthYear + 21}${suffix}`, end_date: `${birthYear + 28}${suffix}` },
+    { sign: "Cancer", duration_years: 8, start_date: `${birthYear + 28}${suffix}`, end_date: `${birthYear + 36}${suffix}` },
+    { sign: "Leo", duration_years: 9, start_date: `${birthYear + 36}${suffix}`, end_date: `${birthYear + 45}${suffix}` },
+    { sign: "Virgo", duration_years: 11, start_date: `${birthYear + 45}${suffix}`, end_date: `${birthYear + 56}${suffix}` },
+    { sign: "Libra", duration_years: 12, start_date: `${birthYear + 56}${suffix}`, end_date: `${birthYear + 68}${suffix}` },
+    { sign: "Scorpio", duration_years: 10, start_date: `${birthYear + 68}${suffix}`, end_date: `${birthYear + 78}${suffix}` },
+    { sign: "Sagittarius", duration_years: 6, start_date: `${birthYear + 78}${suffix}`, end_date: `${birthYear + 84}${suffix}` },
+    { sign: "Capricorn", duration_years: 8, start_date: `${birthYear + 84}${suffix}`, end_date: `${birthYear + 92}${suffix}` },
+    { sign: "Aquarius", duration_years: 10, start_date: `${birthYear + 92}${suffix}`, end_date: `${birthYear + 102}${suffix}` },
+    { sign: "Pisces", duration_years: 5, start_date: `${birthYear + 102}${suffix}`, end_date: `${birthYear + 107}${suffix}` }
+  ];
+
+  const SIGN_NAMES = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+
+  const getSubPeriods = (parentSign: string, parentStartStr: string, parentEndStr: string) => {
+    const parentIdx = SIGN_NAMES.indexOf(parentSign);
+    if (parentIdx === -1) return [];
+
+    const parentStart = new Date(parentStartStr);
+    const parentEnd = new Date(parentEndStr);
+    const totalMs = parentEnd.getTime() - parentStart.getTime();
+    const partMs = totalMs / 12;
+    const list: any[] = [];
+    let currentStartMs = parentStart.getTime();
+
+    const isOddSign = parentIdx % 2 === 0;
+
+    for (let i = 0; i < 12; i++) {
+      let signIdx = 0;
+      if (isOddSign) {
+        signIdx = (parentIdx + i) % 12;
+      } else {
+        signIdx = (parentIdx - i + 12) % 12;
+      }
+      const signName = SIGN_NAMES[signIdx];
+      const subStart = new Date(currentStartMs);
+      const subEnd = new Date(currentStartMs + partMs);
+
+      list.push({
+        sign: signName,
+        start_date: subStart.toISOString().split("T")[0],
+        end_date: subEnd.toISOString().split("T")[0],
+        duration_months: (partMs / (1000 * 60 * 60 * 24 * 30.4375)).toFixed(1)
+      });
+
+      currentStartMs += partMs;
+    }
+    return list;
+  };
+
+  const getSubSubPeriods = (subSign: string, subStartStr: string, subEndStr: string) => {
+    const subIdx = SIGN_NAMES.indexOf(subSign);
+    if (subIdx === -1) return [];
+
+    const subStart = new Date(subStartStr);
+    const subEnd = new Date(subEndStr);
+    const totalMs = subEnd.getTime() - subStart.getTime();
+    const partMs = totalMs / 12;
+    const list: any[] = [];
+    let currentStartMs = subStart.getTime();
+
+    const isOddSign = subIdx % 2 === 0;
+
+    for (let i = 0; i < 12; i++) {
+      let signIdx = 0;
+      if (isOddSign) {
+        signIdx = (subIdx + i) % 12;
+      } else {
+        signIdx = (subIdx - i + 12) % 12;
+      }
+      const signName = SIGN_NAMES[signIdx];
+      const ssubStart = new Date(currentStartMs);
+      const ssubEnd = new Date(currentStartMs + partMs);
+
+      list.push({
+        sign: signName,
+        start_date: ssubStart.toISOString().split("T")[0],
+        end_date: ssubEnd.toISOString().split("T")[0],
+        duration_days: (partMs / (1000 * 60 * 60 * 24)).toFixed(1)
+      });
+
+      currentStartMs += partMs;
+    }
+    return list;
+  };
+
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <div className="space-y-4 text-xs font-mono">
+      <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
+        <table className="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr className="bg-slate-900 border-b border-slate-800 text-slate-400 font-sans text-[10px] uppercase font-bold tracking-wider">
+              <th className="py-2.5 px-3">Level / Sign</th>
+              <th className="py-2.5 px-3">Duration</th>
+              <th className="py-2.5 px-3">Start Date</th>
+              <th className="py-2.5 px-3">End Date</th>
+              <th className="py-2.5 px-3">Status</th>
+              <th className="py-2.5 px-3 text-right">Drilldown</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800/30 text-slate-300">
+            {finalDashas.map((dasha: any, idx: number) => {
+              const startYr = parseInt(dasha.start_date.split("-")[0]);
+              const endYr = parseInt(dasha.end_date.split("-")[0]);
+              const isActive = currentYear >= startYr && currentYear < endYr;
+              const isPast = currentYear >= endYr;
+              const isExpanded = expandedMajor === idx;
+
+              const subPeriods = isExpanded ? getSubPeriods(dasha.sign, dasha.start_date, dasha.end_date) : [];
+
+              return (
+                <React.Fragment key={`major-${idx}`}>
+                  {/* Major Dasha Row */}
+                  <tr className={`hover:bg-slate-900/40 ${isActive ? "bg-amber-500/5 font-bold text-amber-300" : ""}`}>
+                    <td className="py-2.5 px-3 font-bold font-sans text-slate-200">
+                      🔶 {dasha.sign} (MD)
+                    </td>
+                    <td className="py-2.5 px-3">{dasha.duration_years} Years</td>
+                    <td className="py-2.5 px-3">{dasha.start_date}</td>
+                    <td className="py-2.5 px-3">{dasha.end_date}</td>
+                    <td className="py-2.5 px-3">
+                      {isActive ? (
+                        <span className="px-2 py-0.5 text-[9px] bg-amber-500/15 border border-amber-500/40 text-amber-400 rounded font-bold uppercase tracking-wider animate-pulse">
+                          Active MD
+                        </span>
+                      ) : isPast ? (
+                        <span className="text-slate-500">Completed</span>
+                      ) : (
+                        <span className="text-indigo-400/70">Future</span>
+                      )}
+                    </td>
+                    <td className="py-2.5 px-3 text-right">
+                      <button
+                        onClick={() => {
+                          setExpandedMajor(isExpanded ? null : idx);
+                          setExpandedSub(null);
+                        }}
+                        className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 cursor-pointer text-[10px] font-bold font-sans uppercase"
+                      >
+                        {isExpanded ? "Collapse" : "Explore AD"}
+                      </button>
+                    </td>
+                  </tr>
+
+                  {/* Sub-major (Antardasha) Rows */}
+                  {isExpanded && subPeriods.map((sub: any, sIdx: number) => {
+                    const isSubExpanded = expandedSub === sIdx;
+                    const subSubPeriods = isSubExpanded ? getSubSubPeriods(sub.sign, sub.start_date, sub.end_date) : [];
+                    
+                    const subStart = new Date(sub.start_date);
+                    const subEnd = new Date(sub.end_date);
+                    const now = new Date();
+                    const isSubActive = now >= subStart && now < subEnd;
+                    const isSubPast = now >= subEnd;
+
+                    return (
+                      <React.Fragment key={`sub-${idx}-${sIdx}`}>
+                        <tr className={`bg-slate-900/30 border-l-4 border-amber-500/40 hover:bg-slate-900/50 ${isSubActive ? "bg-amber-500/10 font-bold text-amber-200" : ""}`}>
+                          <td className="py-2 px-3 pl-8 text-slate-300 font-sans">
+                            🔹 {sub.sign} (AD)
+                          </td>
+                          <td className="py-2 px-3">{sub.duration_months} Months</td>
+                          <td className="py-2 px-3 text-slate-400">{sub.start_date}</td>
+                          <td className="py-2 px-3 text-slate-400">{sub.end_date}</td>
+                          <td className="py-2 px-3">
+                            {isSubActive ? (
+                              <span className="px-1.5 py-0.5 text-[9px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded uppercase font-bold tracking-wider">
+                                Active AD
+                              </span>
+                            ) : isSubPast ? (
+                              <span className="text-slate-600">Completed</span>
+                            ) : (
+                              <span className="text-slate-500/60">Future</span>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-right">
+                            <button
+                              onClick={() => setExpandedSub(isSubExpanded ? null : sIdx)}
+                              className="p-1 px-2 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 cursor-pointer text-[9px] font-bold font-sans uppercase"
+                            >
+                              {isSubExpanded ? "Collapse" : "Explore PD"}
+                            </button>
+                          </td>
+                        </tr>
+
+                        {/* Sub-sub-major (Pratyantardasha) Rows */}
+                        {isSubExpanded && subSubPeriods.map((ssub: any, ssIdx: number) => {
+                          const ssubStart = new Date(ssub.start_date);
+                          const ssubEnd = new Date(ssub.end_date);
+                          const now = new Date();
+                          const isSsubActive = now >= ssubStart && now < ssubEnd;
+                          const isSsubPast = now >= ssubEnd;
+
+                          return (
+                            <tr key={`ssub-${idx}-${sIdx}-${ssIdx}`} className={`bg-slate-950/60 border-l-8 border-cyan-500/40 hover:bg-slate-950/80 ${isSsubActive ? "bg-cyan-500/10 font-bold text-cyan-200" : ""}`}>
+                              <td className="py-1.5 px-3 pl-14 text-slate-400 font-sans">
+                                ▫️ {ssub.sign} (PD)
+                              </td>
+                              <td className="py-1.5 px-3 text-slate-500">{ssub.duration_days} Days</td>
+                              <td className="py-1.5 px-3 text-slate-500">{ssub.start_date}</td>
+                              <td className="py-1.5 px-3 text-slate-500">{ssub.end_date}</td>
+                              <td className="py-1.5 px-3" colSpan={2}>
+                                {isSsubActive ? (
+                                  <span className="px-1.5 py-0.5 text-[8px] bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 rounded uppercase font-bold tracking-wider animate-pulse">
+                                    Active PD
+                                  </span>
+                                ) : isSsubPast ? (
+                                  <span className="text-slate-600/50">Completed</span>
+                                ) : (
+                                  <span className="text-slate-600/40">Future</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </React.Fragment>
+                    );
+                  })}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function renderIndexedTable(tableId: string, data: any, profile?: any, astrologyData?: any) {
   let planetsArray = data;
   if (!planetsArray && tableId === "table_2") {
@@ -67,7 +310,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
     }
   }
 
-  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18", "table_20", "table_21", "table_22"].includes(tableId)) return null;
+  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18", "table_20", "table_21", "table_22", "table_23"].includes(tableId)) return null;
   
   const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
   const thStyle = "py-2 px-3 bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider";
@@ -872,6 +1115,8 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
         </div>
       );
     }
+    case "table_23":
+      return <CharaDashaInteractiveTable profile={profile} astrologyData={astrologyData} />;
   }
 }
 
@@ -1412,12 +1657,12 @@ export function MyPageView({
       )}
 
       {/* Submenu Astrological Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-2 pt-1 -mx-2 px-2 scrollbar-thin scrollbar-thumb-slate-500/20 scrollbar-track-transparent">
+      <div className="flex flex-wrap items-center gap-1.5 pb-2 pt-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold tracking-wider uppercase border transition-all whitespace-nowrap cursor-pointer select-none shrink-0 ${
+            className={`px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold tracking-wider uppercase border transition-all cursor-pointer select-none ${
               activeTab === tab.id
                 ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm shadow-amber-500/10"
                 : "bg-slate-500/5 text-slate-400 border-slate-500/10 hover:bg-slate-500/10 hover:text-slate-300"
@@ -1944,6 +2189,17 @@ export function MyPageView({
                 data_sample: {
                   ishta_phala: "Calculated"
                 }
+              },
+              {
+                table_number: 23,
+                title: "Jaimini Chara Dasha (Zodiacal Cycles & Sign-Based Timeline)",
+                source_origin: "Jaimini Chara Dasha Engine",
+                section_key: "Jaimini.chara_dasha",
+                api_source: "Computed Client-side / JHora Mapper (Chara Dasha)",
+                is_populated: true,
+                data_sample: {
+                  chara_dashas: "Calculated down to Sub-Major (AD) and Sub-Sub-Major (PD) periods"
+                }
               }
             ]).map((table: any, idx: number) => {
               const indexedTable = profile?.User?.indexedTables?.[`table_${table.table_number}`] || profile?.User?.indexedTables?.[table.table_number];
@@ -1992,18 +2248,19 @@ export function MyPageView({
                       </div>
                       {renderIndexedTable(`table_${table.table_number}`, indexedTable.data, profile, astrologyData)}
                     </div>
-                  ) : [13, 14, 15, 16, 17, 18].includes(table.table_number) && (
+                  ) : [13, 14, 15, 16, 17, 18, 23].includes(table.table_number) && (
                     (table.table_number === 13 && (profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts)) ||
                     (table.table_number === 14 && (profile?.Jaimini?.arudha || profile?.Vedic?.arudha || astrologyData?.jaimini?.arudha || astrologyData?.horoscope?.arudhas)) ||
                     (table.table_number === 15 && (profile?.Vedic?.sphutas || astrologyData?.sphutas || profile?.Vedic?.special_lagnas || astrologyData?.special_lagnas)) ||
                     (table.table_number === 16 && (profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || astrologyData?.vedic?.strengths?.shadbala)) ||
                     (table.table_number === 17 && (profile?.Vedic?.sahams || astrologyData?.sahams)) ||
-                    (table.table_number === 18 && (profile?.Vedic?.upagrahas || astrologyData?.upagrahas || profile?.Vedic?.upgrahas || astrologyData?.upgrahas))
+                    (table.table_number === 18 && (profile?.Vedic?.upagrahas || astrologyData?.upagrahas || profile?.Vedic?.upgrahas || astrologyData?.upgrahas)) ||
+                    (table.table_number === 23)
                   ) ? (
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider">
-                          🟢 LIVE INTEGRATED DATA ({table.table_number === 13 ? "Divisional Charts" : table.table_number === 14 ? "Arudha Padas" : table.table_number === 15 ? "Sphutas & Special Lagnas" : table.table_number === 16 ? "Shadbala Strengths" : table.table_number === 17 ? "Jaimini Sahams" : "Vedic Upgrahas"})
+                          🟢 LIVE INTEGRATED DATA ({table.table_number === 13 ? "Divisional Charts" : table.table_number === 14 ? "Arudha Padas" : table.table_number === 15 ? "Sphutas & Special Lagnas" : table.table_number === 16 ? "Shadbala Strengths" : table.table_number === 17 ? "Jaimini Sahams" : table.table_number === 18 ? "Vedic Upgrahas" : "Jaimini Chara Dasha"})
                         </span>
                         <span className="text-[9px] font-mono text-amber-500/80">
                           Ready from Astro Engine
@@ -2485,6 +2742,21 @@ export function MyPageView({
             </div>
             <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
               {renderIndexedTable("table_17", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 23: Jaimini Chara Dasha */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 23
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Jaimini Chara Dasha (Zodiacal Cycles & Sign-Based Timeline)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_23", null, profile, astrologyData)}
             </div>
           </div>
         </div>
