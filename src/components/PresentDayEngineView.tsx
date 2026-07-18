@@ -621,8 +621,62 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
     { name: "Ketu", sign: "Virgo", nakshatra: "Hasta", starLord: "Moon", subLord: "Ketu", degree: "11° 04'" }
   ], []);
 
+  // Helper to determine if a period is currently active
+  const isPeriodActive = (startStr: string, endStr: string) => {
+    if (!startStr || !endStr) return false;
+    const now = new Date();
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+    return now >= start && now <= end;
+  };
+
   // 14-Step Calculations for ALL events (dynamically compiled)
   const allEventsResolved = useMemo(() => {
+    // Dynamic extraction of currently operating Vimshottari dasha lords
+    let currentMd = "Jupiter";
+    let currentAd = "Mercury";
+    let currentPd = "Venus";
+    let currentSd = "Moon";
+    let currentPrana = "Mars";
+
+    if (kpData.dba) {
+      currentMd = kpData.dba.mahadasha || currentMd;
+      currentAd = kpData.dba.bhukti || currentAd;
+      currentPd = kpData.dba.antara || currentPd;
+      currentSd = kpData.dba.sookshma || currentSd;
+      currentPrana = kpData.dba.prana || currentPrana;
+    } else if (Array.isArray(astrologyData?.dashas) && astrologyData.dashas.length > 0) {
+      const activeMaha = astrologyData.dashas.find((d: any) => isPeriodActive(d.startDate, d.endDate));
+      if (activeMaha) {
+        currentMd = activeMaha.lord;
+        if (Array.isArray(activeMaha.subPeriods) && activeMaha.subPeriods.length > 0) {
+          const activeAntar = activeMaha.subPeriods.find((sub: any) => isPeriodActive(sub.startDate, sub.endDate));
+          if (activeAntar) {
+            currentAd = activeAntar.lord;
+            if (Array.isArray(activeAntar.subPeriods) && activeAntar.subPeriods.length > 0) {
+              const activePratyantar = activeAntar.subPeriods.find((p: any) => isPeriodActive(p.startDate, p.endDate));
+              if (activePratyantar) {
+                currentPd = activePratyantar.lord;
+                if (Array.isArray(activePratyantar.subPeriods) && activePratyantar.subPeriods.length > 0) {
+                  const activeSookshma = activePratyantar.subPeriods.find((s: any) => isPeriodActive(s.startDate, s.endDate));
+                  if (activeSookshma) currentSd = activeSookshma.lord;
+                }
+              }
+            }
+          }
+        }
+      } else {
+        const fallbackMaha = astrologyData.dashas[0];
+        currentMd = fallbackMaha.lord;
+        if (Array.isArray(fallbackMaha.subPeriods) && fallbackMaha.subPeriods.length > 0) {
+          currentAd = fallbackMaha.subPeriods[0].lord;
+          if (Array.isArray(fallbackMaha.subPeriods[0].subPeriods) && fallbackMaha.subPeriods[0].subPeriods.length > 0) {
+            currentPd = fallbackMaha.subPeriods[0].subPeriods[0].lord;
+          }
+        }
+      }
+    }
+
     return eventsList.map(evt => {
       const eventHouses = evt.houses;
       const primaryHouse = eventHouses[0];
@@ -635,29 +689,133 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
       const subLord = realSubLord || ["Jupiter", "Venus", "Mercury", "Mars", "Saturn", "Sun", "Moon"][(primaryHouse + birthDetails.name.length) % 7];
       const isPromised = evt.defaultPromise;
 
-      // DBA Calculations (Step 3)
+      // Helper to check what houses a planet signifies
+      const getPlanetHousesSignified = (pName: string): number[] => {
+        const housesSet = new Set<number>();
+        const pKp = kpData.planets?.[pName];
+        const pVedic = astrologyData?.planets?.find((pl: any) => pl.name.toLowerCase() === pName.toLowerCase());
+        
+        const hReside = pKp?.house || pVedic?.house;
+        if (hReside) housesSet.add(Number(hReside));
+        
+        if (pKp?.ownership && Array.isArray(pKp.ownership)) {
+          pKp.ownership.forEach((h: number) => housesSet.add(h));
+        } else if (pVedic) {
+          // Standard Rashi Lord Ownership fallback
+          if (pName === "Sun") housesSet.add(5);
+          if (pName === "Moon") housesSet.add(4);
+          if (pName === "Mars") { housesSet.add(1); housesSet.add(8); }
+          if (pName === "Mercury") { housesSet.add(3); housesSet.add(6); }
+          if (pName === "Jupiter") { housesSet.add(9); housesSet.add(12); }
+          if (pName === "Venus") { housesSet.add(2); housesSet.add(7); }
+          if (pName === "Saturn") { housesSet.add(10); housesSet.add(11); }
+        }
+        return Array.from(housesSet);
+      };
+
+      // Math-based dynamic KP power calculator
+      const calculatePlanetPowerForEvent = (pName: string): number => {
+        let score = 45; // Neutral baseline
+        
+        // CSL matching bonus
+        if (subLord && subLord.toLowerCase() === pName.toLowerCase()) {
+          score += 15;
+        }
+        
+        const sigHouses = getPlanetHousesSignified(pName);
+        if (sigHouses.includes(primaryHouse)) {
+          score += 15;
+        }
+        if (sigHouses.includes(supportHouse)) {
+          score += 10;
+        }
+        if (sigHouses.includes(fulfillmentHouse)) {
+          score += 8;
+        }
+        
+        // Stellar links (Star Lord of the planet carries 100% higher weight in KP)
+        const pKp = kpData.planets?.[pName];
+        const starLordName = pKp?.star_lord || pKp?.starLord;
+        if (starLordName) {
+          const starSigHouses = getPlanetHousesSignified(starLordName);
+          if (starSigHouses.includes(primaryHouse)) {
+            score += 18;
+          }
+          if (starSigHouses.includes(supportHouse)) {
+            score += 10;
+          }
+        }
+
+        // Sub-Stellar links (Sub Lord of the planet rules execution)
+        const subLordName = pKp?.sub_lord || pKp?.subLord;
+        if (subLordName) {
+          const subSigHouses = getPlanetHousesSignified(subLordName);
+          if (subSigHouses.includes(primaryHouse)) {
+            score += 10;
+          }
+          if (subSigHouses.includes(supportHouse)) {
+            score += 5;
+          }
+        }
+        
+        // Obstructing house penalty based on domain
+        const obstructingHousesList = evt.id === "marriage" || evt.id === "relationship" || evt.id === "love"
+          ? [1, 6, 10]
+          : evt.id === "career"
+          ? [5, 8, 12]
+          : evt.id === "finance"
+          ? [1, 8, 12]
+          : evt.id === "health"
+          ? [5, 11]
+          : evt.id === "litigation"
+          ? [5, 8, 12]
+          : [];
+        
+        obstructingHousesList.forEach(h => {
+          if (sigHouses.includes(h)) score -= 8;
+        });
+        
+        return Math.min(Math.max(score, 15), 98);
+      };
+
+      const mdPower = calculatePlanetPowerForEvent(currentMd);
+      const adPower = calculatePlanetPowerForEvent(currentAd);
+      const pdPower = calculatePlanetPowerForEvent(currentPd);
+      const sdPower = calculatePlanetPowerForEvent(currentSd);
+
+      // DBA Calculations (Step 3) - Dynamically Resolved
       const dbaDetails = {
-        md: "Jupiter",
-        ad: "Mercury",
-        pd: "Venus",
-        sd: "Moon",
-        prana: "Mars",
-        activePlanets: ["Jupiter", "Mercury", "Venus", "Moon"],
+        md: currentMd,
+        ad: currentAd,
+        pd: currentPd,
+        sd: currentSd,
+        prana: currentPrana,
+        activePlanets: [currentMd, currentAd, currentPd, currentSd],
         ranking: [
-          { planet: "Jupiter", role: "Primary Dasha Lord", power: 94 },
-          { planet: "Mercury", role: "Antar Dasha Lord", power: 88 },
-          { planet: "Venus", role: "Pratyantar Dasha Lord", power: 85 },
-          { planet: "Moon", role: "Sookshma Dasha Lord", power: 72 }
+          { planet: currentMd, role: "Primary Dasha Lord (MD)", power: mdPower },
+          { planet: currentAd, role: "Antar Dasha Lord (AD)", power: adPower },
+          { planet: currentPd, role: "Pratyantar Dasha (PD)", power: pdPower },
+          { planet: currentSd, role: "Sookshma Dasha (SD)", power: sdPower }
         ]
       };
 
-      // Planet DNA (Step 4)
+      // Planet DNA (Step 4) - Dynamically Mapped from active KP/Vedic planetary parameters
+      const pKpActive = kpData.planets?.[currentMd];
+      const starLordActive = pKpActive?.star_lord || pKpActive?.starLord || "Saturn";
+      const subLordActive = pKpActive?.sub_lord || pKpActive?.subLord || "Venus";
+      
+      const getPlanetHouseNum = (planetName: string) => {
+        const pl = astrologyData?.planets?.find((p: any) => p.name.toLowerCase() === planetName.toLowerCase());
+        return pl?.house || 1;
+      };
+      const houseActive = pKpActive?.house || getPlanetHouseNum(currentMd);
+
       const planetDNA = {
-        planet: dbaDetails.md,
-        house: `${primaryHouse}th House`,
-        nakshatra: "Rohini (Moon)",
-        subLord: "Saturn",
-        details: `${dbaDetails.md} resides in natal ${primaryHouse}th House, under Star Lord Moon and Sub Lord Saturn. Multi-level significations resolved.`
+        planet: currentMd,
+        house: `${houseActive}th House`,
+        nakshatra: starLordActive,
+        subLord: subLordActive,
+        details: `${currentMd} resides in natal ${houseActive}th House, under Star Lord ${starLordActive} and Sub Lord ${subLordActive}. Dynamic multi-level significations resolved.`
       };
 
       // Moon Trigger (Step 6)
@@ -678,9 +836,9 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
 
       // Convergence (Step 8)
       const convergence = {
-        commonPlanets: Array.from(new Set(["Jupiter", "Mercury", subLord])),
-        discarded: ["Moon", "Mars"].filter(p => p !== subLord),
-        description: `Comparing the Daily Transit Trigger Chain with active DBA (Jupiter-Mercury-Venus-Moon) highlights high convergence on Jupiter, Mercury, and ${subLord}.`
+        commonPlanets: Array.from(new Set([dbaDetails.md, dbaDetails.ad, subLord])),
+        discarded: ["Moon", "Mars"].filter(p => p !== subLord && p !== dbaDetails.md && p !== dbaDetails.ad),
+        description: `Comparing the Daily Transit Trigger Chain with active DBA (${dbaDetails.md}-${dbaDetails.ad}-${dbaDetails.pd}) highlights high convergence on ${dbaDetails.md}, ${dbaDetails.ad}, and ${subLord}.`
       };
 
       // House Priority (Step 10)
@@ -694,23 +852,28 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
       const highRepeating = primaryHouse === 2 ? "Financially Secure" : primaryHouse === 5 ? "Playful & Romantic" : primaryHouse === 7 ? "Harmony-Seeking & Collaborative" : "Analytical & Growth-Oriented";
       const moodOutput = {
         mood: `${highRepeating} • Deep Emotional Overlay from Moon in Anuradha`,
-        explanation: `By compiling the active DBA significators merged with the Moon's Nakshatra Lord (Saturn) and Moon's Sign Lord (Mars), the highest repeating houses are ${eventHouses.join(", ")}. This manifests as a highly focused daily mind-state.`
+        explanation: `By compiling the active DBA significators (${dbaDetails.md}-${dbaDetails.ad}) merged with the Moon's Nakshatra Lord (Saturn) and Moon's Sign Lord (Mars), the highest repeating houses are ${eventHouses.join(", ")}. This manifests as a highly focused daily mind-state.`
       };
 
-      // Probability Score calculation based on Event, Name hash, and default promise
-      const nameLength = birthDetails.name.length;
-      const hash = (evt.id.charCodeAt(0) + nameLength) % 100;
-      let calculatedProbability = 35 + (hash % 61); // Range 35-95%
+      // Probability Score calculation dynamically derived from MD & AD support scores
+      const avgDbaSupport = (mdPower + adPower) / 2;
+      let calculatedProbability = avgDbaSupport;
       
-      // Fine-tune if event has a high-velocity transit trigger
-      if (evt.id === "career" || evt.id === "finance" || evt.id === "marriage" || evt.id === "communication") {
-        calculatedProbability += 5; // transit boost
-      } else if (evt.id === "divorce" || evt.id === "litigation") {
-        calculatedProbability -= 10; // non-favorable default today
+      if (isPromised) {
+        calculatedProbability += 8; // Boost for natally promised event
+      } else {
+        calculatedProbability -= 12; // Lower chance if no natal promise exists
       }
 
-      const finalProbability = Math.min(Math.max(calculatedProbability, 15), 98);
-      const isSupporting = finalProbability >= 55;
+      // Fine-tune if event has high-velocity transit triggers
+      if (evt.id === "career" || evt.id === "finance" || evt.id === "marriage" || evt.id === "communication") {
+        calculatedProbability += 4; // transit boost
+      } else if (evt.id === "divorce" || evt.id === "litigation") {
+        calculatedProbability -= 8; // non-favorable default today
+      }
+
+      const finalProbability = Math.min(Math.max(Math.round(calculatedProbability), 15), 97);
+      const isSupporting = finalProbability >= 52;
 
       return {
         ...evt,
