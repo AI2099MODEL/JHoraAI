@@ -560,13 +560,15 @@ export function MyPageView({
     
     const fields = [
       ["Full Name", userName, "Ascendant Sign", lagna.sign || ascendantSign || "Cancer"],
-      ["Date of Birth", birthDetails.date || birthDate, "Nakshatra", lagna.nakshatra || ascendantNakshatra || "Pushya"],
-      ["Time of Birth", birthDetails.time || birthTime, "Nakshatra Lord", lagna.nakshatra_lord || lagna.nakLord || ascendantNakLord || "Saturn"],
+      ["Date of Birth", birthDetails.date || birthDate, "Ascendant Nakshatra", lagna.nakshatra || ascendantNakshatra || "Pushya"],
+      ["Time of Birth", birthDetails.time || birthTime, "Ascendant Nak Lord", lagna.nakshatra_lord || lagna.nakLord || ascendantNakLord || "Saturn"],
       ["Birth Place", birthDetails.place || birthDetails.location || birthPlace, "Nakshatra Pada", `Pada ${lagna.pada || "2"}`],
       ["Latitude", birthDetails.latitude ? `${Number(birthDetails.latitude).toFixed(4)}° N` : "30.3165° N", "KP Star Lord", lagna.star_lord || "Saturn"],
       ["Longitude", birthDetails.longitude ? `${Number(birthDetails.longitude).toFixed(4)}° E` : "78.0322° E", "KP Sub Lord", lagna.sub_lord || "Mercury"],
       ["Sidereal Time (LST)", astronomicalData?.sidereal_time || astronomicalData?.local_sidereal_time || "12:14:15", "KP Sub-Sub Lord", lagna.sub_sub_lord || "Rahu"],
       ["Julian Day", astronomicalData?.julian_day_number || "2442784.2778", "Gandanta Status", lagna.gandanta ? "Gandanta" : "Clean"],
+      ["Birth Nakshatra", lagna.moon_nakshatra || profile?.Vedic?.planets?.Moon?.nakshatra || "Shatabhisha", "Moon Nakshatra", lagna.moon_nakshatra || profile?.Vedic?.planets?.Moon?.nakshatra || "Shatabhisha"],
+      ["Sun Nakshatra", lagna.sun_nakshatra || profile?.Vedic?.planets?.Sun?.nakshatra || "Purva Ashadha", "Ayanamsa Reference", birthDetails.ayanamsa || "Lahiri Ayanamsa"],
     ];
 
     fields.forEach(row => {
@@ -747,14 +749,29 @@ export function MyPageView({
               </span>
               <span className="opacity-25 text-slate-500">|</span>
               <span>
-                <strong className="text-amber-500 uppercase font-sans text-[10px]">Nakshatra:</strong>{" "}
+                <strong className="text-amber-500 uppercase font-sans text-[10px]">Ascendant Nakshatra:</strong>{" "}
                 <span className={`${textStyle} font-bold`}>{lagna.nakshatra || ascendantNakshatra || "Pushya"}</span>{" "}
                 (Pada {lagna.pada || "2"})
               </span>
               <span className="opacity-25 text-slate-500">|</span>
               <span>
-                <strong className="text-amber-500 uppercase font-sans text-[10px]">Nakshatra Lord:</strong>{" "}
+                <strong className="text-amber-500 uppercase font-sans text-[10px]">Ascendant Nak Lord:</strong>{" "}
                 <span className={textStyle}>{lagna.nakshatra_lord || lagna.nakLord || ascendantNakLord || "Saturn"}</span>
+              </span>
+              <span className="opacity-25 text-slate-500">|</span>
+              <span>
+                <strong className="text-amber-500 uppercase font-sans text-[10px]">Birth Nakshatra:</strong>{" "}
+                <span className={`${textStyle} font-bold text-amber-400`}>{lagna.moon_nakshatra || profile?.Vedic?.planets?.Moon?.nakshatra || "Shatabhisha"}</span>
+              </span>
+              <span className="opacity-25 text-slate-500">|</span>
+              <span>
+                <strong className="text-amber-500 uppercase font-sans text-[10px]">Moon Nakshatra:</strong>{" "}
+                <span className={`${textStyle} font-bold`}>{lagna.moon_nakshatra || profile?.Vedic?.planets?.Moon?.nakshatra || "Shatabhisha"}</span>
+              </span>
+              <span className="opacity-25 text-slate-500">|</span>
+              <span>
+                <strong className="text-amber-500 uppercase font-sans text-[10px]">Sun Nakshatra:</strong>{" "}
+                <span className={`${textStyle} font-bold`}>{lagna.sun_nakshatra || profile?.Vedic?.planets?.Sun?.nakshatra || "Purva Ashadha"}</span>
               </span>
               <span className="opacity-25 text-slate-500">|</span>
               <span>
