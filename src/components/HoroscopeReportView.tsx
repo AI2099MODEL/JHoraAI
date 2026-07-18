@@ -833,6 +833,40 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "table_10", label: "Table 10" },
       { id: "table_11", label: "Table 11" },
       { id: "table_12", label: "Table 12" },
+      { id: "panchanga", label: "panchanga" },
+      { id: "divisionalCharts", label: "divisionalCharts" },
+      { id: "shadBala", label: "shadBala*" },
+      { id: "ishtaPhala", label: "ishtaPhala*" },
+      { id: "bhavaBala", label: "bhavaBala*" },
+      { id: "ashtakavarga", label: "ashtakavarga*" },
+      { id: "yogas", label: "yogas*" },
+      { id: "doshas", label: "doshas*" },
+      { id: "longevity", label: "longevity*" },
+      { id: "sadeSati", label: "sadeSati*" },
+      { id: "jaimini", label: "jaimini*" },
+      { id: "arudhas", label: "arudhas*" },
+      { id: "sphutas", label: "sphutas*" },
+      { id: "upagrahas", label: "upagrahas*" },
+      { id: "sahams", label: "sahams*" },
+      { id: "special_lagnas", label: "specialLagnas*" },
+      { id: "argalas", label: "argalas*" },
+      { id: "charaDasha", label: "charaDasha*" },
+      { id: "panchapakshi", label: "panchapakshi*" },
+      { id: "lalkitab", label: "lalkitab*" },
+      { id: "gemstones", label: "gemstones*" },
+      { id: "numerology", label: "numerology*" },
+      { id: "mysticalSystems", label: "mysticalSystems*" },
+      { id: "kp_cusps", label: "kpCusps*" },
+      { id: "kp_planet_analysis", label: "kpPlanets*" },
+      { id: "kp_significators", label: "kpSignificators*" },
+      { id: "kp_houses_significators", label: "kpHouses*" },
+      { id: "kp_planet_to_house", label: "kpPlanetToHouse*" },
+      { id: "kp_ruling_planets", label: "kpRulingPlanets*" },
+      { id: "kp_dasha", label: "kpDasha*" },
+      { id: "kp_rulebook", label: "kpRulebook*" },
+      { id: "kp_transit", label: "kpTransit*" },
+      { id: "kp_horary", label: "kpHorary*" },
+      { id: "westernTropical", label: "westernTropical*" },
       { id: "allAstroSystems", label: "allAstroSystems*" }
     ];
 
@@ -874,8 +908,59 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       if (item.id === "table_12") {
         dataVal = { dummy: true };
       }
+      if (item.id === "special_lagnas" && !dataVal) {
+        dataVal = astrologyData.special_lagnas || { dummy: true };
+      }
+      if (item.id === "argalas" && !dataVal) {
+        dataVal = astrologyData.argalas || { dummy: true };
+      }
+      if (item.id === "charaDasha" && !dataVal) {
+        dataVal = astrologyData.charaDasha || { dummy: true };
+      }
+      if (item.id === "panchapakshi" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "lalkitab" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "gemstones" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "numerology" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "mysticalSystems" && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id.startsWith("kp_") && !dataVal) {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "westernTropical" && !dataVal) {
+        dataVal = { dummy: true };
+      }
       if (item.id === "allAstroSystems" && !dataVal) {
         dataVal = { dummy: true };
+      }
+      if (item.id === "ishtaPhala" && !dataVal) {
+        dataVal = astrologyData.shadBala || profileJson?.Vedic?.strengths?.ishta_phala;
+      }
+      if (item.id === "longevity" && !dataVal) {
+        dataVal = astrologyData.longevity || profileJson?.Vedic?.strengths?.longevity || profileJson?.Vedic?.doshas;
+      }
+      if (item.id === "sadeSati" && !dataVal) {
+        dataVal = astrologyData.doshas?.sadeSati || profileJson?.Vedic?.doshas?.sadeSati;
+      }
+      if (item.id === "jaimini" && !dataVal) {
+        dataVal = astrologyData.jaimini || profileJson?.Jaimini;
+      }
+      if (item.id === "upagrahas" && !dataVal) {
+        dataVal = astrologyData.upagrahas || profileJson?.Vedic?.upagrahas || { dummy: true };
+      }
+      if (item.id === "sahams" && !dataVal) {
+        dataVal = astrologyData.sahams || profileJson?.Vedic?.sahams || { dummy: true };
+      }
+      if (item.id === "sphutas" && !dataVal) {
+        dataVal = astrologyData.sphutas || profileJson?.Vedic?.sphutas || { dummy: true };
       }
 
       if (dataVal) {
