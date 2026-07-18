@@ -4415,12 +4415,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                       <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 15: Jaimini Arudha Padas (Manifested Projections of Houses)</h4>
                     </div>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 font-mono text-center text-xs sm:text-sm mt-2">
-                      {Object.entries(jaiminiData?.arudha || {}).map(([padKey, padVal]: [string, any]) => (
-                        <div key={padKey} className="p-3 rounded-lg bg-slate-900/50 border border-slate-800/80">
-                          <span className="font-extrabold text-indigo-400 block text-sm">{padKey}</span>
-                          <span className="text-slate-300 font-sans block mt-1">{padVal}</span>
-                        </div>
-                      ))}
+                      {Object.entries(jaiminiData?.arudha || {}).map(([padKey, padVal]: [string, any]) => {
+                        const displayVal = typeof padVal === "object" && padVal !== null
+                          ? `${padVal.sign || ""} (House ${padVal.house || ""})`
+                          : String(padVal);
+                        return (
+                          <div key={padKey} className="p-3 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                            <span className="font-extrabold text-indigo-400 block text-sm">{padKey}</span>
+                            <span className="text-slate-300 font-sans block mt-1">{displayVal}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -5815,12 +5820,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   12 Arudha Padas (Manifested Projections of Houses)
                 </span>
                 <div className="grid grid-cols-3 gap-2.5 text-center">
-                  {Object.entries(jaiminiData?.arudha || {}).map(([padKey, padVal]: [string, any]) => (
-                    <div key={padKey} className="p-2 rounded bg-slate-900/50 border border-slate-800">
-                      <span className="font-extrabold text-indigo-400 block">{padKey}</span>
-                      <span className="text-slate-300 block mt-1">{padVal}</span>
-                    </div>
-                  ))}
+                  {Object.entries(jaiminiData?.arudha || {}).map(([padKey, padVal]: [string, any]) => {
+                    const displayVal = typeof padVal === "object" && padVal !== null
+                      ? `${padVal.sign || ""} (House ${padVal.house || ""})`
+                      : String(padVal);
+                    return (
+                      <div key={padKey} className="p-2 rounded bg-slate-900/50 border border-slate-800">
+                        <span className="font-extrabold text-indigo-400 block">{padKey}</span>
+                        <span className="text-slate-300 block mt-1">{displayVal}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

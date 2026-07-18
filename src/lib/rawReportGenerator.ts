@@ -587,7 +587,13 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
       let rows: any[][] = [];
       if (s === "arudhas") {
         const arudhas = profileData?.Jaimini?.arudha || {};
-        rows = Object.keys(arudhas).map(k => [k, arudhas[k], "Jaimini Arudha Pada Projection"]);
+        rows = Object.keys(arudhas).map(k => {
+          const val = arudhas[k];
+          const displayVal = typeof val === "object" && val !== null
+            ? `${val.sign || ""} (House ${val.house || ""})`
+            : String(val);
+          return [k, displayVal, "Jaimini Arudha Pada Projection"];
+        });
         drawTable(["Arudha Pada Symbol", "Sign & House Placement", "Method Standards"], rows, [40, 60, 80]);
       } else if (s === "sphutas") {
         rows = [

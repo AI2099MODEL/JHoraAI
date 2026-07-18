@@ -228,13 +228,16 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
               {arudhaKeys.map((key) => {
                 const placement = arudhas[key] || "Unknown";
                 const label = ARUDHA_LABELS[key] || `${key} Pada`;
+                const displayPlacement = typeof placement === "object" && placement !== null
+                  ? `${placement.sign || ""} (House ${placement.house || ""})`
+                  : String(placement);
                 return (
                   <tr key={key} className="hover:bg-slate-900/30">
                     <td className={`${tdStyle} font-bold text-amber-500`}>{key}</td>
                     <td className={tdStyle}>{label}</td>
                     <td className={`${tdStyle} text-slate-200 font-bold`}>
                       <span className="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
-                        {placement}
+                        {displayPlacement}
                       </span>
                     </td>
                   </tr>
