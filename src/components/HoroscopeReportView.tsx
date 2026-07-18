@@ -2842,7 +2842,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                         <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
                           <div className="border-b border-slate-800 pb-2 flex flex-wrap items-center justify-between gap-2">
                             <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 1: Birth Details (Birth Particulars)</h3>
-                            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (birthDetails)</span>
+                            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (birthDetails)</span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
                             <div className="flex justify-between py-1 border-b border-slate-900/60">
@@ -2902,7 +2902,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                         <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
                           <div className="border-b border-slate-800 pb-2 flex flex-wrap items-center justify-between gap-2">
                             <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 1: Lagna Details (Ascendant Coordinates)</h3>
-                            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (ascendant)</span>
+                            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (ascendant)</span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
                             <div className="flex justify-between py-1 border-b border-slate-900/60">
@@ -2955,7 +2955,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 <div className="space-y-4 p-4 rounded-xl border border-slate-800 bg-slate-950/40 text-[11px] md:text-xs">
                   <div className="border-b border-slate-800 pb-2 flex flex-wrap items-center justify-between gap-2">
                     <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 2: KP Graha, Nakshatra and Pada</h3>
-                    <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (planets)</span>
+                    <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (planets)</span>
                   </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -3166,7 +3166,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                             <Clock className="w-4 h-4 text-amber-400" />
                             Table 3: Vimshottari Dasha Timeline (To Prana)
                           </h4>
-                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (dashas.vimshottari)</span>
+                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (dashas.vimshottari)</span>
                         </div>
                         <p className="text-[10px] text-slate-400 font-sans mt-0.5">
                           Interactive down to minutes: click any period to drill down. Yellow items are currently active.
@@ -3521,7 +3521,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                             <Clock className="w-4 h-4 text-amber-400" />
                             Table 4: Yogini Dasha Timeline (36-Year Cycle)
                           </h4>
-                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (dashas.yogini)</span>
+                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (dashas.yogini)</span>
                         </div>
                         <p className="text-[10px] text-slate-400 font-sans mt-0.5">
                           Interactive 5-level Yogini dasha hierarchy. Click any period to drill down. Yellow items are currently active.
@@ -3841,7 +3841,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                             <Clock className="w-4 h-4 text-amber-400" />
                             Table 5: Ashtottari Dasha Timeline (108-Year Cycle)
                           </h4>
-                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (dashas.ashtottari)</span>
+                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (dashas.ashtottari)</span>
                         </div>
                         <p className="text-[10px] text-slate-400 font-sans mt-0.5">
                           Interactive 5-level Ashtottari dasha hierarchy. Click any period to drill down. Yellow items are currently active.
@@ -5693,7 +5693,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   Sage Jaimini's framework of celestial energy interventions (Argalas) computed across all 12 houses to evaluate energy flow obstruction.
                 </p>
               </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (argalas)</span>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (argalas)</span>
             </div>
 
           <div className="overflow-x-auto rounded-xl border border-slate-800 text-xs">
@@ -5861,7 +5861,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   High-precision stellar sublord division of house houses, planetary significators, active dashas, rulebook evaluations, transits, and horary resolutions.
                 </p>
               </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: KP API Suite</span>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">KP Astro API Suite: /api/kp/cusps & /api/kp/chart</span>
             </div>
 
             {!showAllAstroSystems && (
@@ -7109,7 +7109,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   Complete reverse-lookup of planetary significator levels mapped back to the 12 bhavas/houses, with custom-weighted 6-fold KP strength evaluation, priorities, and grading metrics.
                 </p>
               </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: KP API Suite (Reverse Lookup)</span>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">KP Astro API Suite: /api/kp/significators</span>
             </div>
 
             <div className="space-y-6">
@@ -7552,7 +7552,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   Standard major aspect definitions, angular difference metrics, and 12 Placidus house boundaries.
                 </p>
               </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (western)</span>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (western)</span>
             </div>
 
           <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-purple-500/25 transition-all">
@@ -7656,7 +7656,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   Chinese BaZi Four Pillars, Pythagorean Numerology, Lal Kitab remedies, Mayan Day signs, and Celtic tree properties.
                 </p>
               </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (mysticalSystems)</span>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (mysticalSystems)</span>
             </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -7905,7 +7905,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   Comprehensive checklist of active auspicious combinations and major cosmic doshas present.
                 </p>
               </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (yogas & doshas)</span>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (yogas & doshas)</span>
             </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
@@ -7974,7 +7974,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   Exhaustive predictive analysis mapping professional focus, wealth generation, marriage bliss, health, and current lunar transit.
                 </p>
               </div>
-              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (predictions & muhurta)</span>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (predictions & muhurta)</span>
             </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

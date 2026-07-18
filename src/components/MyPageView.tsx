@@ -607,7 +607,7 @@ export function MyPageView({
                 title: "Birth Details & Lagna (Ascendant Coordinates)",
                 source_origin: "Dashboard Page / Input Form",
                 section_key: "Birth & Vedic.ascendant",
-                api_source: "/api/astrology/calculate (Payload: BirthDetails -> Responses: birthDetails, ascendant)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (birthDetails, ascendant)",
                 is_populated: true,
                 data_sample: {
                   profile_name: profile?.User?.profile_name || userName,
@@ -623,7 +623,7 @@ export function MyPageView({
                 title: "Vedic Grahas & Dignities (Planetary Placements)",
                 source_origin: "Vedic Ephemeris Engine",
                 section_key: "Vedic.planets",
-                api_source: "/api/astrology/calculate -> JHora API /horoscope (Response: planets)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (planets)",
                 is_populated: !!profile?.Vedic?.planets,
                 data_sample: profile?.Vedic?.planets ? {
                   total_planets_mapped: Object.keys(profile.Vedic.planets).length,
@@ -635,7 +635,7 @@ export function MyPageView({
                 title: "Astronomical Alignment Parameters",
                 source_origin: "Background Astronomical Engine",
                 section_key: "Astronomical",
-                api_source: "/api/astrology/calculate -> JHora API /horoscope (Response: astronomical)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (astronomical)",
                 is_populated: true,
                 data_sample: {
                   moon_phase: profile?.Astronomical?.moon_phase || moonPhase,
@@ -649,7 +649,7 @@ export function MyPageView({
                 title: "Ashtakavarga Bindus (Sarvashtakavarga SAV)",
                 source_origin: "Ashtakavarga Engine",
                 section_key: "Vedic.ashtakavarga",
-                api_source: "/api/astrology/calculate -> JHora API /horoscope (Response: ashtakavarga)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (ashtakavarga)",
                 is_populated: true,
                 data_sample: {
                   sarvashtakavarga: [28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28]
@@ -660,7 +660,7 @@ export function MyPageView({
                 title: "Shadbala Strengths (Rupas & Strength Ratio)",
                 source_origin: "Shadbala Calculation Engine",
                 section_key: "Vedic.shadbala",
-                api_source: "/api/astrology/calculate -> JHora API /horoscope (Response: strengths.shadbala)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (strengths.shadbala)",
                 is_populated: true,
                 data_sample: {
                   shadbala_strengths: "Calculated"
@@ -671,7 +671,7 @@ export function MyPageView({
                 title: "KP System Cusps & Planets (KP Stellar Division)",
                 source_origin: "KP Stellar Engine",
                 section_key: "KP",
-                api_source: "KP API Suite: /api/kp/cusps & /api/kp/chart",
+                api_source: "KP Astro API Suite: /api/kp/cusps & /api/kp/chart",
                 is_populated: true,
                 data_sample: {
                   nakshatras_and_sub_lords: true
@@ -682,7 +682,7 @@ export function MyPageView({
                 title: "Planet to House Significator Mappings (KP Reverse Lookup)",
                 source_origin: "KP Stellar Significators Engine",
                 section_key: "KP.planet_significators",
-                api_source: "KP API Suite: /api/kp/significators (Response: planet_to_house)",
+                api_source: "KP Astro API Suite: /api/kp/significators",
                 is_populated: true,
                 data_sample: {
                   significators_mapped: true
@@ -693,7 +693,7 @@ export function MyPageView({
                 title: "Western Tropical Chart & Aspects",
                 source_origin: "Western Astrology Engine",
                 section_key: "Western",
-                api_source: "/api/astrology/calculate -> JHora API /horoscope (Response: western)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (western)",
                 is_populated: true,
                 data_sample: {
                   aspects_count: 8
@@ -704,7 +704,7 @@ export function MyPageView({
                 title: "Esoteric & Alternative Mystical Systems (BaZi & Lal Kitab)",
                 source_origin: "Sexagenary and Lal Kitab Engines",
                 section_key: "Chinese & Lal_Kitab",
-                api_source: "/api/astrology/calculate -> JHora API /horoscope (Response: mysticalSystems)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (mysticalSystems)",
                 is_populated: true,
                 data_sample: {
                   lal_kitab_remedies: true,
@@ -716,7 +716,7 @@ export function MyPageView({
                 title: "Planetary Argalas & Obstructions (Interveners)",
                 source_origin: "Jaimini Planetary Interveners Engine",
                 section_key: "Vedic.argalas",
-                api_source: "/api/astrology/calculate -> JHora API /horoscope (Response: argalas)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (argalas)",
                 is_populated: true,
                 data_sample: {
                   houses_calculated: 12,
@@ -728,7 +728,7 @@ export function MyPageView({
                 title: "Vedic Raja/Dhana Yogas & Celestial Doshas",
                 source_origin: "Yogas/Doshas Evaluation Engine",
                 section_key: "Vedic.yogas & Vedic.doshas",
-                api_source: "/api/astrology/calculate -> JHora API /horoscope (Response: yogas & doshas)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (yogas & doshas)",
                 is_populated: true,
                 data_sample: {
                   evaluations_completed: true
@@ -739,7 +739,7 @@ export function MyPageView({
                 title: "Traditional Life Predictions & Daily Muhurta",
                 source_origin: "Predictive Synthesis Engine",
                 section_key: "Vedic.predictions & Vedic.muhurta",
-                api_source: "/api/astrology/calculate -> JHora API /horoscope (Response: predictions & muhurta)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (predictions & muhurta)",
                 is_populated: true,
                 data_sample: {
                   muhurta_calculated: true,
@@ -751,7 +751,7 @@ export function MyPageView({
                 title: "Jaimini Parameters & Chara Dashas",
                 source_origin: "Jaimini Sutra Engine",
                 section_key: "Jaimini",
-                api_source: "/api/astrology/calculate -> JHora API /horoscope (Response: jaimini)",
+                api_source: "Vedic Astro API: /api/astrology/calculate (jaimini)",
                 is_populated: true,
                 data_sample: {
                   atmakaraka: "Saturn",
