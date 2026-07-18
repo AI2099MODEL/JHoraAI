@@ -424,7 +424,7 @@ export const RelationshipConsultationFramework: React.FC<RelationshipConsultatio
                   {selectedMode} Synthesis
                 </h4>
                 <div className="flex flex-wrap gap-2 text-[10px] text-slate-400 font-mono">
-                  <span>Subject: {astrologyData.nativeName || "Native"}</span>
+                  <span>Subject: {astrologyData.nativeName || "Nitin"}</span>
                   <span>•</span>
                   <span>Target Age: {targetAge} Years</span>
                   <span>•</span>

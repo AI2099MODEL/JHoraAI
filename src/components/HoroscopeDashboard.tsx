@@ -26,6 +26,7 @@ interface HoroscopeDashboardProps {
   activeDashaSystem: "vimshottari" | "yogini" | "ashtottari";
   setActiveDashaSystem: (system: "vimshottari" | "yogini" | "ashtottari") => void;
   activeSubmenuId?: string;
+  chartStyle?: "north" | "south";
 }
 
 const ZODIAC_SIGNS = [
@@ -84,6 +85,7 @@ export default function HoroscopeDashboard({
   activeDashaSystem,
   setActiveDashaSystem,
   activeSubmenuId,
+  chartStyle = "north",
 }: HoroscopeDashboardProps) {
 
   const getLordColor = (lord: string) => {
@@ -458,6 +460,7 @@ export default function HoroscopeDashboard({
             vargaLagnas={astrologyData.vargaLagnas}
             lagnaSignIndex={astrologyData.lagna.signIndex}
             lagnaSignName={astrologyData.lagna.sign}
+            chartStyle={chartStyle}
           />
 
           {/* Secondary Divisional Vargas */}

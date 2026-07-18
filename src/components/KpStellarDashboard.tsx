@@ -64,6 +64,7 @@ export default function KpStellarDashboard({
   const [subLoading, setSubLoading] = useState<boolean>(false);
   const [subError, setSubError] = useState<string | null>(null);
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
+  const [sigTab, setSigTab] = useState<"planets" | "houses" | "houses_unique">("planets");
 
   const profileJson = useMemo(() => {
     if (!astrologyData) return null;
@@ -204,6 +205,116 @@ export default function KpStellarDashboard({
         return { status: "INCONCLUSIVE", details: "Rule is queued for verification.", matchPercent: 50 };
     }
   };
+
+  const planetPortfolios: Record<string, string> = {
+    "Sun": "Vitality, authority, father, carrier of soul, government service, status, heart, and general success.",
+    "Moon": "Mind, mother, emotions, liquids, changes, mental peace, left eye, and public interaction.",
+    "Mars": "Energy, courage, brothers, land, real estate, physical strength, surgery, and conflict.",
+    "Mercury": "Intellect, speech, business, education, communication, green color, analytical ability, and writing.",
+    "Jupiter": "Guru, wisdom, wealth, children, husband (for females), spirituality, expansion, liver, and fortune.",
+    "Venus": "Spouse, marriage, vehicles, luxury, arts, relationships, beauty, semen, and material comfort.",
+    "Saturn": "Longevity, labor, service, delays, sorrow, land/mines, teeth/bones, discipline, and hard work.",
+    "Rahu": "Material desires, sudden events, paternal grandfather, foreign travels, obsession, and illusions.",
+    "Ketu": "Moksha (liberation), maternal grandfather, isolation, spiritual detachment, occult sciences, and research."
+  };
+
+  const planetToHouseMap = useMemo(() => {
+    const map: Record<string, { houseNum: number; levels: string[] }[]> = {};
+    const standardPlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    
+    standardPlanets.forEach(p => {
+      map[p] = [];
+    });
+
+    const levelsDef = [
+      { keyPattern: /level1|L1/i, label: "L1" },
+      { keyPattern: /level2|L2/i, label: "L2" },
+      { keyPattern: /level3|L3/i, label: "L3" },
+      { keyPattern: /level4|L4/i, label: "L4" },
+      { keyPattern: /level5|L5/i, label: "L5" },
+      { keyPattern: /level6|L6/i, label: "L6" }
+    ];
+
+    const sourceObj = significatorsData?.houseSignificators || kpData?.house_significators || {};
+
+    for (let hNum = 1; hNum <= 12; hNum++) {
+      const sigObj = (sourceObj || {})[`House_${hNum}`] || 
+                     (sourceObj || {})[String(hNum)] || 
+                     (sourceObj || {})[hNum] || 
+                     (sourceObj || {})[`house_${hNum}`] || 
+                     (sourceObj || {})[`House ${hNum}`];
+      
+      if (!sigObj) continue;
+
+      if (Array.isArray(sigObj)) {
+        sigObj.forEach((p: any) => {
+          const pStr = String(p).trim();
+          if (!pStr || pStr === "—" || pStr === "No active significators") return;
+          
+          let matchedPlanet = pStr;
+          const matchStd = standardPlanets.find(std => std.toLowerCase() === pStr.toLowerCase());
+          if (matchStd) matchedPlanet = matchStd;
+
+          if (!map[matchedPlanet]) map[matchedPlanet] = [];
+          let houseEntry = map[matchedPlanet].find(entry => entry.houseNum === hNum);
+          if (!houseEntry) {
+            houseEntry = { houseNum: hNum, levels: [] };
+            map[matchedPlanet].push(houseEntry);
+          }
+        });
+      } else if (typeof sigObj === "object") {
+        const sigKeys = Object.keys(sigObj);
+        levelsDef.forEach((def) => {
+          const matchingKey = sigKeys.find(k => def.keyPattern.test(k));
+          if (matchingKey) {
+            const val = sigObj[matchingKey];
+            let planetsInLevel: string[] = [];
+            if (Array.isArray(val)) {
+              planetsInLevel = val.map((p: any) => String(p).trim());
+            } else if (typeof val === "string" && val.trim() && val !== "—") {
+              planetsInLevel = val.split(",").map((p: any) => p.trim());
+            }
+
+            planetsInLevel.forEach((p) => {
+              if (!p || p === "—" || p === "No active significators") return;
+              
+              let matchedPlanet = p;
+              const matchStd = standardPlanets.find(std => std.toLowerCase() === p.toLowerCase());
+              if (matchStd) matchedPlanet = matchStd;
+
+              if (!map[matchedPlanet]) map[matchedPlanet] = [];
+              let houseEntry = map[matchedPlanet].find(entry => entry.houseNum === hNum);
+              if (!houseEntry) {
+                houseEntry = { houseNum: hNum, levels: [] };
+                map[matchedPlanet].push(houseEntry);
+              }
+              if (!houseEntry.levels.includes(def.label)) {
+                houseEntry.levels.push(def.label);
+              }
+            });
+          }
+        });
+      } else if (typeof sigObj === "string") {
+        const planetsInLevel = sigObj.split(",").map((p: any) => p.trim());
+        planetsInLevel.forEach((p) => {
+          if (!p || p === "—" || p === "No active significators") return;
+          
+          let matchedPlanet = p;
+          const matchStd = standardPlanets.find(std => std.toLowerCase() === p.toLowerCase());
+          if (matchStd) matchedPlanet = matchStd;
+
+          if (!map[matchedPlanet]) map[matchedPlanet] = [];
+          let houseEntry = map[matchedPlanet].find(entry => entry.houseNum === hNum);
+          if (!houseEntry) {
+            houseEntry = { houseNum: hNum, levels: [] };
+            map[matchedPlanet].push(houseEntry);
+          }
+        });
+      }
+    }
+
+    return map;
+  }, [significatorsData, kpData]);
 
   // 1. Initial Health Check on component mount
   useEffect(() => {
@@ -682,40 +793,309 @@ export default function KpStellarDashboard({
 
           {/* SIGNIFICATORS TAB */}
           {activeSubmenuId === "significators" && (
-            <div className="space-y-6 animate-fade-in">
-              {/* Planet Significators */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Object.keys(significatorsData?.significators || {}).map((planet) => {
-                    const sig = significatorsData.significators[planet];
-                    return (
-                      <div key={planet} className={`p-4 rounded-xl border ${cardStyle} space-y-3`}>
-                        <div className="flex justify-between items-center border-b border-slate-800/60 pb-1.5">
-                          <span className="font-bold text-slate-100">{planet}</span>
-                        </div>
-                        <div className="space-y-1.5 text-xs font-mono">
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">L1 (Star Occupant):</span>
-                            <span className="text-indigo-400 font-semibold">{sig.level1?.join(", ") || "—"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">L2 (Planet Occupant):</span>
-                            <span className="text-amber-500 font-semibold">{sig.level2?.join(", ") || "—"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">L3 (Star Owner):</span>
-                            <span className="text-emerald-400 font-semibold">{sig.level3?.join(", ") || "—"}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-500">L4 (Planet Owner):</span>
-                            <span className="text-slate-300 font-semibold">{sig.level4?.join(", ") || "—"}</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+            <div className="space-y-6 animate-fade-in" id="kp-significators-tab">
+              {/* Inner Tab Selector */}
+              <div className="flex justify-center md:justify-start">
+                <div className="flex p-1 rounded-xl bg-slate-950/40 border border-slate-800/80 gap-1" id="kp-sig-toggle">
+                  <button
+                    onClick={() => setSigTab("planets")}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                      sigTab === "planets"
+                        ? "bg-indigo-600 text-white shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                    id="kp-sig-btn-planets"
+                  >
+                    Planet Significators
+                  </button>
+                  <button
+                    onClick={() => setSigTab("houses")}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                      sigTab === "houses"
+                        ? "bg-indigo-600 text-white shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                    id="kp-sig-btn-houses"
+                  >
+                    6-Level House Details
+                  </button>
+                  <button
+                    onClick={() => setSigTab("houses_unique")}
+                    className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                      sigTab === "houses_unique"
+                        ? "bg-indigo-600 text-white shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                    id="kp-sig-btn-houses-unique"
+                  >
+                    Houses & Unique Significators
+                  </button>
                 </div>
               </div>
+
+              {sigTab === "planets" ? (
+                <div className="space-y-4" id="kp-planet-sigs-panel">
+                  <div className="text-xs text-slate-400 leading-relaxed font-sans max-w-2xl bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/10">
+                    <p className="font-semibold text-indigo-400 mb-1">Planet Significators (6-Fold Table):</p>
+                    Represents the houses signified by each planet across 6 full levels of astrological strength: stellar occupancy (L1), planetary occupancy (L2), stellar lordship (L3), planetary lordship (L4), sub-lord occupancy (L5), and sub-lord lordship (L6).
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Object.keys(significatorsData?.planetSignificators || significatorsData?.significators || {}).map((planet) => {
+                      const sig = (significatorsData?.planetSignificators || significatorsData?.significators)?.[planet] || {};
+                      return (
+                        <div key={planet} className={`p-4 rounded-xl border ${cardStyle} space-y-3 hover:border-indigo-500/30 transition-all duration-200`}>
+                          <div className="flex justify-between items-center border-b border-slate-800/60 pb-1.5">
+                            <span className="font-bold text-slate-100">{planet}</span>
+                          </div>
+                          <div className="space-y-1.5 text-xs font-mono">
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L1 (Star Occupant):</span>
+                              <span className="text-indigo-400 font-semibold">{sig.level1?.length ? sig.level1.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L2 (Planet Occupant):</span>
+                              <span className="text-amber-500 font-semibold">{sig.level2?.length ? sig.level2.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L3 (Star Owner):</span>
+                              <span className="text-emerald-400 font-semibold">{sig.level3?.length ? sig.level3.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L4 (Planet Owner):</span>
+                              <span className="text-slate-300 font-semibold">{sig.level4?.length ? sig.level4.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L5 (Sub Occupant):</span>
+                              <span className="text-fuchsia-400 font-semibold">{sig.level5?.length ? sig.level5.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L6 (Sub Owner):</span>
+                              <span className="text-cyan-400 font-semibold">{sig.level6?.length ? sig.level6.join(", ") : "—"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : sigTab === "houses" ? (
+                <div className="space-y-4" id="kp-house-sigs-panel">
+                  <div className="text-xs text-slate-400 leading-relaxed font-sans max-w-2xl bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/10">
+                    <p className="font-semibold text-indigo-400 mb-1">House Significators (6-Fold Table):</p>
+                    Represents the planets acting as significators for each house across 6 full levels of astrological strength: stellar occupancy (L1), planetary occupancy (L2), stellar lordship (L3), planetary lordship (L4), sub-lord occupancy (L5), and sub-lord lordship (L6).
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Array.from({ length: 12 }, (_, i) => i + 1).map((houseNum) => {
+                      const houseKeyStr = String(houseNum);
+                      const sig = (significatorsData?.houseSignificators || {})[houseKeyStr] || (significatorsData?.houseSignificators || {})[houseNum] || {};
+                      return (
+                        <div key={houseNum} className={`p-4 rounded-xl border ${cardStyle} space-y-3 hover:border-indigo-500/30 transition-all duration-200`}>
+                          <div className="flex justify-between items-center border-b border-slate-800/60 pb-1.5">
+                            <span className="font-bold text-slate-100">House {houseNum}</span>
+                          </div>
+                          <div className="space-y-1.5 text-xs font-mono">
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L1 (Star Occupant):</span>
+                              <span className="text-indigo-400 font-semibold">{sig.level1?.length ? sig.level1.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L2 (Planet Occupant):</span>
+                              <span className="text-amber-500 font-semibold">{sig.level2?.length ? sig.level2.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L3 (Star Owner):</span>
+                              <span className="text-emerald-400 font-semibold">{sig.level3?.length ? sig.level3.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L4 (Planet Owner):</span>
+                              <span className="text-slate-300 font-semibold">{sig.level4?.length ? sig.level4.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L5 (Sub Occupant):</span>
+                              <span className="text-fuchsia-400 font-semibold">{sig.level5?.length ? sig.level5.join(", ") : "—"}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-500">L6 (Sub Owner):</span>
+                              <span className="text-cyan-400 font-semibold">{sig.level6?.length ? sig.level6.join(", ") : "—"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4" id="kp-houses-unique-panel">
+                  <div className="text-xs text-slate-400 leading-relaxed font-sans max-w-2xl bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/10">
+                    <p className="font-semibold text-indigo-400 mb-1">Houses & Unique Significators (6-Fold Aggregated):</p>
+                    Represents each of the 12 houses (Bhavas) mapped to its complete list of unique significator planets compiled from all 6 astrological strength levels, along with the standard significance of each house.
+                  </div>
+
+                  <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono">
+                          <th className="p-3.5 w-1/4">House / Bhava</th>
+                          <th className="p-3.5 w-1/3">Significator Planets (6-Fold Unique)</th>
+                          <th className="p-3.5">Significance / Meaning of House</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map((hNum) => {
+                          const houseKeyStr = String(hNum);
+                          const sigObj = (significatorsData?.houseSignificators || {})[`House_${hNum}`] || 
+                                         (significatorsData?.houseSignificators || {})[houseKeyStr] || 
+                                         (significatorsData?.houseSignificators || {})[hNum] || 
+                                         (significatorsData?.houseSignificators || {})[`house_${hNum}`] || 
+                                         (significatorsData?.houseSignificators || {})[`House ${hNum}`] || {};
+                          
+                          // Get unique planets from all 6 levels
+                          const uniquePlanets = (() => {
+                            if (!sigObj) return [];
+                            if (Array.isArray(sigObj)) {
+                              return Array.from(new Set(sigObj.map((p: any) => String(p).trim()))).filter(Boolean);
+                            }
+                            if (typeof sigObj === "object") {
+                              const planets: string[] = [];
+                              const sigKeys = Object.keys(sigObj);
+                              const levelPatterns = [
+                                /level1|L1/i,
+                                /level2|L2/i,
+                                /level3|L3/i,
+                                /level4|L4/i,
+                                /level5|L5/i,
+                                /level6|L6/i
+                              ];
+
+                              for (const pattern of levelPatterns) {
+                                const matchingKey = sigKeys.find(k => pattern.test(k));
+                                if (matchingKey) {
+                                  const val = sigObj[matchingKey];
+                                  if (Array.isArray(val)) {
+                                    planets.push(...val.map((p: any) => String(p).trim()));
+                                  } else if (typeof val === "string" && val.trim() && val !== "—") {
+                                    planets.push(...val.split(",").map((p: any) => p.trim()));
+                                  }
+                                }
+                              }
+
+                              // Fallback: collect from other string/array keys if empty
+                              if (planets.length === 0) {
+                                for (const key of sigKeys) {
+                                  const val = sigObj[key];
+                                  if (Array.isArray(val)) {
+                                    planets.push(...val.map((p: any) => String(p).trim()));
+                                  } else if (typeof val === "string" && val.trim() && val !== "—" && val !== "No active significators") {
+                                    planets.push(...val.split(",").map((p: any) => p.trim()));
+                                  }
+                                }
+                              }
+
+                              return Array.from(new Set(planets)).filter(p => p && p !== "—");
+                            }
+                            if (typeof sigObj === "string") {
+                              return sigObj.split(",").map((p: any) => p.trim()).filter(p => p && p !== "—");
+                            }
+                            return [];
+                          })();
+
+                          const houseInfo = {
+                            1: { name: "1st House (Ascendant / Tanu Bhava)", meaning: "Represents the self, physical body, appearance, overall vitality, temperament, and path of life." },
+                            2: { name: "2nd House (Dhana Bhava)", meaning: "Represents wealth, family, speech, primary education, facial features, right eye, and assets." },
+                            3: { name: "3rd House (Sahaja Bhava)", meaning: "Represents courage, siblings, communication, writing, short travels, intelligence, hands, and initiative." },
+                            4: { name: "4th House (Sukha Bhava)", meaning: "Represents mother, home, vehicles, happiness, basic education, land, general peace, and chest." },
+                            5: { name: "5th House (Putra Bhava)", meaning: "Represents children, intellect, creativity, romance, speculation, past life merits, and stomach." },
+                            6: { name: "6th House (Shatru Bhava)", meaning: "Represents enemies, debts, diseases, competition, service, daily routine, litigation, and lower abdomen." },
+                            7: { name: "7th House (Yuvati Bhava)", meaning: "Represents marriage, spouse, partnerships, business relations, public interaction, and foreign travels." },
+                            8: { name: "8th House (Randhra Bhava)", meaning: "Represents longevity, sudden events, hidden things, inheritance, mysticism, obstacles, and research." },
+                            9: { name: "9th House (Dharma Bhava)", meaning: "Represents fortune, father, guru, higher education, long journeys, religion, righteousness, and thighs." },
+                            10: { name: "10th House (Karma Bhava)", meaning: "Represents career, profession, status, reputation, public life, authority, father's status, and knees." },
+                            11: { name: "11th House (Labha Bhava)", meaning: "Represents gains, desires fulfillment, friends, elder siblings, income sources, and general success." },
+                            12: { name: "12th House (Vyaya Bhava)", meaning: "Represents losses, liberation (moksha), foreign land, expenditure, dreams, sleep, and feet." }
+                          }[hNum] || { name: `House ${hNum}`, meaning: "Signification of the house according to KP astrology principles." };
+
+                          return (
+                            <tr key={hNum} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0">
+                              <td className="p-3.5 font-bold text-cyan-400 font-mono text-xs">{houseInfo.name}</td>
+                              <td className="p-3.5">
+                                {uniquePlanets.length > 0 ? (
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {uniquePlanets.map((planet) => (
+                                      <span
+                                        key={planet}
+                                        className="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20"
+                                      >
+                                        {planet}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="text-slate-500 italic font-mono text-xs">No active significators</span>
+                                )}
+                              </td>
+                              <td className="p-3.5 text-xs text-slate-300 leading-relaxed">{houseInfo.meaning}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Reverse lookup: Planet to House significators */}
+                  <div className="space-y-4 pt-6 border-t border-slate-800/40">
+                    <div className="flex justify-between items-center pb-2">
+                      <h4 className="text-xs font-bold text-indigo-400 uppercase tracking-wider font-mono">Planet to House Significator Mappings</h4>
+                      <span className="text-[10px] bg-indigo-500/15 text-indigo-300 px-2 py-0.5 rounded font-mono font-bold uppercase font-mono">Reverse Lookup</span>
+                    </div>
+
+                    <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono">
+                            <th className="p-3.5 w-1/4">Planet</th>
+                            <th className="p-3.5 w-1/2">Signified Houses & Strength Levels</th>
+                            <th className="p-3.5">General Significations & Portfolio</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
+                          {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map((planet) => {
+                            const houses = planetToHouseMap[planet] || [];
+                            const sortedHouses = [...houses].sort((a, b) => a.houseNum - b.houseNum);
+
+                            return (
+                              <tr key={planet} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0">
+                                <td className="p-3.5 font-bold text-indigo-300 font-mono text-xs">{planet}</td>
+                                <td className="p-3.5">
+                                  {sortedHouses.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                      {sortedHouses.map((item) => (
+                                        <span
+                                          key={item.houseNum}
+                                          className="text-[10px] px-2.5 py-1 rounded-md font-mono bg-indigo-500/10 text-indigo-200 border border-indigo-500/20 flex items-center gap-1"
+                                        >
+                                          <span className="font-bold text-indigo-300">H{item.houseNum}</span>
+                                          {item.levels.length > 0 && (
+                                            <span className="text-slate-400 text-[9px]">({item.levels.join(", ")})</span>
+                                          )}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <span className="text-slate-500 italic font-mono text-xs">No signified houses</span>
+                                  )}
+                                </td>
+                                <td className="p-3.5 text-xs text-slate-400 leading-relaxed">
+                                  {planetPortfolios[planet] || "Astrological significations according to Vedic and KP astrology principles."}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -976,8 +1356,15 @@ export default function KpStellarDashboard({
                             {getRuleIcon(rule.output.category)}
                           </div>
                           <div className="min-w-0 flex-1 space-y-1">
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">{rule.id}</span>
+                             <div className="flex justify-between items-start gap-2">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">{rule.id}</span>
+                                <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded uppercase font-bold border ${
+                                  rule.type === "Transit" 
+                                    ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/15" 
+                                    : "bg-teal-500/10 text-teal-400 border-teal-500/15"
+                                }`}>{rule.type}</span>
+                              </div>
                               <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
                                 evaluation.status === "PASSED" 
                                   ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20" 

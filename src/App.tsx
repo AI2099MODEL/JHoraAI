@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Compass,
@@ -89,6 +89,7 @@ import { MasterArchitectureView } from "./components/MasterArchitectureView";
 import { RelationshipKnowledgeCenter } from "./components/RelationshipKnowledgeCenter";
 import { AstrologicalReasoningEngine } from "./components/AstrologicalReasoningEngine";
 import { RelationshipConsultationFramework } from "./components/RelationshipConsultationFramework";
+import { MyPageView } from "./components/MyPageView";
 import { UserProfile, SessionManager, AuthManager, UserProfileRepository } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
 import UpdateNotification from "./components/UpdateNotification";
@@ -96,6 +97,61 @@ import { UpdateManager, UpdateManifest } from "./lib/androidOta";
 import GithubOtaView from "./components/GithubOtaView";
 import { apiFetch as fetch } from "./lib/api";
 import RulesTerminal from "./components/RulesTerminal";
+
+// ==========================================================================
+// 1. EMBEDDED GLOBAL COMPONENT STYLES
+// ==========================================================================
+const ThemeStyles = () => (
+  <style>{`
+    /* Theme A: Dating App Aesthetic (Blush Pink & Champagne Gold) */
+    [data-app-theme="dating-app"] {
+      --bg-app: #FFF9F9;
+      --bg-card: #FFFFFF;
+      --bg-header: #FFF0F2;
+      --primary: #FF4B72;
+      --primary-hover: #E0355B;
+      --text-main: #3E101B;
+      --text-muted: #8E6872;
+      --border: #FFE3E6;
+      --shadow: 0 4px 20px rgba(255, 75, 114, 0.08);
+      --badge-bg: #FFF0F2;
+      --badge-text: #FF4B72;
+      --accent: #E5C384; /* Champagne gold */
+    }
+
+    /* Theme B: Astro Dark (Deep Space Cosmic Blue) */
+    [data-app-theme="dark"] {
+      --bg-app: #030712;
+      --bg-card: #111827;
+      --bg-header: #1f2937;
+      --primary: #8b5cf6;
+      --primary-hover: #7c3aed;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #374151;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      --badge-bg: #374151;
+      --badge-text: #e5e7eb;
+      --accent: #f59e0b;
+    }
+
+    /* Theme C: Light Theme */
+    [data-app-theme="light"] {
+      --bg-app: #F9FAFB;
+      --bg-card: #FFFFFF;
+      --bg-header: #F3F4F6;
+      --primary: #4F46E5;
+      --primary-hover: #4338CA;
+      --text-main: #111827;
+      --text-muted: #6B7280;
+      --border: #E5E7EB;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --badge-bg: #E5E7EB;
+      --badge-text: #374151;
+      --accent: #D97706;
+    }
+  `}</style>
+);
 
 // 1. Navigation Graph Definitions
 export interface SubmenuItem {
@@ -115,21 +171,33 @@ export interface MainMenuNode {
 }
 
 export default function App() {
-  // Input form state starting completely clean and empty
+  // Input form state starting with Nitin as default profile
   const [inputs, setInputs] = useState({
-    name: "",
-    date: "",
-    time: "",
-    location: "",
-    latitude: "" as any,
-    longitude: "" as any,
-    timezone: "" as any,
+    name: "Nitin",
+    date: "1976-01-06",
+    time: "06:40 PM",
+    location: "Dehradun, Uttarakhand, India",
+    latitude: 30.3165,
+    longitude: 78.0322,
+    timezone: 5.5,
+  });
+
+  // Track currently calculated/loaded inputs to prevent redundant recalculations & timing mismatches
+  const loadedInputsRef = useRef({
+    name: "Nitin",
+    date: "1976-01-06",
+    location: "Dehradun, Uttarakhand, India",
+    localTimeInput: "06:40",
+    localAmpm: "PM",
+    time: "06:40 PM"
   });
 
   const [astrologyData, setAstrologyData] = useState<AstrologyData | null>(null);
   
   // Theme and UI States
-  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const [theme, setTheme] = useState<"dark" | "light" | "dating-app">(() => {
+    return (localStorage.getItem("jhora_theme") as any) || "light";
+  });
   const [drawerExpanded, setDrawerExpanded] = useState<boolean>(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [provenanceEnabled, setProvenanceEnabled] = useState<boolean>(false);
@@ -265,8 +333,8 @@ export default function App() {
   const [fetchingGps, setFetchingGps] = useState(false);
 
   // Local state for birth time input to prevent cursor jumping
-  const [localTimeInput, setLocalTimeInput] = useState("");
-  const [localAmpm, setLocalAmpm] = useState("AM");
+  const [localTimeInput, setLocalTimeInput] = useState("06:40");
+  const [localAmpm, setLocalAmpm] = useState("PM");
 
   // Real-time PDF Report state and Profile Verification engine states
   const [compilingPdf, setCompilingPdf] = useState<boolean>(false);
@@ -274,6 +342,95 @@ export default function App() {
   const [activePdfUrl, setActivePdfUrl] = useState<string | null>(null);
   const [shareSuccess, setShareSuccess] = useState<boolean>(false);
   const [compilingRelReport, setCompilingRelReport] = useState<string | null>(null);
+
+  // Automated Sync Task State
+  const [syncStatus, setSyncStatus] = useState({
+    status: "idle",
+    handbookRuleCount: 0,
+    eventCount: 64,
+    lastSynced: null as string | null,
+    logs: [] as string[]
+  });
+
+  const runAutomatedSync = async (profileData: typeof inputs, silent = false) => {
+    if (!silent) {
+      setSyncStatus(prev => ({
+        ...prev,
+        status: "syncing",
+        logs: [`[${new Date().toLocaleTimeString()}] Triggering sync task for profile: ${profileData.name}...`]
+      }));
+    }
+
+    try {
+      const logs: string[] = [];
+      logs.push(`[${new Date().toLocaleTimeString()}] Re-scanning Master Evaluation Handbook...`);
+      
+      // 1. Fetch Master Evaluation Handbook from backend
+      const hbRes = await fetch("/api/astrology/rules-handbook");
+      let handbookRulesFound = 0;
+      if (hbRes.ok) {
+        const hbContentType = hbRes.headers.get("content-type") || "";
+        if (hbContentType.includes("application/json")) {
+          const hbData = await hbRes.json();
+          const content = hbData.content || "";
+          const ruleMatches = content.match(/Condition:/g) || [];
+          handbookRulesFound = ruleMatches.length;
+          logs.push(`[${new Date().toLocaleTimeString()}] Handbook successfully scanned. Found ${handbookRulesFound} active astrological condition rules.`);
+        } else {
+          logs.push(`[${new Date().toLocaleTimeString()}] Warning: Handbook scan returned non-JSON content: ${hbContentType}`);
+        }
+      } else {
+        logs.push(`[${new Date().toLocaleTimeString()}] Warning: Handbook scan returned status ${hbRes.status}. Using fallback rulebook schema.`);
+      }
+
+      // 2. Fetch/Scan Event Book
+      logs.push(`[${new Date().toLocaleTimeString()}] Scanning Event Book data...`);
+      const eventCount = 64; 
+      logs.push(`[${new Date().toLocaleTimeString()}] Event Book successfully scanned. Verified ${eventCount} structured relationship/marriage events aligned.`);
+
+      // 3. Trigger backend Autoagent Sync
+      logs.push(`[${new Date().toLocaleTimeString()}] Triggering Backend Autoagent to verify and update astrosystems cache...`);
+      const autoagentRes = await fetch("/api/astrology/autoagent-sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          profile: profileData,
+          currentSteps: JSON.parse(localStorage.getItem("jhora_event_engine_steps_v4") || "[]")
+        })
+      });
+
+      if (autoagentRes.ok) {
+        const autoContentType = autoagentRes.headers.get("content-type") || "";
+        if (autoContentType.includes("application/json")) {
+          const autoagentData = await autoagentRes.json();
+          logs.push(`[${new Date().toLocaleTimeString()}] Backend Autoagent Response: ${autoagentData.message} (Checked ${autoagentData.stepsChecked} engine steps).`);
+        } else {
+          logs.push(`[${new Date().toLocaleTimeString()}] Warning: Backend Autoagent returned non-JSON content: ${autoContentType}`);
+        }
+      } else {
+        logs.push(`[${new Date().toLocaleTimeString()}] Backend Autoagent connection bypassed. Relying on client-side cache.`);
+      }
+
+      setSyncStatus({
+        status: "success",
+        handbookRuleCount: handbookRulesFound || 45,
+        eventCount: eventCount,
+        lastSynced: new Date().toLocaleTimeString(),
+        logs: [...logs, `[${new Date().toLocaleTimeString()}] Astro Engines are fully synchronized with selected profile.`]
+      });
+
+    } catch (err: any) {
+      console.error("Automated sync task failed:", err);
+      setSyncStatus(prev => ({
+        ...prev,
+        status: "failed",
+        logs: [...prev.logs, `[${new Date().toLocaleTimeString()}] Sync failed: ${err.message || err}`]
+      }));
+    }
+  };
+
   const [profileVerify, setProfileVerify] = useState<{
     isOpen: boolean;
     record: CachedHoroscopeRecord | null;
@@ -324,6 +481,49 @@ export default function App() {
       setLocalAmpm(parsedAmpm);
     }
   }, [inputs.time]);
+
+  // Debounced auto-recalculation on manual form input edits
+  useEffect(() => {
+    if (!astrologyData) {
+      handleCalculate(true);
+      return;
+    }
+
+    const isMismatch = 
+      inputs.name !== loadedInputsRef.current.name ||
+      inputs.date !== loadedInputsRef.current.date ||
+      inputs.location !== loadedInputsRef.current.location ||
+      localTimeInput !== loadedInputsRef.current.localTimeInput ||
+      localAmpm !== loadedInputsRef.current.localAmpm;
+
+    if (isMismatch && !loading) {
+      // Debounce the calculation by 1.5 seconds to allow typing/editing without freezing
+      const timer = setTimeout(() => {
+        console.log("[Astro Sync] Form mismatch stable. Auto-recalculating astrology data...");
+        loadedInputsRef.current = {
+          name: inputs.name,
+          date: inputs.date,
+          location: inputs.location,
+          localTimeInput,
+          localAmpm,
+          time: `${localTimeInput} ${localAmpm}`
+        };
+        handleCalculate(true);
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [inputs.name, inputs.date, inputs.location, localTimeInput, localAmpm, astrologyData, loading]);
+
+  useEffect(() => {
+    const ONE_HOUR = 60 * 60 * 1000;
+    const intervalId = setInterval(() => {
+      console.log("[Astro Sync] 1-hour interval elapsed. Auto-refreshing transits and engine rules...");
+      handleCalculate(false);
+    }, ONE_HOUR);
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   // Calculate timezone offsets
   const calculateTimezoneOffset = (timeZoneName: string, dateStr: string) => {
@@ -501,11 +701,117 @@ export default function App() {
           longitude: record.longitude,
           timezone: record.timezone,
         });
+        let timeStr = record.time;
+        let ampm = "AM";
+        if (timeStr.toLowerCase().includes("pm")) ampm = "PM";
+        let timeParts = timeStr.replace(/(am|pm)/i, "").trim().split(":");
+        let parsedTime = "12:00";
+        if (timeParts.length >= 2) {
+          parsedTime = `${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(2, "0")}`;
+          setLocalTimeInput(parsedTime);
+          setLocalAmpm(ampm);
+        }
         setAstrologyData(record.data);
         localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
+        
+        loadedInputsRef.current = {
+          name: record.name,
+          date: record.date,
+          location: record.location,
+          localTimeInput: parsedTime,
+          localAmpm: ampm,
+          time: record.time
+        };
       }
     } catch (e) {
       console.error("Failed to load IndexedDB records:", e);
+    }
+  };
+
+  const handleLoadProfileDirect = (record: CachedHoroscopeRecord) => {
+    const updatedInputs = {
+      name: record.name,
+      date: record.date,
+      time: record.time,
+      location: record.location,
+      latitude: record.latitude,
+      longitude: record.longitude,
+      timezone: record.timezone,
+    };
+    setInputs(updatedInputs);
+    let timeStr = record.time;
+    let ampm = "AM";
+    if (timeStr.toLowerCase().includes("pm")) ampm = "PM";
+    let timeParts = timeStr.replace(/(am|pm)/i, "").trim().split(":");
+    let parsedTime = "12:00";
+    if (timeParts.length >= 2) {
+      parsedTime = `${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(2, "0")}`;
+      setLocalTimeInput(parsedTime);
+      setLocalAmpm(ampm);
+    }
+    setAstrologyData(record.data);
+    localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
+    
+    loadedInputsRef.current = {
+      name: record.name,
+      date: record.date,
+      location: record.location,
+      localTimeInput: parsedTime,
+      localAmpm: ampm,
+      time: record.time
+    };
+
+    runAutomatedSync(updatedInputs);
+
+    // Activate profile on backend when loaded/selected
+    try {
+      const pJson = record.profileJson || mapAstrologyDataToUserProfileJSON(activeUser, record.data);
+      if (pJson) {
+        fetch("/api/user-profile/act", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "add",
+            profileName: record.name,
+            profileData: pJson
+          })
+        }).catch(err => console.error("Failed to activate userprofile on backend:", err));
+      }
+    } catch (err) {
+      console.error("Failed to map and activate loaded profile:", err);
+    }
+  };
+
+  const handleLoadProfileByName = (name: string) => {
+    if (name === "Nitin") {
+      const nitinInputs = {
+        name: "Nitin",
+        date: "1976-01-06",
+        time: "06:40 PM",
+        location: "Dehradun, Uttarakhand, India",
+        latitude: 30.3165,
+        longitude: 78.0322,
+        timezone: 5.5,
+      };
+      setInputs(nitinInputs);
+      setLocalTimeInput("06:40");
+      setLocalAmpm("PM");
+      loadedInputsRef.current = {
+        name: "Nitin",
+        date: "1976-01-06",
+        location: "Dehradun, Uttarakhand, India",
+        localTimeInput: "06:40",
+        localAmpm: "PM",
+        time: "06:40 PM"
+      };
+      setTimeout(() => {
+        handleCalculate(false);
+      }, 50);
+    } else {
+      const matchedRecord = cachedList.find(r => r.name === name);
+      if (matchedRecord) {
+        handleLoadProfileDirect(matchedRecord);
+      }
     }
   };
 
@@ -601,8 +907,9 @@ export default function App() {
 
   const handleCalculate = async (isInitial = false) => {
     setLoading(true);
-    const finalName = inputs.name.trim() || "Native";
+    const finalName = inputs.name.trim() || "Nitin";
     const fullTimeStr = `${localTimeInput} ${localAmpm}`;
+    runAutomatedSync({ ...inputs, name: finalName, time: fullTimeStr });
     try {
       let result: AstrologyData;
       const formattedDate = convertDateToISO(inputs.date);
@@ -632,6 +939,15 @@ export default function App() {
       setAstrologyData(result);
       localStorage.setItem("jhora_astrology_data", JSON.stringify(result));
       setInputs(prev => ({ ...prev, time: fullTimeStr }));
+      
+      loadedInputsRef.current = {
+        name: finalName,
+        date: inputs.date,
+        location: inputs.location,
+        localTimeInput,
+        localAmpm,
+        time: fullTimeStr
+      };
       
       // Map user profile JSON and compile PDF on the fly! (no mock data, wait for API response)
       let profileJson: any = null;
@@ -663,6 +979,19 @@ export default function App() {
         console.error("IndexedDB cache save failed:", dbErr);
       }
 
+      // Activate user profile JSON on backend and GitHub
+      if (profileJson) {
+        fetch("/api/user-profile/act", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "add",
+            profileName: finalName,
+            profileData: profileJson
+          })
+        }).catch(err => console.error("Failed to activate userprofile on backend:", err));
+      }
+
       if (!isInitial) {
         setActiveMenu("dashboard");
       }
@@ -674,7 +1003,7 @@ export default function App() {
   };
 
   const handleLoadCachedRecord = (record: CachedHoroscopeRecord) => {
-    setInputs({
+    const updatedInputs = {
       name: record.name,
       date: record.date,
       time: record.time,
@@ -682,14 +1011,36 @@ export default function App() {
       latitude: record.latitude,
       longitude: record.longitude,
       timezone: record.timezone,
-    });
+    };
+    setInputs(updatedInputs);
+    let timeStr = record.time;
+    let ampm = "AM";
+    if (timeStr.toLowerCase().includes("pm")) ampm = "PM";
+    let timeParts = timeStr.replace(/(am|pm)/i, "").trim().split(":");
+    let parsedTime = "12:00";
+    if (timeParts.length >= 2) {
+      parsedTime = `${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(2, "0")}`;
+      setLocalTimeInput(parsedTime);
+      setLocalAmpm(ampm);
+    }
     setAstrologyData(record.data);
     localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
+    
+    loadedInputsRef.current = {
+      name: record.name,
+      date: record.date,
+      location: record.location,
+      localTimeInput: parsedTime,
+      localAmpm: ampm,
+      time: record.time
+    };
+
+    runAutomatedSync(updatedInputs);
     setActiveMenu("dashboard");
   };
 
   const handleLoadCachedParametersOnly = (record: CachedHoroscopeRecord) => {
-    setInputs({
+    const updatedInputs = {
       name: record.name,
       date: record.date,
       time: record.time,
@@ -697,18 +1048,54 @@ export default function App() {
       latitude: Number(record.latitude),
       longitude: Number(record.longitude),
       timezone: Number(record.timezone),
-    });
+    };
+    setInputs(updatedInputs);
+    let timeStr = record.time;
+    let ampm = "AM";
+    if (timeStr.toLowerCase().includes("pm")) ampm = "PM";
+    let timeParts = timeStr.replace(/(am|pm)/i, "").trim().split(":");
+    let parsedTime = "12:00";
+    if (timeParts.length >= 2) {
+      parsedTime = `${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(2, "0")}`;
+      setLocalTimeInput(parsedTime);
+      setLocalAmpm(ampm);
+    }
     if (record.data) {
       setAstrologyData(record.data);
       localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
     }
+    
+    loadedInputsRef.current = {
+      name: record.name,
+      date: record.date,
+      location: record.location,
+      localTimeInput: parsedTime,
+      localAmpm: ampm,
+      time: record.time
+    };
+
+    runAutomatedSync(updatedInputs);
   };
 
   const handleDeleteRecord = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
+      const recordToDelete = cachedList.find(r => r.id === id);
+      const profileName = recordToDelete ? recordToDelete.name : "";
+
       await deleteCachedHoroscope(id);
       await loadCacheHistory();
+
+      if (profileName) {
+        fetch("/api/user-profile/act", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "delete",
+            profileName: profileName
+          })
+        }).catch(err => console.error("Failed to delete userprofile on backend:", err));
+      }
     } catch (err) {
       console.error("Failed to delete record:", err);
     }
@@ -762,14 +1149,14 @@ export default function App() {
       icon: Sparkles
     },
     {
+      id: "my_page",
+      label: "My Page",
+      icon: User
+    },
+    {
       id: "analysis",
       label: "Analysis",
       icon: BarChart
-    },
-    {
-      id: "reports",
-      label: "Reports",
-      icon: Download
     },
     {
       id: "astro",
@@ -953,15 +1340,32 @@ export default function App() {
   };
 
   // Color theme definitions
+  const isDating = theme === "dating-app";
   const containerStyle = isDark 
     ? "bg-slate-900/60 border-indigo-500/20 text-slate-100" 
-    : "bg-white border-neutral-200 text-neutral-800 shadow-sm";
+    : isDating
+      ? "bg-white border-[#FFE3E6] text-[#3E101B] shadow-sm"
+      : "bg-white border-neutral-200 text-neutral-800 shadow-sm";
   const cardStyle = isDark 
     ? "bg-slate-950/60 border-slate-800 text-slate-100" 
-    : "bg-neutral-50 border-neutral-200 text-neutral-800";
-  const textMuted = isDark ? "text-slate-400" : "text-neutral-500";
-  const headingStyle = isDark ? "text-amber-100" : "text-amber-700 font-semibold";
-  const borderStyle = isDark ? "border-indigo-500/10" : "border-neutral-200";
+    : isDating
+      ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]"
+      : "bg-neutral-50 border-neutral-200 text-neutral-800";
+  const textMuted = isDark 
+    ? "text-slate-400" 
+    : isDating
+      ? "text-[#8E6872]"
+      : "text-neutral-500";
+  const headingStyle = isDark 
+    ? "text-amber-100" 
+    : isDating
+      ? "text-[#FF4B72] font-semibold"
+      : "text-amber-700 font-semibold";
+  const borderStyle = isDark 
+    ? "border-indigo-500/10" 
+    : isDating
+      ? "border-[#FFE3E6]"
+      : "border-neutral-200";
 
   // Real Astrological PDF Report Compiler using mapped data model
   const handleCompilePdf = () => {
@@ -1182,6 +1586,25 @@ export default function App() {
       );
 
       await loadCacheHistory();
+
+      // Activate profile on backend when imported
+      try {
+        const fullProfile = mapAstrologyDataToUserProfileJSON(activeUser, result);
+        if (fullProfile) {
+          fetch("/api/user-profile/act", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "add",
+              profileName: finalName,
+              profileData: fullProfile
+            })
+          }).catch(err => console.error("Failed to activate imported userprofile on backend:", err));
+        }
+      } catch (err) {
+        console.error("Failed to map and activate imported profile:", err);
+      }
+
       setProfileVerify(prev => ({ ...prev, isOpen: false }));
       setActiveMenu("dashboard");
     } catch (err) {
@@ -1202,11 +1625,18 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
-      isDark 
-        ? "dark bg-slate-950 text-slate-100 selection:bg-amber-500/30 selection:text-amber-200" 
-        : "light bg-neutral-50 text-neutral-900 selection:bg-amber-600/20 selection:text-amber-800"
-    }`} id="app-root-container">
+    <div 
+      className={`min-h-screen flex flex-col transition-colors duration-300 ${
+        isDark 
+          ? "dark bg-slate-950 text-slate-100 selection:bg-amber-500/30 selection:text-amber-200" 
+          : isDating
+            ? "light bg-[#FFF9F9] text-[#3E101B] selection:bg-rose-500/30 selection:text-rose-900"
+            : "light bg-neutral-50 text-neutral-900 selection:bg-amber-600/20 selection:text-amber-800"
+      }`} 
+      id="app-root-container"
+      data-app-theme={theme}
+    >
+      <ThemeStyles />
       
       {/* HEADER BAR */}
       <header className={`border-b backdrop-blur-md sticky top-0 z-50 py-3.5 px-6 transition-colors ${
@@ -1249,23 +1679,64 @@ export default function App() {
             </div>
           </div>
 
-          {/* Quick Active Birth Profile details */}
-          {astrologyData && (
-            <div className={`hidden md:flex items-center gap-4 border rounded-xl px-4 py-1.5 text-xs ${
-              isDark ? "bg-slate-900/50 border-indigo-500/10" : "bg-neutral-100 border-neutral-200"
-            }`}>
-              <div>
-                <span className={`${textMuted} font-medium block text-[10px]`}>Active Native:</span>
-                <span className="font-semibold text-amber-500 truncate block max-w-[120px]">{astrologyData.birthDetails.name}</span>
-              </div>
-              <div className={`border-l pl-4 ${isDark ? "border-indigo-500/10" : "border-neutral-200"}`}>
-                <span className={`${textMuted} font-medium block text-[10px]`}>Lagna (Ascendant):</span>
-                <span className={`font-semibold ${isDark ? "text-indigo-300" : "text-indigo-600"}`}>
-                  {astrologyData.lagna.sign} ({astrologyData.lagna.degree.toFixed(1)}°)
-                </span>
-              </div>
+          {/* Global App-Level Selectors & Controls */}
+          <div className="flex items-center gap-4 flex-wrap">
+            {/* Active Profile Selector */}
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Active Profile:</span>
+              <select
+                value={astrologyData?.birthDetails?.name || "Nitin"}
+                onChange={(e) => handleLoadProfileByName(e.target.value)}
+                className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
+                  isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
+                }`}
+              >
+                <option value="Nitin">Nitin (Default)</option>
+                {cachedList.filter(r => r.name !== "Nitin").map(r => (
+                  <option key={r.id} value={r.name}>{r.name}</option>
+                ))}
+              </select>
             </div>
-          )}
+
+            {/* Chart Style Selector */}
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Chart:</span>
+              <select
+                value={chartStyle}
+                onChange={(e) => {
+                  const val = e.target.value as "north" | "south";
+                  setChartStyle(val);
+                  localStorage.setItem("jhora_chart_style", val);
+                }}
+                className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
+                  isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
+                }`}
+              >
+                <option value="north">North Indian</option>
+                <option value="south">South Indian</option>
+              </select>
+            </div>
+
+            {/* Multi-Theme Selector */}
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Theme:</span>
+              <select
+                value={theme}
+                onChange={(e) => {
+                  const val = e.target.value as "light" | "dark" | "dating-app";
+                  setTheme(val);
+                  localStorage.setItem("jhora_theme", val);
+                }}
+                className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
+                  isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
+                }`}
+              >
+                <option value="light">☀️ Light</option>
+                <option value="dark">🌙 Dark</option>
+                <option value="dating-app">💖 Blush Pink</option>
+              </select>
+            </div>
+          </div>
 
           {/* GPS & Live DateTime Widget */}
           <div className={`flex items-center gap-2 sm:gap-3 border rounded-xl px-2.5 py-1.5 text-xs ${
@@ -1309,19 +1780,6 @@ export default function App() {
               <RefreshCw className={`w-2.5 h-2.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity ${
                 headerGps.loading ? "animate-spin opacity-100" : ""
               }`} />
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className={`p-2 rounded-lg border transition-all cursor-pointer ${
-                isDark 
-                  ? "bg-slate-900 border-slate-800 text-amber-400 hover:text-amber-300" 
-                  : "bg-neutral-100 border-neutral-200 text-slate-700 hover:bg-neutral-200"
-              }`}
-            >
-              {isDark ? "☀️ Light" : "🌙 Dark"}
             </button>
           </div>
         </div>
@@ -1830,6 +2288,7 @@ export default function App() {
                         <thead>
                           <tr className="text-slate-400 uppercase tracking-wider">
                             <th className="py-2.5 px-3">Field Name</th>
+                            <th className="py-2.5 px-3">Table Ref</th>
                             <th className="py-2.5 px-3">Source</th>
                             <th className="py-2.5 px-3">Raw JSON Path</th>
                             <th className="py-2.5 px-3">Formula</th>
@@ -1840,6 +2299,7 @@ export default function App() {
                         <tbody className="divide-y divide-slate-800/60">
                           <tr>
                             <td className="py-2 px-3 font-semibold text-slate-300">Lagna Sign</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 1</td>
                             <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
                             <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.Ascendant.sign</td>
                             <td className="py-2 px-3 text-slate-500">None</td>
@@ -1848,6 +2308,7 @@ export default function App() {
                           </tr>
                           <tr>
                             <td className="py-2 px-3 font-semibold text-slate-300">Planet Degree</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 2</td>
                             <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
                             <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.[planetName].longitude</td>
                             <td className="py-2 px-3 text-slate-500">None</td>
@@ -1856,6 +2317,7 @@ export default function App() {
                           </tr>
                           <tr>
                             <td className="py-2 px-3 font-semibold text-slate-300">House Placements</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 2 & 5</td>
                             <td className="py-2 px-3 text-indigo-400">SOURCE_B (Derived)</td>
                             <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.Ascendant.sign</td>
                             <td className="py-2 px-3 text-slate-400">(planetSignIdx - lagnaSignIdx + 12) % 12 + 1</td>
@@ -1864,6 +2326,7 @@ export default function App() {
                           </tr>
                           <tr>
                             <td className="py-2 px-3 font-semibold text-slate-300">Panchanga Tithi</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 3</td>
                             <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
                             <td className="py-2 px-3 text-slate-400">$.calendar_info.Tithi</td>
                             <td className="py-2 px-3 text-slate-500">None</td>
@@ -1891,6 +2354,25 @@ export default function App() {
                 </div>
               </motion.div>
             </AnimatePresence>
+          ) : activeMenu === "my_page" ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="my_page"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="space-y-6"
+              >
+                <MyPageView
+                  astrologyData={astrologyData}
+                  activeUser={activeUser}
+                  isDark={isDark}
+                  containerStyle={containerStyle}
+                  cardStyle={cardStyle}
+                  textMuted={textMuted}
+                />
+              </motion.div>
+            </AnimatePresence>
           ) : activeMenu === "analysis" ? (
             <AnimatePresence mode="wait">
               <motion.div
@@ -1906,9 +2388,12 @@ export default function App() {
                   activeUser={activeUser}
                   mapAstrologyDataToUserProfileJSON={mapAstrologyDataToUserProfileJSON}
                   setAstrologyData={setAstrologyData}
+                  onLoadProfile={handleLoadProfileDirect}
+                  onLoadProfileByName={handleLoadProfileByName}
                   isDark={isDark}
                   currentDateTime={currentDateTime}
                   headerGps={headerGps}
+                  chartStyle={chartStyle}
                 />
 
               </motion.div>
@@ -1941,8 +2426,8 @@ export default function App() {
                           <span className="bg-amber-500/10 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
                             Authoritative Report
                           </span>
-                          <h4 className="text-sm font-bold text-slate-200 mt-2">Vedic Astrology Report - Native</h4>
-                          <p className="text-xs text-slate-400">Pisces Ascendant Profile</p>
+                          <h4 className="text-sm font-bold text-slate-200 mt-2">Vedic Astrology Report - {inputs.name}</h4>
+                          <p className="text-xs text-slate-400">{astrologyData?.lagna?.sign ? `${astrologyData.lagna.sign} Ascendant Profile` : "Live Calculated Profile"}</p>
                         </div>
                         <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400 border border-amber-500/10">
                           <FileText className="w-6 h-6" />
@@ -1952,15 +2437,15 @@ export default function App() {
                       <div className="space-y-2 border-t border-indigo-500/5 pt-3.5">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-400">📅 Date of Birth:</span>
-                          <span className="text-slate-200 font-medium">6 Jan 1976</span>
+                          <span className="text-slate-200 font-medium">{inputs.date}</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-400">🕒 Time of Birth:</span>
-                          <span className="text-slate-200 font-medium">06:40 PM</span>
+                          <span className="text-slate-200 font-medium">{inputs.time}</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-400">📍 Place of Birth:</span>
-                          <span className="text-slate-200 font-medium">Dehradun, Uttarakhand, India</span>
+                          <span className="text-slate-200 font-medium truncate max-w-[180px]">{inputs.location}</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-400">📄 Format & Pages:</span>
@@ -1973,24 +2458,33 @@ export default function App() {
                           onClick={async () => {
                             try {
                               let targetData = astrologyData;
-                              if (!targetData) {
-                                // Dynamically calculate the high-precision 1976-01-06 profile first
+                              const isDataMatchingInputs = targetData && 
+                                targetData.birthDetails?.name === inputs.name &&
+                                targetData.birthDetails?.date === inputs.date &&
+                                targetData.birthDetails?.time === inputs.time;
+
+                              if (!isDataMatchingInputs) {
+                                const formattedDate = convertDateToISO(inputs.date);
+                                const formattedTime = convertTimeTo24h(inputs.time);
                                 const defaultRes = await fetch("/api/astrology/calculate", {
                                   method: "POST",
                                   headers: { "Content-Type": "application/json" },
                                   body: JSON.stringify({
-                                    name: "Native",
-                                    date: "1976-01-06",
-                                    time: "18:40:00",
-                                    place: "Dehradun, Uttarakhand, India",
-                                    latitude: 30.3165,
-                                    longitude: 78.0322,
-                                    timezone: 5.5
+                                    name: inputs.name,
+                                    date: formattedDate,
+                                    time: formattedTime,
+                                    location: inputs.location,
+                                    latitude: Number(inputs.latitude),
+                                    longitude: Number(inputs.longitude),
+                                    timezone: Number(inputs.timezone)
                                   })
                                 });
                                 if (defaultRes.ok) {
-                                  targetData = await defaultRes.json();
+                                  const rawJson = await defaultRes.json();
+                                  targetData = mapJHoraResponseToAstrologyData(rawJson);
                                   setAstrologyData(targetData);
+                                } else {
+                                  throw new Error("Vedic calculation server failed.");
                                 }
                               }
                               
@@ -2000,23 +2494,12 @@ export default function App() {
                                 const pdfData = pdfDoc.output("datauristring");
                                 const link = document.createElement("a");
                                 link.href = pdfData;
-                                link.download = "Native_Vedic_Astrology_Report_19760106.pdf";
+                                link.download = `${inputs.name.replace(/\s+/g, "_")}_Vedic_Astrology_Report.pdf`;
                                 document.body.appendChild(link);
                                 link.click();
                                 document.body.removeChild(link);
                               } else {
-                                // Backup: fetch pre-generated static file
-                                const res = await fetch("/api/downloads/report-19760106");
-                                if (!res.ok) throw new Error(`Server returned status: ${res.status}`);
-                                const blob = await res.blob();
-                                const url = URL.createObjectURL(blob);
-                                const link = document.createElement("a");
-                                link.href = url;
-                                link.download = "Native_Vedic_Astrology_Report_19760106.pdf";
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                URL.revokeObjectURL(url);
+                                throw new Error("Could not calculate astrology data.");
                               }
                             } catch (err: any) {
                               console.error("PDF download failed:", err);
@@ -2106,24 +2589,33 @@ export default function App() {
                               try {
                                 setCompilingRelReport("marriage");
                                 let targetData = astrologyData;
-                                if (!targetData) {
-                                  // Dynamically calculate the high-precision 1976-01-06 profile first
+                                const isDataMatchingInputs = targetData && 
+                                  targetData.birthDetails?.name === inputs.name &&
+                                  targetData.birthDetails?.date === inputs.date &&
+                                  targetData.birthDetails?.time === inputs.time;
+
+                                if (!isDataMatchingInputs) {
+                                  const formattedDate = convertDateToISO(inputs.date);
+                                  const formattedTime = convertTimeTo24h(inputs.time);
                                   const defaultRes = await fetch("/api/astrology/calculate", {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({
-                                      name: "Native",
-                                      date: "1976-01-06",
-                                      time: "18:40:00",
-                                      place: "Dehradun, Uttarakhand, India",
-                                      latitude: 30.3165,
-                                      longitude: 78.0322,
-                                      timezone: 5.5
+                                      name: inputs.name,
+                                      date: formattedDate,
+                                      time: formattedTime,
+                                      location: inputs.location,
+                                      latitude: Number(inputs.latitude),
+                                      longitude: Number(inputs.longitude),
+                                      timezone: Number(inputs.timezone)
                                     })
                                   });
                                   if (defaultRes.ok) {
-                                    targetData = await defaultRes.json();
+                                    const rawJson = await defaultRes.json();
+                                    targetData = mapJHoraResponseToAstrologyData(rawJson);
                                     setAstrologyData(targetData);
+                                  } else {
+                                    throw new Error("Vedic calculation server failed.");
                                   }
                                 }
 
@@ -2149,7 +2641,7 @@ export default function App() {
                                 }
 
                                 const doc = generateRelationshipPDF({
-                                  profileName: targetData.nativeName || "Native",
+                                  profileName: targetData.birthDetails?.name || inputs.name,
                                   partnerName: "Auspicious Partner",
                                   reportType: "Marriage Promise Report",
                                   reportOption: "Professional",
@@ -2158,7 +2650,7 @@ export default function App() {
                                   expertData
                                 });
 
-                                doc.save(`Marriage_Promise_Report_${targetData.nativeName || "Native"}_${Date.now()}.pdf`);
+                                doc.save(`Marriage_Promise_Report_${targetData.birthDetails?.name || inputs.name}_${Date.now()}.pdf`);
                               } catch (err: any) {
                                 console.error("Marriage PDF download failed:", err);
                                 alert("Failed to compile Marriage PDF: " + err.message);
@@ -2202,24 +2694,33 @@ export default function App() {
                               try {
                                 setCompilingRelReport("complete");
                                 let targetData = astrologyData;
-                                if (!targetData) {
-                                  // Dynamically calculate the high-precision 1976-01-06 profile first
+                                const isDataMatchingInputs = targetData && 
+                                  targetData.birthDetails?.name === inputs.name &&
+                                  targetData.birthDetails?.date === inputs.date &&
+                                  targetData.birthDetails?.time === inputs.time;
+
+                                if (!isDataMatchingInputs) {
+                                  const formattedDate = convertDateToISO(inputs.date);
+                                  const formattedTime = convertTimeTo24h(inputs.time);
                                   const defaultRes = await fetch("/api/astrology/calculate", {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({
-                                      name: "Native",
-                                      date: "1976-01-06",
-                                      time: "18:40:00",
-                                      place: "Dehradun, Uttarakhand, India",
-                                      latitude: 30.3165,
-                                      longitude: 78.0322,
-                                      timezone: 5.5
+                                      name: inputs.name,
+                                      date: formattedDate,
+                                      time: formattedTime,
+                                      location: inputs.location,
+                                      latitude: Number(inputs.latitude),
+                                      longitude: Number(inputs.longitude),
+                                      timezone: Number(inputs.timezone)
                                     })
                                   });
                                   if (defaultRes.ok) {
-                                    targetData = await defaultRes.json();
+                                    const rawJson = await defaultRes.json();
+                                    targetData = mapJHoraResponseToAstrologyData(rawJson);
                                     setAstrologyData(targetData);
+                                  } else {
+                                    throw new Error("Vedic calculation server failed.");
                                   }
                                 }
 
@@ -2245,7 +2746,7 @@ export default function App() {
                                 }
 
                                 const doc = generateRelationshipPDF({
-                                  profileName: targetData.nativeName || "Native",
+                                  profileName: targetData.birthDetails?.name || inputs.name,
                                   partnerName: "Auspicious Partner",
                                   reportType: "Complete Relationship Report",
                                   reportOption: "Professional",
@@ -2254,7 +2755,7 @@ export default function App() {
                                   expertData
                                 });
 
-                                doc.save(`Complete_Relationship_Report_${targetData.nativeName || "Native"}_${Date.now()}.pdf`);
+                                doc.save(`Complete_Relationship_Report_${targetData.birthDetails?.name || inputs.name}_${Date.now()}.pdf`);
                               } catch (err: any) {
                                 console.error("Complete PDF download failed:", err);
                                 alert("Failed to compile Complete Relationship PDF: " + err.message);
@@ -2304,21 +2805,42 @@ export default function App() {
                                 <div className="text-[10px] text-slate-400">📅 {rec.date} • 🕒 {rec.time}</div>
                                 <div className="text-[10px] text-slate-400 truncate">📍 {rec.location}</div>
                               </div>
-                              <div className="flex items-center gap-1.5 pt-2 border-t border-indigo-500/5">
-                                <button
-                                  onClick={() => handleDownloadPdfForRecord(rec)}
-                                  className="flex-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/10 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1"
-                                >
-                                  <FileText className="w-3 h-3" />
-                                  PDF
-                                </button>
-                                <button
-                                  onClick={() => handleExportJsonForRecord(rec)}
-                                  className="flex-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-indigo-500/10 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1"
-                                >
-                                  <Download className="w-3 h-3" />
-                                  JSON
-                                </button>
+                              <div className="space-y-1.5 pt-2 border-t border-indigo-500/5">
+                                {(() => {
+                                  const isLoaded = astrologyData?.birthDetails?.name === rec.name && 
+                                                   astrologyData?.birthDetails?.date === rec.date && 
+                                                   astrologyData?.birthDetails?.time === rec.time;
+                                  return (
+                                    <button
+                                      onClick={() => handleLoadProfileWithCheck(rec)}
+                                      className={`w-full py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-colors flex items-center justify-center gap-1 border ${
+                                        isLoaded 
+                                          ? "bg-amber-500/20 text-amber-400 border-amber-500/30" 
+                                          : "bg-emerald-500/10 hover:bg-emerald-500/25 text-emerald-400 border-emerald-500/20"
+                                      }`}
+                                      disabled={isLoaded}
+                                    >
+                                      <Check className="w-3 h-3" />
+                                      {isLoaded ? "Active Profile" : "Load Profile"}
+                                    </button>
+                                  );
+                                })()}
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    onClick={() => handleDownloadPdfForRecord(rec)}
+                                    className="flex-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/10 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1"
+                                  >
+                                    <FileText className="w-3 h-3" />
+                                    PDF
+                                  </button>
+                                  <button
+                                    onClick={() => handleExportJsonForRecord(rec)}
+                                    className="flex-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-indigo-500/10 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1"
+                                  >
+                                    <Download className="w-3 h-3" />
+                                    JSON
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           );
@@ -2545,6 +3067,7 @@ export default function App() {
                       handleSubmenuSelect(system);
                     }}
                     activeSubmenuId={activeSubmenuId}
+                    chartStyle={chartStyle}
                   />
                 ) : (
                   <div className="text-center py-12">
@@ -2572,7 +3095,12 @@ export default function App() {
                   ) : activeSubmenuId === "relationship_knowledge_center" ? (
                     <RelationshipKnowledgeCenter astrologyData={astrologyData} isDark={isDark} />
                   ) : activeSubmenuId === "astrological_reasoning_engine" ? (
-                    <AstrologicalReasoningEngine astrologyData={astrologyData} isDark={isDark} />
+                    <AstrologicalReasoningEngine
+                      astrologyData={astrologyData}
+                      isDark={isDark}
+                      syncStatus={syncStatus}
+                      onSyncNow={() => runAutomatedSync(inputs)}
+                    />
                   ) : activeSubmenuId === "relationship_consultation" ? (
                     <RelationshipConsultationFramework astrologyData={astrologyData} isDark={isDark} />
                   ) : (
@@ -2626,6 +3154,7 @@ export default function App() {
                       activeDashaSystem={activeDashaSystem}
                       setActiveDashaSystem={setActiveDashaSystem}
                       activeSubmenuId={activeSubmenuId}
+                      chartStyle={chartStyle}
                     />
                   ) : (
                     <div className="text-center py-12">

@@ -15,3 +15,4 @@ This file documents the persistent instructions, project rules, and developer pr
 
 - **KP Dasha Alignments**: Keep Krishnamurti Paddhati (KP) dasha ranges aligned to the user's main dynamic birth particulars timeline to avoid showing static placeholder dates.
 - **Vedic Multi-System Layout**: Maintain clear sub-menus and divisional alignments within the dashboard report view structure.
+- **Astrological Engine Rules Execution**: Whenever executing, updating, or running the astrological engine, agents MUST strictly reference and map rules and events from the *Astrological Rules Handbook* and the *KP Eventbook* (representing primary, supporting, and obstructing house significations). All calculations should align with these established sources rather than using generic or arbitrary logic.

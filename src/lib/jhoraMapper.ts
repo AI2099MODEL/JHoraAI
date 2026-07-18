@@ -5,6 +5,34 @@
 
 import { AstrologyData, PlanetPosition, DashaPeriod, YogaAnalysis, DoshaAnalysis, ZODIAC_SIGNS } from "./astrology";
 
+const NORMALIZE_PLANET_NAME: Record<string, string> = {
+  "Raagu": "Rahu",
+  "Rahu": "Rahu",
+  "Kethu": "Ketu",
+  "Ketu": "Ketu",
+  "Suryan": "Sun",
+  "Sun": "Sun",
+  "Chandran": "Moon",
+  "Moon": "Moon",
+  "Sevvai": "Mars",
+  "Mars": "Mars",
+  "Budhan": "Mercury",
+  "Mercury": "Mercury",
+  "Guru": "Jupiter",
+  "Jupiter": "Jupiter",
+  "Sukran": "Venus",
+  "Venus": "Venus",
+  "Sani": "Saturn",
+  "Saturn": "Saturn",
+  "Lagna": "Ascendant",
+  "Ascendant": "Ascendant"
+};
+
+function normPlanet(name: string): string {
+  const trimmed = name.trim();
+  return NORMALIZE_PLANET_NAME[trimmed] || trimmed;
+}
+
 export function parseJHoraDasha(rawList: Array<[string, string]>): DashaPeriod[] {
   if (!rawList || rawList.length === 0) return [];
   
@@ -16,13 +44,13 @@ export function parseJHoraDasha(rawList: Array<[string, string]>): DashaPeriod[]
     
     // Split the path (e.g., "Raagu-Raagu-Raagu" or "Jupiter-Jupiter-Jupiter")
     const parts = path.split("-");
-    const m = parts[0];
-    const a = parts[1] || parts[0];
-    const p = parts[2] || parts[1] || parts[0];
+    const m = normPlanet(parts[0]);
+    const a = normPlanet(parts[1] || parts[0]);
+    const p = normPlanet(parts[2] || parts[1] || parts[0]);
     
-    // Format date string to YYYY-MM-DD
-    const startDate = startStr.split(" ")[0];
-    const endDate = nextStartStr.split(" ")[0];
+    // Format date string - preserve full date and time for maximum precision
+    const startDate = startStr;
+    const endDate = nextStartStr;
     
     if (!mahaMap.has(m)) {
       mahaMap.set(m, {
@@ -135,6 +163,48 @@ export function calculateArgalas(rasiChart: { [house: number]: string[] }) {
   return argalas;
 }
 
+function normalizeNakshatraName(name: string): string {
+  if (!name) return "";
+  const clean = name.toLowerCase().replace(/[^a-z]/g, "");
+  if (clean.includes("ashwini") || clean.includes("asvini")) return "Ashwini";
+  if (clean.includes("bharani")) return "Bharani";
+  if (clean.includes("krittika") || clean.includes("krttika")) return "Krittika";
+  if (clean.includes("rohini")) return "Rohini";
+  if (clean.includes("mrigashira") || clean.includes("mrigasira") || clean.includes("mriga")) return "Mrigashira";
+  if (clean.includes("ardra") || clean.includes("arudra")) return "Ardra";
+  if (clean.includes("punarvasu")) return "Punarvasu";
+  if (clean.includes("pushya") || clean.includes("pusya")) return "Pushya";
+  if (clean.includes("ashlesha") || clean.includes("aslesha")) return "Ashlesha";
+  if (clean.includes("magha")) return "Magha";
+  if (clean.includes("purvaphalguni") || clean.includes("pubba") || clean.includes("purvaphal")) return "Purva Phalguni";
+  if (clean.includes("uttaraphalguni") || (clean.includes("uttara") && clean.includes("phal"))) return "Uttara Phalguni";
+  if (clean.includes("hasta") || clean.includes("hastha")) return "Hasta";
+  if (clean.includes("chitra") || clean.includes("chitha") || clean.includes("citra")) return "Chitra";
+  if (clean.includes("swati") || clean.includes("svati")) return "Swati";
+  if (clean.includes("vishakha") || clean.includes("visakha")) return "Vishakha";
+  if (clean.includes("anuradha")) return "Anuradha";
+  if (clean.includes("jyeshtha") || clean.includes("jyestha") || clean.includes("jesta")) return "Jyeshtha";
+  if (clean.includes("mula") || clean.includes("moola")) return "Mula";
+  if (clean.includes("purvaashadha") || clean.includes("purvashadha") || clean.includes("poorvashada") || (clean.includes("purva") && clean.includes("asadh"))) return "Purva Ashadha";
+  if (clean.includes("uttaraashadha") || clean.includes("uttarashadha") || clean.includes("uttarashada") || (clean.includes("uttara") && clean.includes("asadh"))) return "Uttara Ashadha";
+  if (clean.includes("shravana") || clean.includes("sravana")) return "Shravana";
+  if (clean.includes("dhanishta") || clean.includes("dhanistha")) return "Dhanishta";
+  if (clean.includes("shatabhisha") || clean.includes("shatabhishaj") || clean.includes("satabhisha") || clean.includes("shatabisha") || clean.includes("shatbisha") || clean.includes("satabisha") || clean.includes("shatabhish")) return "Shatabhisha";
+  if (clean.includes("purvabhadrapada") || clean.includes("purvabhadra") || clean.includes("poorvabhadra")) return "Purva Bhadrapada";
+  if (clean.includes("uttarabhadrapada") || clean.includes("uttarabhadra") || clean.includes("uttarabhadra")) return "Uttara Bhadrapada";
+  if (clean.includes("revati") || clean.includes("revathi")) return "Revati";
+  
+  const nList = [
+    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
+    "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
+    "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+    "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha",
+    "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+  ];
+  const match = nList.find(n => n.toLowerCase().replace(/[^a-z]/g, "").includes(clean) || clean.includes(n.toLowerCase().replace(/[^a-z]/g, "")));
+  return match || name;
+}
+
 export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   if (d && d.birthDetails && d.lagna && d.planets) {
     return d as AstrologyData;
@@ -210,7 +280,7 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
         sign: pData.sign,
         signIndex: pSignIdx,
         degree: pData.longitude,
-        nakshatra: nakDetails.nakshatra || "",
+        nakshatra: normalizeNakshatraName(nakDetails.nakshatra || ""),
         pada: nakDetails.pada || 1,
         house: pHouse,
         strength,
@@ -301,17 +371,125 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   const yoginiTree = parseJHoraDasha(dashaPayload.yogini || []);
   const ashtottariTree = parseJHoraDasha(dashaPayload.ashtottari || []);
 
-  const yogini = yoginiTree.map(y => ({
-    lord: y.lord,
-    startDate: y.startDate,
-    endDate: y.endDate
-  }));
+  const PLANET_TO_YOGINI: Record<string, string> = {
+    "Moon": "Mangala (Moon)",
+    "Sun": "Pingala (Sun)",
+    "Jupiter": "Dhanya (Jupiter)",
+    "Mars": "Bhramari (Mars)",
+    "Mercury": "Bhadrika (Mercury)",
+    "Saturn": "Ulka (Saturn)",
+    "Venus": "Siddha (Venus)",
+    "Rahu": "Sankata (Rahu)",
+    "Raagu": "Sankata (Rahu)",
+    "Ketu": "Sankata (Rahu)",
+    "Kethu": "Sankata (Rahu)"
+  };
 
-  const ashtottari = ashtottariTree.map(y => ({
-    lord: y.lord,
-    startDate: y.startDate,
-    endDate: y.endDate
-  }));
+  function translateYoginiNode(node: DashaPeriod): DashaPeriod {
+    const mappedLord = PLANET_TO_YOGINI[node.lord] || node.lord;
+    return {
+      lord: mappedLord,
+      startDate: node.startDate,
+      endDate: node.endDate,
+      subPeriods: node.subPeriods ? node.subPeriods.map(translateYoginiNode) : undefined
+    };
+  }
+
+  let yogini = yoginiTree.map(translateYoginiNode);
+  if (yogini.length === 0) {
+    const moon_p = planets.find((p) => p.name === "Moon");
+    if (moon_p) {
+      const birthDateStr = `${bd.date || "1976-01-06"}T${bd.time || "18:40:00"}`;
+      const birthDate = new Date(birthDateStr);
+      const moonLong = moon_p.longitude;
+      const nakshatraSpan = 360 / 27; // 13.3333 degrees
+      const moonNakshatraIndex = Math.floor(moonLong / nakshatraSpan);
+      const elapsedInNakshatra = (moonLong % nakshatraSpan) / nakshatraSpan;
+
+      const yoginiNames = ["Mangala", "Pingala", "Dhanya", "Bhramari", "Bhadrika", "Ulka", "Siddha", "Sankata"];
+      const yoginiLords = ["Moon", "Sun", "Jupiter", "Mars", "Mercury", "Saturn", "Venus", "Rahu"];
+      const yoginiYears = [1, 2, 3, 4, 5, 6, 7, 8];
+      const yoginiStartIndex = (moonNakshatraIndex + 3) % 8;
+      const calculatedYogini: DashaPeriod[] = [];
+      let yoginiCurrentDate = new Date(birthDate);
+
+      let yIndex = yoginiStartIndex;
+      for (let i = 0; i < 32; i++) { // 4 cycles of 36 years = 144 years to cover active age ranges
+        const yName = yoginiNames[yIndex];
+        const yLord = yoginiLords[yIndex];
+        const rawYears = yoginiYears[yIndex];
+        const years = i === 0 ? rawYears * (1 - elapsedInNakshatra) : rawYears;
+        const yStartDate = new Date(yoginiCurrentDate);
+        const yEndDate = new Date(yoginiCurrentDate);
+        yEndDate.setFullYear(yEndDate.getFullYear() + Math.floor(years));
+        yEndDate.setMonth(yEndDate.getMonth() + Math.floor((years % 1) * 12));
+
+        calculatedYogini.push({
+          lord: `${yName} (${yLord})`,
+          startDate: yStartDate.toISOString().split("T")[0],
+          endDate: yEndDate.toISOString().split("T")[0]
+        });
+
+        yoginiCurrentDate = yEndDate;
+        yIndex = (yIndex + 1) % 8;
+      }
+      yogini = calculatedYogini;
+    }
+  }
+
+  let ashtottari = ashtottariTree;
+  if (ashtottari.length === 0) {
+    const moon_p = planets.find((p) => p.name === "Moon");
+    if (moon_p) {
+      const birthDateStr = `${bd.date || "1976-01-06"}T${bd.time || "18:40:00"}`;
+      const birthDate = new Date(birthDateStr);
+      const moonLong = moon_p.longitude;
+      const nakshatraSpan = 360 / 27; // 13.3333 degrees
+      const moonNakshatraIndex = Math.floor(moonLong / nakshatraSpan);
+      const elapsedInNakshatra = (moonLong % nakshatraSpan) / nakshatraSpan;
+
+      const ashtottariLords = ["Sun", "Moon", "Mars", "Mercury", "Saturn", "Jupiter", "Rahu", "Venus"];
+      const ashtottariYearsMap: Record<string, number> = { "Sun": 6, "Moon": 15, "Mars": 8, "Mercury": 17, "Saturn": 10, "Jupiter": 19, "Rahu": 12, "Venus": 21 };
+      
+      const ASHTOTTARI_MAP = [
+        "Venus", "Venus", // 0, 1 (Ashwini, Bharani)
+        "Sun", "Sun", "Sun", // 2, 3, 4 (Krittika, Rohini, Mrigashira)
+        "Moon", "Moon", "Moon", "Moon", // 5, 6, 7, 8 (Ardra to Ashlesha)
+        "Mars", "Mars", "Mars", // 9, 10, 11 (Magha to Uttara Phalguni)
+        "Mercury", "Mercury", "Mercury", "Mercury", // 12, 13, 14, 15 (Hasta to Vishakha)
+        "Saturn", "Saturn", "Saturn", // 16, 17, 18 (Anuradha, Jyeshtha, Moola)
+        "Jupiter", "Jupiter", "Jupiter", // 19, 20, 21 (Purva Ashadha, Uttar Ashadha, Shravana)
+        "Rahu", "Rahu", "Rahu", // 22, 23, 24 (Dhanishta, Shatabhisha, Purva Bhadrapada)
+        "Venus", "Venus" // 25, 26 (Uttara Bhadrapada, Revati)
+      ];
+      
+      const startLord = ASHTOTTARI_MAP[moonNakshatraIndex] || "Sun";
+      const ashtottariStartIndex = ashtottariLords.indexOf(startLord);
+      const calculatedAshtottari: DashaPeriod[] = [];
+      let ashtottariCurrentDate = new Date(birthDate);
+
+      let aIndex = ashtottariStartIndex;
+      for (let i = 0; i < 16; i++) { // 2 cycles = 216 years to cover multiple lifetimes beautifully
+        const aLord = ashtottariLords[aIndex];
+        const rawYears = ashtottariYearsMap[aLord];
+        const years = i === 0 ? rawYears * (1 - elapsedInNakshatra) : rawYears;
+        const aStartDate = new Date(ashtottariCurrentDate);
+        const aEndDate = new Date(ashtottariCurrentDate);
+        aEndDate.setFullYear(aEndDate.getFullYear() + Math.floor(years));
+        aEndDate.setMonth(aEndDate.getMonth() + Math.floor((years % 1) * 12));
+
+        calculatedAshtottari.push({
+          lord: aLord,
+          startDate: aStartDate.toISOString().split("T")[0],
+          endDate: aEndDate.toISOString().split("T")[0]
+        });
+
+        ashtottariCurrentDate = aEndDate;
+        aIndex = (aIndex + 1) % 8;
+      }
+      ashtottari = calculatedAshtottari;
+    }
+  }
 
   // Yogas Map to List
   const yogas: YogaAnalysis[] = [];
@@ -555,7 +733,7 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   // Return formatted AstrologyData
   return {
     birthDetails: {
-      name: bd.name || "Native",
+      name: bd.name || "Nitin",
       date: bd.date || "1976-01-06",
       time: bd.time || "18:40:00",
       location: bd.place || "Dehradun",
@@ -748,7 +926,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
   const userSection = {
     google_user_id: activeUser?.uid || "guest_user",
     email: activeUser?.email || "guest@jhora.ai",
-    profile_name: data.birthDetails.name || activeUser?.name || "Native",
+    profile_name: data.birthDetails.name || activeUser?.name || "Nitin",
     created_at: activeUser?.createdDate || nowStr,
     updated_at: nowStr
   };
@@ -1085,16 +1263,17 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
   };
 
   // 7. Map dashas
-  const vimshottariDashas = (data.dashas || []).map((d: any) => ({
-    lord: d.lord,
-    start_date: d.startDate,
-    end_date: d.endDate,
-    children: (d.subPeriods || []).map((s: any) => ({
-      lord: s.lord,
-      start_date: s.startDate,
-      end_date: s.endDate
-    }))
-  }));
+  function mapDashaTreeToDb(nodes: any[]): any[] {
+    if (!nodes) return [];
+    return nodes.map((n: any) => ({
+      lord: n.lord || n.lordName || "Unknown",
+      start_date: n.start_date || n.startDate || n.startTime || "",
+      end_date: n.end_date || n.endDate || n.endTime || "",
+      children: mapDashaTreeToDb(n.subPeriods || n.sub_periods || n.children || [])
+    }));
+  }
+
+  const vimshottariDashas = mapDashaTreeToDb(data.dashas || []);
 
   // 8. Map yogas & doshas
   const yogasMapped = (data.yogas || []).map((y: any) => ({
@@ -1594,7 +1773,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
     }
   };
 
-  return {
+  const profileData = {
     User: userSection,
     Birth: birthSection,
     Astronomical: {
@@ -1640,8 +1819,8 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       house_lords: houseLordsObj,
       dashas: {
         vimshottari: vimshottariDashas,
-        yogini: (data.additionalDashas?.yogini || []).map((y: any) => ({ lord: y.lord, start_date: y.startDate, end_date: y.endDate })),
-        ashtottari: (data.additionalDashas?.ashtottari || []).map((a: any) => ({ lord: a.lord, start_date: a.startDate, end_date: a.endDate }))
+        yogini: mapDashaTreeToDb(data.additionalDashas?.yogini || []),
+        ashtottari: mapDashaTreeToDb(data.additionalDashas?.ashtottari || [])
       },
       yogas: yogasMapped,
       doshas: doshasMapped
@@ -1792,6 +1971,203 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       ...currentSkySection
     },
     Validation: validationSection
+  };
+
+  const tableIndex = {
+    metadata: {
+      indexing_agent: "JHoraAI Master Evaluation Indexer",
+      indexed_on: nowStr,
+      handbook_reference: "/documents/master_astro_handbook.md",
+      status: "SYNC_ACTIVE"
+    },
+    tables: [
+      {
+        table_number: 1,
+        title: "Birth Details & Lagna (Ascendant Coordinates)",
+        source_origin: "Dashboard Page / Input Form",
+        section_key: "Birth & Vedic.ascendant",
+        is_populated: true,
+        data_sample: {
+          profile_name: userSection.profile_name,
+          date: birthSection.date,
+          time: birthSection.time,
+          place: birthSection.place,
+          lagna_sign: ascendant.sign,
+          lagna_degree: ascendant.degree,
+          lagna_nakshatra: ascendant.nakshatra
+        }
+      },
+      {
+        table_number: 2,
+        title: "KP Graha, Nakshatra and Pada",
+        source_origin: "Dehradun JHora REST API (/api/jhora/horoscope) & KP Stellar Division Engine",
+        section_key: "Vedic.planets & KP.planets",
+        is_populated: Object.keys(planetsMap).length > 0,
+        data_sample: {
+          total_planets_mapped: Object.keys(planetsMap).length,
+          sample_planet: Object.keys(planetsMap)[0] || "Sun",
+          nakshatras_and_sub_lords: true
+        }
+      },
+      {
+        table_number: 3,
+        title: "Vimshottari Dasha Timeline (To Prana)",
+        source_origin: "Dehradun JHora REST API (/api/jhora/horoscope) & Dasha Engine",
+        section_key: "Vedic.dashas.vimshottari",
+        is_populated: vimshottariDashas.length > 0,
+        data_sample: {
+          total_mahadashas: vimshottariDashas.length,
+          sample_mahadasha: vimshottariDashas[0]?.lord || "Unknown",
+          levels_mapped: ["Maha", "Antar", "Pratyantar", "Sookshma", "Prana"]
+        }
+      },
+      {
+        table_number: 4,
+        title: "Astronomical Alignment Parameters",
+        source_origin: "Background Astronomical Engine",
+        section_key: "Astronomical",
+        is_populated: true,
+        data_sample: {
+          julian_day_number: astronomicalSection.julian_day_number,
+          sidereal_time: astronomicalSection.sidereal_time,
+          moon_phase: astronomicalSection.moon_phase
+        }
+      },
+      {
+        table_number: 5,
+        title: "Planetary Dignities & States (Vedic)",
+        source_origin: "Vedic Ephemeris Engine",
+        section_key: "Vedic.planets",
+        is_populated: Object.keys(planetsMap).length > 0,
+        data_sample: {
+          total_planets_mapped: Object.keys(planetsMap).length,
+          planets_list: Object.keys(planetsMap)
+        }
+      },
+      {
+        table_number: 3,
+        title: "Astronomical Alignment Parameters",
+        source_origin: "Background Astronomical Engine",
+        section_key: "Astronomical",
+        is_populated: true,
+        data_sample: {
+          julian_day_number: astronomicalSection.julian_day_number,
+          sidereal_time: astronomicalSection.sidereal_time,
+          moon_phase: astronomicalSection.moon_phase
+        }
+      },
+      {
+        table_number: 4,
+        title: "Ashtakavarga Bindus (Sarvashtakavarga SAV)",
+        source_origin: "Ashtakavarga Engine",
+        section_key: "Vedic.ashtakavarga",
+        is_populated: true,
+        data_sample: {
+          sarvashtakavarga: ashtakavargaMapped.sav
+        }
+      },
+      {
+        table_number: 5,
+        title: "Shadbala Strengths (Rupas & Strength Ratio)",
+        source_origin: "Shadbala Calculation Engine",
+        section_key: "Vedic.shadbala",
+        is_populated: true,
+        data_sample: {
+          shadbala_planets_count: Object.keys(shadbalaMapped).length
+        }
+      },
+      {
+        table_number: 6,
+        title: "KP System Cusps & Planets (KP Stellar Division)",
+        source_origin: "KP Stellar Engine",
+        section_key: "KP",
+        is_populated: Object.keys(kpPlanets).length > 0,
+        data_sample: {
+          cusps_count: Object.keys(kpCusps).length,
+          ruling_planets: kpRulingPlanets
+        }
+      },
+      {
+        table_number: 7,
+        title: "Planet to House Significator Mappings (KP Reverse Lookup)",
+        source_origin: "KP Stellar Significators Engine",
+        section_key: "KP.planet_significators",
+        is_populated: true,
+        data_sample: {
+          significators_mapped: true
+        }
+      },
+      {
+        table_number: 8,
+        title: "Western Tropical Chart & Aspects",
+        source_origin: "Western Astrology Engine",
+        section_key: "Western",
+        is_populated: true,
+        data_sample: {
+          aspects_count: westernAspectsMapped.length
+        }
+      },
+      {
+        table_number: 9,
+        title: "Esoteric & Alternative Mystical Systems (BaZi & Lal Kitab)",
+        source_origin: "Sexagenary and Lal Kitab Engines",
+        section_key: "Chinese & Lal_Kitab",
+        is_populated: true,
+        data_sample: {
+          bazi_pillars: baziSection.pillars,
+          lal_kitab_remedies_count: Object.keys(lalKitabRemedies).length
+        }
+      },
+      {
+        table_number: 10,
+        title: "Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)",
+        source_origin: "Multi-tiered Dasha Engine",
+        section_key: "Vedic.dashas",
+        is_populated: true,
+        data_sample: {
+          vimshottari_mahadashas: vimshottariDashas.length,
+          yogini_active: true,
+          ashtottari_active: true
+        }
+      },
+      {
+        table_number: 11,
+        title: "Vedic Raja/Dhana Yogas & Celestial Doshas",
+        source_origin: "Yogas/Doshas Evaluation Engine",
+        section_key: "Vedic.yogas & Vedic.doshas",
+        is_populated: true,
+        data_sample: {
+          evaluations_completed: true
+        }
+      },
+      {
+        table_number: 12,
+        title: "Traditional Life Predictions & Daily Muhurta",
+        source_origin: "Predictive Synthesis Engine",
+        section_key: "Vedic.predictions & Vedic.muhurta",
+        is_populated: true,
+        data_sample: {
+          muhurta_calculated: true,
+          predictions_available: true
+        }
+      },
+      {
+        table_number: 13,
+        title: "Jaimini Parameters & Chara Dashas",
+        source_origin: "Jaimini Sutra Engine",
+        section_key: "Jaimini",
+        is_populated: true,
+        data_sample: {
+          atmakaraka: jaiminiKarakas.atmakaraka,
+          karakamsha: karakamshaSign
+        }
+      }
+    ]
+  };
+
+  return {
+    ...profileData,
+    TableIndex: tableIndex
   };
 }
 

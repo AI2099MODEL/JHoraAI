@@ -578,7 +578,7 @@ export default function WhatComesBackExplorer({ initialData }: WhatComesBackExpl
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
                           <div>
                             <span className="text-slate-400">Native Name:</span>{" "}
-                            <span className="font-semibold text-white">{horoData.birthDetails?.name || "Native"}</span>
+                            <span className="font-semibold text-white">{horoData.birthDetails?.name || "Nitin"}</span>
                           </div>
                           <div>
                             <span className="text-slate-400">Date of Birth:</span>{" "}
