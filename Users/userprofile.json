@@ -3,8 +3,8 @@
     "google_user_id": "guest_user",
     "email": "guest@jhora.ai",
     "profile_name": "Nitin",
-    "created_at": "2026-07-18T12:18:59.588Z",
-    "updated_at": "2026-07-18T12:18:59.588Z"
+    "created_at": "2026-07-18T12:24:16.794Z",
+    "updated_at": "2026-07-18T12:24:16.794Z"
   },
   "Birth": {
     "date": "1976-01-06",
@@ -23491,7 +23491,7 @@
     "birth_time_rectified": false,
     "api_version": "v2.0.0",
     "api_confidence": "Authoritative / Verified",
-    "generated_on": "2026-07-18T12:18:59.588Z",
+    "generated_on": "2026-07-18T12:24:16.794Z",
     "generated_by": "JHoraAI Precision Engine",
     "jhora_version": "v7.6",
     "profile_version": "v2.1",
@@ -23500,7 +23500,7 @@
   "TableIndex": {
     "metadata": {
       "indexing_agent": "JHoraAI Master Evaluation Indexer",
-      "indexed_on": "2026-07-18T12:18:59.588Z",
+      "indexed_on": "2026-07-18T12:24:16.794Z",
       "handbook_reference": "/documents/master_astro_handbook.md",
       "status": "SYNC_ACTIVE"
     },
@@ -23531,6 +23531,57 @@
           "total_planets_mapped": 9,
           "sample_planet": "Sun",
           "nakshatras_and_sub_lords": true
+        }
+      },
+      {
+        "table_number": 3,
+        "title": "Vimshottari Dasha Timeline (To Prana)",
+        "source_origin": "Dehradun JHora REST API (/api/jhora/horoscope) & Dasha Engine",
+        "section_key": "Vedic.dashas.vimshottari",
+        "is_populated": true,
+        "data_sample": {
+          "total_mahadashas": 9,
+          "sample_mahadasha": "Rahu",
+          "levels_mapped": [
+            "Maha",
+            "Antar",
+            "Pratyantar",
+            "Sookshma",
+            "Prana"
+          ]
+        }
+      },
+      {
+        "table_number": 4,
+        "title": "Astronomical Alignment Parameters",
+        "source_origin": "Background Astronomical Engine",
+        "section_key": "Astronomical",
+        "is_populated": true,
+        "data_sample": {
+          "julian_day_number": "2442784.277778",
+          "sidereal_time": "06:54:02",
+          "moon_phase": "Sukla Ekadashi"
+        }
+      },
+      {
+        "table_number": 5,
+        "title": "Planetary Dignities & States (Vedic)",
+        "source_origin": "Vedic Ephemeris Engine",
+        "section_key": "Vedic.planets",
+        "is_populated": true,
+        "data_sample": {
+          "total_planets_mapped": 9,
+          "planets_list": [
+            "Sun",
+            "Moon",
+            "Mars",
+            "Mercury",
+            "Jupiter",
+            "Venus",
+            "Saturn",
+            "Rahu",
+            "Ketu"
+          ]
         }
       },
       {
