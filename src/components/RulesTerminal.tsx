@@ -68,20 +68,25 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
 
     const cleanCondition = (raw: string) => {
       let text = raw.trim();
-      // Remove leading bullet characters
-      text = text.replace(/^[\s*\-]*\+?\s*/, "");
-      // Remove Condition prefix (with or without backticks)
-      text = text.replace(/^`?Condition:`?\s*/i, "");
+      let lastText = "";
+      while (text !== lastText) {
+        lastText = text;
+        text = text.replace(/^[\s*\-]*\+?\s*/, "");
+        text = text.replace(/^`?Condition:`?\s*/i, "");
+        text = text.replace(/^[\s`*]+/g, "").replace(/[\s`*]+$/g, "");
+      }
       return text.trim();
     };
 
     const cleanStatus = (raw: string) => {
       let text = raw.trim();
-      text = text.replace(/^(\*\*|`)*Output Status:(\*\*|`|:|\s)*/i, "");
-      // Remove bold wrappers
-      text = text.replace(/^\*\*|\*\*$/g, "");
-      // Remove backtick wrappers
-      text = text.replace(/^`|`$/g, "");
+      let lastText = "";
+      while (text !== lastText) {
+        lastText = text;
+        text = text.replace(/^[\s`*]+/g, "").replace(/[\s`*]+$/g, "");
+        text = text.replace(/^Output\s+Status\s*:?\s*/i, "");
+        text = text.replace(/^[\s`*]+/g, "").replace(/[\s`*]+$/g, "");
+      }
       return text.trim();
     };
 

@@ -217,6 +217,13 @@ export const EventEngineView: React.FC<EventEngineViewProps> = ({ isDark = true,
   // Fetch real-time active KP datasets if birthDetails are available
   useEffect(() => {
     const bDetails = astrologyData?.birthDetails;
+    
+    // Immediately reset states on profile switch
+    setKpCusps(null);
+    setKpChart(null);
+    setKpSignificators(null);
+    setKpDasha(null);
+
     if (!bDetails || !bDetails.date) return;
 
     let active = true;
