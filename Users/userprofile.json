@@ -3,8 +3,8 @@
     "google_user_id": "guest_user",
     "email": "guest@jhora.ai",
     "profile_name": "Nitin",
-    "created_at": "2026-07-18T09:45:23.903Z",
-    "updated_at": "2026-07-18T09:45:23.903Z"
+    "created_at": "2026-07-18T09:50:42.332Z",
+    "updated_at": "2026-07-18T09:50:42.332Z"
   },
   "Birth": {
     "date": "1976-01-06",
@@ -5739,10 +5739,178 @@
     "birth_time_rectified": false,
     "api_version": "v2.0.0",
     "api_confidence": "Authoritative / Verified",
-    "generated_on": "2026-07-18T09:45:23.903Z",
+    "generated_on": "2026-07-18T09:50:42.332Z",
     "generated_by": "JHoraAI Precision Engine",
     "jhora_version": "v7.6",
     "profile_version": "v2.1",
     "schema_version": "v2.0"
+  },
+  "TableIndex": {
+    "metadata": {
+      "indexing_agent": "JHoraAI Master Evaluation Indexer",
+      "indexed_on": "2026-07-18T09:50:42.332Z",
+      "handbook_reference": "/documents/master_astro_handbook.md",
+      "status": "SYNC_ACTIVE"
+    },
+    "tables": [
+      {
+        "table_number": 1,
+        "title": "Birth Details",
+        "source_origin": "Dashboard Page / Input Form",
+        "section_key": "Birth",
+        "is_populated": true,
+        "data_sample": {
+          "profile_name": "Nitin",
+          "date": "1976-01-06",
+          "time": "18:40:00",
+          "place": "Dehradun, Uttarakhand, India"
+        }
+      },
+      {
+        "table_number": 2,
+        "title": "Astronomical Alignment Parameters",
+        "source_origin": "Background Astronomical Engine",
+        "section_key": "Astronomical",
+        "is_populated": true,
+        "data_sample": {
+          "julian_day_number": "2442784.277778",
+          "sidereal_time": "06:54:02",
+          "moon_phase": "Sukla Ekadashi"
+        }
+      },
+      {
+        "table_number": 3,
+        "title": "Planetary Dignities & States (Vedic)",
+        "source_origin": "Vedic Ephemeris Engine",
+        "section_key": "Vedic.planets",
+        "is_populated": true,
+        "data_sample": {
+          "total_planets_mapped": 9,
+          "planets_list": [
+            "Sun",
+            "Moon",
+            "Mars",
+            "Mercury",
+            "Jupiter",
+            "Venus",
+            "Saturn",
+            "Rahu",
+            "Ketu"
+          ]
+        }
+      },
+      {
+        "table_number": 4,
+        "title": "KP System Cusps & Planets (KP)",
+        "source_origin": "KP Stellar Engine",
+        "section_key": "KP",
+        "is_populated": true,
+        "data_sample": {
+          "cusps_count": 12,
+          "ruling_planets": {
+            "ascendant_sign_lord": "Moon",
+            "ascendant_star_lord": "Saturn",
+            "ascendant_sub_lord": "Mercury",
+            "moon_sign_lord": "Saturn",
+            "moon_star_lord": "Raagu",
+            "moon_sub_lord": "Mars",
+            "day_lord": null
+          }
+        }
+      },
+      {
+        "table_number": 5,
+        "title": "Jaimini Parameters & Dashas (Jaimini)",
+        "source_origin": "Jaimini Sutra Engine",
+        "section_key": "Jaimini",
+        "is_populated": true,
+        "data_sample": {
+          "atmakaraka": "Mars",
+          "karakamsha": "Cancer"
+        }
+      },
+      {
+        "table_number": 6,
+        "title": "Lal Kitab Placements & Remedies",
+        "source_origin": "Lal Kitab Engine",
+        "section_key": "Lal_Kitab",
+        "is_populated": true,
+        "data_sample": {
+          "total_remedies": 7
+        }
+      },
+      {
+        "table_number": 7,
+        "title": "Tajik Varshaphal Aspects & Muntha",
+        "source_origin": "Tajik Annual Solar Returns",
+        "section_key": "Tajik",
+        "is_populated": true,
+        "data_sample": {
+          "year": 2026,
+          "muntha_house": 9,
+          "muntha_lord": "Jupiter",
+          "year_lord": "Jupiter",
+          "aspects": [
+            {
+              "type": "Ithasala",
+              "planet1": "Sun",
+              "planet2": "Jupiter",
+              "orb": 1.5,
+              "result": "Highly Auspicious"
+            },
+            {
+              "type": "Eesapha",
+              "planet1": "Mars",
+              "planet2": "Saturn",
+              "orb": 2.1,
+              "result": "Obstacles resolved with discipline"
+            }
+          ]
+        }
+      },
+      {
+        "table_number": 8,
+        "title": "Chinese BaZi Four Pillars",
+        "source_origin": "Chinese Sexagenary Engine",
+        "section_key": "Chinese",
+        "is_populated": true,
+        "data_sample": {
+          "year": {
+            "stem": "Bing (Yang Fire)",
+            "branch": "Chen (Dragon)",
+            "element": "Fire",
+            "animal": "Dragon"
+          },
+          "month": {
+            "stem": "Ji (Yin Earth)",
+            "branch": "Yin (Tiger)",
+            "element": "Earth",
+            "animal": "Tiger"
+          },
+          "day": {
+            "stem": "Geng (Yang Metal)",
+            "branch": "Chen (Dragon)",
+            "element": "Metal",
+            "animal": "Dragon"
+          },
+          "hour": {
+            "stem": "Yi (Yin Wood)",
+            "branch": "You (Rooster)",
+            "element": "Wood",
+            "animal": "Rooster"
+          }
+        }
+      },
+      {
+        "table_number": 9,
+        "title": "Tropical Western Chart & Aspects",
+        "source_origin": "Western Astrology Engine",
+        "section_key": "Western",
+        "is_populated": true,
+        "data_sample": {
+          "aspects_count": 0
+        }
+      }
+    ]
   }
 }
