@@ -49,7 +49,25 @@ const IconMap: { [key: string]: React.ComponentType<any> } = {
 };
 
 function renderIndexedTable(tableId: string, data: any, profile?: any, astrologyData?: any) {
-  if (!data) return null;
+  let planetsArray = data;
+  if (!planetsArray && (tableId === "table_2" || tableId === "table_5")) {
+    const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets || {};
+    if (Object.keys(planetsObj).length > 0) {
+      planetsArray = Object.entries(planetsObj).map(([name, p]: [string, any]) => ({
+        name,
+        sign: p.sign,
+        degree: p.degree,
+        minute: p.minute,
+        second: p.second,
+        nakshatra: p.nakshatra,
+        pada: p.pada,
+        house: p.house,
+        dignity: p.dignity || (p.retrograde ? "Retrograde" : "Neutral")
+      }));
+    }
+  }
+
+  if (!data && !planetsArray && tableId !== "table_13" && tableId !== "table_2" && tableId !== "table_5") return null;
   
   const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
   const thStyle = "py-2 px-3 bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider";
@@ -115,7 +133,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(data) && data.map((p: any, idx: number) => (
+              {Array.isArray(planetsArray) && planetsArray.map((p: any, idx: number) => (
                 <tr key={idx} className="hover:bg-slate-900/30">
                   <td className={`${tdStyle} font-bold text-amber-500`}>{p.name || p.lord}</td>
                   <td className={tdStyle}>{p.sign}</td>
@@ -281,6 +299,7 @@ export function MyPageView({
     { id: "overview", label: "Soul Blueprint" },
     { id: "dasha", label: "Vimshottari Dasha" },
     { id: "charts", label: "Charts" },
+    { id: "pada_table", label: "Pada Table" },
     { id: "table_index", label: "Table Index" },
     { id: "daily", label: "Daily Analysis" },
     { id: "future", label: "Future Analysis" },
@@ -1377,6 +1396,40 @@ export function MyPageView({
                 );
               }
               return renderIndexedTable("table_13", divisional, profile, astrologyData);
+            })()}
+          </div>
+        </div>
+      ) : activeTab === "pada_table" ? (
+        <div className="space-y-4">
+          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                  <Grid className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
+                    Table 2: Vedic Grahas & Dignities (Planetary Placements / Pada Table)
+                  </h3>
+                  <p className={`text-[11px] ${textMutedStyle}`}>
+                    A comprehensive registry of natal planetary longitudes, sign placements, nakshatras, padas, and houses with computed astronomical dignities.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            {(() => {
+              const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets || {};
+              if (Object.keys(planetsObj).length === 0) {
+                return (
+                  <div className="text-center py-8 text-xs text-slate-500 font-mono">
+                    ⚠️ No Planetary placement or Pada data available. Please generate or load user particulars.
+                  </div>
+                );
+              }
+              return renderIndexedTable("table_2", null, profile, astrologyData);
             })()}
           </div>
         </div>
