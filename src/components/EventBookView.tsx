@@ -28,96 +28,646 @@ interface KPEvent {
 }
 
 const relEvents: KPEvent[] = [
-  // Relationships (REL)
+  // Relationships (REL & NEW)
   { 
     id: "REL001", 
     category: "relationship",
     name: "Marriage Promise", 
     primary: "2,7,11", 
-    supporting: "5", 
+    supporting: "5,9", 
     obstructing: "1,6,10", 
     mainCsl: "7",
-    description: "Indicates whether marriage is promised in the lifetime. Primary connection to family (2), spouse (7), and fulfillment of desires (11)."
+    description: "Evaluates the overall foundational promise of marriage in the natal chart."
   },
   { 
     id: "REL002", 
     category: "relationship",
-    name: "Marriage Timing / Celebration", 
+    name: "Marriage Timing", 
     primary: "2,7,11", 
     supporting: "5,9", 
     obstructing: "1,6,10", 
     mainCsl: "7",
-    description: "Evaluates the active DBA (Dasha-Bhukti-Antara) lords and their stellar connections to trigger marriage in a specific time range."
+    description: "Evaluates active DBA lords and timing triggers for marriage celebration."
   },
   { 
     id: "REL003", 
     category: "relationship",
-    name: "Love Marriage", 
-    primary: "5,7,11", 
-    supporting: "2", 
-    obstructing: "6,12", 
-    mainCsl: "5,7",
-    description: "Stellar link between 5th CSL (emotions, romance) and 7th CSL (marriage) signifying mutual attraction and self-chosen partner."
+    name: "Marriage Proposal", 
+    primary: "3,7,11", 
+    supporting: "2,5", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Signifies receiving or presenting a formal marriage proposal."
   },
   { 
     id: "REL004", 
     category: "relationship",
-    name: "Arranged Marriage", 
+    name: "Proposal Acceptance", 
     primary: "2,7,11", 
-    supporting: "9", 
-    obstructing: "5,12", 
+    supporting: "3,5", 
+    obstructing: "1,6,10", 
     mainCsl: "7",
-    description: "Marriage facilitated by family, elder relatives, or traditional matches. 9th house (family dharma) plays a central role."
+    description: "Affirmative acceptance of a marriage proposal by either family or individual."
   },
   { 
     id: "REL005", 
     category: "relationship",
-    name: "Delay in Marriage", 
-    primary: "7", 
-    supporting: "1", 
-    obstructing: "6,8,12", 
+    name: "Proposal Rejection", 
+    primary: "1,6,10", 
+    supporting: "8,12", 
+    obstructing: "2,7,11", 
     mainCsl: "7",
-    description: "Saturnian aspects or connection of the 7th CSL to dusthanas (6, 8, 12), delaying marriage beyond typical societal age."
+    description: "Rejection of a marriage proposal, indicating misaligned expectations."
   },
   { 
     id: "REL006", 
+    category: "relationship",
+    name: "Engagement", 
+    primary: "2,7,11", 
+    supporting: "3,5", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Formal or informal ceremony of betrothal or engagement."
+  },
+  { 
+    id: "REL007", 
+    category: "relationship",
+    name: "Engagement Cancellation", 
+    primary: "1,6,8,12", 
+    supporting: "10", 
+    obstructing: "2,7,11", 
+    mainCsl: "7",
+    description: "Disruption or cancellation of a planned engagement prior to marriage."
+  },
+  { 
+    id: "REL008", 
+    category: "relationship",
+    name: "Marriage Ceremony", 
+    primary: "2,7,11", 
+    supporting: "3,9", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "The actual execution of traditional or customary marriage rituals."
+  },
+  { 
+    id: "REL009", 
+    category: "relationship",
+    name: "Marriage Registration", 
+    primary: "2,7,11", 
+    supporting: "3,10", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Legal documentation and government registration of the marriage contract."
+  },
+  { 
+    id: "REL010", 
+    category: "relationship",
+    name: "Court Marriage", 
+    primary: "6,7,11", 
+    supporting: "3,9", 
+    obstructing: "1,5,10", 
+    mainCsl: "7",
+    description: "Legal wedding conducted in court under civil law."
+  },
+  { 
+    id: "REL011", 
+    category: "relationship",
+    name: "Love Marriage", 
+    primary: "5,7,11", 
+    supporting: "2,9", 
+    obstructing: "1,6,10", 
+    mainCsl: "5,7",
+    description: "Self-chosen relationship translating to legal marriage, driven by affection."
+  },
+  { 
+    id: "REL012", 
+    category: "relationship",
+    name: "Arranged Marriage", 
+    primary: "2,7,11", 
+    supporting: "9", 
+    obstructing: "5,6,10", 
+    mainCsl: "7",
+    description: "Traditional union facilitated primarily by parents, family, or matchmakers."
+  },
+  { 
+    id: "REL013", 
+    category: "relationship",
+    name: "Inter-Caste Marriage", 
+    primary: "7,11", 
+    supporting: "5,9,12", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Marriage breaking traditional lineage or caste boundaries."
+  },
+  { 
+    id: "REL014", 
+    category: "relationship",
+    name: "Inter-Religion Marriage", 
+    primary: "7,11", 
+    supporting: "9,12", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Matrimony between individuals practicing distinct faiths."
+  },
+  { 
+    id: "REL015", 
+    category: "relationship",
+    name: "Foreign Marriage", 
+    primary: "7,9,12", 
+    supporting: "2,11", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Marriage celebrated in a foreign land or with a foreign national."
+  },
+  { 
+    id: "REL016", 
+    category: "relationship",
+    name: "Delay in Marriage", 
+    primary: "7", 
+    supporting: "4,8,10", 
+    obstructing: "2,11", 
+    mainCsl: "7",
+    description: "Slower development of matrimonial conditions, often Sat-linked."
+  },
+  { 
+    id: "REL017", 
     category: "relationship",
     name: "Denial of Marriage", 
     primary: "1,6,10", 
     supporting: "8,12", 
     obstructing: "2,7,11", 
     mainCsl: "7",
-    description: "Total absence of marriage promise. 1st (self), 6th (negation of 7), and 10th (negation of 11) houses fully dominate the 7th CSL."
+    description: "Astrological indications negating marriage promise in the lifetime."
   },
   { 
-    id: "REL011", 
+    id: "REL018", 
     category: "relationship",
-    name: "Marital Discord / Friction", 
-    primary: "6,8,12", 
-    supporting: "1", 
-    obstructing: "2,7,11", 
-    mainCsl: "7",
-    description: "Conflict, arguments, and legal friction caused by active 6th house (disputes) and 8th house (trauma) lords."
-  },
-  { 
-    id: "REL014", 
-    category: "relationship",
-    name: "Divorce Decree", 
-    primary: "6,8,12", 
-    supporting: "1", 
-    obstructing: "2,7,11", 
-    mainCsl: "7",
-    description: "Legal termination of marriage. Requires simultaneous significations of 6 (litigation), 8 (unhappiness), and 12 (losses)."
-  },
-  { 
-    id: "REL016", 
-    category: "relationship",
-    name: "Reconciliation & Reunion", 
+    name: "Married Life Quality", 
     primary: "2,7,11", 
     supporting: "4,5", 
-    obstructing: "6,8,12", 
+    obstructing: "1,6,10", 
     mainCsl: "7",
-    description: "Separated couples reuniting. Requires the 7th CSL or running DBA lords to signify 2, 7, and 11, neutralizing dispute houses."
+    description: "Evaluation of relative peace, prosperity, and stability post-marriage."
+  },
+  { 
+    id: "REL019", 
+    category: "relationship",
+    name: "Marital Happiness", 
+    primary: "4,7,11", 
+    supporting: "2,5", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Inherent domestic bliss, mutual support, and emotional nourishment."
+  },
+  { 
+    id: "REL020", 
+    category: "relationship",
+    name: "Marital Discord", 
+    primary: "1,6,10", 
+    supporting: "8,12", 
+    obstructing: "2,7,11", 
+    mainCsl: "7",
+    description: "Undercurrent of tension, arguments, and ideological differences."
+  },
+  { 
+    id: "REL021", 
+    category: "relationship",
+    name: "Frequent Arguments", 
+    primary: "6,8", 
+    supporting: "3", 
+    obstructing: "2,4,11", 
+    mainCsl: "7",
+    description: "Repetitive verbal disputes or temporary silent phases."
+  },
+  { 
+    id: "REL022", 
+    category: "relationship",
+    name: "Domestic Violence", 
+    primary: "6,8,12", 
+    supporting: "1", 
+    obstructing: "2,4,11", 
+    mainCsl: "4,7",
+    description: "Severe distress, emotional or physical hostility within the household."
+  },
+  { 
+    id: "REL023", 
+    category: "relationship",
+    name: "Temporary Separation", 
+    primary: "6,12", 
+    supporting: "3,8", 
+    obstructing: "2,7,11", 
+    mainCsl: "7",
+    description: "Brief phase of living apart due to discord or external requirements."
+  },
+  { 
+    id: "REL024", 
+    category: "relationship",
+    name: "Permanent Separation", 
+    primary: "1,6,8,12", 
+    supporting: "10", 
+    obstructing: "2,7,11", 
+    mainCsl: "7",
+    description: "Permanent cessation of cohabitation without formal decree."
+  },
+  { 
+    id: "REL025", 
+    category: "relationship",
+    name: "Divorce Petition", 
+    primary: "6,12", 
+    supporting: "3", 
+    obstructing: "2,7,11", 
+    mainCsl: "6",
+    description: "Filing of legal separation papers or dissolution petitions."
+  },
+  { 
+    id: "REL026", 
+    category: "relationship",
+    name: "Divorce Proceedings", 
+    primary: "6,8,12", 
+    supporting: "3,9", 
+    obstructing: "2,7,11", 
+    mainCsl: "6",
+    description: "Ongoing legal litigation and dispute settlement process."
+  },
+  { 
+    id: "REL027", 
+    category: "relationship",
+    name: "Divorce Decree", 
+    primary: "1,6,8,12", 
+    supporting: "10", 
+    obstructing: "2,7,11", 
+    mainCsl: "6,7",
+    description: "Final judicial stamp dissolving the marriage contract completely."
+  },
+  { 
+    id: "REL028", 
+    category: "relationship",
+    name: "Alimony / Maintenance", 
+    primary: "2,8,11", 
+    supporting: "6", 
+    obstructing: "1,7,12", 
+    mainCsl: "8",
+    description: "Financial settlements, spousal support, or child upkeep payments."
+  },
+  { 
+    id: "REL029", 
+    category: "relationship",
+    name: "Child Custody", 
+    primary: "5,11", 
+    supporting: "4,9", 
+    obstructing: "6,12", 
+    mainCsl: "5",
+    description: "Legal determination of wardship and child custody rights."
+  },
+  { 
+    id: "REL030", 
+    category: "relationship",
+    name: "Property Settlement", 
+    primary: "4,11", 
+    supporting: "2,8", 
+    obstructing: "6,12", 
+    mainCsl: "4",
+    description: "Division of joint assets, estates, or homes post-separation."
+  },
+  { 
+    id: "REL031", 
+    category: "relationship",
+    name: "Reconciliation", 
+    primary: "2,7,11", 
+    supporting: "4,5", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Amicable settlement of marital disputes and coming back together."
+  },
+  { 
+    id: "REL032", 
+    category: "relationship",
+    name: "Reunion After Separation", 
+    primary: "2,7,11", 
+    supporting: "4", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Re-establishing joint household after a period of separation."
+  },
+  { 
+    id: "REL033", 
+    category: "relationship",
+    name: "Marriage Restored", 
+    primary: "2,4,7,11", 
+    supporting: "5,9", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Full restoration of marital sanctity and legal withdrawal of petitions."
+  },
+  { 
+    id: "REL034", 
+    category: "relationship",
+    name: "Secret Relationship", 
+    primary: "5,12", 
+    supporting: "8", 
+    obstructing: "1,6,11", 
+    mainCsl: "5",
+    description: "Affectionate bond kept strictly hidden from family and society."
+  },
+  { 
+    id: "REL035", 
+    category: "relationship",
+    name: "Hidden Affair", 
+    primary: "5,12", 
+    supporting: "3,8", 
+    obstructing: "1,6,11", 
+    mainCsl: "5",
+    description: "Romantic partnership managed discreetly away from public eyes."
+  },
+  { 
+    id: "REL036", 
+    category: "relationship",
+    name: "Extra-Marital Affair", 
+    primary: "5,7,12", 
+    supporting: "8", 
+    obstructing: "1,6,11", 
+    mainCsl: "5",
+    description: "Romantic entanglement outside the legal boundary of marriage."
+  },
+  { 
+    id: "REL037", 
+    category: "relationship",
+    name: "Physical Relationship", 
+    primary: "5,7,12", 
+    supporting: "8,11", 
+    obstructing: "1,6", 
+    mainCsl: "7",
+    description: "Intimate physical connection and sexual bonding."
+  },
+  { 
+    id: "REL038", 
+    category: "relationship",
+    name: "Sexual Compatibility", 
+    primary: "8,12", 
+    supporting: "5,7", 
+    obstructing: "1,6", 
+    mainCsl: "8",
+    description: "Physical harmony, matching desire levels, and bedroom happiness."
+  },
+  { 
+    id: "REL039", 
+    category: "relationship",
+    name: "Emotional Compatibility", 
+    primary: "4,5,7", 
+    supporting: "11", 
+    obstructing: "1,6,10", 
+    mainCsl: "4,7",
+    description: "Heartfelt connection, intellectual symmetry, and mental comfort."
+  },
+  { 
+    id: "REL040", 
+    category: "relationship",
+    name: "Romantic Compatibility", 
+    primary: "5,7", 
+    supporting: "11", 
+    obstructing: "1,6,10", 
+    mainCsl: "5",
+    description: "Romantic sparks, courtship bliss, and overall chemistry."
+  },
+  { 
+    id: "REL041", 
+    category: "relationship",
+    name: "Live-in Relationship", 
+    primary: "5,7,12", 
+    supporting: "11", 
+    obstructing: "2,6", 
+    mainCsl: "7",
+    description: "Cohabitation prior to or in lieu of legal marriage ceremonies."
+  },
+  { 
+    id: "REL042", 
+    category: "relationship",
+    name: "Long Distance Relationship", 
+    primary: "5,7,12", 
+    supporting: "3,9", 
+    obstructing: "1,6", 
+    mainCsl: "7",
+    description: "Maintaining courtship despite significant physical distance."
+  },
+  { 
+    id: "REL043", 
+    category: "relationship",
+    name: "Long Distance Marriage", 
+    primary: "7,12", 
+    supporting: "3,9", 
+    obstructing: "1,6", 
+    mainCsl: "7",
+    description: "Matrimonial setup requiring spouses to live in separate zones/countries."
+  },
+  { 
+    id: "REL044", 
+    category: "relationship",
+    name: "Meeting Future Spouse", 
+    primary: "7,11", 
+    supporting: "3,5", 
+    obstructing: "1,6", 
+    mainCsl: "7",
+    description: "First dynamic rendezvous or meeting with the future spouse."
+  },
+  { 
+    id: "REL045", 
+    category: "relationship",
+    name: "Meeting Through Family", 
+    primary: "2,7", 
+    supporting: "4,11", 
+    obstructing: "1,6", 
+    mainCsl: "7",
+    description: "Introduction facilitated by family members or siblings."
+  },
+  { 
+    id: "REL046", 
+    category: "relationship",
+    name: "Meeting Through Friends", 
+    primary: "7,11", 
+    supporting: "3,5", 
+    obstructing: "1,6", 
+    mainCsl: "7",
+    description: "First introduction occurring in a social gathering or via friends."
+  },
+  { 
+    id: "REL047", 
+    category: "relationship",
+    name: "Meeting Through Workplace", 
+    primary: "6,7,10", 
+    supporting: "11", 
+    obstructing: "1,8", 
+    mainCsl: "7",
+    description: "Introduction or romance sparking in professional workspace."
+  },
+  { 
+    id: "REL048", 
+    category: "relationship",
+    name: "Meeting During Travel", 
+    primary: "7,9", 
+    supporting: "3,12", 
+    obstructing: "1,6", 
+    mainCsl: "7",
+    description: "Rendezvous occurring while travelling or during an overseas trip."
+  },
+  { 
+    id: "REL049", 
+    category: "relationship",
+    name: "Meeting Through Internet", 
+    primary: "3,7,11", 
+    supporting: "5", 
+    obstructing: "1,6", 
+    mainCsl: "7",
+    description: "Matrimonial match discovered through social networks or dating websites."
+  },
+  { 
+    id: "REL050", 
+    category: "relationship",
+    name: "Meeting Through Spiritual Circle", 
+    primary: "7,9", 
+    supporting: "12", 
+    obstructing: "1,6", 
+    mainCsl: "9",
+    description: "Meeting occurring in ashrams, spiritual retreats, or temples."
+  },
+  { 
+    id: "REL051", 
+    category: "relationship",
+    name: "Spouse Appearance", 
+    primary: "7", 
+    supporting: "1", 
+    obstructing: "6,8", 
+    mainCsl: "7",
+    description: "Evaluating the facial aesthetics and physical appearance of the spouse."
+  },
+  { 
+    id: "REL052", 
+    category: "relationship",
+    name: "Spouse Physical Features", 
+    primary: "7", 
+    supporting: "1", 
+    obstructing: "6,8", 
+    mainCsl: "7",
+    description: "Height, physique, and bodily features of the marriage partner."
+  },
+  { 
+    id: "REL053", 
+    category: "relationship",
+    name: "Spouse Nature", 
+    primary: "7", 
+    supporting: "4", 
+    obstructing: "6,8", 
+    mainCsl: "7",
+    description: "Temperament, patience levels, and general emotional makeup of the spouse."
+  },
+  { 
+    id: "REL054", 
+    category: "relationship",
+    name: "Spouse Character", 
+    primary: "7", 
+    supporting: "5", 
+    obstructing: "6,8", 
+    mainCsl: "7",
+    description: "Integrity, moral values, and loyalty matrix of the spouse."
+  },
+  { 
+    id: "REL055", 
+    category: "relationship",
+    name: "Spouse Education", 
+    primary: "7", 
+    supporting: "4,9", 
+    obstructing: "6,8", 
+    mainCsl: "7",
+    description: "Academic qualification and intellectual background of the spouse."
+  },
+  { 
+    id: "REL056", 
+    category: "relationship",
+    name: "Spouse Profession", 
+    primary: "7", 
+    supporting: "10", 
+    obstructing: "6,8", 
+    mainCsl: "7",
+    description: "Career line, authority, and status of the matrimonial partner."
+  },
+  { 
+    id: "REL057", 
+    category: "relationship",
+    name: "Spouse Wealth", 
+    primary: "7", 
+    supporting: "2,11", 
+    obstructing: "6,8", 
+    mainCsl: "7",
+    description: "Inherent wealth, assets, and prosperity level of the spouse."
+  },
+  { 
+    id: "REL058", 
+    category: "relationship",
+    name: "Spouse Family Status", 
+    primary: "7", 
+    supporting: "2", 
+    obstructing: "6,8", 
+    mainCsl: "7",
+    description: "Social pedigree, reputation, and background of the spouse's family."
+  },
+  { 
+    id: "NEW059", 
+    category: "relationship",
+    name: "The Friendzone Dynamic", 
+    primary: "5,11", 
+    supporting: "3", 
+    obstructing: "2,7", 
+    mainCsl: "5",
+    description: "Affectionate bond that remains non-matrimonial and restricted to friendship."
+  },
+  { 
+    id: "NEW060", 
+    category: "relationship",
+    name: "Ghosting / Sudden Breakup", 
+    primary: "4,6,10", 
+    supporting: "8,12", 
+    obstructing: "2,5,11", 
+    mainCsl: "5",
+    description: "Sudden or unexplained cessation of relationship communication."
+  },
+  { 
+    id: "NEW061", 
+    category: "relationship",
+    name: "Void / Nullified Marriage", 
+    primary: "1,8,12", 
+    supporting: "6", 
+    obstructing: "2,7,11", 
+    mainCsl: "8",
+    description: "Matrimony declared legally void, non-binding, or fraudulent."
+  },
+  { 
+    id: "NEW062", 
+    category: "relationship",
+    name: "Dowry Disputes / Harassment", 
+    primary: "6,8", 
+    supporting: "1", 
+    obstructing: "2,11", 
+    mainCsl: "8",
+    description: "Legal or household friction relating to property demands."
+  },
+  { 
+    id: "NEW063", 
+    category: "relationship",
+    name: "Second Marriage / Remarriage", 
+    primary: "2,9,11", 
+    supporting: "5", 
+    obstructing: "1,8,10", 
+    mainCsl: "2",
+    description: "Matrimony following dissolution or loss of first spouse."
+  },
+  { 
+    id: "NEW064", 
+    category: "relationship",
+    name: "Third Marriage", 
+    primary: "11,2", 
+    supporting: "7", 
+    obstructing: "6,10", 
+    mainCsl: "11",
+    description: "Matrimonial union celebrating third legal marriage."
   },
 
   // Career & Profession (CAR)
