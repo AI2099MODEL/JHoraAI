@@ -13,6 +13,7 @@ import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelati
 import { generateRelationshipPDF } from "../lib/relationshipReportGenerator";
 import { MasterArchitectureView } from "./MasterArchitectureView";
 import { PresentDayEngineView } from "./PresentDayEngineView";
+import { FinalResultsView } from "./FinalResultsView";
 import { EventEngineView } from "./EventEngineView";
 import { UserProfileSubmenuView } from "./UserProfileSubmenuView";
 import RulesTerminal from "./RulesTerminal";
@@ -102,7 +103,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
   const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("present");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
-  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "rules" | "event_book" | "event_muhurta" | "current_events" | "engine">("present_day");
+  const [eventsSubTab, setEventsSubTab] = useState<"final_results" | "present_day" | "rules" | "event_book" | "event_muhurta" | "current_events" | "engine">("final_results");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
   const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
@@ -1909,6 +1910,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       {majorTab === "present" && (
         <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40 animate-fade-in">
           {[
+            { id: "final_results", label: "Final Results" },
             { id: "present_day", label: "Present Day Engine" },
             { id: "rules", label: "Astrological Rules" },
             { id: "event_book", label: "Event Book" },
@@ -2003,6 +2005,12 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         {/* ================= EVENTS DYNAMIC WORKSPACE ================= */}
         {majorTab === "present" && (
           <div className="space-y-6 animate-fade-in">
+            {eventsSubTab === "final_results" && (
+              <FinalResultsView
+                astrologyData={astrologyData}
+                isDark={isDark}
+              />
+            )}
             {eventsSubTab === "present_day" && (
               <PresentDayEngineView
                 astrologyData={astrologyData}
