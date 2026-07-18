@@ -352,6 +352,7 @@ export function MyPageView({
                 sign: "Cancer",
                 nakshatra: "Pushya",
                 degree: 7,
+                nakshatra_lord: "Saturn",
               }
             }
           };

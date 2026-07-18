@@ -1146,6 +1146,25 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
   const ascMinInt = Math.floor(ascMinFloat);
   const ascSecInt = Math.round((ascMinFloat - ascMinInt) * 60);
 
+  const NAK_NAMES_LIST = [
+    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
+    "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Svati", "Vishakha", "Anuradha", "Jyeshtha",
+    "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+  ];
+  const NAK_LORDS_LIST = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+
+  let resolvedAscNakLord = "Saturn";
+  if (data.lagna?.nakshatra) {
+    const cleanNak = data.lagna.nakshatra.trim().toLowerCase();
+    const idx = NAK_NAMES_LIST.findIndex(n => n.toLowerCase() === cleanNak);
+    if (idx !== -1) {
+      resolvedAscNakLord = NAK_LORDS_LIST[idx % 9];
+    }
+  } else if (data.lagna?.longitude !== undefined) {
+    const idx = Math.floor(data.lagna.longitude / 13.333333) % 27;
+    resolvedAscNakLord = NAK_LORDS_LIST[idx % 9];
+  }
+
   const ascendant = {
     sign: data.lagna?.sign || "Aries",
     sign_index: data.lagna?.signIndex || 0,
@@ -1155,7 +1174,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
     longitude_360: data.lagna?.longitude || 0,
     nakshatra: data.lagna?.nakshatra || null,
     pada: data.lagna?.pada || 1,
-    nakshatra_lord: data.planets?.find((pl: any) => pl.name === "Ketu")?.lord || null
+    nakshatra_lord: resolvedAscNakLord
   };
 
   // 5. Map divisional charts with precise Planet, Sign, Longitude, Nakshatra, House
