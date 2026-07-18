@@ -76,7 +76,7 @@ This table indexes the calculated multi-tiered dasha progression timelines down 
 | **Sookshma (Level 4)** | `string` | Derived | 4th-level sub-period ruler and bounds (`Vedic.dashas.vimshottari.[Maha].[Antar].[Pratyantar].[Sookshma].lord`) |
 | **Prana (Level 5)** | `string` | Derived | 5th-level sub-period ruler and bounds (`Vedic.dashas.vimshottari.[Maha].[Antar].[Pratyantar].[Sookshma].[Prana].lord`) |
 
-#### Table 4: Astronomical Alignment Parameters (Data Schema & Index Logic)
+#### Table 3: Astronomical Alignment Parameters
 This table indexes the calculated astronomical parameters from the ephemeris.
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
@@ -87,15 +87,19 @@ This table indexes the calculated astronomical parameters from the ephemeris.
 | **Sunrise / Sunset** | `string` | Solar Horizon calculation | Calculated solar rise and set times for coordinates (`Astronomical.sunrise` / `sunset`) |
 | **Moon Phase** | `string` | Tithi calculation | Angular distance of Moon from Sun at birth (`Astronomical.moon_phase`) |
 
-#### Table 5: Planetary Placements & Dignities (Vedic Engine)
-This table indexes the calculated planetary longitudinal values, zodiac signs, and houses.
+#### Table 4: Ashtakavarga Bindus
+This table indexes the calculated Ashtakavarga Bindus (both planetary BAV and Sarvashtakavarga SAV).
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
 | :--- | :--- | :--- | :--- |
-| **Planet Longitude** | `float` | JHora Raw API / Swiss Ephemeris | Celestial longitude in 360-degree coordinates (`Vedic.planets.[Planet].longitude`) |
-| **House Placement** | `int` | Divisional Chart Engine | Bhava division placement (`Vedic.planets.[Planet].house`) |
-| **Sign Placement** | `string` | Zodiac Sign Map | Zodiacal sign containing the planet coordinate (`Vedic.planets.[Planet].sign`) |
-| **Nakshatra** | `string` | Nakshatra Engine | 27-Nakshatra division mapping (`Vedic.planets.[Planet].nakshatra`) |
+| **SAV Bindus** | `array` | Ashtakavarga Engine | 12 rasis' samudhaya bindus (`Vedic.ashtakavarga.sarvashtakavarga`) |
+
+#### Table 5: Shadbala Strengths
+This table indexes calculated planetary strengths in Shadbala rupas.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Shadbala Rupas** | `float` | Shadbala Engine | 7 planets' positional, temporal, directional, motional, and aspectual strengths |
 
 #### Table 6: KP System Cusps & Planets (KP Engine)
 This table indexes the Krishnamurti Paddhati stellar, sub, and sub-sub significators.
@@ -104,9 +108,57 @@ This table indexes the Krishnamurti Paddhati stellar, sub, and sub-sub significa
 | :--- | :--- | :--- | :--- |
 | **Cuspal Sub-Lord** | `string` | KP Stellar Division Engine | Sub-lord of Placidus house cusps 1 to 12 (`KP.cusps.[House].sub_lord`) |
 | **Planet Sub-Lord** | `string` | KP Stellar Division Engine | Sub-lord of natal planetary placements (`KP.planets.[Planet].sub_lord`) |
+
+#### Table 7: Planet to House Significator Mappings (KP Reverse Lookup)
+This table indexes planetary significator levels mapped back to the 12 bhavas/houses.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
 | **Significators** | `array` | KP Significator Engine | Houses signified by planets under KP rules (`KP.planet_significators`) |
 
-#### Table 7: Jaimini Parameters & Dashas (Jaimini Engine)
+#### Table 8: Tropical Western Chart & Aspects (Western Engine)
+This table indexes Tropical Western astrology planets, cusps, and aspects.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Tropical Positions**| `object` | Ptolemaic Western Projection | Planets/cusps projected onto Tropical zodiac (`Western.planets` / `cusps`) |
+| **Aspects & Orbs** | `array` | Aspect Angle Engine | Calculated aspects with exact orb angles (`Western.aspects`) |
+
+#### Table 9: Esoteric & Alternative Mystical Systems (BaZi & Lal Kitab)
+This table indexes Chinese Sexagenary cycle parameters and Lal Kitab house translations / remedies.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Pillars** | `object` | Chinese BaZi Calendar Engine | Stems and branches mapped to birth date-time (`Chinese.pillars`) |
+| **Pucca Ghar** | `string` | Lal Kitab Translation | Planet placements translated to Aries-Ascendant house mapping (`Lal_Kitab.houses`) |
+| **Remedies** | `object` | Lal Kitab Traditional Book | Specific planetary remedies for natal positions (`Lal_Kitab.remedies`) |
+
+#### Table 10: Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)
+This table indexes the chronological sequence of planetary dasha cycles computed on lunar longitudes.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Vimshottari Timeline**| `array` | Dasha Engine | Multi-tiered Vimshottari periods |
+| **Yogini Timeline** | `array` | Dasha Engine | Cyclic Yogini timelines |
+| **Ashtottari Timeline** | `array` | Dasha Engine | Ashtottari timelines |
+
+#### Table 11: Vedic Raja/Dhana Yogas & Celestial Doshas
+This table indexes active auspicious combinations and major cosmic doshas present.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Active Yogas** | `array` | Yogas Evaluation Engine | Auspicious planetary formations |
+| **Active Doshas** | `array` | Doshas Evaluation Engine | Inauspicious planetary afflictions |
+
+#### Table 12: Traditional Life Predictions & Daily Muhurta
+This table indexes predictive destiny analysis and the current transit-based daily muhurta.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Destiny Pathways** | `object` | Predictive Synthesis Engine | Life forecasts across key domains (Career, Wealth, Health, Marriage) |
+| **Transit Muhurta** | `object` | Transit Engine | Daily auspicious and inauspicious hours based on lunar transits |
+
+#### Table 13: Jaimini Parameters & Dashas (Jaimini Engine)
 This table indexes the Jaimini karakas, arudhas, and Chara Dashas.
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
@@ -114,38 +166,6 @@ This table indexes the Jaimini karakas, arudhas, and Chara Dashas.
 | **Chara Karakas** | `object` | Jaimini Rank Engine | Planetary rankings by degree (Atmakaraka to Darakaraka) (`Jaimini.karakas`) |
 | **Arudha Padas** | `object` | Pada Projection Engine | Arudha houses calculated relative to house lords (`Jaimini.arudha`) |
 | **Chara Dashas** | `array` | Jaimini Dasha Engine | Sign-based dasha progression sequence and durations (`Jaimini.chara_dasha`) |
-
-#### Table 8: Lal Kitab Placements & Remedies (Lal Kitab Engine)
-This table indexes Lal Kitab house translations and astrological remedies.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Pucca Ghar** | `string` | Lal Kitab Translation | Planet placements translated to Aries-Ascendant house mapping (`Lal_Kitab.houses`) |
-| **Remedies** | `object` | Lal Kitab Traditional Book | Specific planetary remedies for natal positions (`Lal_Kitab.remedies`) |
-
-#### Table 9: Tajik Varshaphal Aspects & Muntha (Tajik Engine)
-This table indexes annual solar return Muntha and Tajik aspects.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Muntha House** | `int` | Tajik Progression Engine | progressed annual lagna house (`Tajik.varshaphal_2026.muntha_house`) |
-| **Tajik Aspects** | `array` | Harsha/Ithasala Engine | Tajik yoga aspects (e.g. Ithasala, Eesapha) (`Tajik.varshaphal_2026.aspects`) |
-
-#### Table 10: Chinese BaZi Four Pillars (Bazi Engine)
-This table indexes Chinese Sexagenary cycle parameters (Year, Month, Day, and Hour Pillars).
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Pillars** | `object` | Chinese BaZi Calendar Engine | Stems and branches mapped to birth date-time (`Chinese.pillars`) |
-| **Elements Balance**| `object` | Element Quantification | Wood, Fire, Earth, Metal, and Water counts (`Chinese.elements`) |
-
-#### Table 11: Tropical Western Chart & Aspects (Western Engine)
-This table indexes Tropical Western astrology planets, cusps, and aspects.
-
-| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
-| :--- | :--- | :--- | :--- |
-| **Tropical Positions**| `object` | Ptolemaic Western Projection | Planets/cusps projected onto Tropical zodiac (`Western.planets` / `cusps`) |
-| **Aspects & Orbs** | `array` | Aspect Angle Engine | Calculated aspects with exact orb angles (`Western.aspects`) |
 
 ---
 

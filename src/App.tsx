@@ -1159,11 +1159,6 @@ export default function App() {
       icon: BarChart
     },
     {
-      id: "reports",
-      label: "Reports",
-      icon: Download
-    },
-    {
       id: "astro",
       label: "Astro",
       icon: Activity,

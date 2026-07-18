@@ -425,6 +425,101 @@ app.post("/api/user-profile/act", async (req, res) => {
   }
 });
 
+// Endpoint to index an astrological table, update user profile and master handbook metadata, and sync with GitHub
+app.post("/api/user-profile/index-table", async (req, res) => {
+  try {
+    const { tableId, tableName, profileName, tableData } = req.body;
+    if (!tableId || !tableName) {
+      return res.status(400).json({ error: "Missing tableId or tableName" });
+    }
+
+    const usersDir = path.join(process.cwd(), "Users");
+    const profilePath = path.join(usersDir, "userprofile.json");
+    let profile: any = {};
+
+    if (fs.existsSync(profilePath)) {
+      try {
+        const content = fs.readFileSync(profilePath, "utf-8");
+        profile = JSON.parse(content);
+      } catch (err) {
+        console.error("Failed to parse userprofile.json:", err);
+      }
+    }
+
+    if (!profile.User) {
+      profile.User = {};
+    }
+
+    if (!profile.User.indexedTables) {
+      profile.User.indexedTables = {};
+    }
+
+    // Save/update indexed table with metadata and raw user table data
+    profile.User.indexedTables[tableId] = {
+      tableName,
+      indexedAt: new Date().toISOString(),
+      data: tableData,
+    };
+
+    // Save active profile to Users/userprofile.json
+    fs.writeFileSync(profilePath, JSON.stringify(profile, null, 2));
+
+    // Also save to dynamic profile file
+    const fallbackName = profileName || profile?.User?.profile_name || "Seeker";
+    const dynamicName = getProfileFileName(profile, fallbackName);
+    const dynamicFilePath = path.join(usersDir, dynamicName);
+    fs.writeFileSync(dynamicFilePath, JSON.stringify(profile, null, 2));
+
+    console.log(`[Table Index] Saved table ${tableId} to user profile.`);
+
+    // Update master_astro_handbook.md with metadata for index
+    const handbookPath = path.join(process.cwd(), "documents", "master_astro_handbook.md");
+    if (fs.existsSync(handbookPath)) {
+      let handbookContent = fs.readFileSync(handbookPath, "utf-8");
+      
+      const tableNum = tableId.replace("table_", "");
+      const headerRegex = new RegExp(`(#### Table ${tableNum}:[^\n]+)`);
+      
+      if (headerRegex.test(handbookContent)) {
+        const indexMetadataLine = `\n* **Index Status:** Indexed for **${fallbackName}** on ${new Date().toISOString().split('T')[0]}`;
+        
+        const statusRegex = new RegExp(`(#### Table ${tableNum}:[^\n]+)\\s*\\* \\*\\*Index Status:\\*\\*[^\n]+`);
+        
+        if (statusRegex.test(handbookContent)) {
+          handbookContent = handbookContent.replace(statusRegex, `$1${indexMetadataLine}`);
+        } else {
+          handbookContent = handbookContent.replace(headerRegex, `$1${indexMetadataLine}`);
+        }
+        
+        fs.writeFileSync(handbookPath, handbookContent);
+        console.log(`[Table Index] Updated master_astro_handbook.md for Table ${tableNum}`);
+      }
+    }
+
+    // Git Operations: commit and push
+    exec(`git add Users/userprofile.json Users/${dynamicName} documents/master_astro_handbook.md && (git diff-index --quiet HEAD || git commit -m "feat: index ${tableId} for profile ${fallbackName}")`, (err, stdout, stderr) => {
+      if (err) {
+        console.warn("[Table Index Git Commit Warning]", err.message);
+      } else {
+        console.log("[Table Index Git Commit Success]");
+        // Push main to origin
+        exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
+          if (pushErr) {
+            console.error("[Table Index Git Push Warning]", pushErr.message);
+          } else {
+            console.log("[Table Index Git Push Success]", pushStdout);
+          }
+        });
+      }
+    });
+
+    res.json({ success: true, message: `Table '${tableName}' indexed successfully.` });
+  } catch (err: any) {
+    console.error("Error in /api/user-profile/index-table:", err);
+    res.status(500).json({ error: err.message || "Failed to index table." });
+  }
+});
+
 // Endpoint to retrieve active user profile JSON from disk
 app.get("/api/user-profile/get", async (req, res) => {
   try {

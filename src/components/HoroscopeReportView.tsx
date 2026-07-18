@@ -73,11 +73,24 @@ function parseSafeDate(str: any): Date {
   return new Date(year, month, day, hours, minutes, seconds);
 }
 
+function normPlanetName(name: string): string {
+  const clean = String(name || "").trim().split(" ")[0].trim();
+  const map: Record<string, string> = {
+    "Sury": "Sun", "Surya": "Sun", "Sun": "Sun",
+    "Chandra": "Moon", "Moon": "Moon",
+    "Kuja": "Mars", "Mars": "Mars",
+    "Budha": "Mercury", "Mercury": "Mercury",
+    "Guru": "Jupiter", "Jupiter": "Jupiter",
+    "Sukra": "Venus", "Venus": "Venus",
+    "Sani": "Saturn", "Saturn": "Saturn",
+    "Rahu": "Rahu", "Raagu": "Rahu", "Rhaago": "Rahu",
+    "Ketu": "Ketu", "Kethu": "Ketu"
+  };
+  return map[clean] || clean;
+}
+
 function getSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> {
-  let cleanLord = parentLord || "";
-  cleanLord = cleanLord.split(" ")[0].trim(); // Extract first word to ignore parentheses like "Rahu (Sankata)"
-  if (cleanLord === "Raagu") cleanLord = "Rahu";
-  if (cleanLord === "Kethu") cleanLord = "Ketu";
+  const cleanLord = normPlanetName(parentLord);
 
   const startIndex = PLANETS_CYCLE.indexOf(cleanLord);
   if (startIndex === -1) return [];
@@ -106,19 +119,15 @@ function getSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): 
 }
 
 function getYoginiSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> {
-  let cleanLord = parentLord;
-  const firstWord = parentLord.split(" ")[0];
+  const rawWord = String(parentLord || "").trim().split(" ")[0].trim();
+  const normalizedPlanet = normPlanetName(rawWord);
   
   const planetMap: Record<string, string> = {
     "Moon": "Mangala", "Sun": "Pingala", "Jupiter": "Dhanya", "Mars": "Bhramari",
-    "Mercury": "Bhadrika", "Saturn": "Ulka", "Venus": "Siddha", "Rahu": "Sankata", "Raagu": "Sankata", "Ketu": "Sankata", "Kethu": "Sankata"
+    "Mercury": "Bhadrika", "Saturn": "Ulka", "Venus": "Siddha", "Rahu": "Sankata"
   };
   
-  if (planetMap[firstWord]) {
-    cleanLord = planetMap[firstWord];
-  } else {
-    cleanLord = firstWord;
-  }
+  const cleanLord = planetMap[normalizedPlanet] || normalizedPlanet;
   
   const YOGINI_CYCLE = ["Mangala", "Pingala", "Dhanya", "Bhramari", "Bhadrika", "Ulka", "Siddha", "Sankata"];
   const YOGINI_YEARS: Record<string, number> = {
@@ -156,8 +165,7 @@ function getYoginiSubPeriods(parentLord: string, parentStart: Date, parentEnd: D
 }
 
 function getAshtottariSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> {
-  let cleanLord = parentLord.split(" ")[0];
-  if (cleanLord === "Raagu") cleanLord = "Rahu";
+  const cleanLord = normPlanetName(parentLord);
   
   const ASHTOTTARI_CYCLE = ["Sun", "Moon", "Mars", "Mercury", "Saturn", "Jupiter", "Rahu", "Venus"];
   const ASHTOTTARI_YEARS: Record<string, number> = {
@@ -260,6 +268,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
   // KP Subtabs state variables
   const [kpSubTab, setKpSubTab] = useState<string>("kp_cusps");
+  const [jaiminiSubTab, setJaiminiSubTab] = useState<string>("jaimini");
   const [kpCuspData, setKpCuspData] = useState<any>(null);
   const [kpChartData, setKpChartData] = useState<any>(null);
   const [kpSignificatorsData, setKpSignificatorsData] = useState<any>(null);
@@ -817,40 +826,13 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "table_3", label: "Table 3" },
       { id: "table_4", label: "Table 4" },
       { id: "table_5", label: "Table 5" },
-      { id: "panchanga", label: "panchanga" },
-      { id: "divisionalCharts", label: "divisionalCharts" },
-      { id: "shadBala", label: "shadBala*" },
-      { id: "ishtaPhala", label: "ishtaPhala*" },
-      { id: "bhavaBala", label: "bhavaBala*" },
-      { id: "ashtakavarga", label: "ashtakavarga*" },
-      { id: "yogas", label: "yogas*" },
-      { id: "doshas", label: "doshas*" },
-      { id: "longevity", label: "longevity*" },
-      { id: "sadeSati", label: "sadeSati*" },
-      { id: "jaimini", label: "jaimini*" },
-      { id: "arudhas", label: "arudhas*" },
-      { id: "sphutas", label: "sphutas*" },
-      { id: "upagrahas", label: "upagrahas*" },
-      { id: "sahams", label: "sahams*" },
-      { id: "special_lagnas", label: "specialLagnas*" },
-      { id: "argalas", label: "argalas*" },
-      { id: "charaDasha", label: "charaDasha*" },
-      { id: "panchapakshi", label: "panchapakshi*" },
-      { id: "lalkitab", label: "lalkitab*" },
-      { id: "gemstones", label: "gemstones*" },
-      { id: "numerology", label: "numerology*" },
-      { id: "mysticalSystems", label: "mysticalSystems*" },
-      { id: "kp_cusps", label: "kpCusps*" },
-      { id: "kp_planet_analysis", label: "kpPlanets*" },
-      { id: "kp_significators", label: "kpSignificators*" },
-      { id: "kp_houses_significators", label: "kpHouses*" },
-      { id: "kp_planet_to_house", label: "kpPlanetToHouse*" },
-      { id: "kp_ruling_planets", label: "kpRulingPlanets*" },
-      { id: "kp_dasha", label: "kpDasha*" },
-      { id: "kp_rulebook", label: "kpRulebook*" },
-      { id: "kp_transit", label: "kpTransit*" },
-      { id: "kp_horary", label: "kpHorary*" },
-      { id: "westernTropical", label: "westernTropical*" },
+      { id: "table_6", label: "Table 6" },
+      { id: "table_7", label: "Table 7" },
+      { id: "table_8", label: "Table 8" },
+      { id: "table_9", label: "Table 9" },
+      { id: "table_10", label: "Table 10" },
+      { id: "table_11", label: "Table 11" },
+      { id: "table_12", label: "Table 12" },
       { id: "allAstroSystems", label: "allAstroSystems*" }
     ];
 
@@ -871,59 +853,29 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       if (item.id === "table_5") {
         dataVal = { dummy: true };
       }
-      if (item.id === "special_lagnas" && !dataVal) {
-        dataVal = astrologyData.special_lagnas || { dummy: true };
-      }
-      if (item.id === "argalas" && !dataVal) {
-        dataVal = astrologyData.argalas || { dummy: true };
-      }
-      if (item.id === "charaDasha" && !dataVal) {
-        dataVal = astrologyData.charaDasha || { dummy: true };
-      }
-      if (item.id === "panchapakshi" && !dataVal) {
+      if (item.id === "table_6") {
         dataVal = { dummy: true };
       }
-      if (item.id === "lalkitab" && !dataVal) {
+      if (item.id === "table_7") {
         dataVal = { dummy: true };
       }
-      if (item.id === "gemstones" && !dataVal) {
+      if (item.id === "table_8") {
         dataVal = { dummy: true };
       }
-      if (item.id === "numerology" && !dataVal) {
+      if (item.id === "table_9") {
         dataVal = { dummy: true };
       }
-      if (item.id === "mysticalSystems" && !dataVal) {
+      if (item.id === "table_10") {
         dataVal = { dummy: true };
       }
-      if (item.id.startsWith("kp_") && !dataVal) {
+      if (item.id === "table_11") {
         dataVal = { dummy: true };
       }
-      if (item.id === "westernTropical" && !dataVal) {
+      if (item.id === "table_12") {
         dataVal = { dummy: true };
       }
       if (item.id === "allAstroSystems" && !dataVal) {
         dataVal = { dummy: true };
-      }
-      if (item.id === "ishtaPhala" && !dataVal) {
-        dataVal = astrologyData.shadBala || profileJson?.Vedic?.strengths?.ishta_phala;
-      }
-      if (item.id === "longevity" && !dataVal) {
-        dataVal = astrologyData.longevity || profileJson?.Vedic?.strengths?.longevity || profileJson?.Vedic?.doshas;
-      }
-      if (item.id === "sadeSati" && !dataVal) {
-        dataVal = astrologyData.doshas?.sadeSati || profileJson?.Vedic?.doshas?.sadeSati;
-      }
-      if (item.id === "jaimini" && !dataVal) {
-        dataVal = astrologyData.jaimini || profileJson?.Jaimini;
-      }
-      if (item.id === "upagrahas" && !dataVal) {
-        dataVal = astrologyData.upagrahas || profileJson?.Vedic?.upagrahas || { dummy: true };
-      }
-      if (item.id === "sahams" && !dataVal) {
-        dataVal = astrologyData.sahams || profileJson?.Vedic?.sahams || { dummy: true };
-      }
-      if (item.id === "sphutas" && !dataVal) {
-        dataVal = astrologyData.sphutas || profileJson?.Vedic?.sphutas || { dummy: true };
       }
 
       if (dataVal) {
@@ -1254,8 +1206,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
       const antars = antarList.map((a: any) => {
         const aLord = a.lord || "Unknown";
-        const aStart = a.start_date || a.startDate || a.startTime || "";
-        const aEnd = a.end_date || a.endDate || a.endTime || "";
+        const aStart = a.start_date || a.startDate || a.startTime || a.start || "";
+        const aEnd = a.end_date || a.endDate || a.endTime || a.end || "";
         const aStartDate = aStart ? parseSafeDate(aStart) : null;
         const aEndDate = aEnd ? parseSafeDate(aEnd) : null;
         
@@ -1270,8 +1222,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
         const pratyantars = pratyantarList.map((p: any) => {
           const pLord = p.lord || "Unknown";
-          const pStart = p.start_date || p.startDate || p.startTime || "";
-          const pEnd = p.end_date || p.endDate || p.endTime || "";
+          const pStart = p.start_date || p.startDate || p.startTime || p.start || "";
+          const pEnd = p.end_date || p.endDate || p.endTime || p.end || "";
           const pStartDate = pStart ? parseSafeDate(pStart) : null;
           const pEndDate = pEnd ? parseSafeDate(pEnd) : null;
           
@@ -1286,8 +1238,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
           const sookshmas = sookshmaList.map((s: any) => {
             const sLord = s.lord || "Unknown";
-            const sStart = s.start_date || s.startDate || s.startTime || "";
-            const sEnd = s.end_date || s.endDate || s.endTime || "";
+            const sStart = s.start_date || s.startDate || s.startTime || s.start || "";
+            const sEnd = s.end_date || s.endDate || s.endTime || s.end || "";
             const sStartDate = sStart ? parseSafeDate(sStart) : null;
             const sEndDate = sEnd ? parseSafeDate(sEnd) : null;
             
@@ -1302,8 +1254,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
             const pranas = pranaList.map((pr: any) => {
               const prLord = pr.lord || "Unknown";
-              const prStart = pr.start_date || pr.startDate || pr.startTime || "";
-              const prEnd = pr.end_date || pr.endDate || pr.endTime || "";
+              const prStart = pr.start_date || pr.startDate || pr.startTime || pr.start || "";
+              const prEnd = pr.end_date || pr.endDate || pr.endTime || pr.end || "";
               
               return {
                 lord: prLord,
@@ -1372,8 +1324,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
       const antars = antarList.map((a: any) => {
         const aLord = a.lord || "Unknown";
-        const aStart = a.start_date || a.startDate || a.startTime || "";
-        const aEnd = a.end_date || a.endDate || a.endTime || "";
+        const aStart = a.start_date || a.startDate || a.startTime || a.start || "";
+        const aEnd = a.end_date || a.endDate || a.endTime || a.end || "";
         const aStartDate = aStart ? parseSafeDate(aStart) : null;
         const aEndDate = aEnd ? parseSafeDate(aEnd) : null;
         
@@ -1388,8 +1340,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
         const pratyantars = pratyantarList.map((p: any) => {
           const pLord = p.lord || "Unknown";
-          const pStart = p.start_date || p.startDate || p.startTime || "";
-          const pEnd = p.end_date || p.endDate || p.endTime || "";
+          const pStart = p.start_date || p.startDate || p.startTime || p.start || "";
+          const pEnd = p.end_date || p.endDate || p.endTime || p.end || "";
           const pStartDate = pStart ? parseSafeDate(pStart) : null;
           const pEndDate = pEnd ? parseSafeDate(pEnd) : null;
           
@@ -1404,8 +1356,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
           const sookshmas = sookshmaList.map((s: any) => {
             const sLord = s.lord || "Unknown";
-            const sStart = s.start_date || s.startDate || s.startTime || "";
-            const sEnd = s.end_date || s.endDate || s.endTime || "";
+            const sStart = s.start_date || s.startDate || s.startTime || s.start || "";
+            const sEnd = s.end_date || s.endDate || s.endTime || s.end || "";
             const sStartDate = sStart ? parseSafeDate(sStart) : null;
             const sEndDate = sEnd ? parseSafeDate(sEnd) : null;
             
@@ -1420,8 +1372,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
             const pranas = pranaList.map((pr: any) => {
               const prLord = pr.lord || "Unknown";
-              const prStart = pr.start_date || pr.startDate || pr.startTime || "";
-              const prEnd = pr.end_date || pr.endDate || pr.endTime || "";
+              const prStart = pr.start_date || pr.startDate || pr.startTime || pr.start || "";
+              const prEnd = pr.end_date || pr.endDate || pr.endTime || pr.end || "";
               
               return {
                 lord: prLord,
@@ -5792,22 +5744,53 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 7 (KP): KRISHNAMURTI PADDHATI (KP) ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab.startsWith("kp_") && vedicSubTab !== "kp_planet_to_house")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_6")) && (
           <div id="report-section-7_kp" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
             <div className="border-b border-cyan-500/10 pb-4 mb-6">
               <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 7 • Krishnamurti Paddhati (KP Stellar Astrology)
+                System 7 • Krishnamurti Paddhati (KP Stellar Astrology) • Table 6
               </span>
               <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
                 <Star className="w-5 h-5 text-cyan-400" />
-                7 - KP STELLAR COSMIC SIGNALS & DASHAS
+                Table 6 - KP STELLAR COSMIC SIGNALS & DASHAS
               </h2>
               <p className={`text-xs ${mutedText} mt-1`}>
                 High-precision stellar sublord division of house houses, planetary significators, active dashas, rulebook evaluations, transits, and horary resolutions.
               </p>
             </div>
+
+            {!showAllAstroSystems && (
+              <div className="flex flex-wrap gap-1.5 mb-6 border-b border-cyan-500/10 pb-4">
+                {[
+                  { id: "kp_cusps", label: "KP House Cusps" },
+                  { id: "kp_planet_analysis", label: "Planet Analysis" },
+                  { id: "kp_significators", label: "Significators" },
+                  { id: "kp_houses_significators", label: "Houses & Unique Significators" },
+                  { id: "kp_ruling_planets", label: "Ruling Planets" },
+                  { id: "kp_dasha", label: "KP Dasha" },
+                  { id: "kp_rulebook", label: "KP Rulebook" },
+                  { id: "kp_transit", label: "KP Transit" },
+                  { id: "kp_horary", label: "KP Horary" }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setKpSubTab(tab.id as any);
+                      setVedicSubTab("table_6");
+                    }}
+                    className={`px-2.5 py-1.5 text-[10px] font-mono rounded-md transition-all border text-center ${
+                      kpSubTab === tab.id
+                        ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-400 font-bold"
+                        : "border-slate-800 bg-slate-900/30 text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {vedicSubTab === "allAstroSystems" ? (
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 text-xs">
@@ -7006,17 +6989,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         )}
 
         {/* ================= SYSTEM 8: PLANET TO HOUSE SIGNIFICATOR MAPPINGS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "kp_planet_to_house")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_7")) && (
           <div id="report-section-8" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
             <div className="border-b border-cyan-500/10 pb-4 mb-6">
               <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 8 • Planet to House Significator Mappings
+                System 8 • Planet to House Significator Mappings • Table 7
               </span>
               <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
                 <Star className="w-5 h-5 text-cyan-400" />
-                8 - PLANET TO HOUSE SIGNIFICATOR MAPPINGS
+                Table 7 - PLANET TO HOUSE SIGNIFICATOR MAPPINGS
               </h2>
               <p className={`text-xs ${mutedText} mt-1`}>
                 Complete reverse-lookup of planetary significator levels mapped back to the 12 bhavas/houses, with custom-weighted 6-fold KP strength evaluation, priorities, and grading metrics.
@@ -7446,17 +7429,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         )}
 
         {/* ================= SYSTEM 9: WESTERN TROPICAL ASTROLOGY ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "westernTropical")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_8")) && (
           <div id="report-section-9" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
             
             <div className="border-b border-purple-500/10 pb-4 mb-6">
               <span className="text-[10px] bg-purple-500/15 text-purple-400 border border-purple-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 9 • Western Tropical Aspect Matrices
+                System 9 • Western Tropical Aspect Matrices • Table 8
               </span>
               <h2 className="text-sm font-bold text-purple-400 mt-2 flex items-center gap-2">
                 <Globe className="w-5 h-5 text-purple-400" />
-                9. TROPICAL PLANETARY ASPECTS & PLACIDUS HOUSE CUSPS
+                Table 8 - TROPICAL PLANETARY ASPECTS & PLACIDUS HOUSE CUSPS
               </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Standard major aspect definitions, angular difference metrics, and 12 Placidus house boundaries.
@@ -7547,17 +7530,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 10: ESOTERIC & ALTERNATIVE MYSTICAL SYSTEMS ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_9")) && (
           <div id="report-section-10" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
             <div className="border-b border-pink-500/10 pb-4 mb-6">
               <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 10 • Mystical Esoteric Systems & Remedial Blueprints
+                System 10 • Mystical Esoteric Systems & Remedial Blueprints • Table 9
               </span>
               <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
                 <Layers className="w-5 h-5 text-pink-400" />
-                10. ESOTERIC, BAZI FOUR PILLARS & LAL KITAB REMEDIES
+                Table 9 - ESOTERIC, BAZI FOUR PILLARS & LAL KITAB REMEDIES
               </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Chinese BaZi Four Pillars, Pythagorean Numerology, Lal Kitab remedies, Mayan Day signs, and Celtic tree properties.
@@ -7700,17 +7683,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 11: VIMSHOTTARI, YOGINI & ASHTOTTARI DASHAS ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_10")) && (
           <div id="report-section-11" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-teal-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full blur-2xl" />
             
             <div className="border-b border-teal-500/10 pb-4 mb-6">
               <span className="text-[10px] bg-teal-500/15 text-teal-400 border border-teal-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 11 • Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)
+                System 11 • Dasha Period Timelines (Vimshottari, Yogini, Ashtottari) • Table 10
               </span>
               <h2 className="text-sm font-bold text-teal-400 mt-2 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-teal-400" />
-                11. VIMSHOTTARI, YOGINI & ASHTOTTARI DASHA CYCLES
+                Table 10 - VIMSHOTTARI, YOGINI & ASHTOTTARI DASHA CYCLES
               </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               The chronological sequence of planetary planetary dasha cycles computed on lunar longitudes, fully expanded.
@@ -7793,17 +7776,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 12: YOGAS & DOSHAS ANALYSIS ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_11")) && (
           <div id="report-section-12" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-rose-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl" />
             
             <div className="border-b border-rose-500/10 pb-4 mb-6">
               <span className="text-[10px] bg-rose-500/15 text-rose-400 border border-rose-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 12 • Planetary Combinations & Afflictions (Yogas & Doshas)
+                System 12 • Planetary Combinations & Afflictions (Yogas & Doshas) • Table 11
               </span>
               <h2 className="text-sm font-bold text-rose-400 mt-2 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-rose-400" />
-                12. VEIDIC RAJA/DHANA YOGAS & CELESTIAL DOSHAS
+                Table 11 - VEDIC RAJA/DHANA YOGAS & CELESTIAL DOSHAS
               </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Comprehensive checklist of active auspicious combinations and major cosmic doshas present.
@@ -7859,17 +7842,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 13: TRADITIONAL LIFE PATHWAYS ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_12")) && (
           <div id="report-section-13" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
             
             <div className="border-b border-amber-500/10 pb-4 mb-6">
               <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 13 • Traditional Life Predictions & Daily Muhurta
+                System 13 • Traditional Life Predictions & Daily Muhurta • Table 12
               </span>
               <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
                 <Briefcase className="w-5 h-5 text-amber-500" />
-                13. LIFE DESTINY PATHWAYS & DAILY TRANSIT ALIGNMENTS
+                Table 12 - LIFE DESTINY PATHWAYS & DAILY TRANSIT ALIGNMENTS
               </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               Exhaustive predictive analysis mapping professional focus, wealth generation, marriage bliss, health, and current lunar transit.

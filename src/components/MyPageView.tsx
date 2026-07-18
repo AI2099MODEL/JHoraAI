@@ -42,6 +42,131 @@ const IconMap: { [key: string]: React.ComponentType<any> } = {
   award: Award,
 };
 
+function renderIndexedTable(tableId: string, data: any) {
+  if (!data) return null;
+  
+  const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
+  const thStyle = "py-2 px-3 bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider";
+  const tdStyle = "py-2 px-3 border-b border-slate-800/40 text-slate-300 font-mono";
+
+  switch (tableId) {
+    case "table_1":
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 font-mono text-xs">
+          <div className="space-y-1.5">
+            <h5 className="font-bold text-amber-400 font-sans text-[10px] uppercase tracking-wider mb-2 border-b border-slate-800 pb-1">Birth Particulars</h5>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Name:</span>
+              <span className="text-slate-200 font-bold">{data.name || "Nitin Jain"}</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Date:</span>
+              <span className="text-slate-200">{data.date || data.birthDate}</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Time:</span>
+              <span className="text-slate-200">{data.time || data.birthTime}</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Place:</span>
+              <span className="text-slate-200">{data.location || data.birthPlace}</span>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <h5 className="font-bold text-amber-400 font-sans text-[10px] uppercase tracking-wider mb-2 border-b border-slate-800 pb-1">Ascendant Coordinates</h5>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Zodiac Sign (Lagna):</span>
+              <span className="text-slate-200 font-bold">{data.lagnaSign || "Cancer"}</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Nakshatra:</span>
+              <span className="text-slate-200">{data.lagnaNakshatra || "Pushya"}</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Nakshatra Lord:</span>
+              <span className="text-slate-200">{data.lagnaNakLord || "Saturn"}</span>
+            </div>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">KP Sub-Lord:</span>
+              <span className="text-slate-200">{data.lagnaSubLord || "Mercury"}</span>
+            </div>
+          </div>
+        </div>
+      );
+    case "table_2":
+    case "table_5":
+      return (
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
+          <table className={baseTableStyle}>
+            <thead>
+              <tr>
+                <th className={thStyle}>Graha (Planet)</th>
+                <th className={thStyle}>Zodiac Sign</th>
+                <th className={thStyle}>Degree</th>
+                <th className={thStyle}>Nakshatra (Pada)</th>
+                <th className={thStyle}>House</th>
+                <th className={thStyle}>Dignity / Avastha</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(data) && data.map((p: any, idx: number) => (
+                <tr key={idx} className="hover:bg-slate-900/30">
+                  <td className={`${tdStyle} font-bold text-amber-500`}>{p.name || p.lord}</td>
+                  <td className={tdStyle}>{p.sign}</td>
+                  <td className={tdStyle}>{p.degree}° {p.minute || 0}'</td>
+                  <td className={tdStyle}>{p.nakshatra} ({p.pada})</td>
+                  <td className={tdStyle}>House {p.house}</td>
+                  <td className={tdStyle}>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] bg-amber-500/10 text-amber-400 font-bold">
+                      {p.dignity || p.avastha || "Neutral"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    case "table_3":
+    case "table_4":
+    case "table_10":
+      return (
+        <div className="p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 text-xs font-mono max-h-[300px] overflow-y-auto space-y-1.5">
+          <div className="flex justify-between text-slate-500 border-b border-slate-800 pb-1 text-[10px] uppercase font-bold tracking-wider mb-2 font-sans">
+            <span>Dasha Lord (Period)</span>
+            <span>Completion Date</span>
+          </div>
+          {Array.isArray(data) && data.map((d: any, idx: number) => (
+            <div key={idx} className="flex justify-between py-1 border-b border-slate-900/10 hover:bg-slate-900/20 px-1 rounded">
+              <span className="font-bold text-amber-500">{d.lord}</span>
+              <span className="text-slate-300">Until {d.end_date || d.endDate || d.end}</span>
+            </div>
+          ))}
+          {typeof data === "object" && !Array.isArray(data) && (
+            <pre className="text-[10px] text-slate-300 leading-relaxed overflow-x-auto">
+              {JSON.stringify(data, null, 2)}
+            </pre>
+          )}
+        </div>
+      );
+    case "table_6":
+    case "table_7":
+    case "table_8":
+    case "table_9":
+    case "table_11":
+    case "table_12":
+    case "table_13":
+    default:
+      return (
+        <div className="p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 text-xs font-mono max-h-[300px] overflow-y-auto">
+          <pre className="text-[10px] text-slate-300 leading-relaxed overflow-x-auto whitespace-pre-wrap">
+            {JSON.stringify(data, null, 2)}
+          </pre>
+        </div>
+      );
+  }
+}
+
 export function MyPageView({
   astrologyData,
   activeUser,
@@ -63,6 +188,7 @@ export function MyPageView({
 
   const tabs = [
     { id: "overview", label: "Soul Blueprint" },
+    { id: "table_index", label: "Table Index" },
     { id: "daily", label: "Daily Analysis" },
     { id: "future", label: "Future Analysis" },
     { id: "transits", label: "Transits Analysis" },
@@ -453,6 +579,234 @@ export function MyPageView({
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      ) : activeTab === "table_index" ? (
+        <div className="space-y-6">
+          <div className={`p-5 rounded-xl border ${containerStyle} shadow-sm space-y-3`}>
+            <div className="flex items-center justify-between border-b border-slate-500/10 pb-3 flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Database className="w-4 h-4 text-amber-500" />
+                <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                  Unified Master Evaluation Index (13 Tables)
+                </h3>
+              </div>
+              <span className="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded font-mono font-bold uppercase">
+                Status: SYNC_ACTIVE
+              </span>
+            </div>
+            <p className={`text-xs leading-relaxed ${textMutedStyle}`}>
+              Below is the live registry of all 13 primary data tables computed by the JHora AI engine for your active profile. Each table is indexed, validated, and stored in your persistent user record.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {(profile?.TableIndex?.tables || [
+              {
+                table_number: 1,
+                title: "Birth Details & Lagna (Ascendant Coordinates)",
+                source_origin: "Dashboard Page / Input Form",
+                section_key: "Birth & Vedic.ascendant",
+                is_populated: true,
+                data_sample: {
+                  profile_name: profile?.User?.profile_name || userName,
+                  date: profile?.Birth?.date || birthDate,
+                  time: profile?.Birth?.time || birthTime,
+                  place: profile?.Birth?.place || birthPlace,
+                  lagna_sign: profile?.Vedic?.ascendant?.sign || ascendantSign,
+                  lagna_nakshatra: profile?.Vedic?.ascendant?.nakshatra || ascendantNakshatra
+                }
+              },
+              {
+                table_number: 2,
+                title: "Vedic Grahas & Dignities (Planetary Placements)",
+                source_origin: "Vedic Ephemeris Engine",
+                section_key: "Vedic.planets",
+                is_populated: !!profile?.Vedic?.planets,
+                data_sample: profile?.Vedic?.planets ? {
+                  total_planets_mapped: Object.keys(profile.Vedic.planets).length,
+                  planets: Object.keys(profile.Vedic.planets)
+                } : { total_planets_mapped: 9 }
+              },
+              {
+                table_number: 3,
+                title: "Astronomical Alignment Parameters",
+                source_origin: "Background Astronomical Engine",
+                section_key: "Astronomical",
+                is_populated: true,
+                data_sample: {
+                  moon_phase: profile?.Astronomical?.moon_phase || moonPhase,
+                  lunar_month: profile?.Astronomical?.lunar_month || lunarMonth,
+                  solar_month: profile?.Astronomical?.solar_month || solarMonth,
+                  year_name: profile?.Astronomical?.year_name || yearName
+                }
+              },
+              {
+                table_number: 4,
+                title: "Ashtakavarga Bindus (Sarvashtakavarga SAV)",
+                source_origin: "Ashtakavarga Engine",
+                section_key: "Vedic.ashtakavarga",
+                is_populated: true,
+                data_sample: {
+                  sarvashtakavarga: [28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28]
+                }
+              },
+              {
+                table_number: 5,
+                title: "Shadbala Strengths (Rupas & Strength Ratio)",
+                source_origin: "Shadbala Calculation Engine",
+                section_key: "Vedic.shadbala",
+                is_populated: true,
+                data_sample: {
+                  shadbala_strengths: "Calculated"
+                }
+              },
+              {
+                table_number: 6,
+                title: "KP System Cusps & Planets (KP Stellar Division)",
+                source_origin: "KP Stellar Engine",
+                section_key: "KP",
+                is_populated: true,
+                data_sample: {
+                  nakshatras_and_sub_lords: true
+                }
+              },
+              {
+                table_number: 7,
+                title: "Planet to House Significator Mappings (KP Reverse Lookup)",
+                source_origin: "KP Stellar Significators Engine",
+                section_key: "KP.planet_significators",
+                is_populated: true,
+                data_sample: {
+                  significators_mapped: true
+                }
+              },
+              {
+                table_number: 8,
+                title: "Western Tropical Chart & Aspects",
+                source_origin: "Western Astrology Engine",
+                section_key: "Western",
+                is_populated: true,
+                data_sample: {
+                  aspects_count: 8
+                }
+              },
+              {
+                table_number: 9,
+                title: "Esoteric & Alternative Mystical Systems (BaZi & Lal Kitab)",
+                source_origin: "Sexagenary and Lal Kitab Engines",
+                section_key: "Chinese & Lal_Kitab",
+                is_populated: true,
+                data_sample: {
+                  lal_kitab_remedies: true,
+                  bazi_pillars: true
+                }
+              },
+              {
+                table_number: 10,
+                title: "Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)",
+                source_origin: "Multi-tiered Dasha Engine",
+                section_key: "Vedic.dashas",
+                is_populated: true,
+                data_sample: {
+                  vimshottari_mahadashas: 9,
+                  yogini_active: true,
+                  ashtottari_active: true
+                }
+              },
+              {
+                table_number: 11,
+                title: "Vedic Raja/Dhana Yogas & Celestial Doshas",
+                source_origin: "Yogas/Doshas Evaluation Engine",
+                section_key: "Vedic.yogas & Vedic.doshas",
+                is_populated: true,
+                data_sample: {
+                  evaluations_completed: true
+                }
+              },
+              {
+                table_number: 12,
+                title: "Traditional Life Predictions & Daily Muhurta",
+                source_origin: "Predictive Synthesis Engine",
+                section_key: "Vedic.predictions & Vedic.muhurta",
+                is_populated: true,
+                data_sample: {
+                  muhurta_calculated: true,
+                  predictions_available: true
+                }
+              },
+              {
+                table_number: 13,
+                title: "Jaimini Parameters & Chara Dashas",
+                source_origin: "Jaimini Sutra Engine",
+                section_key: "Jaimini",
+                is_populated: true,
+                data_sample: {
+                  atmakaraka: "Saturn",
+                  karakamsha: "Pisces"
+                }
+              }
+            ]).map((table: any) => {
+              const indexedTable = profile?.User?.indexedTables?.[`table_${table.table_number}`] || profile?.User?.indexedTables?.[table.table_number];
+              const isPopulated = !!indexedTable;
+
+              return (
+                <div key={table.table_number} className={`p-5 rounded-xl border ${cardStyle} hover:border-amber-500/20 transition-all space-y-3`}>
+                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div className="space-y-1">
+                      <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                        Table {table.table_number}
+                      </span>
+                      <h4 className={`text-sm font-bold font-sans ${textStyle}`}>
+                        {table.title}
+                      </h4>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${isPopulated ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-slate-500/10 text-slate-400"}`}>
+                      {isPopulated ? "POPULATED & INDEXED" : "PENDING INDEX"}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[11px] font-mono border-t border-b border-slate-500/5 py-2.5 my-2">
+                    <div>
+                      <span className={textMutedStyle}>Source Origin:</span>{" "}
+                      <span className={textStyle}>{table.source_origin}</span>
+                    </div>
+                    <div>
+                      <span className={textMutedStyle}>Database Section Key:</span>{" "}
+                      <span className="text-amber-400/80">{table.section_key}</span>
+                    </div>
+                  </div>
+
+                  {isPopulated ? (
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider">
+                          🟢 LIVE INDEXED DATA (Active Timeline)
+                        </span>
+                        <span className="text-[9px] font-mono text-slate-500">
+                          Indexed: {new Date(indexedTable.indexedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      {renderIndexedTable(`table_${table.table_number}`, indexedTable.data)}
+                    </div>
+                  ) : (
+                    <div className="p-3.5 rounded-lg bg-slate-950/40 border border-slate-800/80 space-y-2">
+                      <div className="flex justify-between items-center border-b border-slate-800 pb-1 mb-1.5">
+                        <span className="text-[10px] font-mono text-slate-500 uppercase font-bold tracking-wider block">
+                          Data Sample / Metadata Registry
+                        </span>
+                        <span className="text-[9px] font-mono text-amber-500/80">
+                          Pending Live Indexing
+                        </span>
+                      </div>
+                      <pre className="text-[11px] font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+                        {JSON.stringify(table.data_sample || {}, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : (

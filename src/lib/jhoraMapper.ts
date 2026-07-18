@@ -2045,8 +2045,40 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
+        table_number: 3,
+        title: "Astronomical Alignment Parameters",
+        source_origin: "Background Astronomical Engine",
+        section_key: "Astronomical",
+        is_populated: true,
+        data_sample: {
+          julian_day_number: astronomicalSection.julian_day_number,
+          sidereal_time: astronomicalSection.sidereal_time,
+          moon_phase: astronomicalSection.moon_phase
+        }
+      },
+      {
+        table_number: 4,
+        title: "Ashtakavarga Bindus (Sarvashtakavarga SAV)",
+        source_origin: "Ashtakavarga Engine",
+        section_key: "Vedic.ashtakavarga",
+        is_populated: true,
+        data_sample: {
+          sarvashtakavarga: ashtakavargaMapped.sav
+        }
+      },
+      {
+        table_number: 5,
+        title: "Shadbala Strengths (Rupas & Strength Ratio)",
+        source_origin: "Shadbala Calculation Engine",
+        section_key: "Vedic.shadbala",
+        is_populated: true,
+        data_sample: {
+          shadbala_planets_count: Object.keys(shadbalaMapped).length
+        }
+      },
+      {
         table_number: 6,
-        title: "KP System Cusps & Planets (KP)",
+        title: "KP System Cusps & Planets (KP Stellar Division)",
         source_origin: "KP Stellar Engine",
         section_key: "KP",
         is_populated: Object.keys(kpPlanets).length > 0,
@@ -2057,49 +2089,77 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       },
       {
         table_number: 7,
-        title: "Jaimini Parameters & Dashas (Jaimini)",
+        title: "Planet to House Significator Mappings (KP Reverse Lookup)",
+        source_origin: "KP Stellar Significators Engine",
+        section_key: "KP.planet_significators",
+        is_populated: true,
+        data_sample: {
+          significators_mapped: true
+        }
+      },
+      {
+        table_number: 8,
+        title: "Western Tropical Chart & Aspects",
+        source_origin: "Western Astrology Engine",
+        section_key: "Western",
+        is_populated: true,
+        data_sample: {
+          aspects_count: westernAspectsMapped.length
+        }
+      },
+      {
+        table_number: 9,
+        title: "Esoteric & Alternative Mystical Systems (BaZi & Lal Kitab)",
+        source_origin: "Sexagenary and Lal Kitab Engines",
+        section_key: "Chinese & Lal_Kitab",
+        is_populated: true,
+        data_sample: {
+          bazi_pillars: baziSection.pillars,
+          lal_kitab_remedies_count: Object.keys(lalKitabRemedies).length
+        }
+      },
+      {
+        table_number: 10,
+        title: "Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)",
+        source_origin: "Multi-tiered Dasha Engine",
+        section_key: "Vedic.dashas",
+        is_populated: true,
+        data_sample: {
+          vimshottari_mahadashas: vimshottariDashas.length,
+          yogini_active: true,
+          ashtottari_active: true
+        }
+      },
+      {
+        table_number: 11,
+        title: "Vedic Raja/Dhana Yogas & Celestial Doshas",
+        source_origin: "Yogas/Doshas Evaluation Engine",
+        section_key: "Vedic.yogas & Vedic.doshas",
+        is_populated: true,
+        data_sample: {
+          evaluations_completed: true
+        }
+      },
+      {
+        table_number: 12,
+        title: "Traditional Life Predictions & Daily Muhurta",
+        source_origin: "Predictive Synthesis Engine",
+        section_key: "Vedic.predictions & Vedic.muhurta",
+        is_populated: true,
+        data_sample: {
+          muhurta_calculated: true,
+          predictions_available: true
+        }
+      },
+      {
+        table_number: 13,
+        title: "Jaimini Parameters & Chara Dashas",
         source_origin: "Jaimini Sutra Engine",
         section_key: "Jaimini",
         is_populated: true,
         data_sample: {
           atmakaraka: jaiminiKarakas.atmakaraka,
           karakamsha: karakamshaSign
-        }
-      },
-      {
-        table_number: 8,
-        title: "Lal Kitab Placements & Remedies",
-        source_origin: "Lal Kitab Engine",
-        section_key: "Lal_Kitab",
-        is_populated: true,
-        data_sample: {
-          total_remedies: Object.keys(lalKitabRemedies).length
-        }
-      },
-      {
-        table_number: 9,
-        title: "Tajik Varshaphal Aspects & Muntha",
-        source_origin: "Tajik Annual Solar Returns",
-        section_key: "Tajik",
-        is_populated: true,
-        data_sample: tajikSection.varshaphal_2026
-      },
-      {
-        table_number: 10,
-        title: "Chinese BaZi Four Pillars",
-        source_origin: "Chinese Sexagenary Engine",
-        section_key: "Chinese",
-        is_populated: true,
-        data_sample: baziSection.pillars
-      },
-      {
-        table_number: 11,
-        title: "Tropical Western Chart & Aspects",
-        source_origin: "Western Astrology Engine",
-        section_key: "Western",
-        is_populated: true,
-        data_sample: {
-          aspects_count: westernAspectsMapped.length
         }
       }
     ]
