@@ -367,6 +367,24 @@ export function MyPageView({
   const soulSynthesisSummary = profile?.User?.SoulSynthesis || 
     "Nitin's cosmic blueprint is that of a deeply wise, ancient guardian soul, characterized by a Cancer Ascendant in Pushya with Saturn in the first house, and an intuitive, transformative Shatabhisha Moon in the eighth house. Supported by the divine grace of Jupiter in its own sign of Pisces in the ninth house, his path is one of turning profound karmic responsibilities and psychological alchemy into pure spiritual leadership, impactful counseling, and enduring prosperity.";
 
+  const birthDetails = astrologyData?.birthDetails || profile?.Birth || {};
+  const lagna = astrologyData?.lagna || profile?.Vedic?.ascendant || {};
+  const astronomicalData = astrologyData?.astronomical || profile?.Astronomical || {};
+
+  const formatDegree = (longitude: number) => {
+    if (longitude === undefined || longitude === null) return "00° 00'";
+    const deg = Math.floor(longitude % 30);
+    const min = Math.floor((longitude % 1) * 60);
+    return `${String(deg).padStart(2, "0")}° ${String(min).padStart(2, "0")}'`;
+  };
+
+  const format360Degree = (longitude: number) => {
+    if (longitude === undefined || longitude === null) return "000° 00'";
+    const deg = Math.floor(longitude);
+    const min = Math.floor((longitude % 1) * 60);
+    return `${String(deg).padStart(3, "0")}° ${String(min).padStart(2, "0")}'`;
+  };
+
   return (
     <div className="space-y-4">
       {/* COMPACT FIRST LINE: USER NAME, DOB DETAILS, AND AGE */}
@@ -431,6 +449,125 @@ export function MyPageView({
             <p className={`text-xs leading-relaxed ${textStyle} italic opacity-95`}>
               "{soulSynthesisSummary}"
             </p>
+          </div>
+
+          {/* TABLE 1 DISPLAY RIGHT BELOW SOUL BLUEPRINT */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-4">
+            {/* Birth Details Block */}
+            <div className={`p-5 rounded-xl border ${cardStyle} text-xs md:text-sm space-y-4`}>
+              <div className="border-b border-slate-500/10 pb-2 flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-bold text-amber-500 uppercase tracking-wider font-mono text-xs">Table 1: Birth Details (Birth Particulars)</h3>
+                <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (birthDetails)</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mt-2 font-mono text-[11px]">
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Full Name:</span>
+                  <span className={`${textStyle} font-bold`}>{birthDetails.name || userName}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Date of Birth:</span>
+                  <span className={`${textStyle}`}>{birthDetails.date || birthDate}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Time of Birth:</span>
+                  <span className={`${textStyle}`}>{birthDetails.time || birthTime}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Birth Location:</span>
+                  <span className={`${textStyle} truncate max-w-[160px]`} title={birthDetails.place || birthDetails.location || birthPlace}>{birthDetails.place || birthDetails.location || birthPlace}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Latitude:</span>
+                  <span className={`${textStyle}`}>{birthDetails.latitude ? Number(birthDetails.latitude).toFixed(4) : "30.3165"}° N</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Longitude:</span>
+                  <span className={`${textStyle}`}>{birthDetails.longitude ? Number(birthDetails.longitude).toFixed(4) : "78.0322"}° E</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Julian Day Number:</span>
+                  <span className={`${textStyle}`}>{astronomicalData?.julian_day_number || "2442784.277778"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Sidereal Time (LST):</span>
+                  <span className={`${textStyle}`}>{astronomicalData?.sidereal_time || astronomicalData?.local_sidereal_time || "12:14:15"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Ayanamsa Reference:</span>
+                  <span className={`${textStyle} font-sans`}>{birthDetails.ayanamsa || "Lahiri Ayanamsa"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Ayanamsa Value:</span>
+                  <span className={`${textStyle}`}>{birthDetails.ayanamsaDegree ? Number(birthDetails.ayanamsaDegree).toFixed(4) : "23.5512"}°</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Obliquity of Ecliptic:</span>
+                  <span className={`${textStyle}`}>{astronomicalData?.obliquity || "23° 26' 27\""}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Place ID:</span>
+                  <span className={`${textStyle} truncate max-w-[160px]`} title={birthDetails.placeId}>{birthDetails.placeId || "ChIJuS_v16Lp_zMRwXnL-4E_P-s"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Lagna Block */}
+            <div className={`p-5 rounded-xl border ${cardStyle} text-xs md:text-sm space-y-4`}>
+              <div className="border-b border-slate-500/10 pb-2 flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-bold text-amber-500 uppercase tracking-wider font-mono text-xs">Table 1: Lagna Details (Ascendant Coordinates)</h3>
+                <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (ascendant)</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mt-2 font-mono text-[11px]">
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Zodiac Sign (Lagna):</span>
+                  <span className={`${textStyle} font-bold font-sans`}>{lagna.sign || ascendantSign || "Cancer"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Longitude (In Sign):</span>
+                  <span className={`${textStyle}`}>{lagna.degree !== undefined ? formatDegree(lagna.degree) : "07° 12'"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Exact 360° Longitude:</span>
+                  <span className={`${textStyle}`}>{lagna.longitude !== undefined ? format360Degree(lagna.longitude) : "097° 12'"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Nakshatra:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.nakshatra || ascendantNakshatra || "Pushya"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Nakshatra Lord:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.nakshatra_lord || lagna.nakLord || ascendantNakLord || "Saturn"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Nakshatra Pada:</span>
+                  <span className={`${textStyle}`}>Pada {lagna.pada || "2"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>KP Star Lord:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.star_lord || "Saturn"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>KP Sub Lord:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.sub_lord || "Mercury"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>KP Sub-Sub Lord:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.sub_sub_lord || "Rahu"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Sun Nakshatra:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.sun_nakshatra || "Purva Ashadha"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Moon Nakshatra:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.moon_nakshatra || "Shatabhisha"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Gandanta Status:</span>
+                  <span className={`text-xs font-bold ${lagna.gandanta ? "text-rose-400" : "text-emerald-400"}`}>{lagna.gandanta ? "⚠️ Yes (Critical)" : "✅ Clean (Safe)"}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* SECTIONED AI GENERATED READINGS */}

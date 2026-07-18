@@ -2436,6 +2436,22 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         </div>
       </div>
 
+      {/* API Capture & AI Calculation Architecture Banner */}
+      <div className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/20 text-[10px] leading-relaxed font-mono space-y-2 md:space-y-0 md:flex md:flex-col md:gap-1.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-amber-400 font-bold uppercase tracking-wider bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded text-[8px]">Astrological Captures</span>
+          <span className="text-slate-300">
+            Traditional data computed & captured via <strong className="text-indigo-400 font-sans">Jagannatha Hora (JHora) Astronomical Service</strong> & the server-side <strong className="text-indigo-400 font-sans">Vedic Astro API</strong> (<code className="text-slate-400">/api/astrology/calculate</code>).
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-cyan-400 font-bold uppercase tracking-wider bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded text-[8px]">AI Reasoning & Summaries</span>
+          <span className="text-slate-300">
+            Personal summaries, readings, & consultation answers are processed & calculated using the server-side <strong className="text-cyan-400 font-sans">Gemini API</strong> (<code className="text-slate-400">/api/astrology/ai-analyze</code> & <code className="text-slate-400">/api/user-profile/generate-summary</code>).
+          </span>
+        </div>
+      </div>
+
       {/* Tabs bar for Advanced, Profile */}
       <div className="border-b border-slate-800 flex gap-1 overflow-x-auto pb-px">
         <button
