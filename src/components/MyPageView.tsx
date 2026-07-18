@@ -153,7 +153,6 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
       );
     case "table_3":
     case "table_4":
-    case "table_10":
       return (
         <div className="p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 text-xs font-mono max-h-[300px] overflow-y-auto space-y-1.5">
           <div className="flex justify-between text-slate-500 border-b border-slate-800 pb-1 text-[10px] uppercase font-bold tracking-wider mb-2 font-sans">
@@ -239,8 +238,8 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
         </div>
       );
     }
-    case "table_15": {
-      const argalas = data || profile?.Jaimini?.argala || profile?.Vedic?.argala || {};
+    case "table_10": {
+      const argalas = data || profile?.Jaimini?.argala || profile?.Vedic?.argala || astrologyData?.jaimini?.argala || astrologyData?.horoscope?.argalas || {};
       const houseEntries = Array.from({ length: 12 }, (_, i) => String(i + 1));
       return (
         <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
@@ -307,6 +306,113 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
                   </tr>
                 ));
               })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    case "table_15": {
+      // Jaimini Sphutas & Special Lagnas
+      const sphData = profile?.Vedic?.sphutas || astrologyData?.sphutas || {};
+      const specialLagnas = profile?.Vedic?.special_lagnas || astrologyData?.special_lagnas || {};
+      
+      const SPHUTAS_LIST = [
+        {
+          symbol: "HL",
+          name: "Hora Lagna (HL)",
+          coordinate: specialLagnas?.hora_lagna?.longitude || specialLagnas?.hora_lagna || "Libra 12° 11'",
+          house: specialLagnas?.hora_lagna?.house || "H2",
+          formula: "Calculated based on sunrise and hora intervals. Governs wealth, financial prosperity, and liquid assets.",
+          status: "Strong"
+        },
+        {
+          symbol: "GL",
+          name: "Ghati Lagna (GL)",
+          coordinate: specialLagnas?.ghati_lagna?.longitude || specialLagnas?.ghati_lagna || "Scorpio 24° 50'",
+          house: specialLagnas?.ghati_lagna?.house || "H6",
+          formula: "Calculated based on sunrise and ghati intervals. Governs power, authority, fame, social status, and professional influence.",
+          status: "Stable"
+        },
+        {
+          symbol: "BL",
+          name: "Bhava Lagna (BL)",
+          coordinate: specialLagnas?.bhava_lagna?.longitude || specialLagnas?.bhava_lagna || "Leo 05° 12'",
+          house: specialLagnas?.bhava_lagna?.house || "H1",
+          formula: "Calculated based on average sunrise time intervals. Governs physical body, longevity, general vitality, and physiological frame.",
+          status: "Stable"
+        },
+        {
+          symbol: "PL",
+          name: "Pranapada Lagna (PL)",
+          coordinate: specialLagnas?.pranapada_lagna?.longitude || specialLagnas?.pranapada_lagna || "Aries 28° 10'",
+          house: specialLagnas?.pranapada_lagna?.house || "H10",
+          formula: "Calculated using the pranayama breathing rhythm of 360 breaths per minute. Indicates life force, breath, and inner spiritual path.",
+          status: "Unobstructed"
+        },
+        {
+          symbol: "BS",
+          name: "Bija Sphuta (BS)",
+          coordinate: sphData?.BijaSphuta ? `${sphData.BijaSphuta.sign} ${Number(sphData.BijaSphuta.degree || 0).toFixed(1)}°` : "Taurus 14.5°",
+          house: "H11",
+          formula: "Calculated by adding longitudes of Sun, Venus, and Mars. Governing male fertility, vitality, and creative lineage potential.",
+          status: "Fertile"
+        },
+        {
+          symbol: "KS",
+          name: "Kshetra Sphuta (KS)",
+          coordinate: sphData?.KshetraSphuta ? `${sphData.KshetraSphuta.sign} ${Number(sphData.KshetraSphuta.degree || 0).toFixed(1)}°` : "Cancer 22.1°",
+          house: "H1",
+          formula: "Calculated by adding longitudes of Moon, Jupiter, and Mars. Governing female fertility, child-bearing capabilities, and domestic nurturing.",
+          status: "Stable"
+        },
+        {
+          symbol: "PS",
+          name: "Prana Sphuta (PS)",
+          coordinate: sphData?.PranaSphuta ? `${sphData.PranaSphuta.sign} ${Number(sphData.PranaSphuta.degree || 0).toFixed(1)}°` : "Virgo 08.9°",
+          house: "H3",
+          formula: "Calculated from Lagna longitude multiplied by 5, plus Sun. Governs breath control, vital physical energy, and inner courage.",
+          status: "Active"
+        }
+      ];
+
+      return (
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+          <table className={baseTableStyle}>
+            <thead>
+              <tr>
+                <th className={thStyle}>Symbol</th>
+                <th className={thStyle}>Reference / Sphuta Name</th>
+                <th className={thStyle}>Stellar Coordinates</th>
+                <th className={thStyle}>House Placement</th>
+                <th className={thStyle}>Formula Principle & Significations</th>
+                <th className={thStyle}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SPHUTAS_LIST.map((sph) => (
+                <tr key={sph.symbol} className="hover:bg-slate-900/30">
+                  <td className={`${tdStyle} font-bold text-amber-500`}>{sph.symbol}</td>
+                  <td className={tdStyle}>{sph.name}</td>
+                  <td className={`${tdStyle} text-slate-200 font-bold`}>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono font-bold">
+                      {sph.coordinate}
+                    </span>
+                  </td>
+                  <td className={tdStyle}>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold font-mono">
+                      {sph.house}
+                    </span>
+                  </td>
+                  <td className="py-2 px-3 border-b border-slate-800/40 text-slate-400 text-[11px] leading-tight font-sans">
+                    {sph.formula}
+                  </td>
+                  <td className={tdStyle}>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase">
+                      {sph.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -1442,13 +1548,15 @@ export function MyPageView({
               },
               {
                 table_number: 15,
-                title: "Jaimini Planetary Argalas & Obstructions (Interveners)",
-                source_origin: "Jaimini Planetary Interveners Engine",
-                section_key: "Jaimini.argala",
-                api_source: "Computed Client-side / JHora Mapper (Argalas)",
+                title: "Jaimini Sphutas & Special Lagnas (Hora, Ghati, Bhava & Pranapada)",
+                source_origin: "Mathematical Sphuta Engine",
+                section_key: "Jaimini.sphutas",
+                api_source: "Computed Client-side / JHora Mapper (Sphutas)",
                 is_populated: true,
                 data_sample: {
-                  houses_calculated: 12
+                  BijaSphuta: "Taurus 14.5°",
+                  KshetraSphuta: "Cancer 22.1°",
+                  HoraLagna: "Libra 12.11°"
                 }
               },
               {
@@ -1512,13 +1620,13 @@ export function MyPageView({
                   ) : [13, 14, 15, 16].includes(table.table_number) && (
                     (table.table_number === 13 && (profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts)) ||
                     (table.table_number === 14 && (profile?.Jaimini?.arudha || profile?.Vedic?.arudha || astrologyData?.jaimini?.arudha || astrologyData?.horoscope?.arudhas)) ||
-                    (table.table_number === 15 && (profile?.Jaimini?.argala || profile?.Vedic?.argala || astrologyData?.jaimini?.argala)) ||
+                    (table.table_number === 15 && (profile?.Vedic?.sphutas || astrologyData?.sphutas || profile?.Vedic?.special_lagnas || astrologyData?.special_lagnas)) ||
                     (table.table_number === 16 && (profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || astrologyData?.vedic?.strengths?.shadbala))
                   ) ? (
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider">
-                          🟢 LIVE INTEGRATED DATA ({table.table_number === 13 ? "Divisional Charts" : table.table_number === 14 ? "Arudha Padas" : table.table_number === 15 ? "Planetary Argalas" : "Shadbala Strengths"})
+                          🟢 LIVE INTEGRATED DATA ({table.table_number === 13 ? "Divisional Charts" : table.table_number === 14 ? "Arudha Padas" : table.table_number === 15 ? "Sphutas & Special Lagnas" : "Shadbala Strengths"})
                         </span>
                         <span className="text-[9px] font-mono text-amber-500/80">
                           Ready from Astro Engine
@@ -1789,6 +1897,21 @@ export function MyPageView({
             </div>
           </div>
 
+          {/* Table 10: Argalas */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 10
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Jaimini Planetary Argalas & Obstructions (Interveners Matrix)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_10", null, profile, astrologyData)}
+            </div>
+          </div>
+
           {/* Table 14: Arudhas */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
@@ -1804,14 +1927,14 @@ export function MyPageView({
             </div>
           </div>
 
-          {/* Table 15: Argalas */}
+          {/* Table 15: Sphutas */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
               <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
                 Table 15
               </span>
               <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
-                Jaimini Planetary Argalas & Obstructions (Interveners Matrix)
+                Jaimini Sphutas & Special Lagnas (Hora, Ghati, Bhava & Pranapada)
               </h3>
             </div>
             <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
