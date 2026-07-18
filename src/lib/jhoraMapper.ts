@@ -135,6 +135,48 @@ export function calculateArgalas(rasiChart: { [house: number]: string[] }) {
   return argalas;
 }
 
+function normalizeNakshatraName(name: string): string {
+  if (!name) return "";
+  const clean = name.toLowerCase().replace(/[^a-z]/g, "");
+  if (clean.includes("ashwini") || clean.includes("asvini")) return "Ashwini";
+  if (clean.includes("bharani")) return "Bharani";
+  if (clean.includes("krittika") || clean.includes("krttika")) return "Krittika";
+  if (clean.includes("rohini")) return "Rohini";
+  if (clean.includes("mrigashira") || clean.includes("mrigasira") || clean.includes("mriga")) return "Mrigashira";
+  if (clean.includes("ardra") || clean.includes("arudra")) return "Ardra";
+  if (clean.includes("punarvasu")) return "Punarvasu";
+  if (clean.includes("pushya") || clean.includes("pusya")) return "Pushya";
+  if (clean.includes("ashlesha") || clean.includes("aslesha")) return "Ashlesha";
+  if (clean.includes("magha")) return "Magha";
+  if (clean.includes("purvaphalguni") || clean.includes("pubba") || clean.includes("purvaphal")) return "Purva Phalguni";
+  if (clean.includes("uttaraphalguni") || (clean.includes("uttara") && clean.includes("phal"))) return "Uttara Phalguni";
+  if (clean.includes("hasta") || clean.includes("hastha")) return "Hasta";
+  if (clean.includes("chitra") || clean.includes("chitha") || clean.includes("citra")) return "Chitra";
+  if (clean.includes("swati") || clean.includes("svati")) return "Swati";
+  if (clean.includes("vishakha") || clean.includes("visakha")) return "Vishakha";
+  if (clean.includes("anuradha")) return "Anuradha";
+  if (clean.includes("jyeshtha") || clean.includes("jyestha") || clean.includes("jesta")) return "Jyeshtha";
+  if (clean.includes("mula") || clean.includes("moola")) return "Mula";
+  if (clean.includes("purvaashadha") || clean.includes("purvashadha") || clean.includes("poorvashada") || (clean.includes("purva") && clean.includes("asadh"))) return "Purva Ashadha";
+  if (clean.includes("uttaraashadha") || clean.includes("uttarashadha") || clean.includes("uttarashada") || (clean.includes("uttara") && clean.includes("asadh"))) return "Uttara Ashadha";
+  if (clean.includes("shravana") || clean.includes("sravana")) return "Shravana";
+  if (clean.includes("dhanishta") || clean.includes("dhanistha")) return "Dhanishta";
+  if (clean.includes("shatabhisha") || clean.includes("shatabhishaj") || clean.includes("satabhisha") || clean.includes("shatabisha") || clean.includes("shatbisha") || clean.includes("satabisha") || clean.includes("shatabhish")) return "Shatabhisha";
+  if (clean.includes("purvabhadrapada") || clean.includes("purvabhadra") || clean.includes("poorvabhadra")) return "Purva Bhadrapada";
+  if (clean.includes("uttarabhadrapada") || clean.includes("uttarabhadra") || clean.includes("uttarabhadra")) return "Uttara Bhadrapada";
+  if (clean.includes("revati") || clean.includes("revathi")) return "Revati";
+  
+  const nList = [
+    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
+    "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
+    "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+    "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha",
+    "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+  ];
+  const match = nList.find(n => n.toLowerCase().replace(/[^a-z]/g, "").includes(clean) || clean.includes(n.toLowerCase().replace(/[^a-z]/g, "")));
+  return match || name;
+}
+
 export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   if (d && d.birthDetails && d.lagna && d.planets) {
     return d as AstrologyData;
@@ -210,7 +252,7 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
         sign: pData.sign,
         signIndex: pSignIdx,
         degree: pData.longitude,
-        nakshatra: nakDetails.nakshatra || "",
+        nakshatra: normalizeNakshatraName(nakDetails.nakshatra || ""),
         pada: nakDetails.pada || 1,
         house: pHouse,
         strength,
@@ -325,8 +367,101 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
     };
   }
 
-  const yogini = yoginiTree.map(translateYoginiNode);
-  const ashtottari = ashtottariTree;
+  let yogini = yoginiTree.map(translateYoginiNode);
+  if (yogini.length === 0) {
+    const moon_p = planets.find((p) => p.name === "Moon");
+    if (moon_p) {
+      const birthDateStr = `${bd.date || "1976-01-06"}T${bd.time || "18:40:00"}`;
+      const birthDate = new Date(birthDateStr);
+      const moonLong = moon_p.longitude;
+      const nakshatraSpan = 360 / 27; // 13.3333 degrees
+      const moonNakshatraIndex = Math.floor(moonLong / nakshatraSpan);
+      const elapsedInNakshatra = (moonLong % nakshatraSpan) / nakshatraSpan;
+
+      const yoginiNames = ["Mangala", "Pingala", "Dhanya", "Bhramari", "Bhadrika", "Ulka", "Siddha", "Sankata"];
+      const yoginiLords = ["Moon", "Sun", "Jupiter", "Mars", "Mercury", "Saturn", "Venus", "Rahu"];
+      const yoginiYears = [1, 2, 3, 4, 5, 6, 7, 8];
+      const yoginiStartIndex = (moonNakshatraIndex + 3) % 8;
+      const calculatedYogini: DashaPeriod[] = [];
+      let yoginiCurrentDate = new Date(birthDate);
+
+      let yIndex = yoginiStartIndex;
+      for (let i = 0; i < 32; i++) { // 4 cycles of 36 years = 144 years to cover active age ranges
+        const yName = yoginiNames[yIndex];
+        const yLord = yoginiLords[yIndex];
+        const rawYears = yoginiYears[yIndex];
+        const years = i === 0 ? rawYears * (1 - elapsedInNakshatra) : rawYears;
+        const yStartDate = new Date(yoginiCurrentDate);
+        const yEndDate = new Date(yoginiCurrentDate);
+        yEndDate.setFullYear(yEndDate.getFullYear() + Math.floor(years));
+        yEndDate.setMonth(yEndDate.getMonth() + Math.floor((years % 1) * 12));
+
+        calculatedYogini.push({
+          lord: `${yName} (${yLord})`,
+          startDate: yStartDate.toISOString().split("T")[0],
+          endDate: yEndDate.toISOString().split("T")[0]
+        });
+
+        yoginiCurrentDate = yEndDate;
+        yIndex = (yIndex + 1) % 8;
+      }
+      yogini = calculatedYogini;
+    }
+  }
+
+  let ashtottari = ashtottariTree;
+  if (ashtottari.length === 0) {
+    const moon_p = planets.find((p) => p.name === "Moon");
+    if (moon_p) {
+      const birthDateStr = `${bd.date || "1976-01-06"}T${bd.time || "18:40:00"}`;
+      const birthDate = new Date(birthDateStr);
+      const moonLong = moon_p.longitude;
+      const nakshatraSpan = 360 / 27; // 13.3333 degrees
+      const moonNakshatraIndex = Math.floor(moonLong / nakshatraSpan);
+      const elapsedInNakshatra = (moonLong % nakshatraSpan) / nakshatraSpan;
+
+      const ashtottariLords = ["Sun", "Moon", "Mars", "Mercury", "Saturn", "Jupiter", "Rahu", "Venus"];
+      const ashtottariYearsMap: Record<string, number> = { "Sun": 6, "Moon": 15, "Mars": 8, "Mercury": 17, "Saturn": 10, "Jupiter": 19, "Rahu": 12, "Venus": 21 };
+      
+      const ASHTOTTARI_MAP = [
+        "Venus", "Venus", // 0, 1 (Ashwini, Bharani)
+        "Sun", "Sun", "Sun", // 2, 3, 4 (Krittika, Rohini, Mrigashira)
+        "Moon", "Moon", "Moon", "Moon", // 5, 6, 7, 8 (Ardra to Ashlesha)
+        "Mars", "Mars", "Mars", // 9, 10, 11 (Magha to Uttara Phalguni)
+        "Mercury", "Mercury", "Mercury", "Mercury", // 12, 13, 14, 15 (Hasta to Vishakha)
+        "Saturn", "Saturn", "Saturn", // 16, 17, 18 (Anuradha, Jyeshtha, Moola)
+        "Jupiter", "Jupiter", "Jupiter", // 19, 20, 21 (Purva Ashadha, Uttar Ashadha, Shravana)
+        "Rahu", "Rahu", "Rahu", // 22, 23, 24 (Dhanishta, Shatabhisha, Purva Bhadrapada)
+        "Venus", "Venus" // 25, 26 (Uttara Bhadrapada, Revati)
+      ];
+      
+      const startLord = ASHTOTTARI_MAP[moonNakshatraIndex] || "Sun";
+      const ashtottariStartIndex = ashtottariLords.indexOf(startLord);
+      const calculatedAshtottari: DashaPeriod[] = [];
+      let ashtottariCurrentDate = new Date(birthDate);
+
+      let aIndex = ashtottariStartIndex;
+      for (let i = 0; i < 16; i++) { // 2 cycles = 216 years to cover multiple lifetimes beautifully
+        const aLord = ashtottariLords[aIndex];
+        const rawYears = ashtottariYearsMap[aLord];
+        const years = i === 0 ? rawYears * (1 - elapsedInNakshatra) : rawYears;
+        const aStartDate = new Date(ashtottariCurrentDate);
+        const aEndDate = new Date(ashtottariCurrentDate);
+        aEndDate.setFullYear(aEndDate.getFullYear() + Math.floor(years));
+        aEndDate.setMonth(aEndDate.getMonth() + Math.floor((years % 1) * 12));
+
+        calculatedAshtottari.push({
+          lord: aLord,
+          startDate: aStartDate.toISOString().split("T")[0],
+          endDate: aEndDate.toISOString().split("T")[0]
+        });
+
+        ashtottariCurrentDate = aEndDate;
+        aIndex = (aIndex + 1) % 8;
+      }
+      ashtottari = calculatedAshtottari;
+    }
+  }
 
   // Yogas Map to List
   const yogas: YogaAnalysis[] = [];
