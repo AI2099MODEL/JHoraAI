@@ -3,8 +3,8 @@
     "google_user_id": "guest_user",
     "email": "guest@jhora.ai",
     "profile_name": "Nitin",
-    "created_at": "2026-07-18T09:50:43.785Z",
-    "updated_at": "2026-07-18T09:50:43.785Z"
+    "created_at": "2026-07-18T10:00:29.123Z",
+    "updated_at": "2026-07-18T10:00:29.123Z"
   },
   "Birth": {
     "date": "1976-01-06",
@@ -5739,7 +5739,7 @@
     "birth_time_rectified": false,
     "api_version": "v2.0.0",
     "api_confidence": "Authoritative / Verified",
-    "generated_on": "2026-07-18T09:50:43.785Z",
+    "generated_on": "2026-07-18T10:00:29.123Z",
     "generated_by": "JHoraAI Precision Engine",
     "jhora_version": "v7.6",
     "profile_version": "v2.1",
@@ -5748,22 +5748,25 @@
   "TableIndex": {
     "metadata": {
       "indexing_agent": "JHoraAI Master Evaluation Indexer",
-      "indexed_on": "2026-07-18T09:50:43.785Z",
+      "indexed_on": "2026-07-18T10:00:29.123Z",
       "handbook_reference": "/documents/master_astro_handbook.md",
       "status": "SYNC_ACTIVE"
     },
     "tables": [
       {
         "table_number": 1,
-        "title": "Birth Details",
+        "title": "Birth Details & Lagna (Ascendant Coordinates)",
         "source_origin": "Dashboard Page / Input Form",
-        "section_key": "Birth",
+        "section_key": "Birth & Vedic.ascendant",
         "is_populated": true,
         "data_sample": {
           "profile_name": "Nitin",
           "date": "1976-01-06",
           "time": "18:40:00",
-          "place": "Dehradun, Uttarakhand, India"
+          "place": "Dehradun, Uttarakhand, India",
+          "lagna_sign": "Cancer",
+          "lagna_degree": 7,
+          "lagna_nakshatra": "Pushya"
         }
       },
       {
