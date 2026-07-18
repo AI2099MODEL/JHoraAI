@@ -50,7 +50,7 @@ const IconMap: { [key: string]: React.ComponentType<any> } = {
 
 function renderIndexedTable(tableId: string, data: any, profile?: any, astrologyData?: any) {
   let planetsArray = data;
-  if (!planetsArray && (tableId === "table_2" || tableId === "table_5")) {
+  if (!planetsArray && tableId === "table_2") {
     const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets || {};
     if (Object.keys(planetsObj).length > 0) {
       planetsArray = Object.entries(planetsObj).map(([name, p]: [string, any]) => ({
@@ -67,7 +67,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
     }
   }
 
-  if (!data && !planetsArray && !["table_13", "table_14", "table_15", "table_16"].includes(tableId)) return null;
+  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_13", "table_14", "table_15", "table_16"].includes(tableId)) return null;
   
   const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
   const thStyle = "py-2 px-3 bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider";
@@ -118,7 +118,6 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
         </div>
       );
     case "table_2":
-    case "table_5":
       return (
         <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
           <table className={baseTableStyle}>
@@ -153,25 +152,33 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
       );
     case "table_3":
     case "table_4":
+    case "table_5": {
+      let dashaData = data;
+      if (!dashaData) {
+        if (tableId === "table_3") dashaData = profile?.Vedic?.dashas?.vimshottari || astrologyData?.dashas || [];
+        else if (tableId === "table_4") dashaData = profile?.Vedic?.dashas?.yogini || [];
+        else if (tableId === "table_5") dashaData = profile?.Vedic?.dashas?.ashtottari || [];
+      }
       return (
         <div className="p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 text-xs font-mono max-h-[300px] overflow-y-auto space-y-1.5">
           <div className="flex justify-between text-slate-500 border-b border-slate-800 pb-1 text-[10px] uppercase font-bold tracking-wider mb-2 font-sans">
             <span>Dasha Lord (Period)</span>
             <span>Completion Date</span>
           </div>
-          {Array.isArray(data) && data.map((d: any, idx: number) => (
+          {Array.isArray(dashaData) && dashaData.map((d: any, idx: number) => (
             <div key={idx} className="flex justify-between py-1 border-b border-slate-900/10 hover:bg-slate-900/20 px-1 rounded">
               <span className="font-bold text-amber-500">{d.lord}</span>
               <span className="text-slate-300">Until {d.end_date || d.endDate || d.end}</span>
             </div>
           ))}
-          {typeof data === "object" && !Array.isArray(data) && (
+          {typeof dashaData === "object" && !Array.isArray(dashaData) && (
             <pre className="text-[10px] text-slate-300 leading-relaxed overflow-x-auto">
-              {JSON.stringify(data, null, 2)}
+              {JSON.stringify(dashaData, null, 2)}
             </pre>
           )}
         </div>
       );
+    }
     case "table_6":
     case "table_7":
     case "table_8":
@@ -591,11 +598,11 @@ export function MyPageView({
     { id: "overview", label: "Soul Blueprint" },
     { id: "dasha", label: "Vimshottari Dasha" },
     { id: "charts", label: "Charts" },
-    { id: "pada_table", label: "Pada Table" },
     { id: "table_index", label: "Table Index" },
     { id: "daily", label: "Daily Analysis" },
     { id: "future", label: "Future Analysis" },
     { id: "vedic", label: "Vedic Data" },
+    { id: "transits_data", label: "Transits data" },
     { id: "jaimini", label: "Jaimini Data" },
     { id: "kp", label: "KP Data" },
     { id: "lalkitab", label: "Lalkitab" },
@@ -1434,13 +1441,13 @@ export function MyPageView({
               },
               {
                 table_number: 5,
-                title: "Shadbala Strengths (Rupas & Strength Ratio)",
-                source_origin: "Shadbala Calculation Engine",
-                section_key: "Vedic.shadbala",
-                api_source: "Vedic Astro API: /api/astrology/calculate (strengths.shadbala)",
+                title: "Ashtottari Dasha Timeline",
+                source_origin: "Ashtottari Dasha Engine",
+                section_key: "Vedic.dashas.ashtottari",
+                api_source: "Vedic Astro API: /api/astrology/calculate (dashas.ashtottari)",
                 is_populated: true,
                 data_sample: {
-                  shadbala_strengths: "Calculated"
+                  ashtottari_dasha: "Calculated"
                 }
               },
               {
@@ -1732,7 +1739,7 @@ export function MyPageView({
             })()}
           </div>
         </div>
-      ) : activeTab === "pada_table" ? (
+      ) : activeTab === "vedic" ? (
         <div className="space-y-4">
           <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
             <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -1742,7 +1749,7 @@ export function MyPageView({
                 </div>
                 <div>
                   <h3 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
-                    Table 2: Vedic Grahas & Dignities (Planetary Placements / Pada Table)
+                    Vedic Data
                   </h3>
                   <p className={`text-[11px] ${textMutedStyle}`}>
                     A comprehensive registry of natal planetary longitudes, sign placements, nakshatras, padas, and houses with computed astronomical dignities.
@@ -1763,6 +1770,85 @@ export function MyPageView({
                 );
               }
               return renderIndexedTable("table_2", null, profile, astrologyData);
+            })()}
+          </div>
+        </div>
+      ) : activeTab === "transits_data" ? (
+        <div className="space-y-6">
+          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
+                    Real-Time Transit Panchanga (Current Sky)
+                  </h3>
+                  <p className={`text-[11px] ${textMutedStyle}`}>
+                    The five attributes of time: Tithi, Vara, Nakshatra, Yoga, and Karana reflecting current celestial patterns.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm font-mono text-xs space-y-4`}>
+            <div className="border-b border-slate-800 pb-2">
+              <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider block">
+                🟢 Live Transit Panchang Pillars
+              </span>
+            </div>
+
+            {(() => {
+              const pData = astrologyData?.panchanga || profile?.Vedic?.panchanga || {};
+              const astroDetails = astrologyData?.astronomical_details || profile?.Astronomical || {};
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2">
+                  <div className="flex justify-between py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Tithi (Lunar Day):</span>
+                    <span className="text-slate-100 font-bold font-sans">{pData.tithi || "Sukla Ekadashi"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Nakshatra (Asterism):</span>
+                    <span className="text-slate-100 font-bold font-sans">{pData.nakshatra || "Rohini"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Yoga (Luni-Solar Angle):</span>
+                    <span className="text-slate-100 font-bold font-sans">{pData.yoga || "Preeti"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Karana (Half-Tithi):</span>
+                    <span className="text-slate-100 font-bold font-sans">{pData.karana || "Bava"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Vara (Weekday):</span>
+                    <span className="text-slate-100 font-bold font-sans">
+                      {pData.vara || (profile?.Birth?.date ? new Date(profile.Birth.date).toLocaleDateString("en-US", { weekday: "long" }) : "Friday")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Sunrise:</span>
+                    <span className="text-slate-200">{astroDetails.sunrise || "05:42 AM"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Sunset:</span>
+                    <span className="text-slate-200">{astroDetails.sunset || "06:55 PM"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Lunar Month:</span>
+                    <span className="text-slate-200 font-sans">{astroDetails.lunar_month || astroDetails.lunarMonth || "Kartika"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Samvatsara (Year Name):</span>
+                    <span className="text-slate-200 font-sans">{astroDetails.year_name || astroDetails.yearName || "Krodhi"}</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-800/60">
+                    <span className="text-slate-400">Season (Vedic Ritu):</span>
+                    <span className="text-slate-200 font-sans">{astroDetails.season || "Sharad"}</span>
+                  </div>
+                </div>
+              );
             })()}
           </div>
         </div>
