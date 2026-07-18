@@ -45,8 +45,41 @@ const PLANET_YEARS: Record<string, number> = {
   Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
 };
 
+function parseSafeDate(str: string): Date {
+  if (!str) return new Date();
+  if (str instanceof Date) return str;
+  const s = String(str).trim();
+  if (s.includes("T")) {
+    return new Date(s);
+  }
+  const parts = s.split(/\s+/);
+  const datePart = parts[0];
+  const timePart = parts[1] || "00:00:00";
+  
+  const dParts = datePart.split("-");
+  const tParts = timePart.split(":");
+  
+  const year = parseInt(dParts[0], 10);
+  const month = parseInt(dParts[1], 10) - 1;
+  const day = parseInt(dParts[2], 10);
+  
+  const hours = parseInt(tParts[0], 10) || 0;
+  const minutes = parseInt(tParts[1], 10) || 0;
+  const seconds = parseInt(tParts[2], 10) || 0;
+  
+  if (isNaN(year) || isNaN(month) || isNaN(day)) {
+    return new Date(s); // Fallback
+  }
+  return new Date(year, month, day, hours, minutes, seconds);
+}
+
 function getSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> {
-  const startIndex = PLANETS_CYCLE.indexOf(parentLord);
+  let cleanLord = parentLord || "";
+  cleanLord = cleanLord.split(" ")[0].trim(); // Extract first word to ignore parentheses like "Rahu (Sankata)"
+  if (cleanLord === "Raagu") cleanLord = "Rahu";
+  if (cleanLord === "Kethu") cleanLord = "Ketu";
+
+  const startIndex = PLANETS_CYCLE.indexOf(cleanLord);
   if (startIndex === -1) return [];
   
   const totalParentMs = parentEnd.getTime() - parentStart.getTime();
@@ -1208,8 +1241,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       const mLord = m.lord || m.lordName || "Unknown";
       const mStart = m.start_date || m.startDate || m.startTime || "";
       const mEnd = m.end_date || m.endDate || m.endTime || "";
-      const mStartDate = mStart ? new Date(mStart) : new Date();
-      const mEndDate = mEnd ? new Date(mEnd) : new Date(mStartDate.getFullYear() + (PLANET_YEARS[mLord] || 10), mStartDate.getMonth(), mStartDate.getDate());
+      const mStartDate = mStart ? parseSafeDate(mStart) : new Date();
+      const mEndDate = mEnd ? parseSafeDate(mEnd) : new Date(mStartDate.getFullYear() + (PLANET_YEARS[mLord] || 10), mStartDate.getMonth(), mStartDate.getDate());
 
       // Get level 2 (Antar)
       let antarList = m.children || m.subPeriods || [];
@@ -1221,8 +1254,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         const aLord = a.lord || "Unknown";
         const aStart = a.start_date || a.startDate || a.startTime || "";
         const aEnd = a.end_date || a.endDate || a.endTime || "";
-        const aStartDate = aStart ? new Date(aStart) : null;
-        const aEndDate = aEnd ? new Date(aEnd) : null;
+        const aStartDate = aStart ? parseSafeDate(aStart) : null;
+        const aEndDate = aEnd ? parseSafeDate(aEnd) : null;
         
         const start = aStartDate || new Date();
         const end = aEndDate || new Date();
@@ -1237,8 +1270,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           const pLord = p.lord || "Unknown";
           const pStart = p.start_date || p.startDate || p.startTime || "";
           const pEnd = p.end_date || p.endDate || p.endTime || "";
-          const pStartDate = pStart ? new Date(pStart) : null;
-          const pEndDate = pEnd ? new Date(pEnd) : null;
+          const pStartDate = pStart ? parseSafeDate(pStart) : null;
+          const pEndDate = pEnd ? parseSafeDate(pEnd) : null;
           
           const pStartReal = pStartDate || new Date();
           const pEndReal = pEndDate || new Date();
@@ -1253,8 +1286,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             const sLord = s.lord || "Unknown";
             const sStart = s.start_date || s.startDate || s.startTime || "";
             const sEnd = s.end_date || s.endDate || s.endTime || "";
-            const sStartDate = sStart ? new Date(sStart) : null;
-            const sEndDate = sEnd ? new Date(sEnd) : null;
+            const sStartDate = sStart ? parseSafeDate(sStart) : null;
+            const sEndDate = sEnd ? parseSafeDate(sEnd) : null;
             
             const sStartReal = sStartDate || new Date();
             const sEndReal = sEndDate || new Date();
@@ -1272,8 +1305,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               
               return {
                 lord: prLord,
-                start: prStart ? new Date(prStart) : new Date(),
-                end: prEnd ? new Date(prEnd) : new Date()
+                start: prStart ? parseSafeDate(prStart) : new Date(),
+                end: prEnd ? parseSafeDate(prEnd) : new Date()
               };
             });
 
@@ -1321,13 +1354,13 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       const mLord = m.lord || m.lordName || "Unknown";
       const mStart = m.start_date || m.startDate || m.startTime || "";
       const mEnd = m.end_date || m.endDate || m.endTime || "";
-      const mStartDate = mStart ? new Date(mStart) : new Date();
+      const mStartDate = mStart ? parseSafeDate(mStart) : new Date();
       
       const cleanLord = mLord.split(" ")[0];
       const YOGINI_YEARS: Record<string, number> = {
         Mangala: 1, Pingala: 2, Dhanya: 3, Bhramari: 4, Bhadrika: 5, Ulka: 6, Siddha: 7, Sankata: 8
       };
-      const mEndDate = mEnd ? new Date(mEnd) : new Date(mStartDate.getFullYear() + (YOGINI_YEARS[cleanLord] || 5), mStartDate.getMonth(), mStartDate.getDate());
+      const mEndDate = mEnd ? parseSafeDate(mEnd) : new Date(mStartDate.getFullYear() + (YOGINI_YEARS[cleanLord] || 5), mStartDate.getMonth(), mStartDate.getDate());
 
       // Get level 2 (Antar)
       let antarList = m.children || m.subPeriods || [];
@@ -1339,8 +1372,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         const aLord = a.lord || "Unknown";
         const aStart = a.start_date || a.startDate || a.startTime || "";
         const aEnd = a.end_date || a.endDate || a.endTime || "";
-        const aStartDate = aStart ? new Date(aStart) : null;
-        const aEndDate = aEnd ? new Date(aEnd) : null;
+        const aStartDate = aStart ? parseSafeDate(aStart) : null;
+        const aEndDate = aEnd ? parseSafeDate(aEnd) : null;
         
         const start = aStartDate || new Date();
         const end = aEndDate || new Date();
@@ -1355,8 +1388,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           const pLord = p.lord || "Unknown";
           const pStart = p.start_date || p.startDate || p.startTime || "";
           const pEnd = p.end_date || p.endDate || p.endTime || "";
-          const pStartDate = pStart ? new Date(pStart) : null;
-          const pEndDate = pEnd ? new Date(pEnd) : null;
+          const pStartDate = pStart ? parseSafeDate(pStart) : null;
+          const pEndDate = pEnd ? parseSafeDate(pEnd) : null;
           
           const pStartReal = pStartDate || new Date();
           const pEndReal = pEndDate || new Date();
@@ -1371,8 +1404,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             const sLord = s.lord || "Unknown";
             const sStart = s.start_date || s.startDate || s.startTime || "";
             const sEnd = s.end_date || s.endDate || s.endTime || "";
-            const sStartDate = sStart ? new Date(sStart) : null;
-            const sEndDate = sEnd ? new Date(sEnd) : null;
+            const sStartDate = sStart ? parseSafeDate(sStart) : null;
+            const sEndDate = sEnd ? parseSafeDate(sEnd) : null;
             
             const sStartReal = sStartDate || new Date();
             const sEndReal = sEndDate || new Date();
@@ -1390,8 +1423,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               
               return {
                 lord: prLord,
-                start: prStart ? new Date(prStart) : new Date(),
-                end: prEnd ? new Date(prEnd) : new Date()
+                start: prStart ? parseSafeDate(prStart) : new Date(),
+                end: prEnd ? parseSafeDate(prEnd) : new Date()
               };
             });
 
@@ -1439,13 +1472,13 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       const mLord = m.lord || m.lordName || "Unknown";
       const mStart = m.start_date || m.startDate || m.startTime || "";
       const mEnd = m.end_date || m.endDate || m.endTime || "";
-      const mStartDate = mStart ? new Date(mStart) : new Date();
+      const mStartDate = mStart ? parseSafeDate(mStart) : new Date();
       
       const ASHTOTTARI_YEARS: Record<string, number> = {
         Sun: 6, Moon: 15, Mars: 8, Mercury: 17, Saturn: 10, Jupiter: 19, Rahu: 12, Venus: 21
       };
       const cleanLord = mLord.split(" ")[0];
-      const mEndDate = mEnd ? new Date(mEnd) : new Date(mStartDate.getFullYear() + (ASHTOTTARI_YEARS[cleanLord] || 10), mStartDate.getMonth(), mStartDate.getDate());
+      const mEndDate = mEnd ? parseSafeDate(mEnd) : new Date(mStartDate.getFullYear() + (ASHTOTTARI_YEARS[cleanLord] || 10), mStartDate.getMonth(), mStartDate.getDate());
 
       // Get level 2 (Antar)
       let antarList = m.children || m.subPeriods || [];
@@ -1457,8 +1490,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         const aLord = a.lord || "Unknown";
         const aStart = a.start_date || a.startDate || a.startTime || "";
         const aEnd = a.end_date || a.endDate || a.endTime || "";
-        const aStartDate = aStart ? new Date(aStart) : null;
-        const aEndDate = aEnd ? new Date(aEnd) : null;
+        const aStartDate = aStart ? parseSafeDate(aStart) : null;
+        const aEndDate = aEnd ? parseSafeDate(aEnd) : null;
         
         const start = aStartDate || new Date();
         const end = aEndDate || new Date();
@@ -1473,8 +1506,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           const pLord = p.lord || "Unknown";
           const pStart = p.start_date || p.startDate || p.startTime || "";
           const pEnd = p.end_date || p.endDate || p.endTime || "";
-          const pStartDate = pStart ? new Date(pStart) : null;
-          const pEndDate = pEnd ? new Date(pEnd) : null;
+          const pStartDate = pStart ? parseSafeDate(pStart) : null;
+          const pEndDate = pEnd ? parseSafeDate(pEnd) : null;
           
           const pStartReal = pStartDate || new Date();
           const pEndReal = pEndDate || new Date();
@@ -1489,8 +1522,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             const sLord = s.lord || "Unknown";
             const sStart = s.start_date || s.startDate || s.startTime || "";
             const sEnd = s.end_date || s.endDate || s.endTime || "";
-            const sStartDate = sStart ? new Date(sStart) : null;
-            const sEndDate = sEnd ? new Date(sEnd) : null;
+            const sStartDate = sStart ? parseSafeDate(sStart) : null;
+            const sEndDate = sEnd ? parseSafeDate(sEnd) : null;
             
             const sStartReal = sStartDate || new Date();
             const sEndReal = sEndDate || new Date();
@@ -1508,8 +1541,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               
               return {
                 lord: prLord,
-                start: prStart ? new Date(prStart) : new Date(),
-                end: prEnd ? new Date(prEnd) : new Date()
+                start: prStart ? parseSafeDate(prStart) : new Date(),
+                end: prEnd ? parseSafeDate(prEnd) : new Date()
               };
             });
 

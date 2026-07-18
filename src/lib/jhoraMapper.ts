@@ -20,9 +20,9 @@ export function parseJHoraDasha(rawList: Array<[string, string]>): DashaPeriod[]
     const a = parts[1] || parts[0];
     const p = parts[2] || parts[1] || parts[0];
     
-    // Format date string to YYYY-MM-DD
-    const startDate = startStr.split(" ")[0];
-    const endDate = nextStartStr.split(" ")[0];
+    // Format date string - preserve full date and time for maximum precision
+    const startDate = startStr;
+    const endDate = nextStartStr;
     
     if (!mahaMap.has(m)) {
       mahaMap.set(m, {
