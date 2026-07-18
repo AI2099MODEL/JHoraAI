@@ -24,7 +24,8 @@ import {
   Award as RibbonIcon,
   FileDown,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Grid
 } from "lucide-react";
 
 interface MyPageViewProps {
@@ -47,7 +48,7 @@ const IconMap: { [key: string]: React.ComponentType<any> } = {
   award: Award,
 };
 
-function renderIndexedTable(tableId: string, data: any) {
+function renderIndexedTable(tableId: string, data: any, profile?: any, astrologyData?: any) {
   if (!data) return null;
   
   const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
@@ -160,7 +161,6 @@ function renderIndexedTable(tableId: string, data: any) {
     case "table_9":
     case "table_11":
     case "table_12":
-    case "table_13":
     default:
       return (
         <div className="p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 text-xs font-mono max-h-[300px] overflow-y-auto">
@@ -169,6 +169,92 @@ function renderIndexedTable(tableId: string, data: any) {
           </pre>
         </div>
       );
+    case "table_13": {
+      // Divisional Charts Shodashavargas Matrix
+      const divisional = data || profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts || {};
+      const PLANET_ORDER = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+      const STANDARD_VARGAS = ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D16", "D20", "D24", "D27", "D30", "D40", "D45", "D60"];
+      const ZODIAC_SIGNS_ABBR = ["Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi"];
+      const ZODIAC_SIGNS_FULL = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+
+      return (
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
+          <table className={baseTableStyle}>
+            <thead>
+              <tr className="bg-slate-900 border-b border-slate-800 text-amber-500">
+                <th className={`${thStyle} border-r border-slate-800/60`}>Varga Chart</th>
+                <th className={thStyle}>ASC</th>
+                {PLANET_ORDER.map(p => (
+                  <th key={p} className={thStyle}>{p.substring(0, 3).toUpperCase()}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/30 text-slate-300">
+              {STANDARD_VARGAS.map(vKey => {
+                const vObj = divisional[vKey] || {};
+                const ascObj = vObj.ascendant || {};
+                let ascSignAbbr = "Ar";
+                if (ascObj.sign) {
+                  const signIdx = ZODIAC_SIGNS_FULL.indexOf(ascObj.sign);
+                  ascSignAbbr = signIdx !== -1 ? ZODIAC_SIGNS_ABBR[signIdx] : ascObj.sign.substring(0, 2);
+                } else if (profile?.Vedic?.ascendant?.sign) {
+                  const signIdx = ZODIAC_SIGNS_FULL.indexOf(profile.Vedic.ascendant.sign);
+                  ascSignAbbr = signIdx !== -1 ? ZODIAC_SIGNS_ABBR[signIdx] : "Ar";
+                }
+
+                return (
+                  <tr key={vKey} className="hover:bg-amber-500/5 transition-colors">
+                    <td className="py-2 px-3 font-bold text-amber-500 font-sans border-r border-slate-800/60">
+                      {vKey} {vKey === "D1" ? "Rasi" : vKey === "D9" ? "Navamsa" : vKey === "D10" ? "Dasamsa" : ""}
+                    </td>
+                    <td className="py-2 px-3 text-slate-400">
+                      {ascSignAbbr} <span className="text-[9px] text-amber-500 font-bold">(H1)</span>
+                    </td>
+                    {PLANET_ORDER.map(pName => {
+                      const list = vObj.planets || [];
+                      const found = list.find((item: any) => item.planet.toLowerCase() === pName.toLowerCase());
+                      
+                      let signAbbr = "-";
+                      let houseNum = "";
+                      if (found) {
+                        const signIdx = ZODIAC_SIGNS_FULL.indexOf(found.sign);
+                        signAbbr = signIdx !== -1 ? ZODIAC_SIGNS_ABBR[signIdx] : found.sign.substring(0, 2);
+                        houseNum = `H${found.house}`;
+                      } else {
+                        // Check if house_placements is available
+                        const housePlacements = vObj.house_placements || {};
+                        let foundHouse = 0;
+                        for (let h = 1; h <= 12; h++) {
+                          if (housePlacements[String(h)]?.includes(pName)) {
+                            foundHouse = h;
+                            break;
+                          }
+                        }
+                        if (foundHouse > 0) {
+                          houseNum = `H${foundHouse}`;
+                          // estimate sign
+                          let lIdx = ZODIAC_SIGNS_FULL.indexOf(ascObj.sign || profile?.Vedic?.ascendant?.sign || "Aries");
+                          if (lIdx === -1) lIdx = 0;
+                          const sIdx = (lIdx + foundHouse - 1) % 12;
+                          signAbbr = ZODIAC_SIGNS_ABBR[sIdx];
+                        }
+                      }
+
+                      return (
+                        <td key={pName} className="py-2 px-3">
+                          <span className="text-slate-200">{signAbbr}</span>{" "}
+                          <span className="text-[9px] text-amber-500 font-bold">{houseNum}</span>
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
   }
 }
 
@@ -194,6 +280,7 @@ export function MyPageView({
   const tabs = [
     { id: "overview", label: "Soul Blueprint" },
     { id: "dasha", label: "Vimshottari Dasha" },
+    { id: "charts", label: "Charts" },
     { id: "table_index", label: "Table Index" },
     { id: "daily", label: "Daily Analysis" },
     { id: "future", label: "Future Analysis" },
@@ -1126,14 +1213,13 @@ export function MyPageView({
               },
               {
                 table_number: 13,
-                title: "Jaimini Parameters & Chara Dashas",
-                source_origin: "Jaimini Sutra Engine",
-                section_key: "Jaimini",
-                api_source: "Vedic Astro API: /api/astrology/calculate (jaimini)",
+                title: "Vedic Divisional Charts (Shodashavargas) Matrix",
+                source_origin: "Divisional Chart Calculation Engine",
+                section_key: "Vedic.divisional_charts",
+                api_source: "Vedic Astro API: /api/astrology/calculate (divisional_charts)",
                 is_populated: true,
                 data_sample: {
-                  atmakaraka: "Saturn",
-                  karakamsha: "Pisces"
+                  charts_available: ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D16", "D20", "D24", "D27", "D30", "D40", "D45", "D60"]
                 }
               }
             ]).map((table: any, idx: number) => {
@@ -1181,7 +1267,19 @@ export function MyPageView({
                           Indexed: {new Date(indexedTable.indexedAt).toLocaleDateString()}
                         </span>
                       </div>
-                      {renderIndexedTable(`table_${table.table_number}`, indexedTable.data)}
+                      {renderIndexedTable(`table_${table.table_number}`, indexedTable.data, profile, astrologyData)}
+                    </div>
+                  ) : table.table_number === 13 && (profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts) ? (
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider">
+                          🟢 LIVE INTEGRATED DATA (Divisional Charts)
+                        </span>
+                        <span className="text-[9px] font-mono text-amber-500/80">
+                          Ready from Vedic Profile
+                        </span>
+                      </div>
+                      {renderIndexedTable(`table_${table.table_number}`, null, profile, astrologyData)}
                     </div>
                   ) : (
                     <div className="p-3.5 rounded-lg bg-slate-950/40 border border-slate-800/80 space-y-2">
@@ -1244,6 +1342,40 @@ export function MyPageView({
               return (
                 <DashaTree dashas={rawDashas} />
               );
+            })()}
+          </div>
+        </div>
+      ) : activeTab === "charts" ? (
+        <div className="space-y-4">
+          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                  <Grid className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
+                    Table 13: Vedic Divisional Charts (Shodashavargas) Matrix
+                  </h3>
+                  <p className={`text-[11px] ${textMutedStyle}`}>
+                    A comprehensive matrix of the 20 primary divisional charts (Vargas) representing specific dimensions of karma, destiny, and life potential.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            {(() => {
+              const divisional = profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts || {};
+              if (Object.keys(divisional).length === 0) {
+                return (
+                  <div className="text-center py-8 text-xs text-slate-500 font-mono">
+                    ⚠️ No Divisional Chart data available. Please generate or load user particulars.
+                  </div>
+                );
+              }
+              return renderIndexedTable("table_13", divisional, profile, astrologyData);
             })()}
           </div>
         </div>
