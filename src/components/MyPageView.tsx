@@ -746,12 +746,12 @@ export function MyPageView({
                   karakamsha: "Pisces"
                 }
               }
-            ]).map((table: any) => {
+            ]).map((table: any, idx: number) => {
               const indexedTable = profile?.User?.indexedTables?.[`table_${table.table_number}`] || profile?.User?.indexedTables?.[table.table_number];
               const isPopulated = !!indexedTable;
 
               return (
-                <div key={table.table_number} className={`p-5 rounded-xl border ${cardStyle} hover:border-amber-500/20 transition-all space-y-3`}>
+                <div key={`${table.table_number}-${idx}`} className={`p-5 rounded-xl border ${cardStyle} hover:border-amber-500/20 transition-all space-y-3`}>
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div className="space-y-1">
                       <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
