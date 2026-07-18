@@ -844,6 +844,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "kp_planet_analysis", label: "kpPlanets*" },
       { id: "kp_significators", label: "kpSignificators*" },
       { id: "kp_houses_significators", label: "kpHouses*" },
+      { id: "kp_planet_to_house", label: "kpPlanetToHouse*" },
       { id: "kp_ruling_planets", label: "kpRulingPlanets*" },
       { id: "kp_dasha", label: "kpDasha*" },
       { id: "kp_rulebook", label: "kpRulebook*" },
@@ -951,7 +952,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
     "argalas", "charaDasha", "panchapakshi", "lalkitab", "gemstones", "numerology",
     "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
-    "kp_significators", "kp_houses_significators", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
+    "kp_significators", "kp_houses_significators", "kp_planet_to_house", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
     "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
     "eso_nadi", "eso_lalkitab", "eso_varshaphala", "eso_bazi", "eso_numerology", "eso_celtic", "eso_mayan"
   ];
@@ -961,6 +962,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     { id: "kp_planet_analysis", label: "Planet Analysis" },
     { id: "kp_significators", label: "Significators" },
     { id: "kp_houses_significators", label: "Houses & Unique Significators" },
+    { id: "kp_planet_to_house", label: "Planet to House Mappings" },
     { id: "kp_ruling_planets", label: "Ruling Planets" },
     { id: "kp_dasha", label: "KP Dasha" },
     { id: "kp_rulebook", label: "KP Rulebook" },
@@ -1114,7 +1116,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         } else if (kpSubTab === "kp_planet_analysis" && !kpChartData) {
           const chart = await fetchReportKpData("/api/kp/chart");
           if (active && chart) setKpChartData(chart);
-        } else if ((kpSubTab === "kp_significators" || kpSubTab === "kp_houses_significators") && !kpSignificatorsData) {
+        } else if ((kpSubTab === "kp_significators" || kpSubTab === "kp_houses_significators" || kpSubTab === "kp_planet_to_house") && !kpSignificatorsData) {
           const sigs = await fetchReportKpData("/api/kp/significators");
           if (active && sigs) setKpSignificatorsData(sigs);
         } else if (kpSubTab === "kp_dasha" && !kpDashaData) {
@@ -5789,9 +5791,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         </div>
       )}
 
-        {/* ================= SYSTEM 8: KRISHNAMURTI PADDHATI (KP) ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab.startsWith("kp_"))) && (
-          <div id="report-section-8" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
+        {/* ================= SYSTEM 7 (KP): KRISHNAMURTI PADDHATI (KP) ================= */}
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab.startsWith("kp_") && vedicSubTab !== "kp_planet_to_house")) && (
+          <div id="report-section-7_kp" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
             <div className="border-b border-cyan-500/10 pb-4 mb-6">
@@ -6219,9 +6221,13 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                         </tbody>
                       </table>
                     </div>
+                  </div>
+                )}
 
+                {kpSubTab === "kp_planet_to_house" && (
+                  <div className="space-y-6 animate-fade-in">
                     {/* Reverse lookup: Planet to House significators */}
-                    <div className="space-y-4 pt-6 border-t border-slate-800/40">
+                    <div className="space-y-4">
                       <div className="flex justify-between items-center pb-2">
                         <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono">Planet to House Significator Mappings</h4>
                         <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2 py-0.5 rounded font-mono font-bold uppercase">Reverse Lookup</span>
@@ -6996,6 +7002,446 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ================= SYSTEM 8: PLANET TO HOUSE SIGNIFICATOR MAPPINGS ================= */}
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "kp_planet_to_house")) && (
+          <div id="report-section-8" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-cyan-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                System 8 • Planet to House Significator Mappings
+              </span>
+              <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
+                <Star className="w-5 h-5 text-cyan-400" />
+                8 - PLANET TO HOUSE SIGNIFICATOR MAPPINGS
+              </h2>
+              <p className={`text-xs ${mutedText} mt-1`}>
+                Complete reverse-lookup of planetary significator levels mapped back to the 12 bhavas/houses, with custom-weighted 6-fold KP strength evaluation, priorities, and grading metrics.
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              {/* Reverse lookup: Planet to House significators */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center pb-2">
+                  <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono">Planet to House Significator Mappings</h4>
+                  <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-0.5 rounded font-mono font-bold uppercase">Reverse Lookup</span>
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono">
+                        <th className="p-3.5 w-1/4">Planet</th>
+                        <th className="p-3.5 w-1/2">Signified Houses & Strength Levels</th>
+                        <th className="p-3.5">General Significations & Portfolio</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
+                      {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map((planet) => {
+                        const houses = planetToHouseMap[planet] || [];
+                        const sortedHouses = [...houses].sort((a, b) => a.houseNum - b.houseNum);
+
+                        return (
+                          <tr key={planet} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0">
+                            <td className="p-3.5 font-bold text-cyan-400 font-mono text-xs">{planet}</td>
+                            <td className="p-3.5">
+                              {sortedHouses.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                  {sortedHouses.map((item) => (
+                                    <span
+                                      key={item.houseNum}
+                                      className="text-[10px] px-2.5 py-1 rounded-md font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center gap-1"
+                                    >
+                                      <span className="font-bold text-cyan-400">H{item.houseNum}</span>
+                                      {item.levels.length > 0 && (
+                                        <span className="text-slate-400 text-[9px]">({item.levels.join(", ")})</span>
+                                      )}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-slate-500 italic font-mono text-xs">No signified houses</span>
+                              )}
+                            </td>
+                            <td className="p-3.5 text-xs text-slate-400 leading-relaxed">
+                              {planetPortfolios[planet] || "Astrological significations according to Vedic and KP astrology principles."}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* KP Planet Strength Evaluation Section */}
+              <div className="space-y-5 pt-6 border-t border-slate-800/40">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2">
+                  <div>
+                    <h4 className="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                      <Star className="w-4 h-4 text-amber-500 fill-amber-500/10" />
+                      KP Planet Strength Evaluation &amp; Priorities
+                    </h4>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      Evaluating 6-fold planet strength. Refactored to map a Significator Matrix and execute the separate KP Weight Engine.
+                    </p>
+                  </div>
+                  <span className="text-[10px] bg-cyan-500/15 text-cyan-400 px-2.5 py-1 rounded-full font-mono font-bold uppercase shrink-0">
+                    ⭐ Configurable Weight Engine
+                  </span>
+                </div>
+
+                {/* KP Weight Engine Interactive Configuration */}
+                <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-900/25 space-y-3.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/60 pb-2.5">
+                    <div>
+                      <span className="text-[9px] font-mono text-cyan-400 font-bold uppercase tracking-wider">Weight Matrix Controller</span>
+                      <h5 className="text-xs font-bold text-slate-200 mt-0.5">Customize KP Level Priorities</h5>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      <button
+                        onClick={() => setKpWeights({ L1: 5.0, L2: 4.0, L3: 3.0, L4: 2.0, L5: 1.0, L6: 0.5 })}
+                        className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
+                      >
+                        Classical Preset
+                      </button>
+                      <button
+                        onClick={() => setKpWeights({ L1: 1.0, L2: 1.0, L3: 1.0, L4: 1.0, L5: 1.0, L6: 1.0 })}
+                        className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
+                      >
+                        Equal Weights Preset
+                      </button>
+                      <button
+                        onClick={() => setKpWeights({ L1: 6.0, L2: 2.0, L3: 4.0, L4: 1.0, L5: 3.0, L6: 0.5 })}
+                        className="px-2.5 py-1 text-[9px] font-mono font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 transition-colors cursor-pointer"
+                      >
+                        Stellar Preset
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    {[
+                      { key: "L1", desc: "Star Occupant" },
+                      { key: "L2", desc: "Cusp Occupant" },
+                      { key: "L3", desc: "Star Owner" },
+                      { key: "L4", desc: "Cusp Lord" },
+                      { key: "L5", desc: "Sub Occupant" },
+                      { key: "L6", desc: "Sub Owner" }
+                    ].map((item) => {
+                      const k = item.key as keyof typeof kpWeights;
+                      return (
+                        <div key={k} className="p-2.5 rounded-lg bg-slate-950/50 border border-slate-800/80 flex flex-col justify-between space-y-2">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] font-bold text-slate-300 font-mono">{k}</span>
+                            <span className="text-[10px] font-bold text-cyan-400 font-mono bg-cyan-500/10 px-1.5 py-0.2 rounded border border-cyan-500/10">
+                              {kpWeights[k].toFixed(1)}
+                            </span>
+                          </div>
+                          <div className="text-[9px] text-slate-400 font-medium truncate">{item.desc}</div>
+                          <input
+                            type="range"
+                            min="0"
+                            max="10"
+                            step="0.5"
+                            value={kpWeights[k]}
+                            onChange={(e) => setKpWeights(prev => ({ ...prev, [k]: parseFloat(e.target.value) }))}
+                            className="w-full accent-cyan-500 cursor-pointer h-1 bg-slate-800 rounded-lg appearance-none"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Filters & Statistics Summary Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+                  {/* Filters Column */}
+                  <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {/* Planet Filter */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-mono text-slate-400 uppercase font-bold">Filter Planet</label>
+                      <select
+                        value={kpStrengthPlanetFilter}
+                        onChange={(e) => setKpStrengthPlanetFilter(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
+                      >
+                        <option value="All">All Planets</option>
+                        {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map(p => (
+                          <option key={p} value={p}>{p}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* House Filter */}
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-mono text-slate-400 uppercase font-bold">Filter House</label>
+                      <select
+                        value={kpStrengthHouseFilter}
+                        onChange={(e) => setKpStrengthHouseFilter(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-cyan-500"
+                      >
+                        <option value="All">All Houses</option>
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (
+                          <option key={h} value={`House ${h}`}>House {h}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Reset Filters Button */}
+                    <div className="flex items-end">
+                      <button
+                        onClick={() => {
+                          setKpStrengthPlanetFilter("All");
+                          setKpStrengthHouseFilter("All");
+                          setKpStrengthSortField("planet");
+                          setKpStrengthSortOrder("asc");
+                        }}
+                        className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-slate-700 font-mono transition-colors cursor-pointer"
+                      >
+                        Clear Filters
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Summary Metrics Panel */}
+                  <div className="lg:col-span-4 bg-slate-900/40 border border-slate-800/60 rounded-xl p-2.5 flex justify-around text-center">
+                    <div>
+                      <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Total Evaluated</div>
+                      <div className="text-sm font-bold font-mono text-cyan-400 mt-0.5">
+                        {filteredAndSortedPlanetStrength.length}
+                      </div>
+                    </div>
+                    <div className="border-l border-slate-800 h-8 self-center"></div>
+                    <div>
+                      <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Very High/High</div>
+                      <div className="text-sm font-bold font-mono text-emerald-400 mt-0.5">
+                        {filteredAndSortedPlanetStrength.filter(r => r.grade === "Very High" || r.grade === "High").length}
+                      </div>
+                    </div>
+                    <div className="border-l border-slate-800 h-8 self-center"></div>
+                    <div>
+                      <div className="text-[10px] text-slate-500 font-mono uppercase font-bold">Medium/Low</div>
+                      <div className="text-sm font-bold font-mono text-amber-500 mt-0.5">
+                        {filteredAndSortedPlanetStrength.filter(r => r.grade === "Medium" || r.grade === "Low").length}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Interactive Data Table */}
+                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/20">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 font-mono select-none">
+                        <th 
+                          className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors"
+                          onClick={() => {
+                            if (kpStrengthSortField === "planet") {
+                              setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
+                            } else {
+                              setKpStrengthSortField("planet");
+                              setKpStrengthSortOrder("asc");
+                            }
+                          }}
+                        >
+                          <div className="flex items-center gap-1">
+                            Planet
+                            {kpStrengthSortField === "planet" && (
+                              <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
+                            )}
+                          </div>
+                        </th>
+                        <th 
+                          className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors"
+                          onClick={() => {
+                            if (kpStrengthSortField === "houseNum") {
+                              setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
+                            } else {
+                              setKpStrengthSortField("houseNum");
+                              setKpStrengthSortOrder("asc");
+                            }
+                          }}
+                        >
+                          <div className="flex items-center gap-1">
+                            House / Bhava
+                            {kpStrengthSortField === "houseNum" && (
+                              <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
+                            )}
+                          </div>
+                        </th>
+                        <th className="p-3 text-center">L1</th>
+                        <th className="p-3 text-center">L2</th>
+                        <th className="p-3 text-center">L3</th>
+                        <th className="p-3 text-center">L4</th>
+                        <th className="p-3 text-center">L5</th>
+                        <th className="p-3 text-center">L6</th>
+                        <th 
+                          className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
+                          onClick={() => {
+                            if (kpStrengthSortField === "count") {
+                              setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
+                            } else {
+                              setKpStrengthSortField("count");
+                              setKpStrengthSortOrder("desc");
+                            }
+                          }}
+                        >
+                          <div className="flex items-center justify-center gap-1">
+                            Count
+                            {kpStrengthSortField === "count" && (
+                              <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
+                            )}
+                          </div>
+                        </th>
+                        <th 
+                          className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
+                          onClick={() => {
+                            if (kpStrengthSortField === "score") {
+                              setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
+                            } else {
+                              setKpStrengthSortField("score");
+                              setKpStrengthSortOrder("desc");
+                            }
+                          }}
+                        >
+                          <div className="flex items-center justify-center gap-1">
+                            Score
+                            {kpStrengthSortField === "score" && (
+                              <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
+                            )}
+                          </div>
+                        </th>
+                        <th 
+                          className="p-3 cursor-pointer hover:bg-slate-800/40 hover:text-slate-200 transition-colors text-center"
+                          onClick={() => {
+                            if (kpStrengthSortField === "grade") {
+                              setKpStrengthSortOrder(prev => prev === "asc" ? "desc" : "asc");
+                            } else {
+                              setKpStrengthSortField("grade");
+                              setKpStrengthSortOrder("desc");
+                            }
+                          }}
+                        >
+                          <div className="flex items-center justify-center gap-1">
+                            Strength Grade
+                            {kpStrengthSortField === "grade" && (
+                              <span className="text-cyan-400 text-[10px]">{kpStrengthSortOrder === "asc" ? " ▲" : " ▼"}</span>
+                            )}
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/20 text-slate-300 font-sans">
+                      {filteredAndSortedPlanetStrength.length > 0 ? (
+                        filteredAndSortedPlanetStrength.map((row, index) => {
+                          const houseSanskritMap: Record<number, string> = {
+                            1: "Ascendant (Tanu)",
+                            2: "Wealth (Dhana)",
+                            3: "Siblings (Sahaja)",
+                            4: "Home & Comfort (Sukha)",
+                            5: "Progeny & Intellect (Putra)",
+                            6: "Debts & Enemies (Shatru)",
+                            7: "Spouse & Partnership (Yuvati)",
+                            8: "Longevity (Randhra)",
+                            9: "Fortune & Dharma (Dharma)",
+                            10: "Career & Status (Karma)",
+                            11: "Gains & Wishes (Labha)",
+                            12: "Losses & Moksha (Vyaya)"
+                          };
+
+                          return (
+                            <tr key={`${row.planet}-${row.houseNum}-${index}`} className="hover:bg-slate-900/10 font-sans border-b border-slate-800/10 last:border-0 transition-colors">
+                              <td className="p-3 font-bold text-cyan-300 font-mono text-xs">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                                  {row.planet}
+                                </div>
+                              </td>
+                              <td className="p-3 text-xs text-slate-200">
+                                <span className="font-mono font-bold text-slate-300 bg-slate-900 px-1.5 py-0.5 rounded mr-1.5">H{row.houseNum}</span>
+                                <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">{houseSanskritMap[row.houseNum] || `House ${row.houseNum}`}</span>
+                              </td>
+                              <td className="p-3 text-center text-xs">
+                                {row.L1 ? (
+                                  <span className="text-emerald-400 font-extrabold" title="L1 Active">✅</span>
+                                ) : (
+                                  <span className="text-slate-700" title="L1 Inactive">❌</span>
+                                )}
+                              </td>
+                              <td className="p-3 text-center text-xs">
+                                {row.L2 ? (
+                                  <span className="text-emerald-400 font-extrabold" title="L2 Active">✅</span>
+                                ) : (
+                                  <span className="text-slate-700" title="L2 Inactive">❌</span>
+                                )}
+                              </td>
+                              <td className="p-3 text-center text-xs">
+                                {row.L3 ? (
+                                  <span className="text-emerald-400 font-extrabold" title="L3 Active">✅</span>
+                                ) : (
+                                  <span className="text-slate-700" title="L3 Inactive">❌</span>
+                                )}
+                              </td>
+                              <td className="p-3 text-center text-xs">
+                                {row.L4 ? (
+                                  <span className="text-emerald-400 font-extrabold" title="L4 Active">✅</span>
+                                ) : (
+                                  <span className="text-slate-700" title="L4 Inactive">❌</span>
+                                )}
+                              </td>
+                              <td className="p-3 text-center text-xs">
+                                {row.L5 ? (
+                                  <span className="text-emerald-400 font-extrabold" title="L5 Active">✅</span>
+                                ) : (
+                                  <span className="text-slate-700" title="L5 Inactive">❌</span>
+                                )}
+                              </td>
+                              <td className="p-3 text-center text-xs">
+                                {row.L6 ? (
+                                  <span className="text-emerald-400 font-extrabold" title="L6 Active">✅</span>
+                                ) : (
+                                  <span className="text-slate-700" title="L6 Inactive">❌</span>
+                                )}
+                              </td>
+                              <td className="p-3 font-mono text-xs font-bold text-slate-300 text-center">
+                                {row.count}
+                              </td>
+                              <td className="p-3 font-mono text-xs font-extrabold text-cyan-400 text-center bg-cyan-500/5">
+                                {row.score.toFixed(1)}
+                              </td>
+                              <td className="p-3 text-center">
+                                <span className={`text-[10px] px-2.5 py-1 rounded-full font-mono font-bold uppercase tracking-wider shadow-sm border ${
+                                  row.grade === "Very High"
+                                    ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                                    : row.grade === "High"
+                                    ? "bg-teal-500/15 text-teal-400 border-teal-500/30"
+                                    : row.grade === "Medium"
+                                    ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                                    : "bg-rose-500/15 text-rose-400 border-rose-500/30"
+                                }`}>
+                                  {row.grade}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={11} className="p-8 text-center text-slate-500 italic font-mono text-xs">
+                            No records found matching the specified filters.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
