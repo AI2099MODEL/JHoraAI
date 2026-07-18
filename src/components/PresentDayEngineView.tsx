@@ -63,16 +63,19 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
     const fetchHandbook = async () => {
       try {
         const res = await fetch("/api/astrology/rules-handbook");
-        const data = await res.json();
-        if (data.content) {
-          const lines = data.content.split("\n");
-          const rules: any[] = [];
-          let currentSectionNum = 0;
-          let currentSectionTitle = "";
-          let currentSystem = "";
-          
-          for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
+        if (res.ok) {
+          const contentType = res.headers.get("content-type") || "";
+          if (contentType.includes("application/json")) {
+            const data = await res.json();
+            if (data.content) {
+              const lines = data.content.split("\n");
+              const rules: any[] = [];
+              let currentSectionNum = 0;
+              let currentSectionTitle = "";
+              let currentSystem = "";
+              
+              for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
             if (line.startsWith("### ")) {
               const secText = line.substring(4).trim();
               const numMatch = secText.match(/^(\d+)/);
@@ -116,6 +119,8 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
             }
           }
           setHandbookRules(rules);
+            }
+          }
         }
       } catch (err) {
         console.error("Failed to load rules handbook in PresentDayEngineView:", err);

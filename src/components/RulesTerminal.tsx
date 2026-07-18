@@ -194,6 +194,10 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
     setError(null);
     try {
       const res = await fetch("/api/astrology/rules-handbook");
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error("Server returned non-JSON response (" + contentType + "). Please verify the server is fully started.");
+      }
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       
@@ -225,6 +229,10 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
         body: JSON.stringify({ content: mdContent })
       });
 
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error("Server returned non-JSON response (" + contentType + "). Failed to save changes.");
+      }
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 

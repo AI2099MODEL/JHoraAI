@@ -358,11 +358,16 @@ export default function App() {
       const hbRes = await fetch("/api/astrology/rules-handbook");
       let handbookRulesFound = 0;
       if (hbRes.ok) {
-        const hbData = await hbRes.json();
-        const content = hbData.content || "";
-        const ruleMatches = content.match(/Condition:/g) || [];
-        handbookRulesFound = ruleMatches.length;
-        logs.push(`[${new Date().toLocaleTimeString()}] Handbook successfully scanned. Found ${handbookRulesFound} active astrological condition rules.`);
+        const hbContentType = hbRes.headers.get("content-type") || "";
+        if (hbContentType.includes("application/json")) {
+          const hbData = await hbRes.json();
+          const content = hbData.content || "";
+          const ruleMatches = content.match(/Condition:/g) || [];
+          handbookRulesFound = ruleMatches.length;
+          logs.push(`[${new Date().toLocaleTimeString()}] Handbook successfully scanned. Found ${handbookRulesFound} active astrological condition rules.`);
+        } else {
+          logs.push(`[${new Date().toLocaleTimeString()}] Warning: Handbook scan returned non-JSON content: ${hbContentType}`);
+        }
       } else {
         logs.push(`[${new Date().toLocaleTimeString()}] Warning: Handbook scan returned status ${hbRes.status}. Using fallback rulebook schema.`);
       }
@@ -386,8 +391,13 @@ export default function App() {
       });
 
       if (autoagentRes.ok) {
-        const autoagentData = await autoagentRes.json();
-        logs.push(`[${new Date().toLocaleTimeString()}] Backend Autoagent Response: ${autoagentData.message} (Checked ${autoagentData.stepsChecked} engine steps).`);
+        const autoContentType = autoagentRes.headers.get("content-type") || "";
+        if (autoContentType.includes("application/json")) {
+          const autoagentData = await autoagentRes.json();
+          logs.push(`[${new Date().toLocaleTimeString()}] Backend Autoagent Response: ${autoagentData.message} (Checked ${autoagentData.stepsChecked} engine steps).`);
+        } else {
+          logs.push(`[${new Date().toLocaleTimeString()}] Warning: Backend Autoagent returned non-JSON content: ${autoContentType}`);
+        }
       } else {
         logs.push(`[${new Date().toLocaleTimeString()}] Backend Autoagent connection bypassed. Relying on client-side cache.`);
       }
