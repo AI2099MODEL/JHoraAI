@@ -2,35 +2,37 @@
 
 Welcome to the **Master Evaluation Handbook**, the authoritative index, registry, and rulebook for JHora AI's unified astrological engines. This document serves as the ground truth of data structures, provenances, and evaluation gates.
 
+> **Execution Directive:** This handbook stores only the indices, data schema, structural logic, and rule conditions. Individual user data is stored dynamically within separate files in the `Users/` directory (e.g., `userprofile.json` representing the active profile). The client dashboard dynamically reads and populates these values based on the active session profile.
+
 ---
 
 ## I. ASTROLOGICAL DATA INDEX & REGISTRY
 
-This index catalogs the primary data tables, variables, and calculation systems dynamically populated by the JHora calculation engines.
+This index catalogs the primary data tables, variables, and calculation schemas dynamically populated by the JHora calculation engines.
 
 ### 100. Evaluation Data Index & Birth Registry
-* **Registry Source File:** `/Users/userprofile.json` (Primary active profile payload)
-* **Status:** Synchronized with active user credentials and dynamic calculations.
+* **Registry Source File:** `/Users/userprofile.json` (Active profile payload)
+* **Status:** Dynamically populated based on active selected profile session.
 
-#### Table 1: Birth Details (Active Profile - Nitin)
-This table acts as the absolute astronomical foundation for all subsequent divisional chart, dasha timeline, and transit calculations.
+#### Table 1: Birth Details (Data Schema & Index Logic)
+This table represents the layout schema of the primary birth particulars. The engine maps these parameters as the absolute mathematical foundation for divisional chart calculations, dasha timelines, and planetary transits.
 
-| Parameter | Value | Source / Ephemeris / Provenance |
+| Parameter | Data Type | Logic & Provenance Source |
 | :--- | :--- | :--- |
-| **Profile Name** | Nitin | Client Local Profile Selection / `Users/userprofile.json` |
-| **User Email** | guest@jhora.ai | Mapped from user authentication session |
-| **Birth Date** | 1976-01-06 | Primary Birth Input (Standard ISO: YYYY-MM-DD) |
-| **Birth Time** | 18:40:00 | Primary Birth Input (Standard 24-hour HH:MM:SS) |
-| **Latitude** | 30.3165 | Mapped from Geographical GPS coordinate lookup |
-| **Longitude** | 78.0322 | Mapped from Geographical GPS coordinate lookup |
-| **Timezone** | 5.5 (UTC +05:30) | Verified local timezone offset for North India |
-| **Place** | Dehradun, Uttarakhand, India | Resolved location name from coordinates database |
-| **Ayanamsa** | Lahiri | Mapped via Lahiri projection algorithms |
-| **Julian Day Number** | 2442784.277778 | Mapped from UTC date-time representation |
-| **Sidereal Time** | 06:54:02 | Derived local sidereal coordinate representation |
-| **Obliquity** | 23° 26' 33" | Celestial obliquity derived from Julian Century epoch |
-| **Ephemeris Used** | Swiss Ephemeris / JHora Calculation Engine | Swiss Ephemeris Standard Library / JHora Engine |
-| **House System** | Placidus / KP Cusps | Placidus Division Engine with local cusp parameters |
+| **Profile Name** | `string` | Loaded dynamically from selected profile (`User.profile_name`) |
+| **User Email** | `string` | Loaded dynamically from selected profile session (`User.email`) |
+| **Birth Date** | `string (YYYY-MM-DD)` | Loaded dynamically from birth parameters (`Birth.date`) |
+| **Birth Time** | `string (HH:MM:SS)` | Loaded dynamically from birth parameters (`Birth.time`) |
+| **Latitude** | `float` | Geographical coordinates mapped via city database lookup (`Birth.latitude`) |
+| **Longitude** | `float` | Geographical coordinates mapped via city database lookup (`Birth.longitude`) |
+| **Timezone** | `float` | Local UTC timezone offset derived during calculation (`Birth.timezone`) |
+| **Place** | `string` | Resolved location name from geographical coordinates database (`Birth.place`) |
+| **Ayanamsa** | `string` | Calculation mode standard selected by user (e.g., Lahiri) (`Birth.ayanamsa`) |
+| **Julian Day Number**| `string` | Derived mathematically from UTC birth moment timestamp (`Birth.julian_day_number`) |
+| **Sidereal Time** | `string` | Calculated Local Sidereal Time for birth coordinates (`Birth.local_sidereal_time`) |
+| **Obliquity** | `string` | Obliquity of the ecliptic derived for Julian epoch (`Birth.obliquity`) |
+| **Ephemeris Used** | `string` | Calculation engine background source (`Birth.ephemeris_used`) |
+| **House System** | `string` | Structural house division rules applied (e.g., Placidus / KP Cusps) |
 
 ---
 
