@@ -1726,76 +1726,162 @@ Synthesize a professional, beautifully structured consultation. Return a JSON ma
 app.post("/api/astrology/master-ask", async (req, res) => {
   const { astrologyData, question, history, targetAge } = req.body;
 
-  try {
-    const openai = getOpenAIClient(req);
+  // 1. Read users json file (userprofile.json) from disk for precise, fast, and secure context
+  const filePath = path.join(process.cwd(), "Users", "userprofile.json");
+  let userProfile: any = null;
+  if (fs.existsSync(filePath)) {
+    try {
+      const content = fs.readFileSync(filePath, "utf-8");
+      userProfile = JSON.parse(content);
+    } catch (err) {
+      console.error("Failed to parse userprofile.json in master-ask:", err);
+    }
+  }
 
+  // Merge incoming astrologyData from request body with loaded profile from disk for maximum high-fidelity input
+  const mergedProfile = {
+    ...(userProfile || {}),
+    ...(astrologyData || {})
+  };
+
+  try {
     const formattedHistory = (history || [])
       .map((h: any) => `${h.sender === "user" ? "User" : "Astrologer"}: ${h.text}`)
       .join("\n");
 
+    const userName = mergedProfile.User?.profile_name || "Seeker";
+    const userEmail = mergedProfile.User?.email || "guest@jhora.ai";
+    const soulSynthesis = mergedProfile.User?.SoulSynthesis || "None cached yet.";
+    const birthDate = mergedProfile.Birth?.date || "Unknown";
+    const birthTime = mergedProfile.Birth?.time || "Unknown";
+    const birthPlace = mergedProfile.Birth?.place || "Unknown";
+    
+    // Extract key Vedic and Astronomical metrics
+    const moonPhase = mergedProfile.Astronomical?.moon_phase || "Unknown";
+    const ascendantSign = mergedProfile.Vedic?.ascendant?.sign || "Unknown";
+    const ascendantNakshatra = mergedProfile.Vedic?.ascendant?.nakshatra || "Unknown";
+    const season = mergedProfile.Astronomical?.season || "Unknown";
+    const yearName = mergedProfile.Astronomical?.year_name || "Unknown";
+
     const systemInstruction = `You are JHoraAI's Master AI Astrologer, the unified intelligence core of the entire application.
 You are directly connected to all 7 relationship systems (Vedic, KP, Jaimini, Nadi, Lal Kitab, Tajik, Western), the Unified Evidence and Decision Engines, the Astrological Reasoning Engine, and the Knowledge Center.
-
-LAWS OF CELESTIAL ANALYSIS:
-1. Automatically detect the user's intent. For example:
-   - "When will I marry?" -> Load Timeline, KP, Vedic, Jaimini, Nadi, Tajik, Decisions.
-   - "Why marriage delay?" -> Load Delay, Saturn, DBA, Transits, Rules, Knowledge Center.
-   - "Explain spouse." -> Load Spouse traits, Decisions, Knowledge Center.
-2. Formulate your conversational reply using elegant markdown. CITE specific decision codes and rule IDs in brackets (e.g. [KP_DEC_PROMISE_01], [System: Vedic]) where applicable to maintain rigorous tracing integrity.
-3. Chat memory is active: reference previous decisions or reports if present in the history.
-4. Internet tool integration: Use Google Search ONLY for current dates, planetary ephemeris, legal/divorce laws, psychology/counseling literature, historical cases, or astronomy definitions. Never let search override calculated mathematical rules.
-5. KNOWLEDGE ACQUISITION ENGINES: Analyze the conversation. If a new insight, counseling pattern, user correction, or research detail is discovered, populate "candidateKnowledge" with classification, source, index category, and confidence level. Otherwise, keep it null.
-
-You MUST respond in a clean JSON format matching the schema provided. No markdown backticks wrapper around the JSON in the response. Return raw JSON text.`;
+You have direct, full-read access to the user's static profile JSON and their custom "Soul Blueprint Synthesis" page data.
+Use the active birth profile, dasha periods, planetary coordinates, and evaluation age to answer their questions with complete precision and deep empathetic insight.
+Return your response structured in a clean JSON format matching the schema.`;
 
     const userPrompt = `
-Birth Details & Current Calculation Data:
-${astrologyData ? JSON.stringify(astrologyData, null, 2) : "No birth details configured."}
+You are consulting for logged-in user: ${userName} (${userEmail}).
+Birth MOMENT details: Born on ${birthDate} at ${birthTime} in ${birthPlace}.
+Astronomical Metrics: Moon Phase (Tithi): ${moonPhase}, Season: ${season}, Vedic Year: ${yearName}.
+Ascendant (Lagna): ${ascendantSign} in ${ascendantNakshatra} Nakshatra.
 
-Selected Target Evaluation Age: ${targetAge || 28}
+SOUL BLUEPRINT SYNTHESIS (Page Data):
+"${soulSynthesis}"
+
+Full Nested Astrological Profile Data (Natal coordinates, houses, Dashas, aspects):
+${JSON.stringify(mergedProfile, null, 2)}
 
 Active Dialogue History:
 ${formattedHistory || "None."}
 
-Current User Message:
+Current User Message / Question:
 "${question || "Hello, analyze my chart."}"
 
-Synthesize a professional response. Return a JSON matching the requested schema.
+Selected Target Evaluation Age: ${targetAge || 28}
+
+LAWS OF CELESTIAL ANALYSIS:
+1. Deeply read the user's nested JSON profile (above) and their "Soul Blueprint Synthesis" page data.
+2. Formulate your conversational response with elegant, reassuring, professional counseling-style markdown.
+3. Automatically detect the user's query intent. Cite specific decision codes (e.g. [KP_DEC_PROMISE_01], [VEDIC_DEC_DELAY_01]) or rule IDs in brackets where appropriate to maintain high tracing integrity.
+4. If a new counseling pattern or user-offered correction is discovered in their message, populate candidateKnowledge with categorization. Otherwise, leave it empty or null.
 `;
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemInstruction },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.3,
-        response_format: { type: "json_object" }
-      });
 
-      const text = response.choices[0]?.message?.content || "{}";
-      const output = JSON.parse(text);
-      res.json(output);
-    } catch (apiErr: any) {
-      let keyNotice = "";
-      if (apiErr.message?.includes("No OpenAI API key found")) {
-        console.info("OpenAI API key not provided for master-ask; using local synthesis fallback.");
-        keyNotice = "⚠️ **ChatGPT API Key Missing**: Please set your personal ChatGPT/OpenAI API key in the Settings panel (top-right corner ⚙️) to unlock live GPT-4o-mini readings!\n\n*(Currently running on JHora local high-fidelity rules engine fallback)*\n\n";
-      } else {
-        console.warn("OpenAI API error during Master Ask, using high-fidelity local JSON synthesis fallback:", apiErr);
+    const ai = getGeminiClient();
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: userPrompt,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            reply: {
+              type: Type.STRING,
+              description: "The main conversational response to the user's question, styled elegantly with clean markdown."
+            },
+            intentDetected: {
+              type: Type.OBJECT,
+              properties: {
+                intent: { type: Type.STRING },
+                loadedSystems: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING }
+                },
+                loadedRulebooks: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING }
+                },
+                loadedEvidence: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING }
+                },
+                loadedDecisions: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING }
+                },
+                confidence: { type: Type.INTEGER }
+              },
+              required: ["intent", "loadedSystems", "loadedRulebooks", "loadedEvidence", "loadedDecisions", "confidence"]
+            },
+            candidateKnowledge: {
+              type: Type.OBJECT,
+              properties: {
+                classification: { type: Type.STRING },
+                source: { type: Type.STRING },
+                category: { type: Type.STRING },
+                confidence: { type: Type.INTEGER }
+              }
+            }
+          },
+          required: ["reply", "intentDetected"]
+        }
       }
+    });
 
-      // Detect query intent from question
-      const q = (question || "").toLowerCase();
-      let detectedIntent = "Marriage Promise";
-      let matchedSys = ["Vedic", "KP", "Jaimini"];
-      let matchedRules = ["VEDIC_RULE_PROMISE", "KP_RULE_SUB_LORD"];
-      let replyText = keyNotice;
+    const text = response.text || "{}";
+    const output = JSON.parse(text);
+    res.json(output);
+  } catch (apiErr: any) {
+    console.error("Gemini API error during Master Ask:", apiErr);
+    
+    // High-fidelity local fallback using the active user profile data to make it extremely personalized and responsive
+    const q = (question || "").toLowerCase();
+    const userName = mergedProfile?.User?.profile_name || "Nitin";
+    const birthDate = mergedProfile?.Birth?.date || "1976-01-06";
+    const birthPlace = mergedProfile?.Birth?.place || "Dehradun";
+    const soulSynthesis = mergedProfile?.User?.SoulSynthesis || "";
 
-      if (q.includes("delay") || q.includes("when") || q.includes("time")) {
-        detectedIntent = "Marriage Delay & Timings";
-        matchedSys = ["Vedic", "KP", "Dashas", "Transits"];
-        matchedRules = ["VEDIC_RULE_DELAY", "KP_CUSP_7", "DASHA_TIMING_RULE"];
-        replyText = `Based on your query regarding relationship timings and delay, the JHoraAI multi-system engine has cross-evaluated your Vimshottari Dasha cycles and transits. 
+    let detectedIntent = "General Chart Consultation";
+    let matchedSys = ["Vedic", "KP"];
+    let matchedRules = ["VEDIC_RULE_PROMISE", "KP_RULE_SUB_LORD"];
+    let replyText = "";
+
+    if (apiErr.message?.includes("GEMINI_API_KEY environment variable is required") || apiErr.message?.includes("API key")) {
+      replyText += `⚠️ **Gemini API Key Notice**: Please set your personal \`GEMINI_API_KEY\` in the Settings panel (top-right corner ⚙️) to activate full real-time conversations. In the meantime, here is your high-fidelity offline synthesis from your calculated profile:\n\n`;
+    } else {
+      replyText += `⚠️ **Celestial Session Interrupted** (using offline local synthesis fallback):\n\n`;
+    }
+
+    if (soulSynthesis) {
+      replyText += `### Active Soul Blueprint Synthesis\n*"${soulSynthesis}"*\n\n`;
+    }
+
+    if (q.includes("delay") || q.includes("when") || q.includes("time")) {
+      detectedIntent = "Marriage Delay & Timings";
+      matchedSys = ["Vedic", "KP", "Dashas", "Transits"];
+      matchedRules = ["VEDIC_RULE_DELAY", "KP_CUSP_7", "DASHA_TIMING_RULE"];
+      replyText += `Based on your query regarding relationship timings and delay, JHoraAI has cross-evaluated the birth coordinates for **${userName}** (born **${birthDate}** in **${birthPlace}**).
 
 ### Multi-System Synthesis [System: Vedic, System: KP]
 1. **KP Cuspal Sub-Lord**: The 7th cusp sub-lord is highly supportive, confirming marriage promise [KP_DEC_PROMISE_01].
@@ -1804,11 +1890,11 @@ Synthesize a professional response. Return a JSON matching the requested schema.
 
 ### Actionable Guidance & Remedies
 To dissolve temporary delay blocks, consider chanting 'Om Shukraya Namah' on Fridays, and practicing mindful patience. This is a highly auspicious timeline for personal growth.`;
-      } else if (q.includes("spouse") || q.includes("partner") || q.includes("wife") || q.includes("husband")) {
-        detectedIntent = "Spouse Profile & Character";
-        matchedSys = ["Vedic", "Jaimini", "Western"];
-        matchedRules = ["7TH_HOUSE_SIGN", "DARA_KARAKA_RULE", "WESTERN_SYNASTRY"];
-        replyText = `Regarding your partner's profile and traits, the JHoraAI engines have analyzed the 7th house lord, the Dara Karaka, and key planetary signposts in your D1 and D9 charts.
+    } else if (q.includes("spouse") || q.includes("partner") || q.includes("wife") || q.includes("husband")) {
+      detectedIntent = "Spouse Profile & Character";
+      matchedSys = ["Vedic", "Jaimini", "Western"];
+      matchedRules = ["7TH_HOUSE_SIGN", "DARA_KARAKA_RULE", "WESTERN_SYNASTRY"];
+      replyText += `Regarding partner traits for **${userName}**, the JHoraAI engines have analyzed the 7th house lord, the Dara Karaka, and key planetary signposts in your D1 and D9 charts.
 
 ### Partner Characteristics [System: Vedic, System: Jaimini]
 1. **Physical & Character Traits**: Your spouse is indicated to be intellectually vibrant, highly supportive, and deeply compassionate [VEDIC_DEC_SPOUSE_01].
@@ -1816,11 +1902,11 @@ To dissolve temporary delay blocks, consider chanting 'Om Shukraya Namah' on Fri
 3. **Soul Connection**: Your Dara Karaka planet confirms a deep spiritual bond with high compatibility [JAIMINI_DEC_SPOUSE_01].
 
 Focus on nurturing a communicative and respectful atmosphere to let this partnership flourish naturally.`;
-      } else if (q.includes("remedy") || q.includes("mantra") || q.includes("gem") || q.includes("dosha")) {
-        detectedIntent = "Astrological Remedies & Dosha Clearing";
-        matchedSys = ["Vedic", "Lal Kitab"];
-        matchedRules = ["VEDIC_REMEDY_RULE", "LAL_KITAB_DEBT"];
-        replyText = `To harmonize planetary energies and clear any active celestial doshas, here are your personalized JHoraAI remedial protocols:
+    } else if (q.includes("remedy") || q.includes("mantra") || q.includes("gem") || q.includes("dosha")) {
+      detectedIntent = "Astrological Remedies & Dosha Clearing";
+      matchedSys = ["Vedic", "Lal Kitab"];
+      matchedRules = ["VEDIC_REMEDY_RULE", "LAL_KITAB_DEBT"];
+      replyText += `To harmonize planetary energies and clear any active celestial doshas, here are your personalized JHoraAI remedial protocols for **${userName}**:
 
 ### Remedial Protocols [System: Vedic, System: Lal Kitab]
 1. **Vedic Mantra**: Chant *Om Namah Shivaya* daily 108 times to neutralize Saturn's delays and gain spiritual clarity [VEDIC_DEC_REMEDY_01].
@@ -1828,33 +1914,31 @@ Focus on nurturing a communicative and respectful atmosphere to let this partner
 3. **Gemstone Guidance**: If recommended by a personal counselor, wearing a high-quality Pearl or Yellow Sapphire under appropriate conditions can boost supportive energies.
 
 Perform these remedies with complete devotion and clear intent for positive transformation.`;
-      } else {
-        detectedIntent = "General Chart Consultation";
-        replyText = `Welcome to your Master AI Astrologer consultation. Based on your birth details, your chart demonstrates solid life path vitality with active planetary yogas.
-
-### Strategic Insights [System: Vedic, System: KP]
+    } else {
+      replyText += `### Strategic Insights [System: Vedic, System: KP]
+- **Birth Resonance**: Welcome, **${userName}**. Based on your birth details (**${birthDate}** at **${birthPlace}**), your chart demonstrates solid life path vitality with active planetary yogas.
 - **Lagna Resonance**: Your Ascendant lord is placed in a supportive sector, granting you natural resilience and charisma.
 - **Relationship Harmony**: Your 7th house has a stable energetic balance, indicating that patient, honest dialogs will always bring peace.
 - **Career Growth**: Professional indicators are highly promising. Keep your focus on discipline and high moral standards.
 
 Please ask me any specific question about Marriage Delay, Spouse traits, Timings, or Remedies to explore your chart in greater depth!`;
-      }
-
-      const fallbackOutput = {
-        reply: replyText,
-        intentDetected: {
-          intent: detectedIntent,
-          loadedSystems: matchedSys,
-          loadedRulebooks: matchedRules,
-          loadedEvidence: ["VEDIC_EVIDENCE_MATCH", "KP_EVIDENCE_MATCH"],
-          loadedDecisions: ["DEC_PROMISE_01", "DEC_DELAY_01"],
-          confidence: 85
-        },
-        candidateKnowledge: null
-      };
-
-      res.json(fallbackOutput);
     }
+
+    const fallbackOutput = {
+      reply: replyText,
+      intentDetected: {
+        intent: detectedIntent,
+        loadedSystems: matchedSys,
+        loadedRulebooks: matchedRules,
+        loadedEvidence: ["VEDIC_EVIDENCE_MATCH", "KP_EVIDENCE_MATCH"],
+        loadedDecisions: ["DEC_PROMISE_01", "DEC_DELAY_01"],
+        confidence: 85
+      },
+      candidateKnowledge: null
+    };
+
+    res.json(fallbackOutput);
+  }
 });
 
 // ==========================================
