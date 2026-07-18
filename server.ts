@@ -257,7 +257,7 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
       fs.writeFileSync(filePath, JSON.stringify(profileData, null, 2));
       console.log(`[Git Sync] Written Users/userprofile.json for profile: ${profileName}`);
 
-      exec(`git add Users/userprofile.json && (git diff-index --quiet HEAD || git commit -m "feat: activate user profile ${profileName}") && git pull --rebase origin main && git push origin main`, (err, stdout, stderr) => {
+      exec(`git add Users/userprofile.json && (git diff-index --quiet HEAD || git commit -m "feat: activate user profile ${profileName}") && git pull --rebase --autostash origin main && git push origin main`, (err, stdout, stderr) => {
         if (err) {
           console.error("[Git Sync Add Error]", err, stderr);
         } else {
@@ -282,7 +282,7 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
           fs.unlinkSync(filePath);
           console.log(`[Git Sync] Deleted Users/userprofile.json because active profile ${profileName} was deleted.`);
 
-          exec(`git add -A Users/userprofile.json && (git diff-index --quiet HEAD || git commit -m "feat: deactivate user profile ${profileName}") && git pull --rebase origin main && git push origin main`, (err, stdout, stderr) => {
+          exec(`git add -A Users/userprofile.json && (git diff-index --quiet HEAD || git commit -m "feat: deactivate user profile ${profileName}") && git pull --rebase --autostash origin main && git push origin main`, (err, stdout, stderr) => {
             if (err) {
               console.error("[Git Sync Delete Error]", err, stderr);
             } else {
