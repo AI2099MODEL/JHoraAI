@@ -3,20 +3,20 @@
     "google_user_id": "guest_user",
     "email": "guest@jhora.ai",
     "profile_name": "Nitin",
-    "created_at": "2026-07-18T09:20:08.242Z",
-    "updated_at": "2026-07-18T09:20:08.242Z"
+    "created_at": "2026-07-18T09:27:16.594Z",
+    "updated_at": "2026-07-18T09:27:16.594Z"
   },
   "Birth": {
     "date": "1976-01-06",
     "time": "18:40:00",
-    "latitude": 30.3244,
-    "longitude": 78.0339,
+    "latitude": 30.3165,
+    "longitude": 78.0322,
     "timezone": "5.5",
     "place": "Dehradun, Uttarakhand, India",
     "ayanamsa": "Lahiri",
     "dst_used": false,
     "julian_day_number": "2442784.277778",
-    "local_sidereal_time": "06:54:03",
+    "local_sidereal_time": "06:54:02",
     "obliquity": "23° 26' 33\"",
     "ephemeris_used": "Swiss Ephemeris / JHora Calculation Engine",
     "house_system": "Placidus / KP Cusps"
@@ -30,7 +30,7 @@
     },
     "julian_day_number": "2442784.277778",
     "ayanamsa": "Lahiri",
-    "sidereal_time": "06:54:03",
+    "sidereal_time": "06:54:02",
     "obliquity": "23° 26' 33\"",
     "house_system": "Placidus / KP Cusps",
     "ephemeris_used": "Swiss Ephemeris / JHora Calculation Engine",
@@ -58,9 +58,9 @@
       "sign": "Cancer",
       "sign_index": 3,
       "degree": 7,
-      "minute": 19,
-      "second": 12,
-      "longitude_360": 97.3201,
+      "minute": 18,
+      "second": 55,
+      "longitude_360": 97.3153,
       "nakshatra": "Pushya",
       "pada": 2,
       "nakshatra_lord": "Venus"
@@ -750,7 +750,7 @@
         "description": "Divisional Chart D1",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -863,7 +863,7 @@
         "description": "Divisional Chart D2",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -974,7 +974,7 @@
         "description": "Divisional Chart D3",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -1086,7 +1086,7 @@
         "description": "Divisional Chart D4",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -1197,7 +1197,7 @@
         "description": "Divisional Chart D5",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -1306,7 +1306,7 @@
         "description": "Divisional Chart D6",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -1416,7 +1416,7 @@
         "description": "Divisional Chart D7",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -1527,7 +1527,7 @@
         "description": "Divisional Chart D8",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -1636,7 +1636,7 @@
         "description": "Divisional Chart D9",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -1748,7 +1748,7 @@
         "description": "Divisional Chart D10",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -1858,7 +1858,7 @@
         "description": "Divisional Chart D11",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -1967,7 +1967,7 @@
         "description": "Divisional Chart D12",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -2077,7 +2077,7 @@
         "description": "Divisional Chart D16",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -2187,7 +2187,7 @@
         "description": "Divisional Chart D20",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -2297,7 +2297,7 @@
         "description": "Divisional Chart D24",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -2406,7 +2406,7 @@
         "description": "Divisional Chart D27",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -2516,7 +2516,7 @@
         "description": "Divisional Chart D30",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -2625,7 +2625,7 @@
         "description": "Divisional Chart D40",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -2736,7 +2736,7 @@
         "description": "Divisional Chart D45",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -2846,7 +2846,7 @@
         "description": "Divisional Chart D60",
         "ascendant": {
           "sign": "Cancer",
-          "longitude": 97.3201
+          "longitude": 97.3153
         },
         "house_placements": {
           "1": [
@@ -2969,11 +2969,11 @@
         "Sun": {
           "sthana_bala": 203.94,
           "dig_bala": 71.64,
-          "kala_bala": 27.62,
+          "kala_bala": 27.63,
           "cheshta_bala": 0,
           "naisargika_bala": 60,
           "drig_bala": -6.21,
-          "total_score": 356.99,
+          "total_score": 357,
           "strength_ratio": 1.19,
           "strength_percentage": 119
         },
@@ -3054,7 +3054,7 @@
           "rank": 2
         },
         "H3": {
-          "strength_shashtiamsas": 393.39,
+          "strength_shashtiamsas": 393.4,
           "rank": 3
         },
         "H4": {
@@ -4160,7 +4160,7 @@
     "cusps": {
       "House_1": {
         "house_number": 1,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Cancer",
         "sign_lord": "Moon",
         "star_lord": "Saturn",
@@ -4171,7 +4171,7 @@
       },
       "House_2": {
         "house_number": 2,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Leo",
         "sign_lord": "Sun",
         "star_lord": "Ketu",
@@ -4182,7 +4182,7 @@
       },
       "House_3": {
         "house_number": 3,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Virgo",
         "sign_lord": "Mercury",
         "star_lord": "Sun",
@@ -4193,7 +4193,7 @@
       },
       "House_4": {
         "house_number": 4,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Libra",
         "sign_lord": "Venus",
         "star_lord": "Rahu",
@@ -4204,7 +4204,7 @@
       },
       "House_5": {
         "house_number": 5,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Scorpio",
         "sign_lord": "Mars",
         "star_lord": "Saturn",
@@ -4215,7 +4215,7 @@
       },
       "House_6": {
         "house_number": 6,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Sagittarius",
         "sign_lord": "Jupiter",
         "star_lord": "Ketu",
@@ -4226,7 +4226,7 @@
       },
       "House_7": {
         "house_number": 7,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Capricorn",
         "sign_lord": "Saturn",
         "star_lord": "Sun",
@@ -4237,7 +4237,7 @@
       },
       "House_8": {
         "house_number": 8,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Aquarius",
         "sign_lord": "Saturn",
         "star_lord": "Rahu",
@@ -4248,7 +4248,7 @@
       },
       "House_9": {
         "house_number": 9,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Pisces",
         "sign_lord": "Jupiter",
         "star_lord": "Saturn",
@@ -4259,7 +4259,7 @@
       },
       "House_10": {
         "house_number": 10,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Aries",
         "sign_lord": "Mars",
         "star_lord": "Ketu",
@@ -4270,7 +4270,7 @@
       },
       "House_11": {
         "house_number": 11,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Taurus",
         "sign_lord": "Venus",
         "star_lord": "Sun",
@@ -4281,7 +4281,7 @@
       },
       "House_12": {
         "house_number": 12,
-        "longitude": 7.3201,
+        "longitude": 7.3153,
         "sign": "Gemini",
         "sign_lord": "Mercury",
         "star_lord": "Rahu",
@@ -4431,7 +4431,7 @@
       "cusps": {
         "House_1": {
           "house_number": 1,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Cancer",
           "sign_lord": "Moon",
           "star_lord": "Saturn",
@@ -4442,7 +4442,7 @@
         },
         "House_2": {
           "house_number": 2,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Leo",
           "sign_lord": "Sun",
           "star_lord": "Ketu",
@@ -4453,7 +4453,7 @@
         },
         "House_3": {
           "house_number": 3,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Virgo",
           "sign_lord": "Mercury",
           "star_lord": "Sun",
@@ -4464,7 +4464,7 @@
         },
         "House_4": {
           "house_number": 4,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Libra",
           "sign_lord": "Venus",
           "star_lord": "Rahu",
@@ -4475,7 +4475,7 @@
         },
         "House_5": {
           "house_number": 5,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Scorpio",
           "sign_lord": "Mars",
           "star_lord": "Saturn",
@@ -4486,7 +4486,7 @@
         },
         "House_6": {
           "house_number": 6,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Sagittarius",
           "sign_lord": "Jupiter",
           "star_lord": "Ketu",
@@ -4497,7 +4497,7 @@
         },
         "House_7": {
           "house_number": 7,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Capricorn",
           "sign_lord": "Saturn",
           "star_lord": "Sun",
@@ -4508,7 +4508,7 @@
         },
         "House_8": {
           "house_number": 8,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Aquarius",
           "sign_lord": "Saturn",
           "star_lord": "Rahu",
@@ -4519,7 +4519,7 @@
         },
         "House_9": {
           "house_number": 9,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Pisces",
           "sign_lord": "Jupiter",
           "star_lord": "Saturn",
@@ -4530,7 +4530,7 @@
         },
         "House_10": {
           "house_number": 10,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Aries",
           "sign_lord": "Mars",
           "star_lord": "Ketu",
@@ -4541,7 +4541,7 @@
         },
         "House_11": {
           "house_number": 11,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Taurus",
           "sign_lord": "Venus",
           "star_lord": "Sun",
@@ -4552,7 +4552,7 @@
         },
         "House_12": {
           "house_number": 12,
-          "longitude": 7.3201,
+          "longitude": 7.3153,
           "sign": "Gemini",
           "sign_lord": "Mercury",
           "star_lord": "Rahu",
@@ -5321,51 +5321,51 @@
     "cusps": {
       "Cusp_1": {
         "sign": "Cancer",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_2": {
         "sign": "Leo",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_3": {
         "sign": "Virgo",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_4": {
         "sign": "Libra",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_5": {
         "sign": "Scorpio",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_6": {
         "sign": "Sagittarius",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_7": {
         "sign": "Capricorn",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_8": {
         "sign": "Aquarius",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_9": {
         "sign": "Pisces",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_10": {
         "sign": "Aries",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_11": {
         "sign": "Taurus",
-        "degree": 7.3201
+        "degree": 7.3153
       },
       "Cusp_12": {
         "sign": "Gemini",
-        "degree": 7.3201
+        "degree": 7.3153
       }
     },
     "aspects": [],
@@ -5739,7 +5739,7 @@
     "birth_time_rectified": false,
     "api_version": "v2.0.0",
     "api_confidence": "Authoritative / Verified",
-    "generated_on": "2026-07-18T09:20:08.242Z",
+    "generated_on": "2026-07-18T09:27:16.594Z",
     "generated_by": "JHoraAI Precision Engine",
     "jhora_version": "v7.6",
     "profile_version": "v2.1",
