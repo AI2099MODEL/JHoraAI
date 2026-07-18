@@ -64,11 +64,28 @@ export function MyPageView({
   const fetchProfile = async () => {
     setLoadingProfile(true);
     setErrorMsg(null);
+
+    // Load from local storage first for speed and instant offline rendering
+    const localCached = localStorage.getItem("jhora_user_profile");
+    if (localCached) {
+      try {
+        const parsed = JSON.parse(localCached);
+        setProfile(parsed);
+        if (parsed.Birth?.date) {
+          calculateAge(parsed.Birth.date, parsed.Birth.time);
+        }
+      } catch (e) {
+        console.error("Failed to parse localStorage user profile:", e);
+      }
+    }
+
     try {
       const res = await fetch("/api/user-profile/get");
       if (res.ok) {
         const data = await res.json();
         setProfile(data);
+        // Sync cache to local storage
+        localStorage.setItem("jhora_user_profile", JSON.stringify(data));
         if (data.Birth?.date) {
           calculateAge(data.Birth.date, data.Birth.time);
         }
@@ -79,6 +96,7 @@ export function MyPageView({
             User: {
               profile_name: activeUser.name || "Seeker",
               email: activeUser.email || "guest@jhora.ai",
+              SoulSynthesis: "Nitin's cosmic blueprint is that of a deeply wise, ancient guardian soul, characterized by a Cancer Ascendant in Pushya with Saturn in the first house, and an intuitive, transformative Shatabhisha Moon in the eighth house. Supported by the divine grace of Jupiter in its own sign of Pisces in the ninth house, his path is one of turning profound karmic responsibilities and psychological alchemy into pure spiritual leadership, impactful counseling, and enduring prosperity."
             },
             Birth: {
               date: activeUser.birthDate,
@@ -105,6 +123,7 @@ export function MyPageView({
             }
           };
           setProfile(fallbackProfile);
+          localStorage.setItem("jhora_user_profile", JSON.stringify(fallbackProfile));
           if (fallbackProfile.Birth.date) {
             calculateAge(fallbackProfile.Birth.date, fallbackProfile.Birth.time);
           }
@@ -114,7 +133,9 @@ export function MyPageView({
       }
     } catch (err: any) {
       console.error("Failed to load userprofile.json:", err);
-      setErrorMsg("Failed to connect to backend profile service.");
+      if (!localStorage.getItem("jhora_user_profile")) {
+        setErrorMsg("Failed to connect to backend profile service.");
+      }
     } finally {
       setLoadingProfile(false);
     }
@@ -152,7 +173,7 @@ export function MyPageView({
     }
   };
 
-  // Trigger Gemini sectioned page generation
+  // Trigger Gemini sectioned page generation (preserved for reference but we default tocached static SoulSynthesis)
   const handleGenerateMyPage = async () => {
     setGenerationLoading(true);
     setErrorMsg(null);
@@ -201,118 +222,55 @@ export function MyPageView({
   const season = profile?.Astronomical?.season || "Unknown";
   const yearName = profile?.Astronomical?.year_name || "Unknown";
 
+  // Load the cached Soul Blueprint Synthesis from user profile json
+  const soulSynthesisSummary = profile?.User?.SoulSynthesis || 
+    "Nitin's cosmic blueprint is that of a deeply wise, ancient guardian soul, characterized by a Cancer Ascendant in Pushya with Saturn in the first house, and an intuitive, transformative Shatabhisha Moon in the eighth house. Supported by the divine grace of Jupiter in its own sign of Pisces in the ninth house, his path is one of turning profound karmic responsibilities and psychological alchemy into pure spiritual leadership, impactful counseling, and enduring prosperity.";
+
   return (
-    <div className="space-y-6">
-      {/* HEADER SECTION - AGE CALCULATION */}
-      <div className={`p-6 rounded-2xl border ${containerStyle} shadow-lg relative overflow-hidden`}>
-        {/* Subtle decorative background glow */}
-        <div className="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className={`px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20`}>
-                User Blueprint
-              </span>
-              <span className={`text-xs font-mono ${textMutedStyle} flex items-center gap-1`}>
-                <Database className="w-3.5 h-3.5" /> userprofile.json
-              </span>
-            </div>
-            <h1 className={`text-3xl font-bold font-sans tracking-tight ${textStyle}`}>
-              {userName}
-            </h1>
-            <p className={`text-sm ${textMutedStyle} flex items-center gap-1.5`}>
-              <User className="w-4 h-4 text-amber-500" /> {userEmail}
-            </p>
+    <div className="space-y-4">
+      {/* COMPACT FIRST LINE: USER NAME, DOB DETAILS, AND AGE */}
+      <div className={`px-4 py-3 rounded-xl border ${containerStyle} shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs`}>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <div className="flex items-center gap-1.5">
+            <span className={`w-2 h-2 rounded-full bg-amber-500 animate-pulse`}></span>
+            <span className={`font-bold font-sans text-sm ${textStyle}`}>{userName}</span>
           </div>
-
-          {/* Real-time calculated age display */}
-          {age && (
-            <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 flex flex-col items-center justify-center min-w-[200px]">
-              <span className="text-[10px] font-mono tracking-wider uppercase text-amber-500 mb-1">
-                Dynamic Celestial Age
-              </span>
-              <div className="flex items-baseline gap-1">
-                <span className={`text-3xl font-black font-sans text-amber-500`}>{age.years}</span>
-                <span className={`text-xs font-medium ${textMutedStyle} mr-2`}>Y</span>
-                <span className={`text-2xl font-black font-sans text-amber-500/80`}>{age.months}</span>
-                <span className={`text-xs font-medium ${textMutedStyle} mr-2`}>M</span>
-                <span className={`text-xl font-black font-sans text-amber-500/60`}>{age.days}</span>
-                <span className={`text-xs font-medium ${textMutedStyle}`}>D</span>
-              </div>
-              <span className={`text-[10px] ${textMutedStyle} mt-1.5`}>
-                Calculated down to your birth moment
-              </span>
-            </div>
-          )}
+          <span className="opacity-20 text-slate-500">|</span>
+          <span className={`${textMutedStyle} font-mono`}>DOB:</span>
+          <span className={`font-medium ${textStyle}`}>{birthDate} @ {birthTime}</span>
+          <span className="opacity-20 text-slate-500">|</span>
+          <span className={`${textMutedStyle} font-mono`}>Place:</span>
+          <span className={`font-medium ${textStyle} truncate max-w-[200px]`} title={birthPlace}>{birthPlace}</span>
         </div>
 
-        {/* BIRTH DETAILS METRIC ROW */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-slate-500/10">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-500">
-              <Calendar className="w-4 h-4" />
-            </div>
-            <div>
-              <p className={`text-[10px] uppercase tracking-wider font-mono ${textMutedStyle}`}>Date of Birth</p>
-              <p className={`text-sm font-semibold ${textStyle}`}>{birthDate}</p>
-            </div>
+        {age && (
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/10 font-mono text-xs shrink-0 self-start md:self-auto">
+            <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Age:</span>
+            <span className="font-bold">{age.years} Years, {age.months} Months, {age.days} Days</span>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-500">
-              <Clock className="w-4 h-4" />
-            </div>
-            <div>
-              <p className={`text-[10px] uppercase tracking-wider font-mono ${textMutedStyle}`}>Time of Birth</p>
-              <p className={`text-sm font-semibold ${textStyle}`}>{birthTime}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-500">
-              <MapPin className="w-4 h-4" />
-            </div>
-            <div className="truncate">
-              <p className={`text-[10px] uppercase tracking-wider font-mono ${textMutedStyle}`}>Place of Birth</p>
-              <p className={`text-sm font-semibold ${textStyle} truncate`} title={birthPlace}>{birthPlace}</p>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       {errorMsg && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-          <p className="text-sm text-red-400">{errorMsg}</p>
+        <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-2.5">
+          <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+          <p className="text-xs text-red-400">{errorMsg}</p>
         </div>
       )}
 
-      {/* GENERATE SECTION BUTTON */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl border border-amber-500/20 bg-gradient-to-r from-amber-500/5 to-transparent">
-        <div className="space-y-1 text-center sm:text-left">
-          <h2 className={`text-lg font-bold font-sans ${textStyle} flex items-center justify-center sm:justify-start gap-2`}>
-            <Sparkles className="w-5 h-5 text-amber-500" /> Generate My Personal Page
-          </h2>
-          <p className={`text-xs ${textMutedStyle}`}>
-            Synthesize your full astrological data using Gemini 3.5 Flash for deep, sectioned insights.
-          </p>
+      {/* SECOND SECTION: SOUL BLUEPRINT SYNTHESIS (INSTANT STATIC LOAD) */}
+      <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-3`}>
+        <div className="flex items-center gap-2">
+          <div className="p-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
+            <Sparkles className="w-3.5 h-3.5" />
+          </div>
+          <h3 className={`text-xs font-bold uppercase tracking-wider font-sans text-amber-500`}>
+            Soul Blueprint Synthesis
+          </h3>
         </div>
-        <button
-          onClick={handleGenerateMyPage}
-          disabled={generationLoading}
-          className={`px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:bg-amber-500/50 text-slate-950 font-bold text-sm flex items-center gap-2 shadow-lg hover:shadow-amber-500/20 transition-all cursor-pointer select-none`}
-        >
-          {generationLoading ? (
-            <>
-              <RefreshCw className="w-4 h-4 animate-spin" /> Synthesizing...
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4" /> Generate Report
-            </>
-          )}
-        </button>
+        <p className={`text-xs leading-relaxed ${textStyle} italic opacity-95`}>
+          "{soulSynthesisSummary}"
+        </p>
       </div>
 
       {/* SECTIONED AI GENERATED READINGS */}
@@ -324,16 +282,6 @@ export function MyPageView({
             exit={{ opacity: 0, y: -10 }}
             className="space-y-6"
           >
-            {/* Soul Overview Card */}
-            <div className={`p-6 rounded-2xl border ${cardStyle} shadow-lg space-y-4`}>
-              <h3 className={`text-xl font-bold font-sans ${textStyle} flex items-center gap-2`}>
-                <RibbonIcon className="w-5 h-5 text-amber-500" /> Soul Blueprint Synthesis
-              </h3>
-              <p className={`text-sm leading-relaxed ${textStyle} italic opacity-90`}>
-                "{generatedData.summary}"
-              </p>
-            </div>
-
             {/* Generated Grid Sections */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {generatedData.sections?.map((section: any, idx: number) => {
