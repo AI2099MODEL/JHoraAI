@@ -243,6 +243,62 @@ app.post("/api/user-profile/save", async (req, res) => {
   }
 });
 
+function getProfileFileName(profileData: any, fallbackName: string): string {
+  // 1. Username
+  const rawUser = profileData?.User?.profile_name || fallbackName;
+  const username = rawUser.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  // 2. DOB (format: DDMMYYYY)
+  const rawDob = profileData?.Birth?.date || "";
+  let dob = "00000000";
+  if (rawDob) {
+    const cleanedDob = rawDob.replace(/[^0-9]/g, "");
+    if (rawDob.includes("-") && rawDob.split("-")[0].length === 4) {
+      const parts = rawDob.split("-");
+      dob = parts[2].padStart(2, '0') + parts[1].padStart(2, '0') + parts[0];
+    } else {
+      dob = cleanedDob;
+    }
+  }
+
+  // 3. Place
+  const rawPlace = profileData?.Birth?.place || "";
+  const place = rawPlace ? rawPlace.split(",")[0].trim().toLowerCase().replace(/[^a-z0-9]/g, "") : "unknown";
+
+  // 4. Birthtime (format: hhmmAM/PM)
+  const rawTime = profileData?.Birth?.time || "";
+  let birthtime = "0000am";
+  if (rawTime) {
+    const hasAmPm = /([ap]m)/i.test(rawTime);
+    if (hasAmPm) {
+      const match = rawTime.match(/(\d+):(\d+)\s*([ap]m)/i);
+      if (match) {
+        const hh = match[1].padStart(2, '0');
+        const mm = match[2].padStart(2, '0');
+        const ampm = match[3].toUpperCase();
+        birthtime = `${hh}${mm}${ampm}`;
+      }
+    } else {
+      const timeParts = rawTime.split(":");
+      if (timeParts.length >= 2) {
+        let hh = parseInt(timeParts[0], 10);
+        const mm = timeParts[1].padStart(2, '0');
+        const isPm = hh >= 12;
+        const ampm = isPm ? "PM" : "AM";
+        if (hh > 12) {
+          hh -= 12;
+        } else if (hh === 0) {
+          hh = 12;
+        }
+        const hhStr = hh.toString().padStart(2, '0');
+        birthtime = `${hhStr}${mm}${ampm}`;
+      }
+    }
+  }
+
+  return `${username}${dob}${place}${birthtime}.json`;
+}
+
 // Helper to handle git synchronization on the server
 async function syncProfileToGithub(action: "add" | "delete", profileName: string, profileData?: any) {
   try {
@@ -254,10 +310,14 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
         fs.mkdirSync(usersDir, { recursive: true });
       }
 
-      fs.writeFileSync(filePath, JSON.stringify(profileData, null, 2));
-      console.log(`[Git Sync] Written Users/userprofile.json for profile: ${profileName}`);
+      const dynamicName = getProfileFileName(profileData, profileName);
+      const dynamicFilePath = path.join(usersDir, dynamicName);
 
-      exec(`git add Users/userprofile.json && (git diff-index --quiet HEAD || git commit -m "feat: activate user profile ${profileName}") && git pull --rebase --autostash origin main && git push origin main`, (err, stdout, stderr) => {
+      fs.writeFileSync(filePath, JSON.stringify(profileData, null, 2));
+      fs.writeFileSync(dynamicFilePath, JSON.stringify(profileData, null, 2));
+      console.log(`[Git Sync] Written Users/userprofile.json and Users/${dynamicName} for profile: ${profileName}`);
+
+      exec(`git add Users/userprofile.json Users/${dynamicName} && (git diff-index --quiet HEAD || git commit -m "feat: activate user profile ${profileName}") && git pull --rebase --autostash origin main && git push origin main`, (err, stdout, stderr) => {
         if (err) {
           console.error("[Git Sync Add Error]", err, stderr);
         } else {
@@ -266,23 +326,52 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
       });
 
     } else if (action === "delete") {
-      if (fs.existsSync(filePath)) {
-        let isMatching = false;
-        try {
-          const content = fs.readFileSync(filePath, "utf-8");
-          const parsed = JSON.parse(content);
-          if (parsed?.User?.profile_name === profileName) {
-            isMatching = true;
+      if (fs.existsSync(usersDir)) {
+        const files = fs.readdirSync(usersDir);
+        let deletedAny = false;
+        const filesToGitRm: string[] = [];
+
+        for (const file of files) {
+          if (file.endsWith(".json") && file !== "userprofile.json") {
+            const fPath = path.join(usersDir, file);
+            try {
+              const content = fs.readFileSync(fPath, "utf-8");
+              const parsed = JSON.parse(content);
+              if (parsed?.User?.profile_name === profileName) {
+                fs.unlinkSync(fPath);
+                filesToGitRm.push(`Users/${file}`);
+                deletedAny = true;
+                console.log(`[Git Sync] Deleted Users/${file} because profile ${profileName} was deleted.`);
+              }
+            } catch (e) {
+              console.error(`Error processing file ${file} during deletion check:`, e);
+            }
           }
-        } catch (e) {
-          console.error("Failed to parse userprofile.json during deletion check:", e);
         }
 
-        if (isMatching) {
-          fs.unlinkSync(filePath);
-          console.log(`[Git Sync] Deleted Users/userprofile.json because active profile ${profileName} was deleted.`);
+        if (fs.existsSync(filePath)) {
+          let isMatching = false;
+          try {
+            const content = fs.readFileSync(filePath, "utf-8");
+            const parsed = JSON.parse(content);
+            if (parsed?.User?.profile_name === profileName) {
+              isMatching = true;
+            }
+          } catch (e) {
+            console.error("Failed to parse userprofile.json during deletion check:", e);
+          }
 
-          exec(`git add -A Users/userprofile.json && (git diff-index --quiet HEAD || git commit -m "feat: deactivate user profile ${profileName}") && git pull --rebase --autostash origin main && git push origin main`, (err, stdout, stderr) => {
+          if (isMatching) {
+            fs.unlinkSync(filePath);
+            filesToGitRm.push("Users/userprofile.json");
+            deletedAny = true;
+            console.log(`[Git Sync] Deleted Users/userprofile.json because active profile ${profileName} was deleted.`);
+          }
+        }
+
+        if (deletedAny && filesToGitRm.length > 0) {
+          const filesStr = filesToGitRm.join(" ");
+          exec(`git rm ${filesStr} && (git diff-index --quiet HEAD || git commit -m "feat: deactivate user profile ${profileName}") && git pull --rebase --autostash origin main && git push origin main`, (err, stdout, stderr) => {
             if (err) {
               console.error("[Git Sync Delete Error]", err, stderr);
             } else {
