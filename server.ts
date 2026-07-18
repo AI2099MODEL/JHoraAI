@@ -24,7 +24,8 @@ const app = express();
 const PORT = 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 const JHORA_API_URL = "https://jagannatha-hora-359167915530.europe-west1.run.app";
 
