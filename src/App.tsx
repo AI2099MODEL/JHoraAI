@@ -2060,6 +2060,7 @@ export default function App() {
                   activeUser={activeUser}
                   mapAstrologyDataToUserProfileJSON={mapAstrologyDataToUserProfileJSON}
                   setAstrologyData={setAstrologyData}
+                  onLoadProfile={handleLoadProfileDirect}
                   isDark={isDark}
                   currentDateTime={currentDateTime}
                   headerGps={headerGps}

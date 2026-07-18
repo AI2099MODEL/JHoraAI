@@ -77,6 +77,7 @@ interface HoroscopeReportViewProps {
   activeUser: any;
   mapAstrologyDataToUserProfileJSON: (user: any, data: any) => any;
   setAstrologyData: (data: any) => void;
+  onLoadProfile?: (record: CachedHoroscopeRecord) => void;
   isDark: boolean;
   currentDateTime: Date;
   headerGps: {
@@ -94,6 +95,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   activeUser,
   mapAstrologyDataToUserProfileJSON,
   setAstrologyData,
+  onLoadProfile,
   isDark,
   currentDateTime,
   headerGps,
@@ -1750,11 +1752,23 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             {profilesList.length > 0 ? (
               <div className="flex items-center gap-1.5">
                 <select
-                  value={profilesList.find(p => p.name === (birthDetails.name || "Nitin Jain"))?.id || ""}
+                  value={
+                    profilesList.find(p => 
+                      p.name === birthDetails.name && 
+                      p.date === birthDetails.date && 
+                      p.time === birthDetails.time
+                    )?.id || 
+                    profilesList.find(p => p.name === birthDetails.name)?.id || 
+                    ""
+                  }
                   onChange={(e) => {
                     const selected = profilesList.find(p => p.id === e.target.value);
                     if (selected) {
-                      setAstrologyData(selected.data);
+                      if (onLoadProfile) {
+                        onLoadProfile(selected);
+                      } else {
+                        setAstrologyData(selected.data);
+                      }
                     }
                   }}
                   className="bg-slate-900/90 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500/50 cursor-pointer font-medium"
