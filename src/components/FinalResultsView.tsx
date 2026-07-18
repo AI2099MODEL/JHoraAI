@@ -34,7 +34,7 @@ export const FinalResultsView: React.FC<FinalResultsViewProps> = ({
   }, [astrologyData]);
 
   const profileName = useMemo(() => {
-    return birthDetails?.name || "Native";
+    return birthDetails?.name || "Nitin";
   }, [birthDetails]);
 
   // Generate complete high-fidelity profile JSON dynamically to avoid static placeholders

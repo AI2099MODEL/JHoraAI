@@ -1021,7 +1021,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         // 3. Marriage Promise
         const evidence = calculateUnifiedRelationshipEvidence(astrologyData, undefined, 28);
         const doc3 = generateRelationshipPDF({
-          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Native",
+          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Nitin",
           partnerName: "Auspicious Partner",
           reportType: "Marriage Promise Report",
           reportOption: "Professional",
@@ -1034,7 +1034,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
         // 4. Partner Diagnostics
         const doc4 = generateRelationshipPDF({
-          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Native",
+          profileName: targetProfile?.User?.profile_name || birthDetails.name || "Nitin",
           partnerName: "Auspicious Partner",
           reportType: "Complete Relationship Report",
           reportOption: "Professional",

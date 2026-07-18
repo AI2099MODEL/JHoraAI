@@ -242,7 +242,7 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
     };
 
     const cond = rule.condition.toLowerCase();
-    const profileName = astrologyData.birthDetails?.name || "Native";
+    const profileName = astrologyData.birthDetails?.name || "Nitin";
     const kpData = astrologyData.kp || {};
     
     // SECTION 1: MARITAL LIFE

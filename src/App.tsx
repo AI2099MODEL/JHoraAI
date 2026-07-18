@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Compass,
@@ -179,6 +179,16 @@ export default function App() {
     latitude: 30.3165,
     longitude: 78.0322,
     timezone: 5.5,
+  });
+
+  // Track currently calculated/loaded inputs to prevent redundant recalculations & timing mismatches
+  const loadedInputsRef = useRef({
+    name: "Nitin",
+    date: "1976-01-06",
+    location: "Dehradun, Uttarakhand, India",
+    localTimeInput: "06:40",
+    localAmpm: "PM",
+    time: "06:40 PM"
   });
 
   const [astrologyData, setAstrologyData] = useState<AstrologyData | null>(null);
@@ -471,30 +481,38 @@ export default function App() {
     }
   }, [inputs.time]);
 
-  // Automated recalculation trigger on profile mismatch and 1-hour automatic transit refresh
+  // Debounced auto-recalculation on manual form input edits
   useEffect(() => {
     if (!astrologyData) {
       handleCalculate(true);
       return;
     }
 
-    const currentBirthDetails = astrologyData.birthDetails;
-    if (currentBirthDetails) {
-      const formattedDate = convertDateToISO(inputs.date);
-      const fullTimeStr = `${localTimeInput} ${localAmpm}`;
-      const formattedTime = convertTimeTo24h(fullTimeStr);
-      
-      const isMismatch = 
-        (inputs.name && inputs.name !== currentBirthDetails.name) ||
-        (formattedDate && formattedDate !== currentBirthDetails.date) ||
-        (formattedTime && formattedTime !== currentBirthDetails.time);
+    const isMismatch = 
+      inputs.name !== loadedInputsRef.current.name ||
+      inputs.date !== loadedInputsRef.current.date ||
+      inputs.location !== loadedInputsRef.current.location ||
+      localTimeInput !== loadedInputsRef.current.localTimeInput ||
+      localAmpm !== loadedInputsRef.current.localAmpm;
 
-      if (isMismatch && !loading) {
-        console.log("[Astro Sync] Profile mismatch detected. Auto-recalculating astrology data...");
+    if (isMismatch && !loading) {
+      // Debounce the calculation by 1.5 seconds to allow typing/editing without freezing
+      const timer = setTimeout(() => {
+        console.log("[Astro Sync] Form mismatch stable. Auto-recalculating astrology data...");
+        loadedInputsRef.current = {
+          name: inputs.name,
+          date: inputs.date,
+          location: inputs.location,
+          localTimeInput,
+          localAmpm,
+          time: `${localTimeInput} ${localAmpm}`
+        };
         handleCalculate(true);
-      }
+      }, 1500);
+
+      return () => clearTimeout(timer);
     }
-  }, [inputs.name, inputs.date, localTimeInput, localAmpm, astrologyData]);
+  }, [inputs.name, inputs.date, inputs.location, localTimeInput, localAmpm, astrologyData, loading]);
 
   useEffect(() => {
     const ONE_HOUR = 60 * 60 * 1000;
@@ -682,8 +700,27 @@ export default function App() {
           longitude: record.longitude,
           timezone: record.timezone,
         });
+        let timeStr = record.time;
+        let ampm = "AM";
+        if (timeStr.toLowerCase().includes("pm")) ampm = "PM";
+        let timeParts = timeStr.replace(/(am|pm)/i, "").trim().split(":");
+        let parsedTime = "12:00";
+        if (timeParts.length >= 2) {
+          parsedTime = `${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(2, "0")}`;
+          setLocalTimeInput(parsedTime);
+          setLocalAmpm(ampm);
+        }
         setAstrologyData(record.data);
         localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
+        
+        loadedInputsRef.current = {
+          name: record.name,
+          date: record.date,
+          location: record.location,
+          localTimeInput: parsedTime,
+          localAmpm: ampm,
+          time: record.time
+        };
       }
     } catch (e) {
       console.error("Failed to load IndexedDB records:", e);
@@ -691,7 +728,7 @@ export default function App() {
   };
 
   const handleLoadProfileDirect = (record: CachedHoroscopeRecord) => {
-    setInputs({
+    const updatedInputs = {
       name: record.name,
       date: record.date,
       time: record.time,
@@ -699,31 +736,36 @@ export default function App() {
       latitude: record.latitude,
       longitude: record.longitude,
       timezone: record.timezone,
-    });
+    };
+    setInputs(updatedInputs);
     let timeStr = record.time;
     let ampm = "AM";
     if (timeStr.toLowerCase().includes("pm")) ampm = "PM";
     let timeParts = timeStr.replace(/(am|pm)/i, "").trim().split(":");
+    let parsedTime = "12:00";
     if (timeParts.length >= 2) {
-      setLocalTimeInput(`${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(2, "0")}`);
+      parsedTime = `${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(2, "0")}`;
+      setLocalTimeInput(parsedTime);
       setLocalAmpm(ampm);
     }
     setAstrologyData(record.data);
     localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
-    runAutomatedSync({
+    
+    loadedInputsRef.current = {
       name: record.name,
       date: record.date,
-      time: record.time,
       location: record.location,
-      latitude: record.latitude,
-      longitude: record.longitude,
-      timezone: record.timezone,
-    });
+      localTimeInput: parsedTime,
+      localAmpm: ampm,
+      time: record.time
+    };
+
+    runAutomatedSync(updatedInputs);
   };
 
   const handleLoadProfileByName = (name: string) => {
     if (name === "Nitin") {
-      setInputs({
+      const nitinInputs = {
         name: "Nitin",
         date: "1976-01-06",
         time: "06:40 PM",
@@ -731,9 +773,18 @@ export default function App() {
         latitude: 30.3165,
         longitude: 78.0322,
         timezone: 5.5,
-      });
+      };
+      setInputs(nitinInputs);
       setLocalTimeInput("06:40");
       setLocalAmpm("PM");
+      loadedInputsRef.current = {
+        name: "Nitin",
+        date: "1976-01-06",
+        location: "Dehradun, Uttarakhand, India",
+        localTimeInput: "06:40",
+        localAmpm: "PM",
+        time: "06:40 PM"
+      };
       setTimeout(() => {
         handleCalculate(false);
       }, 50);
@@ -837,7 +888,7 @@ export default function App() {
 
   const handleCalculate = async (isInitial = false) => {
     setLoading(true);
-    const finalName = inputs.name.trim() || "Native";
+    const finalName = inputs.name.trim() || "Nitin";
     const fullTimeStr = `${localTimeInput} ${localAmpm}`;
     runAutomatedSync({ ...inputs, name: finalName, time: fullTimeStr });
     try {
@@ -869,6 +920,15 @@ export default function App() {
       setAstrologyData(result);
       localStorage.setItem("jhora_astrology_data", JSON.stringify(result));
       setInputs(prev => ({ ...prev, time: fullTimeStr }));
+      
+      loadedInputsRef.current = {
+        name: finalName,
+        date: inputs.date,
+        location: inputs.location,
+        localTimeInput,
+        localAmpm,
+        time: fullTimeStr
+      };
       
       // Map user profile JSON and compile PDF on the fly! (no mock data, wait for API response)
       let profileJson: any = null;
@@ -921,8 +981,28 @@ export default function App() {
       timezone: record.timezone,
     };
     setInputs(updatedInputs);
+    let timeStr = record.time;
+    let ampm = "AM";
+    if (timeStr.toLowerCase().includes("pm")) ampm = "PM";
+    let timeParts = timeStr.replace(/(am|pm)/i, "").trim().split(":");
+    let parsedTime = "12:00";
+    if (timeParts.length >= 2) {
+      parsedTime = `${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(2, "0")}`;
+      setLocalTimeInput(parsedTime);
+      setLocalAmpm(ampm);
+    }
     setAstrologyData(record.data);
     localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
+    
+    loadedInputsRef.current = {
+      name: record.name,
+      date: record.date,
+      location: record.location,
+      localTimeInput: parsedTime,
+      localAmpm: ampm,
+      time: record.time
+    };
+
     runAutomatedSync(updatedInputs);
     setActiveMenu("dashboard");
   };
@@ -938,10 +1018,30 @@ export default function App() {
       timezone: Number(record.timezone),
     };
     setInputs(updatedInputs);
+    let timeStr = record.time;
+    let ampm = "AM";
+    if (timeStr.toLowerCase().includes("pm")) ampm = "PM";
+    let timeParts = timeStr.replace(/(am|pm)/i, "").trim().split(":");
+    let parsedTime = "12:00";
+    if (timeParts.length >= 2) {
+      parsedTime = `${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(2, "0")}`;
+      setLocalTimeInput(parsedTime);
+      setLocalAmpm(ampm);
+    }
     if (record.data) {
       setAstrologyData(record.data);
       localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
     }
+    
+    loadedInputsRef.current = {
+      name: record.name,
+      date: record.date,
+      location: record.location,
+      localTimeInput: parsedTime,
+      localAmpm: ampm,
+      time: record.time
+    };
+
     runAutomatedSync(updatedInputs);
   };
 
@@ -1516,9 +1616,9 @@ export default function App() {
 
           {/* Global App-Level Selectors & Controls */}
           <div className="flex items-center gap-4 flex-wrap">
-            {/* Native Profile Selector */}
+            {/* Active Profile Selector */}
             <div className="flex items-center gap-1.5">
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Native:</span>
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Active Profile:</span>
               <select
                 value={astrologyData?.birthDetails?.name || "Nitin"}
                 onChange={(e) => handleLoadProfileByName(e.target.value)}

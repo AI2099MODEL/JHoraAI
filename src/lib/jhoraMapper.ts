@@ -555,7 +555,7 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   // Return formatted AstrologyData
   return {
     birthDetails: {
-      name: bd.name || "Native",
+      name: bd.name || "Nitin",
       date: bd.date || "1976-01-06",
       time: bd.time || "18:40:00",
       location: bd.place || "Dehradun",
@@ -748,7 +748,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
   const userSection = {
     google_user_id: activeUser?.uid || "guest_user",
     email: activeUser?.email || "guest@jhora.ai",
-    profile_name: data.birthDetails.name || activeUser?.name || "Native",
+    profile_name: data.birthDetails.name || activeUser?.name || "Nitin",
     created_at: activeUser?.createdDate || nowStr,
     updated_at: nowStr
   };
