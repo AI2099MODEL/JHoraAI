@@ -2099,8 +2099,8 @@ export default function App() {
                           <span className="bg-amber-500/10 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
                             Authoritative Report
                           </span>
-                          <h4 className="text-sm font-bold text-slate-200 mt-2">Vedic Astrology Report - Native</h4>
-                          <p className="text-xs text-slate-400">Pisces Ascendant Profile</p>
+                          <h4 className="text-sm font-bold text-slate-200 mt-2">Vedic Astrology Report - {inputs.name}</h4>
+                          <p className="text-xs text-slate-400">{astrologyData?.lagna?.sign ? `${astrologyData.lagna.sign} Ascendant Profile` : "Live Calculated Profile"}</p>
                         </div>
                         <div className="p-3 bg-amber-500/10 rounded-xl text-amber-400 border border-amber-500/10">
                           <FileText className="w-6 h-6" />
@@ -2110,15 +2110,15 @@ export default function App() {
                       <div className="space-y-2 border-t border-indigo-500/5 pt-3.5">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-400">📅 Date of Birth:</span>
-                          <span className="text-slate-200 font-medium">6 Jan 1976</span>
+                          <span className="text-slate-200 font-medium">{inputs.date}</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-400">🕒 Time of Birth:</span>
-                          <span className="text-slate-200 font-medium">06:40 PM</span>
+                          <span className="text-slate-200 font-medium">{inputs.time}</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-400">📍 Place of Birth:</span>
-                          <span className="text-slate-200 font-medium">Dehradun, Uttarakhand, India</span>
+                          <span className="text-slate-200 font-medium truncate max-w-[180px]">{inputs.location}</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-400">📄 Format & Pages:</span>
@@ -2131,24 +2131,33 @@ export default function App() {
                           onClick={async () => {
                             try {
                               let targetData = astrologyData;
-                              if (!targetData) {
-                                // Dynamically calculate the high-precision 1976-01-06 profile first
+                              const isDataMatchingInputs = targetData && 
+                                targetData.birthDetails?.name === inputs.name &&
+                                targetData.birthDetails?.date === inputs.date &&
+                                targetData.birthDetails?.time === inputs.time;
+
+                              if (!isDataMatchingInputs) {
+                                const formattedDate = convertDateToISO(inputs.date);
+                                const formattedTime = convertTimeTo24h(inputs.time);
                                 const defaultRes = await fetch("/api/astrology/calculate", {
                                   method: "POST",
                                   headers: { "Content-Type": "application/json" },
                                   body: JSON.stringify({
-                                    name: "Native",
-                                    date: "1976-01-06",
-                                    time: "18:40:00",
-                                    place: "Dehradun, Uttarakhand, India",
-                                    latitude: 30.3165,
-                                    longitude: 78.0322,
-                                    timezone: 5.5
+                                    name: inputs.name,
+                                    date: formattedDate,
+                                    time: formattedTime,
+                                    location: inputs.location,
+                                    latitude: Number(inputs.latitude),
+                                    longitude: Number(inputs.longitude),
+                                    timezone: Number(inputs.timezone)
                                   })
                                 });
                                 if (defaultRes.ok) {
-                                  targetData = await defaultRes.json();
+                                  const rawJson = await defaultRes.json();
+                                  targetData = mapJHoraResponseToAstrologyData(rawJson);
                                   setAstrologyData(targetData);
+                                } else {
+                                  throw new Error("Vedic calculation server failed.");
                                 }
                               }
                               
@@ -2158,23 +2167,12 @@ export default function App() {
                                 const pdfData = pdfDoc.output("datauristring");
                                 const link = document.createElement("a");
                                 link.href = pdfData;
-                                link.download = "Native_Vedic_Astrology_Report_19760106.pdf";
+                                link.download = `${inputs.name.replace(/\s+/g, "_")}_Vedic_Astrology_Report.pdf`;
                                 document.body.appendChild(link);
                                 link.click();
                                 document.body.removeChild(link);
                               } else {
-                                // Backup: fetch pre-generated static file
-                                const res = await fetch("/api/downloads/report-19760106");
-                                if (!res.ok) throw new Error(`Server returned status: ${res.status}`);
-                                const blob = await res.blob();
-                                const url = URL.createObjectURL(blob);
-                                const link = document.createElement("a");
-                                link.href = url;
-                                link.download = "Native_Vedic_Astrology_Report_19760106.pdf";
-                                document.body.appendChild(link);
-                                link.click();
-                                document.body.removeChild(link);
-                                URL.revokeObjectURL(url);
+                                throw new Error("Could not calculate astrology data.");
                               }
                             } catch (err: any) {
                               console.error("PDF download failed:", err);
@@ -2264,24 +2262,33 @@ export default function App() {
                               try {
                                 setCompilingRelReport("marriage");
                                 let targetData = astrologyData;
-                                if (!targetData) {
-                                  // Dynamically calculate the high-precision 1976-01-06 profile first
+                                const isDataMatchingInputs = targetData && 
+                                  targetData.birthDetails?.name === inputs.name &&
+                                  targetData.birthDetails?.date === inputs.date &&
+                                  targetData.birthDetails?.time === inputs.time;
+
+                                if (!isDataMatchingInputs) {
+                                  const formattedDate = convertDateToISO(inputs.date);
+                                  const formattedTime = convertTimeTo24h(inputs.time);
                                   const defaultRes = await fetch("/api/astrology/calculate", {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({
-                                      name: "Native",
-                                      date: "1976-01-06",
-                                      time: "18:40:00",
-                                      place: "Dehradun, Uttarakhand, India",
-                                      latitude: 30.3165,
-                                      longitude: 78.0322,
-                                      timezone: 5.5
+                                      name: inputs.name,
+                                      date: formattedDate,
+                                      time: formattedTime,
+                                      location: inputs.location,
+                                      latitude: Number(inputs.latitude),
+                                      longitude: Number(inputs.longitude),
+                                      timezone: Number(inputs.timezone)
                                     })
                                   });
                                   if (defaultRes.ok) {
-                                    targetData = await defaultRes.json();
+                                    const rawJson = await defaultRes.json();
+                                    targetData = mapJHoraResponseToAstrologyData(rawJson);
                                     setAstrologyData(targetData);
+                                  } else {
+                                    throw new Error("Vedic calculation server failed.");
                                   }
                                 }
 
@@ -2307,7 +2314,7 @@ export default function App() {
                                 }
 
                                 const doc = generateRelationshipPDF({
-                                  profileName: targetData.nativeName || "Native",
+                                  profileName: targetData.birthDetails?.name || inputs.name,
                                   partnerName: "Auspicious Partner",
                                   reportType: "Marriage Promise Report",
                                   reportOption: "Professional",
@@ -2316,7 +2323,7 @@ export default function App() {
                                   expertData
                                 });
 
-                                doc.save(`Marriage_Promise_Report_${targetData.nativeName || "Native"}_${Date.now()}.pdf`);
+                                doc.save(`Marriage_Promise_Report_${targetData.birthDetails?.name || inputs.name}_${Date.now()}.pdf`);
                               } catch (err: any) {
                                 console.error("Marriage PDF download failed:", err);
                                 alert("Failed to compile Marriage PDF: " + err.message);
@@ -2360,24 +2367,33 @@ export default function App() {
                               try {
                                 setCompilingRelReport("complete");
                                 let targetData = astrologyData;
-                                if (!targetData) {
-                                  // Dynamically calculate the high-precision 1976-01-06 profile first
+                                const isDataMatchingInputs = targetData && 
+                                  targetData.birthDetails?.name === inputs.name &&
+                                  targetData.birthDetails?.date === inputs.date &&
+                                  targetData.birthDetails?.time === inputs.time;
+
+                                if (!isDataMatchingInputs) {
+                                  const formattedDate = convertDateToISO(inputs.date);
+                                  const formattedTime = convertTimeTo24h(inputs.time);
                                   const defaultRes = await fetch("/api/astrology/calculate", {
                                     method: "POST",
                                     headers: { "Content-Type": "application/json" },
                                     body: JSON.stringify({
-                                      name: "Native",
-                                      date: "1976-01-06",
-                                      time: "18:40:00",
-                                      place: "Dehradun, Uttarakhand, India",
-                                      latitude: 30.3165,
-                                      longitude: 78.0322,
-                                      timezone: 5.5
+                                      name: inputs.name,
+                                      date: formattedDate,
+                                      time: formattedTime,
+                                      location: inputs.location,
+                                      latitude: Number(inputs.latitude),
+                                      longitude: Number(inputs.longitude),
+                                      timezone: Number(inputs.timezone)
                                     })
                                   });
                                   if (defaultRes.ok) {
-                                    targetData = await defaultRes.json();
+                                    const rawJson = await defaultRes.json();
+                                    targetData = mapJHoraResponseToAstrologyData(rawJson);
                                     setAstrologyData(targetData);
+                                  } else {
+                                    throw new Error("Vedic calculation server failed.");
                                   }
                                 }
 
@@ -2403,7 +2419,7 @@ export default function App() {
                                 }
 
                                 const doc = generateRelationshipPDF({
-                                  profileName: targetData.nativeName || "Native",
+                                  profileName: targetData.birthDetails?.name || inputs.name,
                                   partnerName: "Auspicious Partner",
                                   reportType: "Complete Relationship Report",
                                   reportOption: "Professional",
@@ -2412,7 +2428,7 @@ export default function App() {
                                   expertData
                                 });
 
-                                doc.save(`Complete_Relationship_Report_${targetData.nativeName || "Native"}_${Date.now()}.pdf`);
+                                doc.save(`Complete_Relationship_Report_${targetData.birthDetails?.name || inputs.name}_${Date.now()}.pdf`);
                               } catch (err: any) {
                                 console.error("Complete PDF download failed:", err);
                                 alert("Failed to compile Complete Relationship PDF: " + err.message);
