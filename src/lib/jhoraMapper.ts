@@ -2018,7 +2018,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       },
       {
         table_number: 2,
-        title: "KP Graha, Nakshatra and Pada",
+        title: "KP Graha, Nakshatra and Pada (Planetary Coordinates)",
         source_origin: "Dehradun JHora REST API (/api/jhora/horoscope) & KP Stellar Division Engine",
         section_key: "Vedic.planets & KP.planets",
         is_populated: Object.keys(planetsMap).length > 0,
@@ -2030,6 +2030,18 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       },
       {
         table_number: 3,
+        title: "Astronomical Alignment Parameters",
+        source_origin: "Background Astronomical Engine",
+        section_key: "Astronomical",
+        is_populated: true,
+        data_sample: {
+          julian_day_number: astronomicalSection.julian_day_number,
+          sidereal_time: astronomicalSection.sidereal_time,
+          moon_phase: astronomicalSection.moon_phase
+        }
+      },
+      {
+        table_number: 4,
         title: "Vimshottari Dasha Timeline (To Prana)",
         source_origin: "Dehradun JHora REST API (/api/jhora/horoscope) & Dasha Engine",
         section_key: "Vedic.dashas.vimshottari",
@@ -2041,62 +2053,27 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 4,
-        title: "Astronomical Alignment Parameters",
-        source_origin: "Background Astronomical Engine",
-        section_key: "Astronomical",
-        is_populated: true,
-        data_sample: {
-          julian_day_number: astronomicalSection.julian_day_number,
-          sidereal_time: astronomicalSection.sidereal_time,
-          moon_phase: astronomicalSection.moon_phase
-        }
-      },
-      {
         table_number: 5,
-        title: "Planetary Dignities & States (Vedic)",
-        source_origin: "Vedic Ephemeris Engine",
-        section_key: "Vedic.planets",
-        is_populated: Object.keys(planetsMap).length > 0,
-        data_sample: {
-          total_planets_mapped: Object.keys(planetsMap).length,
-          planets_list: Object.keys(planetsMap)
-        }
-      },
-      {
-        table_number: 3,
-        title: "Astronomical Alignment Parameters",
-        source_origin: "Background Astronomical Engine",
-        section_key: "Astronomical",
+        title: "Ashtottari Dasha Timeline",
+        source_origin: "Ashtottari Dasha Engine",
+        section_key: "Vedic.dashas.ashtottari",
         is_populated: true,
         data_sample: {
-          julian_day_number: astronomicalSection.julian_day_number,
-          sidereal_time: astronomicalSection.sidereal_time,
-          moon_phase: astronomicalSection.moon_phase
-        }
-      },
-      {
-        table_number: 4,
-        title: "Ashtakavarga Bindus (Sarvashtakavarga SAV)",
-        source_origin: "Ashtakavarga Engine",
-        section_key: "Vedic.ashtakavarga",
-        is_populated: true,
-        data_sample: {
-          sarvashtakavarga: ashtakavargaMapped.sav
-        }
-      },
-      {
-        table_number: 5,
-        title: "Shadbala Strengths (Rupas & Strength Ratio)",
-        source_origin: "Shadbala Calculation Engine",
-        section_key: "Vedic.shadbala",
-        is_populated: true,
-        data_sample: {
-          shadbala_planets_count: Object.keys(shadbalaMapped).length
+          ashtottari_dasha: "Calculated"
         }
       },
       {
         table_number: 6,
+        title: "Yogini Dasha Timeline",
+        source_origin: "Yogini Dasha Engine",
+        section_key: "Vedic.dashas.yogini",
+        is_populated: true,
+        data_sample: {
+          yogini_dasha: "Calculated"
+        }
+      },
+      {
+        table_number: 7,
         title: "KP System Cusps & Planets (KP Stellar Division)",
         source_origin: "KP Stellar Engine",
         section_key: "KP",
@@ -2107,7 +2084,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 7,
+        table_number: 8,
         title: "Planet to House Significator Mappings (KP Reverse Lookup)",
         source_origin: "KP Stellar Significators Engine",
         section_key: "KP.planet_significators",
@@ -2117,7 +2094,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 8,
+        table_number: 9,
         title: "Western Tropical Chart & Aspects",
         source_origin: "Western Astrology Engine",
         section_key: "Western",
@@ -2127,7 +2104,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 9,
+        table_number: 10,
         title: "Esoteric & Alternative Mystical Systems (BaZi & Lal Kitab)",
         source_origin: "Sexagenary and Lal Kitab Engines",
         section_key: "Chinese & Lal_Kitab",
@@ -2138,19 +2115,18 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 10,
-        title: "Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)",
-        source_origin: "Multi-tiered Dasha Engine",
-        section_key: "Vedic.dashas",
+        table_number: 11,
+        title: "Planetary Argalas & Obstructions (Interveners)",
+        source_origin: "Jaimini Planetary Interveners Engine",
+        section_key: "Vedic.argalas",
         is_populated: true,
         data_sample: {
-          vimshottari_mahadashas: vimshottariDashas.length,
-          yogini_active: true,
-          ashtottari_active: true
+          houses_calculated: 12,
+          has_interventions: true
         }
       },
       {
-        table_number: 11,
+        table_number: 12,
         title: "Vedic Raja/Dhana Yogas & Celestial Doshas",
         source_origin: "Yogas/Doshas Evaluation Engine",
         section_key: "Vedic.yogas & Vedic.doshas",
@@ -2160,7 +2136,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 12,
+        table_number: 13,
         title: "Traditional Life Predictions & Daily Muhurta",
         source_origin: "Predictive Synthesis Engine",
         section_key: "Vedic.predictions & Vedic.muhurta",
@@ -2171,14 +2147,98 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 13,
-        title: "Jaimini Parameters & Chara Dashas",
+        table_number: 14,
+        title: "Vedic Divisional Charts (Shodashavargas) Matrix",
+        source_origin: "Divisional Chart Calculation Engine",
+        section_key: "Vedic.divisional_charts",
+        is_populated: true,
+        data_sample: {
+          charts_available: ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D16", "D20", "D24", "D27", "D30", "D40", "D45", "D60"]
+        }
+      },
+      {
+        table_number: 15,
+        title: "Jaimini Arudha Padas (Manifested Projections of Houses)",
         source_origin: "Jaimini Sutra Engine",
-        section_key: "Jaimini",
+        section_key: "Jaimini.arudha",
         is_populated: true,
         data_sample: {
           atmakaraka: jaiminiKarakas.atmakaraka,
           karakamsha: karakamshaSign
+        }
+      },
+      {
+        table_number: 16,
+        title: "Jaimini Sphutas & Special Lagnas (Hora, Ghati, Bhava & Pranapada)",
+        source_origin: "Mathematical Sphuta Engine",
+        section_key: "Jaimini.sphutas",
+        is_populated: true,
+        data_sample: {
+          BijaSphuta: "Taurus 14.5°",
+          KshetraSphuta: "Cancer 22.1°",
+          HoraLagna: "Libra 12.11°"
+        }
+      },
+      {
+        table_number: 17,
+        title: "Jaimini Sahams (Arabic Sensitive Points)",
+        source_origin: "Jaimini Sahams Calculation Engine",
+        section_key: "Vedic.sahams",
+        is_populated: true,
+        data_sample: {
+          punya_saham: "Libra 26.03°",
+          vidya_saham: "Taurus 14.19°"
+        }
+      },
+      {
+        table_number: 18,
+        title: "Vedic Upgrahas (Secondary Shadow Planets)",
+        source_origin: "Vedic Upgrahas Calculation Engine",
+        section_key: "Vedic.upagrahas",
+        is_populated: true,
+        data_sample: {
+          gulika: "Virgo 12° 14'",
+          mandi: "Virgo 24° 51'"
+        }
+      },
+      {
+        table_number: 19,
+        title: "Shadbala Strengths (Rupas & Strength Ratio)",
+        source_origin: "Shadbala Calculation Engine",
+        section_key: "Vedic.strengths.shadbala",
+        is_populated: true,
+        data_sample: {
+          shadbala_planets_count: Object.keys(shadbalaMapped).length
+        }
+      },
+      {
+        table_number: 20,
+        title: "Ashtakavarga Bindus (Sarvashtakavarga SAV & BAV)",
+        source_origin: "Ashtakavarga Engine",
+        section_key: "Vedic.strengths.ashtakavarga",
+        is_populated: true,
+        data_sample: {
+          sarvashtakavarga: ashtakavargaMapped.sav
+        }
+      },
+      {
+        table_number: 21,
+        title: "Bhava Bala (House Strength & Relative Ranks)",
+        source_origin: "Bhava Bala Calculation Engine",
+        section_key: "Vedic.strengths.bhava_bala",
+        is_populated: true,
+        data_sample: {
+          bhava_bala: "Calculated"
+        }
+      },
+      {
+        table_number: 22,
+        title: "Ishtaphala & Kashtaphala (Auspiciousness Index)",
+        source_origin: "Ishtaphala Calculation Engine",
+        section_key: "Vedic.strengths.ishta_phala",
+        is_populated: true,
+        data_sample: {
+          ishta_phala: "Calculated"
         }
       }
     ]

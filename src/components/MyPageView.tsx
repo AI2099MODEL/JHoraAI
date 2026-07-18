@@ -67,7 +67,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
     }
   }
 
-  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18"].includes(tableId)) return null;
+  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18", "table_20", "table_21", "table_22"].includes(tableId)) return null;
   
   const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
   const thStyle = "py-2 px-3 bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider";
@@ -763,6 +763,109 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
               })}
             </tbody>
           </table>
+        </div>
+      );
+    }
+    case "table_20": {
+      const vData = profile?.Vedic || astrologyData?.vedic || {};
+      const ashtakavarga = vData.strengths?.ashtakavarga || {};
+      const bav = ashtakavarga.bav || {};
+      const sav = ashtakavarga.sav || [];
+      const ZODIAC_SIGNS_FULL = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+      
+      return (
+        <div className="overflow-x-auto font-mono text-[11px] rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="bg-slate-900 text-slate-300 border-b border-slate-800 font-sans">
+                <th className={thStyle}>Graha (Variable)</th>
+                {ZODIAC_SIGNS_FULL.map(s => (
+                  <th key={s} className="py-2 px-1.5 text-center font-bold text-[10px]">{s.substring(0,3).toUpperCase()}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/30 text-slate-300">
+              {Object.keys(bav).length > 0 ? (
+                Object.entries(bav).map(([pName, bList]: [string, any]) => (
+                  <tr key={pName} className="hover:bg-slate-900/10">
+                    <td className="py-2 px-3 font-sans font-semibold text-slate-200 border-r border-slate-800/55">{pName}</td>
+                    {Array.isArray(bList) && bList.map((pts: number, idx: number) => (
+                      <td key={idx} className={`p-2 text-center font-bold ${pts >= 5 ? "text-emerald-400" : pts <= 2 ? "text-rose-400" : "text-slate-400"}`}>
+                        {pts}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                <tr className="hover:bg-slate-900/10">
+                  <td colSpan={13} className="p-4 text-center text-slate-500 italic">No individual Ashtakavarga data available.</td>
+                </tr>
+              )}
+              {Array.isArray(sav) && sav.length > 0 && (
+                <tr className="bg-cyan-500/5 font-sans font-bold text-cyan-400 border-t border-slate-800">
+                  <td className="py-3 px-3 border-r border-slate-800">SAMUDHAYA (SAV)</td>
+                  {sav.map((pts: number, idx: number) => (
+                    <td key={idx} className={`p-3 text-center text-sm font-mono font-black ${pts >= 28 ? "text-emerald-300" : "text-slate-400"}`}>
+                      {pts}
+                    </td>
+                  ))}
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    case "table_21": {
+      const vData = profile?.Vedic || astrologyData?.vedic || {};
+      const bhava_bala = vData.strengths?.bhava_bala || {};
+      
+      return (
+        <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 mt-2">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono">
+            {Object.keys(bhava_bala).length > 0 ? (
+              Object.entries(bhava_bala).map(([hKey, bVal]: [string, any]) => (
+                <div key={hKey} className="p-2 rounded bg-slate-900/50 border border-slate-800">
+                  <span className="font-bold text-indigo-400 block font-sans text-xs">{hKey.replace("H", "House ")}</span>
+                  <span className="text-slate-300 block mt-1 text-sm">{bVal.strength_shashtiamsas}</span>
+                  <span className="text-[9px] text-amber-500 font-bold block mt-0.5">Rank: {bVal.rank}</span>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-6 text-center py-4 text-slate-500 italic text-xs">No Bhava Bala data available.</div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    case "table_22": {
+      const vData = profile?.Vedic || astrologyData?.vedic || {};
+      const ishta_phala = vData.strengths?.ishta_phala || {};
+      const kashta_phala = vData.strengths?.kashta_phala || {};
+      
+      return (
+        <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 mt-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs mt-2">
+            {Object.keys(ishta_phala).length > 0 ? (
+              Object.entries(ishta_phala).map(([pName, ishtaVal]: [string, any]) => {
+                const kashtaVal = kashta_phala[pName] || 0;
+                return (
+                  <div key={pName} className="p-4 rounded-lg bg-slate-900/20 border border-slate-850 space-y-2">
+                    <div className="flex justify-between font-bold">
+                      <span className="font-sans text-slate-200 text-sm">{pName}</span>
+                      <span className="text-xs">Ishta: <span className="text-emerald-400">{ishtaVal}</span> / Kashta: <span className="text-rose-400">{kashtaVal}</span></span>
+                    </div>
+                    <div className="w-full bg-slate-900 h-2.5 rounded overflow-hidden flex border border-slate-955">
+                      <div className="bg-emerald-500 h-full" style={{ width: `${(ishtaVal / 60) * 100}%` }} title={`Ishta: ${ishtaVal}`} />
+                      <div className="bg-rose-500 h-full" style={{ width: `${(kashtaVal / 60) * 100}%` }} title={`Kashta: ${kashtaVal}`} />
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="col-span-2 text-center py-4 text-slate-500 italic text-xs">No Ishtaphala & Kashtaphala data available.</div>
+            )}
+          </div>
         </div>
       );
     }
@@ -1566,7 +1669,7 @@ export function MyPageView({
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-amber-500" />
                 <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
-                  Unified Master Evaluation Index (18 Tables)
+                  Unified Master Evaluation Index (22 Tables)
                 </h3>
               </div>
               <span className="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded font-mono font-bold uppercase">
@@ -1574,7 +1677,7 @@ export function MyPageView({
               </span>
             </div>
             <p className={`text-xs leading-relaxed ${textMutedStyle}`}>
-              Below is the live registry of all 18 primary data tables computed by the JHora AI engine for your active profile. Each table is indexed, validated, and stored in your persistent user record.
+              Below is the live registry of all 22 primary data tables computed by the JHora AI engine for your active profile. Each table is indexed, validated, and stored in your persistent user record.
             </p>
           </div>
 
@@ -1598,10 +1701,10 @@ export function MyPageView({
               },
               {
                 table_number: 2,
-                title: "Vedic Grahas & Dignities (Planetary Placements)",
-                source_origin: "Vedic Ephemeris Engine",
-                section_key: "Vedic.planets",
-                api_source: "Vedic Astro API: /api/astrology/calculate (planets)",
+                title: "KP Graha, Nakshatra and Pada (Planetary Coordinates)",
+                source_origin: "Dehradun JHora REST API & KP Stellar Division Engine",
+                section_key: "Vedic.planets & KP.planets",
+                api_source: "KP Astro API Suite: /api/jhora/horoscope",
                 is_populated: !!profile?.Vedic?.planets,
                 data_sample: profile?.Vedic?.planets ? {
                   total_planets_mapped: Object.keys(profile.Vedic.planets).length,
@@ -1624,13 +1727,13 @@ export function MyPageView({
               },
               {
                 table_number: 4,
-                title: "Ashtakavarga Bindus (Sarvashtakavarga SAV)",
-                source_origin: "Ashtakavarga Engine",
-                section_key: "Vedic.ashtakavarga",
-                api_source: "Vedic Astro API: /api/astrology/calculate (ashtakavarga)",
+                title: "Vimshottari Dasha Timeline (To Prana)",
+                source_origin: "Dehradun JHora REST API & Dasha Engine",
+                section_key: "Vedic.dashas.vimshottari",
+                api_source: "Vedic Astro API: /api/jhora/horoscope",
                 is_populated: true,
                 data_sample: {
-                  sarvashtakavarga: [28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28]
+                  vimshottari_dasha: "Calculated"
                 }
               },
               {
@@ -1646,6 +1749,17 @@ export function MyPageView({
               },
               {
                 table_number: 6,
+                title: "Yogini Dasha Timeline",
+                source_origin: "Yogini Dasha Engine",
+                section_key: "Vedic.dashas.yogini",
+                api_source: "Vedic Astro API: /api/astrology/calculate (dashas.yogini)",
+                is_populated: true,
+                data_sample: {
+                  yogini_dasha: "Calculated"
+                }
+              },
+              {
+                table_number: 7,
                 title: "KP System Cusps & Planets (KP Stellar Division)",
                 source_origin: "KP Stellar Engine",
                 section_key: "KP",
@@ -1656,7 +1770,7 @@ export function MyPageView({
                 }
               },
               {
-                table_number: 7,
+                table_number: 8,
                 title: "Planet to House Significator Mappings (KP Reverse Lookup)",
                 source_origin: "KP Stellar Significators Engine",
                 section_key: "KP.planet_significators",
@@ -1667,7 +1781,7 @@ export function MyPageView({
                 }
               },
               {
-                table_number: 8,
+                table_number: 9,
                 title: "Western Tropical Chart & Aspects",
                 source_origin: "Western Astrology Engine",
                 section_key: "Western",
@@ -1678,7 +1792,7 @@ export function MyPageView({
                 }
               },
               {
-                table_number: 9,
+                table_number: 10,
                 title: "Esoteric & Alternative Mystical Systems (BaZi & Lal Kitab)",
                 source_origin: "Sexagenary and Lal Kitab Engines",
                 section_key: "Chinese & Lal_Kitab",
@@ -1690,7 +1804,7 @@ export function MyPageView({
                 }
               },
               {
-                table_number: 10,
+                table_number: 11,
                 title: "Planetary Argalas & Obstructions (Interveners)",
                 source_origin: "Jaimini Planetary Interveners Engine",
                 section_key: "Vedic.argalas",
@@ -1702,7 +1816,7 @@ export function MyPageView({
                 }
               },
               {
-                table_number: 11,
+                table_number: 12,
                 title: "Vedic Raja/Dhana Yogas & Celestial Doshas",
                 source_origin: "Yogas/Doshas Evaluation Engine",
                 section_key: "Vedic.yogas & Vedic.doshas",
@@ -1713,7 +1827,7 @@ export function MyPageView({
                 }
               },
               {
-                table_number: 12,
+                table_number: 13,
                 title: "Traditional Life Predictions & Daily Muhurta",
                 source_origin: "Predictive Synthesis Engine",
                 section_key: "Vedic.predictions & Vedic.muhurta",
@@ -1725,7 +1839,7 @@ export function MyPageView({
                 }
               },
               {
-                table_number: 13,
+                table_number: 14,
                 title: "Vedic Divisional Charts (Shodashavargas) Matrix",
                 source_origin: "Divisional Chart Calculation Engine",
                 section_key: "Vedic.divisional_charts",
@@ -1736,7 +1850,7 @@ export function MyPageView({
                 }
               },
               {
-                table_number: 14,
+                table_number: 15,
                 title: "Jaimini Arudha Padas (Manifested Projections of Houses)",
                 source_origin: "Jaimini Sutra Engine",
                 section_key: "Jaimini.arudha",
@@ -1748,7 +1862,7 @@ export function MyPageView({
                 }
               },
               {
-                table_number: 15,
+                table_number: 16,
                 title: "Jaimini Sphutas & Special Lagnas (Hora, Ghati, Bhava & Pranapada)",
                 source_origin: "Mathematical Sphuta Engine",
                 section_key: "Jaimini.sphutas",
@@ -1758,17 +1872,6 @@ export function MyPageView({
                   BijaSphuta: "Taurus 14.5°",
                   KshetraSphuta: "Cancer 22.1°",
                   HoraLagna: "Libra 12.11°"
-                }
-              },
-              {
-                table_number: 16,
-                title: "Shadbala Strengths (Rupas & Strength Ratio)",
-                source_origin: "Shadbala Calculation Engine",
-                section_key: "Vedic.strengths.shadbala",
-                api_source: "Computed Client-side / JHora Mapper (Shadbala)",
-                is_populated: true,
-                data_sample: {
-                  shadbala_strengths: "Calculated"
                 }
               },
               {
@@ -1793,6 +1896,50 @@ export function MyPageView({
                 data_sample: {
                   gulika: "Virgo 12.14°",
                   mandi: "Virgo 24.51°"
+                }
+              },
+              {
+                table_number: 19,
+                title: "Shadbala Strengths (Rupas & Strength Ratio)",
+                source_origin: "Shadbala Calculation Engine",
+                section_key: "Vedic.strengths.shadbala",
+                api_source: "Computed Client-side / JHora Mapper (Shadbala)",
+                is_populated: true,
+                data_sample: {
+                  shadbala_strengths: "Calculated"
+                }
+              },
+              {
+                table_number: 20,
+                title: "Ashtakavarga Bindus (Sarvashtakavarga SAV & BAV)",
+                source_origin: "Ashtakavarga Engine",
+                section_key: "Vedic.strengths.ashtakavarga",
+                api_source: "Computed Client-side / JHora Mapper (Ashtakavarga)",
+                is_populated: true,
+                data_sample: {
+                  sarvashtakavarga: [28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28]
+                }
+              },
+              {
+                table_number: 21,
+                title: "Bhava Bala (House Strength & Relative Ranks)",
+                source_origin: "Bhava Bala Calculation Engine",
+                section_key: "Vedic.strengths.bhava_bala",
+                api_source: "Computed Client-side / JHora Mapper (Bhava Bala)",
+                is_populated: true,
+                data_sample: {
+                  bhava_bala: "Calculated"
+                }
+              },
+              {
+                table_number: 22,
+                title: "Ishtaphala & Kashtaphala (Auspiciousness Index)",
+                source_origin: "Ishtaphala Calculation Engine",
+                section_key: "Vedic.strengths.ishta_phala",
+                api_source: "Computed Client-side / JHora Mapper (Ishtaphala)",
+                is_populated: true,
+                data_sample: {
+                  ishta_phala: "Calculated"
                 }
               }
             ]).map((table: any, idx: number) => {
@@ -2005,6 +2152,51 @@ export function MyPageView({
             </div>
             <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
               {renderIndexedTable("table_18", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 20: Ashtakavarga Bindus */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 20
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Ashtakavarga Bindu Points (SAV / BAV)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_20", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 21: Bhava Bala */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 21
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Bhava Bala (House Strength Analysis)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_21", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 22: Ishtaphala & Kashtaphala */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 22
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Ishtaphala & Kashtaphala (Auspiciousness Index)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_22", null, profile, astrologyData)}
             </div>
           </div>
         </div>

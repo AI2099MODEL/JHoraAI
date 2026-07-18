@@ -832,20 +832,20 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "table_9", label: "Table 9" },
       { id: "table_11", label: "Table 11" },
       { id: "table_12", label: "Table 12" },
-      { id: "divisionalCharts", label: "Table 13" },
-      { id: "shadBala", label: "Table 16" },
-      { id: "ishtaPhala", label: "ishtaPhala*" },
-      { id: "bhavaBala", label: "bhavaBala*" },
-      { id: "ashtakavarga", label: "ashtakavarga*" },
+      { id: "divisionalCharts", label: "Table 14" },
+      { id: "shadBala", label: "Table 19" },
+      { id: "ishtaPhala", label: "Table 22" },
+      { id: "bhavaBala", label: "Table 21" },
+      { id: "ashtakavarga", label: "Table 20" },
       { id: "yogas", label: "yogas*" },
       { id: "doshas", label: "doshas*" },
       { id: "longevity", label: "longevity*" },
       { id: "sadeSati", label: "sadeSati*" },
       { id: "jaimini", label: "jaimini*" },
-      { id: "arudhas", label: "Table 14" },
-      { id: "sphutas", label: "Table 15" },
-      { id: "upagrahas", label: "upagrahas*" },
-      { id: "sahams", label: "sahams*" },
+      { id: "arudhas", label: "Table 15" },
+      { id: "sphutas", label: "Table 16" },
+      { id: "upagrahas", label: "Table 18" },
+      { id: "sahams", label: "Table 17" },
       { id: "special_lagnas", label: "specialLagnas*" },
       { id: "argalas", label: "Table 10" },
       { id: "charaDasha", label: "charaDasha*" },
@@ -4168,7 +4168,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 <div className="space-y-6">
                   <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
                     <div className="border-b border-slate-800 pb-2">
-                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 16: Vedic Shadbala Strengths (Rupas & Strength Ratio)</h4>
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 19: Vedic Shadbala Strengths (Rupas & Strength Ratio)</h4>
                     </div>
                     <div className="overflow-x-auto font-mono text-xs md:text-sm">
                       <table className="w-full text-left">
@@ -4208,7 +4208,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 <div className="space-y-6">
                   <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
                     <div className="border-b border-slate-800 pb-2">
-                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">ishtaPhala & kashtaPhala (Auspiciousness Index)</h4>
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 22: Ishtaphala & Kashtaphala (Auspiciousness Index)</h4>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs md:text-sm mt-2">
                       {Object.entries(vedicData?.strengths?.ishta_phala || {}).map(([pName, ishtaVal]: [string, any]) => {
@@ -4234,7 +4234,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               {vedicSubTab === "bhavaBala" && (
                 <div className="space-y-6">
                   <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
-                    <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800 pb-2 font-mono">bhavaBala</span>
+                    <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono border-b border-slate-800 pb-2">Table 21: Bhava Bala (House Strength Analysis)</h4>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono">
                       {Object.entries(vedicData?.strengths?.bhava_bala || {}).map(([hKey, bVal]: [string, any]) => (
                         <div key={hKey} className="p-2 rounded bg-slate-900/50 border border-slate-800">
@@ -4252,7 +4252,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 <div className="space-y-6">
                   <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
                     <div className="border-b border-slate-800 pb-2">
-                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">ashtakavarga</h4>
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 20: Ashtakavarga Bindus (SAV & BAV)</h4>
                     </div>
                     <div className="overflow-x-auto font-mono text-[11px]">
                       <table className="w-full text-left border-collapse">
@@ -4412,7 +4412,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 <div className="space-y-6">
                   <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
                     <div className="border-b border-slate-800 pb-2">
-                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 14: Jaimini Arudha Padas (Manifested Projections of Houses)</h4>
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 15: Jaimini Arudha Padas (Manifested Projections of Houses)</h4>
                     </div>
                     <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 font-mono text-center text-xs sm:text-sm mt-2">
                       {Object.entries(jaiminiData?.arudha || {}).map(([padKey, padVal]: [string, any]) => (
@@ -4550,7 +4550,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 <div className="space-y-6">
                   <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono">
                     <div className="border-b border-slate-800 pb-2">
-                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 15: Jaimini Sphutas & Special Lagnas (Hora, Ghati, Bhava, and Pranapada)</h4>
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 16: Jaimini Sphutas & Special Lagnas (Hora, Ghati, Bhava, and Pranapada)</h4>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mt-2">
                       <div className="p-3.5 rounded-lg bg-slate-900/40 border border-slate-800">
