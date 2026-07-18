@@ -1832,6 +1832,18 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       },
       {
         table_number: 3,
+        title: "Vimshottari Dasha Timeline (To Prana)",
+        source_origin: "Dehradun JHora REST API (/api/jhora/horoscope) & Dasha Engine",
+        section_key: "Vedic.dashas.vimshottari",
+        is_populated: vimshottariDashas.length > 0,
+        data_sample: {
+          total_mahadashas: vimshottariDashas.length,
+          sample_mahadasha: vimshottariDashas[0]?.lord || "Unknown",
+          levels_mapped: ["Maha", "Antar", "Pratyantar", "Sookshma", "Prana"]
+        }
+      },
+      {
+        table_number: 4,
         title: "Astronomical Alignment Parameters",
         source_origin: "Background Astronomical Engine",
         section_key: "Astronomical",
@@ -1843,7 +1855,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 4,
+        table_number: 5,
         title: "Planetary Dignities & States (Vedic)",
         source_origin: "Vedic Ephemeris Engine",
         section_key: "Vedic.planets",
@@ -1854,7 +1866,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 5,
+        table_number: 6,
         title: "KP System Cusps & Planets (KP)",
         source_origin: "KP Stellar Engine",
         section_key: "KP",
@@ -1865,7 +1877,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 6,
+        table_number: 7,
         title: "Jaimini Parameters & Dashas (Jaimini)",
         source_origin: "Jaimini Sutra Engine",
         section_key: "Jaimini",
@@ -1876,7 +1888,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 7,
+        table_number: 8,
         title: "Lal Kitab Placements & Remedies",
         source_origin: "Lal Kitab Engine",
         section_key: "Lal_Kitab",
@@ -1886,7 +1898,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         }
       },
       {
-        table_number: 8,
+        table_number: 9,
         title: "Tajik Varshaphal Aspects & Muntha",
         source_origin: "Tajik Annual Solar Returns",
         section_key: "Tajik",
@@ -1894,7 +1906,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         data_sample: tajikSection.varshaphal_2026
       },
       {
-        table_number: 9,
+        table_number: 10,
         title: "Chinese BaZi Four Pillars",
         source_origin: "Chinese Sexagenary Engine",
         section_key: "Chinese",
@@ -1902,7 +1914,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
         data_sample: baziSection.pillars
       },
       {
-        table_number: 10,
+        table_number: 11,
         title: "Tropical Western Chart & Aspects",
         source_origin: "Western Astrology Engine",
         section_key: "Western",

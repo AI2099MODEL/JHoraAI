@@ -126,6 +126,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [selectedAntarIdx, setSelectedAntarIdx] = useState<number | null>(null);
   const [selectedPratyantarIdx, setSelectedPratyantarIdx] = useState<number | null>(null);
   const [selectedSookshmaIdx, setSelectedSookshmaIdx] = useState<number | null>(null);
+  const [selectedPranaIdx, setSelectedPranaIdx] = useState<number | null>(null);
 
   // KP Subtabs state variables
   const [kpSubTab, setKpSubTab] = useState<string>("kp_cusps");
@@ -681,11 +682,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     if (!astrologyData) return list;
 
     const supportedKeys = [
-      { id: "table_1", label: "table 1" },
-      { id: "table_2", label: "table 2" },
+      { id: "table_1", label: "Table 1" },
+      { id: "table_2", label: "Table 2" },
+      { id: "table_3", label: "Table 3" },
       { id: "panchanga", label: "panchanga" },
       { id: "divisionalCharts", label: "divisionalCharts" },
-      { id: "dashas", label: "dashas*" },
       { id: "shadBala", label: "shadBala*" },
       { id: "ishtaPhala", label: "ishtaPhala*" },
       { id: "bhavaBala", label: "bhavaBala*" },
@@ -727,6 +728,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       }
       if (item.id === "table_2") {
         dataVal = astrologyData.planets || { dummy: true };
+      }
+      if (item.id === "table_3") {
+        dataVal = astrologyData.dashas || { dummy: true };
       }
       if (item.id === "special_lagnas" && !dataVal) {
         dataVal = astrologyData.special_lagnas || { dummy: true };
@@ -2594,7 +2598,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               </div>
             )}
 
-              {vedicSubTab === "dashas" && ((dashas && dashas.length > 0) || (astrologyData?.additionalDashas?.yogini && astrologyData.additionalDashas.yogini.length > 0)) && (
+              {vedicSubTab === "table_3" && ((dashas && dashas.length > 0) || (astrologyData?.additionalDashas?.yogini && astrologyData.additionalDashas.yogini.length > 0)) && (
                 <div className="space-y-6 text-[10.5px] sm:text-xs">
                   {/* Active Pathway Header & Selection Tracker */}
                   <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/50 space-y-3">
@@ -2602,7 +2606,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                       <div>
                         <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
                           <Clock className="w-4 h-4 text-amber-400" />
-                          dashas
+                          Table 3: Vimshottari Dasha Timeline (To Prana)
                         </h4>
                       <p className="text-[10px] text-slate-400 font-sans mt-0.5">
                         Interactive down to minutes: click any period to drill down. Yellow items are currently active.
@@ -2625,7 +2629,15 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                               setSelectedPratyantarIdx(pIdx);
                               const p = a.pratyantars[pIdx];
                               const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
-                              setSelectedSookshmaIdx(sIdx !== -1 ? sIdx : 0);
+                              if (sIdx !== -1) {
+                                setSelectedSookshmaIdx(sIdx);
+                                const s = p.sookshmas[sIdx];
+                                const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
+                                setSelectedPranaIdx(prIdx !== -1 ? prIdx : 0);
+                              } else {
+                                setSelectedSookshmaIdx(0);
+                                setSelectedPranaIdx(0);
+                              }
                             }
                           }
                         }
@@ -2674,6 +2686,10 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                 if (selectedSookshmaIdx !== null && p.sookshmas[selectedSookshmaIdx]) {
                                   const s = p.sookshmas[selectedSookshmaIdx];
                                   path += ` ➔ ${s.lord}`;
+                                  if (selectedPranaIdx !== null && s.pranas && s.pranas[selectedPranaIdx]) {
+                                    const pr = s.pranas[selectedPranaIdx];
+                                    path += ` ➔ ${pr.lord}`;
+                                  }
                                 }
                               }
                             }
@@ -2705,6 +2721,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                               setSelectedAntarIdx(0);
                               setSelectedPratyantarIdx(0);
                               setSelectedSookshmaIdx(0);
+                              setSelectedPranaIdx(0);
                             }}
                             className={`p-2 rounded cursor-pointer transition-all border text-left ${
                               isActive
@@ -2745,6 +2762,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                                 setSelectedAntarIdx(idx);
                                 setSelectedPratyantarIdx(0);
                                 setSelectedSookshmaIdx(0);
+                                setSelectedPranaIdx(0);
                               }}
                               className={`p-2 rounded cursor-pointer transition-all border text-left ${
                                 isActive
@@ -2787,6 +2805,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                               onClick={() => {
                                 setSelectedPratyantarIdx(idx);
                                 setSelectedSookshmaIdx(0);
+                                setSelectedPranaIdx(0);
                               }}
                               className={`p-2 rounded cursor-pointer transition-all border text-left ${
                                 isActive
@@ -2826,7 +2845,10 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                           return (
                             <div
                               key={idx}
-                              onClick={() => setSelectedSookshmaIdx(idx)}
+                              onClick={() => {
+                                setSelectedSookshmaIdx(idx);
+                                setSelectedPranaIdx(0);
+                              }}
                               className={`p-2 rounded cursor-pointer transition-all border text-left ${
                                 isActive
                                   ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
@@ -2861,13 +2883,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                         dashaTree[selectedMahaIdx].antars[selectedAntarIdx].pratyantars[selectedPratyantarIdx].sookshmas[selectedSookshmaIdx].pranas.map((pr: any, idx: number) => {
                           const now = new Date();
                           const isActive = now >= pr.start && now <= pr.end;
+                          const isSelected = selectedPranaIdx === idx;
                           return (
                             <div
                               key={idx}
-                              className={`p-2 rounded border text-left ${
+                              onClick={() => setSelectedPranaIdx(idx)}
+                              className={`p-2 rounded border text-left cursor-pointer transition-all ${
                                 isActive
                                   ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
-                                  : "border-slate-800/20 bg-slate-900/10 text-slate-400"
+                                  : isSelected
+                                  ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                  : "border-slate-800/20 bg-slate-900/10 text-slate-400 hover:bg-slate-900/20 hover:text-slate-300"
                               }`}
                             >
                               <div className="flex justify-between items-center">
