@@ -1594,7 +1594,7 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
     }
   };
 
-  return {
+  const profileData = {
     User: userSection,
     Birth: birthSection,
     Astronomical: {
@@ -1792,6 +1792,116 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       ...currentSkySection
     },
     Validation: validationSection
+  };
+
+  const tableIndex = {
+    metadata: {
+      indexing_agent: "JHoraAI Master Evaluation Indexer",
+      indexed_on: nowStr,
+      handbook_reference: "/documents/master_astro_handbook.md",
+      status: "SYNC_ACTIVE"
+    },
+    tables: [
+      {
+        table_number: 1,
+        title: "Birth Details",
+        source_origin: "Dashboard Page / Input Form",
+        section_key: "Birth",
+        is_populated: true,
+        data_sample: {
+          profile_name: userSection.profile_name,
+          date: birthSection.date,
+          time: birthSection.time,
+          place: birthSection.place
+        }
+      },
+      {
+        table_number: 2,
+        title: "Astronomical Alignment Parameters",
+        source_origin: "Background Astronomical Engine",
+        section_key: "Astronomical",
+        is_populated: true,
+        data_sample: {
+          julian_day_number: astronomicalSection.julian_day_number,
+          sidereal_time: astronomicalSection.sidereal_time,
+          moon_phase: astronomicalSection.moon_phase
+        }
+      },
+      {
+        table_number: 3,
+        title: "Planetary Dignities & States (Vedic)",
+        source_origin: "Vedic Ephemeris Engine",
+        section_key: "Vedic.planets",
+        is_populated: Object.keys(planetsMap).length > 0,
+        data_sample: {
+          total_planets_mapped: Object.keys(planetsMap).length,
+          planets_list: Object.keys(planetsMap)
+        }
+      },
+      {
+        table_number: 4,
+        title: "KP System Cusps & Planets (KP)",
+        source_origin: "KP Stellar Engine",
+        section_key: "KP",
+        is_populated: Object.keys(kpPlanets).length > 0,
+        data_sample: {
+          cusps_count: Object.keys(kpCusps).length,
+          ruling_planets: kpRulingPlanets
+        }
+      },
+      {
+        table_number: 5,
+        title: "Jaimini Parameters & Dashas (Jaimini)",
+        source_origin: "Jaimini Sutra Engine",
+        section_key: "Jaimini",
+        is_populated: true,
+        data_sample: {
+          atmakaraka: jaiminiKarakas.atmakaraka,
+          karakamsha: karakamshaSign
+        }
+      },
+      {
+        table_number: 6,
+        title: "Lal Kitab Placements & Remedies",
+        source_origin: "Lal Kitab Engine",
+        section_key: "Lal_Kitab",
+        is_populated: true,
+        data_sample: {
+          total_remedies: Object.keys(lalKitabRemedies).length
+        }
+      },
+      {
+        table_number: 7,
+        title: "Tajik Varshaphal Aspects & Muntha",
+        source_origin: "Tajik Annual Solar Returns",
+        section_key: "Tajik",
+        is_populated: true,
+        data_sample: tajikSection.varshaphal_2026
+      },
+      {
+        table_number: 8,
+        title: "Chinese BaZi Four Pillars",
+        source_origin: "Chinese Sexagenary Engine",
+        section_key: "Chinese",
+        is_populated: true,
+        data_sample: baziSection.pillars
+      },
+      {
+        table_number: 9,
+        title: "Tropical Western Chart & Aspects",
+        source_origin: "Western Astrology Engine",
+        section_key: "Western",
+        is_populated: true,
+        data_sample: {
+          aspects_count: westernAspectsMapped.length
+        }
+      }
+    ]
+  };
+
+  return {
+    ...profileData,
+    TableIndex: tableIndex
   };
 }
 

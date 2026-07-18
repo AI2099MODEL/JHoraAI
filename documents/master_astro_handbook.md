@@ -35,6 +35,77 @@ This table represents the layout schema of the primary birth particulars. The en
 | **Ephemeris Used** | `string` | Background Library | Calculation engine background source (`Birth.ephemeris_used`) |
 | **House System** | `string` | **Dashboard Page** Settings | Structural house division rules applied (e.g., Placidus / KP Cusps) |
 
+#### Table 2: Astronomical Alignment Parameters (Data Schema & Index Logic)
+This table indexes the calculated astronomical parameters from the ephemeris.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Julian Day** | `string` | Astronomical Calculation Engine | Derived dynamically from UTC birth moment timestamp (`Astronomical.julian_day_number`) |
+| **Sidereal Time** | `string` | Local Sidereal Meridian | Derived dynamically from longitude and UTC birth time (`Astronomical.sidereal_time`) |
+| **Obliquity** | `string` | Ecliptic inclination | Obliquity of the ecliptic derived for Julian epoch (`Astronomical.obliquity`) |
+| **Sunrise / Sunset** | `string` | Solar Horizon calculation | Calculated solar rise and set times for coordinates (`Astronomical.sunrise` / `sunset`) |
+| **Moon Phase** | `string` | Tithi calculation | Angular distance of Moon from Sun at birth (`Astronomical.moon_phase`) |
+
+#### Table 3: Planetary Placements & Dignities (Vedic Engine)
+This table indexes the calculated planetary longitudinal values, zodiac signs, and houses.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Planet Longitude** | `float` | JHora Raw API / Swiss Ephemeris | Celestial longitude in 360-degree coordinates (`Vedic.planets.[Planet].longitude`) |
+| **House Placement** | `int` | Divisional Chart Engine | Bhava division placement (`Vedic.planets.[Planet].house`) |
+| **Sign Placement** | `string` | Zodiac Sign Map | Zodiacal sign containing the planet coordinate (`Vedic.planets.[Planet].sign`) |
+| **Nakshatra** | `string` | Nakshatra Engine | 27-Nakshatra division mapping (`Vedic.planets.[Planet].nakshatra`) |
+
+#### Table 4: KP System Cusps & Planets (KP Engine)
+This table indexes the Krishnamurti Paddhati stellar, sub, and sub-sub significators.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Cuspal Sub-Lord** | `string` | KP Stellar Division Engine | Sub-lord of Placidus house cusps 1 to 12 (`KP.cusps.[House].sub_lord`) |
+| **Planet Sub-Lord** | `string` | KP Stellar Division Engine | Sub-lord of natal planetary placements (`KP.planets.[Planet].sub_lord`) |
+| **Significators** | `array` | KP Significator Engine | Houses signified by planets under KP rules (`KP.planet_significators`) |
+
+#### Table 5: Jaimini Parameters & Dashas (Jaimini Engine)
+This table indexes the Jaimini karakas, arudhas, and Chara Dashas.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Chara Karakas** | `object` | Jaimini Rank Engine | Planetary rankings by degree (Atmakaraka to Darakaraka) (`Jaimini.karakas`) |
+| **Arudha Padas** | `object` | Pada Projection Engine | Arudha houses calculated relative to house lords (`Jaimini.arudha`) |
+| **Chara Dashas** | `array` | Jaimini Dasha Engine | Sign-based dasha progression sequence and durations (`Jaimini.chara_dasha`) |
+
+#### Table 6: Lal Kitab Placements & Remedies (Lal Kitab Engine)
+This table indexes Lal Kitab house translations and astrological remedies.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Pucca Ghar** | `string` | Lal Kitab Translation | Planet placements translated to Aries-Ascendant house mapping (`Lal_Kitab.houses`) |
+| **Remedies** | `object` | Lal Kitab Traditional Book | Specific planetary remedies for natal positions (`Lal_Kitab.remedies`) |
+
+#### Table 7: Tajik Varshaphal Aspects & Muntha (Tajik Engine)
+This table indexes annual solar return Muntha and Tajik aspects.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Muntha House** | `int` | Tajik Progression Engine | progressed annual lagna house (`Tajik.varshaphal_2026.muntha_house`) |
+| **Tajik Aspects** | `array` | Harsha/Ithasala Engine | Tajik yoga aspects (e.g. Ithasala, Eesapha) (`Tajik.varshaphal_2026.aspects`) |
+
+#### Table 8: Chinese BaZi Four Pillars (Bazi Engine)
+This table indexes Chinese Sexagenary cycle parameters (Year, Month, Day, and Hour Pillars).
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Pillars** | `object` | Chinese BaZi Calendar Engine | Stems and branches mapped to birth date-time (`Chinese.pillars`) |
+| **Elements Balance**| `object` | Element Quantification | Wood, Fire, Earth, Metal, and Water counts (`Chinese.elements`) |
+
+#### Table 9: Tropical Western Chart & Aspects (Western Engine)
+This table indexes Tropical Western astrology planets, cusps, and aspects.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Tropical Positions**| `object` | Ptolemaic Western Projection | Planets/cusps projected onto Tropical zodiac (`Western.planets` / `cusps`) |
+| **Aspects & Orbs** | `array` | Aspect Angle Engine | Calculated aspects with exact orb angles (`Western.aspects`) |
+
 ---
 
 ## II. ASTROLOGICAL RULES & LOGIC GATES
