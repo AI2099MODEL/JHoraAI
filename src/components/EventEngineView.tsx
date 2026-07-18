@@ -857,9 +857,9 @@ export const EventEngineView: React.FC<EventEngineViewProps> = ({ isDark = true,
       <div className={`p-4 rounded-xl border ${isDark ? "border-indigo-500/10 bg-indigo-500/5" : "border-indigo-100 bg-indigo-50/40"} flex items-start gap-3 text-xs leading-relaxed`}>
         <Info className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
         <div className={`space-y-1 ${isDark ? "text-slate-300" : "text-neutral-600"}`}>
-          <span className={`font-bold ${isDark ? "text-slate-200" : "text-neutral-800"}`}>Calculated Data Verification Mode:</span>
+          <span className={`font-bold ${isDark ? "text-slate-200" : "text-neutral-800"}`}>Sequential Calculation Pipeline Mode:</span>
           <p>
-            The engine is running. Click on any row to expand the <strong className="text-amber-500 font-bold">Calculation Verification Log</strong> to see exactly which active profile variables are captured and evaluated at that phase of the pipeline.
+            The engine is running. All active profile variables are captured and evaluated at each phase of the pipeline.
           </p>
         </div>
       </div>
@@ -1067,17 +1067,6 @@ export const EventEngineView: React.FC<EventEngineViewProps> = ({ isDark = true,
                       ) : (
                         <div className="flex items-center justify-center gap-1.5">
                           <button
-                            onClick={() => setExpandedStepId(isExpanded ? null : step.id)}
-                            className={`p-1.5 rounded border transition-colors cursor-pointer ${
-                              isExpanded 
-                                ? "bg-amber-500/10 border-amber-500/30 text-amber-400" 
-                                : "bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border-slate-700"
-                            }`}
-                            title="Verify Captured Profile Data"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                          </button>
-                          <button
                             onClick={() => startEdit(step)}
                             className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700 hover:border-slate-600 transition-colors cursor-pointer"
                             title="Edit Step"
@@ -1095,32 +1084,6 @@ export const EventEngineView: React.FC<EventEngineViewProps> = ({ isDark = true,
                       )}
                     </td>
                   </tr>
-
-                  {/* Expanded Verification Card Drawer */}
-                  {isExpanded && (
-                    <tr className={isDark ? "bg-slate-950/40" : "bg-neutral-50/20"}>
-                      <td colSpan={6} className="p-4 pl-12 border-b border-indigo-500/5">
-                        <div className={`p-5 rounded-xl border ${isDark ? "bg-slate-950/70 border-slate-800/80" : "bg-white border-neutral-200 shadow-sm"} space-y-4 animate-fade-in`}>
-                          <div className="flex items-center justify-between border-b border-indigo-500/5 pb-2">
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                              <span className={`text-xs font-bold ${isDark ? "text-slate-200" : "text-neutral-800"} font-sans`}>
-                                Calculation Verification Log: <strong className="text-amber-500 font-mono text-[11px] bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/25 ml-1">{step.stepNumber}</strong>
-                              </span>
-                            </div>
-                            <span className="flex items-center gap-1.5 text-[9px] font-bold font-mono text-emerald-400 uppercase bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                              LOADED
-                            </span>
-                          </div>
-                          
-                          <div className={`text-xs ${isDark ? "text-slate-300" : "text-neutral-600"} space-y-3`}>
-                            {renderStepVerificationData(step.id)}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
                 </React.Fragment>
               );
             })}

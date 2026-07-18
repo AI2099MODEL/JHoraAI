@@ -78,6 +78,7 @@ interface HoroscopeReportViewProps {
   mapAstrologyDataToUserProfileJSON: (user: any, data: any) => any;
   setAstrologyData: (data: any) => void;
   onLoadProfile?: (record: CachedHoroscopeRecord) => void;
+  onLoadProfileByName?: (name: string) => void;
   isDark: boolean;
   currentDateTime: Date;
   headerGps: {
@@ -96,6 +97,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   mapAstrologyDataToUserProfileJSON,
   setAstrologyData,
   onLoadProfile,
+  onLoadProfileByName,
   isDark,
   currentDateTime,
   headerGps,
@@ -1749,20 +1751,27 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               </span>
             </div>
             
-            {profilesList.length > 0 ? (
-              <div className="flex items-center gap-1.5">
-                <select
-                  value={
-                    profilesList.find(p => 
-                      p.name === birthDetails.name && 
-                      p.date === birthDetails.date && 
-                      p.time === birthDetails.time
-                    )?.id || 
-                    profilesList.find(p => p.name === birthDetails.name)?.id || 
-                    ""
-                  }
-                  onChange={(e) => {
-                    const selected = profilesList.find(p => p.id === e.target.value);
+            <div className="flex items-center gap-1.5">
+              <select
+                value={
+                  birthDetails?.name === "Nitin"
+                    ? "Nitin"
+                    : profilesList.find(p => 
+                        p.name === birthDetails?.name && 
+                        p.date === birthDetails?.date && 
+                        p.time === birthDetails?.time
+                      )?.id || 
+                      profilesList.find(p => p.name === birthDetails?.name)?.id || 
+                      "Nitin"
+                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "Nitin") {
+                    if (onLoadProfileByName) {
+                      onLoadProfileByName("Nitin");
+                    }
+                  } else {
+                    const selected = profilesList.find(p => p.id === val);
                     if (selected) {
                       if (onLoadProfile) {
                         onLoadProfile(selected);
@@ -1770,20 +1779,18 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                         setAstrologyData(selected.data);
                       }
                     }
-                  }}
-                  className="bg-slate-900/90 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500/50 cursor-pointer font-medium"
-                >
-                  <option value="" disabled>-- Select a Profile --</option>
-                  {profilesList.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} ({p.date})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ) : (
-              <span className="text-xs text-slate-400 italic">No profiles cached</span>
-            )}
+                  }
+                }}
+                className="bg-slate-900/90 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500/50 cursor-pointer font-medium font-sans"
+              >
+                <option value="Nitin">Nitin (Default)</option>
+                {profilesList.filter(p => p.name !== "Nitin").map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.date})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Right: Transit Location geocoder input */}

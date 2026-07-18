@@ -588,6 +588,30 @@ export default function App() {
     localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
   };
 
+  const handleLoadProfileByName = (name: string) => {
+    if (name === "Nitin") {
+      setInputs({
+        name: "Nitin",
+        date: "1976-01-06",
+        time: "06:40 PM",
+        location: "Dehradun, Uttarakhand, India",
+        latitude: 30.3165,
+        longitude: 78.0322,
+        timezone: 5.5,
+      });
+      setLocalTimeInput("06:40");
+      setLocalAmpm("PM");
+      setTimeout(() => {
+        handleCalculate(false);
+      }, 50);
+    } else {
+      const matchedRecord = cachedList.find(r => r.name === name);
+      if (matchedRecord) {
+        handleLoadProfileDirect(matchedRecord);
+      }
+    }
+  };
+
   // Load calculated chart from localStorage on mount
   useEffect(() => {
     loadCacheHistory();
@@ -1359,30 +1383,7 @@ export default function App() {
               <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Native:</span>
               <select
                 value={astrologyData?.birthDetails?.name || "Nitin"}
-                onChange={(e) => {
-                  const selectedName = e.target.value;
-                  if (selectedName === "Nitin" && (!astrologyData || astrologyData.birthDetails.name !== "Nitin")) {
-                    setInputs({
-                      name: "Nitin",
-                      date: "1976-01-06",
-                      time: "06:40 PM",
-                      location: "Dehradun, Uttarakhand, India",
-                      latitude: 30.3165,
-                      longitude: 78.0322,
-                      timezone: 5.5,
-                    });
-                    setLocalTimeInput("06:40");
-                    setLocalAmpm("PM");
-                    setTimeout(() => {
-                      handleCalculate(false);
-                    }, 50);
-                  } else {
-                    const matchedRecord = cachedList.find(r => r.name === selectedName);
-                    if (matchedRecord) {
-                      handleLoadProfileDirect(matchedRecord);
-                    }
-                  }
-                }}
+                onChange={(e) => handleLoadProfileByName(e.target.value)}
                 className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
                   isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
                 }`}
@@ -2061,6 +2062,7 @@ export default function App() {
                   mapAstrologyDataToUserProfileJSON={mapAstrologyDataToUserProfileJSON}
                   setAstrologyData={setAstrologyData}
                   onLoadProfile={handleLoadProfileDirect}
+                  onLoadProfileByName={handleLoadProfileByName}
                   isDark={isDark}
                   currentDateTime={currentDateTime}
                   headerGps={headerGps}
@@ -2460,21 +2462,42 @@ export default function App() {
                                 <div className="text-[10px] text-slate-400">📅 {rec.date} • 🕒 {rec.time}</div>
                                 <div className="text-[10px] text-slate-400 truncate">📍 {rec.location}</div>
                               </div>
-                              <div className="flex items-center gap-1.5 pt-2 border-t border-indigo-500/5">
-                                <button
-                                  onClick={() => handleDownloadPdfForRecord(rec)}
-                                  className="flex-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/10 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1"
-                                >
-                                  <FileText className="w-3 h-3" />
-                                  PDF
-                                </button>
-                                <button
-                                  onClick={() => handleExportJsonForRecord(rec)}
-                                  className="flex-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-indigo-500/10 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1"
-                                >
-                                  <Download className="w-3 h-3" />
-                                  JSON
-                                </button>
+                              <div className="space-y-1.5 pt-2 border-t border-indigo-500/5">
+                                {(() => {
+                                  const isLoaded = astrologyData?.birthDetails?.name === rec.name && 
+                                                   astrologyData?.birthDetails?.date === rec.date && 
+                                                   astrologyData?.birthDetails?.time === rec.time;
+                                  return (
+                                    <button
+                                      onClick={() => handleLoadProfileWithCheck(rec)}
+                                      className={`w-full py-1.5 rounded-lg text-[10px] font-bold cursor-pointer transition-colors flex items-center justify-center gap-1 border ${
+                                        isLoaded 
+                                          ? "bg-amber-500/20 text-amber-400 border-amber-500/30" 
+                                          : "bg-emerald-500/10 hover:bg-emerald-500/25 text-emerald-400 border-emerald-500/20"
+                                      }`}
+                                      disabled={isLoaded}
+                                    >
+                                      <Check className="w-3 h-3" />
+                                      {isLoaded ? "Active Profile" : "Load Profile"}
+                                    </button>
+                                  );
+                                })()}
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    onClick={() => handleDownloadPdfForRecord(rec)}
+                                    className="flex-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/10 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1"
+                                  >
+                                    <FileText className="w-3 h-3" />
+                                    PDF
+                                  </button>
+                                  <button
+                                    onClick={() => handleExportJsonForRecord(rec)}
+                                    className="flex-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-indigo-500/10 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center justify-center gap-1"
+                                  >
+                                    <Download className="w-3 h-3" />
+                                    JSON
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           );
