@@ -97,6 +97,61 @@ import GithubOtaView from "./components/GithubOtaView";
 import { apiFetch as fetch } from "./lib/api";
 import RulesTerminal from "./components/RulesTerminal";
 
+// ==========================================================================
+// 1. EMBEDDED GLOBAL COMPONENT STYLES
+// ==========================================================================
+const ThemeStyles = () => (
+  <style>{`
+    /* Theme A: Dating App Aesthetic (Blush Pink & Champagne Gold) */
+    [data-app-theme="dating-app"] {
+      --bg-app: #FFF9F9;
+      --bg-card: #FFFFFF;
+      --bg-header: #FFF0F2;
+      --primary: #FF4B72;
+      --primary-hover: #E0355B;
+      --text-main: #3E101B;
+      --text-muted: #8E6872;
+      --border: #FFE3E6;
+      --shadow: 0 4px 20px rgba(255, 75, 114, 0.08);
+      --badge-bg: #FFF0F2;
+      --badge-text: #FF4B72;
+      --accent: #E5C384; /* Champagne gold */
+    }
+
+    /* Theme B: Astro Dark (Deep Space Cosmic Blue) */
+    [data-app-theme="dark"] {
+      --bg-app: #030712;
+      --bg-card: #111827;
+      --bg-header: #1f2937;
+      --primary: #8b5cf6;
+      --primary-hover: #7c3aed;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #374151;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      --badge-bg: #374151;
+      --badge-text: #e5e7eb;
+      --accent: #f59e0b;
+    }
+
+    /* Theme C: Light Theme */
+    [data-app-theme="light"] {
+      --bg-app: #F9FAFB;
+      --bg-card: #FFFFFF;
+      --bg-header: #F3F4F6;
+      --primary: #4F46E5;
+      --primary-hover: #4338CA;
+      --text-main: #111827;
+      --text-muted: #6B7280;
+      --border: #E5E7EB;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --badge-bg: #E5E7EB;
+      --badge-text: #374151;
+      --accent: #D97706;
+    }
+  `}</style>
+);
+
 // 1. Navigation Graph Definitions
 export interface SubmenuItem {
   id: string;
@@ -115,21 +170,23 @@ export interface MainMenuNode {
 }
 
 export default function App() {
-  // Input form state starting completely clean and empty
+  // Input form state starting with Nitin as default profile
   const [inputs, setInputs] = useState({
-    name: "",
-    date: "",
-    time: "",
-    location: "",
-    latitude: "" as any,
-    longitude: "" as any,
-    timezone: "" as any,
+    name: "Nitin",
+    date: "1976-01-06",
+    time: "06:40 PM",
+    location: "Dehradun, Uttarakhand, India",
+    latitude: 30.3165,
+    longitude: 78.0322,
+    timezone: 5.5,
   });
 
   const [astrologyData, setAstrologyData] = useState<AstrologyData | null>(null);
   
   // Theme and UI States
-  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const [theme, setTheme] = useState<"dark" | "light" | "dating-app">(() => {
+    return (localStorage.getItem("jhora_theme") as any) || "light";
+  });
   const [drawerExpanded, setDrawerExpanded] = useState<boolean>(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [provenanceEnabled, setProvenanceEnabled] = useState<boolean>(false);
@@ -265,8 +322,8 @@ export default function App() {
   const [fetchingGps, setFetchingGps] = useState(false);
 
   // Local state for birth time input to prevent cursor jumping
-  const [localTimeInput, setLocalTimeInput] = useState("");
-  const [localAmpm, setLocalAmpm] = useState("AM");
+  const [localTimeInput, setLocalTimeInput] = useState("06:40");
+  const [localAmpm, setLocalAmpm] = useState("PM");
 
   // Real-time PDF Report state and Profile Verification engine states
   const [compilingPdf, setCompilingPdf] = useState<boolean>(false);
@@ -507,6 +564,28 @@ export default function App() {
     } catch (e) {
       console.error("Failed to load IndexedDB records:", e);
     }
+  };
+
+  const handleLoadProfileDirect = (record: CachedHoroscopeRecord) => {
+    setInputs({
+      name: record.name,
+      date: record.date,
+      time: record.time,
+      location: record.location,
+      latitude: record.latitude,
+      longitude: record.longitude,
+      timezone: record.timezone,
+    });
+    let timeStr = record.time;
+    let ampm = "AM";
+    if (timeStr.toLowerCase().includes("pm")) ampm = "PM";
+    let timeParts = timeStr.replace(/(am|pm)/i, "").trim().split(":");
+    if (timeParts.length >= 2) {
+      setLocalTimeInput(`${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(2, "0")}`);
+      setLocalAmpm(ampm);
+    }
+    setAstrologyData(record.data);
+    localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
   };
 
   // Load calculated chart from localStorage on mount
@@ -953,15 +1032,32 @@ export default function App() {
   };
 
   // Color theme definitions
+  const isDating = theme === "dating-app";
   const containerStyle = isDark 
     ? "bg-slate-900/60 border-indigo-500/20 text-slate-100" 
-    : "bg-white border-neutral-200 text-neutral-800 shadow-sm";
+    : isDating
+      ? "bg-white border-[#FFE3E6] text-[#3E101B] shadow-sm"
+      : "bg-white border-neutral-200 text-neutral-800 shadow-sm";
   const cardStyle = isDark 
     ? "bg-slate-950/60 border-slate-800 text-slate-100" 
-    : "bg-neutral-50 border-neutral-200 text-neutral-800";
-  const textMuted = isDark ? "text-slate-400" : "text-neutral-500";
-  const headingStyle = isDark ? "text-amber-100" : "text-amber-700 font-semibold";
-  const borderStyle = isDark ? "border-indigo-500/10" : "border-neutral-200";
+    : isDating
+      ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]"
+      : "bg-neutral-50 border-neutral-200 text-neutral-800";
+  const textMuted = isDark 
+    ? "text-slate-400" 
+    : isDating
+      ? "text-[#8E6872]"
+      : "text-neutral-500";
+  const headingStyle = isDark 
+    ? "text-amber-100" 
+    : isDating
+      ? "text-[#FF4B72] font-semibold"
+      : "text-amber-700 font-semibold";
+  const borderStyle = isDark 
+    ? "border-indigo-500/10" 
+    : isDating
+      ? "border-[#FFE3E6]"
+      : "border-neutral-200";
 
   // Real Astrological PDF Report Compiler using mapped data model
   const handleCompilePdf = () => {
@@ -1202,11 +1298,18 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
-      isDark 
-        ? "dark bg-slate-950 text-slate-100 selection:bg-amber-500/30 selection:text-amber-200" 
-        : "light bg-neutral-50 text-neutral-900 selection:bg-amber-600/20 selection:text-amber-800"
-    }`} id="app-root-container">
+    <div 
+      className={`min-h-screen flex flex-col transition-colors duration-300 ${
+        isDark 
+          ? "dark bg-slate-950 text-slate-100 selection:bg-amber-500/30 selection:text-amber-200" 
+          : isDating
+            ? "light bg-[#FFF9F9] text-[#3E101B] selection:bg-rose-500/30 selection:text-rose-900"
+            : "light bg-neutral-50 text-neutral-900 selection:bg-amber-600/20 selection:text-amber-800"
+      }`} 
+      id="app-root-container"
+      data-app-theme={theme}
+    >
+      <ThemeStyles />
       
       {/* HEADER BAR */}
       <header className={`border-b backdrop-blur-md sticky top-0 z-50 py-3.5 px-6 transition-colors ${
@@ -1249,23 +1352,87 @@ export default function App() {
             </div>
           </div>
 
-          {/* Quick Active Birth Profile details */}
-          {astrologyData && (
-            <div className={`hidden md:flex items-center gap-4 border rounded-xl px-4 py-1.5 text-xs ${
-              isDark ? "bg-slate-900/50 border-indigo-500/10" : "bg-neutral-100 border-neutral-200"
-            }`}>
-              <div>
-                <span className={`${textMuted} font-medium block text-[10px]`}>Active Native:</span>
-                <span className="font-semibold text-amber-500 truncate block max-w-[120px]">{astrologyData.birthDetails.name}</span>
-              </div>
-              <div className={`border-l pl-4 ${isDark ? "border-indigo-500/10" : "border-neutral-200"}`}>
-                <span className={`${textMuted} font-medium block text-[10px]`}>Lagna (Ascendant):</span>
-                <span className={`font-semibold ${isDark ? "text-indigo-300" : "text-indigo-600"}`}>
-                  {astrologyData.lagna.sign} ({astrologyData.lagna.degree.toFixed(1)}°)
-                </span>
-              </div>
+          {/* Global App-Level Selectors & Controls */}
+          <div className="flex items-center gap-4 flex-wrap">
+            {/* Native Profile Selector */}
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Native:</span>
+              <select
+                value={astrologyData?.birthDetails?.name || "Nitin"}
+                onChange={(e) => {
+                  const selectedName = e.target.value;
+                  if (selectedName === "Nitin" && (!astrologyData || astrologyData.birthDetails.name !== "Nitin")) {
+                    setInputs({
+                      name: "Nitin",
+                      date: "1976-01-06",
+                      time: "06:40 PM",
+                      location: "Dehradun, Uttarakhand, India",
+                      latitude: 30.3165,
+                      longitude: 78.0322,
+                      timezone: 5.5,
+                    });
+                    setLocalTimeInput("06:40");
+                    setLocalAmpm("PM");
+                    setTimeout(() => {
+                      handleCalculate(false);
+                    }, 50);
+                  } else {
+                    const matchedRecord = cachedList.find(r => r.name === selectedName);
+                    if (matchedRecord) {
+                      handleLoadProfileDirect(matchedRecord);
+                    }
+                  }
+                }}
+                className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
+                  isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
+                }`}
+              >
+                <option value="Nitin">Nitin (Default)</option>
+                {cachedList.filter(r => r.name !== "Nitin").map(r => (
+                  <option key={r.id} value={r.name}>{r.name}</option>
+                ))}
+              </select>
             </div>
-          )}
+
+            {/* Chart Style Selector */}
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Chart:</span>
+              <select
+                value={chartStyle}
+                onChange={(e) => {
+                  const val = e.target.value as "north" | "south";
+                  setChartStyle(val);
+                  localStorage.setItem("jhora_chart_style", val);
+                }}
+                className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
+                  isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
+                }`}
+              >
+                <option value="north">North Indian</option>
+                <option value="south">South Indian</option>
+              </select>
+            </div>
+
+            {/* Multi-Theme Selector */}
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Theme:</span>
+              <select
+                value={theme}
+                onChange={(e) => {
+                  const val = e.target.value as "light" | "dark" | "dating-app";
+                  setTheme(val);
+                  localStorage.setItem("jhora_theme", val);
+                }}
+                className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
+                  isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
+                }`}
+              >
+                <option value="light">☀️ Light</option>
+                <option value="dark">🌙 Dark</option>
+                <option value="dating-app">💖 Blush Pink</option>
+              </select>
+            </div>
+          </div>
 
           {/* GPS & Live DateTime Widget */}
           <div className={`flex items-center gap-2 sm:gap-3 border rounded-xl px-2.5 py-1.5 text-xs ${
@@ -1309,19 +1476,6 @@ export default function App() {
               <RefreshCw className={`w-2.5 h-2.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity ${
                 headerGps.loading ? "animate-spin opacity-100" : ""
               }`} />
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className={`p-2 rounded-lg border transition-all cursor-pointer ${
-                isDark 
-                  ? "bg-slate-900 border-slate-800 text-amber-400 hover:text-amber-300" 
-                  : "bg-neutral-100 border-neutral-200 text-slate-700 hover:bg-neutral-200"
-              }`}
-            >
-              {isDark ? "☀️ Light" : "🌙 Dark"}
             </button>
           </div>
         </div>
@@ -1909,6 +2063,7 @@ export default function App() {
                   isDark={isDark}
                   currentDateTime={currentDateTime}
                   headerGps={headerGps}
+                  chartStyle={chartStyle}
                 />
 
               </motion.div>
@@ -2545,6 +2700,7 @@ export default function App() {
                       handleSubmenuSelect(system);
                     }}
                     activeSubmenuId={activeSubmenuId}
+                    chartStyle={chartStyle}
                   />
                 ) : (
                   <div className="text-center py-12">
@@ -2626,6 +2782,7 @@ export default function App() {
                       activeDashaSystem={activeDashaSystem}
                       setActiveDashaSystem={setActiveDashaSystem}
                       activeSubmenuId={activeSubmenuId}
+                      chartStyle={chartStyle}
                     />
                   ) : (
                     <div className="text-center py-12">

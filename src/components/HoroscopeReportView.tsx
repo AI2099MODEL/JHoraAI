@@ -85,6 +85,7 @@ interface HoroscopeReportViewProps {
     loading: boolean;
     error: string | null;
   };
+  chartStyle?: "north" | "south";
 }
 
 export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
@@ -94,7 +95,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   setAstrologyData,
   isDark,
   currentDateTime,
-  headerGps
+  headerGps,
+  chartStyle = "north" as "north" | "south"
 }) => {
   const [compiling, setCompiling] = useState(false);
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
@@ -2118,6 +2120,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 <TransitsTab 
                   astrologyData={astrologyData}
                   subTab="current_events"
+                  chartStyle={chartStyle}
                 />
               </div>
             )}
@@ -4005,6 +4008,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 defaultDivision="D1"
                 hideHeader={true}
                 hideVargaSelector={true}
+                chartStyle={chartStyle}
               />
             </div>
 
@@ -4022,6 +4026,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 defaultDivision="D9"
                 hideHeader={true}
                 hideVargaSelector={true}
+                chartStyle={chartStyle}
               />
               <div className="absolute top-2 right-2 text-[9px] bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 font-bold">
                 D9 Navamsa
@@ -6361,6 +6366,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   transitLongitude={transitLongitude}
                   transitTimezone={transitTimezone}
                   subTab={transitSubTab}
+                  chartStyle={chartStyle}
                 />
               </div>
             ) : (
