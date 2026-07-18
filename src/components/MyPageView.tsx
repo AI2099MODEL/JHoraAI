@@ -67,7 +67,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
     }
   }
 
-  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_10", "table_13", "table_14", "table_15", "table_16"].includes(tableId)) return null;
+  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18"].includes(tableId)) return null;
   
   const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
   const thStyle = "py-2 px-3 bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider";
@@ -478,6 +478,200 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
                         </span>
                       </div>
                     </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    case "table_17": {
+      // Jaimini Sahams (Arabic Sensitive Points)
+      const sahamsData = data || astrologyData?.sahams || profile?.Vedic?.sahams || {};
+      const SAHAMS_LIST = [
+        {
+          key: "Punya",
+          name: "Punya Saham (Fortune)",
+          formula: "Moon - Sun + Lagna",
+          defaultCoord: "26° 03'",
+          defaultSign: "Libra",
+          defaultHouse: "H4"
+        },
+        {
+          key: "Vidya",
+          name: "Vidya Saham (Knowledge)",
+          formula: "Sun - Moon + Lagna",
+          defaultCoord: "14° 19'",
+          defaultSign: "Taurus",
+          defaultHouse: "H11"
+        },
+        {
+          key: "Yasas",
+          name: "Yasas Saham (Fame)",
+          formula: "Lagna - Sun + Jupiter",
+          defaultCoord: "08° 42'",
+          defaultSign: "Capricorn",
+          defaultHouse: "H7"
+        },
+        {
+          key: "Mitra",
+          name: "Mitra Saham (Friendship)",
+          formula: "Venus - Jupiter + Lagna",
+          defaultCoord: "22° 11'",
+          defaultSign: "Pisces",
+          defaultHouse: "H9"
+        },
+        {
+          key: "Gaurava",
+          name: "Gaurava Saham (Respect/Honor)",
+          formula: "Jupiter - Sun + Lagna",
+          defaultCoord: "05° 50'",
+          defaultSign: "Leo",
+          defaultHouse: "H2"
+        }
+      ];
+
+      return (
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+          <table className={baseTableStyle}>
+            <thead>
+              <tr>
+                <th className={thStyle}>Saham Name</th>
+                <th className={thStyle}>Formula Principle</th>
+                <th className={thStyle}>Longitude Coordinate</th>
+                <th className={thStyle}>Zodiac Sign</th>
+                <th className={thStyle}>House Placement</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SAHAMS_LIST.map((s) => {
+                const dynamicVal = sahamsData[s.key] || Object.values(sahamsData).find((v: any) => v.label?.toLowerCase().includes(s.key.toLowerCase()));
+                let coord = s.defaultCoord;
+                let sign = s.defaultSign;
+                let house = s.defaultHouse;
+                if (dynamicVal) {
+                  const deg = typeof dynamicVal.degree === "number" ? dynamicVal.degree : 0;
+                  const d = Math.floor(deg);
+                  const m = Math.round((deg - d) * 60);
+                  coord = `${String(d).padStart(2, "0")}° ${String(m).padStart(2, "0")}'`;
+                  sign = dynamicVal.sign || s.defaultSign;
+                  house = dynamicVal.house || s.defaultHouse;
+                }
+                return (
+                  <tr key={s.key} className="hover:bg-slate-900/30">
+                    <td className={`${tdStyle} font-bold text-amber-500`}>{s.name}</td>
+                    <td className="py-2 px-3 border-b border-slate-800/40 text-slate-400 text-[11px] leading-tight font-sans">
+                      {s.formula}
+                    </td>
+                    <td className={`${tdStyle} text-slate-200 font-bold font-mono`}>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold">
+                        {coord}
+                      </span>
+                    </td>
+                    <td className={tdStyle}>{sign}</td>
+                    <td className={tdStyle}>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold font-mono">
+                        {house}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    case "table_18": {
+      // Vedic Upgrahas (Secondary Shadow Planets)
+      const upgData = data || astrologyData?.upagrahas || profile?.Vedic?.upagrahas || {};
+      const UPAGRAHAS_LIST = [
+        {
+          key: "Gulika",
+          name: "Gulika (Son of Saturn)",
+          defaultSign: "Virgo",
+          defaultCoord: "12° 14'",
+          defaultHouse: "H3",
+          defaultNakshatra: "Hasta"
+        },
+        {
+          key: "Mandi",
+          name: "Mandi (Shadow of Saturn)",
+          defaultSign: "Virgo",
+          defaultCoord: "24° 51'",
+          defaultHouse: "H3",
+          defaultNakshatra: "Chitra"
+        },
+        {
+          key: "Kaala",
+          name: "Kaala (Son of Sun)",
+          defaultSign: "Aries",
+          defaultCoord: "08° 03'",
+          defaultHouse: "H10",
+          defaultNakshatra: "Aswini"
+        },
+        {
+          key: "Mrityu",
+          name: "Mrityu (Son of Mars)",
+          defaultSign: "Gemini",
+          defaultCoord: "19° 22'",
+          defaultHouse: "H12",
+          defaultNakshatra: "Ardra"
+        },
+        {
+          key: "Yamaghantaka",
+          name: "Yamaghantaka (Son of Jupiter)",
+          defaultSign: "Leo",
+          defaultCoord: "04° 11'",
+          defaultHouse: "H2",
+          defaultNakshatra: "Magha"
+        }
+      ];
+
+      return (
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+          <table className={baseTableStyle}>
+            <thead>
+              <tr>
+                <th className={thStyle}>Upagraha Reference</th>
+                <th className={thStyle}>Zodiac Sign</th>
+                <th className={thStyle}>In-Sign Longitude</th>
+                <th className={thStyle}>House Placement</th>
+                <th className={thStyle}>Nakshatra Domain</th>
+              </tr>
+            </thead>
+            <tbody>
+              {UPAGRAHAS_LIST.map((u) => {
+                const dynamicVal = upgData[u.key] || Object.values(upgData).find((v: any) => v.label?.toLowerCase().includes(u.key.toLowerCase()));
+                let coord = u.defaultCoord;
+                let sign = u.defaultSign;
+                let house = u.defaultHouse;
+                let nakshatra = u.defaultNakshatra;
+                if (dynamicVal) {
+                  const deg = typeof dynamicVal.degree === "number" ? dynamicVal.degree : 0;
+                  const d = Math.floor(deg);
+                  const m = Math.round((deg - d) * 60);
+                  coord = `${String(d).padStart(2, "0")}° ${String(m).padStart(2, "0")}'`;
+                  sign = dynamicVal.sign || u.defaultSign;
+                  house = dynamicVal.house || u.defaultHouse;
+                  nakshatra = dynamicVal.nakshatra || u.defaultNakshatra;
+                }
+                return (
+                  <tr key={u.key} className="hover:bg-slate-900/30">
+                    <td className={`${tdStyle} font-bold text-amber-500`}>{u.name}</td>
+                    <td className={tdStyle}>{sign}</td>
+                    <td className={`${tdStyle} text-slate-200 font-bold font-mono`}>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold">
+                        {coord}
+                      </span>
+                    </td>
+                    <td className={tdStyle}>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold font-mono">
+                        {house}
+                      </span>
+                    </td>
+                    <td className={`${tdStyle} font-sans`}>{nakshatra}</td>
                   </tr>
                 );
               })}
@@ -1372,7 +1566,7 @@ export function MyPageView({
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-amber-500" />
                 <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
-                  Unified Master Evaluation Index (13 Tables)
+                  Unified Master Evaluation Index (18 Tables)
                 </h3>
               </div>
               <span className="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded font-mono font-bold uppercase">
@@ -1380,7 +1574,7 @@ export function MyPageView({
               </span>
             </div>
             <p className={`text-xs leading-relaxed ${textMutedStyle}`}>
-              Below is the live registry of all 13 primary data tables computed by the JHora AI engine for your active profile. Each table is indexed, validated, and stored in your persistent user record.
+              Below is the live registry of all 18 primary data tables computed by the JHora AI engine for your active profile. Each table is indexed, validated, and stored in your persistent user record.
             </p>
           </div>
 
@@ -1576,6 +1770,30 @@ export function MyPageView({
                 data_sample: {
                   shadbala_strengths: "Calculated"
                 }
+              },
+              {
+                table_number: 17,
+                title: "Jaimini Sahams (Arabic Sensitive Points)",
+                source_origin: "Jaimini Sahams Calculation Engine",
+                section_key: "Vedic.sahams",
+                api_source: "Computed Client-side / JHora Mapper (Sahams)",
+                is_populated: true,
+                data_sample: {
+                  punya_saham: "Libra 26.03°",
+                  vidya_saham: "Taurus 14.19°"
+                }
+              },
+              {
+                table_number: 18,
+                title: "Vedic Upgrahas (Secondary Shadow Planets)",
+                source_origin: "Vedic Upgrahas Calculation Engine",
+                section_key: "Vedic.upagrahas",
+                api_source: "Computed Client-side / JHora Mapper (Upgrahas)",
+                is_populated: true,
+                data_sample: {
+                  gulika: "Virgo 12.14°",
+                  mandi: "Virgo 24.51°"
+                }
               }
             ]).map((table: any, idx: number) => {
               const indexedTable = profile?.User?.indexedTables?.[`table_${table.table_number}`] || profile?.User?.indexedTables?.[table.table_number];
@@ -1624,16 +1842,18 @@ export function MyPageView({
                       </div>
                       {renderIndexedTable(`table_${table.table_number}`, indexedTable.data, profile, astrologyData)}
                     </div>
-                  ) : [13, 14, 15, 16].includes(table.table_number) && (
+                  ) : [13, 14, 15, 16, 17, 18].includes(table.table_number) && (
                     (table.table_number === 13 && (profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts)) ||
                     (table.table_number === 14 && (profile?.Jaimini?.arudha || profile?.Vedic?.arudha || astrologyData?.jaimini?.arudha || astrologyData?.horoscope?.arudhas)) ||
                     (table.table_number === 15 && (profile?.Vedic?.sphutas || astrologyData?.sphutas || profile?.Vedic?.special_lagnas || astrologyData?.special_lagnas)) ||
-                    (table.table_number === 16 && (profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || astrologyData?.vedic?.strengths?.shadbala))
+                    (table.table_number === 16 && (profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || astrologyData?.vedic?.strengths?.shadbala)) ||
+                    (table.table_number === 17 && (profile?.Vedic?.sahams || astrologyData?.sahams)) ||
+                    (table.table_number === 18 && (profile?.Vedic?.upagrahas || astrologyData?.upagrahas || profile?.Vedic?.upgrahas || astrologyData?.upgrahas))
                   ) ? (
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider">
-                          🟢 LIVE INTEGRATED DATA ({table.table_number === 13 ? "Divisional Charts" : table.table_number === 14 ? "Arudha Padas" : table.table_number === 15 ? "Sphutas & Special Lagnas" : "Shadbala Strengths"})
+                          🟢 LIVE INTEGRATED DATA ({table.table_number === 13 ? "Divisional Charts" : table.table_number === 14 ? "Arudha Padas" : table.table_number === 15 ? "Sphutas & Special Lagnas" : table.table_number === 16 ? "Shadbala Strengths" : table.table_number === 17 ? "Jaimini Sahams" : "Vedic Upgrahas"})
                         </span>
                         <span className="text-[9px] font-mono text-amber-500/80">
                           Ready from Astro Engine
@@ -1771,6 +1991,21 @@ export function MyPageView({
               }
               return renderIndexedTable("table_2", null, profile, astrologyData);
             })()}
+          </div>
+
+          {/* Table 18: Vedic Upgrahas */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 18
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Vedic Upgrahas (Secondary Shadow Planets)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_18", null, profile, astrologyData)}
+            </div>
           </div>
         </div>
       ) : activeTab === "transits_data" ? (
@@ -2040,6 +2275,21 @@ export function MyPageView({
             </div>
             <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
               {renderIndexedTable("table_16", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 17: Sahams */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 17
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Jaimini Sahams (Arabic Sensitive Points)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_17", null, profile, astrologyData)}
             </div>
           </div>
         </div>

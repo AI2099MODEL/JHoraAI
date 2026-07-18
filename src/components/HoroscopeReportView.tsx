@@ -4430,7 +4430,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 <div className="space-y-6">
                   <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
                     <div className="border-b border-slate-800 pb-2">
-                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">upagrahas (Secondary/Shadow Planets)</h4>
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 18: Vedic Upgrahas (Secondary/Shadow Planets)</h4>
                     </div>
                     <div className="overflow-x-auto mt-2">
                       <table className="w-full text-left">
@@ -4490,7 +4490,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 <div className="space-y-6">
                   <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4 font-mono text-xs sm:text-sm">
                     <div className="border-b border-slate-800 pb-2">
-                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">sahams (Sensitive Arabic Astrological Points)</h4>
+                      <h4 className="font-bold text-amber-400 uppercase tracking-wider text-xs font-mono">Table 17: Jaimini Sahams (Sensitive Arabic Astrological Points)</h4>
                     </div>
                     <div className="overflow-x-auto mt-2">
                       <table className="w-full text-left">
