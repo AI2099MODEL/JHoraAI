@@ -52,28 +52,86 @@ function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, 
   const [expandedMajor, setExpandedMajor] = useState<number | null>(null);
   const [expandedSub, setExpandedSub] = useState<number | null>(null);
 
+  const SIGN_NAMES = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+  const SIGN_LORDS = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+
   const charaDashas = profile?.Jaimini?.chara_dasha || astrologyData?.jaimini?.chara_dasha || astrologyData?.charaDasha || [];
   const birthDateStr = profile?.Birth?.date || astrologyData?.birthDetails?.date || "1976-01-06";
   const [bYr, bMon, bDay] = birthDateStr.split("-");
   const birthYear = parseInt(bYr) || 1976;
   const suffix = `-${bMon || "01"}-${bDay || "06"}`;
-  
-  const finalDashas = charaDashas.length > 0 ? charaDashas : [
-    { sign: "Aries", duration_years: 9, start_date: `${birthYear}${suffix}`, end_date: `${birthYear + 9}${suffix}` },
-    { sign: "Taurus", duration_years: 12, start_date: `${birthYear + 9}${suffix}`, end_date: `${birthYear + 21}${suffix}` },
-    { sign: "Gemini", duration_years: 7, start_date: `${birthYear + 21}${suffix}`, end_date: `${birthYear + 28}${suffix}` },
-    { sign: "Cancer", duration_years: 8, start_date: `${birthYear + 28}${suffix}`, end_date: `${birthYear + 36}${suffix}` },
-    { sign: "Leo", duration_years: 9, start_date: `${birthYear + 36}${suffix}`, end_date: `${birthYear + 45}${suffix}` },
-    { sign: "Virgo", duration_years: 11, start_date: `${birthYear + 45}${suffix}`, end_date: `${birthYear + 56}${suffix}` },
-    { sign: "Libra", duration_years: 12, start_date: `${birthYear + 56}${suffix}`, end_date: `${birthYear + 68}${suffix}` },
-    { sign: "Scorpio", duration_years: 10, start_date: `${birthYear + 68}${suffix}`, end_date: `${birthYear + 78}${suffix}` },
-    { sign: "Sagittarius", duration_years: 6, start_date: `${birthYear + 78}${suffix}`, end_date: `${birthYear + 84}${suffix}` },
-    { sign: "Capricorn", duration_years: 8, start_date: `${birthYear + 84}${suffix}`, end_date: `${birthYear + 92}${suffix}` },
-    { sign: "Aquarius", duration_years: 10, start_date: `${birthYear + 92}${suffix}`, end_date: `${birthYear + 102}${suffix}` },
-    { sign: "Pisces", duration_years: 5, start_date: `${birthYear + 102}${suffix}`, end_date: `${birthYear + 107}${suffix}` }
-  ];
 
-  const SIGN_NAMES = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+  const getLordSignIdx = (lordName: string): number => {
+    if (Array.isArray(astrologyData?.planets)) {
+      const pl = astrologyData.planets.find((p: any) => p.name?.toLowerCase() === lordName.toLowerCase());
+      if (pl && pl.signIndex !== undefined) return pl.signIndex;
+    }
+    if (profile?.Vedic?.planets) {
+      const pl = profile.Vedic.planets[lordName] || Object.values(profile.Vedic.planets).find((p: any) => p.name?.toLowerCase() === lordName.toLowerCase());
+      if (pl) {
+        if (pl.sign_index !== undefined) return pl.sign_index;
+        if (pl.sign) {
+          const sIdx = SIGN_NAMES.indexOf(pl.sign);
+          if (sIdx !== -1) return sIdx;
+        }
+      }
+    }
+    const plObj = profile?.Vedic?.planets;
+    if (plObj) {
+      const plKey = Object.keys(plObj).find(k => k.toLowerCase() === lordName.toLowerCase());
+      if (plKey) {
+        const p = plObj[plKey];
+        if (p.sign_index !== undefined) return p.sign_index;
+        if (p.sign) {
+          const sIdx = SIGN_NAMES.indexOf(p.sign);
+          if (sIdx !== -1) return sIdx;
+        }
+      }
+    }
+    return 0;
+  };
+
+  let dynamicDashas: any[] = [];
+  if (charaDashas.length === 0) {
+    const ascSignName = profile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.sign || "Aries";
+    let ascendantSignIndex = profile?.Vedic?.ascendant?.sign_index !== undefined 
+      ? profile?.Vedic?.ascendant?.sign_index 
+      : (astrologyData?.lagna?.signIndex !== undefined ? astrologyData?.lagna?.signIndex : SIGN_NAMES.indexOf(ascSignName));
+    if (ascendantSignIndex === -1) ascendantSignIndex = 0;
+
+    const isEvenLagna = ascendantSignIndex % 2 === 1;
+    let runningYear = birthYear;
+    let currentSignIdx = ascendantSignIndex;
+
+    for (let i = 0; i < 12; i++) {
+      const dashaSign = SIGN_NAMES[currentSignIdx];
+      const signLord = SIGN_LORDS[currentSignIdx];
+      const lordSignIdx = getLordSignIdx(signLord);
+      
+      let dashaYears = 0;
+      if (currentSignIdx % 2 === 0) { // odd sign (direct counting)
+        dashaYears = (lordSignIdx - currentSignIdx + 12) % 12;
+      } else { // even sign (reverse counting)
+        dashaYears = (currentSignIdx - lordSignIdx + 12) % 12;
+      }
+      if (dashaYears === 0) dashaYears = 12;
+
+      dynamicDashas.push({
+        sign: dashaSign,
+        start_date: `${runningYear}${suffix}`,
+        end_date: `${runningYear + dashaYears}${suffix}`,
+        duration_years: dashaYears
+      });
+      runningYear += dashaYears;
+      if (isEvenLagna) {
+        currentSignIdx = (currentSignIdx - 1 + 12) % 12;
+      } else {
+        currentSignIdx = (currentSignIdx + 1) % 12;
+      }
+    }
+  }
+
+  const finalDashas = charaDashas.length > 0 ? charaDashas : dynamicDashas;
 
   const getSubPeriods = (parentSign: string, parentStartStr: string, parentEndStr: string) => {
     const parentIdx = SIGN_NAMES.indexOf(parentSign);
