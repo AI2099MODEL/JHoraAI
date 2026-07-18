@@ -5,6 +5,34 @@
 
 import { AstrologyData, PlanetPosition, DashaPeriod, YogaAnalysis, DoshaAnalysis, ZODIAC_SIGNS } from "./astrology";
 
+const NORMALIZE_PLANET_NAME: Record<string, string> = {
+  "Raagu": "Rahu",
+  "Rahu": "Rahu",
+  "Kethu": "Ketu",
+  "Ketu": "Ketu",
+  "Suryan": "Sun",
+  "Sun": "Sun",
+  "Chandran": "Moon",
+  "Moon": "Moon",
+  "Sevvai": "Mars",
+  "Mars": "Mars",
+  "Budhan": "Mercury",
+  "Mercury": "Mercury",
+  "Guru": "Jupiter",
+  "Jupiter": "Jupiter",
+  "Sukran": "Venus",
+  "Venus": "Venus",
+  "Sani": "Saturn",
+  "Saturn": "Saturn",
+  "Lagna": "Ascendant",
+  "Ascendant": "Ascendant"
+};
+
+function normPlanet(name: string): string {
+  const trimmed = name.trim();
+  return NORMALIZE_PLANET_NAME[trimmed] || trimmed;
+}
+
 export function parseJHoraDasha(rawList: Array<[string, string]>): DashaPeriod[] {
   if (!rawList || rawList.length === 0) return [];
   
@@ -16,9 +44,9 @@ export function parseJHoraDasha(rawList: Array<[string, string]>): DashaPeriod[]
     
     // Split the path (e.g., "Raagu-Raagu-Raagu" or "Jupiter-Jupiter-Jupiter")
     const parts = path.split("-");
-    const m = parts[0];
-    const a = parts[1] || parts[0];
-    const p = parts[2] || parts[1] || parts[0];
+    const m = normPlanet(parts[0]);
+    const a = normPlanet(parts[1] || parts[0]);
+    const p = normPlanet(parts[2] || parts[1] || parts[0]);
     
     // Format date string - preserve full date and time for maximum precision
     const startDate = startStr;

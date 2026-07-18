@@ -45,7 +45,7 @@ const PLANET_YEARS: Record<string, number> = {
   Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
 };
 
-function parseSafeDate(str: string): Date {
+function parseSafeDate(str: any): Date {
   if (!str) return new Date();
   if (str instanceof Date) return str;
   const s = String(str).trim();
@@ -5796,11 +5796,11 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             
             <div className="border-b border-cyan-500/10 pb-4 mb-6">
               <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 8 • Krishnamurti Paddhati (KP Stellar Astrology)
+                System 7 • Krishnamurti Paddhati (KP Stellar Astrology)
               </span>
               <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
                 <Star className="w-5 h-5 text-cyan-400" />
-                8. KP STELLAR COSMIC SIGNALS & DASHAS
+                7 - KP STELLAR COSMIC SIGNALS & DASHAS
               </h2>
               <p className={`text-xs ${mutedText} mt-1`}>
                 High-precision stellar sublord division of house houses, planetary significators, active dashas, rulebook evaluations, transits, and horary resolutions.

@@ -76,6 +76,9 @@ export class VedicAstroProvider implements IKpProvider {
     }
 
     const data = await response.json();
+    if (data && data.response !== undefined) {
+      return data.response;
+    }
     return data;
   }
 
@@ -161,6 +164,11 @@ export class VedicAstroProvider implements IKpProvider {
       const raw = await this.fetchFromProvider("/kp/planet_significators", params);
       const parsed = KpMapper.toKpPlanetSignificators(raw);
       
+      if (!parsed.significators || Object.keys(parsed.significators).length === 0) {
+        const dynamic = await this.calculateDynamicSignificators(params);
+        return dynamic.planetSignificators;
+      }
+
       let has56 = false;
       Object.values(parsed.significators).forEach(p => {
         if ((p.level5 && p.level5.length > 0) || (p.level6 && p.level6.length > 0)) has56 = true;
@@ -192,6 +200,11 @@ export class VedicAstroProvider implements IKpProvider {
     try {
       const raw = await this.fetchFromProvider("/kp/house_significators", params);
       const parsed = KpMapper.toKpHouseSignificators(raw);
+
+      if (!parsed.significators || Object.keys(parsed.significators).length === 0) {
+        const dynamic = await this.calculateDynamicSignificators(params);
+        return dynamic.houseSignificators;
+      }
 
       let has56 = false;
       Object.values(parsed.significators).forEach(h => {
