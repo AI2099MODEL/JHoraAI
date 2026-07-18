@@ -15,6 +15,7 @@ import {
   RefreshCw,
   Info
 } from "lucide-react";
+import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
 
 interface FinalResultsViewProps {
   astrologyData: any;
@@ -36,10 +37,32 @@ export const FinalResultsView: React.FC<FinalResultsViewProps> = ({
     return birthDetails?.name || "Native";
   }, [birthDetails]);
 
-  // Derived core details
-  const lagnaName = astrologyData?.lagna?.sign || "Libra";
-  const moonSign = astrologyData?.moon_sign || "Aquarius";
-  const nakshatra = astrologyData?.nakshatra || "Shatabhisha";
+  // Generate complete high-fidelity profile JSON dynamically to avoid static placeholders
+  const profileJson = useMemo(() => {
+    if (!astrologyData) return null;
+    return mapAstrologyDataToUserProfileJSON(null, astrologyData);
+  }, [astrologyData]);
+
+  const kpData = useMemo(() => {
+    return profileJson?.KP || {};
+  }, [profileJson]);
+
+  // Derived core details from actual astrology coordinates of the active profile
+  const lagnaName = useMemo(() => {
+    return profileJson?.Vedic?.ascendant?.sign || astrologyData?.lagna?.sign || "Libra";
+  }, [profileJson, astrologyData]);
+
+  const moonPlanet = useMemo(() => {
+    return astrologyData?.planets?.find((p: any) => p.name === "Moon");
+  }, [astrologyData]);
+
+  const moonSign = useMemo(() => {
+    return moonPlanet?.sign || "Aquarius";
+  }, [moonPlanet]);
+
+  const nakshatra = useMemo(() => {
+    return astrologyData?.panchanga?.nakshatra || moonPlanet?.nakshatra || "Shatabhisha";
+  }, [astrologyData, moonPlanet]);
 
   // KP events mapped for synthesis evaluation (referencing KP Eventbook)
   const mappedEvents = useMemo(() => [
@@ -77,6 +100,95 @@ export const FinalResultsView: React.FC<FinalResultsViewProps> = ({
     }
   ], []);
 
+  // Helper to check what houses a planet signifies
+  const getPlanetHousesSignified = (pName: string): number[] => {
+    const housesSet = new Set<number>();
+    const pKp = kpData.planets?.[pName];
+    const pVedic = astrologyData?.planets?.find((pl: any) => pl.name.toLowerCase() === pName.toLowerCase());
+    
+    const hReside = pKp?.house || pVedic?.house;
+    if (hReside) housesSet.add(Number(hReside));
+    
+    if (pKp?.ownership && Array.isArray(pKp.ownership)) {
+      pKp.ownership.forEach((h: number) => housesSet.add(h));
+    } else if (pVedic) {
+      // Standard Rashi Lord Ownership fallback
+      if (pName === "Sun") housesSet.add(5);
+      if (pName === "Moon") housesSet.add(4);
+      if (pName === "Mars") { housesSet.add(1); housesSet.add(8); }
+      if (pName === "Mercury") { housesSet.add(3); housesSet.add(6); }
+      if (pName === "Jupiter") { housesSet.add(9); housesSet.add(12); }
+      if (pName === "Venus") { housesSet.add(2); housesSet.add(7); }
+      if (pName === "Saturn") { housesSet.add(10); housesSet.add(11); }
+    }
+    return Array.from(housesSet);
+  };
+
+  // Helper to check what sign a planet owns
+  const houseLords = useMemo(() => {
+    return profileJson?.Vedic?.house_lords || {};
+  }, [profileJson]);
+
+  const lordOf10th = useMemo(() => houseLords["10"] || "Mercury", [houseLords]);
+  const lordOf10thPlanet = useMemo(() => astrologyData?.planets?.find((p: any) => p.name.toLowerCase() === lordOf10th.toLowerCase()), [astrologyData, lordOf10th]);
+  const lordOf10thHouse = useMemo(() => lordOf10thPlanet?.house || 10, [lordOf10thPlanet]);
+  const isPlacedInKendraTrikona = useMemo(() => [1, 4, 5, 7, 9, 10].includes(lordOf10thHouse), [lordOf10thHouse]);
+
+  const lordOf7th = useMemo(() => houseLords["7"] || "Venus", [houseLords]);
+  const lordOf7thPlanet = useMemo(() => astrologyData?.planets?.find((p: any) => p.name.toLowerCase() === lordOf7th.toLowerCase()), [astrologyData, lordOf7th]);
+  const lordOf7thHouse = useMemo(() => lordOf7thPlanet?.house || 7, [lordOf7thPlanet]);
+
+  const sunPlanet = useMemo(() => astrologyData?.planets?.find((p: any) => p.name === "Sun"), [astrologyData]);
+  const sunHouse = useMemo(() => sunPlanet?.house || 10, [sunPlanet]);
+
+  const venusPlanetInChart = useMemo(() => astrologyData?.planets?.find((p: any) => p.name === "Venus"), [astrologyData]);
+  const venusHouse = useMemo(() => venusPlanetInChart?.house || 11, [venusPlanetInChart]);
+
+  const csl10PlanetName = useMemo(() => kpData?.cusps?.["House_10"]?.sub_lord || kpData?.cusps?.["10"]?.sub_lord || "Mercury", [kpData]);
+  const csl10Signifies = useMemo(() => getPlanetHousesSignified(csl10PlanetName), [kpData, csl10PlanetName]);
+  const csl10Favorable = useMemo(() => csl10Signifies.some(h => [2, 6, 10, 11].includes(h)), [csl10Signifies]);
+
+  const csl7PlanetName = useMemo(() => kpData?.cusps?.["House_7"]?.sub_lord || kpData?.cusps?.["7"]?.sub_lord || "Saturn", [kpData]);
+  const csl7Signifies = useMemo(() => getPlanetHousesSignified(csl7PlanetName), [kpData, csl7PlanetName]);
+  const csl7Favorable = useMemo(() => csl7Signifies.some(h => [2, 7, 11].includes(h)), [csl7Signifies]);
+  const csl7Adverse = useMemo(() => csl7Signifies.some(h => [1, 6, 10].includes(h)), [csl7Signifies]);
+
+  // Jaimini Jupiter / Venus evaluation
+  const jupiterPlanet = useMemo(() => astrologyData?.planets?.find((p: any) => p.name === "Jupiter"), [astrologyData]);
+  const jupHouse = useMemo(() => jupiterPlanet?.house || 9, [jupiterPlanet]);
+
+  const rulePar01IsMet = useMemo(() => isPlacedInKendraTrikona, [isPlacedInKendraTrikona]);
+  const rulePar01Reasoning = useMemo(() => {
+    return rulePar01IsMet
+      ? `The 10th Lord (${lordOf10th}) resides in the supportive ${lordOf10thHouse}th house (Kendra/Trikona), providing strong career resilience and steady professional foundations.`
+      : `The 10th Lord (${lordOf10th}) is placed in the ${lordOf10thHouse}th house, requiring disciplined strategy and steady perseverance for professional success.`;
+  }, [rulePar01IsMet, lordOf10th, lordOf10thHouse]);
+
+  const ruleKp01IsMet = useMemo(() => csl7Favorable, [csl7Favorable]);
+  const ruleKp01Reasoning = useMemo(() => {
+    return `The 7th Cuspal Sub-Lord (${csl7PlanetName}) signifies houses [${csl7Signifies.join(", ")}]. ${
+      csl7Favorable
+        ? `Auspicous links to relationship houses (2, 7, 11) confirm strong potential for a supportive, committed bond.`
+        : `Mixed linkages to houses suggest that clarity of expectations and open, compassionate communication are essential keys.`
+    }`;
+  }, [csl7PlanetName, csl7Signifies, csl7Favorable]);
+
+  const ruleKp02IsMet = useMemo(() => csl10Favorable, [csl10Favorable]);
+  const ruleKp02Reasoning = useMemo(() => {
+    return `The 10th Cuspal Sub-Lord (${csl10PlanetName}) signifies houses [${csl10Signifies.join(", ")}]. ${
+      csl10Favorable
+        ? `Direct connection to professional houses [2, 6, 10, 11] triggers excellent opportunities for professional success and consistent growth.`
+        : `Provides steady professional foundations. Advancement will align smoothly with structured milestones and diligent execution.`
+    }`;
+  }, [csl10PlanetName, csl10Signifies, csl10Favorable]);
+
+  const ruleJaim01IsMet = useMemo(() => [1, 4, 5, 7, 9, 10, 11].includes(jupHouse) || [1, 4, 5, 7, 9, 10, 11].includes(venusHouse), [jupHouse, venusHouse]);
+  const ruleJaim01Reasoning = useMemo(() => {
+    return ruleJaim01IsMet
+      ? `Benefic lords Jupiter (H${jupHouse}) / Venus (H${venusHouse}) are placed in auspicious quadrants/trines, casting a soft, protective influence over relationship node alignments.`
+      : `Jupiter (H${jupHouse}) and Venus (H${venusHouse}) are positioned to promote internal growth and emotional maturity, strengthening bonding capacity.`;
+  }, [ruleJaim01IsMet, jupHouse, venusHouse]);
+
   // Synthesis engine mapping rules from Astrological Rules Handbook (Parashari & KP)
   const synthesizedRules = useMemo(() => [
     {
@@ -84,99 +196,164 @@ export const FinalResultsView: React.FC<FinalResultsViewProps> = ({
       title: "10th Lord Quality (Career)",
       system: "Parashari (Vedic)",
       condition: "Natal 10th Lord placement in Kendra/Trikona or associated with Ascendant Lord.",
-      isMet: true,
-      reasoning: "The 10th Lord is well-placed, assuring strong underlying professional resilience."
+      isMet: rulePar01IsMet,
+      reasoning: rulePar01Reasoning
     },
     {
       id: "RULE_KP_01",
       title: "7th Cuspal Sub-Lord Verification (Relationship)",
       system: "KP Binary System",
       condition: "7th CSL signifies houses 2, 7, 11 (Favorable) and avoids 1, 6, 10 (Adverse).",
-      isMet: profileName === "Nitin" ? true : (profileName.length % 2 === 0),
-      reasoning: profileName === "Nitin"
-        ? "7th CSL is Saturn. Highly auspicious connection to houses 2, 7, and 11, indicating deep stability and eventual resolution."
-        : "7th CSL has a mixed signification with strong supportive connections, though minor obstruction is present in the current phase."
+      isMet: ruleKp01IsMet,
+      reasoning: ruleKp01Reasoning
     },
     {
       id: "RULE_KP_02",
       title: "10th Cuspal Sub-Lord Verification (Career)",
       system: "KP Binary System",
       condition: "10th CSL signifies professional houses [2, 6, 10, 11].",
-      isMet: true,
-      reasoning: "10th CSL (Mercury) is connected to houses 6 and 11, ensuring professional gains and consistent career expansion."
+      isMet: ruleKp02IsMet,
+      reasoning: ruleKp02Reasoning
     },
     {
       id: "RULE_JAIM_01",
       title: "Upapada Lagna Transit Check",
       system: "Jaimini System",
       condition: "Aspect or conjunction of transiting benefics (Jupiter/Venus) on Upapada Lagna or its 2nd house.",
-      isMet: (profileName.length % 3) !== 0,
-      reasoning: "Transiting benefic aspects on the Upapada Lagna (UL) open peaceful reconciliation gates and soften marital discord."
+      isMet: ruleJaim01IsMet,
+      reasoning: ruleJaim01Reasoning
     }
-  ], [profileName]);
+  ], [rulePar01IsMet, rulePar01Reasoning, ruleKp01IsMet, ruleKp01Reasoning, ruleKp02IsMet, ruleKp02Reasoning, ruleJaim01IsMet, ruleJaim01Reasoning]);
 
   // Natal Horoscope Synthesis
   const natalSynthesis = useMemo(() => {
+    let careerBaseScore = 65;
+    if ([1, 4, 5, 7, 9, 10].includes(lordOf10thHouse)) careerBaseScore += 12;
+    if ([10, 11].includes(sunHouse)) careerBaseScore += 8;
+    if (csl10Favorable) careerBaseScore += 10;
+    const dynamicCareerScore = Math.min(Math.max(careerBaseScore, 40), 96);
+
+    let relationshipBaseScore = 60;
+    if ([1, 4, 5, 7, 9, 11].includes(lordOf7thHouse)) relationshipBaseScore += 12;
+    if ([5, 7, 9, 11].includes(venusHouse)) relationshipBaseScore += 10;
+    if (csl7Favorable) relationshipBaseScore += 10;
+    if (csl7Adverse) relationshipBaseScore -= 8;
+    const dynamicRelationshipScore = Math.min(Math.max(relationshipBaseScore, 35), 95);
+
     return {
       career: {
-        status: "Highly Favorable (Long-term Stability)",
-        score: 85,
-        details: `Your Natal Horoscope reveals a strong professional bedrock. The 10th Lord resides in a quadrant (Kendra), and the 10th Cuspal Sub-Lord (CSL) signifies houses 2, 6, and 11. This alignment guarantees that despite short-term transit hurdles, you possess excellent professional endurance. Promising opportunities in leadership, technical domains, or corporate management are indicated.`,
+        status: dynamicCareerScore > 80 ? "Highly Favorable (Excellent Path Promise)" : "Stable Professional Foundations",
+        score: dynamicCareerScore,
+        details: `Your Natal Horoscope reveals a personalized professional bedrock. The 10th Lord (${lordOf10th}) resides in your natal ${lordOf10thHouse}th house, and the 10th Cuspal Sub-Lord (CSL) is ${csl10PlanetName}, which signifies houses: [${csl10Signifies.join(", ")}]. This specific configuration guarantees that you possess excellent professional endurance to navigate transit fluctuations and achieve steady upward progress.`,
         keyPlacements: [
-          { planet: "10th Lord", house: "9th House", strength: "Strong", effect: "Auspicious career luck & overseas travel opportunities" },
-          { planet: "Sun", house: "10th House", strength: "Dig Bala (Directional)", effect: "Authoritative roles, executive power, and public recognition" },
-          { planet: "10th CSL", house: "Mercury", strength: "Exalted Signification", effect: "Sharp business intelligence, analytics, and exceptional communication" }
+          { planet: "10th Lord", house: `${lordOf10thHouse}th House`, strength: [1, 4, 5, 7, 9, 10].includes(lordOf10thHouse) ? "Strong Placement" : "Average Placement", effect: `Lord (${lordOf10th}) governs professional drive and career expansion.` },
+          { planet: "Sun", house: `${sunHouse}th House`, strength: [10, 11].includes(sunHouse) ? "Highly Supportive" : "Steady", effect: "Influences executive power, career authority, and public recognition." },
+          { planet: "10th CSL", house: `${csl10PlanetName}`, strength: csl10Favorable ? "Auspicious Links" : "Stable", effect: `Stellar subdivision connects professional outcomes to houses: [${csl10Signifies.join(", ")}].` }
         ],
         relevance: "Directly mapped from Event ID: CAR001 & CAR002 (KP Eventbook). Underpinned by Parashari Career rule [RULE_PAR_01]."
       },
       relationship: {
-        status: profileName === "Nitin" ? "Harmonious & Stable Bond Promise" : "Mixed Signification with Growth Milestones",
-        score: profileName === "Nitin" ? 90 : 72,
-        details: profileName === "Nitin" 
-          ? "Your 7th Cuspal Sub-Lord signifies house 2, 7, and 11 without any negation from 1, 6, 10, assuring a deep, protective bond. Venus is fortified by a benign Jovian aspect, ensuring that relationship friction resolves smoothly and fosters a lifelong committed companionship."
-          : `Your natal 7th house shows a mixed dynamic. While the 7th CSL signifies the supportive 2nd and 11th houses, there are minor afflictions from the 6th Lord, which can cause periods of temporary misunderstanding or distance. However, because Venus is aspected by Jupiter, major breakdowns are prevented, and these hurdles serve as vital emotional growth milestones.`,
+        status: dynamicRelationshipScore > 78 ? "Harmonious & Durable Partnership Promise" : "Mixed Signification with Conscious Growth Milestones",
+        score: dynamicRelationshipScore,
+        details: `Your natal relationship chart highlights unique astrological dynamics. The 7th Lord (${lordOf7th}) resides in the ${lordOf7thHouse}th house, while your 7th Cuspal Sub-Lord is ${csl7PlanetName} (signifying houses: [${csl7Signifies.join(", ")}]). Venus is placed in the ${venusHouse}th house. This specific alignment shapes your expectations, emotional bonding patterns, and long-term marital stability.`,
         keyPlacements: [
-          { planet: "7th Lord", house: "7th House", strength: "Own House", effect: "Strong marital foundations and attractive, intelligent spouse" },
-          { planet: "Venus", house: "11th House", strength: "Favorable", effect: "Fulfilment of emotional desires and deep friendships within the bond" },
-          { planet: "7th CSL", house: "Saturn", strength: "Moderate/Steady", effect: "Delayed but highly mature, dependable, and everlasting partnership" }
+          { planet: "7th Lord", house: `${lordOf7thHouse}th House`, strength: [1, 4, 5, 7, 9, 11].includes(lordOf7thHouse) ? "Fortified" : "Standard", effect: `Lord (${lordOf7th}) anchors partnership foundations and mutual understanding.` },
+          { planet: "Venus", house: `${venusHouse}th House`, strength: [5, 7, 9, 11].includes(venusHouse) ? "Favorable" : "Stable", effect: "Governs aesthetic appreciation, marital joy, and emotional satisfaction." },
+          { planet: "7th CSL", house: `${csl7PlanetName}`, strength: csl7Favorable ? "Harmonious Signification" : "Mixed Signification", effect: `Stellar subdivision maps relationship dynamics to houses: [${csl7Signifies.join(", ")}].` }
         ],
         relevance: "Directly mapped from Event ID: REL001 (Marriage Promise) & REL007 (Quality) in the KP Eventbook."
       }
     };
-  }, [profileName]);
+  }, [lordOf10thHouse, lordOf10th, sunHouse, csl10Favorable, csl10PlanetName, csl10Signifies, lordOf7thHouse, lordOf7th, venusHouse, csl7Favorable, csl7Adverse, csl7PlanetName, csl7Signifies]);
 
-  // Daily Horoscope Synthesis (Dynamic based on current time & Moon transits)
+  // Daily Horoscope Synthesis (Dynamic based on current active dasha lords and transits)
   const dailySynthesis = useMemo(() => {
-    // We generate deterministic daily readings based on profileName length and day coordinates
-    const seed = (profileName.charCodeAt(0) || 1) + (profileName.charCodeAt(1) || 1);
-    const careerScore = 70 + (seed % 25);
-    const relScore = 65 + ((seed * 3) % 30);
+    // Dynamic extraction of currently operating Vimshottari dasha lords
+    let currentMd = "Jupiter";
+    let currentAd = "Mercury";
+
+    const isPeriodActive = (startStr: string, endStr: string) => {
+      if (!startStr || !endStr) return false;
+      const now = new Date();
+      return now >= new Date(startStr) && now <= new Date(endStr);
+    };
+
+    if (kpData?.dba) {
+      currentMd = kpData.dba.mahadasha || currentMd;
+      currentAd = kpData.dba.bhukti || currentAd;
+    } else if (Array.isArray(astrologyData?.dashas) && astrologyData.dashas.length > 0) {
+      const activeMaha = astrologyData.dashas.find((d: any) => isPeriodActive(d.startDate, d.endDate));
+      if (activeMaha) {
+        currentMd = activeMaha.lord;
+        if (Array.isArray(activeMaha.subPeriods) && activeMaha.subPeriods.length > 0) {
+          const activeAntar = activeMaha.subPeriods.find((sub: any) => isPeriodActive(sub.startDate, sub.endDate));
+          if (activeAntar) currentAd = activeAntar.lord;
+        }
+      } else {
+        const fallbackMaha = astrologyData.dashas[0];
+        currentMd = fallbackMaha.lord;
+        if (Array.isArray(fallbackMaha.subPeriods) && fallbackMaha.subPeriods.length > 0) {
+          currentAd = fallbackMaha.subPeriods[0].lord;
+        }
+      }
+    }
+
+    const calculatePlanetPowerForTheme = (pName: string, isCareer: boolean): number => {
+      let score = 55; // Neutral baseline
+      const sigHouses = getPlanetHousesSignified(pName);
+      if (isCareer) {
+        if (sigHouses.includes(10)) score += 15;
+        if (sigHouses.includes(11)) score += 10;
+        if (sigHouses.includes(6)) score += 8;
+        if (sigHouses.includes(2)) score += 6;
+        if (sigHouses.includes(12)) score -= 10;
+        if (sigHouses.includes(8)) score -= 8;
+        if (sigHouses.includes(5)) score -= 5;
+      } else {
+        if (sigHouses.includes(7)) score += 18;
+        if (sigHouses.includes(11)) score += 10;
+        if (sigHouses.includes(2)) score += 8;
+        if (sigHouses.includes(6)) score -= 10;
+        if (sigHouses.includes(10)) score -= 8;
+        if (sigHouses.includes(1)) score -= 5;
+      }
+      return Math.min(Math.max(score, 15), 98);
+    };
+
+    const mdCareerPower = calculatePlanetPowerForTheme(currentMd, true);
+    const adCareerPower = calculatePlanetPowerForTheme(currentAd, true);
+    const careerScore = Math.round((mdCareerPower + adCareerPower) / 2);
+
+    const mdRelPower = calculatePlanetPowerForTheme(currentMd, false);
+    const adRelPower = calculatePlanetPowerForTheme(currentAd, false);
+    const relScore = Math.round((mdRelPower + adRelPower) / 2);
 
     return {
       date: new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" }),
       moonTransit: `Moon in transiting Nakshatra ${nakshatra} (Chandra Rashi ${moonSign})`,
       career: {
-        status: careerScore > 85 ? "Excellent Day for Professional Wins" : "Steady & Productive Work Day",
+        status: careerScore > 75 ? "Highly Active Professional Transits" : "Steady & Productive Work Day",
         score: careerScore,
-        alert: careerScore > 85 
-          ? "Superb transit convergence! Perfect day for pitching new projects, signing contracts, or resolving past professional bottlenecks."
-          : "Focus on routine tasks and backlog clearances. Avoid making impulsive financial commitments, as minor communication delays are likely.",
-        transitSignifier: "Transit Sun conjuncts Natal 10th CSL, aspecting professional house cusps.",
-        relevance: "Evaluated against transit rules for high-velocity career triggers."
+        alert: careerScore > 75
+          ? `Superb Vimshottari dasha alignment! Current active lords (${currentMd}-${currentAd}) are strongly connected to your professional houses. Excellent day for pitches, executing projects, or initiating key tasks.`
+          : `Steady energy today. Your current dasha lords (${currentMd}-${currentAd}) favor routine work, organization, and background preparation. Refrain from major professional risks.`,
+        transitSignifier: `Transit Moon in ${nakshatra} interacts with your Natal 10th CSL (${csl10PlanetName}).`,
+        relevance: "Evaluated against dynamic transit rules for career trigger points."
       },
       relationship: {
-        status: relScore > 82 ? "Warm & Compassionate Dynamics" : "Moderate Day (Maintain Clear Communication)",
+        status: relScore > 75 ? "Warm & Supportive Emotional Transits" : "Moderate Day (Focus on Clear Expression)",
         score: relScore,
-        alert: relScore > 82
-          ? "Highly auspicious lunar transit. Perfect for heartfelt conversations, dating, or resolving long-standing domestic conflicts."
-          : "Keep expectations grounded today. Moon aspects natal Saturn; a minor feeling of detachment or distance may arise. Speak gently.",
-        transitSignifier: `Transit Moon in ${nakshatra} aligns harmoniously with Natal 7th CSL.`,
-        relevance: "Cross-referenced with transit moon triggers from the KP Eventbook."
+        alert: relScore > 75
+          ? `Highly auspicious emotional gateway! Your operating lords (${currentMd}-${currentAd}) support harmony and connection. Perfect for heartfelt discussions, dating, or resolving long-standing issues.`
+          : `Keep expectations realistic today. Minor communication hurdles are possible under current dasha alignment (${currentMd}-${currentAd}). Speak mindfully and listen with empathy.`,
+        transitSignifier: `Transit Moon in ${nakshatra} aligns harmoniously with Natal 7th CSL (${csl7PlanetName}).`,
+        relevance: "Cross-referenced with lunar transit rules from the active KP Eventbook."
       }
     };
-  }, [profileName, moonSign, nakshatra]);
+  }, [kpData, astrologyData, nakshatra, moonSign, csl10PlanetName, csl7PlanetName]);
 
   return (
+
     <div className="space-y-6 animate-fade-in">
       {/* Upper Greeting Banner */}
       <div className={`p-6 rounded-2xl border ${
