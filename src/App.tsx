@@ -761,6 +761,24 @@ export default function App() {
     };
 
     runAutomatedSync(updatedInputs);
+
+    // Activate profile on backend when loaded/selected
+    try {
+      const pJson = record.profileJson || mapAstrologyDataToUserProfileJSON(activeUser, record.data);
+      if (pJson) {
+        fetch("/api/user-profile/act", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "add",
+            profileName: record.name,
+            profileData: pJson
+          })
+        }).catch(err => console.error("Failed to activate userprofile on backend:", err));
+      }
+    } catch (err) {
+      console.error("Failed to map and activate loaded profile:", err);
+    }
   };
 
   const handleLoadProfileByName = (name: string) => {
@@ -960,6 +978,19 @@ export default function App() {
         console.error("IndexedDB cache save failed:", dbErr);
       }
 
+      // Activate user profile JSON on backend and GitHub
+      if (profileJson) {
+        fetch("/api/user-profile/act", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "add",
+            profileName: finalName,
+            profileData: profileJson
+          })
+        }).catch(err => console.error("Failed to activate userprofile on backend:", err));
+      }
+
       if (!isInitial) {
         setActiveMenu("dashboard");
       }
@@ -1048,8 +1079,22 @@ export default function App() {
   const handleDeleteRecord = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     try {
+      const recordToDelete = cachedList.find(r => r.id === id);
+      const profileName = recordToDelete ? recordToDelete.name : "";
+
       await deleteCachedHoroscope(id);
       await loadCacheHistory();
+
+      if (profileName) {
+        fetch("/api/user-profile/act", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "delete",
+            profileName: profileName
+          })
+        }).catch(err => console.error("Failed to delete userprofile on backend:", err));
+      }
     } catch (err) {
       console.error("Failed to delete record:", err);
     }
@@ -1540,6 +1585,25 @@ export default function App() {
       );
 
       await loadCacheHistory();
+
+      // Activate profile on backend when imported
+      try {
+        const fullProfile = mapAstrologyDataToUserProfileJSON(activeUser, result);
+        if (fullProfile) {
+          fetch("/api/user-profile/act", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "add",
+              profileName: finalName,
+              profileData: fullProfile
+            })
+          }).catch(err => console.error("Failed to activate imported userprofile on backend:", err));
+        }
+      } catch (err) {
+        console.error("Failed to map and activate imported profile:", err);
+      }
+
       setProfileVerify(prev => ({ ...prev, isOpen: false }));
       setActiveMenu("dashboard");
     } catch (err) {

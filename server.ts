@@ -6,6 +6,7 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import { exec } from "child_process";
 import nodemailer from "nodemailer";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
@@ -239,6 +240,89 @@ app.post("/api/user-profile/save", async (req, res) => {
   } catch (error: any) {
     console.error("Backend User Profile Save Error:", error);
     res.status(500).json({ error: error.message || "Failed to save profile on backend." });
+  }
+});
+
+// Helper to handle git synchronization on the server
+async function syncProfileToGithub(action: "add" | "delete", profileName: string, profileData?: any) {
+  try {
+    const usersDir = path.join(process.cwd(), "Users");
+    const filePath = path.join(usersDir, "userprofile.json");
+
+    if (action === "add") {
+      if (!fs.existsSync(usersDir)) {
+        fs.mkdirSync(usersDir, { recursive: true });
+      }
+
+      fs.writeFileSync(filePath, JSON.stringify(profileData, null, 2));
+      console.log(`[Git Sync] Written Users/userprofile.json for profile: ${profileName}`);
+
+      exec(`git add Users/userprofile.json && git commit -m "feat: activate user profile ${profileName}" && git push origin main`, (err, stdout, stderr) => {
+        if (err) {
+          console.error("[Git Sync Add Error]", err, stderr);
+        } else {
+          console.log("[Git Sync Add Success]", stdout);
+        }
+      });
+
+    } else if (action === "delete") {
+      if (fs.existsSync(filePath)) {
+        let isMatching = false;
+        try {
+          const content = fs.readFileSync(filePath, "utf-8");
+          const parsed = JSON.parse(content);
+          if (parsed?.User?.profile_name === profileName) {
+            isMatching = true;
+          }
+        } catch (e) {
+          console.error("Failed to parse userprofile.json during deletion check:", e);
+        }
+
+        if (isMatching) {
+          fs.unlinkSync(filePath);
+          console.log(`[Git Sync] Deleted Users/userprofile.json because active profile ${profileName} was deleted.`);
+
+          exec(`git rm Users/userprofile.json && git commit -m "feat: deactivate user profile ${profileName}" && git push origin main`, (err, stdout, stderr) => {
+            if (err) {
+              console.error("[Git Sync Delete Error]", err, stderr);
+              exec(`git add -u Users/userprofile.json && git commit -m "feat: deactivate user profile ${profileName}" && git push origin main`, (err2, stdout2, stderr2) => {
+                if (err2) {
+                  console.error("[Git Sync Delete Backup Error]", err2, stderr2);
+                } else {
+                  console.log("[Git Sync Delete Backup Success]", stdout2);
+                }
+              });
+            } else {
+              console.log("[Git Sync Delete Success]", stdout);
+            }
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error("[syncProfileToGithub Error]", error);
+  }
+}
+
+// Endpoint to act upon user profile JSON on github / Users folder
+app.post("/api/user-profile/act", async (req, res) => {
+  try {
+    const { action, profileName, profileData } = req.body;
+    if (!action || !profileName) {
+      return res.status(400).json({ error: "Missing action or profileName" });
+    }
+
+    if (action === "add" && !profileData) {
+      return res.status(400).json({ error: "Missing profileData for add action" });
+    }
+
+    // Trigger git sync asynchronously to not block the frontend
+    syncProfileToGithub(action, profileName, profileData);
+
+    res.json({ success: true, message: `Profile action '${action}' triggered and syncing asynchronously.` });
+  } catch (err: any) {
+    console.error("Error in /api/user-profile/act endpoint:", err);
+    res.status(500).json({ error: err.message || "Failed to process profile action." });
   }
 });
 
