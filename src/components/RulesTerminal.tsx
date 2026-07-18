@@ -77,7 +77,7 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
 
     const cleanStatus = (raw: string) => {
       let text = raw.trim();
-      text = text.replace(/^`?Output Status:`?\s*/i, "");
+      text = text.replace(/^(\*\*|`)*Output Status:(\*\*|`|:|\s)*/i, "");
       // Remove bold wrappers
       text = text.replace(/^\*\*|\*\*$/g, "");
       // Remove backtick wrappers
