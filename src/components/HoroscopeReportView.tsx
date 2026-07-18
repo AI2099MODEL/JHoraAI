@@ -682,7 +682,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
     const supportedKeys = [
       { id: "table_1", label: "table 1" },
-      { id: "planets", label: "planets" },
+      { id: "table_2", label: "table 2" },
       { id: "panchanga", label: "panchanga" },
       { id: "divisionalCharts", label: "divisionalCharts" },
       { id: "dashas", label: "dashas*" },
@@ -724,6 +724,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       let dataVal = astrologyData[item.id];
       if (item.id === "table_1") {
         dataVal = { dummy: true };
+      }
+      if (item.id === "table_2") {
+        dataVal = astrologyData.planets || { dummy: true };
       }
       if (item.id === "special_lagnas" && !dataVal) {
         dataVal = astrologyData.special_lagnas || { dummy: true };
@@ -2388,10 +2391,10 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                     </div>
                   )}
 
-              {vedicSubTab === "planets" && planets && planets.length > 0 && (
+              {vedicSubTab === "table_2" && planets && planets.length > 0 && (
                 <div className="space-y-4 p-4 rounded-xl border border-slate-800 bg-slate-950/40 text-[11px] md:text-xs">
                   <div className="border-b border-slate-800 pb-2">
-                    <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">planets</h3>
+                    <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 2: KP Graha, Nakshatra and Pada</h3>
                   </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -2443,6 +2446,13 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                       })}
                     </tbody>
                   </table>
+                </div>
+
+                <div className="mt-4 p-4 rounded-lg bg-slate-900/50 border border-slate-800/80">
+                  <h4 className="text-amber-400 font-bold text-xs uppercase tracking-wider mb-2 font-sans">Table 2: Data Provenance & Analysis Summary</h4>
+                  <p className="text-slate-300 text-xs leading-relaxed font-sans">
+                    Every parameter displayed in this grid binds to a single source of truth. The raw planetary longitude, sign, house placements, nakshatras, and retrograde/combust coordinates are retrieved in real-time from the authoritative <strong>Dehradun JHora Rest Server Endpoint (/api/jhora/horoscope)</strong>. Sub-lords, Nakshatra rulers, and Sub-Sub-lords are derived dynamically by executing calculations from the <strong>KP Stellar Division Engine</strong> against the exact Placidus cuspal coordinates to maintain extreme multi-system precision.
+                  </p>
                 </div>
               </div>
             )}

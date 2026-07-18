@@ -2293,6 +2293,7 @@ export default function App() {
                         <thead>
                           <tr className="text-slate-400 uppercase tracking-wider">
                             <th className="py-2.5 px-3">Field Name</th>
+                            <th className="py-2.5 px-3">Table Ref</th>
                             <th className="py-2.5 px-3">Source</th>
                             <th className="py-2.5 px-3">Raw JSON Path</th>
                             <th className="py-2.5 px-3">Formula</th>
@@ -2303,6 +2304,7 @@ export default function App() {
                         <tbody className="divide-y divide-slate-800/60">
                           <tr>
                             <td className="py-2 px-3 font-semibold text-slate-300">Lagna Sign</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 1</td>
                             <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
                             <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.Ascendant.sign</td>
                             <td className="py-2 px-3 text-slate-500">None</td>
@@ -2311,6 +2313,7 @@ export default function App() {
                           </tr>
                           <tr>
                             <td className="py-2 px-3 font-semibold text-slate-300">Planet Degree</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 2</td>
                             <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
                             <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.[planetName].longitude</td>
                             <td className="py-2 px-3 text-slate-500">None</td>
@@ -2319,6 +2322,7 @@ export default function App() {
                           </tr>
                           <tr>
                             <td className="py-2 px-3 font-semibold text-slate-300">House Placements</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 2 & 5</td>
                             <td className="py-2 px-3 text-indigo-400">SOURCE_B (Derived)</td>
                             <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.Ascendant.sign</td>
                             <td className="py-2 px-3 text-slate-400">(planetSignIdx - lagnaSignIdx + 12) % 12 + 1</td>
@@ -2327,6 +2331,7 @@ export default function App() {
                           </tr>
                           <tr>
                             <td className="py-2 px-3 font-semibold text-slate-300">Panchanga Tithi</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 3</td>
                             <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
                             <td className="py-2 px-3 text-slate-400">$.calendar_info.Tithi</td>
                             <td className="py-2 px-3 text-slate-500">None</td>

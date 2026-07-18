@@ -41,7 +41,29 @@ This table represents the layout schema of the primary birth particulars and lag
 | **Lagna Nakshatra Pada** | `int` | Calculated (from Birth Parameters) | Nakshatra quarter of the ascendant (`Vedic.ascendant.pada`) |
 | **Lagna Nakshatra Lord** | `string` | Calculated (from Birth Parameters) | Planetary ruler of the ascendant nakshatra (`Vedic.ascendant.nakshatra_lord`) |
 
-#### Table 2: Astronomical Alignment Parameters (Data Schema & Index Logic)
+#### Table 2: KP Graha, Nakshatra and Pada (Planetary Coordinates)
+This table indexes the coordinates, nakshatras, padas, star-lords, sub-lords, and sub-sub-lords of all primary natal planets.
+* **Primary Information Source / Info Origin:** JHora REST API Server endpoint (`/api/jhora/horoscope`) & KP Stellar Division Engine.
+* **Logic & Provenance Source:** Raw planet coordinates are retrieved directly from the JHora engine, while sub-lords and sub-sub-lords are derived using KP Placidus stellar division equations against the exact coordinates.
+
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Graha Name** | `string` | JHora Raw API | Name of the primary celestial body (`Vedic.planets.[Planet].name`) |
+| **Zodiac Sign** | `string` | JHora Raw API | Rasi sign containing the planet (`Vedic.planets.[Planet].sign`) |
+| **Longitude (In Sign)** | `string` | JHora Raw API | Coordinate degree, minute, and second within the sign (`Vedic.planets.[Planet].longitude_formatted`) |
+| **360° Longitude** | `float` | JHora Raw API | Celestial longitude in 360-degree coordinates (`Vedic.planets.[Planet].longitude`) |
+| **House Placement** | `int` | JHora Raw API | House position in the rasi chart (`Vedic.planets.[Planet].house`) |
+| **Nakshatra** | `string` | JHora Raw API | Asterism division (1 to 27) of the planet (`Vedic.planets.[Planet].nakshatra`) |
+| **Nakshatra Pada** | `int` | JHora Raw API | Asterism quarter (1 to 4) of the planet (`Vedic.planets.[Planet].pada`) |
+| **Nakshatra Lord** | `string` | Nakshatra Ruler Map | Planetary ruler of the nakshatra (`Vedic.planets.[Planet].nakshatra_lord`) |
+| **Sub Lord** | `string` | KP Stellar Division Engine | Krishnamurti Paddhati sub-lord ruler (`KP.planets.[Planet].sub_lord`) |
+| **Sub-Sub Lord** | `string` | KP Stellar Division Engine | Krishnamurti Paddhati sub-sub-lord ruler (`KP.planets.[Planet].sub_sub_lord`) |
+| **Retrograde (Y/N)** | `boolean` | JHora Raw API | Indicates if the planet is in retrograde motion (`Vedic.planets.[Planet].is_retrograde`) |
+| **Combust (Y/N)** | `boolean` | JHora Raw API | Indicates if the planet is combust with the Sun (`Vedic.planets.[Planet].is_combust`) |
+| **Dignity** | `string` | Dignities Engine | Planetary dignity (Exalted, Own, Moolatrikona, Friendly, Enemy, Debilitated) (`Vedic.planets.[Planet].dignity`) |
+| **Avasthas** | `string` | Baladi/Jagrat/Deepta Avasthas | Calculated planetary age, alertness, and mood states (`Vedic.planets.[Planet].state`) |
+
+#### Table 3: Astronomical Alignment Parameters (Data Schema & Index Logic)
 This table indexes the calculated astronomical parameters from the ephemeris.
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
@@ -52,7 +74,7 @@ This table indexes the calculated astronomical parameters from the ephemeris.
 | **Sunrise / Sunset** | `string` | Solar Horizon calculation | Calculated solar rise and set times for coordinates (`Astronomical.sunrise` / `sunset`) |
 | **Moon Phase** | `string` | Tithi calculation | Angular distance of Moon from Sun at birth (`Astronomical.moon_phase`) |
 
-#### Table 3: Planetary Placements & Dignities (Vedic Engine)
+#### Table 4: Planetary Placements & Dignities (Vedic Engine)
 This table indexes the calculated planetary longitudinal values, zodiac signs, and houses.
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
@@ -62,7 +84,7 @@ This table indexes the calculated planetary longitudinal values, zodiac signs, a
 | **Sign Placement** | `string` | Zodiac Sign Map | Zodiacal sign containing the planet coordinate (`Vedic.planets.[Planet].sign`) |
 | **Nakshatra** | `string` | Nakshatra Engine | 27-Nakshatra division mapping (`Vedic.planets.[Planet].nakshatra`) |
 
-#### Table 4: KP System Cusps & Planets (KP Engine)
+#### Table 5: KP System Cusps & Planets (KP Engine)
 This table indexes the Krishnamurti Paddhati stellar, sub, and sub-sub significators.
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
@@ -71,7 +93,7 @@ This table indexes the Krishnamurti Paddhati stellar, sub, and sub-sub significa
 | **Planet Sub-Lord** | `string` | KP Stellar Division Engine | Sub-lord of natal planetary placements (`KP.planets.[Planet].sub_lord`) |
 | **Significators** | `array` | KP Significator Engine | Houses signified by planets under KP rules (`KP.planet_significators`) |
 
-#### Table 5: Jaimini Parameters & Dashas (Jaimini Engine)
+#### Table 6: Jaimini Parameters & Dashas (Jaimini Engine)
 This table indexes the Jaimini karakas, arudhas, and Chara Dashas.
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
@@ -80,7 +102,7 @@ This table indexes the Jaimini karakas, arudhas, and Chara Dashas.
 | **Arudha Padas** | `object` | Pada Projection Engine | Arudha houses calculated relative to house lords (`Jaimini.arudha`) |
 | **Chara Dashas** | `array` | Jaimini Dasha Engine | Sign-based dasha progression sequence and durations (`Jaimini.chara_dasha`) |
 
-#### Table 6: Lal Kitab Placements & Remedies (Lal Kitab Engine)
+#### Table 7: Lal Kitab Placements & Remedies (Lal Kitab Engine)
 This table indexes Lal Kitab house translations and astrological remedies.
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
@@ -88,7 +110,7 @@ This table indexes Lal Kitab house translations and astrological remedies.
 | **Pucca Ghar** | `string` | Lal Kitab Translation | Planet placements translated to Aries-Ascendant house mapping (`Lal_Kitab.houses`) |
 | **Remedies** | `object` | Lal Kitab Traditional Book | Specific planetary remedies for natal positions (`Lal_Kitab.remedies`) |
 
-#### Table 7: Tajik Varshaphal Aspects & Muntha (Tajik Engine)
+#### Table 8: Tajik Varshaphal Aspects & Muntha (Tajik Engine)
 This table indexes annual solar return Muntha and Tajik aspects.
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
@@ -96,7 +118,7 @@ This table indexes annual solar return Muntha and Tajik aspects.
 | **Muntha House** | `int` | Tajik Progression Engine | progressed annual lagna house (`Tajik.varshaphal_2026.muntha_house`) |
 | **Tajik Aspects** | `array` | Harsha/Ithasala Engine | Tajik yoga aspects (e.g. Ithasala, Eesapha) (`Tajik.varshaphal_2026.aspects`) |
 
-#### Table 8: Chinese BaZi Four Pillars (Bazi Engine)
+#### Table 9: Chinese BaZi Four Pillars (Bazi Engine)
 This table indexes Chinese Sexagenary cycle parameters (Year, Month, Day, and Hour Pillars).
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
@@ -104,7 +126,7 @@ This table indexes Chinese Sexagenary cycle parameters (Year, Month, Day, and Ho
 | **Pillars** | `object` | Chinese BaZi Calendar Engine | Stems and branches mapped to birth date-time (`Chinese.pillars`) |
 | **Elements Balance**| `object` | Element Quantification | Wood, Fire, Earth, Metal, and Water counts (`Chinese.elements`) |
 
-#### Table 9: Tropical Western Chart & Aspects (Western Engine)
+#### Table 10: Tropical Western Chart & Aspects (Western Engine)
 This table indexes Tropical Western astrology planets, cusps, and aspects.
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
