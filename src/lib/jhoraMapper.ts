@@ -1804,15 +1804,18 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
     tables: [
       {
         table_number: 1,
-        title: "Birth Details",
+        title: "Birth Details & Lagna (Ascendant Coordinates)",
         source_origin: "Dashboard Page / Input Form",
-        section_key: "Birth",
+        section_key: "Birth & Vedic.ascendant",
         is_populated: true,
         data_sample: {
           profile_name: userSection.profile_name,
           date: birthSection.date,
           time: birthSection.time,
-          place: birthSection.place
+          place: birthSection.place,
+          lagna_sign: ascendant.sign,
+          lagna_degree: ascendant.degree,
+          lagna_nakshatra: ascendant.nakshatra
         }
       },
       {

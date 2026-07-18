@@ -111,7 +111,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
   const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
-  const [vedicSubTab, setVedicSubTab] = useState<string>("birthDetails");
+  const [vedicSubTab, setVedicSubTab] = useState<string>("table_1");
   const [testName, setTestName] = useState<string>(activeUser?.name || "Nitin Jain");
   const [divisionalChartStyle, setDivisionalChartStyle] = useState<"north" | "south">("north");
   const [generatedPdfs, setGeneratedPdfs] = useState<{
@@ -681,8 +681,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     if (!astrologyData) return list;
 
     const supportedKeys = [
-      { id: "birthDetails", label: "birthDetails" },
-      { id: "lagna", label: "lagna" },
+      { id: "table_1", label: "table 1" },
       { id: "planets", label: "planets" },
       { id: "panchanga", label: "panchanga" },
       { id: "divisionalCharts", label: "divisionalCharts" },
@@ -723,6 +722,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
     for (const item of supportedKeys) {
       let dataVal = astrologyData[item.id];
+      if (item.id === "table_1") {
+        dataVal = { dummy: true };
+      }
       if (item.id === "special_lagnas" && !dataVal) {
         dataVal = astrologyData.special_lagnas || { dummy: true };
       }
@@ -2272,113 +2274,119 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             <div className="w-full space-y-6">
               {majorTab === "jhora" && (
                 <div className="space-y-6">
-                  {vedicSubTab === "birthDetails" && birthDetails && Object.keys(birthDetails).length > 0 && (
-                <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
-                  <div className="border-b border-slate-800 pb-2">
-                    <h3 className="font-bold text-amber-400 uppercase tracking-wider">birthDetails (Birth Particulars)</h3>
-                  </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Full Name:</span>
-                    <span className="text-slate-100 font-bold">{birthDetails.name || activeUser?.name || "Nitin Jain"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Date of Birth:</span>
-                    <span className="text-slate-200">{birthDetails.date || "1976-01-06"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Time of Birth:</span>
-                    <span className="text-slate-200">{birthDetails.time || "18:40:00"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Birth Location:</span>
-                    <span className="text-slate-200 font-sans">{birthDetails.location || "Dehradun, India"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Latitude:</span>
-                    <span className="text-slate-200">{Number(birthDetails.latitude || 30.3165).toFixed(4)}° N</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Longitude:</span>
-                    <span className="text-slate-200">{Number(birthDetails.longitude || 78.0322).toFixed(4)}° E</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Julian Day Number:</span>
-                    <span className="text-slate-200">{astronomicalData?.julian_day_number || "2442784.277778"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Sidereal Time (LST):</span>
-                    <span className="text-slate-200">{astronomicalData?.sidereal_time || "12:14:15"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Ayanamsa Reference:</span>
-                    <span className="text-slate-200 font-sans">{birthDetails.ayanamsa || "Lahiri Ayanamsa"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Ayanamsa Value:</span>
-                    <span className="text-slate-200">{Number(birthDetails.ayanamsaDegree || 23.5512).toFixed(4)}°</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Obliquity of Ecliptic:</span>
-                    <span className="text-slate-200">{astronomicalData?.obliquity || "23° 26' 27\""}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Place ID:</span>
-                    <span className="text-slate-200 overflow-hidden text-ellipsis whitespace-nowrap max-w-[180px]" title={birthDetails.placeId}>{birthDetails.placeId || "ChIJuS_v16Lp_zMRwXnL-4E_P-s"}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+                  {vedicSubTab === "table_1" && (
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                      {/* Birth Details Block */}
+                      {birthDetails && Object.keys(birthDetails).length > 0 && (
+                        <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
+                          <div className="border-b border-slate-800 pb-2">
+                            <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 1: Birth Details (Birth Particulars)</h3>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Full Name:</span>
+                              <span className="text-slate-100 font-bold">{birthDetails.name || activeUser?.name || "Nitin Jain"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Date of Birth:</span>
+                              <span className="text-slate-200">{birthDetails.date || "1976-01-06"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Time of Birth:</span>
+                              <span className="text-slate-200">{birthDetails.time || "18:40:00"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Birth Location:</span>
+                              <span className="text-slate-200 font-sans">{birthDetails.location || "Dehradun, India"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Latitude:</span>
+                              <span className="text-slate-200">{Number(birthDetails.latitude || 30.3165).toFixed(4)}° N</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Longitude:</span>
+                              <span className="text-slate-200">{Number(birthDetails.longitude || 78.0322).toFixed(4)}° E</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Julian Day Number:</span>
+                              <span className="text-slate-200">{astronomicalData?.julian_day_number || "2442784.277778"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Sidereal Time (LST):</span>
+                              <span className="text-slate-200">{astronomicalData?.sidereal_time || "12:14:15"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Ayanamsa Reference:</span>
+                              <span className="text-slate-200 font-sans">{birthDetails.ayanamsa || "Lahiri Ayanamsa"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Ayanamsa Value:</span>
+                              <span className="text-slate-200">{Number(birthDetails.ayanamsaDegree || 23.5512).toFixed(4)}°</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Obliquity of Ecliptic:</span>
+                              <span className="text-slate-200">{astronomicalData?.obliquity || "23° 26' 27\""}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Place ID:</span>
+                              <span className="text-slate-200 overflow-hidden text-ellipsis whitespace-nowrap max-w-[180px]" title={birthDetails.placeId}>{birthDetails.placeId || "ChIJuS_v16Lp_zMRwXnL-4E_P-s"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
-              {vedicSubTab === "lagna" && lagna && Object.keys(lagna).length > 0 && (
-                <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
-                  <div className="border-b border-slate-800 pb-2">
-                    <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">lagna</h3>
-                  </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Zodiac Sign (Lagna):</span>
-                    <span className="text-slate-100 font-bold font-sans">{lagna.sign || "Cancer"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Longitude (In Sign):</span>
-                    <span className="text-slate-200">{lagna.degree ? formatDegree(lagna.degree) : "00° 00'"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Exact 360° Longitude:</span>
-                    <span className="text-slate-200">{lagna.longitude ? format360Degree(lagna.longitude) : "00° 00'"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Nakshatra:</span>
-                    <span className="text-slate-200 font-sans">{lagna.nakshatra || "Pushya"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Nakshatra Pada:</span>
-                    <span className="text-slate-200 font-bold">{lagna.pada || 2}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Nakshatra Lord (Ruler):</span>
-                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.nakshatra_lord || "Saturn"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Sub-Lord (KP):</span>
-                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.sub_lord || "Mercury"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Sub-Sub-Lord (KP):</span>
-                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.sub_sub_lord || "Rahu"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Lagna Lord (Ruler of Sign):</span>
-                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.lagna_lord || "Moon"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-900/60">
-                    <span className="text-slate-400">Lagna Lord Placement:</span>
-                    <span className="text-slate-200 font-sans">{vedicData?.ascendant?.lagna_lord_house || "House 11"}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+                      {/* Lagna Block */}
+                      {lagna && Object.keys(lagna).length > 0 && (
+                        <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
+                          <div className="border-b border-slate-800 pb-2">
+                            <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 1: Lagna Details (Ascendant Coordinates)</h3>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Zodiac Sign (Lagna):</span>
+                              <span className="text-slate-100 font-bold font-sans">{lagna.sign || "Cancer"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Longitude (In Sign):</span>
+                              <span className="text-slate-200">{lagna.degree ? formatDegree(lagna.degree) : "00° 00'"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Exact 360° Longitude:</span>
+                              <span className="text-slate-200">{lagna.longitude ? format360Degree(lagna.longitude) : "00° 00'"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Nakshatra:</span>
+                              <span className="text-slate-200 font-sans">{lagna.nakshatra || "Pushya"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Nakshatra Pada:</span>
+                              <span className="text-slate-200 font-bold">{lagna.pada || 2}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Nakshatra Lord (Ruler):</span>
+                              <span className="text-slate-200 font-sans">{vedicData?.ascendant?.nakshatra_lord || "Saturn"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Sub-Lord (KP):</span>
+                              <span className="text-slate-200 font-sans">{vedicData?.ascendant?.sub_lord || "Mercury"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Sub-Sub-Lord (KP):</span>
+                              <span className="text-slate-200 font-sans">{vedicData?.ascendant?.sub_sub_lord || "Rahu"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Lagna Lord (Ruler of Sign):</span>
+                              <span className="text-slate-200 font-sans">{vedicData?.ascendant?.lagna_lord || "Moon"}</span>
+                            </div>
+                            <div className="flex justify-between py-1 border-b border-slate-900/60">
+                              <span className="text-slate-400">Lagna Lord Placement:</span>
+                              <span className="text-slate-200 font-sans">{vedicData?.ascendant?.lagna_lord_house || "House 11"}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
               {vedicSubTab === "planets" && planets && planets.length > 0 && (
                 <div className="space-y-4 p-4 rounded-xl border border-slate-800 bg-slate-950/40 text-[11px] md:text-xs">

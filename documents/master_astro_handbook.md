@@ -15,8 +15,8 @@ This index catalogs the primary data tables, variables, and calculation schemas 
 * **Primary Information Source:** **Dashboard Page** (User birth inputs: Date, Time, Place/Coordinates, and selected Ayanamsa)
 * **Status:** Dynamically populated based on active selected profile session.
 
-#### Table 1: Birth Details (Data Schema & Index Logic)
-This table represents the layout schema of the primary birth particulars. The engine maps these parameters as the absolute mathematical foundation for divisional chart calculations, dasha timelines, and planetary transits.
+#### Table 1: Birth Details & Lagna (Ascendant Coordinates)
+This table represents the layout schema of the primary birth particulars and lagna (ascendant) coordinates. The engine maps these parameters as the absolute mathematical foundation for divisional chart calculations, dasha timelines, and planetary transits.
 
 | Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
 | :--- | :--- | :--- | :--- |
@@ -34,6 +34,12 @@ This table represents the layout schema of the primary birth particulars. The en
 | **Obliquity** | `string` | Calculated (from Ephemeris) | Obliquity of the ecliptic derived for Julian epoch (`Birth.obliquity`) |
 | **Ephemeris Used** | `string` | Background Library | Calculation engine background source (`Birth.ephemeris_used`) |
 | **House System** | `string` | **Dashboard Page** Settings | Structural house division rules applied (e.g., Placidus / KP Cusps) |
+| **Zodiac Sign (Lagna)** | `string` | Calculated (from Birth Parameters) | Sign rising on eastern horizon (`Vedic.ascendant.sign`) |
+| **Lagna Longitude (In Sign)** | `string` | Calculated (from Birth Parameters) | Ascendant degree within zodiac sign (`Vedic.ascendant.degree`, `minute`, `second`) |
+| **Lagna 360° Longitude** | `float` | Calculated (from Birth Parameters) | Exact 360-degree celestial longitude of ascendant (`Vedic.ascendant.longitude_360`) |
+| **Lagna Nakshatra** | `string` | Calculated (from Birth Parameters) | Nakshatra containing the ascendant degree (`Vedic.ascendant.nakshatra`) |
+| **Lagna Nakshatra Pada** | `int` | Calculated (from Birth Parameters) | Nakshatra quarter of the ascendant (`Vedic.ascendant.pada`) |
+| **Lagna Nakshatra Lord** | `string` | Calculated (from Birth Parameters) | Planetary ruler of the ascendant nakshatra (`Vedic.ascendant.nakshatra_lord`) |
 
 #### Table 2: Astronomical Alignment Parameters (Data Schema & Index Logic)
 This table indexes the calculated astronomical parameters from the ephemeris.
