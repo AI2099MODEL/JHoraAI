@@ -3,8 +3,8 @@
     "google_user_id": "guest_user",
     "email": "guest@jhora.ai",
     "profile_name": "Nitin",
-    "created_at": "2026-07-18T11:55:36.077Z",
-    "updated_at": "2026-07-18T11:55:36.077Z"
+    "created_at": "2026-07-18T12:13:13.433Z",
+    "updated_at": "2026-07-18T12:13:13.433Z"
   },
   "Birth": {
     "date": "1976-01-06",
@@ -23491,7 +23491,7 @@
     "birth_time_rectified": false,
     "api_version": "v2.0.0",
     "api_confidence": "Authoritative / Verified",
-    "generated_on": "2026-07-18T11:55:36.077Z",
+    "generated_on": "2026-07-18T12:13:13.433Z",
     "generated_by": "JHoraAI Precision Engine",
     "jhora_version": "v7.6",
     "profile_version": "v2.1",
@@ -23500,7 +23500,7 @@
   "TableIndex": {
     "metadata": {
       "indexing_agent": "JHoraAI Master Evaluation Indexer",
-      "indexed_on": "2026-07-18T11:55:36.077Z",
+      "indexed_on": "2026-07-18T12:13:13.433Z",
       "handbook_reference": "/documents/master_astro_handbook.md",
       "status": "SYNC_ACTIVE"
     },
@@ -23585,8 +23585,53 @@
         }
       },
       {
+        "table_number": 3,
+        "title": "Astronomical Alignment Parameters",
+        "source_origin": "Background Astronomical Engine",
+        "section_key": "Astronomical",
+        "is_populated": true,
+        "data_sample": {
+          "julian_day_number": "2442784.277778",
+          "sidereal_time": "06:54:02",
+          "moon_phase": "Sukla Ekadashi"
+        }
+      },
+      {
+        "table_number": 4,
+        "title": "Ashtakavarga Bindus (Sarvashtakavarga SAV)",
+        "source_origin": "Ashtakavarga Engine",
+        "section_key": "Vedic.ashtakavarga",
+        "is_populated": true,
+        "data_sample": {
+          "sarvashtakavarga": [
+            27,
+            31,
+            24,
+            29,
+            24,
+            31,
+            34,
+            26,
+            33,
+            24,
+            24,
+            30
+          ]
+        }
+      },
+      {
+        "table_number": 5,
+        "title": "Shadbala Strengths (Rupas & Strength Ratio)",
+        "source_origin": "Shadbala Calculation Engine",
+        "section_key": "Vedic.shadbala",
+        "is_populated": true,
+        "data_sample": {
+          "shadbala_planets_count": 7
+        }
+      },
+      {
         "table_number": 6,
-        "title": "KP System Cusps & Planets (KP)",
+        "title": "KP System Cusps & Planets (KP Stellar Division)",
         "source_origin": "KP Stellar Engine",
         "section_key": "KP",
         "is_populated": true,
@@ -23605,95 +23650,102 @@
       },
       {
         "table_number": 7,
-        "title": "Jaimini Parameters & Dashas (Jaimini)",
+        "title": "Planet to House Significator Mappings (KP Reverse Lookup)",
+        "source_origin": "KP Stellar Significators Engine",
+        "section_key": "KP.planet_significators",
+        "is_populated": true,
+        "data_sample": {
+          "significators_mapped": true
+        }
+      },
+      {
+        "table_number": 8,
+        "title": "Western Tropical Chart & Aspects",
+        "source_origin": "Western Astrology Engine",
+        "section_key": "Western",
+        "is_populated": true,
+        "data_sample": {
+          "aspects_count": 0
+        }
+      },
+      {
+        "table_number": 9,
+        "title": "Esoteric & Alternative Mystical Systems (BaZi & Lal Kitab)",
+        "source_origin": "Sexagenary and Lal Kitab Engines",
+        "section_key": "Chinese & Lal_Kitab",
+        "is_populated": true,
+        "data_sample": {
+          "bazi_pillars": {
+            "year": {
+              "stem": "Bing (Yang Fire)",
+              "branch": "Chen (Dragon)",
+              "element": "Fire",
+              "animal": "Dragon"
+            },
+            "month": {
+              "stem": "Ji (Yin Earth)",
+              "branch": "Yin (Tiger)",
+              "element": "Earth",
+              "animal": "Tiger"
+            },
+            "day": {
+              "stem": "Geng (Yang Metal)",
+              "branch": "Chen (Dragon)",
+              "element": "Metal",
+              "animal": "Dragon"
+            },
+            "hour": {
+              "stem": "Yi (Yin Wood)",
+              "branch": "You (Rooster)",
+              "element": "Wood",
+              "animal": "Rooster"
+            }
+          },
+          "lal_kitab_remedies_count": 7
+        }
+      },
+      {
+        "table_number": 10,
+        "title": "Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)",
+        "source_origin": "Multi-tiered Dasha Engine",
+        "section_key": "Vedic.dashas",
+        "is_populated": true,
+        "data_sample": {
+          "vimshottari_mahadashas": 9,
+          "yogini_active": true,
+          "ashtottari_active": true
+        }
+      },
+      {
+        "table_number": 11,
+        "title": "Vedic Raja/Dhana Yogas & Celestial Doshas",
+        "source_origin": "Yogas/Doshas Evaluation Engine",
+        "section_key": "Vedic.yogas & Vedic.doshas",
+        "is_populated": true,
+        "data_sample": {
+          "evaluations_completed": true
+        }
+      },
+      {
+        "table_number": 12,
+        "title": "Traditional Life Predictions & Daily Muhurta",
+        "source_origin": "Predictive Synthesis Engine",
+        "section_key": "Vedic.predictions & Vedic.muhurta",
+        "is_populated": true,
+        "data_sample": {
+          "muhurta_calculated": true,
+          "predictions_available": true
+        }
+      },
+      {
+        "table_number": 13,
+        "title": "Jaimini Parameters & Chara Dashas",
         "source_origin": "Jaimini Sutra Engine",
         "section_key": "Jaimini",
         "is_populated": true,
         "data_sample": {
           "atmakaraka": "Mars",
           "karakamsha": "Cancer"
-        }
-      },
-      {
-        "table_number": 8,
-        "title": "Lal Kitab Placements & Remedies",
-        "source_origin": "Lal Kitab Engine",
-        "section_key": "Lal_Kitab",
-        "is_populated": true,
-        "data_sample": {
-          "total_remedies": 7
-        }
-      },
-      {
-        "table_number": 9,
-        "title": "Tajik Varshaphal Aspects & Muntha",
-        "source_origin": "Tajik Annual Solar Returns",
-        "section_key": "Tajik",
-        "is_populated": true,
-        "data_sample": {
-          "year": 2026,
-          "muntha_house": 9,
-          "muntha_lord": "Jupiter",
-          "year_lord": "Jupiter",
-          "aspects": [
-            {
-              "type": "Ithasala",
-              "planet1": "Sun",
-              "planet2": "Jupiter",
-              "orb": 1.5,
-              "result": "Highly Auspicious"
-            },
-            {
-              "type": "Eesapha",
-              "planet1": "Mars",
-              "planet2": "Saturn",
-              "orb": 2.1,
-              "result": "Obstacles resolved with discipline"
-            }
-          ]
-        }
-      },
-      {
-        "table_number": 10,
-        "title": "Chinese BaZi Four Pillars",
-        "source_origin": "Chinese Sexagenary Engine",
-        "section_key": "Chinese",
-        "is_populated": true,
-        "data_sample": {
-          "year": {
-            "stem": "Bing (Yang Fire)",
-            "branch": "Chen (Dragon)",
-            "element": "Fire",
-            "animal": "Dragon"
-          },
-          "month": {
-            "stem": "Ji (Yin Earth)",
-            "branch": "Yin (Tiger)",
-            "element": "Earth",
-            "animal": "Tiger"
-          },
-          "day": {
-            "stem": "Geng (Yang Metal)",
-            "branch": "Chen (Dragon)",
-            "element": "Metal",
-            "animal": "Dragon"
-          },
-          "hour": {
-            "stem": "Yi (Yin Wood)",
-            "branch": "You (Rooster)",
-            "element": "Wood",
-            "animal": "Rooster"
-          }
-        }
-      },
-      {
-        "table_number": 11,
-        "title": "Tropical Western Chart & Aspects",
-        "source_origin": "Western Astrology Engine",
-        "section_key": "Western",
-        "is_populated": true,
-        "data_sample": {
-          "aspects_count": 0
         }
       }
     ]
