@@ -72,6 +72,91 @@ function getSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): 
   return list;
 }
 
+function getYoginiSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> {
+  let cleanLord = parentLord;
+  const firstWord = parentLord.split(" ")[0];
+  
+  const planetMap: Record<string, string> = {
+    "Moon": "Mangala", "Sun": "Pingala", "Jupiter": "Dhanya", "Mars": "Bhramari",
+    "Mercury": "Bhadrika", "Saturn": "Ulka", "Venus": "Siddha", "Rahu": "Sankata", "Raagu": "Sankata", "Ketu": "Sankata", "Kethu": "Sankata"
+  };
+  
+  if (planetMap[firstWord]) {
+    cleanLord = planetMap[firstWord];
+  } else {
+    cleanLord = firstWord;
+  }
+  
+  const YOGINI_CYCLE = ["Mangala", "Pingala", "Dhanya", "Bhramari", "Bhadrika", "Ulka", "Siddha", "Sankata"];
+  const YOGINI_YEARS: Record<string, number> = {
+    Mangala: 1, Pingala: 2, Dhanya: 3, Bhramari: 4, Bhadrika: 5, Ulka: 6, Siddha: 7, Sankata: 8
+  };
+  const YOGINI_LORDS: Record<string, string> = {
+    Mangala: "Moon", Pingala: "Sun", Dhanya: "Jupiter", Bhramari: "Mars", Bhadrika: "Mercury", Ulka: "Saturn", Siddha: "Venus", Sankata: "Rahu"
+  };
+
+  const startIndex = YOGINI_CYCLE.indexOf(cleanLord);
+  if (startIndex === -1) return [];
+  
+  const totalParentMs = parentEnd.getTime() - parentStart.getTime();
+  const list: Array<{ lord: string; start: Date; end: Date }> = [];
+  let currentStartMs = parentStart.getTime();
+  
+  for (let i = 0; i < 8; i++) {
+    const yName = YOGINI_CYCLE[(startIndex + i) % 8];
+    const yLord = YOGINI_LORDS[yName];
+    const years = YOGINI_YEARS[yName];
+    const share = years / 36;
+    const durationMs = totalParentMs * share;
+    const currentEndMs = currentStartMs + durationMs;
+    
+    list.push({
+      lord: `${yName} (${yLord})`,
+      start: new Date(currentStartMs),
+      end: new Date(currentEndMs)
+    });
+    
+    currentStartMs = currentEndMs;
+  }
+  
+  return list;
+}
+
+function getAshtottariSubPeriods(parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> {
+  let cleanLord = parentLord.split(" ")[0];
+  if (cleanLord === "Raagu") cleanLord = "Rahu";
+  
+  const ASHTOTTARI_CYCLE = ["Sun", "Moon", "Mars", "Mercury", "Saturn", "Jupiter", "Rahu", "Venus"];
+  const ASHTOTTARI_YEARS: Record<string, number> = {
+    Sun: 6, Moon: 15, Mars: 8, Mercury: 17, Saturn: 10, Jupiter: 19, Rahu: 12, Venus: 21
+  };
+
+  const startIndex = ASHTOTTARI_CYCLE.indexOf(cleanLord);
+  if (startIndex === -1) return [];
+  
+  const totalParentMs = parentEnd.getTime() - parentStart.getTime();
+  const list: Array<{ lord: string; start: Date; end: Date }> = [];
+  let currentStartMs = parentStart.getTime();
+  
+  for (let i = 0; i < 8; i++) {
+    const lord = ASHTOTTARI_CYCLE[(startIndex + i) % 8];
+    const years = ASHTOTTARI_YEARS[lord];
+    const share = years / 108;
+    const durationMs = totalParentMs * share;
+    const currentEndMs = currentStartMs + durationMs;
+    
+    list.push({
+      lord,
+      start: new Date(currentStartMs),
+      end: new Date(currentEndMs)
+    });
+    
+    currentStartMs = currentEndMs;
+  }
+  
+  return list;
+}
+
 interface HoroscopeReportViewProps {
   astrologyData: any;
   activeUser: any;
@@ -127,6 +212,18 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [selectedPratyantarIdx, setSelectedPratyantarIdx] = useState<number | null>(null);
   const [selectedSookshmaIdx, setSelectedSookshmaIdx] = useState<number | null>(null);
   const [selectedPranaIdx, setSelectedPranaIdx] = useState<number | null>(null);
+
+  const [selectedYoginiMahaIdx, setSelectedYoginiMahaIdx] = useState<number | null>(null);
+  const [selectedYoginiAntarIdx, setSelectedYoginiAntarIdx] = useState<number | null>(null);
+  const [selectedYoginiPratyantarIdx, setSelectedYoginiPratyantarIdx] = useState<number | null>(null);
+  const [selectedYoginiSookshmaIdx, setSelectedYoginiSookshmaIdx] = useState<number | null>(null);
+  const [selectedYoginiPranaIdx, setSelectedYoginiPranaIdx] = useState<number | null>(null);
+
+  const [selectedAshtottariMahaIdx, setSelectedAshtottariMahaIdx] = useState<number | null>(null);
+  const [selectedAshtottariAntarIdx, setSelectedAshtottariAntarIdx] = useState<number | null>(null);
+  const [selectedAshtottariPratyantarIdx, setSelectedAshtottariPratyantarIdx] = useState<number | null>(null);
+  const [selectedAshtottariSookshmaIdx, setSelectedAshtottariSookshmaIdx] = useState<number | null>(null);
+  const [selectedAshtottariPranaIdx, setSelectedAshtottariPranaIdx] = useState<number | null>(null);
 
   // KP Subtabs state variables
   const [kpSubTab, setKpSubTab] = useState<string>("kp_cusps");
@@ -685,6 +782,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       { id: "table_1", label: "Table 1" },
       { id: "table_2", label: "Table 2" },
       { id: "table_3", label: "Table 3" },
+      { id: "table_4", label: "Table 4" },
+      { id: "table_5", label: "Table 5" },
       { id: "panchanga", label: "panchanga" },
       { id: "divisionalCharts", label: "divisionalCharts" },
       { id: "shadBala", label: "shadBala*" },
@@ -731,6 +830,12 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       }
       if (item.id === "table_3") {
         dataVal = astrologyData.dashas || { dummy: true };
+      }
+      if (item.id === "table_4") {
+        dataVal = { dummy: true };
+      }
+      if (item.id === "table_5") {
+        dataVal = { dummy: true };
       }
       if (item.id === "special_lagnas" && !dataVal) {
         dataVal = astrologyData.special_lagnas || { dummy: true };
@@ -1204,6 +1309,383 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       };
     });
   }, [vedicData, dashas]);
+
+  const yoginiDashaTree = useMemo(() => {
+    const rawList = Array.isArray(vedicData?.dashas?.yogini) && vedicData.dashas.yogini.length > 0
+      ? vedicData.dashas.yogini
+      : (Array.isArray(astrologyData?.additionalDashas?.yogini) ? astrologyData.additionalDashas.yogini : []);
+
+    if (rawList.length === 0) return [];
+
+    return rawList.map((m: any) => {
+      const mLord = m.lord || m.lordName || "Unknown";
+      const mStart = m.start_date || m.startDate || m.startTime || "";
+      const mEnd = m.end_date || m.endDate || m.endTime || "";
+      const mStartDate = mStart ? new Date(mStart) : new Date();
+      
+      const cleanLord = mLord.split(" ")[0];
+      const YOGINI_YEARS: Record<string, number> = {
+        Mangala: 1, Pingala: 2, Dhanya: 3, Bhramari: 4, Bhadrika: 5, Ulka: 6, Siddha: 7, Sankata: 8
+      };
+      const mEndDate = mEnd ? new Date(mEnd) : new Date(mStartDate.getFullYear() + (YOGINI_YEARS[cleanLord] || 5), mStartDate.getMonth(), mStartDate.getDate());
+
+      // Get level 2 (Antar)
+      let antarList = m.children || m.subPeriods || [];
+      if (antarList.length === 0) {
+        antarList = getYoginiSubPeriods(mLord, mStartDate, mEndDate);
+      }
+
+      const antars = antarList.map((a: any) => {
+        const aLord = a.lord || "Unknown";
+        const aStart = a.start_date || a.startDate || a.startTime || "";
+        const aEnd = a.end_date || a.endDate || a.endTime || "";
+        const aStartDate = aStart ? new Date(aStart) : null;
+        const aEndDate = aEnd ? new Date(aEnd) : null;
+        
+        const start = aStartDate || new Date();
+        const end = aEndDate || new Date();
+
+        // Get level 3 (Pratyantar)
+        let pratyantarList = a.children || a.subPeriods || [];
+        if (pratyantarList.length === 0) {
+          pratyantarList = getYoginiSubPeriods(aLord, start, end);
+        }
+
+        const pratyantars = pratyantarList.map((p: any) => {
+          const pLord = p.lord || "Unknown";
+          const pStart = p.start_date || p.startDate || p.startTime || "";
+          const pEnd = p.end_date || p.endDate || p.endTime || "";
+          const pStartDate = pStart ? new Date(pStart) : null;
+          const pEndDate = pEnd ? new Date(pEnd) : null;
+          
+          const pStartReal = pStartDate || new Date();
+          const pEndReal = pEndDate || new Date();
+
+          // Get level 4 (Sookshma)
+          let sookshmaList = p.children || p.subPeriods || [];
+          if (sookshmaList.length === 0) {
+            sookshmaList = getYoginiSubPeriods(pLord, pStartReal, pEndReal);
+          }
+
+          const sookshmas = sookshmaList.map((s: any) => {
+            const sLord = s.lord || "Unknown";
+            const sStart = s.start_date || s.startDate || s.startTime || "";
+            const sEnd = s.end_date || s.endDate || s.endTime || "";
+            const sStartDate = sStart ? new Date(sStart) : null;
+            const sEndDate = sEnd ? new Date(sEnd) : null;
+            
+            const sStartReal = sStartDate || new Date();
+            const sEndReal = sEndDate || new Date();
+
+            // Get level 5 (Prana)
+            let pranaList = s.children || s.subPeriods || [];
+            if (pranaList.length === 0) {
+              pranaList = getYoginiSubPeriods(sLord, sStartReal, sEndReal);
+            }
+
+            const pranas = pranaList.map((pr: any) => {
+              const prLord = pr.lord || "Unknown";
+              const prStart = pr.start_date || pr.startDate || pr.startTime || "";
+              const prEnd = pr.end_date || pr.endDate || pr.endTime || "";
+              
+              return {
+                lord: prLord,
+                start: prStart ? new Date(prStart) : new Date(),
+                end: prEnd ? new Date(prEnd) : new Date()
+              };
+            });
+
+            return {
+              lord: sLord,
+              start: sStartReal,
+              end: sEndReal,
+              pranas
+            };
+          });
+
+          return {
+            lord: pLord,
+            start: pStartReal,
+            end: pEndReal,
+            sookshmas
+          };
+        });
+
+        return {
+          lord: aLord,
+          start,
+          end,
+          pratyantars
+        };
+      });
+
+      return {
+        lord: mLord,
+        start: mStartDate,
+        end: mEndDate,
+        antars
+      };
+    });
+  }, [vedicData, astrologyData]);
+
+  const ashtottariDashaTree = useMemo(() => {
+    const rawList = Array.isArray(vedicData?.dashas?.ashtottari) && vedicData.dashas.ashtottari.length > 0
+      ? vedicData.dashas.ashtottari
+      : (Array.isArray(astrologyData?.additionalDashas?.ashtottari) ? astrologyData.additionalDashas.ashtottari : []);
+
+    if (rawList.length === 0) return [];
+
+    return rawList.map((m: any) => {
+      const mLord = m.lord || m.lordName || "Unknown";
+      const mStart = m.start_date || m.startDate || m.startTime || "";
+      const mEnd = m.end_date || m.endDate || m.endTime || "";
+      const mStartDate = mStart ? new Date(mStart) : new Date();
+      
+      const ASHTOTTARI_YEARS: Record<string, number> = {
+        Sun: 6, Moon: 15, Mars: 8, Mercury: 17, Saturn: 10, Jupiter: 19, Rahu: 12, Venus: 21
+      };
+      const cleanLord = mLord.split(" ")[0];
+      const mEndDate = mEnd ? new Date(mEnd) : new Date(mStartDate.getFullYear() + (ASHTOTTARI_YEARS[cleanLord] || 10), mStartDate.getMonth(), mStartDate.getDate());
+
+      // Get level 2 (Antar)
+      let antarList = m.children || m.subPeriods || [];
+      if (antarList.length === 0) {
+        antarList = getAshtottariSubPeriods(mLord, mStartDate, mEndDate);
+      }
+
+      const antars = antarList.map((a: any) => {
+        const aLord = a.lord || "Unknown";
+        const aStart = a.start_date || a.startDate || a.startTime || "";
+        const aEnd = a.end_date || a.endDate || a.endTime || "";
+        const aStartDate = aStart ? new Date(aStart) : null;
+        const aEndDate = aEnd ? new Date(aEnd) : null;
+        
+        const start = aStartDate || new Date();
+        const end = aEndDate || new Date();
+
+        // Get level 3 (Pratyantar)
+        let pratyantarList = a.children || a.subPeriods || [];
+        if (pratyantarList.length === 0) {
+          pratyantarList = getAshtottariSubPeriods(aLord, start, end);
+        }
+
+        const pratyantars = pratyantarList.map((p: any) => {
+          const pLord = p.lord || "Unknown";
+          const pStart = p.start_date || p.startDate || p.startTime || "";
+          const pEnd = p.end_date || p.endDate || p.endTime || "";
+          const pStartDate = pStart ? new Date(pStart) : null;
+          const pEndDate = pEnd ? new Date(pEnd) : null;
+          
+          const pStartReal = pStartDate || new Date();
+          const pEndReal = pEndDate || new Date();
+
+          // Get level 4 (Sookshma)
+          let sookshmaList = p.children || p.subPeriods || [];
+          if (sookshmaList.length === 0) {
+            sookshmaList = getAshtottariSubPeriods(pLord, pStartReal, pEndReal);
+          }
+
+          const sookshmas = sookshmaList.map((s: any) => {
+            const sLord = s.lord || "Unknown";
+            const sStart = s.start_date || s.startDate || s.startTime || "";
+            const sEnd = s.end_date || s.endDate || s.endTime || "";
+            const sStartDate = sStart ? new Date(sStart) : null;
+            const sEndDate = sEnd ? new Date(sEnd) : null;
+            
+            const sStartReal = sStartDate || new Date();
+            const sEndReal = sEndDate || new Date();
+
+            // Get level 5 (Prana)
+            let pranaList = s.children || s.subPeriods || [];
+            if (pranaList.length === 0) {
+              pranaList = getAshtottariSubPeriods(sLord, sStartReal, sEndReal);
+            }
+
+            const pranas = pranaList.map((pr: any) => {
+              const prLord = pr.lord || "Unknown";
+              const prStart = pr.start_date || pr.startDate || pr.startTime || "";
+              const prEnd = pr.end_date || pr.endDate || pr.endTime || "";
+              
+              return {
+                lord: prLord,
+                start: prStart ? new Date(prStart) : new Date(),
+                end: prEnd ? new Date(prEnd) : new Date()
+              };
+            });
+
+            return {
+              lord: sLord,
+              start: sStartReal,
+              end: sEndReal,
+              pranas
+            };
+          });
+
+          return {
+            lord: pLord,
+            start: pStartReal,
+            end: pEndReal,
+            sookshmas
+          };
+        });
+
+        return {
+          lord: aLord,
+          start,
+          end,
+          pratyantars
+        };
+      });
+
+      return {
+        lord: mLord,
+        start: mStartDate,
+        end: mEndDate,
+        antars
+      };
+    });
+  }, [vedicData, astrologyData]);
+
+  // Auto-sync Vimshottari to current time
+  useEffect(() => {
+    if (dashaTree && dashaTree.length > 0) {
+      const now = new Date();
+      const mIdx = dashaTree.findIndex(m => now >= m.start && now <= m.end);
+      if (mIdx !== -1) {
+        setSelectedMahaIdx(mIdx);
+        const m = dashaTree[mIdx];
+        const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
+        if (aIdx !== -1) {
+          setSelectedAntarIdx(aIdx);
+          const a = m.antars[aIdx];
+          const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
+          if (pIdx !== -1) {
+            setSelectedPratyantarIdx(pIdx);
+            const p = a.pratyantars[pIdx];
+            const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
+            if (sIdx !== -1) {
+              setSelectedSookshmaIdx(sIdx);
+              const s = p.sookshmas[sIdx];
+              const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
+              setSelectedPranaIdx(prIdx !== -1 ? prIdx : 0);
+            } else {
+              setSelectedSookshmaIdx(0);
+              setSelectedPranaIdx(0);
+            }
+          } else {
+            setSelectedPratyantarIdx(0);
+            setSelectedSookshmaIdx(0);
+            setSelectedPranaIdx(0);
+          }
+        } else {
+          setSelectedAntarIdx(0);
+          setSelectedPratyantarIdx(0);
+          setSelectedSookshmaIdx(0);
+          setSelectedPranaIdx(0);
+        }
+      } else {
+        setSelectedMahaIdx(0);
+        setSelectedAntarIdx(0);
+        setSelectedPratyantarIdx(0);
+        setSelectedSookshmaIdx(0);
+        setSelectedPranaIdx(0);
+      }
+    }
+  }, [dashaTree]);
+
+  // Auto-sync Yogini to current time
+  useEffect(() => {
+    if (yoginiDashaTree && yoginiDashaTree.length > 0) {
+      const now = new Date();
+      const mIdx = yoginiDashaTree.findIndex(m => now >= m.start && now <= m.end);
+      if (mIdx !== -1) {
+        setSelectedYoginiMahaIdx(mIdx);
+        const m = yoginiDashaTree[mIdx];
+        const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
+        if (aIdx !== -1) {
+          setSelectedYoginiAntarIdx(aIdx);
+          const a = m.antars[aIdx];
+          const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
+          if (pIdx !== -1) {
+            setSelectedYoginiPratyantarIdx(pIdx);
+            const p = a.pratyantars[pIdx];
+            const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
+            if (sIdx !== -1) {
+              setSelectedYoginiSookshmaIdx(sIdx);
+              const s = p.sookshmas[sIdx];
+              const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
+              setSelectedYoginiPranaIdx(prIdx !== -1 ? prIdx : 0);
+            } else {
+              setSelectedYoginiSookshmaIdx(0);
+              setSelectedYoginiPranaIdx(0);
+            }
+          } else {
+            setSelectedYoginiPratyantarIdx(0);
+            setSelectedYoginiSookshmaIdx(0);
+            setSelectedYoginiPranaIdx(0);
+          }
+        } else {
+          setSelectedYoginiAntarIdx(0);
+          setSelectedYoginiPratyantarIdx(0);
+          setSelectedYoginiSookshmaIdx(0);
+          setSelectedYoginiPranaIdx(0);
+        }
+      } else {
+        setSelectedYoginiMahaIdx(0);
+        setSelectedYoginiAntarIdx(0);
+        setSelectedYoginiPratyantarIdx(0);
+        setSelectedYoginiSookshmaIdx(0);
+        setSelectedYoginiPranaIdx(0);
+      }
+    }
+  }, [yoginiDashaTree]);
+
+  // Auto-sync Ashtottari to current time
+  useEffect(() => {
+    if (ashtottariDashaTree && ashtottariDashaTree.length > 0) {
+      const now = new Date();
+      const mIdx = ashtottariDashaTree.findIndex(m => now >= m.start && now <= m.end);
+      if (mIdx !== -1) {
+        setSelectedAshtottariMahaIdx(mIdx);
+        const m = ashtottariDashaTree[mIdx];
+        const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
+        if (aIdx !== -1) {
+          setSelectedAshtottariAntarIdx(aIdx);
+          const a = m.antars[aIdx];
+          const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
+          if (pIdx !== -1) {
+            setSelectedAshtottariPratyantarIdx(pIdx);
+            const p = a.pratyantars[pIdx];
+            const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
+            if (sIdx !== -1) {
+              setSelectedAshtottariSookshmaIdx(sIdx);
+              const s = p.sookshmas[sIdx];
+              const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
+              setSelectedAshtottariPranaIdx(prIdx !== -1 ? prIdx : 0);
+            } else {
+              setSelectedAshtottariSookshmaIdx(0);
+              setSelectedAshtottariPranaIdx(0);
+            }
+          } else {
+            setSelectedAshtottariPratyantarIdx(0);
+            setSelectedAshtottariSookshmaIdx(0);
+            setSelectedAshtottariPranaIdx(0);
+          }
+        } else {
+          setSelectedAshtottariAntarIdx(0);
+          setSelectedAshtottariPratyantarIdx(0);
+          setSelectedAshtottariSookshmaIdx(0);
+          setSelectedAshtottariPranaIdx(0);
+        }
+      } else {
+        setSelectedAshtottariMahaIdx(0);
+        setSelectedAshtottariAntarIdx(0);
+        setSelectedAshtottariPratyantarIdx(0);
+        setSelectedAshtottariSookshmaIdx(0);
+        setSelectedAshtottariPranaIdx(0);
+      }
+    }
+  }, [ashtottariDashaTree]);
 
   const rawCuspsList = useMemo(() => {
     return kpCuspData?.cusps || (kpData?.cusps ? Object.entries(kpData.cusps).map(([k, v]: [string, any]) => ({
@@ -2950,7 +3432,641 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               </div>
             )}
 
-              {vedicSubTab === "shadBala" && (
+              {vedicSubTab === "table_4" && yoginiDashaTree && yoginiDashaTree.length > 0 && (
+                <div className="space-y-6 text-[10.5px] sm:text-xs">
+                  {/* Active Pathway Header & Selection Tracker */}
+                  <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/50 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-900 pb-2">
+                      <div>
+                        <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
+                          <Clock className="w-4 h-4 text-amber-400" />
+                          Table 4: Yogini Dasha Timeline (36-Year Cycle)
+                        </h4>
+                        <p className="text-[10px] text-slate-400 font-sans mt-0.5">
+                          Interactive 5-level Yogini dasha hierarchy. Click any period to drill down. Yellow items are currently active.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (yoginiDashaTree.length === 0) return;
+                          const now = new Date();
+                          const mIdx = yoginiDashaTree.findIndex(m => now >= m.start && now <= m.end);
+                          if (mIdx !== -1) {
+                            setSelectedYoginiMahaIdx(mIdx);
+                            const m = yoginiDashaTree[mIdx];
+                            const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
+                            if (aIdx !== -1) {
+                              setSelectedYoginiAntarIdx(aIdx);
+                              const a = m.antars[aIdx];
+                              const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
+                              if (pIdx !== -1) {
+                                setSelectedYoginiPratyantarIdx(pIdx);
+                                const p = a.pratyantars[pIdx];
+                                const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
+                                if (sIdx !== -1) {
+                                  setSelectedYoginiSookshmaIdx(sIdx);
+                                  const s = p.sookshmas[sIdx];
+                                  const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
+                                  setSelectedYoginiPranaIdx(prIdx !== -1 ? prIdx : 0);
+                                } else {
+                                  setSelectedYoginiSookshmaIdx(0);
+                                  setSelectedYoginiPranaIdx(0);
+                                }
+                              }
+                            }
+                          }
+                        }}
+                        className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded hover:bg-amber-500/20 transition-all font-sans"
+                      >
+                        ⚡ Sync to Active Timeline
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                      <div className="p-2.5 rounded bg-slate-900/60 border border-slate-850/80 space-y-1">
+                        <span className="text-[9px] uppercase font-bold text-slate-500 font-sans block">Current Active Timeline Path:</span>
+                        <span className="font-bold text-amber-400 tracking-wide text-[11px]">
+                          {(() => {
+                            if (yoginiDashaTree.length === 0) return "No data available";
+                            const now = new Date();
+                            const m = yoginiDashaTree.find(x => now >= x.start && now <= x.end);
+                            if (!m) return "Outside computed cycle";
+                            const a = m.antars.find(x => now >= x.start && now <= x.end);
+                            if (!a) return m.lord;
+                            const p = a.pratyantars.find(x => now >= x.start && now <= x.end);
+                            if (!p) return `${m.lord} ➔ ${a.lord}`;
+                            const s = p.sookshmas.find(x => now >= x.start && now <= x.end);
+                            if (!s) return `${m.lord} ➔ ${a.lord} ➔ ${p.lord}`;
+                            const pr = s.pranas.find(x => now >= x.start && now <= x.end);
+                            if (!pr) return `${m.lord} ➔ ${a.lord} ➔ ${p.lord} ➔ ${s.lord}`;
+                            return `${m.lord} ➔ ${a.lord} ➔ ${p.lord} ➔ ${s.lord} ➔ ${pr.lord}`;
+                          })()}
+                        </span>
+                      </div>
+
+                      <div className="p-2.5 rounded bg-slate-900/60 border border-slate-850/80 space-y-1">
+                        <span className="text-[9px] uppercase font-bold text-slate-500 font-sans block">Currently Selected Focus:</span>
+                        <span className="font-bold text-indigo-400 tracking-wide text-[11px]">
+                          {selectedYoginiMahaIdx !== null && yoginiDashaTree[selectedYoginiMahaIdx] ? (
+                            (() => {
+                              const m = yoginiDashaTree[selectedYoginiMahaIdx];
+                              let path = m.lord;
+                              if (selectedYoginiAntarIdx !== null && m.antars[selectedYoginiAntarIdx]) {
+                                const a = m.antars[selectedYoginiAntarIdx];
+                                path += ` ➔ ${a.lord}`;
+                                if (selectedYoginiPratyantarIdx !== null && a.pratyantars[selectedYoginiPratyantarIdx]) {
+                                  const p = a.pratyantars[selectedYoginiPratyantarIdx];
+                                  path += ` ➔ ${p.lord}`;
+                                  if (selectedYoginiSookshmaIdx !== null && p.sookshmas[selectedYoginiSookshmaIdx]) {
+                                    const s = p.sookshmas[selectedYoginiSookshmaIdx];
+                                    path += ` ➔ ${s.lord}`;
+                                    if (selectedYoginiPranaIdx !== null && s.pranas && s.pranas[selectedYoginiPranaIdx]) {
+                                      const pr = s.pranas[selectedYoginiPranaIdx];
+                                      path += ` ➔ ${pr.lord}`;
+                                    }
+                                  }
+                                }
+                              }
+                              return path;
+                            })()
+                          ) : "Select a row below to inspect periods"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Column Layout */}
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-3 h-[420px] overflow-hidden">
+                    {/* LEVEL 1 */}
+                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 1: Maha</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                        {yoginiDashaTree.map((m: any, idx: number) => {
+                          const now = new Date();
+                          const isActive = now >= m.start && now <= m.end;
+                          const isSelected = selectedYoginiMahaIdx === idx;
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => {
+                                setSelectedYoginiMahaIdx(idx);
+                                setSelectedYoginiAntarIdx(0);
+                                setSelectedYoginiPratyantarIdx(0);
+                                setSelectedYoginiSookshmaIdx(0);
+                                setSelectedYoginiPranaIdx(0);
+                              }}
+                              className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                isActive
+                                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                  : isSelected
+                                  ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                  : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                              }`}
+                            >
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold font-sans text-xs">{m.lord}</span>
+                                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                              </div>
+                              <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                Until {formatDashaDate(m.end)}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* LEVEL 2 */}
+                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 2: Antar</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                        {selectedYoginiMahaIdx !== null && yoginiDashaTree[selectedYoginiMahaIdx] ? (
+                          yoginiDashaTree[selectedYoginiMahaIdx].antars.map((a: any, idx: number) => {
+                            const now = new Date();
+                            const isActive = now >= a.start && now <= a.end;
+                            const isSelected = selectedYoginiAntarIdx === idx;
+                            return (
+                              <div
+                                key={idx}
+                                onClick={() => {
+                                  setSelectedYoginiAntarIdx(idx);
+                                  setSelectedYoginiPratyantarIdx(0);
+                                  setSelectedYoginiSookshmaIdx(0);
+                                  setSelectedYoginiPranaIdx(0);
+                                }}
+                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                  isActive
+                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                    : isSelected
+                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold font-sans text-xs">{a.lord}</span>
+                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                                </div>
+                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                  Until {formatDashaDate(a.end)}
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Mahadasha</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* LEVEL 3 */}
+                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 3: Pratyantar</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                        {selectedYoginiMahaIdx !== null && selectedYoginiAntarIdx !== null && yoginiDashaTree[selectedYoginiMahaIdx]?.antars[selectedYoginiAntarIdx] ? (
+                          yoginiDashaTree[selectedYoginiMahaIdx].antars[selectedYoginiAntarIdx].pratyantars.map((p: any, idx: number) => {
+                            const now = new Date();
+                            const isActive = now >= p.start && now <= p.end;
+                            const isSelected = selectedYoginiPratyantarIdx === idx;
+                            return (
+                              <div
+                                key={idx}
+                                onClick={() => {
+                                  setSelectedYoginiPratyantarIdx(idx);
+                                  setSelectedYoginiSookshmaIdx(0);
+                                  setSelectedYoginiPranaIdx(0);
+                                }}
+                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                  isActive
+                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                    : isSelected
+                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold font-sans text-[11px]">{p.lord}</span>
+                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                                </div>
+                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                  Until {formatDashaDate(p.end)}
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Antardasha</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* LEVEL 4 */}
+                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 4: Sookshma</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                        {selectedYoginiMahaIdx !== null && selectedYoginiAntarIdx !== null && selectedYoginiPratyantarIdx !== null && yoginiDashaTree[selectedYoginiMahaIdx]?.antars[selectedYoginiAntarIdx]?.pratyantars[selectedYoginiPratyantarIdx] ? (
+                          yoginiDashaTree[selectedYoginiMahaIdx].antars[selectedYoginiAntarIdx].pratyantars[selectedYoginiPratyantarIdx].sookshmas.map((s: any, idx: number) => {
+                            const now = new Date();
+                            const isActive = now >= s.start && now <= s.end;
+                            const isSelected = selectedYoginiSookshmaIdx === idx;
+                            return (
+                              <div
+                                key={idx}
+                                onClick={() => {
+                                  setSelectedYoginiSookshmaIdx(idx);
+                                  setSelectedYoginiPranaIdx(0);
+                                }}
+                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                  isActive
+                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                    : isSelected
+                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold font-sans text-[11px]">{s.lord}</span>
+                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                                </div>
+                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                  Until {formatDashaDate(s.end)}
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Pratyantar</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* LEVEL 5 */}
+                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 5: Prana</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                        {selectedYoginiMahaIdx !== null && selectedYoginiAntarIdx !== null && selectedYoginiPratyantarIdx !== null && selectedYoginiSookshmaIdx !== null && yoginiDashaTree[selectedYoginiMahaIdx]?.antars[selectedYoginiAntarIdx]?.pratyantars[selectedYoginiPratyantarIdx]?.sookshmas[selectedYoginiSookshmaIdx] ? (
+                          yoginiDashaTree[selectedYoginiMahaIdx].antars[selectedYoginiAntarIdx].pratyantars[selectedYoginiPratyantarIdx].sookshmas[selectedYoginiSookshmaIdx].pranas.map((pr: any, idx: number) => {
+                            const now = new Date();
+                            const isActive = now >= pr.start && now <= pr.end;
+                            const isSelected = selectedYoginiPranaIdx === idx;
+                            return (
+                              <div
+                                key={idx}
+                                onClick={() => setSelectedYoginiPranaIdx(idx)}
+                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                  isActive
+                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                    : isSelected
+                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold font-sans text-[11px]">{pr.lord}</span>
+                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                                </div>
+                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                  Until {formatDashaDate(pr.end)}
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Sookshma</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {vedicSubTab === "table_5" && ashtottariDashaTree && ashtottariDashaTree.length > 0 && (
+                <div className="space-y-6 text-[10.5px] sm:text-xs">
+                  {/* Active Pathway Header & Selection Tracker */}
+                  <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/50 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-900 pb-2">
+                      <div>
+                        <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
+                          <Clock className="w-4 h-4 text-amber-400" />
+                          Table 5: Ashtottari Dasha Timeline (108-Year Cycle)
+                        </h4>
+                        <p className="text-[10px] text-slate-400 font-sans mt-0.5">
+                          Interactive 5-level Ashtottari dasha hierarchy. Click any period to drill down. Yellow items are currently active.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          if (ashtottariDashaTree.length === 0) return;
+                          const now = new Date();
+                          const mIdx = ashtottariDashaTree.findIndex(m => now >= m.start && now <= m.end);
+                          if (mIdx !== -1) {
+                            setSelectedAshtottariMahaIdx(mIdx);
+                            const m = ashtottariDashaTree[mIdx];
+                            const aIdx = m.antars.findIndex(a => now >= a.start && now <= a.end);
+                            if (aIdx !== -1) {
+                              setSelectedAshtottariAntarIdx(aIdx);
+                              const a = m.antars[aIdx];
+                              const pIdx = a.pratyantars.findIndex(p => now >= p.start && now <= p.end);
+                              if (pIdx !== -1) {
+                                setSelectedAshtottariPratyantarIdx(pIdx);
+                                const p = a.pratyantars[pIdx];
+                                const sIdx = p.sookshmas.findIndex(s => now >= s.start && now <= s.end);
+                                if (sIdx !== -1) {
+                                  setSelectedAshtottariSookshmaIdx(sIdx);
+                                  const s = p.sookshmas[sIdx];
+                                  const prIdx = s.pranas.findIndex(pr => now >= pr.start && now <= pr.end);
+                                  setSelectedAshtottariPranaIdx(prIdx !== -1 ? prIdx : 0);
+                                } else {
+                                  setSelectedAshtottariSookshmaIdx(0);
+                                  setSelectedAshtottariPranaIdx(0);
+                                }
+                              }
+                            }
+                          }
+                        }}
+                        className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded hover:bg-amber-500/20 transition-all font-sans"
+                      >
+                        ⚡ Sync to Active Timeline
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+                      <div className="p-2.5 rounded bg-slate-900/60 border border-slate-850/80 space-y-1">
+                        <span className="text-[9px] uppercase font-bold text-slate-500 font-sans block">Current Active Timeline Path:</span>
+                        <span className="font-bold text-amber-400 tracking-wide text-[11px]">
+                          {(() => {
+                            if (ashtottariDashaTree.length === 0) return "No data available";
+                            const now = new Date();
+                            const m = ashtottariDashaTree.find(x => now >= x.start && x.end);
+                            if (!m) return "Outside computed cycle";
+                            const a = m.antars.find(x => now >= x.start && x.end);
+                            if (!a) return m.lord;
+                            const p = a.pratyantars.find(x => now >= x.start && x.end);
+                            if (!p) return `${m.lord} ➔ ${a.lord}`;
+                            const s = p.sookshmas.find(x => now >= x.start && x.end);
+                            if (!s) return `${m.lord} ➔ ${a.lord} ➔ ${p.lord}`;
+                            const pr = s.pranas.find(x => now >= x.start && x.end);
+                            if (!pr) return `${m.lord} ➔ ${a.lord} ➔ ${p.lord} ➔ ${s.lord}`;
+                            return `${m.lord} ➔ ${a.lord} ➔ ${p.lord} ➔ ${s.lord} ➔ ${pr.lord}`;
+                          })()}
+                        </span>
+                      </div>
+
+                      <div className="p-2.5 rounded bg-slate-900/60 border border-slate-850/80 space-y-1">
+                        <span className="text-[9px] uppercase font-bold text-slate-500 font-sans block">Currently Selected Focus:</span>
+                        <span className="font-bold text-indigo-400 tracking-wide text-[11px]">
+                          {selectedAshtottariMahaIdx !== null && ashtottariDashaTree[selectedAshtottariMahaIdx] ? (
+                            (() => {
+                              const m = ashtottariDashaTree[selectedAshtottariMahaIdx];
+                              let path = m.lord;
+                              if (selectedAshtottariAntarIdx !== null && m.antars[selectedAshtottariAntarIdx]) {
+                                const a = m.antars[selectedAshtottariAntarIdx];
+                                path += ` ➔ ${a.lord}`;
+                                if (selectedAshtottariPratyantarIdx !== null && a.pratyantars[selectedAshtottariPratyantarIdx]) {
+                                  const p = a.pratyantars[selectedAshtottariPratyantarIdx];
+                                  path += ` ➔ ${p.lord}`;
+                                  if (selectedAshtottariSookshmaIdx !== null && p.sookshmas[selectedAshtottariSookshmaIdx]) {
+                                    const s = p.sookshmas[selectedAshtottariSookshmaIdx];
+                                    path += ` ➔ ${s.lord}`;
+                                    if (selectedAshtottariPranaIdx !== null && s.pranas && s.pranas[selectedAshtottariPranaIdx]) {
+                                      const pr = s.pranas[selectedAshtottariPranaIdx];
+                                      path += ` ➔ ${pr.lord}`;
+                                    }
+                                  }
+                                }
+                              }
+                              return path;
+                            })()
+                          ) : "Select a row below to inspect periods"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Column Layout */}
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-3 h-[420px] overflow-hidden">
+                    {/* LEVEL 1 */}
+                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 1: Maha</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                        {ashtottariDashaTree.map((m: any, idx: number) => {
+                          const now = new Date();
+                          const isActive = now >= m.start && now <= m.end;
+                          const isSelected = selectedAshtottariMahaIdx === idx;
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => {
+                                setSelectedAshtottariMahaIdx(idx);
+                                setSelectedAshtottariAntarIdx(0);
+                                setSelectedAshtottariPratyantarIdx(0);
+                                setSelectedAshtottariSookshmaIdx(0);
+                                setSelectedAshtottariPranaIdx(0);
+                              }}
+                              className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                isActive
+                                  ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                  : isSelected
+                                  ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                  : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                              }`}
+                            >
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold font-sans text-xs">{m.lord}</span>
+                                {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                              </div>
+                              <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                Until {formatDashaDate(m.end)}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* LEVEL 2 */}
+                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 2: Antar</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                        {selectedAshtottariMahaIdx !== null && ashtottariDashaTree[selectedAshtottariMahaIdx] ? (
+                          ashtottariDashaTree[selectedAshtottariMahaIdx].antars.map((a: any, idx: number) => {
+                            const now = new Date();
+                            const isActive = now >= a.start && now <= a.end;
+                            const isSelected = selectedAshtottariAntarIdx === idx;
+                            return (
+                              <div
+                                key={idx}
+                                onClick={() => {
+                                  setSelectedAshtottariAntarIdx(idx);
+                                  setSelectedAshtottariPratyantarIdx(0);
+                                  setSelectedAshtottariSookshmaIdx(0);
+                                  setSelectedAshtottariPranaIdx(0);
+                                }}
+                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                  isActive
+                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                    : isSelected
+                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold font-sans text-xs">{a.lord}</span>
+                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                                </div>
+                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                  Until {formatDashaDate(a.end)}
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Mahadasha</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* LEVEL 3 */}
+                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 3: Pratyantar</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                        {selectedAshtottariMahaIdx !== null && selectedAshtottariAntarIdx !== null && ashtottariDashaTree[selectedAshtottariMahaIdx]?.antars[selectedAshtottariAntarIdx] ? (
+                          ashtottariDashaTree[selectedAshtottariMahaIdx].antars[selectedAshtottariAntarIdx].pratyantars.map((p: any, idx: number) => {
+                            const now = new Date();
+                            const isActive = now >= p.start && now <= p.end;
+                            const isSelected = selectedAshtottariPratyantarIdx === idx;
+                            return (
+                              <div
+                                key={idx}
+                                onClick={() => {
+                                  setSelectedAshtottariPratyantarIdx(idx);
+                                  setSelectedAshtottariSookshmaIdx(0);
+                                  setSelectedAshtottariPranaIdx(0);
+                                }}
+                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                  isActive
+                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                    : isSelected
+                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold font-sans text-[11px]">{p.lord}</span>
+                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                                </div>
+                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                  Until {formatDashaDate(p.end)}
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Antardasha</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* LEVEL 4 */}
+                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 4: Sookshma</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                        {selectedAshtottariMahaIdx !== null && selectedAshtottariAntarIdx !== null && selectedAshtottariPratyantarIdx !== null && ashtottariDashaTree[selectedAshtottariMahaIdx]?.antars[selectedAshtottariAntarIdx]?.pratyantars[selectedAshtottariPratyantarIdx] ? (
+                          ashtottariDashaTree[selectedAshtottariMahaIdx].antars[selectedAshtottariAntarIdx].pratyantars[selectedAshtottariPratyantarIdx].sookshmas.map((s: any, idx: number) => {
+                            const now = new Date();
+                            const isActive = now >= s.start && now <= s.end;
+                            const isSelected = selectedAshtottariSookshmaIdx === idx;
+                            return (
+                              <div
+                                key={idx}
+                                onClick={() => {
+                                  setSelectedAshtottariSookshmaIdx(idx);
+                                  setSelectedAshtottariPranaIdx(0);
+                                }}
+                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                  isActive
+                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                    : isSelected
+                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold font-sans text-[11px]">{s.lord}</span>
+                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                                </div>
+                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                  Until {formatDashaDate(s.end)}
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Pratyantar</div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* LEVEL 5 */}
+                    <div className="rounded-xl border border-slate-850/80 bg-slate-950/20 flex flex-col h-full overflow-hidden">
+                      <div className="bg-slate-900/40 p-2 border-b border-slate-850/80 text-center">
+                        <span className="font-bold text-slate-300 font-sans text-[10px] block uppercase tracking-wider">Level 5: Prana</span>
+                      </div>
+                      <div className="flex-1 overflow-y-auto p-1.5 space-y-1 scrollbar-thin">
+                        {selectedAshtottariMahaIdx !== null && selectedAshtottariAntarIdx !== null && selectedAshtottariPratyantarIdx !== null && selectedAshtottariSookshmaIdx !== null && ashtottariDashaTree[selectedAshtottariMahaIdx]?.antars[selectedAshtottariAntarIdx]?.pratyantars[selectedAshtottariPratyantarIdx]?.sookshmas[selectedAshtottariSookshmaIdx] ? (
+                          ashtottariDashaTree[selectedAshtottariMahaIdx].antars[selectedAshtottariAntarIdx].pratyantars[selectedAshtottariPratyantarIdx].sookshmas[selectedAshtottariSookshmaIdx].pranas.map((pr: any, idx: number) => {
+                            const now = new Date();
+                            const isActive = now >= pr.start && now <= pr.end;
+                            const isSelected = selectedAshtottariPranaIdx === idx;
+                            return (
+                              <div
+                                key={idx}
+                                onClick={() => setSelectedAshtottariPranaIdx(idx)}
+                                className={`p-2 rounded cursor-pointer transition-all border text-left ${
+                                  isActive
+                                    ? "border-amber-500/50 bg-amber-500/10 text-amber-300"
+                                    : isSelected
+                                    ? "border-indigo-500 bg-indigo-500/10 text-slate-200"
+                                    : "border-slate-800/40 bg-slate-900/20 text-slate-400 hover:bg-slate-900/40 hover:text-slate-300"
+                                }`}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span className="font-bold font-sans text-[11px]">{pr.lord}</span>
+                                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shrink-0" />}
+                                </div>
+                                <div className="text-[9px] font-mono mt-1 opacity-80 block leading-tight">
+                                  Until {formatDashaDate(pr.end)}
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="p-4 text-center text-slate-500 italic text-[10px]">Select Sookshma</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+                  {vedicSubTab === "shadBala" && (
                 <div className="space-y-6">
                   <div className="p-5 rounded-xl border border-slate-800 bg-slate-950/40 space-y-4">
                     <div className="border-b border-slate-800 pb-2">

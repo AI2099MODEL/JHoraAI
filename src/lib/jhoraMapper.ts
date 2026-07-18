@@ -301,17 +301,32 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
   const yoginiTree = parseJHoraDasha(dashaPayload.yogini || []);
   const ashtottariTree = parseJHoraDasha(dashaPayload.ashtottari || []);
 
-  const yogini = yoginiTree.map(y => ({
-    lord: y.lord,
-    startDate: y.startDate,
-    endDate: y.endDate
-  }));
+  const PLANET_TO_YOGINI: Record<string, string> = {
+    "Moon": "Mangala (Moon)",
+    "Sun": "Pingala (Sun)",
+    "Jupiter": "Dhanya (Jupiter)",
+    "Mars": "Bhramari (Mars)",
+    "Mercury": "Bhadrika (Mercury)",
+    "Saturn": "Ulka (Saturn)",
+    "Venus": "Siddha (Venus)",
+    "Rahu": "Sankata (Rahu)",
+    "Raagu": "Sankata (Rahu)",
+    "Ketu": "Sankata (Rahu)",
+    "Kethu": "Sankata (Rahu)"
+  };
 
-  const ashtottari = ashtottariTree.map(y => ({
-    lord: y.lord,
-    startDate: y.startDate,
-    endDate: y.endDate
-  }));
+  function translateYoginiNode(node: DashaPeriod): DashaPeriod {
+    const mappedLord = PLANET_TO_YOGINI[node.lord] || node.lord;
+    return {
+      lord: mappedLord,
+      startDate: node.startDate,
+      endDate: node.endDate,
+      subPeriods: node.subPeriods ? node.subPeriods.map(translateYoginiNode) : undefined
+    };
+  }
+
+  const yogini = yoginiTree.map(translateYoginiNode);
+  const ashtottari = ashtottariTree;
 
   // Yogas Map to List
   const yogas: YogaAnalysis[] = [];
@@ -1085,16 +1100,17 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
   };
 
   // 7. Map dashas
-  const vimshottariDashas = (data.dashas || []).map((d: any) => ({
-    lord: d.lord,
-    start_date: d.startDate,
-    end_date: d.endDate,
-    children: (d.subPeriods || []).map((s: any) => ({
-      lord: s.lord,
-      start_date: s.startDate,
-      end_date: s.endDate
-    }))
-  }));
+  function mapDashaTreeToDb(nodes: any[]): any[] {
+    if (!nodes) return [];
+    return nodes.map((n: any) => ({
+      lord: n.lord || n.lordName || "Unknown",
+      start_date: n.start_date || n.startDate || n.startTime || "",
+      end_date: n.end_date || n.endDate || n.endTime || "",
+      children: mapDashaTreeToDb(n.subPeriods || n.sub_periods || n.children || [])
+    }));
+  }
+
+  const vimshottariDashas = mapDashaTreeToDb(data.dashas || []);
 
   // 8. Map yogas & doshas
   const yogasMapped = (data.yogas || []).map((y: any) => ({
@@ -1640,8 +1656,8 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
       house_lords: houseLordsObj,
       dashas: {
         vimshottari: vimshottariDashas,
-        yogini: (data.additionalDashas?.yogini || []).map((y: any) => ({ lord: y.lord, start_date: y.startDate, end_date: y.endDate })),
-        ashtottari: (data.additionalDashas?.ashtottari || []).map((a: any) => ({ lord: a.lord, start_date: a.startDate, end_date: a.endDate }))
+        yogini: mapDashaTreeToDb(data.additionalDashas?.yogini || []),
+        ashtottari: mapDashaTreeToDb(data.additionalDashas?.ashtottari || [])
       },
       yogas: yogasMapped,
       doshas: doshasMapped
