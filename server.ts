@@ -708,6 +708,98 @@ app.post("/api/astrology/calculate", async (req, res) => {
   }
 });
 
+// Backend Autoagent synchronization and profile check endpoint
+app.post("/api/astrology/autoagent-sync", async (req, res) => {
+  try {
+    const { profile, currentSteps } = req.body;
+    if (!profile) {
+      return res.status(400).json({ error: "Profile particulars are required for autoagent verification." });
+    }
+
+    const { name, date, time, latitude, longitude, timezone, location } = profile;
+    const targetDate = date || new Date().toISOString().split("T")[0];
+    const targetTime = time || "12:00:00";
+    const latNum = Number(latitude) || 28.6139;
+    const lonNum = Number(longitude) || 77.2090;
+
+    // Check if astrosystem is already updated and cached for this profile
+    const cacheKey = `profile_${name || "unnamed"}_${targetDate}_${targetTime}_LAT${latNum}_LON${lonNum}`;
+    const cached = transitCache.get(cacheKey);
+
+    if (cached && (Date.now() - cached.timestamp < CACHE_VALIDITY_MS)) {
+      console.log(`[Autoagent] Astrosystem data for profile "${name}" is already up-to-date and verified.`);
+      return res.json({
+        status: "up-to-date",
+        updated: false,
+        message: `Astrosystem data for profile "${name}" is already up-to-date. Sync bypassed.`,
+        stepsChecked: currentSteps ? currentSteps.length : 0,
+        cachedAt: new Date(cached.timestamp).toLocaleTimeString()
+      });
+    }
+
+    console.log(`[Autoagent] Profile mismatch or cache miss. Syncing and recalculating astrosystem for "${name}"...`);
+    
+    // Perform calculation and save to cache
+    const tzNum = Number(timezone) || 5.5;
+    let data: any = null;
+    
+    try {
+      // Try fetching from official JHora backend
+      const response = await fetch(`${JHORA_API_URL}/horoscope`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          date: targetDate,
+          time: targetTime,
+          latitude: latNum,
+          longitude: lonNum,
+          timezone: tzNum,
+          place: location || "Query Location"
+        })
+      });
+
+      if (response.ok) {
+        data = await response.json();
+      }
+    } catch (e) {
+      console.log(`[Autoagent] Remote fetch bypassed or failed, calculating using local engine.`);
+    }
+
+    if (!data) {
+      data = calculateAstrology(
+        name || "Transit Sky",
+        targetDate,
+        targetTime,
+        location || "Query Location",
+        latNum,
+        lonNum,
+        tzNum
+      );
+    }
+
+    // Save newly calculated data to the transit cache
+    if (data && !data.error && !data.detail) {
+      transitCache.set(cacheKey, {
+        timestamp: Date.now(),
+        data
+      });
+    }
+
+    return res.json({
+      status: "updated",
+      updated: true,
+      message: `Astrosystem data for profile "${name}" updated and cached successfully by backend Autoagent.`,
+      stepsChecked: currentSteps ? currentSteps.length : 0,
+      timestamp: new Date().toLocaleTimeString()
+    });
+
+  } catch (error: any) {
+    console.error("[Autoagent Engine Error]:", error);
+    res.status(500).json({ error: error.message || "Failed to execute autoagent synchronization." });
+  }
+});
+
 // Helper to parse standard query or body parameters
 const parseKpParams = (req: any) => {
   const { date, time, latitude, longitude, timezone, place, horaryNumber, question, targetDate } = req.body;

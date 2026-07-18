@@ -285,6 +285,7 @@ export const EventEngineView: React.FC<EventEngineViewProps> = ({ isDark = true,
   const saveSteps = (updatedSteps: EngineStep[]) => {
     setSteps(updatedSteps);
     localStorage.setItem("jhora_event_engine_steps_v4", JSON.stringify(updatedSteps));
+    window.dispatchEvent(new Event("jhora_steps_updated"));
   };
 
   const handleReset = () => {
