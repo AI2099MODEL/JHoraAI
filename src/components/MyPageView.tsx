@@ -67,7 +67,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
     }
   }
 
-  if (!data && !planetsArray && tableId !== "table_13" && tableId !== "table_2" && tableId !== "table_5") return null;
+  if (!data && !planetsArray && !["table_13", "table_14", "table_15", "table_16"].includes(tableId)) return null;
   
   const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
   const thStyle = "py-2 px-3 bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider";
@@ -187,6 +187,192 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
           </pre>
         </div>
       );
+    case "table_14": {
+      const arudhas = data || profile?.Jaimini?.arudha || profile?.Vedic?.arudha || {};
+      const arudhaKeys = Object.keys(arudhas).length > 0 ? Object.keys(arudhas) : ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11", "A12"];
+      
+      const ARUDHA_LABELS: Record<string, string> = {
+        A1: "Lagna Pada / Arudha Lagna (AL) - Manifested Self & Public Image",
+        AL: "Arudha Lagna (AL) - Manifested Self & Public Image",
+        A2: "Dhanarudha (A2) - Wealth, Speech & Financial Projection",
+        A3: "Bhratrarudha / Vikramarudha (A3) - Valour, Siblings & Communication",
+        A4: "Matrarudha / Sukharudha (A4) - Happiness, Real Estate & Vehicles",
+        A5: "Putrarudha / Mantrarudha (A5) - Intelligence, Progeny & Creative Genius",
+        A6: "Shatrurudha / Rogarudha (A6) - Debts, Disputes & Obstacles",
+        A7: "Dararudha (A7) - Marriage, Partnership & Relationship Projection",
+        A8: "Mrityurudha (A8) - Longevity, Transformations & Sudden Events",
+        A9: "Bhagyarudha (A9) - Fortune, Wisdom & Dharma Projection",
+        A10: "Rajyarudha (A10) - Profession, Fame, Career & Status",
+        A11: "Labharudha (A11) - Cash Flow, Earnings & Social Networks",
+        A12: "Upapada Lagna (UL) - Expenditures, Spousal Quality & Spiritual Retreat",
+        UL: "Upapada Lagna (UL) - Expenditures, Spousal Quality & Spiritual Retreat",
+      };
+
+      return (
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+          <table className={baseTableStyle}>
+            <thead>
+              <tr>
+                <th className={thStyle}>Pada Symbol</th>
+                <th className={thStyle}>Arudha Name / Significance</th>
+                <th className={thStyle}>Sign Placement & House Offset</th>
+              </tr>
+            </thead>
+            <tbody>
+              {arudhaKeys.map((key) => {
+                const placement = arudhas[key] || "Unknown";
+                const label = ARUDHA_LABELS[key] || `${key} Pada`;
+                return (
+                  <tr key={key} className="hover:bg-slate-900/30">
+                    <td className={`${tdStyle} font-bold text-amber-500`}>{key}</td>
+                    <td className={tdStyle}>{label}</td>
+                    <td className={`${tdStyle} text-slate-200 font-bold`}>
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
+                        {placement}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    case "table_15": {
+      const argalas = data || profile?.Jaimini?.argala || profile?.Vedic?.argala || {};
+      const houseEntries = Array.from({ length: 12 }, (_, i) => String(i + 1));
+      return (
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+          <table className={baseTableStyle}>
+            <thead>
+              <tr>
+                <th className={thStyle}>House Reference</th>
+                <th className={thStyle}>Argala Configurations</th>
+                <th className={thStyle}>Virodha (Obstructions)</th>
+                <th className={thStyle}>Status / Verdict</th>
+              </tr>
+            </thead>
+            <tbody>
+              {houseEntries.map((hKey) => {
+                const configs = argalas[hKey] || [];
+                if (configs.length === 0) {
+                  return (
+                    <tr key={hKey} className="hover:bg-slate-900/30">
+                      <td className={`${tdStyle} font-bold text-amber-500`}>House {hKey}</td>
+                      <td className={tdStyle} colSpan={3}>
+                        <span className="text-slate-500 italic">No significant Argalas found</span>
+                      </td>
+                    </tr>
+                  );
+                }
+                return configs.map((cfg: any, idx: number) => (
+                  <tr key={`${hKey}-${idx}`} className="hover:bg-slate-900/30 border-b border-slate-900/40">
+                    {idx === 0 ? (
+                      <td className={`${tdStyle} font-bold text-amber-500 border-r border-slate-900/50`} rowSpan={configs.length}>
+                        House {hKey}
+                      </td>
+                    ) : null}
+                    <td className={tdStyle}>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className={`px-1 rounded text-[9px] font-bold ${cfg.type === "Primary" ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"}`}>
+                          {cfg.type}
+                        </span>
+                        <span className="text-slate-200 font-mono">
+                          {cfg.argalaPlanets?.join(", ") || "None"}
+                        </span>
+                        <span className="text-slate-500 text-[10px]">
+                          (in H{cfg.argalaHouse})
+                        </span>
+                      </div>
+                    </td>
+                    <td className={tdStyle}>
+                      {cfg.virodhaPlanets && cfg.virodhaPlanets.length > 0 ? (
+                        <div className="flex items-center gap-1.5 flex-wrap font-mono">
+                          <span className="text-rose-400">{cfg.virodhaPlanets.join(", ")}</span>
+                          <span className="text-slate-500 text-[10px]">(in H{cfg.virodhaHouse})</span>
+                        </div>
+                      ) : (
+                        <span className="text-emerald-500 text-[10px] font-bold">Unobstructed</span>
+                      )}
+                    </td>
+                    <td className={tdStyle}>
+                      <span className={`text-[11px] ${cfg.isObstructed ? "text-amber-500" : "text-emerald-400 font-bold"}`}>
+                        {cfg.isObstructed ? "Obstructed" : "Active / Unobstructed"}
+                      </span>
+                      <p className="text-[10px] text-slate-500 leading-normal mt-0.5 max-w-sm">
+                        {cfg.verdict || `${cfg.type} Argala from H${hKey} in H${cfg.argalaHouse}`}
+                      </p>
+                    </td>
+                  </tr>
+                ));
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    case "table_16": {
+      const shadbala = data || profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || {};
+      const planets = Object.keys(shadbala).length > 0 ? Object.keys(shadbala) : ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+      return (
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+          <table className={baseTableStyle}>
+            <thead>
+              <tr>
+                <th className={thStyle}>Planet</th>
+                <th className={thStyle}>Sthana Bala (Positional)</th>
+                <th className={thStyle}>Dig Bala (Directional)</th>
+                <th className={thStyle}>Kala Bala (Temporal)</th>
+                <th className={thStyle}>Cheshta Bala (Motional)</th>
+                <th className={thStyle}>Naisargika Bala (Natural)</th>
+                <th className={thStyle}>Drig Bala (Aspect)</th>
+                <th className={thStyle}>Total Strength (Shashtiamsa)</th>
+                <th className={thStyle}>Strength Ratio & %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {planets.map((pName) => {
+                const pBala = shadbala[pName] || {};
+                const ratio = pBala.strength_ratio || pBala.ratio || 1.0;
+                const percentage = pBala.strength_percentage || pBala.percentage || Math.round(ratio * 100);
+                const total = pBala.total_score || pBala.totalScore || pBala.total || 300;
+                
+                // Color indicators for strength ratio
+                let ratioColor = "text-emerald-400 bg-emerald-500/10 border-emerald-500/20";
+                if (ratio < 1.0) {
+                  ratioColor = "text-rose-400 bg-rose-500/10 border-rose-500/20";
+                } else if (ratio < 1.2) {
+                  ratioColor = "text-amber-400 bg-amber-500/10 border-amber-500/20";
+                }
+
+                return (
+                  <tr key={pName} className="hover:bg-slate-900/30">
+                    <td className={`${tdStyle} font-bold text-amber-500`}>{pName}</td>
+                    <td className={tdStyle}>{Number(pBala.sthana_bala || pBala.sthana || 0).toFixed(1)}</td>
+                    <td className={tdStyle}>{Number(pBala.dig_bala || pBala.dig || 0).toFixed(1)}</td>
+                    <td className={tdStyle}>{Number(pBala.kala_bala || pBala.kala || 0).toFixed(1)}</td>
+                    <td className={tdStyle}>{Number(pBala.cheshta_bala || pBala.cheshta || 0).toFixed(1)}</td>
+                    <td className={tdStyle}>{Number(pBala.naisargika_bala || pBala.naisargika || 0).toFixed(1)}</td>
+                    <td className={tdStyle}>{Number(pBala.drig_bala || pBala.drig || 0).toFixed(1)}</td>
+                    <td className={`${tdStyle} font-bold text-slate-200`}>
+                      {Number(total).toFixed(1)}
+                    </td>
+                    <td className={tdStyle}>
+                      <div className="flex items-center gap-1.5">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold border ${ratioColor}`}>
+                          {ratio.toFixed(2)}x ({percentage}%)
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
     case "table_13": {
       // Divisional Charts Shodashavargas Matrix
       const divisional = data || profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts || {};
@@ -1241,6 +1427,40 @@ export function MyPageView({
                 data_sample: {
                   charts_available: ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D16", "D20", "D24", "D27", "D30", "D40", "D45", "D60"]
                 }
+              },
+              {
+                table_number: 14,
+                title: "Jaimini Arudha Padas (Manifested Projections of Houses)",
+                source_origin: "Jaimini Sutra Engine",
+                section_key: "Jaimini.arudha",
+                api_source: "Computed Client-side / JHora Mapper (Arudhas)",
+                is_populated: true,
+                data_sample: {
+                  A1: "Virgo (H3)",
+                  A10: "Gemini (H12)"
+                }
+              },
+              {
+                table_number: 15,
+                title: "Jaimini Planetary Argalas & Obstructions (Interveners)",
+                source_origin: "Jaimini Planetary Interveners Engine",
+                section_key: "Jaimini.argala",
+                api_source: "Computed Client-side / JHora Mapper (Argalas)",
+                is_populated: true,
+                data_sample: {
+                  houses_calculated: 12
+                }
+              },
+              {
+                table_number: 16,
+                title: "Shadbala Strengths (Rupas & Strength Ratio)",
+                source_origin: "Shadbala Calculation Engine",
+                section_key: "Vedic.strengths.shadbala",
+                api_source: "Computed Client-side / JHora Mapper (Shadbala)",
+                is_populated: true,
+                data_sample: {
+                  shadbala_strengths: "Calculated"
+                }
               }
             ]).map((table: any, idx: number) => {
               const indexedTable = profile?.User?.indexedTables?.[`table_${table.table_number}`] || profile?.User?.indexedTables?.[table.table_number];
@@ -1289,14 +1509,19 @@ export function MyPageView({
                       </div>
                       {renderIndexedTable(`table_${table.table_number}`, indexedTable.data, profile, astrologyData)}
                     </div>
-                  ) : table.table_number === 13 && (profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts) ? (
+                  ) : [13, 14, 15, 16].includes(table.table_number) && (
+                    (table.table_number === 13 && (profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts)) ||
+                    (table.table_number === 14 && (profile?.Jaimini?.arudha || profile?.Vedic?.arudha || astrologyData?.jaimini?.arudha || astrologyData?.horoscope?.arudhas)) ||
+                    (table.table_number === 15 && (profile?.Jaimini?.argala || profile?.Vedic?.argala || astrologyData?.jaimini?.argala)) ||
+                    (table.table_number === 16 && (profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || astrologyData?.vedic?.strengths?.shadbala))
+                  ) ? (
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider">
-                          🟢 LIVE INTEGRATED DATA (Divisional Charts)
+                          🟢 LIVE INTEGRATED DATA ({table.table_number === 13 ? "Divisional Charts" : table.table_number === 14 ? "Arudha Padas" : table.table_number === 15 ? "Planetary Argalas" : "Shadbala Strengths"})
                         </span>
                         <span className="text-[9px] font-mono text-amber-500/80">
-                          Ready from Vedic Profile
+                          Ready from Astro Engine
                         </span>
                       </div>
                       {renderIndexedTable(`table_${table.table_number}`, null, profile, astrologyData)}
@@ -1431,6 +1656,182 @@ export function MyPageView({
               }
               return renderIndexedTable("table_2", null, profile, astrologyData);
             })()}
+          </div>
+        </div>
+      ) : activeTab === "jaimini" ? (
+        <div className="space-y-6">
+          {/* Header Card */}
+          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                  <Compass className="w-5 h-5 animate-spin-slow" />
+                </div>
+                <div>
+                  <h3 className={`text-base font-bold uppercase tracking-wider font-sans text-amber-500`}>
+                    Jaimini Astrological & Planetary Strength Matrix
+                  </h3>
+                  <p className={`text-[11px] ${textMutedStyle}`}>
+                    A comprehensive analysis of Sage Jaimini's Chara Karakas, Arudhas, Argalas, and computed Shadbala strengths.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Top Section: Chara Karakas & Core Jaimini Coordinates */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Left Column: Chara Karakas */}
+            <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+                <Award className="w-4 h-4 text-amber-400" />
+                <h4 className={`text-sm font-bold font-sans ${textStyle}`}>
+                  Sage Jaimini's Chara Karakas (Planetary Roles)
+                </h4>
+              </div>
+              <p className={`text-[11px] ${textMutedStyle} leading-relaxed`}>
+                The seven standard planets (Sun to Saturn) are ranked by their degree longitudes in descending order to assign vital life significations.
+              </p>
+              <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/20 text-xs">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider">
+                      <th className="py-2 px-3">Karaka Name</th>
+                      <th className="py-2 px-3">Significance</th>
+                      <th className="py-2 px-3">Graha (Planet)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      const karakas = profile?.Jaimini?.karakas || {};
+                      const karakaSignifications: Record<string, { label: string; desc: string }> = {
+                        atmakaraka: { label: "Atmakaraka (AK)", desc: "King of the chart, represents Soul's prime purpose & desire" },
+                        amatyakaraka: { label: "Amatyakaraka (AmK)", desc: "Minister, governs intellect, profession, wealth & guides life paths" },
+                        bhratrukaraka: { label: "Bhratrukaraka (BK)", desc: "Siblings, close associates, inner courage & dynamic initiatives" },
+                        matrukaraka: { label: "Matrukaraka (MK)", desc: "Mother, general happiness, domestic peace & real estate" },
+                        putrakaraka: { label: "Putrakaraka (PK)", desc: "Children, creative intelligence, discipleship & personal education" },
+                        gnatikaraka: { label: "Gnatikaraka (GK)", desc: "Conflicts, diseases, obstacles, relatives & karmic debts" },
+                        darakaraka: { label: "Darakaraka (DK)", desc: "Spouse, physical partner, relationships & trade alliances" }
+                      };
+
+                      const keys = Object.keys(karakaSignifications);
+                      return keys.map((key) => {
+                        const planet = karakas[key] || "Unknown";
+                        const sig = karakaSignifications[key];
+                        return (
+                          <tr key={key} className="hover:bg-slate-900/30 border-b border-slate-900/40">
+                            <td className="py-2 px-3 font-bold text-amber-500 font-sans">{sig.label}</td>
+                            <td className="py-2 px-3 text-slate-400 text-[10px] leading-tight">{sig.desc}</td>
+                            <td className="py-2 px-3 font-mono font-bold text-slate-200">
+                              <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 border border-slate-700 text-amber-400">
+                                {planet}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      });
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Right Column: Jaimini Soul Coordinates & Karakamsha */}
+            <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+                <Shield className="w-4 h-4 text-emerald-400" />
+                <h4 className={`text-sm font-bold font-sans ${textStyle}`}>
+                  Jaimini Soul Coordinates & Swamsha Lagnas
+                </h4>
+              </div>
+              <p className={`text-[11px] ${textMutedStyle} leading-relaxed`}>
+                The spatial projection of the Atmakaraka onto Navamsha determines spiritual orientation and higher intelligence planes.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-3 bg-slate-950/40 border border-slate-800/80 rounded-lg space-y-1">
+                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">
+                    Karakamsha Sign
+                  </span>
+                  <span className="text-sm font-bold text-emerald-400 block font-sans">
+                    {profile?.Jaimini?.karakamsha || "Cancer"}
+                  </span>
+                  <p className="text-[9px] text-slate-400 leading-normal font-sans">
+                    Navamsha sign occupied by the natal Atmakaraka. Indicates soul's inner light and path to liberation (Moksha).
+                  </p>
+                </div>
+
+                <div className="p-3 bg-slate-950/40 border border-slate-800/80 rounded-lg space-y-1">
+                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">
+                    Swamsha Sign
+                  </span>
+                  <span className="text-sm font-bold text-emerald-400 block font-sans">
+                    {profile?.Jaimini?.swamsha || "Cancer"}
+                  </span>
+                  <p className="text-[9px] text-slate-400 leading-normal font-sans">
+                    The Navamsha Lagna sign / Atmakaraka alignment in the divisional charts. Maps soul projection to physical manifest destiny.
+                  </p>
+                </div>
+              </div>
+
+              {/* Jaimini Sutra Standard */}
+              <div className="p-3.5 rounded-lg bg-amber-500/5 border border-amber-500/10 space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500 font-mono">
+                    Calculation Standard Reference
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-400 leading-normal">
+                  Calculated based on <strong>Sage Jaimini's Upadesha Sutras</strong>. Degrees sorted precisely client-side with secondary planet longitude filters to avoid static placeholder dates.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Table 14: Arudhas */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 14
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Jaimini Arudha Padas (Manifested Projections of Houses)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_14", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 15: Argalas */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 15
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Jaimini Planetary Argalas & Obstructions (Interveners Matrix)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_15", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 16: Shadbala */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 16
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Vedic Shadbala Strengths (Rupas & Strength Ratio)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_16", null, profile, astrologyData)}
+            </div>
           </div>
         </div>
       ) : (
