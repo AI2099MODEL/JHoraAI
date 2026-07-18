@@ -2840,8 +2840,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                       {/* Birth Details Block */}
                       {birthDetails && Object.keys(birthDetails).length > 0 && (
                         <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
-                          <div className="border-b border-slate-800 pb-2">
+                          <div className="border-b border-slate-800 pb-2 flex flex-wrap items-center justify-between gap-2">
                             <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 1: Birth Details (Birth Particulars)</h3>
+                            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (birthDetails)</span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
                             <div className="flex justify-between py-1 border-b border-slate-900/60">
@@ -2899,8 +2900,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                       {/* Lagna Block */}
                       {lagna && Object.keys(lagna).length > 0 && (
                         <div className="space-y-4 p-5 rounded-xl border border-slate-800 bg-slate-950/40 text-xs md:text-sm">
-                          <div className="border-b border-slate-800 pb-2">
+                          <div className="border-b border-slate-800 pb-2 flex flex-wrap items-center justify-between gap-2">
                             <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 1: Lagna Details (Ascendant Coordinates)</h3>
+                            <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (ascendant)</span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2 font-mono">
                             <div className="flex justify-between py-1 border-b border-slate-900/60">
@@ -2951,8 +2953,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
 
               {vedicSubTab === "table_2" && planets && planets.length > 0 && (
                 <div className="space-y-4 p-4 rounded-xl border border-slate-800 bg-slate-950/40 text-[11px] md:text-xs">
-                  <div className="border-b border-slate-800 pb-2">
+                  <div className="border-b border-slate-800 pb-2 flex flex-wrap items-center justify-between gap-2">
                     <h3 className="font-bold text-amber-400 uppercase tracking-wider font-mono">Table 2: KP Graha, Nakshatra and Pada</h3>
+                    <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (planets)</span>
                   </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -3157,15 +3160,18 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   {/* Active Pathway Header & Selection Tracker */}
                   <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/50 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-900 pb-2">
-                      <div>
-                        <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
-                          <Clock className="w-4 h-4 text-amber-400" />
-                          Table 3: Vimshottari Dasha Timeline (To Prana)
-                        </h4>
-                      <p className="text-[10px] text-slate-400 font-sans mt-0.5">
-                        Interactive down to minutes: click any period to drill down. Yellow items are currently active.
-                      </p>
-                    </div>
+                      <div className="w-full">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
+                            <Clock className="w-4 h-4 text-amber-400" />
+                            Table 3: Vimshottari Dasha Timeline (To Prana)
+                          </h4>
+                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (dashas.vimshottari)</span>
+                        </div>
+                        <p className="text-[10px] text-slate-400 font-sans mt-0.5">
+                          Interactive down to minutes: click any period to drill down. Yellow items are currently active.
+                        </p>
+                      </div>
                     <button
                       onClick={() => {
                         if (dashaTree.length === 0) return;
@@ -3509,11 +3515,14 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   {/* Active Pathway Header & Selection Tracker */}
                   <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/50 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-900 pb-2">
-                      <div>
-                        <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
-                          <Clock className="w-4 h-4 text-amber-400" />
-                          Table 4: Yogini Dasha Timeline (36-Year Cycle)
-                        </h4>
+                      <div className="w-full">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
+                            <Clock className="w-4 h-4 text-amber-400" />
+                            Table 4: Yogini Dasha Timeline (36-Year Cycle)
+                          </h4>
+                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (dashas.yogini)</span>
+                        </div>
                         <p className="text-[10px] text-slate-400 font-sans mt-0.5">
                           Interactive 5-level Yogini dasha hierarchy. Click any period to drill down. Yellow items are currently active.
                         </p>
@@ -3826,11 +3835,14 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                   {/* Active Pathway Header & Selection Tracker */}
                   <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/50 space-y-3">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-900 pb-2">
-                      <div>
-                        <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
-                          <Clock className="w-4 h-4 text-amber-400" />
-                          Table 5: Ashtottari Dasha Timeline (108-Year Cycle)
-                        </h4>
+                      <div className="w-full">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-xs font-mono flex items-center gap-1.5">
+                            <Clock className="w-4 h-4 text-amber-400" />
+                            Table 5: Ashtottari Dasha Timeline (108-Year Cycle)
+                          </h4>
+                          <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-0.5 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (dashas.ashtottari)</span>
+                        </div>
                         <p className="text-[10px] text-slate-400 font-sans mt-0.5">
                           Interactive 5-level Ashtottari dasha hierarchy. Click any period to drill down. Yellow items are currently active.
                         </p>
@@ -5664,22 +5676,25 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 6: PLANETARY ARGALAS ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_10")) && (
           <div id="report-section-6" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-pink-500/10 pb-4 mb-6">
-              <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 6 • Jaimini Planetary Argalas (Interveners)
-              </span>
-              <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-pink-400" />
-                6. HOUSE-WISE PLANETARY ARGALAS & OBSTRUCTIONS (VIRODHA)
-              </h2>
-            <p className={`text-xs ${mutedText} mt-1`}>
-              Sage Jaimini's framework of celestial energy interventions (Argalas) computed across all 12 houses to evaluate energy flow obstruction.
-            </p>
-          </div>
+            <div className="border-b border-pink-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  System 6 • Jaimini Planetary Argalas & Obstructions • Table 10
+                </span>
+                <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-pink-400" />
+                  Table 10 - JAIMINI HOUSE-WISE PLANETARY ARGALAS & OBSTRUCTIONS
+                </h2>
+                <p className={`text-xs ${mutedText} mt-1`}>
+                  Sage Jaimini's framework of celestial energy interventions (Argalas) computed across all 12 houses to evaluate energy flow obstruction.
+                </p>
+              </div>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (argalas)</span>
+            </div>
 
           <div className="overflow-x-auto rounded-xl border border-slate-800 text-xs">
             <table className="w-full text-left">
@@ -5833,17 +5848,20 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           <div id="report-section-7_kp" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-cyan-500/10 pb-4 mb-6">
-              <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 7 • Krishnamurti Paddhati (KP Stellar Astrology) • Table 6
-              </span>
-              <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
-                <Star className="w-5 h-5 text-cyan-400" />
-                Table 6 - KP STELLAR COSMIC SIGNALS & DASHAS
-              </h2>
-              <p className={`text-xs ${mutedText} mt-1`}>
-                High-precision stellar sublord division of house houses, planetary significators, active dashas, rulebook evaluations, transits, and horary resolutions.
-              </p>
+            <div className="border-b border-cyan-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  System 7 • Krishnamurti Paddhati (KP Stellar Astrology) • Table 6
+                </span>
+                <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-cyan-400" />
+                  Table 6 - KP STELLAR COSMIC SIGNALS & DASHAS
+                </h2>
+                <p className={`text-xs ${mutedText} mt-1`}>
+                  High-precision stellar sublord division of house houses, planetary significators, active dashas, rulebook evaluations, transits, and horary resolutions.
+                </p>
+              </div>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: KP API Suite</span>
             </div>
 
             {!showAllAstroSystems && (
@@ -7078,17 +7096,20 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           <div id="report-section-8" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-cyan-500/10 pb-4 mb-6">
-              <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 8 • Planet to House Significator Mappings • Table 7
-              </span>
-              <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
-                <Star className="w-5 h-5 text-cyan-400" />
-                Table 7 - PLANET TO HOUSE SIGNIFICATOR MAPPINGS
-              </h2>
-              <p className={`text-xs ${mutedText} mt-1`}>
-                Complete reverse-lookup of planetary significator levels mapped back to the 12 bhavas/houses, with custom-weighted 6-fold KP strength evaluation, priorities, and grading metrics.
-              </p>
+            <div className="border-b border-cyan-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[10px] bg-cyan-500/15 text-cyan-400 border border-cyan-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  System 8 • Planet to House Significator Mappings • Table 7
+                </span>
+                <h2 className="text-sm font-bold text-cyan-400 mt-2 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-cyan-400" />
+                  Table 7 - PLANET TO HOUSE SIGNIFICATOR MAPPINGS
+                </h2>
+                <p className={`text-xs ${mutedText} mt-1`}>
+                  Complete reverse-lookup of planetary significator levels mapped back to the 12 bhavas/houses, with custom-weighted 6-fold KP strength evaluation, priorities, and grading metrics.
+                </p>
+              </div>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: KP API Suite (Reverse Lookup)</span>
             </div>
 
             <div className="space-y-6">
@@ -7518,18 +7539,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           <div id="report-section-9" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-purple-500/10 pb-4 mb-6">
-              <span className="text-[10px] bg-purple-500/15 text-purple-400 border border-purple-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 9 • Western Tropical Aspect Matrices • Table 8
-              </span>
-              <h2 className="text-sm font-bold text-purple-400 mt-2 flex items-center gap-2">
-                <Globe className="w-5 h-5 text-purple-400" />
-                Table 8 - TROPICAL PLANETARY ASPECTS & PLACIDUS HOUSE CUSPS
-              </h2>
-            <p className={`text-xs ${mutedText} mt-1`}>
-              Standard major aspect definitions, angular difference metrics, and 12 Placidus house boundaries.
-            </p>
-          </div>
+            <div className="border-b border-purple-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[10px] bg-purple-500/15 text-purple-400 border border-purple-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  System 9 • Western Tropical Aspect Matrices • Table 8
+                </span>
+                <h2 className="text-sm font-bold text-purple-400 mt-2 flex items-center gap-2">
+                  <Globe className="w-5 h-5 text-purple-400" />
+                  Table 8 - TROPICAL PLANETARY ASPECTS & PLACIDUS HOUSE CUSPS
+                </h2>
+                <p className={`text-xs ${mutedText} mt-1`}>
+                  Standard major aspect definitions, angular difference metrics, and 12 Placidus house boundaries.
+                </p>
+              </div>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (western)</span>
+            </div>
 
           <div className="p-5 rounded-xl bg-slate-950/30 border border-slate-800 space-y-4 hover:border-purple-500/25 transition-all">
             <span className="text-xs font-bold text-amber-400 block uppercase tracking-wider border-b border-slate-800/60 pb-2">
@@ -7619,18 +7643,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           <div id="report-section-10" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-pink-500/10 pb-4 mb-6">
-              <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 10 • Mystical Esoteric Systems & Remedial Blueprints • Table 9
-              </span>
-              <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
-                <Layers className="w-5 h-5 text-pink-400" />
-                Table 9 - ESOTERIC, BAZI FOUR PILLARS & LAL KITAB REMEDIES
-              </h2>
-            <p className={`text-xs ${mutedText} mt-1`}>
-              Chinese BaZi Four Pillars, Pythagorean Numerology, Lal Kitab remedies, Mayan Day signs, and Celtic tree properties.
-            </p>
-          </div>
+            <div className="border-b border-pink-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[10px] bg-pink-500/15 text-pink-400 border border-pink-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  System 10 • Mystical Esoteric Systems & Remedial Blueprints • Table 9
+                </span>
+                <h2 className="text-sm font-bold text-pink-400 mt-2 flex items-center gap-2">
+                  <Layers className="w-5 h-5 text-pink-400" />
+                  Table 9 - ESOTERIC, BAZI FOUR PILLARS & LAL KITAB REMEDIES
+                </h2>
+                <p className={`text-xs ${mutedText} mt-1`}>
+                  Chinese BaZi Four Pillars, Pythagorean Numerology, Lal Kitab remedies, Mayan Day signs, and Celtic tree properties.
+                </p>
+              </div>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (mysticalSystems)</span>
+            </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* BaZi */}
@@ -7768,17 +7795,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 11: VIMSHOTTARI, YOGINI & ASHTOTTARI DASHAS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_10")) && (
+        {showAllAstroSystems && (
           <div id="report-section-11" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-teal-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full blur-2xl" />
             
             <div className="border-b border-teal-500/10 pb-4 mb-6">
               <span className="text-[10px] bg-teal-500/15 text-teal-400 border border-teal-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 11 • Dasha Period Timelines (Vimshottari, Yogini, Ashtottari) • Table 10
+                System 11 • Dasha Period Timelines (Vimshottari, Yogini, Ashtottari)
               </span>
               <h2 className="text-sm font-bold text-teal-400 mt-2 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-teal-400" />
-                Table 10 - VIMSHOTTARI, YOGINI & ASHTOTTARI DASHA CYCLES
+                VIMSHOTTARI, YOGINI & ASHTOTTARI DASHA CYCLES
               </h2>
             <p className={`text-xs ${mutedText} mt-1`}>
               The chronological sequence of planetary planetary dasha cycles computed on lunar longitudes, fully expanded.
@@ -7865,18 +7892,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           <div id="report-section-12" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-rose-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-rose-500/10 pb-4 mb-6">
-              <span className="text-[10px] bg-rose-500/15 text-rose-400 border border-rose-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 12 • Planetary Combinations & Afflictions (Yogas & Doshas) • Table 11
-              </span>
-              <h2 className="text-sm font-bold text-rose-400 mt-2 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-rose-400" />
-                Table 11 - VEDIC RAJA/DHANA YOGAS & CELESTIAL DOSHAS
-              </h2>
-            <p className={`text-xs ${mutedText} mt-1`}>
-              Comprehensive checklist of active auspicious combinations and major cosmic doshas present.
-            </p>
-          </div>
+            <div className="border-b border-rose-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[10px] bg-rose-500/15 text-rose-400 border border-rose-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  System 12 • Planetary Combinations & Afflictions (Yogas & Doshas) • Table 11
+                </span>
+                <h2 className="text-sm font-bold text-rose-400 mt-2 flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-rose-400" />
+                  Table 11 - VEDIC RAJA/DHANA YOGAS & CELESTIAL DOSHAS
+                </h2>
+                <p className={`text-xs ${mutedText} mt-1`}>
+                  Comprehensive checklist of active auspicious combinations and major cosmic doshas present.
+                </p>
+              </div>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (yogas & doshas)</span>
+            </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 text-xs">
             {/* Yogas */}
@@ -7931,18 +7961,21 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           <div id="report-section-13" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-amber-500/10 pb-4 mb-6">
-              <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                System 13 • Traditional Life Predictions & Daily Muhurta • Table 12
-              </span>
-              <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-amber-500" />
-                Table 12 - LIFE DESTINY PATHWAYS & DAILY TRANSIT ALIGNMENTS
-              </h2>
-            <p className={`text-xs ${mutedText} mt-1`}>
-              Exhaustive predictive analysis mapping professional focus, wealth generation, marriage bliss, health, and current lunar transit.
-            </p>
-          </div>
+            <div className="border-b border-amber-500/10 pb-4 mb-6 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  System 13 • Traditional Life Predictions & Daily Muhurta • Table 12
+                </span>
+                <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
+                  <Briefcase className="w-5 h-5 text-amber-500" />
+                  Table 12 - LIFE DESTINY PATHWAYS & DAILY TRANSIT ALIGNMENTS
+                </h2>
+                <p className={`text-xs ${mutedText} mt-1`}>
+                  Exhaustive predictive analysis mapping professional focus, wealth generation, marriage bliss, health, and current lunar transit.
+                </p>
+              </div>
+              <span className="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2.5 py-1 rounded font-mono font-bold">API SOURCE: /api/astrology/calculate (predictions & muhurta)</span>
+            </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Career */}
