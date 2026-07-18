@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { jsPDF } from "jspdf";
+import DashaTree from "./DashaTree";
 import {
   User,
   Calendar,
@@ -19,7 +21,10 @@ import {
   ArrowRight,
   Database,
   Activity,
-  Award as RibbonIcon
+  Award as RibbonIcon,
+  FileDown,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 
 interface MyPageViewProps {
@@ -188,10 +193,10 @@ export function MyPageView({
 
   const tabs = [
     { id: "overview", label: "Soul Blueprint" },
+    { id: "dasha", label: "Vimshottari Dasha" },
     { id: "table_index", label: "Table Index" },
     { id: "daily", label: "Daily Analysis" },
     { id: "future", label: "Future Analysis" },
-    { id: "transits", label: "Transits Analysis" },
     { id: "vedic", label: "Vedic Data" },
     { id: "jaimini", label: "Jaimini Data" },
     { id: "kp", label: "KP Data" },
@@ -385,6 +390,278 @@ export function MyPageView({
     return `${String(deg).padStart(3, "0")}° ${String(min).padStart(2, "0")}'`;
   };
 
+  const PLANETS_CYCLE = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+  const PLANET_YEARS: Record<string, number> = {
+    Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
+  };
+
+  const getSubPeriods = (parentLord: string, parentStart: Date, parentEnd: Date): Array<{ lord: string; start: Date; end: Date }> => {
+    const startIndex = PLANETS_CYCLE.indexOf(parentLord);
+    if (startIndex === -1) return [];
+    
+    const totalParentMs = parentEnd.getTime() - parentStart.getTime();
+    const list: Array<{ lord: string; start: Date; end: Date }> = [];
+    let currentStartMs = parentStart.getTime();
+    
+    for (let i = 0; i < 9; i++) {
+      const lord = PLANETS_CYCLE[(startIndex + i) % 9];
+      const years = PLANET_YEARS[lord];
+      const share = years / 120;
+      const durationMs = totalParentMs * share;
+      const currentEndMs = currentStartMs + durationMs;
+      
+      list.push({
+        lord,
+        start: new Date(currentStartMs),
+        end: new Date(currentEndMs)
+      });
+      
+      currentStartMs = currentEndMs;
+    }
+    
+    return list;
+  };
+
+  const downloadDashaCSV = () => {
+    const rawList = astrologyData?.dashas || profile?.Vedic?.dashas?.vimshottari || [];
+    if (rawList.length === 0) {
+      alert("No Vimshottari dasha data available to export. Please generate or load a profile first.");
+      return;
+    }
+
+    const now = new Date();
+    const fiftyYearsLater = new Date(now.getFullYear() + 50, now.getMonth(), now.getDate());
+
+    const csvRows = [
+      ["Mahadasha", "Bhukti (Antardasha)", "Antara (Pratyantar)", "Sookshma", "Prana", "Start Date", "End Date"]
+    ];
+
+    rawList.forEach((m: any) => {
+      const mLord = m.lord || m.lordName || "Unknown";
+      const mStart = new Date(m.start_date || m.startDate || m.startTime || m.start || "");
+      const mEnd = new Date(m.end_date || m.endDate || m.endTime || m.end || "");
+      
+      if (mEnd < now || mStart > fiftyYearsLater) return;
+      
+      const antars = getSubPeriods(mLord, mStart, mEnd);
+      
+      antars.forEach((a: any) => {
+        const aLord = a.lord;
+        const aStart = a.start;
+        const aEnd = a.end;
+        
+        if (aEnd < now || aStart > fiftyYearsLater) return;
+        
+        const pratyantars = getSubPeriods(aLord, aStart, aEnd);
+        
+        pratyantars.forEach((p: any) => {
+          const pLord = p.lord;
+          const pStart = p.start;
+          const pEnd = p.end;
+          
+          if (pEnd < now || pStart > fiftyYearsLater) return;
+          
+          const sookshmas = getSubPeriods(pLord, pStart, pEnd);
+          
+          sookshmas.forEach((s: any) => {
+            const sLord = s.lord;
+            const sStart = s.start;
+            const sEnd = s.end;
+            
+            if (sEnd < now || sStart > fiftyYearsLater) return;
+            
+            const pranas = getSubPeriods(sLord, sStart, sEnd);
+            
+            pranas.forEach((pr: any) => {
+              const prLord = pr.lord;
+              const prStart = pr.start;
+              const prEnd = pr.end;
+              
+              if (prEnd < now || prStart > fiftyYearsLater) return;
+              
+              const formatCSVDate = (d: Date) => {
+                return d.toISOString().replace('T', ' ').substring(0, 19);
+              };
+
+              csvRows.push([
+                mLord,
+                aLord,
+                pLord,
+                sLord,
+                prLord,
+                formatCSVDate(prStart),
+                formatCSVDate(prEnd)
+              ]);
+            });
+          });
+        });
+      });
+    });
+
+    const csvString = csvRows.map(e => e.map(val => `"${val.replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `vimshottari_50year_prana_dasha_${userName.toLowerCase().replace(/\s+/g, '_')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportMyPagePDF = () => {
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4"
+    });
+    
+    let y = 15;
+    
+    const checkPageOverflow = (neededHeight: number) => {
+      if (y + neededHeight > 280) {
+        doc.addPage();
+        y = 15;
+        return true;
+      }
+      return false;
+    };
+
+    // Header Panel
+    doc.setFillColor(15, 23, 42); // slate-900
+    doc.rect(0, 0, 210, 35, "F");
+    
+    doc.setTextColor(245, 158, 11); // amber-500
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("JHORA AI", 15, 18);
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text("SOUL BLUEPRINT & ASTROLOGICAL DOSSIER", 15, 26);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 150, 26);
+    
+    y = 45;
+
+    // 1. Birth Details
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("1. Birth & Ascendant Particulars", 15, y);
+    y += 5;
+    doc.setDrawColor(226, 232, 240);
+    doc.line(15, y, 195, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9.5);
+    
+    const fields = [
+      ["Full Name", userName, "Ascendant Sign", lagna.sign || ascendantSign || "Cancer"],
+      ["Date of Birth", birthDetails.date || birthDate, "Nakshatra", lagna.nakshatra || ascendantNakshatra || "Pushya"],
+      ["Time of Birth", birthDetails.time || birthTime, "Nakshatra Lord", lagna.nakshatra_lord || lagna.nakLord || ascendantNakLord || "Saturn"],
+      ["Birth Place", birthDetails.place || birthDetails.location || birthPlace, "Nakshatra Pada", `Pada ${lagna.pada || "2"}`],
+      ["Latitude", birthDetails.latitude ? `${Number(birthDetails.latitude).toFixed(4)}° N` : "30.3165° N", "KP Star Lord", lagna.star_lord || "Saturn"],
+      ["Longitude", birthDetails.longitude ? `${Number(birthDetails.longitude).toFixed(4)}° E` : "78.0322° E", "KP Sub Lord", lagna.sub_lord || "Mercury"],
+      ["Sidereal Time (LST)", astronomicalData?.sidereal_time || astronomicalData?.local_sidereal_time || "12:14:15", "KP Sub-Sub Lord", lagna.sub_sub_lord || "Rahu"],
+      ["Julian Day", astronomicalData?.julian_day_number || "2442784.2778", "Gandanta Status", lagna.gandanta ? "Gandanta" : "Clean"],
+    ];
+
+    fields.forEach(row => {
+      checkPageOverflow(8);
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(71, 85, 105);
+      doc.text(`${row[0]}:`, 15, y);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(15, 23, 42);
+      doc.text(String(row[1]), 52, y);
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(71, 85, 105);
+      doc.text(`${row[2]}:`, 110, y);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(15, 23, 42);
+      doc.text(String(row[3]), 145, y);
+      y += 6.5;
+    });
+
+    y += 4;
+
+    // 2. Soul Blueprint Synthesis
+    checkPageOverflow(30);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(15, 23, 42);
+    doc.text("2. Soul Blueprint Synthesis", 15, y);
+    y += 5;
+    doc.line(15, y, 195, y);
+    y += 7;
+
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9.5);
+    doc.setTextColor(30, 41, 59);
+    
+    const splitSynth = doc.splitTextToSize(soulSynthesisSummary, 180);
+    doc.text(splitSynth, 15, y);
+    y += (splitSynth.length * 4.5) + 10;
+
+    // 3. AI Generated Readings
+    if (generatedData && generatedData.sections) {
+      checkPageOverflow(25);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(15, 23, 42);
+      doc.text("3. Core Astrological Readings & Life Spheres", 15, y);
+      y += 5;
+      doc.line(15, y, 195, y);
+      y += 8;
+
+      generatedData.sections.forEach((sect: any) => {
+        const splitTitle = doc.splitTextToSize(sect.title, 180);
+        const splitContent = doc.splitTextToSize(sect.content, 180);
+        const splitRemedy = sect.remedy ? doc.splitTextToSize(sect.remedy, 172) : [];
+        
+        const neededHeight = (splitTitle.length * 5) + (splitContent.length * 4.5) + (sect.remedy ? (splitRemedy.length * 4.5) + 15 : 0) + 10;
+        checkPageOverflow(neededHeight);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(217, 119, 6); // amber-600
+        doc.text(sect.title, 15, y);
+        y += 5.5;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(51, 65, 85);
+        doc.text(splitContent, 15, y);
+        y += (splitContent.length * 4.5) + 4;
+
+        if (sect.remedy) {
+          doc.setFillColor(254, 243, 199); // light amber-50
+          doc.rect(15, y, 180, (splitRemedy.length * 4.5) + 7, "F");
+          
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(8);
+          doc.setTextColor(180, 83, 9); // amber-700
+          doc.text("ALIGNMENT REMEDY:", 18, y + 4.5);
+          
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(8.5);
+          doc.setTextColor(120, 53, 4);
+          doc.text(splitRemedy, 18, y + 9);
+          
+          y += (splitRemedy.length * 4.5) + 11;
+        } else {
+          y += 3;
+        }
+      });
+    }
+
+    doc.save(`jhora_ai_profile_report_${userName.toLowerCase().replace(/\s+/g, '_')}.pdf`);
+  };
+
   return (
     <div className="space-y-4">
       {/* COMPACT FIRST LINE: USER NAME, DOB DETAILS, AND AGE */}
@@ -402,12 +679,21 @@ export function MyPageView({
           <span className={`font-medium ${textStyle} truncate max-w-[200px]`} title={birthPlace}>{birthPlace}</span>
         </div>
 
-        {age && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/10 font-mono text-xs shrink-0 self-start md:self-auto">
-            <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Age:</span>
-            <span className="font-bold">{age.years} Years, {age.months} Months, {age.days} Days</span>
-          </div>
-        )}
+        <div className="flex items-center gap-3 shrink-0 self-start md:self-auto flex-wrap">
+          {age && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/10 font-mono text-xs">
+              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Age:</span>
+              <span className="font-bold">{age.years} Y, {age.months} M, {age.days} D</span>
+            </div>
+          )}
+          <button
+            onClick={exportMyPagePDF}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500 text-slate-950 hover:bg-amber-600 font-bold transition-all text-[11px] uppercase tracking-wider cursor-pointer select-none shadow-md shadow-amber-500/10 border border-amber-500"
+          >
+            <FileDown className="w-3.5 h-3.5" />
+            <span>Export PDF</span>
+          </button>
+        </div>
       </div>
 
       {errorMsg && (
@@ -451,6 +737,38 @@ export function MyPageView({
             </p>
           </div>
 
+          {/* LAGNA INFO IN SMALL FONTS */}
+          <div className="p-4 rounded-xl border border-slate-500/10 bg-slate-500/5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-slate-400">
+              <span>
+                <strong className="text-amber-500 uppercase font-sans text-[10px]">Lagna (Ascendant):</strong>{" "}
+                <span className={`${textStyle} font-bold`}>{lagna.sign || ascendantSign || "Cancer"}</span>{" "}
+                ({lagna.degree !== undefined ? formatDegree(lagna.degree) : "07° 12'"})
+              </span>
+              <span className="opacity-25 text-slate-500">|</span>
+              <span>
+                <strong className="text-amber-500 uppercase font-sans text-[10px]">Nakshatra:</strong>{" "}
+                <span className={`${textStyle} font-bold`}>{lagna.nakshatra || ascendantNakshatra || "Pushya"}</span>{" "}
+                (Pada {lagna.pada || "2"})
+              </span>
+              <span className="opacity-25 text-slate-500">|</span>
+              <span>
+                <strong className="text-amber-500 uppercase font-sans text-[10px]">Nakshatra Lord:</strong>{" "}
+                <span className={textStyle}>{lagna.nakshatra_lord || lagna.nakLord || ascendantNakLord || "Saturn"}</span>
+              </span>
+              <span className="opacity-25 text-slate-500">|</span>
+              <span>
+                <strong className="text-amber-500 uppercase font-sans text-[10px]">KP Lords:</strong> Star: <span className={textStyle}>{lagna.star_lord || "Saturn"}</span> • Sub: <span className={textStyle}>{lagna.sub_lord || "Mercury"}</span> • Sub-Sub: <span className={textStyle}>{lagna.sub_sub_lord || "Rahu"}</span>
+              </span>
+              <span className="opacity-25 text-slate-500">|</span>
+              <span>
+                <strong className="text-amber-500 uppercase font-sans text-[10px]">Status:</strong>{" "}
+                <span className={lagna.gandanta ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
+                  {lagna.gandanta ? "⚠️ Gandanta" : "✅ Clean"}
+                </span>
+              </span>
+            </div>
+          </div>
 
           {/* SECTIONED AI GENERATED READINGS */}
           <AnimatePresence mode="wait">
@@ -505,99 +823,123 @@ export function MyPageView({
             )}
           </AnimatePresence>
 
-          {/* OFFLINE BLUEPRINT DASHBOARD SECTION */}
-          <div className="space-y-6">
-            <h3 className={`text-lg font-bold font-sans ${textStyle} flex items-center gap-2`}>
-              <Activity className="w-5 h-5 text-amber-500" /> Offline Astronomical & Vedic Parameters
-            </h3>
-
-            {/* Section 1: Astronomical alignments */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-              <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-                <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Lunar Phase</span>
-                <p className={`text-xs font-semibold ${textStyle}`}>{moonPhase}</p>
+          {/* BIRTH & ASCENDANT COORDINATES GRID */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-4">
+            {/* Birth Details Block */}
+            <div className={`p-5 rounded-xl border ${cardStyle} text-xs md:text-sm space-y-4`}>
+              <div className="border-b border-slate-500/10 pb-2 flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-bold text-amber-500 uppercase tracking-wider font-mono text-xs">Table 1: Birth Details (Birth Particulars)</h3>
+                <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (birthDetails)</span>
               </div>
-              <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-                <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Lunar Month</span>
-                <p className={`text-xs font-semibold ${textStyle}`}>{lunarMonth}</p>
-              </div>
-              <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-                <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Solar Month</span>
-                <p className={`text-xs font-semibold ${textStyle}`}>{solarMonth}</p>
-              </div>
-              <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-                <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Ritu (Season)</span>
-                <p className={`text-xs font-semibold ${textStyle}`}>{season}</p>
-              </div>
-              <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-                <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Samvatsara (Year)</span>
-                <p className={`text-xs font-semibold ${textStyle}`}>{yearName}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mt-2 font-mono text-[11px]">
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Full Name:</span>
+                  <span className={`${textStyle} font-bold`}>{birthDetails.name || userName}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Date of Birth:</span>
+                  <span className={`${textStyle}`}>{birthDetails.date || birthDate}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Time of Birth:</span>
+                  <span className={`${textStyle}`}>{birthDetails.time || birthTime}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Birth Location:</span>
+                  <span className={`${textStyle} truncate max-w-[160px]`} title={birthDetails.place || birthDetails.location || birthPlace}>{birthDetails.place || birthDetails.location || birthPlace}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Latitude:</span>
+                  <span className={`${textStyle}`}>{birthDetails.latitude ? Number(birthDetails.latitude).toFixed(4) : "30.3165"}° N</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Longitude:</span>
+                  <span className={`${textStyle}`}>{birthDetails.longitude ? Number(birthDetails.longitude).toFixed(4) : "78.0322"}° E</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Julian Day Number:</span>
+                  <span className={`${textStyle}`}>{astronomicalData?.julian_day_number || "2442784.277778"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Sidereal Time (LST):</span>
+                  <span className={`${textStyle}`}>{astronomicalData?.sidereal_time || astronomicalData?.local_sidereal_time || "12:14:15"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Ayanamsa Reference:</span>
+                  <span className={`${textStyle} font-sans`}>{birthDetails.ayanamsa || "Lahiri Ayanamsa"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Ayanamsa Value:</span>
+                  <span className={`${textStyle}`}>{birthDetails.ayanamsaDegree ? Number(birthDetails.ayanamsaDegree).toFixed(4) : "23.5512"}°</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Obliquity of Ecliptic:</span>
+                  <span className={`${textStyle}`}>{astronomicalData?.obliquity || "23° 26' 27\""}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Place ID:</span>
+                  <span className={`${textStyle} truncate max-w-[160px]`} title={birthDetails.placeId}>{birthDetails.placeId || "ChIJuS_v16Lp_zMRwXnL-4E_P-s"}</span>
+                </div>
               </div>
             </div>
 
-            {/* Section 2: Ascendant Profile */}
-            <div className={`p-5 rounded-2xl border ${containerStyle} space-y-4`}>
-              <h4 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
-                Lagna (Ascendant) Profile
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-                  <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Ascendant Sign</span>
-                  <p className={`text-base font-bold ${textStyle}`}>{ascendantSign}</p>
+            {/* Lagna Block */}
+            <div className={`p-5 rounded-xl border ${cardStyle} text-xs md:text-sm space-y-4`}>
+              <div className="border-b border-slate-500/10 pb-2 flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-bold text-amber-500 uppercase tracking-wider font-mono text-xs">Table 1: Lagna Details (Ascendant Coordinates)</h3>
+                <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (ascendant)</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mt-2 font-mono text-[11px]">
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Zodiac Sign (Lagna):</span>
+                  <span className={`${textStyle} font-bold font-sans`}>{lagna.sign || ascendantSign || "Cancer"}</span>
                 </div>
-                <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-                  <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Nakshatra</span>
-                  <p className={`text-base font-bold ${textStyle}`}>{ascendantNakshatra}</p>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Longitude (In Sign):</span>
+                  <span className={`${textStyle}`}>{lagna.degree !== undefined ? formatDegree(lagna.degree) : "07° 12'"}</span>
                 </div>
-                <div className={`p-4 rounded-xl border ${cardStyle} space-y-1`}>
-                  <span className={`text-[10px] uppercase font-mono ${textMutedStyle}`}>Nakshatra Lord</span>
-                  <p className={`text-base font-bold ${textStyle}`}>{ascendantNakLord}</p>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Exact 360° Longitude:</span>
+                  <span className={`${textStyle}`}>{lagna.longitude !== undefined ? format360Degree(lagna.longitude) : "097° 12'"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Nakshatra:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.nakshatra || ascendantNakshatra || "Pushya"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Nakshatra Lord:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.nakshatra_lord || lagna.nakLord || ascendantNakLord || "Saturn"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Nakshatra Pada:</span>
+                  <span className={`${textStyle}`}>Pada {lagna.pada || "2"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>KP Star Lord:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.star_lord || "Saturn"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>KP Sub Lord:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.sub_lord || "Mercury"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>KP Sub-Sub Lord:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.sub_sub_lord || "Rahu"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Sun Nakshatra:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.sun_nakshatra || "Purva Ashadha"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Moon Nakshatra:</span>
+                  <span className={`${textStyle} font-sans`}>{lagna.moon_nakshatra || "Shatabhisha"}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-slate-500/10">
+                  <span className={`${textMutedStyle}`}>Gandanta Status:</span>
+                  <span className={`text-xs font-bold ${lagna.gandanta ? "text-rose-400" : "text-emerald-400"}`}>{lagna.gandanta ? "⚠️ Yes (Critical)" : "✅ Clean (Safe)"}</span>
                 </div>
               </div>
             </div>
-
-            {/* Section 3: Detailed Planetary States */}
-            {profile?.Vedic?.planets && (
-              <div className={`p-5 rounded-2xl border ${containerStyle} space-y-4`}>
-                <h4 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
-                  Planetary Dignities & States (Awasthas)
-                </h4>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="border-b border-slate-500/10 text-[10px] uppercase font-mono text-amber-500">
-                        <th className="pb-3 pr-4">Planet</th>
-                        <th className="pb-3 px-4">Sign</th>
-                        <th className="pb-3 px-4">Degree</th>
-                        <th className="pb-3 px-4">House</th>
-                        <th className="pb-3 px-4">Dignity</th>
-                        <th className="pb-3 px-4">Baladi State</th>
-                        <th className="pb-3 pl-4">Conscious State</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-500/10 text-xs">
-                      {Object.entries(profile.Vedic.planets).map(([name, planet]: [string, any]) => (
-                        <tr key={name} className="hover:bg-slate-500/5">
-                          <td className={`py-3 pr-4 font-bold ${textStyle}`}>{name}</td>
-                          <td className={`py-3 px-4 ${textStyle}`}>{planet.sign || "N/A"}</td>
-                          <td className={`py-3 px-4 font-mono ${textStyle}`}>
-                            {planet.degree !== undefined ? `${planet.degree}° ${planet.minute || 0}'` : "N/A"}
-                          </td>
-                          <td className={`py-3 px-4 font-mono ${textStyle}`}>{planet.house || "N/A"}</td>
-                          <td className="py-3 px-4">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-500`}>
-                              {planet.dignity || "Neutral"}
-                            </span>
-                          </td>
-                          <td className={`py-3 px-4 ${textStyle}`}>{planet.state?.baladi || "N/A"}</td>
-                          <td className={`py-3 pl-4 ${textStyle}`}>{planet.state?.jagrat || "N/A"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       ) : activeTab === "table_index" ? (
@@ -844,138 +1186,48 @@ export function MyPageView({
             })}
           </div>
         </div>
-      ) : activeTab === "transits" ? (
+      ) : activeTab === "dasha" ? (
         <div className="space-y-4">
-          <div className={`p-5 rounded-xl border ${containerStyle} shadow-sm space-y-3`}>
-            <div className="flex items-center gap-2">
-              <div className="p-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                <Activity className="w-3.5 h-3.5" />
+          <div className={`p-5 rounded-xl border ${containerStyle} shadow-sm space-y-4`}>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
+                    Table 3: Vimshottari Dasha Timeline
+                  </h3>
+                  <p className={`text-[11px] ${textMutedStyle}`}>
+                    A 120-year planetary cycle mapping major life epochs, micro-trends, and active prana streams.
+                  </p>
+                </div>
               </div>
-              <h3 className={`text-xs font-bold uppercase tracking-wider font-sans text-amber-500`}>
-                Transit Analysis & Coordinates
-              </h3>
+              <button
+                onClick={downloadDashaCSV}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-all text-xs font-mono font-bold cursor-pointer select-none"
+              >
+                <FileDown className="w-3.5 h-3.5" />
+                <span>Download 50-Year Prana Dasha (CSV)</span>
+              </button>
             </div>
-            <p className={`text-xs leading-relaxed ${textStyle} italic opacity-95`}>
-              Real-time planetary transits mapped against your core birth coordinates. Under Krishnamurti Paddhati (KP) and Vedic metric models, these active alignments determine key windows of opportunity and developmental cycles.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-4">
-            {/* Birth Details Block */}
-            <div className={`p-5 rounded-xl border ${cardStyle} text-xs md:text-sm space-y-4`}>
-              <div className="border-b border-slate-500/10 pb-2 flex flex-wrap items-center justify-between gap-2">
-                <h3 className="font-bold text-amber-500 uppercase tracking-wider font-mono text-xs">Table 1: Birth Details (Birth Particulars)</h3>
-                <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (birthDetails)</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mt-2 font-mono text-[11px]">
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Full Name:</span>
-                  <span className={`${textStyle} font-bold`}>{birthDetails.name || userName}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Date of Birth:</span>
-                  <span className={`${textStyle}`}>{birthDetails.date || birthDate}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Time of Birth:</span>
-                  <span className={`${textStyle}`}>{birthDetails.time || birthTime}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Birth Location:</span>
-                  <span className={`${textStyle} truncate max-w-[160px]`} title={birthDetails.place || birthDetails.location || birthPlace}>{birthDetails.place || birthDetails.location || birthPlace}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Latitude:</span>
-                  <span className={`${textStyle}`}>{birthDetails.latitude ? Number(birthDetails.latitude).toFixed(4) : "30.3165"}° N</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Longitude:</span>
-                  <span className={`${textStyle}`}>{birthDetails.longitude ? Number(birthDetails.longitude).toFixed(4) : "78.0322"}° E</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Julian Day Number:</span>
-                  <span className={`${textStyle}`}>{astronomicalData?.julian_day_number || "2442784.277778"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Sidereal Time (LST):</span>
-                  <span className={`${textStyle}`}>{astronomicalData?.sidereal_time || astronomicalData?.local_sidereal_time || "12:14:15"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Ayanamsa Reference:</span>
-                  <span className={`${textStyle} font-sans`}>{birthDetails.ayanamsa || "Lahiri Ayanamsa"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Ayanamsa Value:</span>
-                  <span className={`${textStyle}`}>{birthDetails.ayanamsaDegree ? Number(birthDetails.ayanamsaDegree).toFixed(4) : "23.5512"}°</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Obliquity of Ecliptic:</span>
-                  <span className={`${textStyle}`}>{astronomicalData?.obliquity || "23° 26' 27\""}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Place ID:</span>
-                  <span className={`${textStyle} truncate max-w-[160px]`} title={birthDetails.placeId}>{birthDetails.placeId || "ChIJuS_v16Lp_zMRwXnL-4E_P-s"}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Lagna Block */}
-            <div className={`p-5 rounded-xl border ${cardStyle} text-xs md:text-sm space-y-4`}>
-              <div className="border-b border-slate-500/10 pb-2 flex flex-wrap items-center justify-between gap-2">
-                <h3 className="font-bold text-amber-500 uppercase tracking-wider font-mono text-xs">Table 1: Lagna Details (Ascendant Coordinates)</h3>
-                <span className="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-2 py-0.5 rounded font-mono font-bold">Vedic Astro API: /api/astrology/calculate (ascendant)</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 mt-2 font-mono text-[11px]">
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Zodiac Sign (Lagna):</span>
-                  <span className={`${textStyle} font-bold font-sans`}>{lagna.sign || ascendantSign || "Cancer"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Longitude (In Sign):</span>
-                  <span className={`${textStyle}`}>{lagna.degree !== undefined ? formatDegree(lagna.degree) : "07° 12'"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Exact 360° Longitude:</span>
-                  <span className={`${textStyle}`}>{lagna.longitude !== undefined ? format360Degree(lagna.longitude) : "097° 12'"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Nakshatra:</span>
-                  <span className={`${textStyle} font-sans`}>{lagna.nakshatra || ascendantNakshatra || "Pushya"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Nakshatra Lord:</span>
-                  <span className={`${textStyle} font-sans`}>{lagna.nakshatra_lord || lagna.nakLord || ascendantNakLord || "Saturn"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Nakshatra Pada:</span>
-                  <span className={`${textStyle}`}>Pada {lagna.pada || "2"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>KP Star Lord:</span>
-                  <span className={`${textStyle} font-sans`}>{lagna.star_lord || "Saturn"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>KP Sub Lord:</span>
-                  <span className={`${textStyle} font-sans`}>{lagna.sub_lord || "Mercury"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>KP Sub-Sub Lord:</span>
-                  <span className={`${textStyle} font-sans`}>{lagna.sub_sub_lord || "Rahu"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Sun Nakshatra:</span>
-                  <span className={`${textStyle} font-sans`}>{lagna.sun_nakshatra || "Purva Ashadha"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Moon Nakshatra:</span>
-                  <span className={`${textStyle} font-sans`}>{lagna.moon_nakshatra || "Shatabhisha"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-500/10">
-                  <span className={`${textMutedStyle}`}>Gandanta Status:</span>
-                  <span className={`text-xs font-bold ${lagna.gandanta ? "text-rose-400" : "text-emerald-400"}`}>{lagna.gandanta ? "⚠️ Yes (Critical)" : "✅ Clean (Safe)"}</span>
-                </div>
-              </div>
-            </div>
+          {/* Dasha Tree View */}
+          <div className={`p-5 rounded-xl border ${containerStyle} shadow-sm`}>
+            {(() => {
+              const rawDashas = astrologyData?.dashas || profile?.Vedic?.dashas?.vimshottari || [];
+              if (rawDashas.length === 0) {
+                return (
+                  <div className="text-center py-8 text-xs text-slate-500 font-mono">
+                    ⚠️ No Vimshottari dasha data available. Please generate or load user particulars.
+                  </div>
+                );
+              }
+              return (
+                <DashaTree dashas={rawDashas} />
+              );
+            })()}
           </div>
         </div>
       ) : (
