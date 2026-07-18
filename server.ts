@@ -319,6 +319,32 @@ app.post("/api/user-profile/act", async (req, res) => {
   }
 });
 
+// Endpoint to retrieve active user profile JSON from disk
+app.get("/api/user-profile/get", async (req, res) => {
+  try {
+    const filePath = path.join(process.cwd(), "Users", "userprofile.json");
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      const parsed = JSON.parse(content);
+      return res.json(parsed);
+    }
+    // Fallback to local data dir if git file isn't created yet
+    const localFilePath = path.join(process.cwd(), "data", "user_profiles.json");
+    if (fs.existsSync(localFilePath)) {
+      const localContent = fs.readFileSync(localFilePath, "utf-8");
+      const localProfiles = JSON.parse(localContent);
+      const firstProfile = Object.values(localProfiles)[0];
+      if (firstProfile) {
+        return res.json(firstProfile);
+      }
+    }
+    res.status(404).json({ error: "No user profile found" });
+  } catch (err: any) {
+    console.error("Error in /api/user-profile/get endpoint:", err);
+    res.status(500).json({ error: err.message || "Failed to retrieve user profile." });
+  }
+});
+
 // ==========================================
 // API Endpoints (Pure Gateway Proxies)
 // ==========================================
@@ -1213,6 +1239,97 @@ To harmonize any planetary imbalances, consider the following traditional measur
 *Note: This report was generated using the local JHoraAI Vedic Synthesis engine as a robust fallback.*`;
     
     res.json({ analysis: prependedNotice + analysisFallback });
+  }
+});
+
+// Endpoint to generate sectioned personalized My Page reading using server-side Gemini API
+app.post("/api/user-profile/generate-summary", async (req, res) => {
+  try {
+    const ai = getGeminiClient();
+    let profileData = req.body.profile;
+
+    if (!profileData) {
+      // Fallback: Read from Users/userprofile.json
+      const filePath = path.join(process.cwd(), "Users", "userprofile.json");
+      if (fs.existsSync(filePath)) {
+        const content = fs.readFileSync(filePath, "utf-8");
+        profileData = JSON.parse(content);
+      } else {
+        return res.status(400).json({ error: "Profile data is required or must be synchronized first." });
+      }
+    }
+
+    // Construct a concise, informative prompt for Gemini using the structured user profile
+    const userName = profileData.User?.profile_name || "Seeker";
+    const birthDate = profileData.Birth?.date || "Unknown";
+    const birthPlace = profileData.Birth?.place || "Unknown";
+    const moonPhase = profileData.Astronomical?.moon_phase || "Unknown";
+    const ascendantSign = profileData.Vedic?.ascendant?.sign || "Unknown";
+    const ascendantNakshatra = profileData.Vedic?.ascendant?.nakshatra || "Unknown";
+
+    const planetsList = profileData.Vedic?.planets 
+      ? Object.entries(profileData.Vedic.planets)
+          .map(([name, p]: [string, any]) => `- ${name}: in ${p.sign}, House ${p.house}, Nakshatra ${p.nakshatra}, State: ${p.state?.baladi || "N/A"}`)
+          .join("\n")
+      : "No planet placements available";
+
+    const prompt = `
+You are an expert Vedic astrologer and counselor. Generate a deeply personal, inspiring, and sectioned soul blueprint reading for ${userName}, born on ${birthDate} at ${birthPlace}.
+Key particulars of their chart:
+- Ascendant (Lagna): ${ascendantSign} in ${ascendantNakshatra} Nakshatra
+- Lunar Phase (Tithi): ${moonPhase}
+- Planetary Placements:
+${planetsList}
+
+Synthesize these configurations into 4 distinct, meaningful, and comprehensive sections:
+1. Core Soul Archetype & Personality: Deep dive into their ascendant, moon phase, and prominent planetary alignments.
+2. Karmic Cycles & Life Path: What lessons and patterns do their house placements and planetary states (awasthas) indicate?
+3. Prosperity, Career & Life Purpose: What fields of creation, service, or wealth align with their chart?
+4. Spiritual Practices & Remedies: Actionable daily practices, meditative focal points, or remedies for balance.
+
+Use the requested JSON schema. Choose appropriate icons for each section from: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'.
+    `;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            summary: {
+              type: Type.STRING,
+              description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
+            },
+            sections: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
+                  content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
+                  remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
+                  icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
+                },
+                required: ["title", "content", "remedy", "icon"]
+              }
+            }
+          },
+          required: ["summary", "sections"]
+        }
+      }
+    });
+
+    if (!response.text) {
+      throw new Error("Empty response from Gemini API.");
+    }
+
+    const result = JSON.parse(response.text.trim());
+    res.json(result);
+  } catch (err: any) {
+    console.error("Error in /api/user-profile/generate-summary:", err);
+    res.status(500).json({ error: err.message || "Failed to generate personalized page content." });
   }
 });
 

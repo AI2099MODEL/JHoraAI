@@ -89,6 +89,7 @@ import { MasterArchitectureView } from "./components/MasterArchitectureView";
 import { RelationshipKnowledgeCenter } from "./components/RelationshipKnowledgeCenter";
 import { AstrologicalReasoningEngine } from "./components/AstrologicalReasoningEngine";
 import { RelationshipConsultationFramework } from "./components/RelationshipConsultationFramework";
+import { MyPageView } from "./components/MyPageView";
 import { UserProfile, SessionManager, AuthManager, UserProfileRepository } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
 import UpdateNotification from "./components/UpdateNotification";
@@ -1146,6 +1147,11 @@ export default function App() {
       id: "ai_assistant",
       label: "AI Assistant",
       icon: Sparkles
+    },
+    {
+      id: "my_page",
+      label: "My Page",
+      icon: User
     },
     {
       id: "analysis",
@@ -2346,6 +2352,25 @@ export default function App() {
                 <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
                   <AstroChat astrologyData={astrologyData} />
                 </div>
+              </motion.div>
+            </AnimatePresence>
+          ) : activeMenu === "my_page" ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="my_page"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="space-y-6"
+              >
+                <MyPageView
+                  astrologyData={astrologyData}
+                  activeUser={activeUser}
+                  isDark={isDark}
+                  containerStyle={containerStyle}
+                  cardStyle={cardStyle}
+                  textMuted={textMuted}
+                />
               </motion.div>
             </AnimatePresence>
           ) : activeMenu === "analysis" ? (
