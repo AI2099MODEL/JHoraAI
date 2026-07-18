@@ -6,3 +6,10 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Python virtual environments & bytecode (added Phase 1 hygiene pass)
+venv_astro/
+venv/
+__pycache__/
+*.pyc
+*.pyo
