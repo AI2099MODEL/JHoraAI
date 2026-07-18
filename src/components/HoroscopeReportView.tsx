@@ -100,7 +100,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
   const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("present");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
-  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "rules" | "event_book" | "event_muhurta" | "current_events" | "engine" | "user_profile_data">("present_day");
+  const [eventsSubTab, setEventsSubTab] = useState<"present_day" | "rules" | "event_book" | "event_muhurta" | "current_events" | "engine">("present_day");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
   const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
@@ -1911,7 +1911,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             { id: "rules", label: "Astrological Rules" },
             { id: "event_book", label: "Event Book" },
             { id: "engine", label: "Engine" },
-            { id: "user_profile_data", label: "User Profile Data" },
             { id: "event_muhurta", label: "Event Muhurta Finder" },
             { id: "current_events", label: "Space Weather Alerts" }
           ].map((tab) => (
@@ -2023,13 +2022,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               <EventEngineView
                 isDark={isDark}
                 astrologyData={astrologyData}
-              />
-            )}
-            {eventsSubTab === "user_profile_data" && (
-              <UserProfileSubmenuView
-                isDark={isDark}
-                astrologyData={astrologyData}
-                profileJson={profileJson}
               />
             )}
             {eventsSubTab === "event_muhurta" && (

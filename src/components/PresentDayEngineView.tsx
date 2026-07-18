@@ -223,7 +223,6 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
   // Static Engine Loader statuses
   const staticCache = useMemo(() => {
     return [
-      { id: "birth_details", label: "Birth Details Profile", status: "LOADED", icon: CheckCircle, value: `${birthDetails.name} • ${birthDetails.place}` },
       { id: "house_cusps", label: "House Cusps Coordinates", status: "LOADED", icon: CheckCircle, value: "12 Placidus Cusps mapped to 100% precision" },
       { id: "planet_positions", label: "Planetary Degrees & Speed", status: "LOADED", icon: CheckCircle, value: "9 Planets + Uranian system parsed" },
       { id: "six_fold", label: "6-Fold Significators (A, B, C, D, E, F)", status: "LOADED", icon: CheckCircle, value: "Stellar house links fully resolved" },

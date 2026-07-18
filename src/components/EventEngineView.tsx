@@ -19,154 +19,154 @@ const DEFAULT_STEPS: EngineStep[] = [
     stepNumber: "INIT 01",
     module: "Birth Details Profile",
     whatToDo: "Load birth chart profile details: Name, DOB, TOB, Place, Time Zone.",
-    referencedTable: "Birth Records / Profile Form State (`birthDetails`)"
+    referencedTable: "Birth Records / Profile Form State (birthDetails)"
   },
   {
     id: "init_2",
     stepNumber: "INIT 02",
     module: "House Cusps Coordinates",
-    whatToDo: "Load astronomical coordinates for all 12 house cusps (Sign, Degree, Nakshatra, Sub).",
-    referencedTable: "House Cusps Coordinates Table (`cusps`)"
+    whatToDo: "Load astronomical coordinates for all 12 house cusps including Sign, Degree, Nakshatra, Pada, Star Lord and Sub Lord.",
+    referencedTable: "House Cusps Coordinates Table (cusps)"
   },
   {
     id: "init_3",
     stepNumber: "INIT 03",
     module: "Planetary Positions",
-    whatToDo: "Load planetary details for all planets: Sign, Degree, Nakshatra, Star Lord, Sub Lord.",
-    referencedTable: "Planetary Positions Table (`planets`)"
+    whatToDo: "Load planetary details for all planets including Sign, Degree, House, Nakshatra, Pada, Star Lord, Sub Lord and Motion (Direct/Retrograde).",
+    referencedTable: "Planetary Positions Table (planets)"
   },
   {
     id: "init_4",
     stepNumber: "INIT 04",
     module: "Planetary House Positions",
-    whatToDo: "Map planets to their occupied houses in the Bhava Chalit chart (Planet → House mapping).",
-    referencedTable: "Planetary House Positions Map (`planetaryHousePositions`)"
+    whatToDo: "Map every planet to its occupied house in the Bhava Chalit chart (Planet → House mapping).",
+    referencedTable: "Planetary House Positions Map (planetaryHousePositions)"
   },
   {
     id: "init_5",
     stepNumber: "INIT 05",
     module: "House Ownership Matrix",
     whatToDo: "Retrieve the ruling sign lord (ownership) for each of the 12 houses.",
-    referencedTable: "House Lord Ownership Matrix Table"
+    referencedTable: "House Lord Ownership Matrix (houseOwnership)"
   },
   {
     id: "init_6",
     stepNumber: "INIT 06",
     module: "6-Fold Significators",
-    whatToDo: "Load the complete A–F significator vectors for all planets under stellar theory.",
-    referencedTable: "KP 6-Fold Significators Table (`significators`)"
+    whatToDo: "Load the complete KP 6-Fold significator vectors (Levels A–F) for every planet.",
+    referencedTable: "KP 6-Fold Significators Table (significators)"
   },
   {
     id: "init_7",
     stepNumber: "INIT 07",
     module: "Cuspal Sub Lords (CSL) Matrix",
-    whatToDo: "Identify the Cuspal Sub Lord (CSL) for all 12 houses to serve as crucial event anchors.",
-    referencedTable: "Cuspal Sub Lords (CSL) Matrix Table"
+    whatToDo: "Load the complete CSL profile for all 12 cusps including Sign, Degree, Nakshatra, Star Lord and Sub Lord to serve as event anchors.",
+    referencedTable: "Cuspal Sub Lords Matrix (cslMatrix)"
   },
   {
     id: "init_8",
     stepNumber: "INIT 08",
     module: "KP Strength Matrix",
-    whatToDo: "Retrieve the comprehensive planetary and house strengths, including overall Score and Grade.",
-    referencedTable: "KP Planets & Houses Strength Table (`kpStrengths`)"
+    whatToDo: "Load the complete KP Strength Matrix including L1–L6 Significations, Evidence Count, KP Score and Strength Grade for every planet.",
+    referencedTable: "KP Strength Table (kpStrengths)"
   },
-  { 
-    id: "1", 
-    stepNumber: "STEP 01", 
-    module: "Target Coordinates & Event Binding", 
-    whatToDo: "Load the selected Event from the Event Book. Identify Primary, Supporting, Obstructing Houses and the Main CSL.",
-    referencedTable: "KP Relationship Event Book (relEvents)"
+  {
+    id: "1",
+    stepNumber: "STEP 01",
+    module: "Target Coordinates & Event Binding",
+    whatToDo: "Load the selected Event from the Event Book. Bind the complete Event Definition including Event ID, Event Name, Category, Primary Houses, Supporting Houses, Obstructing Houses and Main CSL. This step only maps event coordinates and metadata; it performs no astrological evaluation.",
+    referencedTable: "Master Event Book (relEvents)"
   },
-  { 
-    id: "2", 
-    stepNumber: "STEP 02", 
-    module: "Natal Promise Verification", 
-    whatToDo: "Execute all Rule Book natal rules (KP, Parashari, Jaimini, Custom). Determine whether the event is promised.",
+  {
+    id: "2",
+    stepNumber: "STEP 02",
+    module: "Natal Promise Verification",
+    whatToDo: "Execute all applicable natal rules for the selected Event from the Rule Book (KP, Parashari, Jaimini and Custom). Evaluate each rule against the natal chart, record PASS/FAIL/PARTIAL, and determine whether the event has a natal promise. No DBA, Transit or Timing analysis is performed in this step.",
     referencedTable: "Astrological Rules Handbook (master_astro_handbook.md)"
   },
-  { 
-    id: "3", 
-    stepNumber: "STEP 03", 
-    module: "Vimshottari DBA Scan", 
-    whatToDo: "Read current MD, AD, PD, SD. Check whether active Dasha lords support the promised event.",
+  {
+    id: "3",
+    stepNumber: "STEP 03",
+    module: "Vimshottari DBA Scan",
+    whatToDo: "Read the current Vimshottari Dasha sequence and identify the active Maha Dasha (MD), Antar Dasha (AD), Pratyantar Dasha (PD), Sookshma Dasha (SD) and Prana Dasha (PrD). Evaluate whether the active DBA chain supports the natally promised event by correlating the active dasha lords with the Event Houses, Event CSL and KP Significators. This step only validates DBA support; it does not perform Transit or Trigger analysis.",
     referencedTable: "Vimshottari Dasha Tree (astrologyData.dashas)"
   },
-  { 
-    id: "4", 
-    stepNumber: "STEP 04", 
-    module: "Active Planet Resolution", 
-    whatToDo: "Resolve every active DBA planet's complete profile: House, Star Lord, Sub Lord, Significations, KP Strength, Rule relevance.",
-    referencedTable: "Planet Analysis & Significators Level 1-4 Tables"
+  {
+    id: "4",
+    stepNumber: "STEP 04",
+    module: "Active Dasha Planet Resolution",
+    whatToDo: "Resolve the complete astrological profile of each active DBA planet (MD, AD, PD, SD and PrD). Retrieve its Sign, House, Nakshatra, Star Lord, Sub Lord, House Ownership, KP 6-Fold Significations, KP Strength, Natal Rule relevance and Event House involvement. This step builds the complete planetary profile for subsequent Transit, Trigger and Convergence analysis without evaluating transits or timing.",
+    referencedTable: "Planet Analysis & Significators Tables (planetAnalysis)"
   },
-  { 
-    id: "5", 
-    stepNumber: "STEP 05", 
-    module: "Transit Position Mapping", 
-    whatToDo: "Calculate current transit positions of all planets. Map them to natal houses, signs, stars and subs.",
-    referencedTable: "Transit Planetary Positions & Gochara Table"
+  {
+    id: "5",
+    stepNumber: "STEP 05",
+    module: "Transit Position Mapping",
+    whatToDo: "Calculate the current transit positions of all planets. Determine each planet's Sign, House, Nakshatra, Pada, Star Lord and Sub Lord, then map every transit planet to the natal chart and correlate it with the active DBA planets, Event Houses and Event CSL. This step establishes the complete transit framework only; it does not evaluate Trigger Chains or event timing.",
+    referencedTable: "Transit Planetary Positions & Gochara Table (transitPlanets)"
   },
-  { 
-    id: "6", 
-    stepNumber: "STEP 06", 
-    module: "Transit Moon Trigger", 
-    whatToDo: "Calculate today's Moon Sign, Nakshatra, Star Lord and Sub Lord. Identify today's primary daily trigger.",
-    referencedTable: "Transit Moon & Nakshatra Coordinates Table"
+  {
+    id: "6",
+    stepNumber: "STEP 06",
+    module: "Transit Moon Trigger",
+    whatToDo: "Calculate the current Transit Moon's Sign, House, Nakshatra, Pada, Star Lord and Sub Lord. Map the Transit Moon to the natal chart and identify the primary daily stellar trigger by correlating it with the active DBA lords, Event CSL and Event Houses. This step establishes the day's trigger point only; it does not evaluate the complete Trigger Chain or event timing.",
+    referencedTable: "Transit Moon & Nakshatra Coordinates Table (transitMoon)"
   },
-  { 
-    id: "7", 
-    stepNumber: "STEP 07", 
-    module: "Trigger Chain Evaluation", 
-    whatToDo: "Build the trigger network between Transit Moon → Star Lord → Sub Lord → DBA Lords → Event CSL → Event Houses. Score all trigger paths.",
-    referencedTable: "Stellar Trigger Chain Matrix (AstrologicalReasoningEngine)"
+  {
+    id: "7",
+    stepNumber: "STEP 07",
+    module: "Trigger Chain Evaluation",
+    whatToDo: "Build and evaluate the complete stellar trigger network by tracing Transit Moon → Star Lord → Sub Lord → Active DBA Lords → Event CSL → Event Houses. Identify all valid trigger paths, calculate their individual strengths, and generate an overall Trigger Chain Score. This step evaluates stellar activation only; it does not determine final event probability.",
+    referencedTable: "Stellar Trigger Chain Matrix (triggerChain)"
   },
-  { 
-    id: "8", 
-    stepNumber: "STEP 08", 
-    module: "Cosmic Convergence & Synergy", 
-    whatToDo: "Compare Natal Promise + DBA + Transit + Trigger Chain. Find common supporting planets and remove inactive ones.",
-    referencedTable: "Cosmic Convergence Daily Evaluation Scoreboard"
+  {
+    id: "8",
+    stepNumber: "STEP 08",
+    module: "Cosmic Convergence & Synergy",
+    whatToDo: "Compare the outputs of Natal Promise, DBA Support, Transit Mapping and Trigger Chain Evaluation. Identify planets and houses that consistently support the selected event, eliminate inactive or conflicting influences, and calculate the overall Cosmic Convergence Score.",
+    referencedTable: "Cosmic Convergence Scoreboard (convergence)"
   },
-  { 
-    id: "9", 
-    stepNumber: "STEP 09", 
-    module: "Surviving Planetary Agents", 
-    whatToDo: "Keep only planets that satisfy Promise + DBA + Transit simultaneously. These become active event agents.",
-    referencedTable: "Planetary Agents Active Filter Vector"
+  {
+    id: "9",
+    stepNumber: "STEP 09",
+    module: "Surviving Planetary Agents",
+    whatToDo: "Filter and retain only those planets that simultaneously satisfy Natal Promise, Active DBA, Transit Position and Trigger Chain criteria. These surviving planets become the Active Event Agents used for all remaining calculations.",
+    referencedTable: "Planetary Agents Filter (survivingAgents)"
   },
-  { 
-    id: "10", 
-    stepNumber: "STEP 10", 
-    module: "House Priority Matrix", 
-    whatToDo: "Rank Event Houses using Event Book + active planetary support. Classify Primary, Supporting and Obstructing houses.",
-    referencedTable: "House Significators Levels 1-4 Priority Table"
+  {
+    id: "10",
+    stepNumber: "STEP 10",
+    module: "Event House Priority Matrix",
+    whatToDo: "Rank the Event Houses by combining the Event Definition with the support provided by the Active Event Agents. Classify each house as Primary, Supporting or Obstructing and calculate its overall contribution to the selected event.",
+    referencedTable: "Event House Priority Matrix (eventHousePriority)"
   },
-  { 
-    id: "11", 
-    stepNumber: "STEP 11", 
-    module: "Multi-System Consensus", 
-    whatToDo: "Evaluate agreement between KP, Parashari, Jaimini and Custom systems. Produce an overall consensus score.",
-    referencedTable: "Multi-System Consensus Scoreboard (MysticalSystemsView)"
+  {
+    id: "11",
+    stepNumber: "STEP 11",
+    module: "Multi-System Consensus",
+    whatToDo: "Evaluate the selected event independently using KP, Parashari, Jaimini and Custom rule systems. Compare their conclusions, identify areas of agreement or conflict, and calculate the overall Multi-System Consensus Score.",
+    referencedTable: "Multi-System Consensus Scoreboard (consensus)"
   },
-  { 
-    id: "12", 
-    stepNumber: "STEP 12", 
-    module: "Obstacle & Delay Scan", 
-    whatToDo: "Detect retrograde influence, combustion, afflictions, adverse transits and other delay/cancellation factors.",
-    referencedTable: "Planet Retrograde, Combustion & Aspect Table"
+  {
+    id: "12",
+    stepNumber: "STEP 12",
+    module: "Obstacle & Delay Scan",
+    whatToDo: "Detect all delaying, obstructing or cancelling influences including retrograde planets, combustion, afflictions, adverse transits and other applicable factors. Measure their impact on the selected event without recalculating natal promise.",
+    referencedTable: "Transit Obstacle Matrix (transitObstacles)"
   },
-  { 
-    id: "13", 
-    stepNumber: "STEP 13", 
-    module: "Ruling Planet Synchronization", 
-    whatToDo: "Compare today's Ruling Planets with active DBA lords, Trigger Chain and Event CSL for timing precision.",
-    referencedTable: "Active Ruling Planets (RP) Correspondence Table"
+  {
+    id: "13",
+    stepNumber: "STEP 13",
+    module: "Ruling Planet Synchronization",
+    whatToDo: "Compare the current Ruling Planets with the Active DBA Lords, Trigger Chain, Event CSL and Active Event Agents. Measure their synchronization and calculate the final timing support score for the selected event.",
+    referencedTable: "Ruling Planet Correspondence (rulingPlanets)"
   },
-  { 
-    id: "14", 
-    stepNumber: "STEP 14", 
-    module: "Final Synthesis", 
-    whatToDo: "Combine all previous scores to generate Probability, Confidence, Timing, Mood (if applicable) and Actionable Guidance.",
-    referencedTable: "Probability, Confidence & Actionable Guidance Synthesis Table"
+  {
+    id: "14",
+    stepNumber: "STEP 14",
+    module: "Final Synthesis",
+    whatToDo: "Combine the outputs of all previous steps to generate the final prediction. Calculate Probability, Confidence, Confidence Grade, Expected Timing, Active Planetary Agents, Supporting Factors, Obstructing Factors, Mood (where applicable) and Actionable Guidance for the selected event.",
+    referencedTable: "Prediction Synthesis (prediction)"
   }
 ];
 
@@ -202,7 +202,7 @@ export const EventEngineView: React.FC<EventEngineViewProps> = ({ isDark = true,
 
   // Load steps from local storage or defaults on mount
   useEffect(() => {
-    const saved = localStorage.getItem("jhora_event_engine_steps_v3");
+    const saved = localStorage.getItem("jhora_event_engine_steps_v4");
     if (saved) {
       try {
         setSteps(JSON.parse(saved));
@@ -277,7 +277,7 @@ export const EventEngineView: React.FC<EventEngineViewProps> = ({ isDark = true,
   // Save to local storage whenever steps change
   const saveSteps = (updatedSteps: EngineStep[]) => {
     setSteps(updatedSteps);
-    localStorage.setItem("jhora_event_engine_steps_v3", JSON.stringify(updatedSteps));
+    localStorage.setItem("jhora_event_engine_steps_v4", JSON.stringify(updatedSteps));
   };
 
   const handleReset = () => {
