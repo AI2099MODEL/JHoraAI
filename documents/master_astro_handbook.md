@@ -11,28 +11,29 @@ Welcome to the **Master Evaluation Handbook**, the authoritative index, registry
 This index catalogs the primary data tables, variables, and calculation schemas dynamically populated by the JHora calculation engines.
 
 ### 100. Evaluation Data Index & Birth Registry
-* **Registry Source File:** `/Users/userprofile.json` (Active profile payload)
+* **Registry Source File:** `/Users/userprofile.json` (Active selected profile payload)
+* **Primary Information Source:** **Dashboard Page** (User birth inputs: Date, Time, Place/Coordinates, and selected Ayanamsa)
 * **Status:** Dynamically populated based on active selected profile session.
 
 #### Table 1: Birth Details (Data Schema & Index Logic)
 This table represents the layout schema of the primary birth particulars. The engine maps these parameters as the absolute mathematical foundation for divisional chart calculations, dasha timelines, and planetary transits.
 
-| Parameter | Data Type | Logic & Provenance Source |
-| :--- | :--- | :--- |
-| **Profile Name** | `string` | Loaded dynamically from selected profile (`User.profile_name`) |
-| **User Email** | `string` | Loaded dynamically from selected profile session (`User.email`) |
-| **Birth Date** | `string (YYYY-MM-DD)` | Loaded dynamically from birth parameters (`Birth.date`) |
-| **Birth Time** | `string (HH:MM:SS)` | Loaded dynamically from birth parameters (`Birth.time`) |
-| **Latitude** | `float` | Geographical coordinates mapped via city database lookup (`Birth.latitude`) |
-| **Longitude** | `float` | Geographical coordinates mapped via city database lookup (`Birth.longitude`) |
-| **Timezone** | `float` | Local UTC timezone offset derived during calculation (`Birth.timezone`) |
-| **Place** | `string` | Resolved location name from geographical coordinates database (`Birth.place`) |
-| **Ayanamsa** | `string` | Calculation mode standard selected by user (e.g., Lahiri) (`Birth.ayanamsa`) |
-| **Julian Day Number**| `string` | Derived mathematically from UTC birth moment timestamp (`Birth.julian_day_number`) |
-| **Sidereal Time** | `string` | Calculated Local Sidereal Time for birth coordinates (`Birth.local_sidereal_time`) |
-| **Obliquity** | `string` | Obliquity of the ecliptic derived for Julian epoch (`Birth.obliquity`) |
-| **Ephemeris Used** | `string` | Calculation engine background source (`Birth.ephemeris_used`) |
-| **House System** | `string` | Structural house division rules applied (e.g., Placidus / KP Cusps) |
+| Parameter | Data Type | Primary Source / Info Origin | Logic & Provenance Source |
+| :--- | :--- | :--- | :--- |
+| **Profile Name** | `string` | **Dashboard Page** / Selected Profile | Loaded dynamically from selected profile (`User.profile_name`) |
+| **User Email** | `string` | **Dashboard Page** / Active Session | Loaded dynamically from selected profile session (`User.email`) |
+| **Birth Date** | `string (YYYY-MM-DD)` | **Dashboard Page** Input Form | Loaded dynamically from birth parameters (`Birth.date`) |
+| **Birth Time** | `string (HH:MM:SS)` | **Dashboard Page** Input Form | Loaded dynamically from birth parameters (`Birth.time`) |
+| **Latitude** | `float` | **Dashboard Page** GPS Resolver | Geographical coordinates mapped via city database lookup (`Birth.latitude`) |
+| **Longitude** | `float` | **Dashboard Page** GPS Resolver | Geographical coordinates mapped via city database lookup (`Birth.longitude`) |
+| **Timezone** | `float` | **Dashboard Page** Coordinate Mapping| Local UTC timezone offset derived during calculation (`Birth.timezone`) |
+| **Place** | `string` | **Dashboard Page** Input Form | Resolved location name from geographical coordinates database (`Birth.place`) |
+| **Ayanamsa** | `string` | **Dashboard Page** Settings | Calculation mode standard selected by user (e.g., Lahiri) (`Birth.ayanamsa`) |
+| **Julian Day Number**| `string` | Calculated (from Table 1 Date/Time) | Derived mathematically from UTC birth moment timestamp (`Birth.julian_day_number`) |
+| **Sidereal Time** | `string` | Calculated (from Table 1 Lat/Lon/Time) | Calculated Local Sidereal Time for birth coordinates (`Birth.local_sidereal_time`) |
+| **Obliquity** | `string` | Calculated (from Ephemeris) | Obliquity of the ecliptic derived for Julian epoch (`Birth.obliquity`) |
+| **Ephemeris Used** | `string` | Background Library | Calculation engine background source (`Birth.ephemeris_used`) |
+| **House System** | `string` | **Dashboard Page** Settings | Structural house division rules applied (e.g., Placidus / KP Cusps) |
 
 ---
 
