@@ -1,0 +1,97 @@
+{
+  "schema": {
+    "name": "Static Astrology Glossary",
+    "version": "1.0.0",
+    "description": "Master glossary of astrology terminology used across all supported systems."
+  },
+
+  "supported_systems": [
+    "Vedic",
+    "KP",
+    "Jaimini",
+    "Nadi",
+    "Tajik",
+    "Lal Kitab",
+    "Western",
+    "Chinese"
+  ],
+
+  "categories": [
+    "General",
+    "Planets",
+    "Signs",
+    "Houses",
+    "Nakshatras",
+    "Dashas",
+    "Divisional Charts",
+    "Strength",
+    "Yogas",
+    "Doshas",
+    "Karakas",
+    "Lagnas",
+    "Arudhas",
+    "Aspects",
+    "Transits",
+    "Remedies",
+    "KP",
+    "Jaimini",
+    "Nadi",
+    "Tajik",
+    "Western",
+    "Chinese"
+  ],
+
+  "entry_schema": {
+    "term": "Unique glossary term",
+    "sanskrit": "Original Sanskrit name where applicable",
+    "english": "English equivalent",
+    "category": "Glossary category",
+    "system": "Applicable astrology system",
+    "definition": "Standard definition",
+    "synonyms": [],
+    "related_terms": [],
+    "references": []
+  },
+
+  "minimum_required_fields": [
+    "term",
+    "category",
+    "definition"
+  ],
+
+  "supported_languages": [
+    "English",
+    "Sanskrit"
+  ],
+
+  "cross_reference_types": [
+    "Planet",
+    "House",
+    "Sign",
+    "Nakshatra",
+    "Yoga",
+    "Dosha",
+    "Dasha",
+    "Karaka",
+    "Avastha",
+    "Aspect",
+    "Remedy"
+  ],
+
+  "supported_exports": [
+    "JSON",
+    "PDF",
+    "Markdown"
+  ],
+
+  "dependencies": [
+    "static_core.json",
+    "static_planets.json",
+    "static_signs.json",
+    "static_houses.json",
+    "static_nakshatras.json",
+    "static_dashas.json",
+    "static_yogas.json",
+    "static_doshas.json"
+  ]
+}
