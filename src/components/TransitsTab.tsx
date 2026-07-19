@@ -857,7 +857,6 @@ export default function TransitsTab({
     { id: "current_gochara", name: "Current Gochara", icon: RefreshCw },
     { id: "current_dasha", name: "Current Dasha", icon: Calendar },
     { id: "current_transits", name: "Current Transits", icon: Layers },
-    { id: "seven_day_transits", name: "7-Day Transits Matrix", icon: Calendar },
     { id: "panchanga", name: "Current Panchanga", icon: Clock },
     { id: "current_strengths", name: "Current Strengths", icon: Award },
     { id: "current_yogas", name: "Current Yogas", icon: Sparkles },
@@ -1115,174 +1114,87 @@ export default function TransitsTab({
           {/* TAB 3: CURRENT TRANSITS */}
           {subTab === "current_transits" && (
             <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-4">
-              <h4 className="text-base font-semibold text-amber-100">Planet-Wise Transit Details</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map((pName) => {
-                  let natalHouse = -1;
-                  for (let h = 1; h <= 12; h++) {
-                    if (natalChart[h]?.includes(pName)) { natalHouse = h; break; }
-                  }
+              <div className="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <h4 className="text-base font-semibold text-amber-100">Planetary Transits Table</h4>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Real-time transit positions (Gochara) mapped against your natal birth houses.
+                  </p>
+                </div>
+              </div>
 
-                  const tp = transitPlanets.find(p => p.name === pName);
-                  if (!tp) return null;
+              <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/10">
+                <table className="min-w-full divide-y divide-slate-800 text-left text-xs font-sans">
+                  <thead className="bg-slate-900/60 font-mono text-[10px] text-slate-400 uppercase tracking-wider">
+                    <tr>
+                      <th className="px-4 py-3">Planet</th>
+                      <th className="px-4 py-3">Zodiac Sign</th>
+                      <th className="px-4 py-3">Longitude / Degree</th>
+                      <th className="px-4 py-3">Nakshatra</th>
+                      <th className="px-4 py-3 text-center">Pada</th>
+                      <th className="px-4 py-3">Nakshatra Lord</th>
+                      <th className="px-4 py-3">Sub Lord</th>
+                      <th className="px-4 py-3 text-center">Natal House</th>
+                      <th className="px-4 py-3 text-center">Transit House</th>
+                      <th className="px-4 py-3 text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60">
+                    {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map((pName) => {
+                      let natalHouse = -1;
+                      for (let h = 1; h <= 12; h++) {
+                        if (natalChart[h]?.includes(pName)) { natalHouse = h; break; }
+                      }
 
-                  const signIdx = ZODIAC_SIGNS.indexOf(tp.sign);
-                  const transitHouse = ((signIdx - lagnaSignIndex + 12) % 12) + 1;
-                  const isBenefic = getTransitBeneficStatus(pName, transitHouse);
+                      const tp = transitPlanets.find(p => p.name === pName);
+                      if (!tp) {
+                        return (
+                          <tr key={pName} className="hover:bg-slate-900/30 transition-colors">
+                            <td className="px-4 py-3 font-medium text-slate-200">{pName}</td>
+                            <td colSpan={9} className="px-4 py-3 text-slate-500 italic">No transit data available</td>
+                          </tr>
+                        );
+                      }
 
-                  return (
-                    <div key={pName} className="p-4 rounded-xl border border-slate-800/60 bg-slate-900/30 hover:border-indigo-500/20 transition-all flex flex-col justify-between space-y-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <span className="font-bold text-slate-200 block text-sm">{pName}</span>
-                          <span className="text-[11px] text-slate-400">Transit Sign: {tp.sign}</span>
-                        </div>
-                        <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded border ${
-                          isBenefic ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-slate-500/5 text-slate-400 border-slate-500/10"
-                        }`}>
-                          {isBenefic ? "Benefic" : "Neutral"}
-                        </span>
-                      </div>
+                      const signIdx = ZODIAC_SIGNS.indexOf(tp.sign);
+                      const transitHouse = ((signIdx - lagnaSignIndex + 12) % 12) + 1;
+                      const isBenefic = getTransitBeneficStatus(pName, transitHouse);
 
-                      <p className="text-xs text-slate-300 leading-normal">{getTransitExplanation(pName, transitHouse, isBenefic)}</p>
+                      const longitude = getPlanetLongitude(tp);
+                      const nakDetails = getPlanetNakshatraDetails(longitude);
+                      const subLord = getKpSubLord(longitude);
 
-                      <div className="border-t border-slate-800/60 pt-2 flex justify-between text-[10px] font-mono">
-                        <span className="text-slate-500">Natal House: <strong className="text-indigo-400">H{natalHouse}</strong></span>
-                        <span className="text-slate-500">Transit House: <strong className="text-amber-400">H{transitHouse}</strong></span>
-                      </div>
-                    </div>
-                  );
-                })}
+                      // Format degree nicely (e.g. 14° 35')
+                      const degFloor = Math.floor(tp.degree);
+                      const minVal = Math.round((tp.degree - degFloor) * 60);
+                      const formattedDegree = `${degFloor}° ${minVal.toString().padStart(2, '0')}′`;
+
+                      return (
+                        <tr key={pName} className="hover:bg-slate-900/30 transition-colors">
+                          <td className="px-4 py-3.5 font-bold text-slate-100">{pName}</td>
+                          <td className="px-4 py-3.5 text-slate-300">{tp.sign}</td>
+                          <td className="px-4 py-3.5 font-mono text-slate-400">{formattedDegree}</td>
+                          <td className="px-4 py-3.5 font-medium text-amber-200">{nakDetails.name}</td>
+                          <td className="px-4 py-3.5 text-center text-slate-300 font-mono">{nakDetails.pada}</td>
+                          <td className="px-4 py-3.5 text-slate-400">{nakDetails.lord}</td>
+                          <td className="px-4 py-3.5 text-slate-400 font-medium">{subLord}</td>
+                          <td className="px-4 py-3.5 text-center font-mono text-indigo-400 font-semibold">H{natalHouse !== -1 ? natalHouse : "—"}</td>
+                          <td className="px-4 py-3.5 text-center font-mono text-amber-400 font-semibold">H{transitHouse}</td>
+                          <td className="px-4 py-3.5 text-center">
+                            <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded border ${
+                              isBenefic ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-slate-500/5 text-slate-400 border-slate-500/10"
+                            }`}>
+                              {isBenefic ? "Benefic" : "Neutral"}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
-
-          {subTab === "seven_day_transits" && (() => {
-            const lat = Number(transitLatitude) || Number(astrologyData?.birthDetails?.latitude) || 30.3165;
-            const lng = Number(transitLongitude) || Number(astrologyData?.birthDetails?.longitude) || 78.0322;
-            const tz = Number(transitTimezone) || Number(astrologyData?.birthDetails?.timezone) || 5.5;
-            const place = transitPlace || astrologyData?.birthDetails?.location || "Dehradun, India";
-
-            // 1. Calculate the start date (shifting by 1 day if hour >= 18)
-            const now = new Date();
-            const startOffset = now.getHours() >= 18 ? 1 : 0;
-            
-            const baseDate = new Date();
-            baseDate.setDate(baseDate.getDate() + startOffset);
-
-            const sevenDaysData = [];
-
-            for (let d = 0; d < 7; d++) {
-              const curDate = new Date(baseDate.getTime() + d * 24 * 60 * 60 * 1000);
-              const dateStr = curDate.toISOString().split("T")[0];
-              const dateLabel = curDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-
-              // Calculate astrology data for this day at 12:00 PM (Noon) for standard daily positions
-              const dayData = calculateAstrology("Transit", dateStr, "12:00:00", place, lat, lng, tz);
-
-              // Diff in days since J2000.0 for latitude calculations
-              const birthDate = new Date(`${dateStr}T12:00:00`);
-              const utcDate = new Date(birthDate.getTime() - tz * 3600000);
-              const j2000 = new Date("2000-01-01T12:00:00Z");
-              const daysSinceJ2000 = (utcDate.getTime() - j2000.getTime()) / (1000 * 60 * 60 * 24);
-
-              // Approximate planetary latitudes using sinusoidal tilt formulas (high-fidelity astro representation)
-              const latFactors: Record<string, { tilt: number; period: number }> = {
-                Sun: { tilt: 0, period: 365.256 },
-                Moon: { tilt: 5.15, period: 27.321 },
-                Mars: { tilt: 1.85, period: 686.98 },
-                Mercury: { tilt: 7.0, period: 87.97 },
-                Jupiter: { tilt: 1.3, period: 4332.59 },
-                Venus: { tilt: 3.4, period: 224.7 },
-                Saturn: { tilt: 2.49, period: 10759.22 },
-                Rahu: { tilt: 0, period: 6793 },
-                Ketu: { tilt: 0, period: 6793 }
-              };
-
-              const planetsTransits = dayData.planets.map(p => {
-                const factor = latFactors[p.name] || { tilt: 0, period: 365 };
-                const pLat = factor.tilt === 0 ? 0 : factor.tilt * Math.sin((daysSinceJ2000 / factor.period) * 2 * Math.PI);
-                
-                return {
-                  name: p.name,
-                  nakshatra: p.nakshatra,
-                  latitude: pLat,
-                  longitude: p.longitude,
-                  sign: p.sign,
-                  degree: p.degree,
-                  pada: p.pada
-                };
-              });
-
-              sevenDaysData.push({
-                dateLabel,
-                dateStr,
-                planets: planetsTransits
-              });
-            }
-
-            return (
-              <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-6">
-                <div className="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <div>
-                    <h4 className="text-base font-semibold text-amber-100">7-Day Planetary Transits Matrix</h4>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Continuous Gochara ephemeris calculated daily at 12:00 PM local time.
-                      {now.getHours() >= 18 && (
-                        <span className="text-amber-400 font-mono text-[10px] ml-1.5 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
-                          18h+ Refresh Active: Displaying Tomorrow onwards
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                  <div className="text-[10px] font-mono text-slate-500">
-                    Coordinate Source: <span className="text-slate-300">{place} ({lat.toFixed(2)}°N, {lng.toFixed(2)}°E)</span>
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/10">
-                  <table className="min-w-full divide-y divide-slate-800 text-left text-xs font-sans">
-                    <thead className="bg-slate-900/60 font-mono text-[10px] text-slate-400 uppercase tracking-wider">
-                      <tr>
-                        <th className="px-4 py-3">Day / Date</th>
-                        {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map(p => (
-                          <th key={p} className="px-3 py-3 text-center">{p}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/60">
-                      {sevenDaysData.map((day, idx) => (
-                        <tr key={day.dateStr} className={`hover:bg-slate-900/30 transition-colors ${idx === 0 ? "bg-amber-500/5" : ""}`}>
-                          <td className="px-4 py-3.5 font-medium text-slate-200 shrink-0">
-                            <span className="block font-sans text-xs">{day.dateLabel}</span>
-                            <span className="text-[9px] font-mono text-slate-500">{day.dateStr}</span>
-                          </td>
-                          {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map(pName => {
-                            const p = day.planets.find(item => item.name === pName);
-                            if (!p) return <td key={pName} className="px-3 py-3.5 text-center text-slate-600">—</td>;
-                            return (
-                              <td key={pName} className="px-3 py-3.5 text-center">
-                                <div className="space-y-1">
-                                  <span className="text-slate-200 font-bold block text-[11px]">{p.nakshatra}</span>
-                                  <span className="text-slate-400 text-[10px] block font-mono">
-                                    {p.sign.substring(0, 3)} {Math.floor(p.degree)}°{Math.round((p.degree % 1) * 60).toString().padStart(2, '0')}′
-                                  </span>
-                                  <div className="flex justify-center gap-1.5 text-[9px] font-mono text-slate-500 border-t border-slate-800/40 pt-1">
-                                    <span>Lat: <strong className={p.latitude >= 0 ? "text-emerald-400" : "text-rose-400"}>{p.latitude >= 0 ? "+" : ""}{p.latitude.toFixed(2)}°</strong></span>
-                                    <span>Lon: <strong>{p.longitude.toFixed(1)}°</strong></span>
-                                  </div>
-                                </div>
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          })()}
 
           {/* TAB 4: PANCHANGA */}
           {subTab === "panchanga" && (
