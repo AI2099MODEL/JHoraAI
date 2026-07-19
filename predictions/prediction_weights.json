@@ -1,0 +1,222 @@
+{
+  "schema": {
+    "name": "Prediction Weights",
+    "version": "1.0.0",
+    "description": "Master weighting configuration for the prediction engine."
+  },
+
+  "global": {
+
+    "maximum_score": 1000,
+
+    "normalization": "weighted_average",
+
+    "allow_negative_scores": true,
+
+    "minimum_confidence": 0,
+
+    "maximum_confidence": 100
+  },
+
+  "major_modules": {
+
+    "dasha": 30,
+
+    "transit": 20,
+
+    "natal_strength": 15,
+
+    "houses": 10,
+
+    "planet_strength": 8,
+
+    "yogas": 8,
+
+    "doshas": 5,
+
+    "ashtakavarga": 4,
+
+    "kp": 12,
+
+    "jaimini": 10,
+
+    "tajik": 6,
+
+    "nadi": 5,
+
+    "divisional_charts": 15,
+
+    "special_lagnas": 3,
+
+    "argala": 2,
+
+    "arudha": 2
+  },
+
+  "planet_weight": {
+
+    "Sun": 100,
+
+    "Moon": 100,
+
+    "Mars": 90,
+
+    "Mercury": 85,
+
+    "Jupiter": 110,
+
+    "Venus": 95,
+
+    "Saturn": 100,
+
+    "Rahu": 80,
+
+    "Ketu": 80
+
+  },
+
+  "house_weight": {
+
+    "1": 100,
+
+    "2": 90,
+
+    "3": 75,
+
+    "4": 90,
+
+    "5": 100,
+
+    "6": 70,
+
+    "7": 100,
+
+    "8": 65,
+
+    "9": 100,
+
+    "10": 110,
+
+    "11": 95,
+
+    "12": 60
+
+  },
+
+  "strength_weight": {
+
+    "Shadbala": 100,
+
+    "BhavaBala": 80,
+
+    "Vimshopaka": 90,
+
+    "IshtaKashta": 70,
+
+    "Ashtakavarga": 85
+
+  },
+
+  "dignity_weight": {
+
+    "Exalted": 100,
+
+    "Moolatrikona": 95,
+
+    "Own": 90,
+
+    "GreatFriend": 80,
+
+    "Friend": 70,
+
+    "Neutral": 50,
+
+    "Enemy": 30,
+
+    "GreatEnemy": 15,
+
+    "Debilitated": 0
+
+  },
+
+  "motion_weight": {
+
+    "Direct": 100,
+
+    "Retrograde": 95,
+
+    "Stationary": 85,
+
+    "Combust": 60,
+
+    "PlanetaryWarWinner": 100,
+
+    "PlanetaryWarLoser": 40
+
+  },
+
+  "event_priority": {
+
+    "Marriage": 100,
+
+    "Career": 100,
+
+    "Health": 100,
+
+    "Death": 100,
+
+    "Business": 90,
+
+    "Finance": 90,
+
+    "Education": 80,
+
+    "Children": 85,
+
+    "Travel": 70,
+
+    "Property": 85,
+
+    "Vehicle": 60,
+
+    "Litigation": 75,
+
+    "Foreign": 70,
+
+    "Spirituality": 60
+
+  },
+
+  "confidence_adjustments": {
+
+    "multiple_confirmations": 20,
+
+    "contradictions": -25,
+
+    "weak_support": -15,
+
+    "rare_yoga": 15,
+
+    "multiple_dashas_support": 20,
+
+    "strong_transit": 15,
+
+    "weak_transit": -10
+
+  },
+
+  "normalization": {
+
+    "excellent": 90,
+
+    "good": 75,
+
+    "average": 60,
+
+    "weak": 40,
+
+    "poor": 20
+
+  }
+
+}
