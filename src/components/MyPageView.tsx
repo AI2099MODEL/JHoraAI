@@ -505,6 +505,8 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
         </div>
       );
     case "table_7": {
+      // Schema-aligned KP Data Analysis
+
       const SIGN_NAMES = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
       const SIGN_LORDS = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
 
@@ -513,150 +515,237 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
 
       const kpProfile = profile?.KP;
       if (kpProfile && kpProfile.cusps && Object.keys(kpProfile.cusps).length > 0) {
-        kpCuspsList = Object.entries(kpProfile.cusps).map(([key, c]: [string, any]) => ({
-          houseNumber: c.house_number || parseInt(key.replace("House_", "")) || 1,
-          sign: c.sign,
-          degree: c.longitude !== undefined ? c.longitude : 0,
-          longitude: c.longitude !== undefined ? c.longitude : 0,
-          starLord: c.star_lord || "Unknown",
-          subLord: c.sub_lord || "Unknown",
-          subSubLord: c.sub_sub_lord || "Unknown",
-          signLord: c.sign_lord || "Unknown"
-        }));
+        kpCuspsList = Object.entries(kpProfile.cusps).map(([key, c]: [string, any]) => {
+          const cuspNo = c.house_number || parseInt(key.replace("House_", "")) || 1;
+          const absLong = c.longitude !== undefined ? c.longitude : 0;
+          const degInSign = c.degree !== undefined ? c.degree : (c.longitude !== undefined ? c.longitude % 30 : 0);
+          return {
+            CuspNo: cuspNo,
+            AbsoluteLongitude: absLong,
+            ZodiacSign: c.sign || "Unknown",
+            DegreeInSign: degInSign,
+            SignLord: c.sign_lord || c.signLord || "Unknown",
+            StarLord: c.star_lord || c.starLord || "Unknown",
+            SubLord: c.sub_lord || c.subLord || "Unknown",
+            SubSubLord: c.sub_sub_lord || c.subSubLord || "Unknown"
+          };
+        });
       } else if (astrologyData?.kp?.cusps && Array.isArray(astrologyData.kp.cusps)) {
-        kpCuspsList = astrologyData.kp.cusps.map((c: any) => ({
-          houseNumber: c.houseNumber || c.house_number || 1,
-          sign: c.sign,
-          degree: c.degree !== undefined ? c.degree : c.longitude !== undefined ? c.longitude : 0,
-          longitude: c.longitude !== undefined ? c.longitude : 0,
-          starLord: c.starLord || c.star_lord || "Unknown",
-          subLord: c.subLord || c.sub_lord || "Unknown",
-          subSubLord: c.subSubLord || c.sub_sub_lord || "Unknown",
-          signLord: c.signLord || c.sign_lord || "Unknown"
-        }));
+        kpCuspsList = astrologyData.kp.cusps.map((c: any) => {
+          const cuspNo = c.houseNumber || c.house_number || 1;
+          const absLong = c.longitude !== undefined ? c.longitude : 0;
+          const degInSign = c.degree !== undefined ? c.degree : (c.longitude !== undefined ? c.longitude % 30 : 0);
+          return {
+            CuspNo: cuspNo,
+            AbsoluteLongitude: absLong,
+            ZodiacSign: c.sign || "Unknown",
+            DegreeInSign: degInSign,
+            SignLord: c.signLord || c.sign_lord || "Unknown",
+            StarLord: c.starLord || c.star_lord || "Unknown",
+            SubLord: c.subLord || c.sub_lord || "Unknown",
+            SubSubLord: c.subSubLord || c.sub_sub_lord || "Unknown"
+          };
+        });
       } else if (astrologyData?.kpCusps?.cusps && Array.isArray(astrologyData.kpCusps.cusps)) {
-        kpCuspsList = astrologyData.kpCusps.cusps.map((c: any) => ({
-          houseNumber: c.houseNumber || c.house_number || 1,
-          sign: c.sign,
-          degree: c.degree !== undefined ? c.degree : c.longitude !== undefined ? c.longitude : 0,
-          longitude: c.longitude !== undefined ? c.longitude : 0,
-          starLord: c.starLord || c.star_lord || "Unknown",
-          subLord: c.subLord || c.sub_lord || "Unknown",
-          subSubLord: c.subSubLord || c.sub_sub_lord || "Unknown",
-          signLord: c.signLord || c.sign_lord || "Unknown"
-        }));
+        kpCuspsList = astrologyData.kpCusps.cusps.map((c: any) => {
+          const cuspNo = c.houseNumber || c.house_number || 1;
+          const absLong = c.longitude !== undefined ? c.longitude : 0;
+          const degInSign = c.degree !== undefined ? c.degree : (c.longitude !== undefined ? c.longitude % 30 : 0);
+          return {
+            CuspNo: cuspNo,
+            AbsoluteLongitude: absLong,
+            ZodiacSign: c.sign || "Unknown",
+            DegreeInSign: degInSign,
+            SignLord: c.signLord || c.sign_lord || "Unknown",
+            StarLord: c.starLord || c.star_lord || "Unknown",
+            SubLord: c.subLord || c.sub_lord || "Unknown",
+            SubSubLord: c.subSubLord || c.sub_sub_lord || "Unknown"
+          };
+        });
       }
 
+      // Helper to match and query Vedic/astrological planet particulars to enrich the dataset
+      const getPlanetCoordinates = (pName: string, kpP: any) => {
+        const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets || {};
+        const normalizedQuery = pName.toLowerCase().replace(/[^a-z]/g, "");
+        const foundKey = Object.keys(planetsObj).find(k => k.toLowerCase().replace(/[^a-z]/g, "").startsWith(normalizedQuery) || normalizedQuery.startsWith(k.toLowerCase().replace(/[^a-z]/g, "")));
+        const vP = foundKey ? planetsObj[foundKey] : null;
+
+        const absLong = vP?.longitude !== undefined 
+          ? vP.longitude 
+          : kpP?.longitude !== undefined 
+            ? kpP.longitude 
+            : (kpP?.degree !== undefined ? (SIGN_NAMES.indexOf(kpP.sign) * 30 + kpP.degree) : (SIGN_NAMES.indexOf(kpP?.sign || kpP?.zodiacSign || "Aries") * 30));
+
+        const degInSign = vP?.degree !== undefined 
+          ? vP.degree + (vP.minute || 0) / 60
+          : kpP?.degree !== undefined 
+            ? kpP.degree 
+            : (absLong % 30);
+
+        const retrogradeVal = kpP?.isRetrograde || kpP?.retrograde || vP?.retrograde || vP?.isRetrograde ? "Yes" : "No";
+        const combustVal = kpP?.isCombust || kpP?.combust || vP?.combust || vP?.isCombust ? "Yes" : "No";
+
+        const signLordVal = kpP?.signLord || kpP?.sign_lord || vP?.signLord || vP?.sign_lord || SIGN_LORDS[SIGN_NAMES.indexOf(kpP?.sign || "Aries")] || "Unknown";
+
+        return {
+          AbsoluteLongitude: absLong,
+          DegreeInSign: degInSign,
+          Retrograde: retrogradeVal,
+          Combust: combustVal,
+          SignLord: signLordVal
+        };
+      };
+
       if (kpProfile && kpProfile.planets && Object.keys(kpProfile.planets).length > 0) {
-        kpPlanetsList = Object.entries(kpProfile.planets).map(([name, p]: [string, any]) => ({
-          name,
-          sign: p.sign,
-          house: p.house,
-          starLord: p.star_lord || "Unknown",
-          subLord: p.sub_lord || "Unknown",
-          subSubLord: p.sub_sub_lord || "Unknown",
-          isRetrograde: p.retrograde || false,
-          ownership: p.ownership,
-          signLord: p.sign_lord || "Unknown"
-        }));
+        kpPlanetsList = Object.entries(kpProfile.planets).map(([name, p]: [string, any]) => {
+          const coords = getPlanetCoordinates(name, p);
+          return {
+            Planet: name,
+            AbsoluteLongitude: coords.AbsoluteLongitude,
+            ZodiacSign: p.sign || "Unknown",
+            DegreeInSign: coords.DegreeInSign,
+            OccupiedHouse: p.house || 1,
+            SignLord: coords.SignLord,
+            StarLord: p.star_lord || "Unknown",
+            SubLord: p.sub_lord || "Unknown",
+            SubSubLord: p.sub_sub_lord || "Unknown",
+            OwnedHouses: p.ownership,
+            Retrograde: coords.Retrograde,
+            Combust: coords.Combust
+          };
+        });
       } else if (astrologyData?.kp?.planets && Array.isArray(astrologyData.kp.planets)) {
-        kpPlanetsList = astrologyData.kp.planets.map((p: any) => ({
-          name: p.name || p.lord || "Unknown",
-          sign: p.sign,
-          house: p.house,
-          starLord: p.starLord || p.star_lord || "Unknown",
-          subLord: p.subLord || p.sub_lord || "Unknown",
-          subSubLord: p.subSubLord || p.sub_sub_lord || "Unknown",
-          isRetrograde: p.isRetrograde || p.retrograde || false,
-          ownership: p.ownership,
-          signLord: p.signLord || p.sign_lord || "Unknown"
-        }));
+        kpPlanetsList = astrologyData.kp.planets.map((p: any) => {
+          const name = p.name || p.lord || "Unknown";
+          const coords = getPlanetCoordinates(name, p);
+          return {
+            Planet: name,
+            AbsoluteLongitude: coords.AbsoluteLongitude,
+            ZodiacSign: p.sign || "Unknown",
+            DegreeInSign: coords.DegreeInSign,
+            OccupiedHouse: p.house || 1,
+            SignLord: coords.SignLord,
+            StarLord: p.starLord || p.star_lord || "Unknown",
+            SubLord: p.subLord || p.sub_lord || "Unknown",
+            SubSubLord: p.subSubLord || p.sub_sub_lord || "Unknown",
+            OwnedHouses: p.ownership,
+            Retrograde: coords.Retrograde,
+            Combust: coords.Combust
+          };
+        });
       } else if (astrologyData?.kpChart?.planets && Array.isArray(astrologyData.kpChart.planets)) {
-        kpPlanetsList = astrologyData.kpChart.planets.map((p: any) => ({
-          name: p.name || p.lord || "Unknown",
-          sign: p.sign,
-          house: p.house,
-          starLord: p.starLord || p.star_lord || "Unknown",
-          subLord: p.subLord || p.sub_lord || "Unknown",
-          subSubLord: p.subSubLord || p.sub_sub_lord || "Unknown",
-          isRetrograde: p.isRetrograde || p.retrograde || false,
-          ownership: p.ownership,
-          signLord: p.signLord || p.sign_lord || "Unknown"
-        }));
+        kpPlanetsList = astrologyData.kpChart.planets.map((p: any) => {
+          const name = p.name || p.lord || "Unknown";
+          const coords = getPlanetCoordinates(name, p);
+          return {
+            Planet: name,
+            AbsoluteLongitude: coords.AbsoluteLongitude,
+            ZodiacSign: p.sign || "Unknown",
+            DegreeInSign: coords.DegreeInSign,
+            OccupiedHouse: p.house || 1,
+            SignLord: coords.SignLord,
+            StarLord: p.starLord || p.star_lord || "Unknown",
+            SubLord: p.subLord || p.sub_lord || "Unknown",
+            SubSubLord: p.subSubLord || p.sub_sub_lord || "Unknown",
+            OwnedHouses: p.ownership,
+            Retrograde: coords.Retrograde,
+            Combust: coords.Combust
+          };
+        });
       } else if (planetsArray && Array.isArray(planetsArray)) {
-        kpPlanetsList = planetsArray.map((p: any) => ({
-          name: p.name || p.lord || "Unknown",
-          sign: p.sign,
-          house: p.house,
-          starLord: p.starLord || p.star_lord || "Unknown",
-          subLord: p.subLord || p.sub_lord || "Unknown",
-          subSubLord: p.subSubLord || p.sub_sub_lord || "Unknown",
-          isRetrograde: p.retrograde || false
-        }));
+        kpPlanetsList = planetsArray.map((p: any) => {
+          const coords = getPlanetCoordinates(p.name || p.lord || "Unknown", p);
+          return {
+            Planet: p.name || p.lord || "Unknown",
+            AbsoluteLongitude: coords.AbsoluteLongitude,
+            ZodiacSign: p.sign || "Unknown",
+            DegreeInSign: coords.DegreeInSign,
+            OccupiedHouse: p.house || 1,
+            SignLord: coords.SignLord,
+            StarLord: p.starLord || p.star_lord || "Unknown",
+            SubLord: p.subLord || p.sub_lord || "Unknown",
+            SubSubLord: p.subSubLord || p.sub_sub_lord || "Unknown",
+            OwnedHouses: p.ownership,
+            Retrograde: coords.Retrograde,
+            Combust: coords.Combust
+          };
+        });
       }
 
       // High-integrity offline static fallbacks if both data channels are silent
       if (kpCuspsList.length === 0) {
         for (let h = 1; h <= 12; h++) {
           kpCuspsList.push({
-            houseNumber: h,
-            sign: ["Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces", "Aries", "Taurus", "Gemini"][(h - 1) % 12],
-            degree: 12.35,
-            longitude: 12.35,
-            starLord: ["Saturn", "Ketu", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Mercury", "Venus"][(h - 1) % 9],
-            subLord: ["Mercury", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Ketu"][(h - 1) % 9],
-            subSubLord: "Venus",
-            signLord: SIGN_LORDS[(h - 1) % 12]
+            CuspNo: h,
+            AbsoluteLongitude: 12.35,
+            ZodiacSign: ["Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces", "Aries", "Taurus", "Gemini"][(h - 1) % 12],
+            DegreeInSign: 12.35,
+            SignLord: SIGN_LORDS[(h - 1) % 12],
+            StarLord: ["Saturn", "Ketu", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Mercury", "Venus"][(h - 1) % 9],
+            SubLord: ["Mercury", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Ketu"][(h - 1) % 9],
+            SubSubLord: "Venus"
           });
         }
       }
 
       if (kpPlanetsList.length === 0) {
         const kpPlanetsNames = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
-        kpPlanetsList = kpPlanetsNames.map((name, idx) => ({
-          name,
-          sign: ["Virgo", "Gemini", "Libra", "Virgo", "Scorpio", "Leo", "Aquarius", "Virgo", "Pisces"][idx],
-          house: [12, 9, 1, 12, 2, 11, 5, 12, 6][idx],
-          starLord: ["Mars", "Rahu", "Mars", "Moon", "Saturn", "Venus", "Jupiter", "Sun", "Saturn"][idx],
-          subLord: ["Jupiter", "Mercury", "Sun", "Saturn", "Rahu", "Moon", "Mercury", "Saturn", "Saturn"][idx],
-          subSubLord: "Venus",
-          isRetrograde: ["Saturn", "Rahu", "Ketu"].includes(name),
-          signLord: SIGN_LORDS[SIGN_NAMES.indexOf(["Virgo", "Gemini", "Libra", "Virgo", "Scorpio", "Leo", "Aquarius", "Virgo", "Pisces"][idx])]
-        }));
+        kpPlanetsList = kpPlanetsNames.map((name, idx) => {
+          const signVal = ["Virgo", "Gemini", "Libra", "Virgo", "Scorpio", "Leo", "Aquarius", "Virgo", "Pisces"][idx];
+          const houseVal = [12, 9, 1, 12, 2, 11, 5, 12, 6][idx];
+          const absLong = (SIGN_NAMES.indexOf(signVal) * 30) + 15;
+          const isRetroVal = ["Saturn", "Rahu", "Ketu"].includes(name) ? "Yes" : "No";
+          const isCombustVal = name === "Mercury" ? "Yes" : "No";
+          return {
+            Planet: name,
+            AbsoluteLongitude: absLong,
+            ZodiacSign: signVal,
+            DegreeInSign: 15.0,
+            OccupiedHouse: houseVal,
+            SignLord: SIGN_LORDS[SIGN_NAMES.indexOf(signVal)],
+            StarLord: ["Mars", "Rahu", "Mars", "Moon", "Saturn", "Venus", "Jupiter", "Sun", "Saturn"][idx],
+            SubLord: ["Jupiter", "Mercury", "Sun", "Saturn", "Rahu", "Moon", "Mercury", "Saturn", "Saturn"][idx],
+            SubSubLord: "Venus",
+            OwnedHouses: null,
+            Retrograde: isRetroVal,
+            Combust: isCombustVal
+          };
+        });
       }
 
       return (
-        <div className="space-y-6 text-xs">
+        <div className="space-y-6 text-xs animate-fade-in">
           <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
             <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider border-b border-slate-800 pb-1.5">
-              I. KP House Cusps (Placidus Stellar Division)
+              I. KP House Cusps (Placidus Stellar Division) [Table: KP_CUSPS]
             </h5>
             <div className="overflow-x-auto">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider">
-                    <th className="py-2 px-3">Cusp / Bhava</th>
-                    <th className="py-2 px-3">Zodiac Sign</th>
-                    <th className="py-2 px-3">Deg within Sign</th>
-                    <th className="py-2 px-3 text-amber-500">Sign Lord</th>
-                    <th className="py-2 px-3 text-yellow-400">Star Lord</th>
-                    <th className="py-2 px-3 text-indigo-400">Sub Lord (CSL)</th>
-                    <th className="py-2 px-3 text-emerald-400">Sub-Sub Lord</th>
+                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
+                    <th className="py-2.5 px-3">CuspNo</th>
+                    <th className="py-2.5 px-3">AbsoluteLongitude</th>
+                    <th className="py-2.5 px-3">ZodiacSign</th>
+                    <th className="py-2.5 px-3">DegreeInSign</th>
+                    <th className="py-2.5 px-3 text-amber-500">SignLord</th>
+                    <th className="py-2.5 px-3 text-yellow-400">StarLord</th>
+                    <th className="py-2.5 px-3 text-indigo-400">SubLord (CSL)</th>
+                    <th className="py-2.5 px-3 text-emerald-400">SubSubLord</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/20">
+                <tbody className="divide-y divide-slate-800/20 font-mono">
                   {kpCuspsList.map((c: any, idx: number) => {
-                    const sIdx = SIGN_NAMES.indexOf(c.sign);
-                    const calculatedSignLord = c.signLord && c.sign_lord !== "Unknown" ? c.sign_lord : c.signLord && c.signLord !== "Unknown" ? c.signLord : SIGN_LORDS[sIdx] || "Unknown";
                     return (
                       <tr key={idx} className="hover:bg-slate-900/30">
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-300 font-mono font-bold">Cusp {c.houseNumber}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-300 font-sans">{c.sign}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-300 font-mono">{typeof c.degree === "number" ? c.degree.toFixed(4) : c.degree}°</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-amber-500 font-semibold">{calculatedSignLord}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-yellow-400/90 font-medium">{c.starLord}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-indigo-400 font-bold">{c.subLord}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-emerald-400/80">{c.subSubLord || "Saturn"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300 font-bold">Cusp {c.CuspNo}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{typeof c.AbsoluteLongitude === "number" ? c.AbsoluteLongitude.toFixed(4) : c.AbsoluteLongitude}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-200 font-sans font-semibold">{c.ZodiacSign}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{typeof c.DegreeInSign === "number" ? c.DegreeInSign.toFixed(4) : c.DegreeInSign}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-semibold">{c.SignLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-yellow-400/90 font-medium">{c.StarLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400 font-bold">{c.SubLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400/80">{c.SubSubLord || "Saturn"}</td>
                       </tr>
                     );
                   })}
@@ -667,47 +756,61 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
 
           <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
             <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider border-b border-slate-800 pb-1.5">
-              II. KP Planets (Stellar Placement Coordinates)
+              II. KP Planets (Stellar Placement Coordinates) [Table: KP_PLANETS]
             </h5>
             <div className="overflow-x-auto">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider">
-                    <th className="py-2 px-3">Graha (Planet)</th>
-                    <th className="py-2 px-3">Zodiac Sign</th>
-                    <th className="py-2 px-3">Occupied House</th>
-                    <th className="py-2 px-3 text-amber-500">Sign Lord</th>
-                    <th className="py-2 px-3 text-yellow-400">Star Lord</th>
-                    <th className="py-2 px-3 text-indigo-400">Sub Lord (PSL)</th>
-                    <th className="py-2 px-3 text-emerald-400">Sub-Sub Lord</th>
-                    <th className="py-2 px-3">Ownership (Houses)</th>
+                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
+                    <th className="py-2.5 px-3">Planet</th>
+                    <th className="py-2.5 px-3">AbsoluteLongitude</th>
+                    <th className="py-2.5 px-3">ZodiacSign</th>
+                    <th className="py-2.5 px-3">DegreeInSign</th>
+                    <th className="py-2.5 px-3">OccupiedHouse</th>
+                    <th className="py-2.5 px-3 text-amber-500">SignLord</th>
+                    <th className="py-2.5 px-3 text-yellow-400">StarLord</th>
+                    <th className="py-2.5 px-3 text-indigo-400">SubLord (PSL)</th>
+                    <th className="py-2.5 px-3 text-emerald-400">SubSubLord</th>
+                    <th className="py-2.5 px-3 text-slate-400">OwnedHouses</th>
+                    <th className="py-2.5 px-3 text-rose-400">Retrograde</th>
+                    <th className="py-2.5 px-3 text-orange-400">Combust</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/20">
+                <tbody className="divide-y divide-slate-800/20 font-mono">
                   {kpPlanetsList.map((p: any, idx: number) => {
-                    const sIdx = SIGN_NAMES.indexOf(p.sign);
-                    const calculatedSignLord = p.sign_lord && p.sign_lord !== "Unknown" ? p.sign_lord : p.signLord && p.signLord !== "Unknown" ? p.signLord : SIGN_LORDS[sIdx] || "Unknown";
-                    const ownedHousesStr = Array.isArray(p.ownership)
-                      ? p.ownership.join(", ")
-                      : p.ownership
-                        ? String(p.ownership)
-                        : SIGN_LORDS.map((lord, idx) => lord === p.name ? (idx - (SIGN_NAMES.indexOf(profile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.sign || "Cancer") || 0) + 12) % 12 + 1 : -1)
+                    const ownedHousesStr = Array.isArray(p.OwnedHouses)
+                      ? p.OwnedHouses.join(", ")
+                      : p.OwnedHouses
+                        ? String(p.OwnedHouses)
+                        : SIGN_LORDS.map((lord, idx) => lord === p.Planet ? (idx - (SIGN_NAMES.indexOf(profile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.sign || "Cancer") || 0) + 12) % 12 + 1 : -1)
                             .filter(h => h !== -1 && h > 0)
                             .sort((a,b) => a-b)
                             .join(", ");
 
                     return (
                       <tr key={idx} className="hover:bg-slate-900/30">
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-amber-500 font-bold">
-                          {p.name} {p.isRetrograde && <span className="text-[9px] text-red-400 font-normal italic">(R)</span>}
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-bold font-sans">
+                          {p.Planet}
                         </td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-300 font-sans">{p.sign}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-300 font-mono">House {p.house}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-amber-500 font-semibold">{calculatedSignLord}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-yellow-400/90 font-medium">{p.starLord}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-indigo-400 font-bold">{p.subLord}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-emerald-400/80">{p.subSubLord || "Saturn"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-400 font-mono">{ownedHousesStr || "None"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{typeof p.AbsoluteLongitude === "number" ? p.AbsoluteLongitude.toFixed(4) : p.AbsoluteLongitude}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-200 font-sans font-semibold">{p.ZodiacSign}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{typeof p.DegreeInSign === "number" ? p.DegreeInSign.toFixed(4) : p.DegreeInSign}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300 font-bold">House {p.OccupiedHouse}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-semibold">{p.SignLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-yellow-400/90 font-medium">{p.StarLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400 font-bold">{p.SubLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400/80">{p.SubSubLord || "Saturn"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{ownedHousesStr || "None"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.Retrograde === "Yes" ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : "text-slate-500"}`}>
+                            {p.Retrograde}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.Combust === "Yes" ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" : "text-slate-500"}`}>
+                            {p.Combust}
+                          </span>
+                        </td>
                       </tr>
                     );
                   })}
@@ -756,12 +859,40 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
         };
       }
 
+      // Schema mappings to KP_PLANET_SIGNIFICATORS
+      const planetSignificatorsList = planetsList.map((pName) => {
+        const raw = pSigs[pName] || {};
+        return {
+          Planet: pName,
+          L1: raw.level1 || raw.L1 || [],
+          L2: raw.level2 || raw.L2 || [],
+          L3: raw.level3 || raw.L3 || [],
+          L4: raw.level4 || raw.L4 || [],
+          L5: raw.level5 || raw.L5 || [],
+          L6: raw.level6 || raw.L6 || []
+        };
+      });
+
+      // Schema mappings to KP_HOUSE_SIGNIFICATORS
+      const houseSignificatorsList = Array.from({ length: 12 }, (_, i) => i + 1).map((hNum) => {
+        const raw = hSigs[hNum] || hSigs[String(hNum)] || {};
+        return {
+          House: hNum,
+          L1: raw.level1 || raw.L1 || [],
+          L2: raw.level2 || raw.L2 || [],
+          L3: raw.level3 || raw.L3 || [],
+          L4: raw.level4 || raw.L4 || [],
+          L5: raw.level5 || raw.L5 || [],
+          L6: raw.level6 || raw.L6 || []
+        };
+      });
+
       return (
-        <div className="space-y-6 text-xs">
+        <div className="space-y-6 text-xs animate-fade-in">
           <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
             <div className="flex justify-between items-center border-b border-slate-800 pb-1.5 flex-wrap gap-2">
               <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider">
-                I. Planet Significators (Grahas mapped to House significations)
+                I. Planet Significators [Table: KP_PLANET_SIGNIFICATORS]
               </h5>
               <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
                 Levels 1-6 Cusp Outputs
@@ -770,28 +901,27 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
             <div className="overflow-x-auto">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider">
-                    <th className="py-2 px-3">Graha (Planet)</th>
-                    <th className="py-2 px-3 text-emerald-400" title="Star Lord's Occupied House">L1 (Strongest)</th>
-                    <th className="py-2 px-3 text-teal-400" title="Planet's Occupied House">L2 (Strong)</th>
-                    <th className="py-2 px-3 text-slate-300" title="Star Lord's Owned Houses">L3 (Moderate)</th>
-                    <th className="py-2 px-3 text-slate-300" title="Planet's Owned Houses">L4 (Weak)</th>
-                    <th className="py-2 px-3 text-indigo-400" title="Sub Lord's Occupied House">L5 (Sub-level)</th>
-                    <th className="py-2 px-3 text-slate-500" title="Sub Lord's Owned Houses">L6 (Sub-level)</th>
+                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
+                    <th className="py-2.5 px-3">Planet</th>
+                    <th className="py-2.5 px-3 text-emerald-400">L1</th>
+                    <th className="py-2.5 px-3 text-teal-400">L2</th>
+                    <th className="py-2.5 px-3 text-slate-300">L3</th>
+                    <th className="py-2.5 px-3 text-slate-300">L4</th>
+                    <th className="py-2.5 px-3 text-indigo-400">L5</th>
+                    <th className="py-2.5 px-3 text-slate-500">L6</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/20">
-                  {planetsList.map((pName) => {
-                    const sig = pSigs[pName] || { level1: [], level2: [], level3: [], level4: [], level5: [], level6: [] };
+                <tbody className="divide-y divide-slate-800/20 font-mono">
+                  {planetSignificatorsList.map((sig) => {
                     return (
-                      <tr key={pName} className="hover:bg-slate-900/30">
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-amber-500 font-bold font-sans">{pName}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-emerald-400 font-bold font-mono">{sig.level1?.join(", ") || "-"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-teal-400 font-semibold font-mono">{sig.level2?.join(", ") || "-"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-300 font-mono">{sig.level3?.join(", ") || "-"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-300 font-mono">{sig.level4?.join(", ") || "-"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-indigo-400 font-mono">{sig.level5?.join(", ") || "-"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-400 font-mono">{sig.level6?.join(", ") || "-"}</td>
+                      <tr key={sig.Planet} className="hover:bg-slate-900/30">
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-bold font-sans">{sig.Planet}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400 font-bold">{sig.L1.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-teal-400 font-semibold">{sig.L2.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L3.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L4.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400">{sig.L5.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{sig.L6.join(", ") || "-"}</td>
                       </tr>
                     );
                   })}
@@ -803,7 +933,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
           <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
             <div className="flex justify-between items-center border-b border-slate-800 pb-1.5 flex-wrap gap-2">
               <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider">
-                II. House Significators (Houses mapped to Planet significations)
+                II. House Significators [Table: KP_HOUSE_SIGNIFICATORS]
               </h5>
               <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
                 Reverse Lookup Map
@@ -812,28 +942,27 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
             <div className="overflow-x-auto">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider">
-                    <th className="py-2 px-3">House (Bhava)</th>
-                    <th className="py-2 px-3 text-emerald-400">L1 (Strongest)</th>
-                    <th className="py-2 px-3 text-teal-400">L2 (Strong)</th>
-                    <th className="py-2 px-3 text-slate-300">L3 (Moderate)</th>
-                    <th className="py-2 px-3 text-slate-300">L4 (Weak)</th>
-                    <th className="py-2 px-3 text-indigo-400">L5 (Sub-level)</th>
-                    <th className="py-2 px-3 text-slate-500">L6 (Sub-level)</th>
+                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
+                    <th className="py-2.5 px-3">House</th>
+                    <th className="py-2.5 px-3 text-emerald-400">L1</th>
+                    <th className="py-2.5 px-3 text-teal-400">L2</th>
+                    <th className="py-2.5 px-3 text-slate-300">L3</th>
+                    <th className="py-2.5 px-3 text-slate-300">L4</th>
+                    <th className="py-2.5 px-3 text-indigo-400">L5</th>
+                    <th className="py-2.5 px-3 text-slate-500">L6</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/20">
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map((hNum) => {
-                    const sig = hSigs[hNum] || hSigs[String(hNum)] || { level1: [], level2: [], level3: [], level4: [], level5: [], level6: [] };
+                <tbody className="divide-y divide-slate-800/20 font-mono">
+                  {houseSignificatorsList.map((sig) => {
                     return (
-                      <tr key={hNum} className="hover:bg-slate-900/30">
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-300 font-mono font-bold">House {hNum}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-emerald-400 font-bold font-sans">{sig.level1?.join(", ") || "-"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-teal-400 font-semibold font-sans">{sig.level2?.join(", ") || "-"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-300 font-sans">{sig.level3?.join(", ") || "-"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-300 font-sans">{sig.level4?.join(", ") || "-"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-indigo-400 font-sans">{sig.level5?.join(", ") || "-"}</td>
-                        <td className="py-2 px-3 border-b border-slate-800/40 text-slate-400 font-sans">{sig.level6?.join(", ") || "-"}</td>
+                      <tr key={sig.House} className="hover:bg-slate-900/30">
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300 font-bold font-sans">House {sig.House}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400 font-bold">{sig.L1.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-teal-400 font-semibold">{sig.L2.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L3.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L4.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400">{sig.L5.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{sig.L6.join(", ") || "-"}</td>
                       </tr>
                     );
                   })}

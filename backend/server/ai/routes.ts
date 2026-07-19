@@ -2,6 +2,8 @@ import { Router } from "express";
 import { ProviderFactory } from "./ProviderFactory";
 import { QueryRouter } from "../../../src/features/ask/intent/QueryRouter";
 import { RuleRouter } from "../../../src/features/ask/intent/RuleRouter";
+import fs from "fs";
+import path from "path";
 
 const router = Router();
 
@@ -22,18 +24,36 @@ router.post("/consultation", async (req, res) => {
   }
 
   try {
-    // 1. Determine domain
+    // 1. Read userprofile.json from disk for absolute authoritative and complete page calculations
+    const filePath = path.join(process.cwd(), "Users", "userprofile.json");
+    let userProfile: any = null;
+    if (fs.existsSync(filePath)) {
+      try {
+        const content = fs.readFileSync(filePath, "utf-8");
+        userProfile = JSON.parse(content);
+      } catch (err) {
+        console.error("Failed to parse userprofile.json in consultation:", err);
+      }
+    }
+
+    // Merge incoming horoscopeData withloaded userProfile to ensure absolute completeness
+    const mergedHoroscope = {
+      ...(userProfile || {}),
+      ...(horoscopeData || {})
+    };
+
+    // 2. Determine domain
     const decision = QueryRouter.route(userText);
     const { domain, requiredSystems, requiredDataPoints } = decision;
 
-    // 2. Extract facts from horoscopeData if available
+    // 3. Extract facts from mergedHoroscope if available
     const primaryFactors: any[] = [];
     const missingFactors: any[] = [];
 
-    const horoscope = horoscopeData?.horoscope || {};
-    const panchanga = horoscope.panchanga || {};
-    const rasi = horoscope.divisional_charts?.["D-1_rasi"] || {};
-    const dasha = horoscope.dasha?.current_dasha || {};
+    const horoscope = mergedHoroscope.horoscope || mergedHoroscope.Raw?.JHora?.horoscope?.horoscope || mergedHoroscope || {};
+    const panchanga = horoscope.panchanga || horoscope.calendar_info || {};
+    const rasi = horoscope.divisional_charts?.["D-1_rasi"] || horoscope.divisional_charts?.D1_rasi || {};
+    const dasha = horoscope.dasha?.current_dasha || horoscope.dasha || {};
 
     if (rasi && Object.keys(rasi).length > 0) {
       Object.entries(rasi).forEach(([planet, details]: [string, any]) => {
@@ -119,10 +139,10 @@ router.post("/consultation", async (req, res) => {
       });
     }
 
-    // 3. Get relevant rules from RuleRouter
+    // 4. Get relevant rules from RuleRouter
     const activeRules = RuleRouter.getRulesForDomain(domain);
 
-    // 4. Construct ReasoningContext
+    // 5. Construct ReasoningContext
     const reasoningContext = {
       intent: domain,
       domain: domain,
@@ -132,22 +152,34 @@ router.post("/consultation", async (req, res) => {
         time: profile.time,
         place: profile.place,
         gender: profile.gender
-      } : null,
+      } : (mergedHoroscope.BirthDetails || mergedHoroscope.Birth || null),
       requiredSystems: requiredSystems,
       chartFacts: filteredPrimaryFactors,
       currentSky: panchanga,
       activePeriods: dasha,
       ruleGroups: activeRules.map(r => `${r.groupName} - ${r.ruleTitle}: ${r.description}`),
+      completeAstrologyData: mergedHoroscope, // Dynamic loading of all page calculations
       lifeContext: userText,
       conversationHistory: precedingMessages ? precedingMessages.slice(-5).map((m: any) => `${m.role}: ${m.content}`) : []
     };
 
-    const promptText = `You are JHoraAI, the world's most advanced professional astrology system. You have received the following ReasoningContext from the Query Router and Rule Engine.
+    const promptText = `You are JHoraAI, the world's most advanced professional astrology system. You have received the following ReasoningContext containing complete, rich calculations across all dashboard pages and subsystems (Vedic/JHora, KP stellar, Jaimini, Lal Kitab, Tajika, and Western).
 
 ReasoningContext:
 ${JSON.stringify(reasoningContext, null, 2)}
 
-Your responsibility is to analyze the user's inquiry based strictly on the provided chartFacts, activePeriods, and ruleGroups. You must NEVER answer from generic knowledge or invent chart values if they are not in the ReasoningContext.
+Your responsibility is to analyze the user's inquiry based strictly on the provided ReasoningContext, including the extremely rich completeAstrologyData which contains the full live calculations state of all screens and pages in the application.
+
+You are fully trained to read, interpret, and synthesize ALL of the user's page data:
+- Vedic Natal Coordinates & Divisional Charts (D-1 Rasi, D-9 Navamsa, D-10 Dasamsa, etc.)
+- Active Vimshottari/Ashtottari/Yogini dasha tables and planetary periods
+- KP Stellar Dashboard (Placidus cusps, cuspal sub-lords, planet sub-lords, and significations)
+- Jaimini Chara Karakas, Arudha Padas, and special Lagnas
+- Lal Kitab Tevas & Pucca Ghars
+- Tajik Varshaphal and Year Lord strengths
+- Western Astrology placements and aspect orbs
+
+Answer any questions the user asks with extreme specificity, referencing appropriate tables (JH1-JH19), house and sign lords, degrees, and rule books, regardless of which page or sub-system the query comes from.
 
 Every response MUST be highly professional and structured exactly with these headers (using markdown '### ' headers):
 ### Summary
