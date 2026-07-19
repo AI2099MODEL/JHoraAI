@@ -1,0 +1,107 @@
+{
+  "schema": {
+    "name": "Static Dasha Systems",
+    "version": "1.0.0",
+    "description": "Master catalog of all supported Dasha systems and their immutable properties."
+  },
+
+  "supported_dasha_systems": [
+    "Vimshottari",
+    "Yogini",
+    "Ashtottari",
+    "Kalachakra",
+    "Chara",
+    "Narayana",
+    "Shoola",
+    "Mandooka",
+    "Drig",
+    "Tara",
+    "Naisargika",
+    "Panchottari",
+    "Shatabdika",
+    "Dwisaptati Sama",
+    "Shodshottari",
+    "Chaturashiti Sama",
+    "Dwadashottari",
+    "Panchasottari"
+  ],
+
+  "classification": {
+    "nakshatra_based": [
+      "Vimshottari",
+      "Yogini",
+      "Ashtottari",
+      "Kalachakra",
+      "Tara"
+    ],
+    "rashi_based": [
+      "Chara",
+      "Narayana",
+      "Mandooka",
+      "Shoola",
+      "Drig"
+    ],
+    "planet_based": [
+      "Naisargika"
+    ],
+    "conditional": [
+      "Ashtottari",
+      "Panchottari",
+      "Shatabdika",
+      "Dwisaptati Sama",
+      "Shodshottari",
+      "Chaturashiti Sama",
+      "Dwadashottari",
+      "Panchasottari"
+    ]
+  },
+
+  "hierarchy": [
+    "Mahadasha",
+    "Antardasha",
+    "Pratyantardasha",
+    "Sookshma",
+    "Prana",
+    "Deha"
+  ],
+
+  "supported_attributes": [
+    "Name",
+    "Category",
+    "Starting Rule",
+    "Duration",
+    "Planet Sequence",
+    "Sign Sequence",
+    "Eligibility",
+    "Calculation Method",
+    "Hierarchy",
+    "Prediction Weight",
+    "Timing Accuracy",
+    "Supported Charts",
+    "Classical References"
+  ],
+
+  "prediction_usage": [
+    "Life Events",
+    "Marriage",
+    "Career",
+    "Health",
+    "Finance",
+    "Children",
+    "Education",
+    "Travel",
+    "Property",
+    "Spiritual Growth",
+    "Longevity",
+    "Remedies"
+  ],
+
+  "supported_levels": [
+    "Mahadasha",
+    "Bhukti",
+    "Antara",
+    "Sookshma",
+    "Prana",
+    "Deha"
+  ]
+}
