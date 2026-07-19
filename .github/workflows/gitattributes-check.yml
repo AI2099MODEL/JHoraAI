@@ -1,0 +1,110 @@
+name: Binary Asset Protection Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  verify-gitattributes:
+    name: Verify .gitattributes integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Confirm .gitattributes exists
+        run: |
+          if [ ! -f .gitattributes ]; then
+            echo "ERROR: .gitattributes is missing from repository root."
+            exit 1
+          fi
+          echo ".gitattributes found."
+
+      - name: Confirm critical binary patterns are still present
+        run: |
+          required_patterns=(
+            "*.png"
+            "*.jpg"
+            "*.apk"
+            "*.aab"
+            "*.keystore"
+            "*.jks"
+            "*.jar"
+            "*.pdf"
+            "*.docx"
+            "*.xlsx"
+            "*.ttf"
+            "*.sqlite"
+          )
+          missing=0
+          for pattern in "${required_patterns[@]}"; do
+            if ! grep -qF "$pattern" .gitattributes; then
+              echo "MISSING pattern in .gitattributes: $pattern"
+              missing=1
+            fi
+          done
+          if [ "$missing" -eq 1 ]; then
+            echo "ERROR: One or more required binary patterns were removed from .gitattributes."
+            exit 1
+          fi
+          echo "All required binary patterns are present."
+
+      - name: Check that tracked binaries are actually flagged as binary
+        run: |
+          # Uses git check-attr to confirm Git treats known binary
+          # extensions as binary, not text.
+          sample_files=$(git ls-files | grep -E '\.(png|jpg|jpeg|apk|aab|jar|keystore|jks|pdf|docx|xlsx|ttf|sqlite|so)$' || true)
+          if [ -z "$sample_files" ]; then
+            echo "No matching binary files currently tracked — skipping attribute check."
+          else
+            fail=0
+            while IFS= read -r f; do
+              attr=$(git check-attr binary -- "$f" | awk -F': ' '{print $3}')
+              if [ "$attr" != "set" ]; then
+                echo "WARNING: '$f' is not flagged as binary by .gitattributes."
+                fail=1
+              fi
+            done <<< "$sample_files"
+            if [ "$fail" -eq 1 ]; then
+              echo "ERROR: One or more tracked binary files are not covered by .gitattributes."
+              exit 1
+            fi
+            echo "All sampled tracked binary files are correctly flagged."
+          fi
+
+      - name: Verify no unexpected diffs in tracked binaries (PRs only)
+        if: github.event_name == 'pull_request'
+        run: |
+          base_sha="${{ github.event.pull_request.base.sha }}"
+          binary_diffs=$(git diff --name-only "$base_sha" HEAD -- '*.png' '*.jpg' '*.jpeg' '*.apk' '*.aab' '*.jar' '*.keystore' '*.jks' '*.pdf' '*.docx' '*.xlsx' '*.ttf' '*.sqlite' || true)
+          if [ -n "$binary_diffs" ]; then
+            echo "The following binary files changed in this PR — please confirm this is intentional:"
+            echo "$binary_diffs"
+          else
+            echo "No tracked binary assets were modified in this PR."
+          fi
+
+  # Optional: validate checksums for critical assets such as release
+  # keystores. Populate KEYSTORE_SHA256 as a repository secret and
+  # uncomment to enable. Never commit the keystore's expected hash
+  # or the keystore itself in plaintext in the workflow file.
+  #
+  # verify-keystore-checksum:
+  #   name: Verify release keystore checksum
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Compare keystore SHA-256
+  #       env:
+  #         EXPECTED_SHA256: ${{ secrets.KEYSTORE_SHA256 }}
+  #       run: |
+  #         actual=$(sha256sum path/to/release.keystore | awk '{print $1}')
+  #         if [ "$actual" != "$EXPECTED_SHA256" ]; then
+  #           echo "ERROR: Keystore checksum mismatch! Possible corruption or tampering."
+  #           exit 1
+  #         fi
+  #         echo "Keystore checksum verified."
