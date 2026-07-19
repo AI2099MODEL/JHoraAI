@@ -106,52 +106,294 @@ import RulesTerminal from "./components/RulesTerminal";
 // ==========================================================================
 const ThemeStyles = () => (
   <style>{`
-    /* Theme A: Dating App Aesthetic (Blush Pink & Champagne Gold) */
-    [data-app-theme="dating-app"] {
-      --bg-app: #FFF9F9;
-      --bg-card: #FFFFFF;
-      --bg-header: #FFF0F2;
-      --primary: #FF4B72;
-      --primary-hover: #E0355B;
-      --text-main: #3E101B;
-      --text-muted: #8E6872;
-      --border: #FFE3E6;
-      --shadow: 0 4px 20px rgba(255, 75, 114, 0.08);
-      --badge-bg: #FFF0F2;
-      --badge-text: #FF4B72;
-      --accent: #E5C384; /* Champagne gold */
+    /* Global Font Overrides */
+    body, #root, #app-root-container, input, select, button, textarea {
+      font-family: "Space Grotesk", "Inter", sans-serif !important;
+    }
+    h1, h2, h3, h4, .brand-font, .cinzel-font {
+      font-family: "Cinzel", "Space Grotesk", serif !important;
+      letter-spacing: -0.01em;
+    }
+    .font-mono, pre, code, .font-mono * {
+      font-family: "JetBrains Mono", monospace !important;
     }
 
-    /* Theme B: Astro Dark (Deep Space Cosmic Blue) */
-    [data-app-theme="dark"] {
+    /* Theme 1: Cosmic Royal (Midnight Deep Navy & Luxury Amber Gold) */
+    [data-app-theme="cosmic-royal"] {
       --bg-app: #030712;
-      --bg-card: #111827;
-      --bg-header: #1f2937;
-      --primary: #8b5cf6;
-      --primary-hover: #7c3aed;
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --border: #374151;
-      --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-      --badge-bg: #374151;
-      --badge-text: #e5e7eb;
-      --accent: #f59e0b;
+      --bg-card: #0f172a;
+      --bg-header: #1e1b4b;
+      --primary: #fbbf24;
+      --primary-hover: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #312e81;
+      --accent: #10b981;
     }
 
-    /* Theme C: Light Theme */
-    [data-app-theme="light"] {
-      --bg-app: #F9FAFB;
-      --bg-card: #FFFFFF;
-      --bg-header: #F3F4F6;
-      --primary: #4F46E5;
-      --primary-hover: #4338CA;
-      --text-main: #111827;
-      --text-muted: #6B7280;
-      --border: #E5E7EB;
-      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-      --badge-bg: #E5E7EB;
-      --badge-text: #374151;
-      --accent: #D97706;
+    /* Theme 2: Emerald Aura (Sacred Green & Bronze Gold) */
+    [data-app-theme="emerald-aura"] {
+      --bg-app: #022c22;
+      --bg-card: #064e3b;
+      --bg-header: #042f2e;
+      --primary: #fbbf24;
+      --primary-hover: #eab308;
+      --text-main: #f0fdf4;
+      --text-muted: #a7f3d0;
+      --border: #0f766e;
+      --accent: #2dd4bf;
+    }
+
+    /* Theme 3: Deep Amethyst (Regal Velvet Plum & Orchid Lotus) */
+    [data-app-theme="deep-amethyst"] {
+      --bg-app: #1e1b4b;
+      --bg-card: #312e81;
+      --bg-header: #1e1b4b;
+      --primary: #f59e0b;
+      --primary-hover: #e08e06;
+      --text-main: #faf5ff;
+      --text-muted: #e9d5ff;
+      --border: #4338ca;
+      --accent: #d946ef;
+    }
+
+    /* Theme 4: Vedic Sandalwood (Warm Saffron & Terracotta Cream) */
+    [data-app-theme="vedic-sandalwood"] {
+      --bg-app: #fcf9f2;
+      --bg-card: #ffffff;
+      --bg-header: #f3eccb;
+      --primary: #ea580c;
+      --primary-hover: #c2410c;
+      --text-main: #1c1303;
+      --text-muted: #6b5c43;
+      --border: #e2d5b6;
+      --accent: #0369a1;
+    }
+
+    /* Dynamic CSS Color Overrides to apply color values to standard Tailwind utilities */
+
+    /* COSMIC ROYAL OVERRIDES */
+    [data-app-theme="cosmic-royal"].bg-slate-950,
+    [data-app-theme="cosmic-royal"] .bg-slate-950 {
+      background-color: #030712 !important;
+    }
+    [data-app-theme="cosmic-royal"] .bg-slate-900,
+    [data-app-theme="cosmic-royal"] .bg-slate-900\/60,
+    [data-app-theme="cosmic-royal"] .bg-slate-900\/40,
+    [data-app-theme="cosmic-royal"] .bg-slate-900\/80,
+    [data-app-theme="cosmic-royal"] .bg-slate-950\/30,
+    [data-app-theme="cosmic-royal"] .bg-slate-950\/70,
+    [data-app-theme="cosmic-royal"] .bg-slate-950\/65,
+    [data-app-theme="cosmic-royal"] .bg-slate-950\/60,
+    [data-app-theme="cosmic-royal"] .bg-slate-950\/80,
+    [data-app-theme="cosmic-royal"] .bg-slate-950\/20,
+    [data-app-theme="cosmic-royal"] .bg-slate-950\/50,
+    [data-app-theme="cosmic-royal"] .bg-slate-900\/50,
+    [data-app-theme="cosmic-royal"] .bg-slate-900\/30,
+    [data-app-theme="cosmic-royal"] .bg-slate-950\/40,
+    [data-app-theme="cosmic-royal"] .bg-indigo-950\/40,
+    [data-app-theme="cosmic-royal"] .bg-indigo-900\/20 {
+      background-color: #0f172a !important;
+      border-color: #1e293b !important;
+    }
+    [data-app-theme="cosmic-royal"] header,
+    [data-app-theme="cosmic-royal"] #navigation-rail-sidebar,
+    [data-app-theme="cosmic-royal"] #navigation-rail-drawer {
+      background-color: #111827 !important;
+      border-color: #1e293b !important;
+    }
+    [data-app-theme="cosmic-royal"] .text-amber-500,
+    [data-app-theme="cosmic-royal"] .text-amber-400,
+    [data-app-theme="cosmic-royal"] .text-amber-300,
+    [data-app-theme="cosmic-royal"] .text-indigo-400,
+    [data-app-theme="cosmic-royal"] .text-indigo-300 {
+      color: #fbbf24 !important;
+    }
+    [data-app-theme="cosmic-royal"] .bg-amber-500,
+    [data-app-theme="cosmic-royal"] .bg-indigo-600 {
+      background-color: #fbbf24 !important;
+      color: #030712 !important;
+    }
+    [data-app-theme="cosmic-royal"] .bg-amber-500:hover,
+    [data-app-theme="cosmic-royal"] .bg-indigo-600:hover {
+      background-color: #f59e0b !important;
+    }
+    [data-app-theme="cosmic-royal"] .border-slate-800,
+    [data-app-theme="cosmic-royal"] .border-slate-900,
+    [data-app-theme="cosmic-royal"] .border-indigo-500\/10,
+    [data-app-theme="cosmic-royal"] .border-indigo-500\/15,
+    [data-app-theme="cosmic-royal"] .border-indigo-500\/20,
+    [data-app-theme="cosmic-royal"] .border-indigo-500\/30 {
+      border-color: #1e293b !important;
+    }
+
+    /* EMERALD AURA OVERRIDES */
+    [data-app-theme="emerald-aura"].bg-slate-950,
+    [data-app-theme="emerald-aura"] .bg-slate-950 {
+      background-color: #022c22 !important;
+    }
+    [data-app-theme="emerald-aura"] .bg-slate-900,
+    [data-app-theme="emerald-aura"] .bg-slate-900\/60,
+    [data-app-theme="emerald-aura"] .bg-slate-900\/40,
+    [data-app-theme="emerald-aura"] .bg-slate-900\/80,
+    [data-app-theme="emerald-aura"] .bg-slate-950\/30,
+    [data-app-theme="emerald-aura"] .bg-slate-950\/70,
+    [data-app-theme="emerald-aura"] .bg-slate-950\/65,
+    [data-app-theme="emerald-aura"] .bg-slate-950\/60,
+    [data-app-theme="emerald-aura"] .bg-slate-950\/80,
+    [data-app-theme="emerald-aura"] .bg-slate-950\/20,
+    [data-app-theme="emerald-aura"] .bg-slate-950\/50,
+    [data-app-theme="emerald-aura"] .bg-slate-900\/50,
+    [data-app-theme="emerald-aura"] .bg-slate-900\/30,
+    [data-app-theme="emerald-aura"] .bg-slate-950\/40,
+    [data-app-theme="emerald-aura"] .bg-indigo-950\/40,
+    [data-app-theme="emerald-aura"] .bg-indigo-900\/20 {
+      background-color: #064e3b !important;
+      border-color: #0f766e !important;
+      color: #f0fdf4 !important;
+    }
+    [data-app-theme="emerald-aura"] header,
+    [data-app-theme="emerald-aura"] #navigation-rail-sidebar,
+    [data-app-theme="emerald-aura"] #navigation-rail-drawer {
+      background-color: #042f2e !important;
+      border-color: #0f766e !important;
+    }
+    [data-app-theme="emerald-aura"] .text-amber-500,
+    [data-app-theme="emerald-aura"] .text-amber-400,
+    [data-app-theme="emerald-aura"] .text-amber-300,
+    [data-app-theme="emerald-aura"] .text-indigo-400,
+    [data-app-theme="emerald-aura"] .text-indigo-300 {
+      color: #fbbf24 !important;
+    }
+    [data-app-theme="emerald-aura"] .bg-amber-500,
+    [data-app-theme="emerald-aura"] .bg-indigo-600 {
+      background-color: #fbbf24 !important;
+      color: #022c22 !important;
+    }
+    [data-app-theme="emerald-aura"] .bg-amber-500:hover,
+    [data-app-theme="emerald-aura"] .bg-indigo-600:hover {
+      background-color: #eab308 !important;
+    }
+    [data-app-theme="emerald-aura"] .border-slate-800,
+    [data-app-theme="emerald-aura"] .border-slate-900,
+    [data-app-theme="emerald-aura"] .border-indigo-500\/10,
+    [data-app-theme="emerald-aura"] .border-indigo-500\/15,
+    [data-app-theme="emerald-aura"] .border-indigo-500\/20,
+    [data-app-theme="emerald-aura"] .border-indigo-500\/30 {
+      border-color: #0f766e !important;
+    }
+
+    /* DEEP AMETHYST OVERRIDES */
+    [data-app-theme="deep-amethyst"].bg-slate-950,
+    [data-app-theme="deep-amethyst"] .bg-slate-950 {
+      background-color: #1e1b4b !important;
+    }
+    [data-app-theme="deep-amethyst"] .bg-slate-900,
+    [data-app-theme="deep-amethyst"] .bg-slate-900\/60,
+    [data-app-theme="deep-amethyst"] .bg-slate-900\/40,
+    [data-app-theme="deep-amethyst"] .bg-slate-900\/80,
+    [data-app-theme="deep-amethyst"] .bg-slate-950\/30,
+    [data-app-theme="deep-amethyst"] .bg-slate-950\/70,
+    [data-app-theme="deep-amethyst"] .bg-slate-950\/65,
+    [data-app-theme="deep-amethyst"] .bg-slate-950\/60,
+    [data-app-theme="deep-amethyst"] .bg-slate-950\/80,
+    [data-app-theme="deep-amethyst"] .bg-slate-950\/20,
+    [data-app-theme="deep-amethyst"] .bg-slate-950\/50,
+    [data-app-theme="deep-amethyst"] .bg-slate-900\/50,
+    [data-app-theme="deep-amethyst"] .bg-slate-900\/30,
+    [data-app-theme="deep-amethyst"] .bg-slate-950\/40,
+    [data-app-theme="deep-amethyst"] .bg-indigo-950\/40,
+    [data-app-theme="deep-amethyst"] .bg-indigo-900\/20 {
+      background-color: #312e81 !important;
+      border-color: #4338ca !important;
+      color: #faf5ff !important;
+    }
+    [data-app-theme="deep-amethyst"] header,
+    [data-app-theme="deep-amethyst"] #navigation-rail-sidebar,
+    [data-app-theme="deep-amethyst"] #navigation-rail-drawer {
+      background-color: #1e1b4b !important;
+      border-color: #4338ca !important;
+    }
+    [data-app-theme="deep-amethyst"] .text-amber-500,
+    [data-app-theme="deep-amethyst"] .text-amber-400,
+    [data-app-theme="deep-amethyst"] .text-amber-300,
+    [data-app-theme="deep-amethyst"] .text-indigo-400,
+    [data-app-theme="deep-amethyst"] .text-indigo-300 {
+      color: #f59e0b !important;
+    }
+    [data-app-theme="deep-amethyst"] .bg-amber-500,
+    [data-app-theme="deep-amethyst"] .bg-indigo-600 {
+      background-color: #f59e0b !important;
+      color: #1e1b4b !important;
+    }
+    [data-app-theme="deep-amethyst"] .bg-amber-500:hover,
+    [data-app-theme="deep-amethyst"] .bg-indigo-600:hover {
+      background-color: #d97706 !important;
+    }
+    [data-app-theme="deep-amethyst"] .border-slate-800,
+    [data-app-theme="deep-amethyst"] .border-slate-900,
+    [data-app-theme="deep-amethyst"] .border-indigo-500\/10,
+    [data-app-theme="deep-amethyst"] .border-indigo-500\/15,
+    [data-app-theme="deep-amethyst"] .border-indigo-500\/20,
+    [data-app-theme="deep-amethyst"] .border-indigo-500\/30 {
+      border-color: #4338ca !important;
+    }
+
+    /* VEDIC SANDALWOOD OVERRIDES */
+    [data-app-theme="vedic-sandalwood"].bg-slate-950,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-950 {
+      background-color: #fcf9f2 !important;
+      color: #1c1303 !important;
+    }
+    [data-app-theme="vedic-sandalwood"] .bg-slate-900,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-900\/60,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-900\/40,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-900\/80,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-950\/30,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-950\/70,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-950\/65,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-950\/60,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-950\/80,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-950\/20,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-950\/50,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-900\/50,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-900\/30,
+    [data-app-theme="vedic-sandalwood"] .bg-slate-950\/40,
+    [data-app-theme="vedic-sandalwood"] .bg-indigo-950\/40,
+    [data-app-theme="vedic-sandalwood"] .bg-indigo-900\/20 {
+      background-color: #ffffff !important;
+      border-color: #e2d5b6 !important;
+      color: #1c1303 !important;
+    }
+    [data-app-theme="vedic-sandalwood"] header,
+    [data-app-theme="vedic-sandalwood"] #navigation-rail-sidebar,
+    [data-app-theme="vedic-sandalwood"] #navigation-rail-drawer {
+      background-color: #f3eccb !important;
+      border-color: #e2d5b6 !important;
+    }
+    [data-app-theme="vedic-sandalwood"] .text-amber-500,
+    [data-app-theme="vedic-sandalwood"] .text-amber-400,
+    [data-app-theme="vedic-sandalwood"] .text-amber-300,
+    [data-app-theme="vedic-sandalwood"] .text-indigo-400,
+    [data-app-theme="vedic-sandalwood"] .text-indigo-300 {
+      color: #ea580c !important;
+    }
+    [data-app-theme="vedic-sandalwood"] .bg-amber-500,
+    [data-app-theme="vedic-sandalwood"] .bg-indigo-600 {
+      background-color: #ea580c !important;
+      color: #ffffff !important;
+    }
+    [data-app-theme="vedic-sandalwood"] .bg-amber-500:hover,
+    [data-app-theme="vedic-sandalwood"] .bg-indigo-600:hover {
+      background-color: #c2410c !important;
+    }
+    [data-app-theme="vedic-sandalwood"] .border-slate-800,
+    [data-app-theme="vedic-sandalwood"] .border-slate-900,
+    [data-app-theme="vedic-sandalwood"] .border-indigo-500\/10,
+    [data-app-theme="vedic-sandalwood"] .border-indigo-500\/15,
+    [data-app-theme="vedic-sandalwood"] .border-indigo-500\/20,
+    [data-app-theme="vedic-sandalwood"] .border-indigo-500\/30 {
+      border-color: #e2d5b6 !important;
     }
   `}</style>
 );
@@ -198,8 +440,12 @@ export default function App() {
   const [astrologyData, setAstrologyData] = useState<AstrologyData | null>(null);
   
   // Theme and UI States
-  const [theme, setTheme] = useState<"dark" | "light" | "dating-app">(() => {
-    return (localStorage.getItem("jhora_theme") as any) || "light";
+  const [theme, setTheme] = useState<"cosmic-royal" | "emerald-aura" | "deep-amethyst" | "vedic-sandalwood">(() => {
+    const saved = localStorage.getItem("jhora_theme");
+    if (saved === "dark" || saved === "cosmic-royal") return "cosmic-royal";
+    if (saved === "light" || saved === "vedic-sandalwood") return "vedic-sandalwood";
+    if (saved === "dating-app") return "deep-amethyst";
+    return "cosmic-royal";
   });
   const [drawerExpanded, setDrawerExpanded] = useState<boolean>(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
@@ -1148,7 +1394,7 @@ export default function App() {
     setActiveSubMenu(prev => ({ ...prev, settings: "plugin_manager" }));
   };
 
-  const isDark = theme === "dark";
+  const isDark = theme !== "vedic-sandalwood";
 
   // Navigation configuration representing Phase 10 spec
   const MAIN_MENU_STRUCTURE: MainMenuNode[] = [
@@ -1273,32 +1519,22 @@ export default function App() {
   };
 
   // Color theme definitions
-  const isDating = theme === "dating-app";
+  const isDating = false;
   const containerStyle = isDark 
     ? "bg-slate-900/60 border-indigo-500/20 text-slate-100" 
-    : isDating
-      ? "bg-white border-[#FFE3E6] text-[#3E101B] shadow-sm"
-      : "bg-white border-neutral-200 text-neutral-800 shadow-sm";
+    : "bg-white border-neutral-200 text-neutral-800 shadow-sm";
   const cardStyle = isDark 
     ? "bg-slate-950/60 border-slate-800 text-slate-100" 
-    : isDating
-      ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]"
-      : "bg-neutral-50 border-neutral-200 text-neutral-800";
+    : "bg-neutral-50 border-neutral-200 text-neutral-800";
   const textMuted = isDark 
     ? "text-slate-400" 
-    : isDating
-      ? "text-[#8E6872]"
-      : "text-neutral-500";
+    : "text-neutral-500";
   const headingStyle = isDark 
     ? "text-amber-100" 
-    : isDating
-      ? "text-[#FF4B72] font-semibold"
-      : "text-amber-700 font-semibold";
+    : "text-amber-700 font-semibold";
   const borderStyle = isDark 
     ? "border-indigo-500/10" 
-    : isDating
-      ? "border-[#FFE3E6]"
-      : "border-neutral-200";
+    : "border-neutral-200";
 
   // Real Astrological PDF Report Compiler using mapped data model
   const handleCompilePdf = () => {
@@ -1614,9 +1850,7 @@ export default function App() {
       className={`min-h-screen flex flex-col transition-colors duration-300 ${
         isDark 
           ? "dark bg-slate-950 text-slate-100 selection:bg-amber-500/30 selection:text-amber-200" 
-          : isDating
-            ? "light bg-[#FFF9F9] text-[#3E101B] selection:bg-rose-500/30 selection:text-rose-900"
-            : "light bg-neutral-50 text-neutral-900 selection:bg-amber-600/20 selection:text-amber-800"
+          : "light bg-neutral-50 text-neutral-900 selection:bg-amber-600/20 selection:text-amber-800"
       }`} 
       id="app-root-container"
       data-app-theme={theme}
@@ -1704,21 +1938,22 @@ export default function App() {
 
             {/* Multi-Theme Selector */}
             <div className="flex items-center gap-1.5">
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Theme:</span>
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-neutral-400"}`}>Theme:</span>
               <select
                 value={theme}
                 onChange={(e) => {
-                  const val = e.target.value as "light" | "dark" | "dating-app";
+                  const val = e.target.value as "cosmic-royal" | "emerald-aura" | "deep-amethyst" | "vedic-sandalwood";
                   setTheme(val);
                   localStorage.setItem("jhora_theme", val);
                 }}
                 className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
-                  isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
+                  isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : "bg-neutral-50 border-neutral-200 text-neutral-800"
                 }`}
               >
-                <option value="light">☀️ Light</option>
-                <option value="dark">🌙 Dark</option>
-                <option value="dating-app">💖 Blush Pink</option>
+                <option value="cosmic-royal">🌌 Cosmic Royal</option>
+                <option value="emerald-aura">🌿 Emerald Aura</option>
+                <option value="deep-amethyst">🔮 Deep Amethyst</option>
+                <option value="vedic-sandalwood">🪔 Vedic Sandalwood</option>
               </select>
             </div>
           </div>
