@@ -1715,6 +1715,8 @@ export function MyPageView({
   const [tajikTargetAge, setTajikTargetAge] = useState<number>(30);
   const [tajikSubTab, setTajikSubTab] = useState<string>("relationship");
   const [westernSubTab, setWesternSubTab] = useState<string>("dashboard");
+  const [selectedDateOffset, setSelectedDateOffset] = useState<number>(0);
+  const [futurePage, setFuturePage] = useState<number>(0);
 
   const tabs = [
     { id: "overview", label: "Soul" },
@@ -5388,6 +5390,859 @@ export function MyPageView({
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          );
+        })()
+      ) : activeTab === "daily" ? (
+        (() => {
+          // Local Constants & Helpers for Mood Engine
+          const LOCAL_NAKSHATRAS = [
+            "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
+            "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+            "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+          ];
+
+          const LOCAL_SIGN_NAMES = [
+            "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+            "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+          ];
+
+          const LOCAL_SIGN_LORDS = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+
+          const LOCAL_NAKSHATRA_LORDS = [
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"
+          ];
+
+          const LOCAL_PLANETS_CYCLE = [
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"
+          ];
+
+          const LOCAL_PLANET_YEARS: Record<string, number> = {
+            Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
+          };
+
+          const LOCAL_HOUSE_MOOD_MAP: Record<number, { title: string; desc: string; vibe: string; bg: string; text: string }> = {
+            1: { title: "Vitality & Focus", desc: "Focus on self-expression, vitality, personal beginnings, and independent action.", vibe: "Energetic", bg: "bg-red-500/10", text: "text-red-400" },
+            2: { title: "Wealth & Family", desc: "Focus on financial assets, savings, family matters, speech, and material comfort.", vibe: "Resourceful", bg: "bg-amber-500/10", text: "text-amber-400" },
+            3: { title: "Expression & Initiative", desc: "Focus on correspondence, writing, short trips, local networks, and personal effort.", vibe: "Communicative", bg: "bg-sky-500/10", text: "text-sky-400" },
+            4: { title: "Peace & Grounding", desc: "Focus on domestic happiness, home comfort, mental peace, mother, and vehicle matters.", vibe: "Peaceful", bg: "bg-emerald-500/10", text: "text-emerald-400" },
+            5: { title: "Creativity & Romance", desc: "Focus on self-expression, creative intelligence, romance, speculations, and child-related joy.", vibe: "Inspired", bg: "bg-rose-500/10", text: "text-rose-400" },
+            6: { title: "Routines & Service", desc: "Focus on health routines, daily employment duties, resolving obstacles, and competitive focus.", vibe: "Detail-driven", bg: "bg-teal-500/10", text: "text-teal-400" },
+            7: { title: "Partnership & Harmony", desc: "Focus on relationship balance, marriage, business collaborations, and public dealings.", vibe: "Collaborative", bg: "bg-pink-500/10", text: "text-pink-400" },
+            8: { title: "Transformation & Depth", desc: "Focus on introspective research, sudden shifts, secrets, and processing inheritance/joint assets.", vibe: "Introspective", bg: "bg-purple-500/10", text: "text-purple-400" },
+            9: { title: "Wisdom & Faith", desc: "Focus on philosophical insights, higher education, guidance from gurus/mentors, and general fortune.", vibe: "Philosophical", bg: "bg-indigo-500/10", text: "text-indigo-400" },
+            10: { title: "Status & Career", desc: "Focus on professional duties, administrative authority, career achievements, and public status.", vibe: "Ambitious", bg: "bg-blue-500/10", text: "text-blue-400" },
+            11: { title: "Gains & Fulfillment", desc: "Focus on social networking, material gains, profits, and fulfillment of deep-seated desires.", vibe: "Prosperous", bg: "bg-green-500/10", text: "text-green-400" },
+            12: { title: "Solitude & Rest", desc: "Focus on spiritual contemplation, hidden expenses, letting go, sleep, and restorative isolation.", vibe: "Contemplative", bg: "bg-violet-500/10", text: "text-violet-400" }
+          };
+
+          // 1. Get Moon Position
+          const getLocalMoonPosition = (date: Date) => {
+            const daysSinceJ2000 = (date.getTime() - Date.UTC(2000, 0, 1, 12, 0, 0)) / (1000 * 60 * 60 * 24);
+            let L = (218.316 + 13.176396 * daysSinceJ2000) % 360;
+            if (L < 0) L += 360;
+            let M = (134.963 + 13.064993 * daysSinceJ2000) % 360;
+            if (M < 0) M += 360;
+            let moonLon = (L + 6.289 * Math.sin(M * Math.PI / 180)) % 360;
+            if (moonLon < 0) moonLon += 360;
+            const signIdx = Math.floor(moonLon / 30);
+            const nakIdx = Math.floor(moonLon / 13.333333);
+            return {
+              longitude: moonLon,
+              signName: LOCAL_SIGN_NAMES[signIdx],
+              signLord: LOCAL_SIGN_LORDS[signIdx],
+              nakshatraName: LOCAL_NAKSHATRAS[nakIdx],
+              nakshatraLord: LOCAL_NAKSHATRA_LORDS[nakIdx]
+            };
+          };
+
+          // 2. Resolve Vimshottari Dasha
+          const getLocalDashaLords = (dashas: any[], date: Date) => {
+            if (!dashas || dashas.length === 0) {
+              return { maha: "Ketu", antar: "Venus", pratyantar: "Sun", sookshma: "Moon", prana: "Mars" };
+            }
+            const activeMaha = dashas.find(d => {
+              const s = new Date(d.startDate);
+              const e = new Date(d.endDate);
+              return date >= s && date <= e;
+            }) || dashas[0];
+
+            let activeAntar = null;
+            if (activeMaha && activeMaha.subPeriods) {
+              activeAntar = activeMaha.subPeriods.find((sub: any) => {
+                const s = new Date(sub.startDate);
+                const e = new Date(sub.endDate);
+                return date >= s && date <= e;
+              });
+            }
+            if (!activeAntar && activeMaha && activeMaha.subPeriods && activeMaha.subPeriods.length > 0) {
+              activeAntar = activeMaha.subPeriods[0];
+            }
+
+            let activePratyantar = null;
+            if (activeAntar && activeAntar.subPeriods) {
+              activePratyantar = activeAntar.subPeriods.find((p: any) => {
+                const s = new Date(p.startDate || p.start);
+                const e = new Date(p.endDate || p.end);
+                return date >= s && date <= e;
+              });
+            }
+            if (!activePratyantar && activeAntar && activeAntar.subPeriods && activeAntar.subPeriods.length > 0) {
+              activePratyantar = activeAntar.subPeriods[0];
+            }
+
+            // Sookshma
+            let sookshmaLord = "Moon";
+            let sookshmaPeriod = null;
+            if (activePratyantar) {
+              const start = new Date(activePratyantar.startDate || activePratyantar.start || activeMaha.startDate);
+              const end = new Date(activePratyantar.endDate || activePratyantar.end || activeMaha.endDate);
+              const idx = LOCAL_PLANETS_CYCLE.indexOf(activePratyantar.lord);
+              if (idx !== -1) {
+                const totalMs = end.getTime() - start.getTime();
+                let currentStart = start.getTime();
+                for (let i = 0; i < 9; i++) {
+                  const lord = LOCAL_PLANETS_CYCLE[(idx + i) % 9];
+                  const dur = totalMs * (LOCAL_PLANET_YEARS[lord] / 120);
+                  const currentEnd = currentStart + dur;
+                  if (date.getTime() >= currentStart && date.getTime() <= currentEnd) {
+                    sookshmaLord = lord;
+                    sookshmaPeriod = { lord, start: new Date(currentStart), end: new Date(currentEnd) };
+                    break;
+                  }
+                  currentStart = currentEnd;
+                }
+              }
+            }
+
+            // Prana
+            let pranaLord = "Mars";
+            if (sookshmaPeriod) {
+              const start = sookshmaPeriod.start;
+              const end = sookshmaPeriod.end;
+              const idx = LOCAL_PLANETS_CYCLE.indexOf(sookshmaPeriod.lord);
+              if (idx !== -1) {
+                const totalMs = end.getTime() - start.getTime();
+                let currentStart = start.getTime();
+                for (let i = 0; i < 9; i++) {
+                  const lord = LOCAL_PLANETS_CYCLE[(idx + i) % 9];
+                  const dur = totalMs * (LOCAL_PLANET_YEARS[lord] / 120);
+                  const currentEnd = currentStart + dur;
+                  if (date.getTime() >= currentStart && date.getTime() <= currentEnd) {
+                    pranaLord = lord;
+                    break;
+                  }
+                  currentStart = currentEnd;
+                }
+              }
+            }
+
+            return {
+              maha: activeMaha?.lord || "Ketu",
+              antar: activeAntar?.lord || "Venus",
+              pratyantar: activePratyantar?.lord || "Sun",
+              sookshma: sookshmaLord,
+              prana: pranaLord
+            };
+          };
+
+          // 3. Resolve Houses for Planet
+          const kpProfile = profile?.KP;
+          let pSigs = kpProfile?.planet_significators?.significators || kpProfile?.planet_significators || astrologyData?.kpSignificators?.planetSignificators?.significators || astrologyData?.kpSignificators?.planetSignificators || {};
+          
+          if (Object.keys(pSigs).length === 0) {
+            pSigs = {
+              "Sun": { level1: [12], level2: [12], level3: [1], level4: [12], level5: [2], level6: [12] },
+              "Moon": { level1: [9], level2: [9], level3: [12], level4: [9], level5: [12], level6: [9] },
+              "Mars": { level1: [1], level2: [1], level3: [1], level4: [1], level5: [12], level6: [1] },
+              "Mercury": { level1: [12], level2: [12], level3: [9], level4: [12], level5: [5], level6: [12] },
+              "Jupiter": { level1: [2], level2: [2], level3: [5], level4: [2], level5: [12], level6: [2] },
+              "Venus": { level1: [11], level2: [11], level3: [11], level4: [11], level5: [9], level6: [11] },
+              "Saturn": { level1: [5], level2: [5], level3: [2], level4: [5], level5: [12], level6: [5] },
+              "Rahu": { level1: [12], level2: [12], level3: [12], level4: [12], level5: [5], level6: [12] },
+              "Ketu": { level1: [6], level2: [6], level3: [5], level4: [6], level5: [5], level6: [6] }
+            };
+          }
+
+          const getPlanetHousesUnion = (planet: string): number[] => {
+            const sig = pSigs[planet] || { level1: [], level2: [], level3: [], level4: [], level5: [], level6: [] };
+            const combined = [
+              ...(sig.level1 || []),
+              ...(sig.level2 || []),
+              ...(sig.level3 || []),
+              ...(sig.level4 || []),
+              ...(sig.level5 || []),
+              ...(sig.level6 || [])
+            ];
+            return Array.from(new Set(combined.map(Number))).sort((a, b) => a - b);
+          };
+
+          // Generate date-time targets
+          const today = new Date();
+          const datesList = [0, 1, 2].map(offset => {
+            const d = new Date(today);
+            d.setDate(today.getDate() + offset);
+            return d;
+          });
+
+          const currentSelDate = datesList[selectedDateOffset] || today;
+
+          // RUN MOOD ENGINE v1.0
+          const activeLords = getLocalDashaLords(astrologyData?.dashas || [], currentSelDate);
+          const transitMoon = getLocalMoonPosition(currentSelDate);
+
+          const layers = [
+            { id: "Mahadasha", name: "Mahadasha Lord", planet: activeLords.maha },
+            { id: "Antardasha", name: "Antardasha Lord", planet: activeLords.antar },
+            { id: "Pratyantardasha", name: "Pratyantardasha Lord", planet: activeLords.pratyantar },
+            { id: "Sookshma", name: "Sookshma Lord", planet: activeLords.sookshma },
+            { id: "Prana", name: "Prana Lord", planet: activeLords.prana },
+            { id: "MoonNakLord", name: "Moon Nakshatra Lord", planet: transitMoon.nakshatraLord },
+            { id: "MoonSignLord", name: "Moon Sign Lord", planet: transitMoon.signLord }
+          ];
+
+          // Step 3 & 4: Merge House Sets
+          const layerHouseMaps = layers.map(l => {
+            const hSet = getPlanetHousesUnion(l.planet);
+            return { ...l, houses: hSet };
+          });
+
+          // Step 5: Count Frequency
+          const frequencyMap: Record<number, number> = {};
+          for (let h = 1; h <= 12; h++) {
+            frequencyMap[h] = 0;
+          }
+
+          layerHouseMaps.forEach(lm => {
+            lm.houses.forEach(h => {
+              if (frequencyMap[h] !== undefined) {
+                frequencyMap[h]++;
+              }
+            });
+          });
+
+          // Step 6 & 7: Sort and build Tiers
+          const frequencyPairs = Object.entries(frequencyMap)
+            .map(([house, count]) => ({ house: Number(house), count }))
+            .sort((a, b) => b.count - a.count || b.house - a.house);
+
+          // Get unique counts descending
+          const uniqueCounts = Array.from(new Set(frequencyPairs.map(p => p.count)))
+            .filter(c => c > 0)
+            .sort((a, b) => b - a);
+
+          const getHousesInTier = (tierIndex: number): number[] => {
+            if (tierIndex >= uniqueCounts.length) return [];
+            const targetCount = uniqueCounts[tierIndex];
+            return frequencyPairs.filter(p => p.count === targetCount).map(p => p.house);
+          };
+
+          const tier1 = getHousesInTier(0);
+          const tier2 = getHousesInTier(1);
+          const tier3 = getHousesInTier(2);
+          const tier4 = getHousesInTier(3);
+          const tier5 = getHousesInTier(4);
+
+          // Build dynamic mood summaries
+          const formatTierInterpretation = (houses: number[]) => {
+            if (houses.length === 0) return "Quiet subconscious currents with gentle, low-intensity mental rhythms.";
+            return houses.map(h => {
+              const m = LOCAL_HOUSE_MOOD_MAP[h];
+              return m ? `${m.vibe} focus (${m.title})` : `House ${h} issues`;
+            }).join(" blended with ") + ".";
+          };
+
+          const primaryVibe = tier1.length > 0 ? LOCAL_HOUSE_MOOD_MAP[tier1[0]]?.vibe || "Grounded" : "Peaceful";
+          const secondaryVibe = tier2.length > 0 ? LOCAL_HOUSE_MOOD_MAP[tier2[0]]?.vibe || "Stable" : "Reflective";
+
+          return (
+            <div className="space-y-6 animate-fadeIn" id="daily-analysis-tab">
+              {/* Header section with Dynamic Selector */}
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900/40 border border-indigo-500/10 p-5 rounded-2xl">
+                <div>
+                  <h3 className="text-lg font-sans font-medium text-amber-100 flex items-center gap-2">
+                    <Activity className="w-5 h-5 text-indigo-400" />
+                    KP Stellar Daily Mood Engine
+                  </h3>
+                  <p className={`text-xs ${textMuted} mt-1`}>
+                    Mapping the 7 active stellar layers of time to identify daily focus and mental alignments.
+                  </p>
+                </div>
+                {/* Date switcher tabs */}
+                <div className="flex items-center gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
+                  {datesList.map((d, idx) => {
+                    const dayLabel = idx === 0 ? "Today" : idx === 1 ? "Tomorrow" : "Day After";
+                    const isSelected = selectedDateOffset === idx;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedDateOffset(idx)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          isSelected
+                            ? "bg-gradient-to-r from-amber-500/10 to-indigo-500/10 border border-amber-500/30 text-amber-200"
+                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
+                        }`}
+                      >
+                        <span className="block font-bold text-[9px] uppercase tracking-wider text-indigo-400">
+                          {dayLabel}
+                        </span>
+                        <span>
+                          {d.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Main Daily Layout */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                {/* Left Side: Mood Dashboard */}
+                <div className="lg:col-span-7 space-y-6">
+                  
+                  {/* The Mood Dashboard Card */}
+                  <div className="bg-gradient-to-br from-indigo-950/40 via-slate-900/60 to-purple-950/30 border border-indigo-500/20 rounded-2xl p-6 relative overflow-hidden shadow-xl">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="text-[10px] uppercase font-mono tracking-wider font-bold bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded border border-indigo-500/10">
+                        Daily Mental State
+                      </span>
+                      <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        Moon in {transitMoon.nakshatraName} ({transitMoon.nakshatraLord})
+                      </span>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <span className="text-xs text-indigo-300">Dominant Psychological State</span>
+                        <h4 className="text-2xl font-bold text-white mt-1">
+                          {primaryVibe} & {secondaryVibe}
+                        </h4>
+                      </div>
+
+                      <p className="text-sm text-slate-300 leading-relaxed bg-slate-950/30 border border-slate-900 p-4 rounded-xl">
+                        Today's cosmic flow is anchored by the dual alignments of <strong>{transitMoon.nakshatraName}</strong> nakshatra and your active Vimshottari period (<strong>{activeLords.maha}—{activeLords.antar}—{activeLords.pratyantar}</strong>). 
+                        You will experience high mental focus on the house groupings {tier1.join(", ")} and {tier2.join(", ")}. 
+                        This suggests {formatTierInterpretation(tier1)}
+                      </p>
+
+                      {/* Recommend Action Points */}
+                      <div className="space-y-3 pt-2">
+                        <h5 className="text-xs font-semibold text-amber-200 uppercase tracking-wide">
+                          Recommended Alignments For Today
+                        </h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {tier1.slice(0, 4).map((h) => {
+                            const m = LOCAL_HOUSE_MOOD_MAP[h];
+                            if (!m) return null;
+                            return (
+                              <div key={h} className="bg-slate-950/50 border border-slate-900 p-3 rounded-lg flex items-start gap-2.5">
+                                <span className="font-mono text-xs font-bold text-indigo-400 bg-indigo-500/10 w-5 h-5 flex items-center justify-center rounded">
+                                  {h}
+                                </span>
+                                <div>
+                                  <strong className="block text-xs text-white">{m.title}</strong>
+                                  <span className="text-[11px] text-slate-400 leading-normal block mt-0.5 font-sans">
+                                    {m.desc.split("Focus on ")[1] || m.desc}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Frequency Spectrum representation */}
+                  <div className={`p-6 rounded-2xl border ${cardStyle} space-y-4`}>
+                    <div>
+                      <h4 className={`text-sm font-bold ${textStyle} font-sans`}>
+                        Cuspal House Significance Spectrum
+                      </h4>
+                      <p className={`text-xs ${textMuted} mt-0.5`}>
+                        Visualizing how intensely each house is triggered across all 7 cosmic layers.
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
+                      {frequencyPairs.map(({ house, count }) => {
+                        const m = LOCAL_HOUSE_MOOD_MAP[house];
+                        const pct = (count / 7) * 100;
+                        return (
+                          <div key={house} className="flex items-center gap-3">
+                            <span className="w-6 font-mono text-[11px] font-bold text-slate-400 text-right">
+                              H{house}
+                            </span>
+                            <div className="flex-1 h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-900 flex items-center relative">
+                              <div 
+                                className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 rounded-full"
+                                style={{ width: `${pct}%` }}
+                              ></div>
+                              {count > 0 && (
+                                <span className="absolute right-2 font-mono text-[9px] font-bold text-indigo-300">
+                                  {count}/7 Layers
+                                </span>
+                              )}
+                            </div>
+                            <span className={`w-28 text-[11px] ${m?.text || "text-slate-500"} font-medium truncate font-sans`}>
+                              {m?.title || `House ${house}`}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Right Side: Active Layers & Technical Breakdowns */}
+                <div className="lg:col-span-5 space-y-6">
+                  
+                  {/* Active Layers Box */}
+                  <div className={`p-5 rounded-2xl border ${cardStyle} space-y-4 shadow-sm`}>
+                    <div>
+                      <h4 className={`text-sm font-bold ${textStyle} font-sans`}>
+                        The 7 Active Layers of Time
+                      </h4>
+                      <p className={`text-[11px] ${textMuted} mt-0.5`}>
+                        Planets currently acting as rulers of your mind and timeline for this date.
+                      </p>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      {layerHouseMaps.map(layer => {
+                        return (
+                          <div key={layer.id} className="flex items-center justify-between p-2.5 bg-slate-950/40 rounded-xl border border-slate-900">
+                            <div>
+                              <span className="text-[10px] font-mono text-slate-400 block uppercase tracking-wider">
+                                {layer.name}
+                              </span>
+                              <span className={`text-xs font-bold ${textStyle} mt-0.5 inline-block`}>
+                                {layer.planet}
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-[10px] font-mono text-slate-400 block uppercase">
+                                Houses
+                              </span>
+                              <div className="flex gap-1 mt-0.5 justify-end">
+                                {layer.houses.map(h => (
+                                  <span key={h} className="text-[9px] font-mono font-bold px-1 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/5">
+                                    {h}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Frequency Tiers Summary */}
+                  <div className={`p-5 rounded-2xl border ${cardStyle} space-y-4`}>
+                    <div>
+                      <h4 className={`text-sm font-bold ${textStyle} font-sans`}>
+                        Calculated Frequency Tiers
+                      </h4>
+                      <p className={`text-[11px] ${textMuted} mt-0.5`}>
+                        Grouping houses into psychological and environmental influence zones.
+                      </p>
+                    </div>
+
+                    <div className="space-y-3 text-xs">
+                      <div className="border-l-2 border-indigo-500 pl-3 py-1">
+                        <strong className="block text-indigo-300">Tier 1: Primary Focus (Frequency: {uniqueCounts[0] || 0})</strong>
+                        <div className="flex gap-1 mt-1">
+                          {tier1.map(h => (
+                            <span key={h} className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/5 font-mono text-[10px] font-bold">
+                              H{h}
+                            </span>
+                          ))}
+                        </div>
+                        <p className={`text-[11px] ${textMuted} mt-1 leading-normal`}>
+                          {formatTierInterpretation(tier1)}
+                        </p>
+                      </div>
+
+                      <div className="border-l-2 border-indigo-500/60 pl-3 py-1">
+                        <strong className="block text-indigo-300">Tier 2: Secondary Focus (Frequency: {uniqueCounts[1] || 0})</strong>
+                        <div className="flex gap-1 mt-1">
+                          {tier2.map(h => (
+                            <span key={h} className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/5 font-mono text-[10px] font-bold">
+                              H{h}
+                            </span>
+                          ))}
+                        </div>
+                        <p className={`text-[11px] ${textMuted} mt-1 leading-normal`}>
+                          {formatTierInterpretation(tier2)}
+                        </p>
+                      </div>
+
+                      <div className="border-l-2 border-indigo-500/30 pl-3 py-1">
+                        <strong className="block text-slate-400">Tier 3: Supporting (Frequency: {uniqueCounts[2] || 0})</strong>
+                        <div className="flex gap-1 mt-1">
+                          {tier3.map(h => (
+                            <span key={h} className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700/50 font-mono text-[10px] font-bold">
+                              H{h}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="border-l-2 border-indigo-500/10 pl-3 py-1">
+                        <strong className="block text-slate-500">Tier 4 & 5: Background Focus</strong>
+                        <div className="flex gap-1 mt-1">
+                          {[...tier4, ...tier5].map(h => (
+                            <span key={h} className="px-2 py-0.5 rounded bg-slate-900/60 text-slate-500 border border-slate-950 font-mono text-[10px]">
+                              H{h}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+          );
+        })()
+      ) : activeTab === "future" ? (
+        (() => {
+          // Future Analysis Tab local helpers (re-uses local date helpers)
+          const LOCAL_NAKSHATRAS = [
+            "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
+            "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+            "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+          ];
+
+          const LOCAL_SIGN_NAMES = [
+            "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+            "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+          ];
+
+          const LOCAL_SIGN_LORDS = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+
+          const LOCAL_NAKSHATRA_LORDS = [
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"
+          ];
+
+          const LOCAL_PLANETS_CYCLE = [
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+            "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"
+          ];
+
+          const LOCAL_PLANET_YEARS: Record<string, number> = {
+            Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
+          };
+
+          const LOCAL_HOUSE_MOOD_MAP: Record<number, { title: string; desc: string; vibe: string; bg: string; text: string; color: string }> = {
+            1: { title: "Vitality & Focus", desc: "Focus on self-expression, vitality, personal beginnings, and independent action.", vibe: "Self-driven Focus", bg: "bg-red-500/10", text: "text-red-400", color: "#f87171" },
+            2: { title: "Wealth & Family", desc: "Focus on financial assets, savings, family matters, speech, and material comfort.", vibe: "Financial Focus", bg: "bg-amber-500/10", text: "text-amber-400", color: "#fbbf24" },
+            3: { title: "Expression & Effort", desc: "Focus on correspondence, writing, short trips, local networks, and personal effort.", vibe: "Expressive Push", bg: "bg-sky-500/10", text: "text-sky-400", color: "#38bdf8" },
+            4: { title: "Peace & Grounding", desc: "Focus on domestic happiness, home comfort, mental peace, mother, and vehicle matters.", vibe: "Peace & Home", bg: "bg-emerald-500/10", text: "text-emerald-400", color: "#34d399" },
+            5: { title: "Creativity & Joy", desc: "Focus on self-expression, creative intelligence, romance, speculations, and child-related joy.", vibe: "Creative Spark", bg: "bg-rose-500/10", text: "text-rose-400", color: "#fb7185" },
+            6: { title: "Daily Routines", desc: "Focus on health routines, daily employment duties, resolving obstacles, and competitive focus.", vibe: "Routine & Duty", bg: "bg-teal-500/10", text: "text-teal-400", color: "#2dd4bf" },
+            7: { title: "Harmony & Partner", desc: "Focus on relationship balance, marriage, business collaborations, and public dealings.", vibe: "Social Balance", bg: "bg-pink-500/10", text: "text-pink-400", color: "#f472b6" },
+            8: { title: "Introspective depth", desc: "Focus on introspective research, sudden shifts, secrets, and processing inheritance/joint assets.", vibe: "Occult & Depth", bg: "bg-purple-500/10", text: "text-purple-400", color: "#c084fc" },
+            9: { title: "Wisdom & Faith", desc: "Focus on philosophical insights, higher education, guidance from gurus/mentors, and general fortune.", vibe: "Higher Wisdom", bg: "bg-indigo-500/10", text: "text-indigo-400", color: "#818cf8" },
+            10: { title: "Career & Rep", desc: "Focus on professional duties, administrative authority, career achievements, and public status.", vibe: "Career Climax", bg: "bg-blue-500/10", text: "text-blue-400", color: "#60a5fa" },
+            11: { title: "Gains & Network", desc: "Focus on social networking, material gains, profits, and fulfillment of deep-seated desires.", vibe: "Fulfillment & Gain", bg: "bg-green-500/10", text: "text-green-400", color: "#4ade80" },
+            12: { title: "Rest & Solitude", desc: "Focus on spiritual contemplation, hidden expenses, letting go, sleep, and restorative isolation.", vibe: "Solitude & Rest", bg: "bg-violet-500/10", text: "text-violet-400", color: "#a78bfa" }
+          };
+
+          const getLocalMoonPosition = (date: Date) => {
+            const daysSinceJ2000 = (date.getTime() - Date.UTC(2000, 0, 1, 12, 0, 0)) / (1000 * 60 * 60 * 24);
+            let L = (218.316 + 13.176396 * daysSinceJ2000) % 360;
+            if (L < 0) L += 360;
+            let M = (134.963 + 13.064993 * daysSinceJ2000) % 360;
+            if (M < 0) M += 360;
+            let moonLon = (L + 6.289 * Math.sin(M * Math.PI / 180)) % 360;
+            if (moonLon < 0) moonLon += 360;
+            const signIdx = Math.floor(moonLon / 30);
+            const nakIdx = Math.floor(moonLon / 13.333333);
+            return {
+              longitude: moonLon,
+              signName: LOCAL_SIGN_NAMES[signIdx],
+              signLord: LOCAL_SIGN_LORDS[signIdx],
+              nakshatraName: LOCAL_NAKSHATRAS[nakIdx],
+              nakshatraLord: LOCAL_NAKSHATRA_LORDS[nakIdx]
+            };
+          };
+
+          const getLocalDashaLords = (dashas: any[], date: Date) => {
+            if (!dashas || dashas.length === 0) {
+              return { maha: "Ketu", antar: "Venus", pratyantar: "Sun", sookshma: "Moon", prana: "Mars" };
+            }
+            const activeMaha = dashas.find(d => {
+              const s = new Date(d.startDate);
+              const e = new Date(d.endDate);
+              return date >= s && date <= e;
+            }) || dashas[0];
+
+            let activeAntar = null;
+            if (activeMaha && activeMaha.subPeriods) {
+              activeAntar = activeMaha.subPeriods.find((sub: any) => {
+                const s = new Date(sub.startDate);
+                const e = new Date(sub.endDate);
+                return date >= s && date <= e;
+              });
+            }
+            if (!activeAntar && activeMaha && activeMaha.subPeriods && activeMaha.subPeriods.length > 0) {
+              activeAntar = activeMaha.subPeriods[0];
+            }
+
+            let activePratyantar = null;
+            if (activeAntar && activeAntar.subPeriods) {
+              activePratyantar = activeAntar.subPeriods.find((p: any) => {
+                const s = new Date(p.startDate || p.start);
+                const e = new Date(p.endDate || p.end);
+                return date >= s && date <= e;
+              });
+            }
+            if (!activePratyantar && activeAntar && activeAntar.subPeriods && activeAntar.subPeriods.length > 0) {
+              activePratyantar = activeAntar.subPeriods[0];
+            }
+
+            // Sookshma
+            let sookshmaLord = "Moon";
+            let sookshmaPeriod = null;
+            if (activePratyantar) {
+              const start = new Date(activePratyantar.startDate || activePratyantar.start || activeMaha.startDate);
+              const end = new Date(activePratyantar.endDate || activePratyantar.end || activeMaha.endDate);
+              const idx = LOCAL_PLANETS_CYCLE.indexOf(activePratyantar.lord);
+              if (idx !== -1) {
+                const totalMs = end.getTime() - start.getTime();
+                let currentStart = start.getTime();
+                for (let i = 0; i < 9; i++) {
+                  const lord = LOCAL_PLANETS_CYCLE[(idx + i) % 9];
+                  const dur = totalMs * (LOCAL_PLANET_YEARS[lord] / 120);
+                  const currentEnd = currentStart + dur;
+                  if (date.getTime() >= currentStart && date.getTime() <= currentEnd) {
+                    sookshmaLord = lord;
+                    sookshmaPeriod = { lord, start: new Date(currentStart), end: new Date(currentEnd) };
+                    break;
+                  }
+                  currentStart = currentEnd;
+                }
+              }
+            }
+
+            // Prana
+            let pranaLord = "Mars";
+            if (sookshmaPeriod) {
+              const start = sookshmaPeriod.start;
+              const end = sookshmaPeriod.end;
+              const idx = LOCAL_PLANETS_CYCLE.indexOf(sookshmaPeriod.lord);
+              if (idx !== -1) {
+                const totalMs = end.getTime() - start.getTime();
+                let currentStart = start.getTime();
+                for (let i = 0; i < 9; i++) {
+                  const lord = LOCAL_PLANETS_CYCLE[(idx + i) % 9];
+                  const dur = totalMs * (LOCAL_PLANET_YEARS[lord] / 120);
+                  const currentEnd = currentStart + dur;
+                  if (date.getTime() >= currentStart && date.getTime() <= currentEnd) {
+                    pranaLord = lord;
+                    break;
+                  }
+                  currentStart = currentEnd;
+                }
+              }
+            }
+
+            return {
+              maha: activeMaha?.lord || "Ketu",
+              antar: activeAntar?.lord || "Venus",
+              pratyantar: activePratyantar?.lord || "Sun",
+              sookshma: sookshmaLord,
+              prana: pranaLord
+            };
+          };
+
+          const kpProfile = profile?.KP;
+          let pSigs = kpProfile?.planet_significators?.significators || kpProfile?.planet_significators || astrologyData?.kpSignificators?.planetSignificators?.significators || astrologyData?.kpSignificators?.planetSignificators || {};
+          
+          if (Object.keys(pSigs).length === 0) {
+            pSigs = {
+              "Sun": { level1: [12], level2: [12], level3: [1], level4: [12], level5: [2], level6: [12] },
+              "Moon": { level1: [9], level2: [9], level3: [12], level4: [9], level5: [12], level6: [9] },
+              "Mars": { level1: [1], level2: [1], level3: [1], level4: [1], level5: [12], level6: [1] },
+              "Mercury": { level1: [12], level2: [12], level3: [9], level4: [12], level5: [5], level6: [12] },
+              "Jupiter": { level1: [2], level2: [2], level3: [5], level4: [2], level5: [12], level6: [2] },
+              "Venus": { level1: [11], level2: [11], level3: [11], level4: [11], level5: [9], level6: [11] },
+              "Saturn": { level1: [5], level2: [5], level3: [2], level4: [5], level5: [12], level6: [5] },
+              "Rahu": { level1: [12], level2: [12], level3: [12], level4: [12], level5: [5], level6: [12] },
+              "Ketu": { level1: [6], level2: [6], level3: [5], level4: [6], level5: [5], level6: [6] }
+            };
+          }
+
+          const getPlanetHousesUnion = (planet: string): number[] => {
+            const sig = pSigs[planet] || { level1: [], level2: [], level3: [], level4: [], level5: [], level6: [] };
+            const combined = [
+              ...(sig.level1 || []),
+              ...(sig.level2 || []),
+              ...(sig.level3 || []),
+              ...(sig.level4 || []),
+              ...(sig.level5 || []),
+              ...(sig.level6 || [])
+            ];
+            return Array.from(new Set(combined.map(Number))).sort((a, b) => a - b);
+          };
+
+          const calculatePrimaryHouseForDate = (date: Date) => {
+            const activeLords = getLocalDashaLords(astrologyData?.dashas || [], date);
+            const transitMoon = getLocalMoonPosition(date);
+
+            const layers = [
+              activeLords.maha,
+              activeLords.antar,
+              activeLords.pratyantar,
+              activeLords.sookshma,
+              activeLords.prana,
+              transitMoon.nakshatraLord,
+              transitMoon.signLord
+            ];
+
+            const frequencyMap: Record<number, number> = {};
+            for (let h = 1; h <= 12; h++) frequencyMap[h] = 0;
+
+            layers.forEach(p => {
+              getPlanetHousesUnion(p).forEach(h => {
+                if (frequencyMap[h] !== undefined) frequencyMap[h]++;
+              });
+            });
+
+            const topHouse = Object.entries(frequencyMap)
+              .map(([house, count]) => ({ house: Number(house), count }))
+              .sort((a, b) => b.count - a.count || b.house - a.house)[0];
+
+            return {
+              house: topHouse?.house || 1,
+              count: topHouse?.count || 1,
+              moonNak: transitMoon.nakshatraName,
+              moonSign: transitMoon.signName
+            };
+          };
+
+          // Generate 30 days
+          const futureDates = Array.from({ length: 30 }).map((_, i) => {
+            const d = new Date();
+            d.setDate(d.getDate() + i);
+            const data = calculatePrimaryHouseForDate(d);
+            return {
+              date: d,
+              ...data
+            };
+          });
+
+          const pageSize = 10;
+          const totalPages = Math.ceil(futureDates.length / pageSize);
+          const paginatedDates = futureDates.slice(futurePage * pageSize, (futurePage + 1) * pageSize);
+
+          return (
+            <div className="space-y-6 animate-fadeIn" id="future-forecast-tab">
+              <div className="bg-slate-900/40 border border-indigo-500/10 p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <h3 className="text-lg font-sans font-medium text-amber-100 flex items-center gap-2">
+                    <Compass className="w-5 h-5 text-indigo-400" />
+                    KP Stellar 30-Day Future Forecast
+                  </h3>
+                  <p className={`text-xs ${textMuted} mt-1`}>
+                    Previewing daily dominant house activations and transit highlights for the next 30 days.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-800">
+                  <button
+                    disabled={futurePage === 0}
+                    onClick={() => setFuturePage(p => Math.max(0, p - 1))}
+                    className="text-xs text-indigo-400 font-bold hover:text-indigo-200 disabled:opacity-30 disabled:pointer-events-none"
+                  >
+                    Prev
+                  </button>
+                  <span className="text-[11px] font-mono text-slate-400 px-1">
+                    Page {futurePage + 1} of {totalPages}
+                  </span>
+                  <button
+                    disabled={futurePage >= totalPages - 1}
+                    onClick={() => setFuturePage(p => Math.min(totalPages - 1, p + 1))}
+                    className="text-xs text-indigo-400 font-bold hover:text-indigo-200 disabled:opacity-30 disabled:pointer-events-none"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+
+              {/* Grid of future days */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {paginatedDates.map((fd, i) => {
+                  const m = LOCAL_HOUSE_MOOD_MAP[fd.house];
+                  const dateString = fd.date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+                  const isToday = i === 0 && futurePage === 0;
+
+                  return (
+                    <div 
+                      key={i} 
+                      className={`p-4 rounded-xl border transition-all hover:bg-slate-900/20 ${
+                        isToday 
+                          ? "border-amber-500/30 bg-gradient-to-r from-amber-500/5 to-indigo-500/5 ring-1 ring-amber-500/10" 
+                          : "border-indigo-500/10 bg-slate-950/30"
+                      } flex items-start gap-4`}
+                    >
+                      <div className="flex flex-col items-center justify-center p-2.5 bg-slate-950 border border-slate-900 rounded-lg text-center min-w-[70px]">
+                        <span className="text-[9px] uppercase tracking-wider font-bold text-indigo-400">
+                          H{fd.house}
+                        </span>
+                        <span className="text-xl font-bold text-white mt-0.5">
+                          {fd.house}
+                        </span>
+                        <span className="text-[8px] font-mono text-slate-500 uppercase mt-0.5">
+                          {fd.count}/7 Layers
+                        </span>
+                      </div>
+
+                      <div className="flex-1 space-y-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-sm font-bold text-white truncate">
+                            {dateString}
+                          </span>
+                          {isToday && (
+                            <span className="text-[8px] uppercase tracking-widest font-bold bg-amber-500 text-slate-950 px-1.5 py-0.5 rounded animate-pulse">
+                              Active
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="text-xs font-semibold" style={{ color: m?.color || "#818cf8" }}>
+                          {m?.vibe} ({m?.title})
+                        </div>
+
+                        <p className={`text-[11px] ${textMuted} leading-relaxed truncate font-sans`}>
+                          {m?.desc}
+                        </p>
+
+                        <div className="text-[10px] font-mono text-slate-500 flex items-center gap-1.5 flex-wrap">
+                          <span>Moon: {fd.moonNak} ({fd.moonSign})</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           );

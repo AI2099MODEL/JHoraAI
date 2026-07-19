@@ -197,5 +197,34 @@ export const KPRulebook: KPRule[] = [
       significance: "Positive",
       interpretation_template: "The Ruling Planets ({asc_sign_lord}, {asc_star_lord}, {moon_sign_lord}, {moon_star_lord}, {day_lord}) confirm high alignment. This guarantees that your query is genuine and the event's timing is highly precise."
     }
+  },
+  {
+    id: "KP_MOOD_01",
+    name: "Daily Mood Analysis via 7 Active Layers",
+    description: "Evaluates the 7 active layers of time (5 Dasha layers + Moon Nakshatra & Sign Lords) against their level 1-6 significations to determine the daily psychological and behavioral clusters.",
+    inputs_required: [
+      "Vedic.dashas.vimshottari",
+      "Transit.Moon.longitude",
+      "KP.planet_significators"
+    ],
+    conditions: "For any transit day, merge the house significations (L1-L6) of the 5 active dasha lords and the transiting Moon's nakshatra and sign lords, then tier them by frequency to construct the mood clusters.",
+    supporting_evidence: [
+      "Concentration of houses 1, 5, 9 indicates high optimism and spiritual focus.",
+      "Concentration of houses 2, 10, 11 indicates career gains and wealth-oriented drive.",
+      "Concentration of houses 3, 7 indicates social interactions and successful communication."
+    ],
+    contradicting_evidence: [
+      "Concentration of houses 6, 8, 12 indicates fatigue, high expenditure, or psychological blockages."
+    ],
+    priority: 3,
+    exceptions: [
+      "If negative houses (6, 8, 12) are present in the same tier as positive houses (5, 9, 11), the stress is channeled productively as creative tension."
+    ],
+    type: "Transit",
+    output: {
+      category: "General",
+      significance: "Neutral",
+      interpretation_template: "The 7 active layers of time signify a primary focus on houses {primary_houses} and secondary focus on {secondary_houses}, signaling a {primary_mood_summary} tone."
+    }
   }
 ];
