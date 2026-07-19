@@ -1,0 +1,112 @@
+{
+  "schema": {
+    "name": "Static Yogas",
+    "version": "1.0.0",
+    "description": "Master catalog of all Yoga classifications and immutable reference data."
+  },
+
+  "categories": [
+    "Raja Yoga",
+    "Dhana Yoga",
+    "Maha Purusha Yoga",
+    "Pancha Mahapurusha Yoga",
+    "Chandra Yoga",
+    "Surya Yoga",
+    "Lakshmi Yoga",
+    "Saraswati Yoga",
+    "Gaja Kesari Yoga",
+    "Vipareeta Raja Yoga",
+    "Neecha Bhanga Raja Yoga",
+    "Parivartana Yoga",
+    "Rajya Yoga",
+    "Sanyasa Yoga",
+    "Jnana Yoga",
+    "Bhagya Yoga",
+    "Kemadruma Cancellation",
+    "Arishta Bhanga",
+    "Nabhasa Yoga",
+    "Planetary Yoga",
+    "House Yoga",
+    "Special Yoga"
+  ],
+
+  "classification": {
+    "wealth": [],
+    "career": [],
+    "authority": [],
+    "education": [],
+    "marriage": [],
+    "children": [],
+    "health": [],
+    "longevity": [],
+    "spiritual": [],
+    "fortune": [],
+    "leadership": [],
+    "protection": [],
+    "negative": [],
+    "cancellation": []
+  },
+
+  "formation_types": [
+    "Planet Conjunction",
+    "Planet Aspect",
+    "House Placement",
+    "House Lord Relationship",
+    "Exchange",
+    "Planet Strength",
+    "Sign Placement",
+    "Nakshatra Placement",
+    "Divisional Chart",
+    "Multiple Conditions"
+  ],
+
+  "strength_levels": [
+    "Excellent",
+    "Very Strong",
+    "Strong",
+    "Moderate",
+    "Weak",
+    "Cancelled"
+  ],
+
+  "supported_attributes": [
+    "Yoga Name",
+    "Sanskrit Name",
+    "Category",
+    "Formation Rules",
+    "Required Planets",
+    "Required Houses",
+    "Required Signs",
+    "Required Strength",
+    "Exceptions",
+    "Cancellation Rules",
+    "Effects",
+    "Prediction Weight",
+    "Confidence Modifier",
+    "Classical Reference"
+  ],
+
+  "prediction_areas": [
+    "Career",
+    "Finance",
+    "Marriage",
+    "Children",
+    "Health",
+    "Education",
+    "Business",
+    "Politics",
+    "Property",
+    "Travel",
+    "Spirituality",
+    "Fame",
+    "General Life"
+  ],
+
+  "evaluation": {
+    "allow_multiple_yogas": true,
+    "allow_partial_formation": true,
+    "support_cancellation": true,
+    "support_strength_grading": true,
+    "support_divisional_confirmation": true
+  }
+}
