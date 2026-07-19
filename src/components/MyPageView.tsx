@@ -5441,7 +5441,7 @@ export function MyPageView({
             12: { title: "Solitude & Rest", desc: "Focus on spiritual contemplation, hidden expenses, letting go, sleep, and restorative isolation.", vibe: "Contemplative", bg: "bg-violet-500/10", text: "text-violet-400" }
           };
 
-          // 1. Get Moon Position
+          // 1. Get Moon Position (Sidereal / Lahiri)
           const getLocalMoonPosition = (date: Date) => {
             const daysSinceJ2000 = (date.getTime() - Date.UTC(2000, 0, 1, 12, 0, 0)) / (1000 * 60 * 60 * 24);
             let L = (218.316 + 13.176396 * daysSinceJ2000) % 360;
@@ -5450,10 +5450,16 @@ export function MyPageView({
             if (M < 0) M += 360;
             let moonLon = (L + 6.289 * Math.sin(M * Math.PI / 180)) % 360;
             if (moonLon < 0) moonLon += 360;
-            const signIdx = Math.floor(moonLon / 30);
-            const nakIdx = Math.floor(moonLon / 13.333333);
+            
+            // Subtract Lahiri Ayanamsa to convert to Sidereal Longitude
+            const year = 2000 + daysSinceJ2000 / 365.2425;
+            const ayanamsa = 23.85 + 0.0139696 * (year - 2000);
+            const siderealLon = (moonLon - ayanamsa + 360) % 360;
+            
+            const signIdx = Math.floor(siderealLon / 30);
+            const nakIdx = Math.floor(siderealLon / 13.333333);
             return {
-              longitude: moonLon,
+              longitude: siderealLon,
               signName: LOCAL_SIGN_NAMES[signIdx],
               signLord: LOCAL_SIGN_LORDS[signIdx],
               nakshatraName: LOCAL_NAKSHATRAS[nakIdx],
@@ -5974,10 +5980,16 @@ export function MyPageView({
             if (M < 0) M += 360;
             let moonLon = (L + 6.289 * Math.sin(M * Math.PI / 180)) % 360;
             if (moonLon < 0) moonLon += 360;
-            const signIdx = Math.floor(moonLon / 30);
-            const nakIdx = Math.floor(moonLon / 13.333333);
+            
+            // Subtract Lahiri Ayanamsa to convert to Sidereal Longitude
+            const year = 2000 + daysSinceJ2000 / 365.2425;
+            const ayanamsa = 23.85 + 0.0139696 * (year - 2000);
+            const siderealLon = (moonLon - ayanamsa + 360) % 360;
+            
+            const signIdx = Math.floor(siderealLon / 30);
+            const nakIdx = Math.floor(siderealLon / 13.333333);
             return {
-              longitude: moonLon,
+              longitude: siderealLon,
               signName: LOCAL_SIGN_NAMES[signIdx],
               signLord: LOCAL_SIGN_LORDS[signIdx],
               nakshatraName: LOCAL_NAKSHATRAS[nakIdx],
