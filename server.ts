@@ -297,7 +297,7 @@ function getProfileFileName(profileData: any, fallbackName: string): string {
     }
   }
 
-  return `${username}${dob}${place}${birthtime}.json`;
+  return `${username}_${dob}_${birthtime.toLowerCase()}_${place}.json`;
 }
 
 // Helper to handle git synchronization on the server

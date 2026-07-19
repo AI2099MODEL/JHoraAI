@@ -109,3 +109,16 @@ The platform manages two categories of JSON data to balance raw archival storage
 - Acts as a persistent, locked-down, read-only baseline archive of raw REST gateway responses.
 - Keeps raw data intact without on-the-fly client or server calculations, transits, or dynamic overlays. This ensures a 100% stable presentation matching the stored JSON payloads exactly.
 - **KP API Data Notice**: If the external `VedicAstro` API service returns HTTP 404 (or other HTML error responses) for `kp_chart` or `kp_cusps` during fetch, the error is securely written to the ledger as `{"error": "Invalid JSON response..."}`. This preserves raw data provenance exactly as it was received, with no synthetic data generated during capture.
+
+---
+
+## 5. Astrological Engine & Data Persistence Rules
+
+### Rule 1: Strict UserProfile Data Strategy
+Under no circumstances should the system perform client-side or server-side pre-computations, calculations, or generate any transit forecasts or overlays during data fetch. The UserProfile must remain a strictly persistent archive of raw API responses only (from the JHora/VedicAstro endpoints), preserving the raw response exactly as-is. Mappings and interpretations must only be done at render/run-time or in separate transient application logic, never embedded within the stored profile.
+
+### Rule 2: Dynamic Filename Mapping and Raw Payload Preservation
+When a user clicks on "Cast and Generate Horoscope" or "Refresh Horoscope", all raw data must be pulled into respective user profiles with the user profile named precisely as:
+`nativename_dateofbirth_timeofbirth_place.json`
+*(Format: [lowercase native name]_[DDMMYYYY date of birth]_[hhmmam/pm time of birth]_[lowercase place name].json, e.g. `nitin_06011976_0640pm_dehradun.json`)*.
+There must be absolutely **NO CALCULATIONS AND NO TRANSIT DATA** in this JSON file. It must only contain the pristine raw data pulled from the external APIs for downstream rendering and run-time interpretation.
