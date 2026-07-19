@@ -619,14 +619,26 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
                 </th>
                 {showLiveForecast && (
                   <>
-                    <th className="px-4 py-3 text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider text-center w-[7%]">
-                      Day 1
+                    <th className="px-4 py-3 text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider text-center w-[12%]">
+                      <div>Day 1</div>
+                      <div className="text-[9px] text-amber-300/80 font-normal normal-case">
+                        {njResult?.forecastDays[0]?.nakshatra}
+                        {njResult?.forecastDays[0]?.transitChangeText && " 🔄"}
+                      </div>
                     </th>
-                    <th className="px-4 py-3 text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider text-center w-[7%]">
-                      Day 2
+                    <th className="px-4 py-3 text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider text-center w-[12%]">
+                      <div>Day 2</div>
+                      <div className="text-[9px] text-cyan-300/80 font-normal normal-case">
+                        {njResult?.forecastDays[1]?.nakshatra}
+                        {njResult?.forecastDays[1]?.transitChangeText && " 🔄"}
+                      </div>
                     </th>
-                    <th className="px-4 py-3 text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider text-center w-[8%]">
-                      Day 3
+                    <th className="px-4 py-3 text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider text-center w-[12%]">
+                      <div>Day 3</div>
+                      <div className="text-[9px] text-emerald-300/80 font-normal normal-case">
+                        {njResult?.forecastDays[2]?.nakshatra}
+                        {njResult?.forecastDays[2]?.transitChangeText && " 🔄"}
+                      </div>
                     </th>
                   </>
                 )}

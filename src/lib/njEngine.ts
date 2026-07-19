@@ -6,7 +6,7 @@
  * Official Prediction Logic and Computational Engine
  */
 
-import { NAKSHATRAS, PlanetPosition } from "./astrology";
+import { NAKSHATRAS, PlanetPosition, calculateAstrology } from "./astrology";
 
 export interface NJForecastDay {
   dayIndex: number;
@@ -22,6 +22,10 @@ export interface NJForecastDay {
   discardedPlanets: string[];
   houseFrequencies: { [house: number]: number };
   houseRanks: Array<{ house: number; count: number; category: "Core" | "Supporting" | "Background" }>;
+  transitChangeText?: string | null;
+  startNakshatra?: string;
+  endNakshatra?: string;
+  changeTimeStr?: string | null;
   themeScores: Array<{
     id: string;
     name: string;
@@ -165,7 +169,7 @@ export function runNJEngine(
   planetsList.forEach(p => {
     const sigSet = new Set<number>();
     
-    // Level A: Occupant of Star Lord of House
+    // Level A: Occupant of Star Lord of House (L1)
     const pKp = kpData.planets?.[p];
     const starLord = pKp?.star_lord || pKp?.starLord;
     if (starLord) {
@@ -174,19 +178,33 @@ export function runNJEngine(
       if (starHouse) sigSet.add(Number(starHouse));
     }
 
-    // Level B: Occupant of House
+    // Level B: Occupant of House (L2)
     const houseOccupant = pKp?.house;
     if (houseOccupant) sigSet.add(Number(houseOccupant));
 
-    // Level C: Owner of Star Lord of House
+    // Level C: Owner of Star Lord of House (L3)
     if (starLord) {
       const starOwnership = kpData.planets?.[starLord]?.ownership || [];
       starOwnership.forEach((h: number) => sigSet.add(h));
     }
 
-    // Level D: Owner of House
+    // Level D: Owner of House (L4)
     const ownership = pKp?.ownership || [];
     ownership.forEach((h: number) => sigSet.add(h));
+
+    // Level E: Occupant of Sub Lord of House (L5)
+    const subLord = pKp?.sub_lord || pKp?.subLord;
+    if (subLord) {
+      const subKp = kpData.planets?.[subLord];
+      const subHouse = subKp?.house;
+      if (subHouse) sigSet.add(Number(subHouse));
+    }
+
+    // Level F: Owner of Sub Lord of House (L6)
+    if (subLord) {
+      const subOwnership = kpData.planets?.[subLord]?.ownership || [];
+      subOwnership.forEach((h: number) => sigSet.add(h));
+    }
 
     // Fallbacks if no KP data exists
     if (sigSet.size === 0) {
@@ -205,33 +223,159 @@ export function runNJEngine(
     kp6FoldSignificators[p] = Array.from(sigSet).sort((a, b) => a - b);
   });
 
-  // Dynamic Moon Nakshatra for Day 1, Day 2, Day 3
-  // Let's seed Moon's Nakshatra transit starting index based on the prediction date
-  const timeMs = predictionDate.getTime();
-  const dayOffset = Math.floor(timeMs / (1000 * 60 * 60 * 24));
-  
-  // Establish Day 1, 2, 3 Nakshatras
-  const d1NakshatraIdx = (dayOffset + 12) % 27; // Hasta is index 12
-  const d2NakshatraIdx = (d1NakshatraIdx + 1) % 27;
-  const d3NakshatraIdx = (d2NakshatraIdx + 1) % 27;
+  // Dynamic Moon Nakshatra and transit times calculations for Day 1, Day 2, Day 3
+  const lat = Number(inputs.latitude) || 30.3165;
+  const lng = Number(inputs.longitude) || 78.0322;
+  const tz = Number(inputs.timezone) || 5.5;
 
-  const day1Nakshatra = NAKSHATRA_NAMES[d1NakshatraIdx];
-  const day2Nakshatra = NAKSHATRA_NAMES[d2NakshatraIdx];
-  const day3Nakshatra = NAKSHATRA_NAMES[d3NakshatraIdx];
+  const formatISO = (date: Date): string => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
 
-  const forecastDaysRaw = [
-    { idx: 1, name: day1Nakshatra, lord: NAKSHATRA_LORDS[d1NakshatraIdx], subLord: getSubLord(day1Nakshatra, 0), offsetDays: 0 },
-    { idx: 2, name: day2Nakshatra, lord: NAKSHATRA_LORDS[d2NakshatraIdx], subLord: getSubLord(day2Nakshatra, 1), offsetDays: 1 },
-    { idx: 3, name: day3Nakshatra, lord: NAKSHATRA_LORDS[d3NakshatraIdx], subLord: getSubLord(day3Nakshatra, 2), offsetDays: 2 }
-  ];
+  const getMoonNakAtTime = (date: Date, hourStr: string): { nakshatra: string, lord: string, longitude: number } => {
+    const dStr = formatISO(date);
+    const data = calculateAstrology("Predict", dStr, hourStr, "Local", lat, lng, tz);
+    const moon = data.planets.find(p => p.name === "Moon");
+    return {
+      nakshatra: moon?.nakshatra || "Rohini",
+      lord: moon?.lord || "Moon",
+      longitude: moon?.longitude || 0
+    };
+  };
+
+  const getSubLordDynamic = (nakshatraName: string, degree: number): string => {
+    const lords = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+    const nIdx = NAKSHATRA_NAMES.indexOf(nakshatraName);
+    const startLord = NAKSHATRA_LORDS[nIdx];
+    const startLordIdx = lords.indexOf(startLord);
+
+    const fraction = (degree % (360 / 27)) / (360 / 27);
+    const periods = [7, 20, 6, 10, 7, 18, 16, 19, 17];
+    let cumulative = 0;
+    const offsetFracs = periods.map(p => {
+      cumulative += p;
+      return cumulative / 120;
+    });
+
+    let subIdx = 0;
+    for (let i = 0; i < 9; i++) {
+      const checkingIdx = (startLordIdx + i) % 9;
+      const limit = offsetFracs[i];
+      if (fraction <= limit) {
+        subIdx = checkingIdx;
+        break;
+      }
+    }
+    return lords[subIdx];
+  };
+
+  const forecastDaysRaw: any[] = [];
+
+  for (let i = 0; i < 3; i++) {
+    const curDate = new Date(predictionDate.getTime() + i * 24 * 60 * 60 * 1000);
+    
+    let changeTimeStr: string | null = null;
+    let startNakshatra = "";
+    let endNakshatra = "";
+    let startLord = "";
+    let endLord = "";
+    let finalNakshatra = "";
+    let finalLord = "";
+    let finalSubLord = "";
+
+    const nak0 = getMoonNakAtTime(curDate, "00:00:00");
+    const nak23 = getMoonNakAtTime(curDate, "23:59:00");
+
+    if (nak0.nakshatra === nak23.nakshatra) {
+      startNakshatra = nak0.nakshatra;
+      startLord = nak0.lord;
+      finalNakshatra = nak0.nakshatra;
+      finalLord = nak0.lord;
+      finalSubLord = getSubLordDynamic(nak0.nakshatra, nak0.longitude);
+    } else {
+      startNakshatra = nak0.nakshatra;
+      startLord = nak0.lord;
+      endNakshatra = nak23.nakshatra;
+      endLord = nak23.lord;
+      
+      const noon = getMoonNakAtTime(curDate, "12:00:00");
+      finalNakshatra = noon.nakshatra;
+      finalLord = noon.lord;
+      finalSubLord = getSubLordDynamic(noon.nakshatra, noon.longitude);
+
+      let transitionHour = 0;
+      let l1 = nak0.longitude;
+      let l2 = nak0.longitude;
+      for (let h = 1; h <= 24; h++) {
+        const hStr = String(h === 24 ? 23 : h).padStart(2, "0") + (h === 24 ? ":59:00" : ":00:00");
+        const check = getMoonNakAtTime(curDate, hStr);
+        if (check.nakshatra !== startNakshatra) {
+          transitionHour = h - 1;
+          l2 = check.longitude;
+          break;
+        }
+        l1 = check.longitude;
+      }
+
+      const step = 360 / 27;
+      const boundaryIdx = Math.ceil(l1 / step);
+      const boundaryLong = boundaryIdx * step;
+
+      if (l2 > l1) {
+        const diff = l2 - l1;
+        const fraction = (boundaryLong - l1) / diff;
+        const totalMinutes = Math.round(fraction * 60);
+        let targetHour = transitionHour;
+        let targetMinute = totalMinutes;
+        if (targetMinute >= 60) {
+          targetHour += Math.floor(targetMinute / 60);
+          targetMinute = targetMinute % 60;
+        }
+        const ampm = targetHour >= 12 ? "PM" : "AM";
+        const displayHour = targetHour % 12 === 0 ? 12 : targetHour % 12;
+        const displayMinute = String(targetMinute).padStart(2, "0");
+        changeTimeStr = `${displayHour}:${displayMinute} ${ampm}`;
+      } else {
+        const l2Adjusted = l2 + 360;
+        const diff = l2Adjusted - l1;
+        const fraction = (360 - l1) / diff;
+        const totalMinutes = Math.round(fraction * 60);
+        let targetHour = transitionHour;
+        let targetMinute = totalMinutes;
+        if (targetMinute >= 60) {
+          targetHour += Math.floor(targetMinute / 60);
+          targetMinute = targetMinute % 60;
+        }
+        const ampm = targetHour >= 12 ? "PM" : "AM";
+        const displayHour = targetHour % 12 === 0 ? 12 : targetHour % 12;
+        const displayMinute = String(targetMinute).padStart(2, "0");
+        changeTimeStr = `${displayHour}:${displayMinute} ${ampm}`;
+      }
+    }
+
+    forecastDaysRaw.push({
+      idx: i + 1,
+      name: finalNakshatra,
+      lord: finalLord,
+      subLord: finalSubLord,
+      offsetDays: i,
+      transitChangeText: changeTimeStr ? `Changes from ${startNakshatra} to ${endNakshatra} at ${changeTimeStr}` : null,
+      startNakshatra,
+      endNakshatra,
+      changeTimeStr
+    });
+  }
 
   const forecastDays: NJForecastDay[] = forecastDaysRaw.map((fd, i) => {
     const curDate = new Date(predictionDate.getTime() + fd.offsetDays * 24 * 60 * 60 * 1000);
     const nextDate = new Date(curDate.getTime() + 24 * 60 * 60 * 1000);
 
     const dateStr = formatDateLabel(curDate);
-    const approxStart = `${formatDateLabel(curDate)} 09:40`;
-    const approxEnd = `${formatDateLabel(nextDate)} 08:10`;
+    const approxStart = fd.changeTimeStr ? `${dateStr} ${fd.changeTimeStr} (Entering ${fd.endNakshatra})` : `${dateStr} 12:00 AM`;
+    const approxEnd = fd.changeTimeStr ? `${dateStr} ${fd.changeTimeStr} (Leaving ${fd.startNakshatra})` : `${dateStr} 11:59 PM`;
 
     const moonSign = getNakshatraSign(fd.name);
     const signLord = SIGN_LORDS[moonSign] || "Venus";
@@ -398,7 +542,9 @@ export function runNJEngine(
     const secondaryTheme = themeScores[1].name;
 
     // Mood sentence
-    const mood = `${themeScores[0].mood} • Deep Mind-State governed by Moon in ${fd.name}`;
+    const mood = fd.transitChangeText
+      ? `${themeScores[0].mood} • Deep Mind-State governed by Moon [${fd.transitChangeText}]`
+      : `${themeScores[0].mood} • Deep Mind-State governed by Moon in ${fd.name}`;
 
     return {
       dayIndex: fd.idx,
@@ -420,6 +566,10 @@ export function runNJEngine(
       primaryTheme,
       secondaryTheme,
       mood,
+      transitChangeText: fd.transitChangeText,
+      startNakshatra: fd.startNakshatra,
+      endNakshatra: fd.endNakshatra,
+      changeTimeStr: fd.changeTimeStr,
       confidence: themeScores[0].probability
     };
   });
