@@ -1,83 +1,10 @@
-{
-  "schema": {
-    "name": "Canonical Planet Database",
-    "version": "1.0.0",
-    "records": 9
-  },
-
-  "planet_schema": {
-    "id": "unique_id",
-    "name": "Planet Name",
-    "sanskrit_name": "",
-    "short_name": "",
-    "planet_number": 0,
-    "category": "",
-    "nature": "",
-    "gender": "",
-    "element": "",
-    "guna": "",
-    "caste": "",
-    "direction": "",
-    "color": "",
-    "metal": "",
-    "gemstone": "",
-    "grain": "",
-    "deity": "",
-    "vehicle": "",
-    "dosha": "",
-    "body_parts": [],
-    "karakatwas": [],
-    "friends": [],
-    "neutrals": [],
-    "enemies": [],
-    "moolatrikona": "",
-    "own_signs": [],
-    "exaltation": {
-      "sign": "",
-      "degree": 0
-    },
-    "debilitation": {
-      "sign": "",
-      "degree": 0
-    },
-    "nakshatra_lord_of": [],
-    "day": "",
-    "mahadasha_years": 0,
-    "orb": 0,
-    "speed": "",
-    "aspect_type": "",
-    "special_aspects": [],
-    "functional_role": "Depends on Lagna",
-    "references": []
-  },
-
-  "records": [
-    {
-      "id": "SUN"
-    },
-    {
-      "id": "MOON"
-    },
-    {
-      "id": "MARS"
-    },
-    {
-      "id": "MERCURY"
-    },
-    {
-      "id": "JUPITER"
-    },
-    {
-      "id": "VENUS"
-    },
-    {
-      "id": "SATURN"
-    },
-    {
-      "id": "RAHU"
-    },
-    {
-      "id": "KETU"
-    }
-  ]
-}
+planets/
+    sun.json
+    moon.json
+    mars.json
+    mercury.json
+    jupiter.json
+    venus.json
+    saturn.json
+    rahu.json
+    ketu.json
