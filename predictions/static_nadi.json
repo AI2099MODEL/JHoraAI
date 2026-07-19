@@ -1,0 +1,123 @@
+{
+  "schema": {
+    "name": "Static Nadi Astrology",
+    "version": "1.0.0",
+    "description": "Master index and immutable reference catalog for Nadi Astrology systems."
+  },
+
+  "system": {
+    "name": "Nadi Astrology",
+    "category": "Vedic Astrology",
+    "zodiac": "Sidereal",
+    "default_ayanamsa": "Lahiri"
+  },
+
+  "supported_traditions": [
+    "Bhrigu Nadi",
+    "Nandi Nadi",
+    "Dhruva Nadi",
+    "Chandra Kala Nadi",
+    "Sapta Rishi Nadi",
+    "Deva Keralam",
+    "Meena Nadi"
+  ],
+
+  "supported_modules": [
+    "Planetary Combinations",
+    "Nadi Yogas",
+    "Planet Chains",
+    "Planet Clusters",
+    "Nadi Aspects",
+    "Nadi Friendship",
+    "Nadi Avasthas",
+    "Nadi Karakas",
+    "Nadi Dashas",
+    "Transit Interpretation",
+    "Life Event Timing",
+    "Spiritual Indicators"
+  ],
+
+  "supported_calculations": [
+    "Planet Grouping",
+    "Sequential Planet Analysis",
+    "Dispositor Chain",
+    "Nakshatra Chain",
+    "House Linkage",
+    "Planet Exchange",
+    "Conjunction Analysis",
+    "Aspect Chain",
+    "Nadi Strength",
+    "Event Trigger Analysis"
+  ],
+
+  "supported_prediction_methods": [
+    "Life Event Prediction",
+    "Career Analysis",
+    "Marriage Analysis",
+    "Children Analysis",
+    "Finance Analysis",
+    "Property Analysis",
+    "Health Analysis",
+    "Foreign Travel",
+    "Spiritual Progress",
+    "Longevity Analysis"
+  ],
+
+  "supported_entities": [
+    "Planet",
+    "House",
+    "Sign",
+    "Nakshatra",
+    "Planet Chain",
+    "Dispositor",
+    "Yoga",
+    "Karaka",
+    "Transit",
+    "Event Trigger"
+  ],
+
+  "supported_principles": [
+    "Planet Speaks",
+    "Planet Chain",
+    "Dispositor Principle",
+    "Linked House Theory",
+    "Natural Signification",
+    "Composite Signification",
+    "Repeated Indication",
+    "Event Confirmation",
+    "Multi-Level Validation"
+  ],
+
+  "supported_outputs": [
+    "Planet Chain Analysis",
+    "Life Event Analysis",
+    "Career Report",
+    "Marriage Report",
+    "Health Report",
+    "Spiritual Report",
+    "Event Timing",
+    "PDF Report",
+    "JSON Export"
+  ],
+
+  "supported_classical_sources": [
+    "Bhrigu Nadi",
+    "Nandi Nadi",
+    "Dhruva Nadi",
+    "Deva Keralam",
+    "Chandra Kala Nadi",
+    "Meena Nadi"
+  ],
+
+  "dependencies": [
+    "static_core.json",
+    "static_planets.json",
+    "static_signs.json",
+    "static_houses.json",
+    "static_nakshatras.json",
+    "static_dashas.json",
+    "static_yogas.json",
+    "static_special_lagnas.json",
+    "static_arudhas.json"
+  ]
+}
