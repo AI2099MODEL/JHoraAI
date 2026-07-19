@@ -1,75 +1,164 @@
 {
-  "system": "Jaimini Chara Dasha",
-  "description": "Rasi (sign-based) dasha system where each of the 12 zodiac signs becomes a dasha lord in sequence, starting from the Lagna (or Arudha Lagna, per some traditions).",
-  "signs": [
-    {"order": 1, "name": "Aries", "lord": "Mars", "parity": "odd", "modality": "movable"},
-    {"order": 2, "name": "Taurus", "lord": "Venus", "parity": "even", "modality": "fixed"},
-    {"order": 3, "name": "Gemini", "lord": "Mercury", "parity": "odd", "modality": "dual"},
-    {"order": 4, "name": "Cancer", "lord": "Moon", "parity": "even", "modality": "movable"},
-    {"order": 5, "name": "Leo", "lord": "Sun", "parity": "odd", "modality": "fixed"},
-    {"order": 6, "name": "Virgo", "lord": "Mercury", "parity": "even", "modality": "dual"},
-    {"order": 7, "name": "Libra", "lord": "Venus", "parity": "odd", "modality": "movable"},
-    {"order": 8, "name": "Scorpio", "lord": "Mars", "parity": "even", "modality": "fixed"},
-    {"order": 9, "name": "Sagittarius", "lord": "Jupiter", "parity": "odd", "modality": "dual"},
-    {"order": 10, "name": "Capricorn", "lord": "Saturn", "parity": "even", "modality": "movable"},
-    {"order": 11, "name": "Aquarius", "lord": "Saturn", "parity": "odd", "modality": "fixed"},
-    {"order": 12, "name": "Pisces", "lord": "Jupiter", "parity": "even", "modality": "dual"}
-  ],
-  "starting_point": {
-    "rule": "The first Mahadasha is of the sign occupied by the Lagna (Ascendant sign). Some traditions use the Arudha Lagna sign instead — flag this as a configurable option.",
-    "sequence_direction": "The overall sequence of 12 Mahadasha signs proceeds in zodiacal (forward) order from the starting sign if the starting sign is odd, and in counter-zodiacal (reverse) order if the starting sign is even."
-  },
-  "mahadasha_duration_calculation": {
-    "step_1": "Identify the dispositor (lord) of the sign, and the sign it currently occupies in the birth chart.",
-    "step_2": "Count the number of signs (inclusive of both start and end sign) from the dasha sign to the sign occupied by its lord.",
-    "direction_of_counting": {
-      "odd_sign": "count zodiacally (forward, e.g. Aries -> Taurus -> Gemini ...)",
-      "even_sign": "count counter-zodiacally (backward, e.g. Taurus -> Aries -> Pisces ...)"
-    },
-    "duration_years": "The count obtained in step_2 (a number from 1 to 12) is the duration of that sign's Mahadasha in years.",
-    "exceptions": [
-      {
-        "case": "Lord placed in its own sign (count = 1)",
-        "rule": "Duration is taken as 12 years (full period) instead of 1."
-      },
-      {
-        "case": "Aries and Scorpio (both ruled by Mars)",
-        "rule": "Some classical sources (Jaimini sutras) fix these at 7 years each regardless of the counted value, due to Mars owning two signs. This is a commonly cited exception but not universally applied by all software — flag as a configurable/toggleable rule since practitioners differ on this.",
-        "status": "disputed_optional"
-      },
-      {
-        "case": "Lord placed in the 12th sign from the dasha sign (in the counting direction)",
-        "rule": "Some texts reduce or adjust duration further; treatment varies by author. Recommend leaving this off unless following a specific named source (e.g., Sanjay Rath's Jaimini method)."
-      }
+  "id": "CHARA_DASHA",
+  "version": "1.0.0",
+  "engine": "JHoraAI",
+  "enabled": true,
+
+  "input": {
+    "required": [
+      "rashi_chart",
+      "lagna_sign",
+      "planet_positions"
     ],
-    "total_cycle_check": "Regardless of chart, the sum of all 12 Mahadasha durations in one complete cycle always equals exactly 144 years. Use this as a validation check on the calculation."
-  },
-  "antardasha_sub_period_calculation": {
-    "method": "proportional_scaling",
-    "step_1": "List all 12 signs starting from the Mahadasha sign itself, proceeding in the same direction as the overall Mahadasha sequence (forward if Mahadasha sign is odd, backward if even).",
-    "step_2": "For each of these 12 signs, compute its OWN independent full-cycle dasha duration in years (using the same mahadasha_duration_calculation logic applied to that sign, ignoring the current chart's Mahadasha context).",
-    "step_3": "Scale each sign's antardasha length proportionally: antardasha_duration = (Mahadasha_duration_years * that_sign's_own_full_years) / 144",
-    "formula": "AD_duration = (MD_duration_years * sign_full_years) / 144",
-    "notes": "This preserves proportional weighting so all 12 antardashas within a Mahadasha sum exactly to the Mahadasha's total duration."
-  },
-  "further_sub_levels": {
-    "pratyantar_dasha": "Apply the same proportional_scaling method recursively: within each Antardasha, list 12 signs starting from the Antardasha sign (direction per its own parity), scale by (AD_duration * sign_full_years)/144.",
-    "sookshma_dasha": "Repeat the same recursive method one level deeper for further precision.",
-    "general_rule": "Every sub-level uses the identical recursive algorithm: (parent_duration * child_sign_full_years) / 144, with direction determined by the parity (odd/even) of the current level's starting sign."
-  },
-  "output_schema_suggestion": {
-    "mahadasha": [
-      {"sign": "string", "lord": "string", "start_date": "ISO8601", "end_date": "ISO8601", "duration_years": "number",
-       "antardasha": [
-         {"sign": "string", "start_date": "ISO8601", "end_date": "ISO8601", "duration_years": "number",
-          "pratyantar": ["... same structure, recursive ..."]}
-       ]}
+    "optional": [
+      "birth_rectified",
+      "ayanamsa"
     ]
   },
-  "known_variations_across_sources": [
-    "Starting point: Lagna sign vs Arudha Lagna sign (this changes the entire sequence).",
-    "Whether Aries/Scorpio 7-year fixed exception is applied.",
-    "Whether Rahu/Ketu are ever substituted as co-lords in special chart configurations (rare, mostly ignored in mainstream Chara Dasha).",
-    "Some authors count antardasha differently (equal 1/12 division rather than proportional scaling) — proportional scaling is the majority/software-standard approach."
-  ]
+
+  "starting_sign": {
+    "method": "LAGNA_RASHI"
+  },
+
+  "sign_types": {
+    "Aries": "MOVABLE",
+    "Taurus": "FIXED",
+    "Gemini": "DUAL",
+    "Cancer": "MOVABLE",
+    "Leo": "FIXED",
+    "Virgo": "DUAL",
+    "Libra": "MOVABLE",
+    "Scorpio": "FIXED",
+    "Sagittarius": "DUAL",
+    "Capricorn": "MOVABLE",
+    "Aquarius": "FIXED",
+    "Pisces": "DUAL"
+  },
+
+  "direction_rules": {
+    "MOVABLE": {
+      "direction": "FORWARD"
+    },
+
+    "FIXED": {
+      "odd_sign": "FORWARD",
+      "even_sign": "REVERSE"
+    },
+
+    "DUAL": {
+      "odd_sign": "FORWARD",
+      "even_sign": "REVERSE"
+    }
+  },
+
+  "sign_order_forward": [
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces"
+  ],
+
+  "sign_order_reverse": [
+    "Pisces",
+    "Aquarius",
+    "Capricorn",
+    "Sagittarius",
+    "Scorpio",
+    "Libra",
+    "Virgo",
+    "Leo",
+    "Cancer",
+    "Gemini",
+    "Taurus",
+    "Aries"
+  ],
+
+  "sign_lords": {
+    "Aries": "Mars",
+    "Taurus": "Venus",
+    "Gemini": "Mercury",
+    "Cancer": "Moon",
+    "Leo": "Sun",
+    "Virgo": "Mercury",
+    "Libra": "Venus",
+    "Scorpio": "Mars",
+    "Sagittarius": "Jupiter",
+    "Capricorn": "Saturn",
+    "Aquarius": "Saturn",
+    "Pisces": "Jupiter"
+  },
+
+  "duration": {
+    "algorithm": "COUNT_FROM_SIGN_TO_LORD",
+
+    "count_mode": "INCLUSIVE",
+
+    "same_sign_duration": 12,
+
+    "minimum": 1,
+
+    "maximum": 12
+  },
+
+  "lord_resolution": {
+    "ignore_modern_planets": true,
+
+    "rahu_ketu_never_lords": true
+  },
+
+  "antar_dasha": {
+    "enabled": true,
+
+    "order": "SAME_AS_MAHA_DASHA",
+
+    "reuse_duration_algorithm": true
+  },
+
+  "validation": {
+    "exactly_12_signs": true,
+
+    "every_sign_has_lord": true,
+
+    "all_planets_placed": true
+  },
+
+  "execution_pipeline": [
+    "LOAD_CHART",
+    "IDENTIFY_LAGNA",
+    "IDENTIFY_START_SIGN",
+    "IDENTIFY_SIGN_TYPE",
+    "DETERMINE_DIRECTION",
+    "GENERATE_RASHI_SEQUENCE",
+    "CALCULATE_EACH_DASHA_DURATION",
+    "BUILD_MAHADASHA_TABLE",
+    "BUILD_ANTARDASHA_TABLE",
+    "VALIDATE_TOTAL"
+  ],
+
+  "output": {
+    "fields": [
+      "sign",
+      "lord",
+      "start_date",
+      "end_date",
+      "duration_years",
+      "direction",
+      "antar_dashas"
+    ]
+  },
+
+  "engine_flags": {
+    "deterministic": true,
+    "cacheable": true,
+    "parallel_safe": true,
+    "supports_future_extensions": true
+  }
 }
