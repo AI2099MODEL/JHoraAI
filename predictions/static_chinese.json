@@ -1,0 +1,131 @@
+{
+  "schema": {
+    "name": "Static Chinese Astrology",
+    "version": "1.0.0",
+    "description": "Master index and immutable reference catalog for Chinese Astrology."
+  },
+
+  "system": {
+    "name": "Chinese Astrology",
+    "category": "Lunisolar Astrology",
+    "calendar": "Chinese Lunisolar Calendar"
+  },
+
+  "supported_modules": [
+    "Chinese Zodiac",
+    "Five Elements",
+    "Yin Yang",
+    "Heavenly Stems",
+    "Earthly Branches",
+    "Four Pillars (BaZi)",
+    "Ten Gods",
+    "Five Element Balance",
+    "Luck Pillars",
+    "Annual Pillars",
+    "Compatibility",
+    "Flying Stars"
+  ],
+
+  "supported_zodiac_animals": [
+    "Rat",
+    "Ox",
+    "Tiger",
+    "Rabbit",
+    "Dragon",
+    "Snake",
+    "Horse",
+    "Goat",
+    "Monkey",
+    "Rooster",
+    "Dog",
+    "Pig"
+  ],
+
+  "supported_elements": [
+    "Wood",
+    "Fire",
+    "Earth",
+    "Metal",
+    "Water"
+  ],
+
+  "supported_polarities": [
+    "Yin",
+    "Yang"
+  ],
+
+  "supported_heavenly_stems": [
+    "Jia",
+    "Yi",
+    "Bing",
+    "Ding",
+    "Wu",
+    "Ji",
+    "Geng",
+    "Xin",
+    "Ren",
+    "Gui"
+  ],
+
+  "supported_earthly_branches": [
+    "Zi",
+    "Chou",
+    "Yin",
+    "Mao",
+    "Chen",
+    "Si",
+    "Wu",
+    "Wei",
+    "Shen",
+    "You",
+    "Xu",
+    "Hai"
+  ],
+
+  "supported_prediction_methods": [
+    "BaZi Analysis",
+    "Luck Pillar Analysis",
+    "Annual Fortune",
+    "Compatibility",
+    "Career",
+    "Health",
+    "Marriage",
+    "Wealth",
+    "Element Balance",
+    "Feng Shui Integration"
+  ],
+
+  "supported_entities": [
+    "Animal Sign",
+    "Element",
+    "Heavenly Stem",
+    "Earthly Branch",
+    "Pillar",
+    "Ten God",
+    "Luck Pillar",
+    "Annual Pillar"
+  ],
+
+  "supported_classical_sources": [
+    "I Ching",
+    "BaZi Classics",
+    "San Ming Tong Hui",
+    "Yuan Hai Zi Ping",
+    "Di Tian Sui"
+  ],
+
+  "supported_outputs": [
+    "BaZi Report",
+    "Element Analysis",
+    "Compatibility Report",
+    "Luck Pillar Report",
+    "Annual Report",
+    "Career Report",
+    "PDF Report",
+    "JSON Export"
+  ],
+
+  "dependencies": [
+    "static_core.json"
+  ]
+}
