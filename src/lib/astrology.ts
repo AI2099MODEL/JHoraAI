@@ -128,6 +128,8 @@ export interface AstrologyData {
   kpSignificators?: any;
   kpDasha?: any;
   westernChart?: any;
+  astronomical_details?: any;
+  astronomical?: any;
 }
 
 export interface DashaPeriod {

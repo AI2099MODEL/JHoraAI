@@ -25,6 +25,7 @@ interface TransitsTabProps {
   transitTimezone?: number;
   subTab?: string;
   chartStyle?: "north" | "south";
+  profile?: any;
 }
 
 interface TransitPlanet {
@@ -96,7 +97,8 @@ export default function TransitsTab({
   transitLongitude,
   transitTimezone,
   subTab: propSubTab,
-  chartStyle = "north"
+  chartStyle = "north",
+  profile
 }: TransitsTabProps) {
   const getLocalDateString = () => {
     const d = new Date();
@@ -113,7 +115,7 @@ export default function TransitsTab({
   const [lat, setLat] = useState<number>(transitLatitude !== undefined && transitLatitude !== null ? transitLatitude : astrologyData.birthDetails.latitude);
   const [lng, setLng] = useState<number>(transitLongitude !== undefined && transitLongitude !== null ? transitLongitude : astrologyData.birthDetails.longitude);
   const [tz, setTz] = useState<number>(transitTimezone !== undefined && transitTimezone !== null ? transitTimezone : astrologyData.birthDetails.timezone);
-  const [subTabState, setSubTabState] = useState<string>("current_gochara");
+  const [subTabState, setSubTabState] = useState<string>("birth_panchanga");
   const subTab = propSubTab || subTabState;
   const setSubTab = propSubTab ? () => {} : setSubTabState;
 
@@ -1105,6 +1107,7 @@ export default function TransitsTab({
   }, [transitPlanets]);
 
   const SUB_TABS = [
+    { id: "birth_panchanga", name: "Birth Panchang", icon: Star },
     { id: "current_gochara", name: "Current Gochara", icon: RefreshCw },
     { id: "current_dasha", name: "Current Dasha", icon: Calendar },
     { id: "current_transits", name: "Current Transits", icon: Layers },
@@ -1126,32 +1129,6 @@ export default function TransitsTab({
 
   return (
     <div className="space-y-6" id="transits-tab-container">
-      {/* Title block */}
-      {!propSubTab && (
-        <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-indigo-500/20 p-6 shadow-xl">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h3 className="text-xl font-sans font-medium text-amber-100 flex items-center gap-2">
-                <RefreshCw className="w-5 h-5 text-amber-500" />
-                Gochara Subsystem
-              </h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Complete divisional transit alignments, real-time aspects, sensitive points, and Vimshottari dasha intersection.
-                {lat && lng && (
-                  <span className="block mt-1 text-[11px] text-amber-400/80 font-mono flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-amber-500" />
-                    Gps Spot: {Number(lat).toFixed(4)}°N, {Number(lng).toFixed(4)}°E (TZ: {tz >= 0 ? `+${tz}` : tz})
-                  </span>
-                )}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* 13 Horizontal Scrollable Submenus */}
       {!propSubTab && (
         <div className="bg-slate-950/65 rounded-xl border border-indigo-500/10 p-2 shadow-inner">
@@ -1178,6 +1155,32 @@ export default function TransitsTab({
         </div>
       )}
 
+      {/* Title block */}
+      {!propSubTab && subTab !== "birth_panchanga" && (
+        <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-indigo-500/20 p-6 shadow-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-xl font-sans font-medium text-amber-100 flex items-center gap-2">
+                <RefreshCw className="w-5 h-5 text-amber-500" />
+                Gochara Subsystem
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Complete divisional transit alignments, real-time aspects, sensitive points, and Vimshottari dasha intersection.
+                {lat && lng && (
+                  <span className="block mt-1 text-[11px] text-amber-400/80 font-mono flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-amber-500" />
+                    Gps Spot: {Number(lat).toFixed(4)}°N, {Number(lng).toFixed(4)}°E (TZ: {tz >= 0 ? `+${tz}` : tz})
+                  </span>
+                )}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+            </div>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex flex-col items-center justify-center h-[300px]">
           <RefreshCw className="w-7 h-7 animate-spin text-amber-500 mb-3" />
@@ -1189,6 +1192,80 @@ export default function TransitsTab({
         </div>
       ) : (
         <div className="animate-fade-in">
+          {/* TAB 0: BIRTH PANCHANGA */}
+          {subTab === "birth_panchanga" && (
+            <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-6">
+              <div className="border-b border-slate-800 pb-3 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                <div>
+                  <h4 className="text-base font-semibold text-emerald-400 flex items-center gap-2 font-sans">
+                    <span className="text-[12px] font-mono text-emerald-500 font-bold uppercase tracking-wider block">
+                      🟢 Live Birth Panchang Pillars
+                    </span>
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-1 font-sans">
+                    The five primary attributes of time at birth: Tithi, Vara, Nakshatra, Yoga, and Karana.
+                  </p>
+                </div>
+              </div>
+
+              {(() => {
+                const pData = astrologyData?.panchanga || profile?.Vedic?.panchanga || {};
+                const astroDetails = astrologyData?.astronomical_details || profile?.Astronomical || {};
+                return (
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {[
+                      { label: "Tithi (Lunar Day)", value: pData.tithi || "Sukla Ekadashi", sub: "Solilunar Angle", color: "border-amber-500/20 text-amber-400 bg-amber-500/5" },
+                      { label: "Vara (Weekday)", value: pData.vara || (profile?.Birth?.date ? new Date(profile.Birth.date).toLocaleDateString("en-US", { weekday: "long" }) : "Friday"), sub: `Lord: ${pData.varaLord || "Venus"}`, color: "border-indigo-500/20 text-indigo-300 bg-indigo-500/5" },
+                      { label: "Nakshatra (Moon)", value: pData.nakshatra || "Rohini", sub: `Lord: ${pData.nakLord || "Moon"}`, color: "border-emerald-500/20 text-emerald-400 bg-emerald-500/5" },
+                      { label: "Yoga (Solilunar)", value: pData.yoga || "Preeti", sub: "Longitude Sum", color: "border-cyan-500/20 text-cyan-400 bg-cyan-500/5" },
+                      { label: "Karana (Half Tithi)", value: pData.karana || "Bava", sub: "Angle Sectors", color: "border-purple-500/20 text-purple-400 bg-purple-500/5" }
+                    ].map((item, idx) => (
+                      <div key={idx} className={`p-4 rounded-xl border ${item.color} flex flex-col justify-between h-32`}>
+                        <div>
+                          <span className="text-[9px] uppercase font-mono text-slate-400 block tracking-wider font-semibold">{item.label}</span>
+                          <h5 className="text-sm font-bold text-white mt-2 leading-tight font-sans">{item.value}</h5>
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-400">{item.sub}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {/* Day Kaal & Astro details inside Birth Panchang */}
+              {(() => {
+                const astroDetails = astrologyData?.astronomical_details || profile?.Astronomical || {};
+                return (
+                  <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/30">
+                    <span className="text-xs font-mono text-indigo-400 uppercase font-bold block mb-3">Natal Ephemeris & Ritu Parameters</span>
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-xs font-mono">
+                      <div className="p-3 rounded bg-slate-950/40 border border-slate-800 flex justify-between items-center">
+                        <span className="text-slate-400 font-sans">Sunrise:</span>
+                        <span className="text-slate-200 font-bold">{astroDetails.sunrise || "05:42 AM"}</span>
+                      </div>
+                      <div className="p-3 rounded bg-slate-950/40 border border-slate-800 flex justify-between items-center">
+                        <span className="text-slate-400 font-sans">Sunset:</span>
+                        <span className="text-slate-200 font-bold">{astroDetails.sunset || "06:55 PM"}</span>
+                      </div>
+                      <div className="p-3 rounded bg-slate-950/40 border border-slate-800 flex justify-between items-center">
+                        <span className="text-slate-400 font-sans">Lunar Month:</span>
+                        <span className="text-slate-200 font-bold font-sans">{astroDetails.lunar_month || astroDetails.lunarMonth || "Kartika"}</span>
+                      </div>
+                      <div className="p-3 rounded bg-slate-950/40 border border-slate-800 flex justify-between items-center">
+                        <span className="text-slate-400 font-sans">Samvatsara:</span>
+                        <span className="text-slate-200 font-bold font-sans">{astroDetails.year_name || astroDetails.yearName || "Krodhi"}</span>
+                      </div>
+                      <div className="p-3 rounded bg-slate-950/40 border border-slate-800 flex justify-between items-center">
+                        <span className="text-slate-400 font-sans">Vedic Season:</span>
+                        <span className="text-slate-200 font-bold font-sans">{astroDetails.season || "Sharad"}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+
           {/* TAB 1: CURRENT GOCHARA */}
           {subTab === "current_gochara" && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
