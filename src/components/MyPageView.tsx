@@ -1610,7 +1610,7 @@ export function MyPageView({
     setErrorMsg(null);
 
     // Load from local storage first for speed and instant offline rendering
-    const localCached = localStorage.getItem("jhora_user_profile");
+    const localCached = localStorage.getItem("jhora_raw_user_profile_cache");
     if (localCached) {
       try {
         let parsed = JSON.parse(localCached);
@@ -1638,7 +1638,7 @@ export function MyPageView({
         }
         setProfile(parsedProfile);
         // Sync cache to local storage
-        localStorage.setItem("jhora_user_profile", JSON.stringify(data));
+        localStorage.setItem("jhora_raw_user_profile_cache", JSON.stringify(data));
         if (parsedProfile.Birth?.date) {
           calculateAge(parsedProfile.Birth.date, parsedProfile.Birth.time);
         }
@@ -1677,7 +1677,7 @@ export function MyPageView({
             }
           };
           setProfile(fallbackProfile);
-          localStorage.setItem("jhora_user_profile", JSON.stringify(fallbackProfile));
+          localStorage.setItem("jhora_raw_user_profile_cache", JSON.stringify(fallbackProfile));
           if (fallbackProfile.Birth.date) {
             calculateAge(fallbackProfile.Birth.date, fallbackProfile.Birth.time);
           }
@@ -1687,7 +1687,7 @@ export function MyPageView({
       }
     } catch (err: any) {
       console.error("Failed to load userprofile.json:", err);
-      if (!localStorage.getItem("jhora_user_profile")) {
+      if (!localStorage.getItem("jhora_raw_user_profile_cache")) {
         setErrorMsg("Failed to connect to backend profile service.");
       }
     } finally {
