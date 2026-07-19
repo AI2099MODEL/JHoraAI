@@ -1,5 +1,5 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "jhoraai-professional"
+name = "jhoraii"
 compatibility_date = "2026-07-15"
 
 # Static frontend only. The Node.js backend (server.ts) does NOT run here —

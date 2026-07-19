@@ -1,5 +1,5 @@
 {
-  "project_name": "jhoraai-professional",
+  "project_name": "jhoraii",
   "production_branch": "main",
   "build_config": {
     "build_command": "npm run build",
