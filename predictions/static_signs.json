@@ -1,0 +1,151 @@
+{
+  "schema": {
+    "name": "Static Zodiac Signs",
+    "version": "1.0.0",
+    "description": "Master catalog of zodiac signs and their immutable properties."
+  },
+
+  "zodiac": {
+    "total_signs": 12,
+    "types": [
+      "Sidereal",
+      "Tropical"
+    ]
+  },
+
+  "sign_order": [
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces"
+  ],
+
+  "elements": [
+    "Fire",
+    "Earth",
+    "Air",
+    "Water"
+  ],
+
+  "modalities": [
+    "Movable",
+    "Fixed",
+    "Dual"
+  ],
+
+  "genders": [
+    "Masculine",
+    "Feminine"
+  ],
+
+  "parity": [
+    "Odd",
+    "Even"
+  ],
+
+  "directions": [
+    "East",
+    "South",
+    "West",
+    "North"
+  ],
+
+  "varna": [
+    "Brahmin",
+    "Kshatriya",
+    "Vaishya",
+    "Shudra"
+  ],
+
+  "gana": [
+    "Deva",
+    "Manushya",
+    "Rakshasa"
+  ],
+
+  "species": [
+    "Human",
+    "Quadruped",
+    "Insect",
+    "Water",
+    "Reptile"
+  ],
+
+  "mobility": [
+    "Movable",
+    "Fixed",
+    "Dual"
+  ],
+
+  "fertility": [
+    "Fertile",
+    "Semi-Fertile",
+    "Barren"
+  ],
+
+  "temperament": [
+    "Hot",
+    "Cold",
+    "Moist",
+    "Dry"
+  ],
+
+  "body_orientation": [
+    "Head Rising",
+    "Back Rising",
+    "Both"
+  ],
+
+  "time_strength": [
+    "Day",
+    "Night",
+    "Both"
+  ],
+
+  "hemisphere": [
+    "Northern",
+    "Southern"
+  ],
+
+  "planetary_ownership": [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn"
+  ],
+
+  "supported_properties": [
+    "Element",
+    "Modality",
+    "Gender",
+    "Parity",
+    "Direction",
+    "Varna",
+    "Gana",
+    "Species",
+    "Fertility",
+    "Temperament",
+    "Body Part",
+    "Color",
+    "Nature",
+    "Symbol",
+    "Ruler",
+    "Exaltation",
+    "Debilitation",
+    "Moolatrikona",
+    "Friendly Planets",
+    "Enemy Planets",
+    "Neutral Planets"
+  ]
+}
