@@ -4074,7 +4074,6 @@ export function MyPageView({
             <div className="mt-6">
               <TransitsTab
                 astrologyData={astrologyData}
-                subTab="current_transits"
               />
             </div>
           ) : (

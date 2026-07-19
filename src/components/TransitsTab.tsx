@@ -11,6 +11,8 @@ import {
 import { AstrologyData, calculateAstrology } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
 import { mapJHoraResponseToAstrologyData } from "../lib/jhoraMapper";
+import IngressTab from "./IngressTab";
+import currentSkyJson from "../knowledgebase/checklist_engine/current_sky.json";
 
 interface TransitsTabProps {
   astrologyData: AstrologyData;
@@ -853,6 +855,255 @@ export default function TransitsTab({
 
   const upcomingTimeline = getTransitTimeline();
 
+  // 14. Extra transit calculations from HoroscopeReportView for complete feature parity
+  // Dynamic solar muhurtas calculator
+  const computedMuhurtas = React.useMemo(() => {
+    const sunriseStr = transitAstroData?.astronomical_details?.sunrise || transitAstroData?.panchanga?.sunrise || "05:42:00";
+    const sunsetStr = transitAstroData?.astronomical_details?.sunset || transitAstroData?.panchanga?.sunset || "18:55:00";
+    const dayName = transitPanchanga?.vara || "Friday";
+
+    const parseTime = (timeStr: string) => {
+      const parts = timeStr.split(":").map(Number);
+      return (parts[0] || 6) * 60 + (parts[1] || 0) + (parts[2] || 0) / 60;
+    };
+    const formatTime = (minutes: number) => {
+      const hrs = Math.floor(minutes / 60);
+      const mins = Math.floor(minutes % 60);
+      const isPm = hrs >= 12;
+      const displayHrs = hrs % 12 === 0 ? 12 : hrs % 12;
+      return `${displayHrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')} ${isPm ? "PM" : "AM"}`;
+    };
+
+    const sunriseMin = parseTime(sunriseStr);
+    const sunsetMin = parseTime(sunsetStr);
+    const dayLength = sunsetMin - sunriseMin;
+    const partLen = dayLength / 8;
+
+    // Midday
+    const midday = sunriseMin + dayLength / 2;
+    const abhijitStart = formatTime(midday - 24);
+    const abhijitEnd = formatTime(midday + 24);
+
+    const weekDays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayIdx = weekDays.findIndex(d => dayName.toLowerCase().includes(d.toLowerCase()));
+    const activeDayIdx = dayIdx !== -1 ? dayIdx : 5; // Default Friday
+
+    const rahuEighths = [8, 2, 7, 5, 6, 4, 3];
+    const yamaEighths = [5, 4, 3, 2, 1, 7, 6];
+    const gulikaEighths = [7, 6, 5, 4, 3, 2, 1];
+
+    const getInterval = (eighthNum: number) => {
+      const start = sunriseMin + (eighthNum - 1) * partLen;
+      const end = sunriseMin + eighthNum * partLen;
+      return { start: formatTime(start), end: formatTime(end) };
+    };
+
+    const abhijitInterval = { start: abhijitStart, end: abhijitEnd };
+    const brahmaInterval = { start: formatTime(sunriseMin - 96), end: formatTime(sunriseMin - 48) };
+    const rahuInterval = getInterval(rahuEighths[activeDayIdx]);
+    const yamaInterval = getInterval(yamaEighths[activeDayIdx]);
+    const gulikaInterval = getInterval(gulikaEighths[activeDayIdx]);
+
+    return {
+      abhijit: abhijitInterval,
+      brahma: brahmaInterval,
+      rahuKalam: rahuInterval,
+      yamaganda: yamaInterval,
+      gulika: gulikaInterval,
+      sunrise: formatTime(sunriseMin),
+      sunset: formatTime(sunsetMin)
+    };
+  }, [transitAstroData, transitPanchanga]);
+
+  const dynamicEventOpportunity = React.useMemo(() => {
+    if (!transitPanchanga?.nakshatra) {
+      return {
+        marriageWindow: { active: false, timeframe: "Plan for next favorable Nakshatra cycle" },
+        businessOpportunity: { active: false, timeframe: "Avoid launching ventures under current constellation" },
+        investmentOpportunity: { active: false, timeframe: "Defer critical asset settlements temporarily" },
+        learningOpportunity: { active: false, timeframe: "Auspicious for reviews, defer registration" },
+        careerOpportunity: { active: false, timeframe: "Perform internal consolidation, defer proposal" },
+        travelOpportunity: { active: false, timeframe: "Consolidate locally, protect health parameters" }
+      };
+    }
+    const nak = transitPanchanga.nakshatra.toLowerCase();
+    
+    const marriageActive = ["rohini", "anuradha", "revati", "mrigashira", "hasta", "swati", "uttara phalguni", "uttara ashadha", "uttara bhadrapada"].some(n => nak.includes(n));
+    const businessActive = ["pushya", "shravana", "hasta", "chitra", "swati", "revati", "aswini", "punarvasu"].some(n => nak.includes(n));
+    const investmentActive = ["rohini", "uttara phalguni", "uttara ashadha", "uttara bhadrapada", "shravana", "dhanishta", "shatabhisha"].some(n => nak.includes(n));
+    const learningActive = ["hasta", "pushya", "mrigashira", "chitra", "anuradha", "revati", "aswini"].some(n => nak.includes(n));
+    const careerActive = ["krittika", "uttara phalguni", "uttara ashadha", "rohini", "pushya", "magha"].some(n => nak.includes(n));
+    const travelActive = ["aswini", "punarvasu", "pushya", "hasta", "anuradha", "mula", "shravana", "revati"].some(n => nak.includes(n));
+
+    return {
+      marriageWindow: {
+        active: marriageActive,
+        timeframe: marriageActive ? `Peak auspicious wedding wedding muhurta today under ${transitPanchanga.nakshatra}` : "Plan for next favorable Nakshatra cycle"
+      },
+      businessOpportunity: {
+        active: businessActive,
+        timeframe: businessActive ? `Auspicious commerce yoga under ${transitPanchanga.nakshatra}` : "Avoid launching ventures under current constellation"
+      },
+      investmentOpportunity: {
+        active: investmentActive,
+        timeframe: investmentActive ? "Favorable wealth accumulation transit" : "Defer critical asset settlements temporarily"
+      },
+      learningOpportunity: {
+        active: learningActive,
+        timeframe: learningActive ? "Peak concentration and enrollment window" : "Auspicious for reviews, defer registration"
+      },
+      careerOpportunity: {
+        active: careerActive,
+        timeframe: careerActive ? "Excellent authority alignment, initiate leap" : "Perform internal consolidation, defer proposal"
+      },
+      travelOpportunity: {
+        active: travelActive,
+        timeframe: travelActive ? "Auspicious physical transit; low hazard" : "Consolidate locally, protect health parameters"
+      }
+    };
+  }, [transitPanchanga]);
+
+  const dynamicEnergy = React.useMemo(() => {
+    if (!transitPlanets || transitPlanets.length === 0) {
+      const fallback = currentSkyJson?.currentEnergy || {
+        overallEnergy: { score: 0.65, tone: "Balanced" },
+        mentalEnergy: { score: 0.6, tone: "Balanced" },
+        physicalEnergy: { score: 0.55, tone: "Balanced" },
+        relationshipEnergy: { score: 0.65, tone: "Balanced" },
+        careerEnergy: { score: 0.7, tone: "Strong / Robust" },
+        financialEnergy: { score: 0.6, tone: "Balanced" },
+        spiritualEnergy: { score: 0.7, tone: "Strong / Robust" }
+      };
+      return {
+        overall: { score: fallback.overallEnergy.score, tone: fallback.overallEnergy.tone },
+        mental: { score: fallback.mentalEnergy.score, tone: fallback.mentalEnergy.tone },
+        physical: { score: fallback.physicalEnergy.score, tone: fallback.physicalEnergy.tone },
+        relationship: { score: fallback.relationshipEnergy.score, tone: fallback.relationshipEnergy.tone },
+        career: { score: fallback.careerEnergy.score, tone: fallback.careerEnergy.tone },
+        financial: { score: fallback.financialEnergy.score, tone: fallback.financialEnergy.tone },
+        spiritual: { score: fallback.spiritualEnergy.score, tone: fallback.spiritualEnergy.tone }
+      };
+    }
+
+    const findPlanetHouse = (name: string): number => {
+      const p = transitPlanets.find((pl: any) => pl.name === name);
+      return p ? Number(p.house) || 1 : 1;
+    };
+
+    const sunHouse = findPlanetHouse("Sun");
+    const mercHouse = findPlanetHouse("Mercury");
+    const marsHouse = findPlanetHouse("Mars");
+    const venHouse = findPlanetHouse("Venus");
+    const jupHouse = findPlanetHouse("Jupiter");
+    const satHouse = findPlanetHouse("Saturn");
+    const moonHouse = findPlanetHouse("Moon");
+
+    let overallVal = 6.5;
+    if ([1, 3, 6, 10, 11].includes(sunHouse)) overallVal += 2.0;
+    if ([8, 12].includes(sunHouse)) overallVal -= 1.5;
+
+    let mentalVal = 6.0;
+    if ([1, 4, 5, 10, 11].includes(mercHouse)) mentalVal += 2.5;
+    if ([6, 8, 12].includes(mercHouse)) mentalVal -= 1.0;
+
+    let physicalVal = 5.5;
+    if ([3, 6, 10, 11].includes(marsHouse)) physicalVal += 3.0;
+    if ([8, 12].includes(marsHouse)) physicalVal -= 1.5;
+
+    let relationshipVal = 6.5;
+    if ([1, 4, 5, 7, 9, 11].includes(venHouse)) relationshipVal += 2.0;
+    if ([6, 8, 12].includes(venHouse)) relationshipVal -= 1.5;
+
+    let careerVal = 7.0;
+    if ([1, 5, 9, 10, 11].includes(jupHouse)) careerVal += 1.5;
+    if ([3, 6, 10, 11].includes(satHouse)) careerVal += 1.0;
+
+    let financialVal = 6.0;
+    if ([2, 5, 9, 11, 1].includes(moonHouse)) financialVal += 2.5;
+    if ([6, 8, 12].includes(moonHouse)) financialVal -= 1.5;
+
+    let spiritualVal = 7.0;
+    if ([5, 8, 9, 12].includes(moonHouse)) spiritualVal += 1.5;
+
+    const clamp = (val: number) => Math.max(1, Math.min(10, val));
+    const getTone = (val: number) => {
+      if (val >= 8.5) return "Peak Ascent";
+      if (val >= 7.2) return "Strong / Robust";
+      if (val >= 5.5) return "Balanced";
+      return "Subdued / Vulnerable";
+    };
+
+    return {
+      overall: { score: clamp(overallVal) / 10, tone: getTone(overallVal) },
+      mental: { score: clamp(mentalVal) / 10, tone: getTone(mentalVal) },
+      physical: { score: clamp(physicalVal) / 10, tone: getTone(physicalVal) },
+      relationship: { score: clamp(relationshipVal) / 10, tone: getTone(relationshipVal) },
+      career: { score: clamp(careerVal) / 10, tone: getTone(careerVal) },
+      financial: { score: clamp(financialVal) / 10, tone: getTone(financialVal) },
+      spiritual: { score: clamp(spiritualVal) / 10, tone: getTone(spiritualVal) }
+    };
+  }, [transitPlanets]);
+
+  const dynamicMood = React.useMemo(() => {
+    if (!transitPlanets || transitPlanets.length === 0) {
+      return {
+        dominantHouses: [{ houseNumber: 4, significance: "Domestic Harmony & Spiritual Peace" }],
+        dominantPlanets: [{ planet: "Jupiter", strength: "9.2/10", influenceType: "Wisdom Expansion & Good Fortune" }]
+      };
+    }
+
+    const houseCounts: { [key: number]: number } = {};
+    transitPlanets.forEach((p: any) => {
+      const h = Number(p.house) || 1;
+      houseCounts[h] = (houseCounts[h] || 0) + 1;
+    });
+
+    let maxHouse = 1;
+    let maxCount = 0;
+    Object.keys(houseCounts).forEach((hKey) => {
+      const h = Number(hKey);
+      if (houseCounts[h] > maxCount) {
+        maxCount = houseCounts[h];
+        maxHouse = h;
+      }
+    });
+
+    const houseSignificances: { [key: number]: string } = {
+      1: "Self-expression, Vitality & Physical Horizon",
+      2: "Wealth consolidation, Family and Speech clarity",
+      3: "Courage, short journeys and communication focus",
+      4: "Domestic peace, emotional sanctuary & self-care",
+      5: "Creative intelligence, children & speculation",
+      6: "Health checkups, routine work & discipline",
+      7: "Relationships, negotiations & partnerships",
+      8: "Transformation, joint finances & mysticism",
+      9: "Higher wisdom, long journeys & philosophy",
+      10: "Career authority, leadership & status rise",
+      11: "Gains, friendships, goals and financial network",
+      12: "Subconscious reflections, sleep & spiritual release"
+    };
+
+    const dominantPlanetsList = transitPlanets.map((p: any) => {
+      const exaltationPoints: { [key: string]: string } = {
+        Sun: "Aries", Moon: "Taurus", Mars: "Capricorn", Mercury: "Virgo",
+        Jupiter: "Cancer", Venus: "Pisces", Saturn: "Libra"
+      };
+      let strength = 7.5;
+      if (p.sign === exaltationPoints[p.name]) strength += 2.0;
+      if (p.name === "Jupiter" || p.name === "Venus") strength += 0.5;
+      return {
+        planet: p.name,
+        strength: `${strength.toFixed(1)}/10`,
+        influenceType: p.name === "Sun" ? "Vitality & Focus" : p.name === "Moon" ? "Emotional Balance" : p.name === "Mercury" ? "Intellectual Clarity" : p.name === "Venus" ? "Aesthetic & Harmony" : p.name === "Jupiter" ? "Fortune & Philosophy" : p.name === "Saturn" ? "Discipline & Patience" : "Intense Insights"
+      };
+    }).sort((a: any, b: any) => parseFloat(b.strength) - parseFloat(a.strength));
+
+    return {
+      dominantHouses: [{ houseNumber: maxHouse, significance: houseSignificances[maxHouse] || "Cosmic consolidation" }],
+      dominantPlanets: [dominantPlanetsList[0] || { planet: "Jupiter", strength: "8.5/10", influenceType: "Expansion & Philosophy" }]
+    };
+  }, [transitPlanets]);
+
   const SUB_TABS = [
     { id: "current_gochara", name: "Current Gochara", icon: RefreshCw },
     { id: "current_dasha", name: "Current Dasha", icon: Calendar },
@@ -867,6 +1118,10 @@ export default function TransitsTab({
     { id: "sensitive_points", name: "Sensitive Points", icon: MapPin },
     { id: "current_events", name: "Current Events", icon: Activity },
     { id: "transit_timeline", name: "Transit Timeline", icon: TrendingUp },
+    { id: "planet_ingress", name: "Planet Ingress", icon: ArrowRight },
+    { id: "transit_summary", name: "Transit Summary", icon: Info },
+    { id: "daily_muhurta", name: "Daily Muhurta", icon: Clock },
+    { id: "event_muhurta", name: "Event Muhurta", icon: Calendar },
   ];
 
   return (
@@ -1477,6 +1732,227 @@ export default function TransitsTab({
                     <span className="text-xs font-bold font-mono text-amber-500 shrink-0 bg-amber-500/5 border border-amber-500/20 px-2 py-1 rounded">{item.day}</span>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 14: PLANETARY INGRESS */}
+          {subTab === "planet_ingress" && (
+            <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-4">
+              <IngressTab birthDate={astrologyData.birthDetails.date} />
+            </div>
+          )}
+
+          {/* TAB 15: TRANSIT SUMMARY */}
+          {subTab === "transit_summary" && (
+            <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-6">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 gap-4">
+                <div>
+                  <h4 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-indigo-400" />
+                    Interactive Transit Health, Spirit & Career Synthesizer
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-1">Real-time calculations for mental, physical and spiritual alignments</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* Visual score bars */}
+                <div className="lg:col-span-7 space-y-5">
+                  <h4 className="text-xs font-mono text-indigo-400 uppercase tracking-widest font-bold">
+                    Cosmic Health Energy Scores
+                  </h4>
+                  {[
+                    { label: "Mental Clarity & Communication", score: dynamicEnergy.mental.score, tone: dynamicEnergy.mental.tone, color: "bg-cyan-500" },
+                    { label: "Physical Stamina & Action Drive", score: dynamicEnergy.physical.score, tone: dynamicEnergy.physical.tone, color: "bg-rose-500" },
+                    { label: "Financial Flow & Asset Strength", score: dynamicEnergy.financial.score, tone: dynamicEnergy.financial.tone, color: "bg-emerald-500" },
+                    { label: "Relationship Harmony & Bonding", score: dynamicEnergy.relationship.score, tone: dynamicEnergy.relationship.tone, color: "bg-pink-500" },
+                    { label: "Career Focus & Authority Power", score: dynamicEnergy.career.score, tone: dynamicEnergy.career.tone, color: "bg-amber-500" },
+                    { label: "Spiritual Alignment & Reflection", score: dynamicEnergy.spiritual.score, tone: dynamicEnergy.spiritual.tone, color: "bg-violet-500" },
+                  ].map((bar, idx) => (
+                    <div key={idx} className="space-y-1.5 bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
+                      <div className="flex justify-between items-center text-xs font-semibold">
+                        <span className="text-slate-300">{bar.label}</span>
+                        <div className="flex items-center gap-2 font-mono">
+                          <span className="text-slate-400 text-[11px]">({bar.tone})</span>
+                          <span className="text-indigo-400">{(bar.score * 10).toFixed(1)}/10</span>
+                        </div>
+                      </div>
+                      <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                        <div className={`h-full ${bar.color} transition-all`} style={{ width: `${bar.score * 100}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Dominant Houses and Planets */}
+                <div className="lg:col-span-5 space-y-4">
+                  <h4 className="text-xs font-mono text-indigo-400 uppercase tracking-widest font-bold">
+                    Dominant Cosmic Anchors
+                  </h4>
+
+                  <div className="space-y-3.5">
+                    {/* Dominant House */}
+                    {dynamicMood.dominantHouses.map((house, idx) => (
+                      <div key={idx} className="p-4 rounded-xl border border-slate-800 bg-slate-900/30">
+                        <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest block">Active Transit Focus House</span>
+                        <h5 className="text-xs font-bold text-white mt-1.5">House {house.houseNumber} Transit</h5>
+                        <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                          {house.significance}. Amplifying focus and active planetary alignments.
+                        </p>
+                      </div>
+                    ))}
+
+                    {/* Dominant Planet */}
+                    {dynamicMood.dominantPlanets.map((planet, idx) => (
+                      <div key={idx} className="p-4 rounded-xl border border-slate-800 bg-slate-900/30">
+                        <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest block">Dominant Planet Anchor</span>
+                        <h5 className="text-xs font-bold text-amber-400 mt-1.5">{planet.planet} (Strength: {planet.strength})</h5>
+                        <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                          {planet.influenceType}. Highly supportive of deep analytical and intuitive clarity.
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Synthesis from dynamic calculations */}
+              <div className="mt-6 p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 space-y-2">
+                <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest font-extrabold block">
+                  Vedic Sky Synthesis
+                </span>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  The active sky indicates peak <strong className="text-indigo-400">Spiritual Alignment ({(dynamicEnergy.spiritual.score * 100).toFixed(0)}%)</strong> and high <strong className="text-cyan-400">Mental Clarity ({(dynamicEnergy.mental.score * 100).toFixed(0)}%)</strong>. Dominated by {dynamicMood.dominantPlanets[0]?.planet || "Jupiter"}'s supportive transit across your natal horizon, you are gifted with heightened intuition. Excellent day for domestic consolidation, organizing intellectual projects, and practicing mantra sadhana. Avoid long taxing journeys or physical confrontations during inauspicious solar transit sectors.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 16: DAILY MUHURTA */}
+          {subTab === "daily_muhurta" && (
+            <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-4">
+              <div className="border-b border-slate-800 pb-3 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                <div>
+                  <h4 className="text-base font-semibold text-amber-100 flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-amber-500" />
+                    Daily Muhurtas & Astrological Time Segments
+                  </h4>
+                  <p className="text-xs text-slate-400">Highly customized to the active date, location, and sunrise parameters</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {[
+                  { name: "Abhijit Muhurta", time: `${computedMuhurtas.abhijit.start} - ${computedMuhurtas.abhijit.end}`, status: "Highly Auspicious", score: 5, color: "border-amber-500/20 bg-amber-500/5 text-amber-400" },
+                  { name: "Rahu Kalam", time: `${computedMuhurtas.rahuKalam.start} - ${computedMuhurtas.rahuKalam.end}`, status: "Inauspicious - Avoid", score: 1, color: "border-rose-500/20 bg-rose-500/5 text-rose-400" },
+                  { name: "Yamaganda", time: `${computedMuhurtas.yamaganda.start} - ${computedMuhurtas.yamaganda.end}`, status: "Inauspicious", score: 2, color: "border-red-500/20 bg-red-500/5 text-red-400" },
+                  { name: "Gulika Kalam", time: `${computedMuhurtas.gulika.start} - ${computedMuhurtas.gulika.end}`, status: "Obstacles - Delay", score: 2, color: "border-orange-500/20 bg-orange-500/5 text-orange-400" }
+                ].map((item, idx) => (
+                  <div key={idx} className={`p-4 rounded-xl border ${item.color} flex flex-col justify-between space-y-4`}>
+                    <div>
+                      <div className="flex justify-between items-center">
+                        <strong className="text-xs font-mono uppercase tracking-wider">{item.name}</strong>
+                        <span className="text-[10px] bg-slate-900/40 px-2 py-0.5 rounded font-mono font-bold">{item.status}</span>
+                      </div>
+                      <p className="text-sm font-bold font-mono mt-3 text-white">{item.time}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 pt-2 border-t border-white/5">
+                      <span className="text-[10px] text-slate-400">Strength:</span>
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < item.score ? 'bg-current' : 'bg-slate-700'}`} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Dynamic Muhurtas list */}
+              <div className="mt-6 space-y-4">
+                <h4 className="text-xs font-mono text-indigo-400 uppercase tracking-widest font-bold">
+                  All Calculated Muhurtas for Today
+                </h4>
+                <div className="overflow-x-auto rounded-xl border border-slate-800">
+                  <table className="w-full text-left text-xs font-mono">
+                    <thead>
+                      <tr className="bg-slate-900/60 border-b border-slate-800 text-slate-400">
+                        <th className="p-3">Muhurta Name</th>
+                        <th className="p-3">Calculation Logic / Start Time</th>
+                        <th className="p-3">Nature / Auspiciousness</th>
+                        <th className="p-3">Activities Recommended / Avoided</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/40 text-slate-300">
+                      {Array.isArray(transitAstroData?.muhurtas || astrologyData.muhurtas) && (transitAstroData?.muhurtas || astrologyData.muhurtas).map((m: any, idx: number) => (
+                        <tr key={idx} className="hover:bg-slate-900/20">
+                          <td className="p-3 font-bold text-slate-200">{m.name}</td>
+                          <td className="p-3 text-indigo-300">{m.time}</td>
+                          <td className="p-3">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              m.auspiciousness.includes("Highly") || m.auspiciousness.includes("Good") || m.auspiciousness.includes("Beneficial")
+                                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                            }`}>
+                              {m.auspiciousness}
+                            </span>
+                          </td>
+                          <td className="p-3 text-slate-400 leading-normal max-w-xs truncate md:max-w-md">{m.activities}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 17: EVENT MUHURTA */}
+          {subTab === "event_muhurta" && (
+            <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-4">
+              <div className="border-b border-slate-800 pb-3 flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                <div>
+                  <h4 className="text-base font-semibold text-amber-100 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-indigo-400" />
+                    Specialized Event Muhurta Suitability Finder
+                  </h4>
+                  <p className="text-xs text-slate-400">Targeted activity suitability analysis based on current solar/lunar configurations</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
+                {[
+                  { title: "Marriage & Commitments", key: "marriageWindow", desc: "For weddings, engagements, registry setups and lifelong relationship foundations.", icon: Sparkles },
+                  { title: "Business & Partnerships", key: "businessOpportunity", desc: "For launching ventures, incorporation filings, registering domains and executing major commercial agreements.", icon: Award },
+                  { title: "Investment & Real Estate", key: "investmentOpportunity", desc: "For property acquisition, long-term capital allocation, commodity purchases and portfolio settlement.", icon: TrendingUp },
+                  { title: "Education & Enrollment", key: "learningOpportunity", desc: "For admission filings, learning new languages, initiating analytical research or scriptural study.", icon: HelpCircle },
+                  { title: "Career & Promotions", key: "careerOpportunity", desc: "For leadership pitches, submitting resume profiles, scheduling salary talks, and initiating office moves.", icon: Shield },
+                  { title: "Travel & Relocation", key: "travelOpportunity", desc: "For executing physical transits, cross-border migrations, shipping vessels, or shifting residences.", icon: Compass }
+                ].map((opt, i) => {
+                  const val = (dynamicEventOpportunity as any)[opt.key] || { active: false, timeframe: "Plan for next favorable Nakshatra cycle" };
+                  const Icon = opt.icon;
+                  return (
+                    <div key={i} className="p-4 rounded-xl border border-slate-800 bg-slate-900/30 flex flex-col justify-between space-y-4">
+                      <div>
+                        <div className="flex justify-between items-center">
+                          <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wide">{opt.title}</h5>
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            val.active
+                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                              : "bg-slate-800 text-slate-500 border border-slate-700"
+                          }`}>
+                            {val.active ? "Favorable" : "Neutral / Defer"}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">{opt.desc}</p>
+                      </div>
+                      <div className="p-3 rounded-lg border border-slate-800/60 bg-slate-950/40 text-xs font-mono text-slate-300">
+                        {val.timeframe}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
