@@ -1,0 +1,136 @@
+{
+  "schema": {
+    "name": "Static Jaimini Astrology",
+    "version": "1.0.0",
+    "description": "Master index and immutable reference catalog for Jaimini Astrology."
+  },
+
+  "system": {
+    "name": "Jaimini",
+    "category": "Vedic Astrology",
+    "zodiac": "Sidereal",
+    "default_ayanamsa": "Lahiri"
+  },
+
+  "supported_modules": [
+    "Chara Karakas",
+    "Sthira Karakas",
+    "Pada Lagna",
+    "Arudha Padas",
+    "Karakamsha",
+    "Swamsha",
+    "Upapada Lagna",
+    "Argala",
+    "Rasi Aspects",
+    "Chara Dasha",
+    "Sthira Dasha",
+    "Narayana Dasha",
+    "Mandooka Dasha",
+    "Navamsa Analysis",
+    "Special Yogas"
+  ],
+
+  "supported_calculations": [
+    "Chara Karaka Determination",
+    "Karakamsha",
+    "Swamsha",
+    "Pada Calculation",
+    "Arudha Calculation",
+    "Rasi Drishti",
+    "Argala",
+    "Virodhargala",
+    "Jaimini Aspects",
+    "Jaimini Rajyogas",
+    "Dasha Calculation"
+  ],
+
+  "supported_dashas": [
+    "Chara Dasha",
+    "Sthira Dasha",
+    "Narayana Dasha",
+    "Mandooka Dasha",
+    "Drig Dasha",
+    "Trikona Dasha",
+    "Shoola Dasha",
+    "Yogardha Dasha"
+  ],
+
+  "supported_karakas": [
+    "Atmakaraka",
+    "Amatyakaraka",
+    "Bhratrukaraka",
+    "Matrukaraka",
+    "Putrakaraka",
+    "Gnatikaraka",
+    "Darakaraka",
+    "Pitrukaraka"
+  ],
+
+  "supported_lagnas": [
+    "Lagna",
+    "Karakamsha",
+    "Swamsha",
+    "Pada Lagna",
+    "Arudha Lagna",
+    "Upapada Lagna",
+    "Hora Lagna",
+    "Ghati Lagna"
+  ],
+
+  "supported_prediction_methods": [
+    "Karaka Analysis",
+    "Rasi Aspect Analysis",
+    "Argala Analysis",
+    "Arudha Analysis",
+    "Pada Analysis",
+    "Jaimini Dasha Analysis",
+    "Marriage Analysis",
+    "Career Analysis",
+    "Spiritual Analysis",
+    "Longevity Analysis"
+  ],
+
+  "supported_entities": [
+    "Karaka",
+    "Rasi",
+    "Pada",
+    "Arudha",
+    "Lagna",
+    "Dasha",
+    "Argala",
+    "Rasi Aspect",
+    "Yoga"
+  ],
+
+  "supported_classical_texts": [
+    "Jaimini Sutras",
+    "Jaimini Upadesa Sutras",
+    "Brihat Parashara Hora Shastra",
+    "Phaladeepika",
+    "Jataka Parijata"
+  ],
+
+  "supported_outputs": [
+    "Karaka Analysis",
+    "Arudha Analysis",
+    "Jaimini Dasha Report",
+    "Marriage Analysis",
+    "Career Analysis",
+    "Rajyoga Analysis",
+    "Spiritual Analysis",
+    "PDF Report",
+    "JSON Export"
+  ],
+
+  "dependencies": [
+    "static_core.json",
+    "static_planets.json",
+    "static_signs.json",
+    "static_houses.json",
+    "static_nakshatras.json",
+    "static_divisional_charts.json",
+    "static_dashas.json",
+    "static_special_lagnas.json",
+    "static_arudhas.json"
+  ]
+}
