@@ -1,0 +1,138 @@
+{
+  "schema": {
+    "name": "Static Sahams",
+    "version": "1.0.0",
+    "description": "Master catalog of Tajika Sahams (Arabic Parts) and immutable reference data."
+  },
+
+  "supported_sahams": [
+    "Punya Saham",
+    "Vidya Saham",
+    "Yasha Saham",
+    "Mitra Saham",
+    "Vivaha Saham",
+    "Santana Saham",
+    "Putra Saham",
+    "Rajya Saham",
+    "Karma Saham",
+    "Lakshmi Saham",
+    "Dhana Saham",
+    "Vyapara Saham",
+    "Kraya Saham",
+    "Vikraya Saham",
+    "Bandhu Saham",
+    "Matru Saham",
+    "Pitru Saham",
+    "Roga Saham",
+    "Arogya Saham",
+    "Mrityu Saham",
+    "Ayu Saham",
+    "Prayana Saham",
+    "Videsha Saham",
+    "Bhagya Saham",
+    "Mantra Saham",
+    "Guru Saham",
+    "Shatru Saham",
+    "Jaya Saham",
+    "Stri Saham",
+    "Purusha Saham",
+    "Sukha Saham",
+    "Duhkha Saham",
+    "Paradesha Saham",
+    "Moksha Saham"
+  ],
+
+  "classification": {
+
+    "wealth": [
+      "Lakshmi Saham",
+      "Dhana Saham",
+      "Vyapara Saham",
+      "Kraya Saham",
+      "Vikraya Saham"
+    ],
+
+    "career": [
+      "Rajya Saham",
+      "Karma Saham",
+      "Yasha Saham"
+    ],
+
+    "marriage": [
+      "Vivaha Saham",
+      "Stri Saham",
+      "Purusha Saham"
+    ],
+
+    "children": [
+      "Putra Saham",
+      "Santana Saham"
+    ],
+
+    "health": [
+      "Roga Saham",
+      "Arogya Saham",
+      "Mrityu Saham",
+      "Ayu Saham"
+    ],
+
+    "travel": [
+      "Prayana Saham",
+      "Videsha Saham",
+      "Paradesha Saham"
+    ],
+
+    "spiritual": [
+      "Punya Saham",
+      "Mantra Saham",
+      "Guru Saham",
+      "Moksha Saham"
+    ],
+
+    "relationships": [
+      "Mitra Saham",
+      "Bandhu Saham",
+      "Matru Saham",
+      "Pitru Saham"
+    ]
+
+  },
+
+  "supported_charts": [
+    "Annual Chart",
+    "Tajika Varshaphala",
+    "D1"
+  ],
+
+  "calculation_methods": [
+    "Day Formula",
+    "Night Formula",
+    "Planetary Formula",
+    "House Formula",
+    "Mixed Formula"
+  ],
+
+  "supported_attributes": [
+    "Name",
+    "Sanskrit Name",
+    "Category",
+    "Formula",
+    "Day Formula",
+    "Night Formula",
+    "Applicable Chart",
+    "Life Area",
+    "Associated Planets",
+    "Associated Houses",
+    "Prediction Importance",
+    "Reference"
+  ],
+
+  "evaluation": {
+    "support_day_night_formulas": true,
+    "support_formula_validation": true,
+    "support_annual_predictions": true,
+    "support_chart_specific_analysis": true,
+    "support_cross_validation": true,
+    "support_prediction_weight": true
+  }
+}
