@@ -1,0 +1,100 @@
+{
+  "schema": {
+    "name": "Static Ashtakavarga",
+    "version": "1.0.0",
+    "description": "Master catalog of Ashtakavarga systems, classifications and immutable reference data."
+  },
+
+  "systems": [
+    "Bhinnashtakavarga",
+    "Sarvashtakavarga",
+    "Prastarashtakavarga",
+    "Samudayashtakavarga"
+  ],
+
+  "supported_planets": [
+    "Sun",
+    "Moon",
+    "Mars",
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Saturn"
+  ],
+
+  "supported_charts": [
+    "D1"
+  ],
+
+  "bindu_types": [
+    "Bindu",
+    "Rekha"
+  ],
+
+  "supported_house_range": {
+    "minimum": 1,
+    "maximum": 12
+  },
+
+  "supported_sign_range": {
+    "minimum": 1,
+    "maximum": 12
+  },
+
+  "evaluation_methods": [
+    "Bhinnashtakavarga Total",
+    "Sarvashtakavarga Total",
+    "House Wise Analysis",
+    "Sign Wise Analysis",
+    "Planet Wise Analysis",
+    "Transit Analysis"
+  ],
+
+  "strength_levels": [
+    "Excellent",
+    "Very Strong",
+    "Strong",
+    "Average",
+    "Weak",
+    "Very Weak"
+  ],
+
+  "supported_attributes": [
+    "System",
+    "Planet",
+    "House",
+    "Sign",
+    "Bindu Count",
+    "Rekha Count",
+    "Total Points",
+    "Maximum Points",
+    "Minimum Points",
+    "Strength",
+    "Transit Relevance",
+    "Prediction Importance",
+    "Reference"
+  ],
+
+  "prediction_usage": [
+    "Transit Strength",
+    "House Strength",
+    "Planet Strength",
+    "Career",
+    "Marriage",
+    "Health",
+    "Finance",
+    "Property",
+    "Longevity",
+    "General Life"
+  ],
+
+  "evaluation": {
+    "support_bhinna": true,
+    "support_sarva": true,
+    "support_transits": true,
+    "support_house_ranking": true,
+    "support_sign_ranking": true,
+    "support_planet_ranking": true,
+    "support_normalization": true
+  }
+}
