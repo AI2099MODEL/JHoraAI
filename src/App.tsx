@@ -92,6 +92,7 @@ import { RelationshipKnowledgeCenter } from "./components/RelationshipKnowledgeC
 import { AstrologicalReasoningEngine } from "./components/AstrologicalReasoningEngine";
 import { RelationshipConsultationFramework } from "./components/RelationshipConsultationFramework";
 import { MyPageView } from "./components/MyPageView";
+import { AstroRawTablesView } from "./components/AstroRawTablesView";
 import { UserProfile, SessionManager, AuthManager, UserProfileRepository } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
 import UpdateNotification from "./components/UpdateNotification";
@@ -1211,91 +1212,35 @@ export default function App() {
       icon: Activity,
       submenus: [
         // Category 1: JHORA
-        { id: "overview", label: "Overview", description: "Vedic charts and summary.", systemId: "horoscope", category: "JHORA" },
-        { id: "planetary_positions", label: "Planetary Positions", description: "Degrees, Signs, Nakshatras, and Houses.", systemId: "horoscope", category: "JHORA" },
-        { id: "planet_strength", label: "Planet Strength", description: "Shadbala index matrices.", systemId: "horoscope", category: "JHORA" },
-        { id: "bhava_strength", label: "Bhava Strength", description: "House strength indexes.", systemId: "horoscope", category: "JHORA" },
-        { id: "ashtakavarga", label: "Ashtakavarga", description: "Samudhaya Ashtakavarga charts.", systemId: "horoscope", category: "JHORA" },
-        { id: "yogas", label: "Yogas", description: "Auspicious combinations in natal charts.", systemId: "horoscope", category: "JHORA" },
-        { id: "doshas", label: "Doshas", description: "Manglik and Kaal Sarp analysis.", systemId: "horoscope", category: "JHORA" },
-        { id: "vimshottari", label: "Vimshottari Dasha", description: "120-year cycle.", systemId: "horoscope", category: "JHORA" },
-        { id: "yogini", label: "Yogini Dasha", description: "36-year cycle.", systemId: "horoscope", category: "JHORA" },
-        { id: "ashtottari", label: "Ashtottari Dasha", description: "108-year cycle.", systemId: "horoscope", category: "JHORA" },
-        { id: "longevity", label: "Longevity", description: "Traditional life span calculations.", systemId: "horoscope", category: "JHORA" },
-        { id: "sade_sati", label: "Sade Sati", description: "Saturn transit timeline cycles.", systemId: "horoscope", category: "JHORA" },
-
-        // Divisional Charts
-        { id: "d1_rasi", label: "D1 Rasi", description: "General birth chart.", systemId: "horoscope", category: "JHORA" },
-        { id: "d2_hora", label: "D2 Hora", description: "Wealth, assets, and money.", systemId: "horoscope", category: "JHORA" },
-        { id: "d3_drekkana", label: "D3 Drekkana", description: "Siblings, skills, and values.", systemId: "horoscope", category: "JHORA" },
-        { id: "d4_chaturthamsa", label: "D4 Chaturthamsa", description: "Properties, luck, and destiny.", systemId: "horoscope", category: "JHORA" },
-        { id: "d7_saptamsa", label: "D7 Saptamsa", description: "Progeny, children, and creations.", systemId: "horoscope", category: "JHORA" },
-        { id: "d9_navamsa", label: "D9 Navamsa", description: "Dharma, marriage, and potential.", systemId: "horoscope", category: "JHORA" },
-        { id: "d10_dasamsa", label: "D10 Dasamsa", description: "Profession, achievements, and fame.", systemId: "horoscope", category: "JHORA" },
-        { id: "d12_dwadasamsa", label: "D12 Dwadasamsa", description: "Parents, lineages, and ancestors.", systemId: "horoscope", category: "JHORA" },
-        { id: "d16_shodasamsa", label: "D16 Shodasamsa", description: "Vehicles, comforts, and happiness.", systemId: "horoscope", category: "JHORA" },
-        { id: "d20_vimsamsa", label: "D20 Vimsamsa", description: "Spirituality, worship, and focus.", systemId: "horoscope", category: "JHORA" },
-        { id: "d24_chaturvimsamsa", label: "D24 Chaturvimsamsa", description: "Knowledge, learning, and education.", systemId: "horoscope", category: "JHORA" },
-        { id: "d27_saptavimsamsa", label: "D27 Saptavimsamsa", description: "Strengths, weaknesses, and flaws.", systemId: "horoscope", category: "JHORA" },
-        { id: "d30_trimsamsa", label: "D30 Trimsamsa", description: "Misfortunes, evils, and health.", systemId: "horoscope", category: "JHORA" },
-        { id: "d40_khavedamsa", label: "D40 Khavedamsa", description: "Auspicious alignments.", systemId: "horoscope", category: "JHORA" },
-        { id: "d45_akshavedamsa", label: "D45 Akshavedamsa", description: "General fortune.", systemId: "horoscope", category: "JHORA" },
-        { id: "d60_shastiamsa", label: "D60 Shastiamsa", description: "Past life karmic balances.", systemId: "horoscope", category: "JHORA" },
-
-        // Predictions
-        { id: "arudhas", label: "Arudhas", description: "Image and projection reflections.", systemId: "horoscope", category: "JHORA" },
-        { id: "sphutas", label: "Sphutas", description: "Highly sensitive coordinate points.", systemId: "horoscope", category: "JHORA" },
-        { id: "upagrahas", label: "Upagrahas", description: "Shadow planets calculations.", systemId: "horoscope", category: "JHORA" },
-        { id: "sahams", label: "Sahams", description: "Arabic/Tajik sensitive lots.", systemId: "horoscope", category: "JHORA" },
-        { id: "special_lagnas", label: "Special Lagnas", description: "Hora, Ghati, and Bhava Ascendants.", systemId: "horoscope", category: "JHORA" },
+        { id: "jhora_birth_details", label: "Birth Details", description: "Table 1: Birth Details & Astronomical Metrics.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_planets", label: "Planets Placements", description: "Table 2: Natal Planets Longitudes & Rasi Placements.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_shadbala", label: "Shadbala Matrix", description: "Table 3: Shadbala Planet Strength Matrix.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_bhava_balas", label: "Bhava Strengths", description: "Table 4: Bhava Balas (House Strengths).", systemId: "astro", category: "JHORA" },
+        { id: "jhora_ashtakavarga", label: "SAV Ashtakavarga", description: "Table 5: Samudhaya Ashtakavarga Points.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_divisional", label: "Divisional Vargas", description: "Table 6: Divisional Vargas D1 to D60.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_vimshottari", label: "Vimshottari Dasha", description: "Table 7: Vimshottari Mahadasha Timelines.", systemId: "astro", category: "JHORA" },
 
         // Category 2: KP STELLAR
-        { id: "kp_dashboard", label: "Dashboard", description: "Overview, Provider Health & Status.", systemId: "kp_stellar", originalId: "dashboard", category: "KP STELLAR" },
-        { id: "kp_rulebook", label: "KP Rulebook", description: "Krishnamurti Paddhati rules & evidence engine.", systemId: "kp_stellar", originalId: "rulebook", category: "KP STELLAR" },
-        { id: "kp_cusps", label: "Cusps", description: "12 Cusps, Degrees & Sub-Lords.", systemId: "kp_stellar", originalId: "cusps", category: "KP STELLAR" },
-        { id: "kp_planet_analysis", label: "Planet Analysis", description: "Planet Star-Lord & Sub-Lord placements.", systemId: "kp_stellar", originalId: "planet_analysis", category: "KP STELLAR" },
-        { id: "kp_significators", label: "Significators", description: "Planet & House level significators.", systemId: "kp_stellar", originalId: "significators", category: "KP STELLAR" },
-        { id: "kp_ruling_planets", label: "Ruling Planets", description: "Day, Moon & Ascendant rulers.", systemId: "kp_stellar", originalId: "ruling_planets", category: "KP STELLAR" },
-        { id: "kp_dasha", label: "KP Dasha", description: "KP Vimshottari & event period indicators.", systemId: "kp_stellar", originalId: "kp_dasha", category: "KP STELLAR" },
-        { id: "kp_transit", label: "Transit", description: "Real-time coordinate significations.", systemId: "kp_stellar", originalId: "transit", category: "KP STELLAR" },
-        { id: "kp_horary", label: "Horary", description: "Prashna seed number calculations.", systemId: "kp_stellar", originalId: "horary", category: "KP STELLAR" },
-        { id: "kp_research", label: "Research", description: "Developer audit tools & raw model values.", systemId: "kp_stellar", originalId: "research", category: "KP STELLAR" },
-        { id: "kp_settings", label: "Settings", description: "Provider priority routing settings.", systemId: "kp_stellar", originalId: "settings", category: "KP STELLAR" },
+        { id: "kp_cusps", label: "Placidus Cusps", description: "Table 8: Placidus House Cusp Coordinates.", systemId: "astro", category: "KP STELLAR" },
+        { id: "kp_sub_lords", label: "Planetary Sub-Lords", description: "Table 9: KP Planetary Sub-Lords.", systemId: "astro", category: "KP STELLAR" },
+        { id: "kp_planet_significators", label: "Planet Significators", description: "Table 10: KP Planet-Level Significators.", systemId: "astro", category: "KP STELLAR" },
+        { id: "kp_house_significators", label: "House Significators", description: "Table 11: KP House-Level Significators.", systemId: "astro", category: "KP STELLAR" },
 
-        // Category 3: WESTERN
-        { id: "west_dashboard", label: "Dashboard", description: "Overview & Provider Health", systemId: "western_astrology", originalId: "dashboard", category: "WESTERN" },
-        { id: "west_natal_chart", label: "Natal Chart", description: "Tropical circular wheel chart.", systemId: "western_astrology", originalId: "natal_chart", category: "WESTERN" },
-        { id: "west_positions", label: "Positions", description: "Degrees, Signs, and Houses.", systemId: "western_astrology", originalId: "positions", category: "WESTERN" },
-        { id: "west_aspects", label: "Aspects", description: "Planetary aspects and aspect grid.", systemId: "western_astrology", originalId: "aspects", category: "WESTERN" },
-        { id: "west_synastry", label: "Synastry", description: "Synastry & Composite compatibility.", systemId: "western_astrology", originalId: "synastry", category: "WESTERN" },
-        { id: "west_transits", label: "Transits", description: "Solar return and active transits.", systemId: "western_astrology", originalId: "transits", category: "WESTERN" },
+        // Category 3: JAIMINI
+        { id: "jaimini_karakas", label: "Chara Karakas", description: "Table 12: Jaimini Chara Karakas.", systemId: "astro", category: "JAIMINI" },
+        { id: "jaimini_arudhas", label: "Arudha Padas", description: "Table 13: Jaimini Arudhas & Padas.", systemId: "astro", category: "JAIMINI" },
 
-        // Category 4: MYSTICAL (ESOTERIC)
-        { id: "eso_nadi", label: "Nadi Astrology", description: "Fine divisions (Nadi Amsas) and guidelines.", systemId: "esoteric", originalId: "nadi", category: "MYSTICAL (ESOTERIC)" },
-        { id: "eso_lalkitab", label: "Lal Kitab", description: "Fixed Aries Ascendant house-remedies.", systemId: "esoteric", originalId: "lalkitab", category: "MYSTICAL (ESOTERIC)" },
-        { id: "eso_varshaphala", label: "Tajik Varshaphala", description: "Progression solar return calculations.", systemId: "esoteric", originalId: "varshaphala", category: "MYSTICAL (ESOTERIC)" },
-        { id: "eso_bazi", label: "Chinese BaZi", description: "The Four Pillars of Destiny (Stems & Branches).", systemId: "esoteric", originalId: "bazi", category: "MYSTICAL (ESOTERIC)" },
-        { id: "eso_numerology", label: "Numerology", description: "Pythagorean & Chaldean numbers profile.", systemId: "esoteric", originalId: "numerology", category: "MYSTICAL (ESOTERIC)" },
-        { id: "eso_celtic", label: "Celtic Tree", description: "Sacred lunar tree zodiac signs.", systemId: "esoteric", originalId: "celtic", category: "MYSTICAL (ESOTERIC)" },
-        { id: "eso_mayan", label: "Mayan Calendar", description: "Tzolkin & Haab Kin signature calculator.", systemId: "esoteric", originalId: "mayan", category: "MYSTICAL (ESOTERIC)" },
+        // Category 4: WESTERN
+        { id: "western_tropical", label: "Tropical Placements", description: "Table 14: Tropical Planetary Placements.", systemId: "astro", category: "WESTERN" },
+        { id: "western_aspects", label: "Aspects Matrix", description: "Table 15: Tropical Planetary Aspects Matrix.", systemId: "astro", category: "WESTERN" },
 
-        // Category 5: MARRIAGE & SYNERGY
-        { id: "mar_ashtakoota", label: "Ashtakoota", description: "8-fold matching grids.", systemId: "marriage", originalId: "ashtakoota", category: "MARRIAGE & SYNERGY" },
-        { id: "mar_porutham", label: "Porutham", description: "10-fold marriage compatibility.", systemId: "marriage", originalId: "porutham", category: "MARRIAGE & SYNERGY" },
-        { id: "mar_compatibility", label: "Compatibility", description: "Overall planetary synergy analysis.", systemId: "marriage", originalId: "compatibility", category: "MARRIAGE & SYNERGY" },
-        { id: "mar_unified_evidence", label: "Unified Evidence", description: "Multi-system astrological evidence aggregator.", systemId: "marriage", originalId: "unified_evidence", category: "MARRIAGE & SYNERGY" },
-        { id: "mar_ai_expert", label: "AI Relationship Expert", description: "Esoteric AI partnership diagnostics and chat.", systemId: "marriage", originalId: "ai_expert", category: "MARRIAGE & SYNERGY" },
-        { id: "mar_relationship_report", label: "Relationship Report", description: "Professional PDF/DOCX multi-system report generator.", systemId: "marriage", originalId: "relationship_report", category: "MARRIAGE & SYNERGY" },
-        { id: "mar_astrological_reasoning_engine", label: "Astrological Reasoning Engine", description: "Audit system-level consistency and breakdown contributions.", systemId: "marriage", originalId: "astrological_reasoning_engine", category: "MARRIAGE & SYNERGY" },
-        { id: "mar_relationship_consultation", label: "Relationship Consultation", description: "Professional AI-guided comprehensive consultation framework.", systemId: "marriage", originalId: "relationship_consultation", category: "MARRIAGE & SYNERGY" },
+        // Category 5: TAJIKA
+        { id: "tajika_varshaphal", label: "Varshaphal Coordinates", description: "Table 16: Varshaphal Planetary Coordinates.", systemId: "astro", category: "TAJIKA" },
+        { id: "tajika_harshabala", label: "Harsha Balas", description: "Table 17: Tajik Harsha Balas.", systemId: "astro", category: "TAJIKA" },
 
-        // Category 6: TRANSIT & MUHURTA
-        { id: "trn_current_gochara", label: "Current Gochara", description: "Live celestial positions.", systemId: "transit", originalId: "current_gochara", category: "TRANSIT & MUHURTA" },
-        { id: "trn_planet_ingress", label: "Planet Ingress", description: "Upcoming sign-change transits.", systemId: "transit", originalId: "planet_ingress", category: "TRANSIT & MUHURTA" },
-        { id: "trn_transit_summary", label: "Transit Summary", description: "Astrological transit interpretation.", systemId: "transit", originalId: "transit_summary", category: "TRANSIT & MUHURTA" },
-        { id: "trn_panchanga", label: "Panchanga", description: "Tithi, Vara, Nakshatra, Yoga, and Karana.", systemId: "transit", originalId: "panchanga", category: "TRANSIT & MUHURTA" },
-        { id: "trn_daily_muhurta", label: "Daily Muhurta", description: "Auspicious times (Choghadiya/Abhijit).", systemId: "transit", originalId: "daily_muhurta", category: "TRANSIT & MUHURTA" },
-        { id: "trn_event_muhurta", label: "Event Muhurta", description: "Custom electional windows.", systemId: "transit", originalId: "event_muhurta", category: "TRANSIT & MUHURTA" }
+        // Category 6: LAL KITAB
+        { id: "lalkitab_houses", label: "LKB Houses", description: "Table 18: Lal Kitab Planetary Houses.", systemId: "astro", category: "LAL KITAB" },
+        { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "Table 19: Lal Kitab Teva & Sleeping Status.", systemId: "astro", category: "LAL KITAB" }
       ]
     },
     {
@@ -1325,7 +1270,7 @@ export default function App() {
     }
   ];
 
-  const isAstroActive = ["horoscope", "kp_stellar", "western_astrology", "esoteric", "marriage", "transit"].includes(activeMenu);
+  const isAstroActive = activeMenu === "astro";
   const activeNode = MAIN_MENU_STRUCTURE.find(node => {
     if (node.id === "astro") return isAstroActive;
     return node.id === activeMenu;
@@ -1334,48 +1279,27 @@ export default function App() {
   const activeSubmenuId = activeSubMenu[activeMenu] || (activeSubmenus[0]?.id || "");
 
   const handleSubmenuSelect = (submenuId: string) => {
-    const astroNode = MAIN_MENU_STRUCTURE.find(n => n.id === "astro");
-    const matchedSub = astroNode?.submenus?.find(s => s.id === submenuId);
-    if (matchedSub && matchedSub.systemId) {
-      setActiveMenu(matchedSub.systemId);
-      setActiveSubMenu(prev => ({ ...prev, [matchedSub.systemId]: matchedSub.originalId || matchedSub.id }));
-    } else {
-      setActiveSubMenu(prev => ({ ...prev, [activeMenu]: submenuId }));
-    }
+    setActiveSubMenu(prev => ({ ...prev, [activeMenu]: submenuId }));
     setIsMobileMenuOpen(false);
   };
 
   const handleDashboardTabNavigation = (tab: string) => {
-    if (tab === "panchanga") {
-      setActiveMenu("transit");
-      setActiveSubMenu(prev => ({ ...prev, transit: "panchanga" }));
-    } else if (tab === "transits") {
-      setActiveMenu("transit");
-      setActiveSubMenu(prev => ({ ...prev, transit: "current_gochara" }));
-    } else if (tab === "ingress") {
-      setActiveMenu("transit");
-      setActiveSubMenu(prev => ({ ...prev, transit: "planet_ingress" }));
-    } else {
-      setActiveMenu("horoscope");
-      const subId = 
-        tab === "dashboard" ? "overview" :
-        tab === "grahas" ? "planetary_positions" :
-        tab === "strengths" ? "planet_strength" :
-        tab === "ashtakavarga" ? "ashtakavarga" :
-        tab === "yogas" ? "yogas" :
-        tab === "saham" ? "sahams" :
-        tab === "dashas" ? "vimshottari" :
-        "overview";
-      setActiveSubMenu(prev => ({ ...prev, horoscope: subId }));
-    }
+    setActiveMenu("astro");
+    const subId = 
+      tab === "dashboard" ? "jhora_birth_details" :
+      tab === "grahas" ? "jhora_planets" :
+      tab === "strengths" ? "jhora_shadbala" :
+      tab === "ashtakavarga" ? "jhora_ashtakavarga" :
+      "jhora_birth_details";
+    setActiveSubMenu(prev => ({ ...prev, astro: subId }));
     setIsMobileMenuOpen(false);
   };
 
   const handleMenuSelect = (menuId: string) => {
     if (menuId === "astro") {
-      setActiveMenu("horoscope");
-      if (!activeSubMenu["horoscope"]) {
-        setActiveSubMenu(prev => ({ ...prev, horoscope: "overview" }));
+      setActiveMenu("astro");
+      if (!activeSubMenu["astro"]) {
+        setActiveSubMenu(prev => ({ ...prev, astro: "jhora_birth_details" }));
       }
     } else {
       setActiveMenu(menuId);
@@ -2970,7 +2894,7 @@ export default function App() {
                 </div>
               </motion.div>
             </AnimatePresence>
-          ) : activeMenu === "horoscope" ? (
+          ) : activeMenu === "astro" ? (
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeSubmenuId}
@@ -2979,220 +2903,11 @@ export default function App() {
                 exit={{ opacity: 0, y: -5 }}
                 className="space-y-6"
               >
-                {activeSubmenuId === "longevity" ? (
-                  /* Longevity analysis placeholder screen */
-                  <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                      <Activity className="w-5 h-5 text-amber-500" />
-                      Longevity (Ayurdaya) Calculations
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1 mb-6">
-                      Traditional life expectancy forecasts computed utilizing Parashari math (Pindayu, Amsayu, and Nisargayu).
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className={`p-4 rounded-xl border ${cardStyle} space-y-4`}>
-                        <h4 className="text-xs font-bold font-mono text-slate-300 uppercase">Core Mathematical Methods</h4>
-                        <div className="space-y-2 text-xs">
-                          <div className="flex justify-between items-center py-1.5 border-b border-indigo-500/5">
-                            <span className={textMuted}>Pindayu Method:</span>
-                            <span className="font-mono text-emerald-400 font-bold">78 Years (Alpayu)</span>
-                          </div>
-                          <div className="flex justify-between items-center py-1.5 border-b border-indigo-500/5">
-                            <span className={textMuted}>Amsayu Method:</span>
-                            <span className="font-mono text-emerald-400 font-bold">81 Years (Madhyayu)</span>
-                          </div>
-                          <div className="flex justify-between items-center py-1.5">
-                            <span className={textMuted}>Nisargayu Method:</span>
-                            <span className="font-mono text-emerald-400 font-bold">Unavailable</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className={`p-4 rounded-xl border ${cardStyle} flex flex-col justify-between`}>
-                        <div>
-                          <h4 className="text-xs font-bold font-mono text-slate-300 uppercase mb-2">Architectural Guard Alert</h4>
-                          <p className="text-[11px] text-slate-400 leading-relaxed">
-                            Official JHora REST calculations are preferred. Because native longevity coordinates contain severe astrological warnings, approximate math is disabled. Display is strictly authoritative.
-                          </p>
-                        </div>
-                        <span className="text-[9px] font-mono text-indigo-400 uppercase mt-4">API CONFIDENCE: REFERENCE ONLY</span>
-                      </div>
-                    </div>
-                  </div>
-                ) : activeSubmenuId === "sade_sati" ? (
-                  /* Sade Sati timeline checker */
-                  <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                      <AlertTriangle className="w-5 h-5 text-amber-500" />
-                      Saturn Sade Sati Analysis
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1 mb-6">
-                      Evaluates Saturn's current transit through the 12th, 1st, and 2nd houses relative to the native's natal Moon sign.
-                    </p>
-
-                    {astrologyData ? (
-                      <div className="space-y-4">
-                        <div className={`p-4 rounded-xl border ${cardStyle} flex items-center justify-between`}>
-                          <div>
-                            <span className="text-xs text-slate-400 font-mono uppercase block">Sade Sati Status</span>
-                            <span className="text-sm font-bold text-amber-400">
-                              {astrologyData.doshas.sadeSati.isActive ? "Sade Sati Active" : "Sade Sati Inactive"}
-                            </span>
-                          </div>
-                          <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
-                            astrologyData.doshas.sadeSati.isActive ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : "bg-green-500/10 text-green-400 border border-green-500/20"
-                          }`}>
-                            {astrologyData.doshas.sadeSati.isActive ? "WARNING" : "SAFE"}
-                          </span>
-                        </div>
-
-                        <div className={`p-4 rounded-xl border ${cardStyle}`}>
-                          <h4 className="text-xs font-bold font-mono text-slate-300 uppercase mb-2">Transit Details</h4>
-                          <p className="text-xs text-slate-400 leading-relaxed">
-                            {astrologyData.doshas.sadeSati.explanation || "No active afflictions. Saturn is currently placed transit-wise safely relative to natal moon."}
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-xs text-slate-500 font-mono">
-                        Astrology calculations needed.
-                      </div>
-                    )}
-                  </div>
-                ) : activeSubmenuId.startsWith("d") ? (
-                  /* DIVISIONAL VARGAS WHEEL (Moved from Charts) */
-                  astrologyData ? (
-                    <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                      <div className="border-b border-indigo-500/10 pb-4 mb-6">
-                        <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                          <Layers className="w-5 h-5 text-amber-500" />
-                          Divisional Vargas Wheel
-                        </h3>
-                        <p className="text-xs text-slate-400 mt-1">
-                          Viewing high-fidelity wheel projections for <strong>{activeSubmenus.find(s => (s.id === activeSubmenuId || s.originalId === activeSubmenuId) && (!s.systemId || s.systemId === activeMenu))?.label || activeSubmenuId}</strong>.
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                        <div className="md:col-span-8 flex items-center justify-center border border-indigo-500/10 p-4 rounded-xl bg-slate-950/30">
-                          <div className="w-full">
-                            <AstroChart
-                              rasiChart={
-                                activeSubmenuId === "d9_navamsa" 
-                                  ? astrologyData.divisionalCharts["D-9_navamsa"]?.housePlacements || {}
-                                  : astrologyData.divisionalCharts["D-1_rasi"]?.housePlacements || {}
-                              }
-                              navamsaChart={astrologyData.divisionalCharts["D-9_navamsa"]?.housePlacements || {}}
-                              lagnaSignIndex={astrologyData.lagna.signIndex}
-                              lagnaSignName={astrologyData.lagna.sign}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="md:col-span-4 space-y-4">
-                          <div className={`p-4 rounded-xl border ${cardStyle}`}>
-                            <h4 className="text-xs font-bold font-mono text-slate-300 uppercase mb-2">Varga Interpretation</h4>
-                            <p className="text-xs text-slate-400 leading-relaxed">
-                              {activeSubmenuId === "d1_rasi" ? "Representing general physical body characteristics, overall health and native fortune." :
-                               activeSubmenuId === "d9_navamsa" ? "Deep subconscious potential, marriage luck, and spiritual destination path." :
-                               "Displaying structural divisions mapped from JHora response payload."}
-                            </p>
-                          </div>
-
-                          {provenanceEnabled && (
-                            <div className={`p-4 rounded-xl border ${cardStyle} font-mono text-[10px] space-y-1`}>
-                              <span className="text-slate-500 uppercase block">INTEGRITY META</span>
-                              <div>PATH: $.divisional_charts.{activeSubmenuId}</div>
-                              <div>SOURCE: SOURCE_A</div>
-                              <div>CONFIDENCE: AUTHORITATIVE</div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      Please cast a horoscope first to view this page.
-                    </div>
-                  )
-                ) : ["arudhas", "sphutas", "upagrahas", "special_lagnas"].includes(activeSubmenuId) ? (
-                  /* Standard predictive placeholders (Moved from Predictions) */
-                  <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                      <Award className="w-5 h-5 text-amber-500" />
-                      {activeSubmenus.find(s => (s.id === activeSubmenuId || s.originalId === activeSubmenuId) && (!s.systemId || s.systemId === activeMenu))?.label || "Predictions"}
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1 mb-6">
-                      Interpretive natal reports evaluating specialized combinations.
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className={`p-4 rounded-xl border ${cardStyle} space-y-4`}>
-                        <span className="text-[10px] font-mono text-slate-400 block uppercase">Natal Combinations</span>
-                        <div className="text-xs space-y-2">
-                          <div className="flex justify-between py-1 border-b border-indigo-500/5">
-                            <span className={textMuted}>Raja Yoga Status:</span>
-                            <span className="font-bold text-amber-400">Pristine Potential</span>
-                          </div>
-                          <div className="flex justify-between py-1 border-b border-indigo-500/5">
-                            <span className={textMuted}>Dhana Yoga:</span>
-                            <span className="font-bold text-amber-400">Favorable Wealth</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className={`p-4 rounded-xl border ${cardStyle} flex flex-col justify-between`}>
-                        <div>
-                          <h4 className="text-xs font-bold font-mono text-slate-300 uppercase mb-2">Vedic Interpretations</h4>
-                          <p className="text-xs text-slate-400 leading-relaxed">
-                            Predictions are derived strictly by evaluating astronomical planet degrees from JHora against standard Parashari alignments. No approximation logic.
-                          </p>
-                        </div>
-                        <span className="text-[9px] font-mono text-indigo-400 uppercase mt-4">API STATUS: IMMUTABLE REFERENCE</span>
-                      </div>
-                    </div>
-                  </div>
-                ) : astrologyData ? (
-                  /* Existing fully-working dashboard bindings with integrated Saham and Predictions */
-                  <HoroscopeDashboard
-                    astrologyData={astrologyData}
-                    activeSubTab={
-                      activeSubmenuId === "overview" ? "dashboard" :
-                      activeSubmenuId === "planetary_positions" ? "grahas" :
-                      activeSubmenuId === "panchanga" ? "panchanga" :
-                      activeSubmenuId === "planet_strength" ? "strengths" :
-                      activeSubmenuId === "bhava_strength" ? "strengths" :
-                      activeSubmenuId === "ashtakavarga" ? "ashtakavarga" :
-                      activeSubmenuId === "yogas" ? "yogas" :
-                      activeSubmenuId === "sahams" ? "saham" :
-                      activeSubmenuId === "doshas" ? "yogas" :
-                      activeSubmenuId === "vimshottari" || activeSubmenuId === "yogini" || activeSubmenuId === "ashtottari" ? "dashas" :
-                      "dashboard"
-                    }
-                    setActiveSubTab={handleDashboardTabNavigation}
-                    selectedVarga={selectedVarga}
-                    setSelectedVarga={setSelectedVarga}
-                    selectedBavPlanet={selectedBavPlanet}
-                    setSelectedBavPlanet={setSelectedBavPlanet}
-                    activeDashaSystem={
-                      activeSubmenuId === "vimshottari" ? "vimshottari" :
-                      activeSubmenuId === "yogini" ? "yogini" :
-                      activeSubmenuId === "ashtottari" ? "ashtottari" :
-                      activeDashaSystem
-                    }
-                    setActiveDashaSystem={(system) => {
-                      setActiveDashaSystem(system);
-                      handleSubmenuSelect(system);
-                    }}
-                    activeSubmenuId={activeSubmenuId}
-                    chartStyle={chartStyle}
-                  />
-                ) : (
-                  <div className="text-center py-12">
-                    Please cast a horoscope first to view this page.
-                  </div>
-                )}
+                <AstroRawTablesView 
+                  astrologyData={astrologyData} 
+                  activeSubmenuId={activeSubmenuId} 
+                  isDark={isDark} 
+                />
               </motion.div>
             </AnimatePresence>
           ) : activeMenu === "marriage" ? (
