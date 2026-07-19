@@ -1,0 +1,153 @@
+{
+  "schema": {
+    "name": "Prediction Confidence Model",
+    "version": "1.0.0",
+    "description": "Framework for computing confidence in generated predictions."
+  },
+
+  "confidence": {
+
+    "range": {
+      "minimum": 0,
+      "maximum": 100
+    },
+
+    "initial_score": 50,
+
+    "calculation": {
+      "method": "weighted_evidence_consensus"
+    }
+
+  },
+
+  "positive_adjustments": {
+
+    "multiple_system_confirmation": 12,
+
+    "multiple_dasha_confirmation": 10,
+
+    "multiple_divisional_confirmation": 10,
+
+    "strong_planetary_strength": 8,
+
+    "strong_house_strength": 6,
+
+    "strong_yoga_support": 8,
+
+    "high_ashtakavarga": 5,
+
+    "kp_confirmation": 10,
+
+    "jaimini_confirmation": 8,
+
+    "tajik_confirmation": 5,
+
+    "nadi_confirmation": 5,
+
+    "exact_degree_conditions": 6,
+
+    "rare_combination": 5
+
+  },
+
+  "negative_adjustments": {
+
+    "conflicting_systems": -15,
+
+    "weak_planets": -10,
+
+    "weak_house": -8,
+
+    "contradicting_yogas": -12,
+
+    "strong_doshas": -8,
+
+    "conflicting_dashas": -12,
+
+    "weak_divisional_support": -10,
+
+    "insufficient_evidence": -20,
+
+    "low_data_quality": -15
+
+  },
+
+  "consensus": {
+
+    "required_modules": 2,
+
+    "excellent": 6,
+
+    "very_good": 5,
+
+    "good": 4,
+
+    "acceptable": 3,
+
+    "weak": 2,
+
+    "poor": 1
+
+  },
+
+  "confidence_levels": [
+
+    {
+      "name": "Very High",
+      "minimum": 90,
+      "maximum": 100
+    },
+
+    {
+      "name": "High",
+      "minimum": 75,
+      "maximum": 89
+    },
+
+    {
+      "name": "Medium",
+      "minimum": 60,
+      "maximum": 74
+    },
+
+    {
+      "name": "Low",
+      "minimum": 40,
+      "maximum": 59
+    },
+
+    {
+      "name": "Very Low",
+      "minimum": 0,
+      "maximum": 39
+    }
+
+  ],
+
+  "quality_requirements": {
+
+    "minimum_evidence_sources": 2,
+
+    "minimum_astrological_support": 2,
+
+    "allow_prediction_without_dasha": false,
+
+    "allow_prediction_without_natal_chart": false,
+
+    "allow_prediction_without_transits": false
+
+  },
+
+  "validation": {
+
+    "clamp_to_range": true,
+
+    "round_to_integer": true,
+
+    "store_raw_score": true,
+
+    "store_normalized_score": true
+
+  }
+
+}
