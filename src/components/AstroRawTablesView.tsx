@@ -15,19 +15,26 @@ import {
   Shield,
   Eye,
   Settings,
-  RefreshCw
+  RefreshCw,
+  Download,
+  FileText,
+  Code
 } from "lucide-react";
+import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
+import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
 
 interface AstroRawTablesViewProps {
   astrologyData: any;
   activeSubmenuId: string;
   isDark: boolean;
+  activeUser?: any;
 }
 
 export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({ 
   astrologyData, 
   activeSubmenuId, 
-  isDark 
+  isDark,
+  activeUser
 }) => {
   // Local states for fetched datasets
   const [kpCusps, setKpCusps] = useState<any>(null);
@@ -38,7 +45,67 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [pdfCompiling, setPdfCompiling] = useState<boolean>(false);
+  const [showRawJson, setShowRawJson] = useState<boolean>(false);
+
   const [targetAge, setTargetAge] = useState<number>(30); // Default Tajik Varshaphala age
+
+  // Helper to compile all 19 raw system tables into a high-fidelity PDF document
+  const handleExportPDF = async () => {
+    try {
+      setPdfCompiling(true);
+      const profileJson = mapAstrologyDataToUserProfileJSON(activeUser || {}, astrologyData);
+      const doc = generateRawAstrologyPDF(profileJson, {
+        profileName: profileJson.User?.profile_name || astrologyData?.birthDetails?.name || "Vedic Native",
+        submenus: [
+          "overview", "planetary_positions", "planet_strength", "bhava_strength", 
+          "ashtakavarga", "yogas", "doshas", "vimshottari", "yogini", "ashtottari", 
+          "longevity", "sade_sati", "d1_rasi", "d9_navamsa", "d10_dasamsa", 
+          "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
+          "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
+          "kp_significators", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
+          "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
+          "eso_nadi", "eso_lalkitab", "eso_varshaphala", "eso_bazi", "eso_numerology", "eso_celtic", "eso_mayan"
+        ]
+      });
+      doc.save(`Astro_Raw_Report_JH_${astrologyData?.birthDetails?.name || "native"}_${Date.now()}.pdf`);
+    } catch (err: any) {
+      console.error("PDF generation failed:", err);
+      alert("Failed to export PDF: " + err.message);
+    } finally {
+      setPdfCompiling(false);
+    }
+  };
+
+  // Helper to download complete JSON schema
+  const handleDownloadJSON = () => {
+    const combinedPayload = {
+      User: {
+        google_user_id: activeUser?.uid || "guest_user",
+        email: activeUser?.email || "guest@example.com",
+        profile_name: astrologyData?.birthDetails?.name || "Vedic Native",
+        created_at: new Date().toISOString()
+      },
+      Birth: astrologyData?.birthDetails || {},
+      astrologyData,
+      supplemental_data: {
+        kpCusps,
+        kpChart,
+        kpSignificators,
+        westernChart
+      }
+    };
+    const dataStr = JSON.stringify(combinedPayload, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `astrology_profile_raw_${astrologyData?.birthDetails?.name || "native"}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const containerStyle = isDark 
     ? "bg-slate-900/60 border border-slate-800 text-slate-200" 
@@ -166,6 +233,78 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
         </div>
       </div>
 
+      {/* EXPORT AND DOWNLOAD CONTROL ACTION ROW */}
+      <div className={`p-4 rounded-xl ${containerStyle} flex flex-col sm:flex-row justify-between items-center gap-4`}>
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
+          <span className="text-xs font-semibold">Active Profile Actions:</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleDownloadJSON}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 text-xs font-bold cursor-pointer transition-all"
+            title="Download JHora/KP raw JSON payload"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Download User JSON
+          </button>
+          
+          <button
+            onClick={handleExportPDF}
+            disabled={pdfCompiling}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold disabled:opacity-50 cursor-pointer transition-all"
+            title="Compile all raw systems into a PDF report"
+          >
+            {pdfCompiling ? (
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <FileText className="w-3.5 h-3.5" />
+            )}
+            {pdfCompiling ? "Compiling Report..." : "Export Complete PDF"}
+          </button>
+
+          <button
+            onClick={() => setShowRawJson(!showRawJson)}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-xs font-bold cursor-pointer transition-all ${
+              showRawJson 
+                ? "bg-slate-700/50 border-slate-600 text-slate-200" 
+                : "bg-slate-800/20 border-slate-800 text-slate-400 hover:bg-slate-800/50"
+            }`}
+            title="Toggle raw interactive JSON viewer"
+          >
+            <Code className="w-3.5 h-3.5" />
+            {showRawJson ? "Hide JSON Payload" : "Inspect Raw JSON"}
+          </button>
+        </div>
+      </div>
+
+      {showRawJson && (
+        <div className={`p-4 rounded-xl border font-mono text-[11px] leading-relaxed relative ${cardStyle}`}>
+          <div className="flex justify-between items-center mb-3 pb-2 border-b border-indigo-500/10">
+            <span className="text-indigo-400 font-bold uppercase tracking-wide">Raw JHora/KP/Western Combined Payload (.json)</span>
+            <span className="text-[10px] text-slate-500">Live memory state</span>
+          </div>
+          <pre className="overflow-x-auto max-h-[400px] text-slate-300 bg-slate-950/85 p-4 rounded-lg select-text">
+            {JSON.stringify({
+              User: {
+                google_user_id: activeUser?.uid || "guest_user",
+                email: activeUser?.email || "guest@example.com",
+                profile_name: astrologyData?.birthDetails?.name || "Vedic Native",
+                created_at: new Date().toISOString()
+              },
+              Birth: astrologyData?.birthDetails || {},
+              astrologyData,
+              supplemental_data: {
+                kpCusps,
+                kpChart,
+                kpSignificators,
+                westernChart
+              }
+            }, null, 2)}
+          </pre>
+        </div>
+      )}
+
       {error && (
         <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400 text-xs flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
@@ -191,7 +330,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <User className="w-4 h-4" />
-                    Table 1: Birth Details & Astronomical Metrics
+                    JH1: Birth Details & Astronomical Metrics
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Parashari Baseline</span>
                 </div>
@@ -279,7 +418,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Compass className="w-4 h-4" />
-                    Table 2: Natal Planets Longitudes & Rasi Placements
+                    JH2: Natal Planets Longitudes & Rasi Placements
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Sidereal Placements</span>
                 </div>
@@ -323,7 +462,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Activity className="w-4 h-4" />
-                    Table 3: Shadbala Planet Strength Matrix (Shashtiamsas)
+                    JH3: Shadbala Planet Strength Matrix (Shashtiamsas)
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Six-Fold Strength Model</span>
                 </div>
@@ -377,7 +516,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Award className="w-4 h-4" />
-                    Table 4: Bhava Balas (House Strengths)
+                    JH4: Bhava Balas (House Strengths)
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">House Boundaries</span>
                 </div>
@@ -435,7 +574,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Hash className="w-4 h-4" />
-                    Table 5: Samudhaya Ashtakavarga Points (SAV)
+                    JH5: Samudhaya Ashtakavarga Points (SAV)
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Binnashtakavarga Matrix</span>
                 </div>
@@ -494,7 +633,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Map className="w-4 h-4" />
-                    Table 6: Divisional Vargas (D1 to D60) Planetary House Distributions
+                    JH6: Divisional Vargas (D1 to D60) Planetary House Distributions
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Harmonics System</span>
                 </div>
@@ -549,7 +688,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Clock className="w-4 h-4" />
-                    Table 7: Vimshottari Mahadasha Timelines
+                    JH7: Vimshottari Mahadasha Timelines
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">120-Year Lunar Cycle</span>
                 </div>
@@ -589,7 +728,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Shield className="w-4 h-4" />
-                    Table 8: Placidus House Cusp Coordinates & Lords
+                    JH8: Placidus House Cusp Coordinates & Lords
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">1-12 House Boundaries</span>
                 </div>
@@ -639,7 +778,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Workflow className="w-4 h-4" />
-                    Table 9: KP Planetary Sub-Lords & Coordinates
+                    JH9: KP Planetary Sub-Lords & Coordinates
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Vedic Stella Ratios</span>
                 </div>
@@ -695,7 +834,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Activity className="w-4 h-4" />
-                    Table 10: KP Planet-Level Significators
+                    JH10: KP Planet-Level Significators
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Stellar Strength Levels</span>
                 </div>
@@ -739,7 +878,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Shield className="w-4 h-4" />
-                    Table 11: KP House-Level Significators
+                    JH11: KP House-Level Significators
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Placidus Boundary Mapping</span>
                 </div>
@@ -779,7 +918,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Award className="w-4 h-4" />
-                    Table 12: Jaimini Chara Karakas
+                    JH12: Jaimini Chara Karakas
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Seven-Fold Status</span>
                 </div>
@@ -845,7 +984,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Compass className="w-4 h-4" />
-                    Table 13: Jaimini Arudhas & Padas
+                    JH13: Jaimini Arudhas & Padas
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Zodiac Reflective Points</span>
                 </div>
@@ -905,7 +1044,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Compass className="w-4 h-4" />
-                    Table 14: Tropical Planetary Placements
+                    JH14: Tropical Planetary Placements
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Western Tropical Zodiac</span>
                 </div>
@@ -959,7 +1098,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Workflow className="w-4 h-4" />
-                    Table 15: Tropical Planetary Aspects Matrix
+                    JH15: Tropical Planetary Aspects Matrix
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Exact Orbs</span>
                 </div>
@@ -1005,7 +1144,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Compass className="w-4 h-4" />
-                    Table 16: Tajik Varshaphal Planetary Coordinates
+                    JH16: Tajik Varshaphal Planetary Coordinates
                   </h3>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono text-slate-400">Target Age:</span>
@@ -1074,7 +1213,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Activity className="w-4 h-4" />
-                    Table 17: Tajik Harsha Balas (4-Fold Strength)
+                    JH17: Tajik Harsha Balas (4-Fold Strength)
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Persian Delight-Point System</span>
                 </div>
@@ -1131,7 +1270,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Compass className="w-4 h-4" />
-                    Table 18: Lal Kitab Planetary Houses & Placements
+                    JH18: Lal Kitab Planetary Houses & Placements
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Aries Fixed Ascendant (1)</span>
                 </div>
@@ -1184,7 +1323,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
                   <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Shield className="w-4 h-4" />
-                    Table 19: Lal Kitab Teva & Sleeping Planet Status
+                    JH19: Lal Kitab Teva & Sleeping Planet Status
                   </h3>
                   <span className="text-[10px] font-mono text-slate-500 font-medium">Dormancy Status (Soye Grah)</span>
                 </div>

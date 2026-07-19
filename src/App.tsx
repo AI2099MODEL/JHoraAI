@@ -1212,35 +1212,35 @@ export default function App() {
       icon: Activity,
       submenus: [
         // Category 1: JHORA
-        { id: "jhora_birth_details", label: "Birth Details", description: "Table 1: Birth Details & Astronomical Metrics.", systemId: "astro", category: "JHORA" },
-        { id: "jhora_planets", label: "Planets Placements", description: "Table 2: Natal Planets Longitudes & Rasi Placements.", systemId: "astro", category: "JHORA" },
-        { id: "jhora_shadbala", label: "Shadbala Matrix", description: "Table 3: Shadbala Planet Strength Matrix.", systemId: "astro", category: "JHORA" },
-        { id: "jhora_bhava_balas", label: "Bhava Strengths", description: "Table 4: Bhava Balas (House Strengths).", systemId: "astro", category: "JHORA" },
-        { id: "jhora_ashtakavarga", label: "SAV Ashtakavarga", description: "Table 5: Samudhaya Ashtakavarga Points.", systemId: "astro", category: "JHORA" },
-        { id: "jhora_divisional", label: "Divisional Vargas", description: "Table 6: Divisional Vargas D1 to D60.", systemId: "astro", category: "JHORA" },
-        { id: "jhora_vimshottari", label: "Vimshottari Dasha", description: "Table 7: Vimshottari Mahadasha Timelines.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_birth_details", label: "Birth Details", description: "JH1: Birth Details & Astronomical Metrics.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_planets", label: "Planets Placements", description: "JH2: Natal Planets Longitudes & Rasi Placements.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_shadbala", label: "Shadbala Matrix", description: "JH3: Shadbala Planet Strength Matrix.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_bhava_balas", label: "Bhava Strengths", description: "JH4: Bhava Balas (House Strengths).", systemId: "astro", category: "JHORA" },
+        { id: "jhora_ashtakavarga", label: "SAV Ashtakavarga", description: "JH5: Samudhaya Ashtakavarga Points.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_divisional", label: "Divisional Vargas", description: "JH6: Divisional Vargas D1 to D60.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_vimshottari", label: "Vimshottari Dasha", description: "JH7: Vimshottari Mahadasha Timelines.", systemId: "astro", category: "JHORA" },
 
         // Category 2: KP STELLAR
-        { id: "kp_cusps", label: "Placidus Cusps", description: "Table 8: Placidus House Cusp Coordinates.", systemId: "astro", category: "KP STELLAR" },
-        { id: "kp_sub_lords", label: "Planetary Sub-Lords", description: "Table 9: KP Planetary Sub-Lords.", systemId: "astro", category: "KP STELLAR" },
-        { id: "kp_planet_significators", label: "Planet Significators", description: "Table 10: KP Planet-Level Significators.", systemId: "astro", category: "KP STELLAR" },
-        { id: "kp_house_significators", label: "House Significators", description: "Table 11: KP House-Level Significators.", systemId: "astro", category: "KP STELLAR" },
+        { id: "kp_cusps", label: "Placidus Cusps", description: "JH8: Placidus House Cusp Coordinates.", systemId: "astro", category: "KP STELLAR" },
+        { id: "kp_sub_lords", label: "Planetary Sub-Lords", description: "JH9: KP Planetary Sub-Lords.", systemId: "astro", category: "KP STELLAR" },
+        { id: "kp_planet_significators", label: "Planet Significators", description: "JH10: KP Planet-Level Significators.", systemId: "astro", category: "KP STELLAR" },
+        { id: "kp_house_significators", label: "House Significators", description: "JH11: KP House-Level Significators.", systemId: "astro", category: "KP STELLAR" },
 
         // Category 3: JAIMINI
-        { id: "jaimini_karakas", label: "Chara Karakas", description: "Table 12: Jaimini Chara Karakas.", systemId: "astro", category: "JAIMINI" },
-        { id: "jaimini_arudhas", label: "Arudha Padas", description: "Table 13: Jaimini Arudhas & Padas.", systemId: "astro", category: "JAIMINI" },
+        { id: "jaimini_karakas", label: "Chara Karakas", description: "JH12: Jaimini Chara Karakas.", systemId: "astro", category: "JAIMINI" },
+        { id: "jaimini_arudhas", label: "Arudha Padas", description: "JH13: Jaimini Arudhas & Padas.", systemId: "astro", category: "JAIMINI" },
 
         // Category 4: WESTERN
-        { id: "western_tropical", label: "Tropical Placements", description: "Table 14: Tropical Planetary Placements.", systemId: "astro", category: "WESTERN" },
-        { id: "western_aspects", label: "Aspects Matrix", description: "Table 15: Tropical Planetary Aspects Matrix.", systemId: "astro", category: "WESTERN" },
+        { id: "western_tropical", label: "Tropical Placements", description: "JH14: Tropical Planetary Placements.", systemId: "astro", category: "WESTERN" },
+        { id: "western_aspects", label: "Aspects Matrix", description: "JH15: Tropical Planetary Aspects Matrix.", systemId: "astro", category: "WESTERN" },
 
         // Category 5: TAJIKA
-        { id: "tajika_varshaphal", label: "Varshaphal Coordinates", description: "Table 16: Varshaphal Planetary Coordinates.", systemId: "astro", category: "TAJIKA" },
-        { id: "tajika_harshabala", label: "Harsha Balas", description: "Table 17: Tajik Harsha Balas.", systemId: "astro", category: "TAJIKA" },
+        { id: "tajika_varshaphal", label: "Varshaphal Coordinates", description: "JH16: Varshaphal Planetary Coordinates.", systemId: "astro", category: "TAJIKA" },
+        { id: "tajika_harshabala", label: "Harsha Balas", description: "JH17: Tajik Harsha Balas.", systemId: "astro", category: "TAJIKA" },
 
         // Category 6: LAL KITAB
-        { id: "lalkitab_houses", label: "LKB Houses", description: "Table 18: Lal Kitab Planetary Houses.", systemId: "astro", category: "LAL KITAB" },
-        { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "Table 19: Lal Kitab Teva & Sleeping Status.", systemId: "astro", category: "LAL KITAB" }
+        { id: "lalkitab_houses", label: "LKB Houses", description: "JH18: Lal Kitab Planetary Houses.", systemId: "astro", category: "LAL KITAB" },
+        { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "JH19: Lal Kitab Teva & Sleeping Status.", systemId: "astro", category: "LAL KITAB" }
       ]
     },
     {
@@ -2907,6 +2907,7 @@ export default function App() {
                   astrologyData={astrologyData} 
                   activeSubmenuId={activeSubmenuId} 
                   isDark={isDark} 
+                  activeUser={activeUser}
                 />
               </motion.div>
             </AnimatePresence>

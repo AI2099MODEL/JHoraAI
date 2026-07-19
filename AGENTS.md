@@ -20,6 +20,7 @@ This file documents the persistent instructions, project rules, and developer pr
 
 ## Baseline Core Rules (Strict Raw Presentation Baseline)
 
-Agents working on this repository MUST strictly abide by these two baseline instructions:
+Agents working on this repository MUST strictly abide by these baseline instructions:
 1. **FETCH RAW DATA FROM API**: Under no circumstances should agents run client-side or server-side pre-computations, calculations, or generate any transit forecasts or overlays during data fetch. The raw responses from JHora or VedicAstro REST gateways must be fetched precisely as they are and stored locally inside the UserProfile.
 2. **DISPLAY ALL DATA IN THE FORM OF TABLES**: Within the Astro systems menu structures, all displayed data must be formatted and presented cleanly in the form of tabular, raw data tables without any on-the-fly calculations, transits, or dynamic overlays. This ensures a 100% stable presentation matching the stored JSON payloads exactly.
+3. **INDEX ALL TABLES STARTING FROM JH1 TILL END**: In the Astro systems registry menu, tables must be strictly indexed from JH1 to JH19 consecutively to maintain cohesive mapping reference bounds. Ensure complete raw JSON payloads can be inspected, and keep the PDF export and raw JSON download functions fully preserved and integrated inside this Astro module.
