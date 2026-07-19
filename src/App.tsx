@@ -95,6 +95,7 @@ import { MyPageView } from "./components/MyPageView";
 import { AstroRawTablesView } from "./components/AstroRawTablesView";
 import { UserProfile, SessionManager, AuthManager, UserProfileRepository } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
+import WorkspaceTab from "./components/WorkspaceTab";
 import UpdateNotification from "./components/UpdateNotification";
 import { UpdateManager, UpdateManifest } from "./lib/androidOta";
 import GithubOtaView from "./components/GithubOtaView";
@@ -1459,6 +1460,11 @@ export default function App() {
         { id: "rules_terminal", label: "Rules Terminal", description: "Review and edit core astrological logic gates." },
         { id: "theme", label: "Theme", description: "Dark, Light, and custom styling." },
         { id: "google_account", label: "Google Account", description: "Enable Google Sign-In & Sync." },
+        { id: "google_drive", label: "Google Drive Backup", description: "Save and load birth charts on Google Drive." },
+        { id: "google_calendar", label: "Google Calendar Sync", description: "Sync Vimshottari dasha events to calendar." },
+        { id: "google_gmail", label: "Google Gmail Dispatcher", description: "Send astrological reports via Gmail." },
+        { id: "google_keep", label: "Google Keep Notes", description: "Save and backup remedies and analysis notes." },
+        { id: "google_contacts", label: "Google Contacts", description: "Access connected Google Contacts list." },
         { id: "github_ota", label: "GitHub OTA Updates", description: "Check for new releases." },
         { id: "language", label: "Language", description: "Switch display languages." },
         { id: "ayanamsa", label: "Ayanamsa", description: "Select precession correction systems." },
@@ -3400,6 +3406,14 @@ export default function App() {
                   <RulesTerminal isDarkTheme={isDark} />
                 ) : activeSubmenuId === "google_account" ? (
                   <AuthScreen onAuthSuccess={(user) => setActiveUser(user)} activeUser={activeUser} />
+                ) : [
+                  "google_drive",
+                  "google_calendar",
+                  "google_gmail",
+                  "google_keep",
+                  "google_contacts"
+                ].includes(activeSubmenuId) ? (
+                  <WorkspaceTab astrologyData={astrologyData} activeSub={activeSubmenuId} />
                 ) : activeSubmenuId === "github_ota" ? (
                   <GithubOtaView isDarkTheme={isDark} />
                 ) : (

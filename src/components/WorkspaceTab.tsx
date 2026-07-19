@@ -22,10 +22,13 @@ import {
   AlertCircle,
   Mail,
   Send,
-  User
+  User,
+  Users,
+  Phone,
+  ExternalLink
 } from "lucide-react";
 import { AstrologyData, DashaPeriod } from "../lib/astrology";
-import { AuthManager, getCachedGoogleAccessToken, setCachedGoogleAccessToken } from "../lib/firebaseAuth";
+import { AuthManager, getCachedGoogleAccessToken, setCachedGoogleAccessToken, fetchGooglePhoneNumber } from "../lib/firebaseAuth";
 
 interface WorkspaceTabProps {
   astrologyData: AstrologyData | null;
@@ -92,6 +95,20 @@ export default function WorkspaceTab({ astrologyData, activeSub }: WorkspaceTabP
   const [gmailSubject, setGmailSubject] = useState("JHora AI Astrological Birth Chart Report");
   const [gmailBody, setGmailBody] = useState("");
   const [gmailUserEmail, setGmailUserEmail] = useState("");
+
+  // Contacts state
+  interface GoogleContact {
+    resourceName: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    photoUrl?: string;
+  }
+  const [contacts, setContacts] = useState<GoogleContact[]>([]);
+  const [contactsLoading, setContactsLoading] = useState(false);
+  const [contactsError, setContactsError] = useState<string | null>(null);
+  const [contactsSearch, setContactsSearch] = useState("");
+  const [userProfilePhone, setUserProfilePhone] = useState<string | undefined>(undefined);
 
   // Auto-fetch connected user's email for auto-filling
   useEffect(() => {
@@ -738,6 +755,79 @@ export default function WorkspaceTab({ astrologyData, activeSub }: WorkspaceTabP
       n.title.toLowerCase().includes(term) ||
       n.content.toLowerCase().includes(term) ||
       n.category.toLowerCase().includes(term)
+    );
+  });
+
+  // -------------------------------------------------------------
+  // GOOGLE CONTACTS SERVICES
+  // -------------------------------------------------------------
+
+  const fetchGoogleContactsAndProfile = async () => {
+    if (!token) return;
+    setContactsLoading(true);
+    setContactsError(null);
+    try {
+      // Fetch user's own phone number
+      const phone = await fetchGooglePhoneNumber(token);
+      setUserProfilePhone(phone);
+
+      // Fetch contacts Connections
+      const res = await fetch(
+        "https://people.googleapis.com/v1/people/me/connections?pageSize=100&personFields=names,emailAddresses,phoneNumbers,photos",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!res.ok) {
+        if (res.status === 401) {
+          setToken(null);
+          setCachedGoogleAccessToken(null);
+          throw new Error("Authorization expired. Please reconnect Google account.");
+        }
+        if (res.status === 403) {
+          throw new Error("Access forbidden. Ensure the Google People API is enabled in your Google Cloud Developer Console and the Contacts scope is approved.");
+        }
+        throw new Error(`Failed to load Google Contacts (Status ${res.status}).`);
+      }
+      const data = await res.json();
+      const connections = data.connections || [];
+      const mapped: GoogleContact[] = connections.map((conn: any) => {
+        const nameObj = conn.names?.[0];
+        const emailObj = conn.emailAddresses?.[0];
+        const phoneObj = conn.phoneNumbers?.[0];
+        const photoObj = conn.photos?.[0];
+
+        return {
+          resourceName: conn.resourceName,
+          name: nameObj?.displayName || "Unnamed Contact",
+          email: emailObj?.value,
+          phone: phoneObj?.value,
+          photoUrl: photoObj?.url,
+        };
+      });
+      setContacts(mapped);
+    } catch (err: any) {
+      console.error("Error loading Google Contacts:", err);
+      setContactsError(err.message || "Failed to retrieve Google Contacts connection list.");
+    } finally {
+      setContactsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (token && activeSub === "google_contacts") {
+      fetchGoogleContactsAndProfile();
+    }
+  }, [token, activeSub]);
+
+  const filteredContacts = contacts.filter((c) => {
+    const term = contactsSearch.toLowerCase();
+    return (
+      (c.name || "").toLowerCase().includes(term) ||
+      (c.email || "").toLowerCase().includes(term) ||
+      (c.phone || "").toLowerCase().includes(term)
     );
   });
 
@@ -1441,6 +1531,155 @@ export default function WorkspaceTab({ astrologyData, activeSub }: WorkspaceTabP
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeSub === "google_contacts" && (
+        <div className="space-y-6">
+          <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-800/60 pb-5">
+              <div>
+                <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-amber-500" />
+                  Google Contacts Integration
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  Manage your personal client connections, select recipients for automated emails, and review linked phone records retrieved from Google Services.
+                </p>
+              </div>
+              <div className="flex gap-2 w-full md:w-auto">
+                <button
+                  onClick={fetchGoogleContactsAndProfile}
+                  disabled={loading || !token}
+                  className="p-2.5 bg-slate-950 border border-slate-800 hover:bg-slate-800 disabled:opacity-40 rounded-xl text-slate-400 transition cursor-pointer"
+                  title="Reload Contacts"
+                >
+                  <RefreshCw className={`w-4 h-4 ${contactsLoading ? "animate-spin" : ""}`} />
+                </button>
+              </div>
+            </div>
+
+            {/* Profile Phone Section */}
+            {token && (
+              <div className="bg-slate-950/50 border border-slate-800/80 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                    <Phone className="w-4 h-4 text-amber-500" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-500 block uppercase tracking-wider font-mono font-bold">Your Registered Phone Number</span>
+                    <span className="text-xs font-mono text-slate-300 font-semibold">
+                      {userProfilePhone || "Loading profile phone..."}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-[11px] text-slate-400 flex items-center gap-1.5 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-800">
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Verified via Google People API</span>
+                </div>
+              </div>
+            )}
+
+            {/* Contacts Search & Table */}
+            {!token ? (
+              <div className="flex flex-col items-center justify-center text-center py-16 bg-slate-950/20 rounded-xl border border-slate-800/40">
+                <Users className="w-12 h-12 text-slate-700 mb-3" />
+                <p className="text-xs text-slate-400 max-w-sm">
+                  Please connect your Google Account at the top of this tab to fetch and manage your Google Contacts.
+                </p>
+              </div>
+            ) : contactsLoading ? (
+              <div className="flex flex-col items-center justify-center py-16">
+                <RefreshCw className="w-8 h-8 text-amber-500 animate-spin mb-3" />
+                <p className="text-xs text-slate-400">Querying secure Google Contacts directory...</p>
+              </div>
+            ) : contactsError ? (
+              <div className="bg-rose-500/10 border border-rose-500/20 p-5 rounded-xl text-xs text-rose-400 flex flex-col items-center gap-2.5">
+                <AlertCircle className="w-8 h-8 text-rose-500" />
+                <p className="text-center font-semibold">{contactsError}</p>
+                <button
+                  onClick={fetchGoogleContactsAndProfile}
+                  className="px-4 py-2 bg-slate-900 hover:bg-slate-850 border border-slate-800 rounded-xl text-slate-300 text-[11px] font-bold"
+                >
+                  Retry Fetch
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="relative flex items-center">
+                  <Search className="w-4 h-4 text-slate-500 absolute left-3" />
+                  <input
+                    type="text"
+                    placeholder="Search client names, emails, or phone numbers..."
+                    value={contactsSearch}
+                    onChange={(e) => setContactsSearch(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-amber-500/30"
+                  />
+                </div>
+
+                {filteredContacts.length === 0 ? (
+                  <div className="bg-slate-950/20 rounded-xl border border-slate-800/40 p-12 text-center">
+                    <Users className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+                    <p className="text-xs text-slate-400">No contacts found on your Google account matching the search query.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto border border-slate-800/60 rounded-xl bg-slate-950/20">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-slate-950/80 border-b border-slate-800/80 text-slate-400 uppercase font-mono text-[9px] tracking-wider">
+                          <th className="py-3 px-4 font-bold">Photo</th>
+                          <th className="py-3 px-4 font-bold">Full Name</th>
+                          <th className="py-3 px-4 font-bold">Email Address</th>
+                          <th className="py-3 px-4 font-bold">Phone Number</th>
+                          <th className="py-3 px-4 font-bold text-center">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/40">
+                        {filteredContacts.map((contact) => (
+                          <tr key={contact.resourceName} className="hover:bg-slate-900/20 transition-colors">
+                            <td className="py-2.5 px-4">
+                              {contact.photoUrl ? (
+                                <img
+                                  src={contact.photoUrl}
+                                  alt={contact.name}
+                                  referrerPolicy="no-referrer"
+                                  className="w-8 h-8 rounded-full border border-slate-800"
+                                />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-slate-850 border border-slate-800 flex items-center justify-center font-mono font-bold text-[10px] text-amber-500">
+                                  {contact.name?.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-4 font-semibold text-slate-200">{contact.name}</td>
+                            <td className="py-2.5 px-4 font-mono text-slate-300">{contact.email || <span className="text-slate-600">No email</span>}</td>
+                            <td className="py-2.5 px-4 font-mono text-slate-300">{contact.phone || <span className="text-slate-600">No phone</span>}</td>
+                            <td className="py-2.5 px-4 text-center">
+                              {contact.email ? (
+                                <button
+                                  onClick={() => {
+                                    setGmailTo(contact.email!);
+                                    setSuccessMsg(`Recipient email updated to "${contact.email}" in Gmail tab!`);
+                                    setTimeout(() => setSuccessMsg(null), 4000);
+                                  }}
+                                  className="px-3 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 text-indigo-400 hover:text-indigo-300 rounded-lg text-[10px] font-bold transition flex items-center gap-1.5 mx-auto cursor-pointer"
+                                >
+                                  <Mail className="w-3 h-3" />
+                                  <span>Select for Gmail</span>
+                                </button>
+                              ) : (
+                                <span className="text-[10px] text-slate-500 italic">No Actions</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

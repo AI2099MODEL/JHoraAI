@@ -3,8 +3,8 @@
     "google_user_id": "guest_user",
     "email": "guest@jhora.ai",
     "profile_name": "Nitin",
-    "created_at": "2026-07-19T16:11:45.636Z",
-    "updated_at": "2026-07-19T16:11:45.636Z"
+    "created_at": "2026-07-18T16:23:38.678Z",
+    "updated_at": "2026-07-18T16:23:38.678Z"
   },
   "Birth": {
     "date": "1976-01-06",
@@ -593,10 +593,10 @@
       "Rahu": {
         "sign": "Libra",
         "sign_index": 6,
-        "degree": 25,
-        "minute": 26,
-        "second": 53,
-        "longitude_360": 205.448,
+        "degree": 26,
+        "minute": 31,
+        "second": 9,
+        "longitude_360": 206.5192,
         "nakshatra": "Vishakha",
         "pada": 2,
         "nakshatra_lord": "Jupiter",
@@ -670,10 +670,10 @@
       "Ketu": {
         "sign": "Aries",
         "sign_index": 0,
-        "degree": 25,
-        "minute": 26,
-        "second": 53,
-        "longitude_360": 25.448,
+        "degree": 26,
+        "minute": 31,
+        "second": 9,
+        "longitude_360": 26.5192,
         "nakshatra": "Bharani",
         "pada": 4,
         "nakshatra_lord": "Venus",
@@ -844,16 +844,16 @@
           {
             "planet": "Rahu",
             "sign": "Libra",
-            "longitude": 205.448,
-            "degree": 25.448,
+            "longitude": 206.5192,
+            "degree": 26.5192,
             "nakshatra": "Vishakha",
             "house": 4
           },
           {
             "planet": "Ketu",
             "sign": "Aries",
-            "longitude": 25.448,
-            "degree": 25.448,
+            "longitude": 26.5192,
+            "degree": 26.5192,
             "nakshatra": "Bharani",
             "house": 10
           }
@@ -955,16 +955,16 @@
           {
             "planet": "Rahu",
             "sign": "Taurus",
-            "longitude": 50.896,
-            "degree": 20.896,
+            "longitude": 53.0384,
+            "degree": 23.0384,
             "nakshatra": "Rohini",
             "house": 7
           },
           {
             "planet": "Ketu",
             "sign": "Taurus",
-            "longitude": 50.896,
-            "degree": 20.896,
+            "longitude": 53.0384,
+            "degree": 23.0384,
             "nakshatra": "Rohini",
             "house": 7
           }
@@ -1067,16 +1067,16 @@
           {
             "planet": "Rahu",
             "sign": "Sagittarius",
-            "longitude": 256.344,
-            "degree": 16.344,
+            "longitude": 259.5576,
+            "degree": 19.5576,
             "nakshatra": "Purva Ashadha",
             "house": 12
           },
           {
             "planet": "Ketu",
             "sign": "Gemini",
-            "longitude": 76.344,
-            "degree": 16.344,
+            "longitude": 79.5576,
+            "degree": 19.5576,
             "nakshatra": "Ardra",
             "house": 6
           }
@@ -1178,16 +1178,16 @@
           {
             "planet": "Rahu",
             "sign": "Cancer",
-            "longitude": 101.792,
-            "degree": 11.792,
+            "longitude": 106.0768,
+            "degree": 16.0768,
             "nakshatra": "Pushya",
             "house": 1
           },
           {
             "planet": "Ketu",
             "sign": "Cancer",
-            "longitude": 101.792,
-            "degree": 11.792,
+            "longitude": 106.0768,
+            "degree": 16.0768,
             "nakshatra": "Pushya",
             "house": 7
           }
@@ -1287,16 +1287,16 @@
           {
             "planet": "Rahu",
             "sign": "Aquarius",
-            "longitude": 307.24,
-            "degree": 7.24,
+            "longitude": 312.596,
+            "degree": 12.596,
             "nakshatra": "Shatabhisha",
             "house": 2
           },
           {
             "planet": "Ketu",
             "sign": "Leo",
-            "longitude": 127.24,
-            "degree": 7.24,
+            "longitude": 132.596,
+            "degree": 12.596,
             "nakshatra": "Magha",
             "house": 2
           }
@@ -1397,16 +1397,16 @@
           {
             "planet": "Rahu",
             "sign": "Virgo",
-            "longitude": 152.688,
-            "degree": 2.688,
+            "longitude": 159.1152,
+            "degree": 9.1152,
             "nakshatra": "Uttara Phalguni",
             "house": 11
           },
           {
             "planet": "Ketu",
             "sign": "Virgo",
-            "longitude": 152.688,
-            "degree": 2.688,
+            "longitude": 159.1152,
+            "degree": 9.1152,
             "nakshatra": "Uttara Phalguni",
             "house": 11
           }
@@ -1423,11 +1423,10 @@
             "Jupiter",
             "Saturn"
           ],
-          "2": [
-            "Rahu"
-          ],
+          "2": [],
           "3": [
-            "Mars"
+            "Mars",
+            "Rahu"
           ],
           "4": [
             "Sun"
@@ -1440,10 +1439,11 @@
           ],
           "7": [],
           "8": [
-            "Mercury",
+            "Mercury"
+          ],
+          "9": [
             "Ketu"
           ],
-          "9": [],
           "10": [],
           "11": [],
           "12": []
@@ -1507,19 +1507,19 @@
           },
           {
             "planet": "Rahu",
-            "sign": "Pisces",
-            "longitude": 358.136,
-            "degree": 28.136,
-            "nakshatra": "Revati",
-            "house": 2
+            "sign": "Aries",
+            "longitude": 5.6344,
+            "degree": 5.6344,
+            "nakshatra": "Ashwini",
+            "house": 3
           },
           {
             "planet": "Ketu",
-            "sign": "Virgo",
-            "longitude": 178.136,
-            "degree": 28.136,
+            "sign": "Libra",
+            "longitude": 185.6344,
+            "degree": 5.6344,
             "nakshatra": "Chitra",
-            "house": 8
+            "house": 9
           }
         ]
       },
@@ -1541,11 +1541,11 @@
           "3": [],
           "4": [],
           "5": [],
-          "6": [
+          "6": [],
+          "7": [
             "Rahu",
             "Ketu"
           ],
-          "7": [],
           "8": [],
           "9": [
             "Sun",
@@ -1616,19 +1616,19 @@
           },
           {
             "planet": "Rahu",
-            "sign": "Libra",
-            "longitude": 203.584,
-            "degree": 23.584,
+            "sign": "Scorpio",
+            "longitude": 212.1536,
+            "degree": 2.1536,
             "nakshatra": "Vishakha",
-            "house": 6
+            "house": 7
           },
           {
             "planet": "Ketu",
-            "sign": "Libra",
-            "longitude": 203.584,
-            "degree": 23.584,
+            "sign": "Scorpio",
+            "longitude": 212.1536,
+            "degree": 2.1536,
             "nakshatra": "Vishakha",
-            "house": 6
+            "house": 7
           }
         ]
       },
@@ -1729,16 +1729,16 @@
           {
             "planet": "Rahu",
             "sign": "Taurus",
-            "longitude": 49.032,
-            "degree": 19.032,
-            "nakshatra": "Rohini",
+            "longitude": 58.6728,
+            "degree": 28.6728,
+            "nakshatra": "Mrigashira",
             "house": 9
           },
           {
             "planet": "Ketu",
             "sign": "Scorpio",
-            "longitude": 229.032,
-            "degree": 19.032,
+            "longitude": 238.6728,
+            "degree": 28.6728,
             "nakshatra": "Jyeshtha",
             "house": 3
           }
@@ -1839,16 +1839,16 @@
           {
             "planet": "Rahu",
             "sign": "Sagittarius",
-            "longitude": 254.48,
-            "degree": 14.48,
+            "longitude": 265.192,
+            "degree": 25.192,
             "nakshatra": "Purva Ashadha",
             "house": 2
           },
           {
             "planet": "Ketu",
             "sign": "Sagittarius",
-            "longitude": 254.48,
-            "degree": 14.48,
+            "longitude": 265.192,
+            "degree": 25.192,
             "nakshatra": "Purva Ashadha",
             "house": 8
           }
@@ -1948,17 +1948,17 @@
           {
             "planet": "Rahu",
             "sign": "Cancer",
-            "longitude": 99.928,
-            "degree": 9.928,
-            "nakshatra": "Pushya",
+            "longitude": 111.7112,
+            "degree": 21.7112,
+            "nakshatra": "Ashlesha",
             "house": 5
           },
           {
             "planet": "Ketu",
             "sign": "Capricorn",
-            "longitude": 279.928,
-            "degree": 9.928,
-            "nakshatra": "Uttara Ashadha",
+            "longitude": 291.7112,
+            "degree": 21.7112,
+            "nakshatra": "Shravana",
             "house": 11
           }
         ]
@@ -2058,17 +2058,17 @@
           {
             "planet": "Rahu",
             "sign": "Aquarius",
-            "longitude": 305.376,
-            "degree": 5.376,
-            "nakshatra": "Dhanishta",
+            "longitude": 318.2304,
+            "degree": 18.2304,
+            "nakshatra": "Shatabhisha",
             "house": 12
           },
           {
             "planet": "Ketu",
             "sign": "Aquarius",
-            "longitude": 305.376,
-            "degree": 5.376,
-            "nakshatra": "Dhanishta",
+            "longitude": 318.2304,
+            "degree": 18.2304,
+            "nakshatra": "Shatabhisha",
             "house": 6
           }
         ]
@@ -2101,12 +2101,11 @@
           ],
           "9": [],
           "10": [],
-          "11": [
+          "11": [],
+          "12": [
+            "Moon",
             "Rahu",
             "Ketu"
-          ],
-          "12": [
-            "Moon"
           ]
         },
         "planets": [
@@ -2168,19 +2167,19 @@
           },
           {
             "planet": "Rahu",
-            "sign": "Taurus",
-            "longitude": 47.168,
-            "degree": 17.168,
-            "nakshatra": "Rohini",
-            "house": 11
+            "sign": "Gemini",
+            "longitude": 64.3072,
+            "degree": 4.3072,
+            "nakshatra": "Mrigashira",
+            "house": 12
           },
           {
             "planet": "Ketu",
-            "sign": "Taurus",
-            "longitude": 47.168,
-            "degree": 17.168,
-            "nakshatra": "Rohini",
-            "house": 11
+            "sign": "Gemini",
+            "longitude": 64.3072,
+            "degree": 4.3072,
+            "nakshatra": "Mrigashira",
+            "house": 12
           }
         ]
       },
@@ -2193,11 +2192,12 @@
         "house_placements": {
           "1": [
             "Venus",
-            "Saturn",
+            "Saturn"
+          ],
+          "2": [
             "Rahu",
             "Ketu"
           ],
-          "2": [],
           "3": [
             "Sun",
             "Jupiter"
@@ -2277,19 +2277,19 @@
           },
           {
             "planet": "Rahu",
-            "sign": "Leo",
-            "longitude": 148.96,
-            "degree": 28.96,
-            "nakshatra": "Uttara Phalguni",
-            "house": 1
+            "sign": "Virgo",
+            "longitude": 170.384,
+            "degree": 20.384,
+            "nakshatra": "Hasta",
+            "house": 2
           },
           {
             "planet": "Ketu",
-            "sign": "Leo",
-            "longitude": 148.96,
-            "degree": 28.96,
-            "nakshatra": "Uttara Phalguni",
-            "house": 1
+            "sign": "Virgo",
+            "longitude": 170.384,
+            "degree": 20.384,
+            "nakshatra": "Hasta",
+            "house": 2
           }
         ]
       },
@@ -2312,12 +2312,11 @@
           "4": [
             "Mercury"
           ],
-          "5": [
+          "5": [],
+          "6": [
+            "Venus",
             "Rahu",
             "Ketu"
-          ],
-          "6": [
-            "Venus"
           ],
           "7": [],
           "8": [],
@@ -2387,19 +2386,19 @@
           },
           {
             "planet": "Rahu",
-            "sign": "Sagittarius",
-            "longitude": 250.752,
-            "degree": 10.752,
-            "nakshatra": "Mula",
-            "house": 5
+            "sign": "Capricorn",
+            "longitude": 276.4608,
+            "degree": 6.4608,
+            "nakshatra": "Uttara Ashadha",
+            "house": 6
           },
           {
             "planet": "Ketu",
-            "sign": "Sagittarius",
-            "longitude": 250.752,
-            "degree": 10.752,
-            "nakshatra": "Mula",
-            "house": 5
+            "sign": "Capricorn",
+            "longitude": 276.4608,
+            "degree": 6.4608,
+            "nakshatra": "Uttara Ashadha",
+            "house": 6
           }
         ]
       },
@@ -2413,11 +2412,10 @@
           "1": [
             "Saturn"
           ],
-          "2": [
-            "Rahu"
-          ],
+          "2": [],
           "3": [
-            "Jupiter"
+            "Jupiter",
+            "Rahu"
           ],
           "4": [],
           "5": [
@@ -2427,12 +2425,11 @@
             "Venus"
           ],
           "7": [],
-          "8": [
-            "Ketu"
-          ],
+          "8": [],
           "9": [
             "Moon",
-            "Mars"
+            "Mars",
+            "Ketu"
           ],
           "10": [
             "Mercury"
@@ -2499,19 +2496,19 @@
           },
           {
             "planet": "Rahu",
-            "sign": "Leo",
-            "longitude": 147.096,
-            "degree": 27.096,
-            "nakshatra": "Uttara Phalguni",
-            "house": 2
+            "sign": "Virgo",
+            "longitude": 176.0184,
+            "degree": 26.0184,
+            "nakshatra": "Chitra",
+            "house": 3
           },
           {
             "planet": "Ketu",
-            "sign": "Aquarius",
-            "longitude": 327.096,
-            "degree": 27.096,
-            "nakshatra": "Purva Bhadrapada",
-            "house": 8
+            "sign": "Pisces",
+            "longitude": 356.0184,
+            "degree": 26.0184,
+            "nakshatra": "Revati",
+            "house": 9
           }
         ]
       },
@@ -2608,18 +2605,18 @@
           },
           {
             "planet": "Rahu",
-            "sign": "Taurus",
-            "longitude": 43.44,
-            "degree": 13.44,
-            "nakshatra": "Rohini",
+            "sign": "Gemini",
+            "longitude": 75.576,
+            "degree": 15.576,
+            "nakshatra": "Ardra",
             "house": 2
           },
           {
             "planet": "Ketu",
-            "sign": "Taurus",
-            "longitude": 43.44,
-            "degree": 13.44,
-            "nakshatra": "Rohini",
+            "sign": "Gemini",
+            "longitude": 75.576,
+            "degree": 15.576,
+            "nakshatra": "Ardra",
             "house": 2
           }
         ]
@@ -2643,15 +2640,14 @@
           "6": [
             "Mercury"
           ],
-          "7": [
-            "Rahu",
-            "Ketu"
-          ],
+          "7": [],
           "8": [
             "Venus"
           ],
           "9": [
-            "Jupiter"
+            "Jupiter",
+            "Rahu",
+            "Ketu"
           ],
           "10": [
             "Mars"
@@ -2720,19 +2716,19 @@
           },
           {
             "planet": "Rahu",
-            "sign": "Capricorn",
-            "longitude": 297.92,
-            "degree": 27.92,
-            "nakshatra": "Dhanishta",
-            "house": 7
+            "sign": "Pisces",
+            "longitude": 340.768,
+            "degree": 10.768,
+            "nakshatra": "Uttara Bhadrapada",
+            "house": 9
           },
           {
             "planet": "Ketu",
-            "sign": "Capricorn",
-            "longitude": 297.92,
-            "degree": 27.92,
-            "nakshatra": "Dhanishta",
-            "house": 7
+            "sign": "Pisces",
+            "longitude": 340.768,
+            "degree": 10.768,
+            "nakshatra": "Uttara Bhadrapada",
+            "house": 9
           }
         ]
       },
@@ -2752,11 +2748,11 @@
           "4": [
             "Mars"
           ],
-          "5": [
+          "5": [],
+          "6": [
             "Rahu",
             "Ketu"
           ],
-          "6": [],
           "7": [
             "Sun",
             "Mercury"
@@ -2830,19 +2826,19 @@
           },
           {
             "planet": "Rahu",
-            "sign": "Sagittarius",
-            "longitude": 245.16,
-            "degree": 5.16,
-            "nakshatra": "Mula",
-            "house": 5
+            "sign": "Capricorn",
+            "longitude": 293.364,
+            "degree": 23.364,
+            "nakshatra": "Dhanishta",
+            "house": 6
           },
           {
             "planet": "Ketu",
-            "sign": "Gemini",
-            "longitude": 65.16,
-            "degree": 5.16,
-            "nakshatra": "Mrigashira",
-            "house": 5
+            "sign": "Cancer",
+            "longitude": 113.364,
+            "degree": 23.364,
+            "nakshatra": "Ashlesha",
+            "house": 6
           }
         ]
       },
@@ -2854,7 +2850,8 @@
         },
         "house_placements": {
           "1": [
-            "Saturn"
+            "Saturn",
+            "Ketu"
           ],
           "2": [],
           "3": [
@@ -2862,21 +2859,20 @@
             "Jupiter"
           ],
           "4": [
-            "Venus",
-            "Rahu"
+            "Venus"
           ],
           "5": [],
           "6": [
             "Mars"
           ],
-          "7": [],
+          "7": [
+            "Rahu"
+          ],
           "8": [
             "Moon"
           ],
           "9": [],
-          "10": [
-            "Ketu"
-          ],
+          "10": [],
           "11": [
             "Sun"
           ],
@@ -2941,27 +2937,27 @@
           },
           {
             "planet": "Rahu",
-            "sign": "Gemini",
-            "longitude": 86.88,
-            "degree": 26.88,
-            "nakshatra": "Punarvasu",
-            "house": 4
+            "sign": "Virgo",
+            "longitude": 151.152,
+            "degree": 1.152,
+            "nakshatra": "Uttara Phalguni",
+            "house": 7
           },
           {
             "planet": "Ketu",
-            "sign": "Gemini",
-            "longitude": 86.88,
-            "degree": 26.88,
-            "nakshatra": "Punarvasu",
-            "house": 10
+            "sign": "Virgo",
+            "longitude": 151.152,
+            "degree": 1.152,
+            "nakshatra": "Uttara Phalguni",
+            "house": 1
           }
         ]
       }
     },
     "panchanga": {
       "tithi": "Sukla",
-      "yoga": "Parigha",
-      "karana": "Baalava",
+      "yoga": "Vriyana",
+      "karana": "Vishti",
       "varna": "Shudra",
       "vashya": "Chatushpada",
       "yoni": "Simha",
@@ -21897,8 +21893,8 @@
         "house": 4,
         "sign_lord": "Venus",
         "star_lord": "Jupiter",
-        "sub_lord": "Mercury",
-        "sub_sub_lord": "Venus",
+        "sub_lord": "Ketu",
+        "sub_sub_lord": "Sun",
         "occupation": "House 4",
         "ownership": null
       },
@@ -21907,8 +21903,8 @@
         "house": 10,
         "sign_lord": "Mars",
         "star_lord": "Venus",
-        "sub_lord": "Mercury",
-        "sub_sub_lord": "Venus",
+        "sub_lord": "Ketu",
+        "sub_sub_lord": "Sun",
         "occupation": "House 10",
         "ownership": null
       }
@@ -22168,8 +22164,8 @@
           "house": 4,
           "sign_lord": "Venus",
           "star_lord": "Jupiter",
-          "sub_lord": "Mercury",
-          "sub_sub_lord": "Venus",
+          "sub_lord": "Ketu",
+          "sub_sub_lord": "Sun",
           "occupation": "House 4",
           "ownership": null
         },
@@ -22178,8 +22174,8 @@
           "house": 10,
           "sign_lord": "Mars",
           "star_lord": "Venus",
-          "sub_lord": "Mercury",
-          "sub_sub_lord": "Venus",
+          "sub_lord": "Ketu",
+          "sub_sub_lord": "Sun",
           "occupation": "House 10",
           "ownership": null
         }
@@ -23059,7 +23055,7 @@
       },
       "Rahu": {
         "sign": "Libra",
-        "degree": 25.448,
+        "degree": 26.5192,
         "house": 4,
         "retrograde": false,
         "element": "Air",
@@ -23067,7 +23063,7 @@
       },
       "Ketu": {
         "sign": "Aries",
-        "degree": 25.448,
+        "degree": 26.5192,
         "house": 10,
         "retrograde": false,
         "element": "Fire",
@@ -23495,7 +23491,7 @@
     "birth_time_rectified": false,
     "api_version": "v2.0.0",
     "api_confidence": "Authoritative / Verified",
-    "generated_on": "2026-07-19T16:11:45.636Z",
+    "generated_on": "2026-07-18T16:23:38.678Z",
     "generated_by": "JHoraAI Precision Engine",
     "jhora_version": "v7.6",
     "profile_version": "v2.1",
@@ -23504,7 +23500,7 @@
   "TableIndex": {
     "metadata": {
       "indexing_agent": "JHoraAI Master Evaluation Indexer",
-      "indexed_on": "2026-07-19T16:11:45.636Z",
+      "indexed_on": "2026-07-18T16:23:38.678Z",
       "handbook_reference": "/documents/master_astro_handbook.md",
       "status": "SYNC_ACTIVE"
     },
