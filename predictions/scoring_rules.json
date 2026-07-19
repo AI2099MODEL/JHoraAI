@@ -1,0 +1,193 @@
+{
+  "schema": {
+    "name": "Prediction Scoring Rules",
+    "version": "1.0.0",
+    "description": "Framework for combining astrological evidence into normalized prediction scores."
+  },
+
+  "scoring_engine": {
+
+    "method": "weighted_evidence",
+
+    "score_range": {
+      "minimum": -1000,
+      "maximum": 1000,
+      "normalized_min": 0,
+      "normalized_max": 100
+    },
+
+    "aggregation": {
+
+      "primary": "weighted_sum",
+
+      "secondary": "confidence_adjustment",
+
+      "final": "normalization"
+
+    }
+
+  },
+
+  "evidence_sources": [
+
+    {
+      "id": "dasha",
+      "enabled": true,
+      "required": true,
+      "weight_profile": "major_modules.dasha"
+    },
+
+    {
+      "id": "transits",
+      "enabled": true,
+      "required": true,
+      "weight_profile": "major_modules.transit"
+    },
+
+    {
+      "id": "natal_strength",
+      "enabled": true,
+      "required": true,
+      "weight_profile": "major_modules.natal_strength"
+    },
+
+    {
+      "id": "planet_strength",
+      "enabled": true
+    },
+
+    {
+      "id": "houses",
+      "enabled": true
+    },
+
+    {
+      "id": "yogas",
+      "enabled": true
+    },
+
+    {
+      "id": "doshas",
+      "enabled": true
+    },
+
+    {
+      "id": "ashtakavarga",
+      "enabled": true
+    },
+
+    {
+      "id": "kp",
+      "enabled": true
+    },
+
+    {
+      "id": "jaimini",
+      "enabled": true
+    },
+
+    {
+      "id": "tajik",
+      "enabled": false
+    },
+
+    {
+      "id": "nadi",
+      "enabled": false
+    }
+
+  ],
+
+  "rule_processing": {
+
+    "evaluate_positive": true,
+
+    "evaluate_negative": true,
+
+    "allow_conflicts": true,
+
+    "resolve_conflicts": true,
+
+    "multiple_confirmation_bonus": true,
+
+    "contradiction_penalty": true
+
+  },
+
+  "evidence_strength": {
+
+    "very_strong": {
+      "range": [90,100]
+    },
+
+    "strong": {
+      "range": [75,89]
+    },
+
+    "moderate": {
+      "range": [55,74]
+    },
+
+    "weak": {
+      "range": [35,54]
+    },
+
+    "very_weak": {
+      "range": [0,34]
+    }
+
+  },
+
+  "decision_thresholds": {
+
+    "publish_prediction": 50,
+
+    "high_confidence": 80,
+
+    "very_high_confidence": 90,
+
+    "suppress_if_confidence_below": 30
+
+  },
+
+  "contradiction_handling": {
+
+    "mode": "weighted_resolution",
+
+    "retain_both_views": true,
+
+    "generate_explanation": true,
+
+    "reduce_confidence": true
+
+  },
+
+  "explanation_requirements": {
+
+    "minimum_supporting_factors": 2,
+
+    "minimum_reasoning_steps": 1,
+
+    "include_positive": true,
+
+    "include_negative": true,
+
+    "include_confidence_reason": true
+
+  },
+
+  "quality_checks": {
+
+    "require_supporting_evidence": true,
+
+    "reject_empty_predictions": true,
+
+    "validate_probability": true,
+
+    "validate_confidence": true,
+
+    "prevent_duplicate_events": true
+
+  }
+
+}
