@@ -108,14 +108,14 @@ The platform manages two categories of JSON data to balance raw archival storage
 ### B. Raw Profile Ledger (`/Users/userprofile.json`)
 - Acts as a persistent, locked-down, read-only baseline archive of raw REST gateway responses.
 - Keeps raw data intact without on-the-fly client or server calculations, transits, or dynamic overlays. This ensures a 100% stable presentation matching the stored JSON payloads exactly.
-- **KP API Data Notice**: If the external `VedicAstro` API service returns HTTP 404 (or other HTML error responses) for `kp_chart` or `kp_cusps` during fetch, the error is securely written to the ledger as `{"error": "Invalid JSON response..."}`. This preserves raw data provenance exactly as it was received, with no synthetic data generated during capture.
+- **API Data Notice**: Only JHora is utilized for raw data storage. The decommissioned and unsupported VedicAstro external endpoint blocks have been fully removed to prevent broken HTML, 404s, or unstable parsing errors in client and server workflows.
 
 ---
 
 ## 5. Astrological Engine & Data Persistence Rules
 
 ### Rule 1: Strict UserProfile Data Strategy
-Under no circumstances should the system perform client-side or server-side pre-computations, calculations, or generate any transit forecasts or overlays during data fetch. The UserProfile must remain a strictly persistent archive of raw API responses only (from the JHora/VedicAstro endpoints), preserving the raw response exactly as-is. Mappings and interpretations must only be done at render/run-time or in separate transient application logic, never embedded within the stored profile.
+Under no circumstances should the system perform client-side or server-side pre-computations, calculations, or generate any transit forecasts or overlays during data fetch. The UserProfile must remain a strictly persistent archive of raw JHora API responses only, preserving the raw response exactly as-is. Mappings and interpretations must only be done at render/run-time or in separate transient application logic, never embedded within the stored profile.
 
 ### Rule 2: Dynamic Filename Mapping and Raw Payload Preservation
 When a user clicks on "Cast and Generate Horoscope" or "Refresh Horoscope", all raw data must be pulled into respective user profiles with the user profile named precisely as:
@@ -125,3 +125,6 @@ There must be absolutely **NO CALCULATIONS AND NO TRANSIT DATA** in this JSON fi
 
 ### Rule 3: Locking User Profile Post-Fetch & AI Assistant Navigation
 Once a user profile has successfully pulled all raw data from the APIs, the user profile is strictly locked. No further background calculations, automatic form-field change recalculations, periodic updates, or modifications are allowed on it, unless the user explicitly triggers "Cast & Generate Horoscope" or "Refresh Horoscope (Force Reload)" by clicking on those respective tabs. Additionally, once the user triggers either of these cast actions, the application must automatically and immediately transition the active menu view to the **AI Assistant** page to streamline user exploration. This guide serves as the master authority and instruction set for all AI agents working on this application; these rules are final and must not be overridden.
+
+### Rule 4: Exclusive JHora Usage & VedicAstro Decommissioning
+The external `VedicAstro` API service is decommissioned and is entirely excluded from the raw user profile JSON files. All agents must fetch raw data solely using the stable `JHora` API. No `VedicAstro` keys, parameters, or endpoints (such as `/kp/*` or `/western/*` from the broken external service) are to be injected, retained, or queried within the user profile payload structures. This keeps user profile files perfectly lightweight, clean, and 100% stable.

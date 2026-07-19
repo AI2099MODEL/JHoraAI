@@ -1050,10 +1050,6 @@ app.post("/api/user-profile/generate-raw", async (req, res) => {
     const tzNum = Number(timezone) || 5.5;
     const placeStr = location || "Query Location";
 
-    // Retrieve VedicAstro credentials
-    const apiKey = process.env.KP_API_KEY || process.env.WESTERN_API_KEY || "";
-    const vedicAstroBaseUrl = (process.env.KP_BASE_URL || "https://api.vedicastroapi.com/v1").replace(/\/$/, "");
-
     // Prepare JHora body
     const jhoraBody = {
       name: name || "Nitin",
@@ -1064,19 +1060,6 @@ app.post("/api/user-profile/generate-raw", async (req, res) => {
       timezone: tzNum,
       place: placeStr
     };
-
-    // Prepare VedicAstro body
-    const vedicAstroBody: any = {
-      date: formattedDate,
-      time: formattedTime,
-      lat: latNum,
-      lon: lonNum,
-      tz: tzNum,
-      place: placeStr
-    };
-    if (apiKey) {
-      vedicAstroBody.api_key = apiKey;
-    }
 
     // 1. Fetch JHora horoscope
     let jhoraHoroscope: any = null;
@@ -1091,53 +1074,7 @@ app.post("/api/user-profile/generate-raw", async (req, res) => {
       throw new Error(`Remote JHora server returned status ${response.status}`);
     }
 
-    // 2. Fetch every available natal/KP/Western VedicAstro endpoint
-    const vedicAstroEndpoints = [
-      "/kp/chart",
-      "/kp/cusps",
-      "/kp/starlords",
-      "/kp/sublords",
-      "/kp/subsublords",
-      "/kp/planet_significators",
-      "/kp/house_significators",
-      "/kp/dasha",
-      "/western/chart"
-    ];
-
-    const vedicAstroPromises = vedicAstroEndpoints.map(async (endpoint) => {
-      try {
-        const url = `${vedicAstroBaseUrl}${endpoint}`;
-        const response = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(vedicAstroBody)
-        });
-        const text = await response.text();
-        try {
-          const json = JSON.parse(text);
-          return { endpoint, success: true, data: json };
-        } catch (e) {
-          return { endpoint, success: false, error: `Invalid JSON response: ${text.slice(0, 200)}` };
-        }
-      } catch (err: any) {
-        return { endpoint, success: false, error: err.message || "Network error" };
-      }
-    });
-
-    const vedicAstroResults = await Promise.all(vedicAstroPromises);
-
-    const vedicAstroData: any = {};
-    for (const result of vedicAstroResults) {
-      // Create a clean key (e.g. "kp_chart")
-      const key = result.endpoint.replace(/^\//, "").replace(/\//g, "_");
-      if (result.success) {
-        vedicAstroData[key] = result.data;
-      } else {
-        vedicAstroData[key] = { error: result.error };
-      }
-    }
-
-    // Build the Raw UserProfile containing JHora and VedicAstro responses
+    // Build the Raw UserProfile containing only JHora response (Rule 4: Only JHora used for fetching raw data)
     const userProfile = {
       BirthDetails: {
         name: name || "Nitin",
@@ -1151,15 +1088,13 @@ app.post("/api/user-profile/generate-raw", async (req, res) => {
       Raw: {
         JHora: {
           horoscope: jhoraHoroscope
-        },
-        VedicAstro: vedicAstroData
+        }
       },
       Metadata: {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         apiVersions: {
-          JHora: "1.0",
-          VedicAstro: "1.0"
+          JHora: "1.0"
         }
       }
     };
