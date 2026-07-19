@@ -3,6 +3,10 @@ import { motion, AnimatePresence } from "motion/react";
 import { jsPDF } from "jspdf";
 import DashaTree from "./DashaTree";
 import {
+  mapJHoraResponseToAstrologyData,
+  mapAstrologyDataToUserProfileJSON
+} from "../lib/jhoraMapper";
+import {
   LalKitabEvidenceAdapter,
   LalKitabDecisionAdapter
 } from "../lib/rules/lalKitabRelationshipEngine";
@@ -1609,7 +1613,11 @@ export function MyPageView({
     const localCached = localStorage.getItem("jhora_user_profile");
     if (localCached) {
       try {
-        const parsed = JSON.parse(localCached);
+        let parsed = JSON.parse(localCached);
+        if (parsed.Raw && parsed.Raw.JHora && parsed.Raw.JHora.horoscope) {
+          const result = mapJHoraResponseToAstrologyData(parsed.Raw.JHora.horoscope);
+          parsed = mapAstrologyDataToUserProfileJSON(activeUser, result);
+        }
         setProfile(parsed);
         if (parsed.Birth?.date) {
           calculateAge(parsed.Birth.date, parsed.Birth.time);
@@ -1623,11 +1631,16 @@ export function MyPageView({
       const res = await fetch("/api/user-profile/get");
       if (res.ok) {
         const data = await res.json();
-        setProfile(data);
+        let parsedProfile = data;
+        if (data.Raw && data.Raw.JHora && data.Raw.JHora.horoscope) {
+          const result = mapJHoraResponseToAstrologyData(data.Raw.JHora.horoscope);
+          parsedProfile = mapAstrologyDataToUserProfileJSON(activeUser, result);
+        }
+        setProfile(parsedProfile);
         // Sync cache to local storage
         localStorage.setItem("jhora_user_profile", JSON.stringify(data));
-        if (data.Birth?.date) {
-          calculateAge(data.Birth.date, data.Birth.time);
+        if (parsedProfile.Birth?.date) {
+          calculateAge(parsedProfile.Birth.date, parsedProfile.Birth.time);
         }
       } else {
         // Fallback to active user props if server file isn't created yet

@@ -1054,28 +1054,15 @@ app.post("/api/user-profile/generate-raw", async (req, res) => {
 
     // 1. Fetch JHora horoscope
     let jhoraHoroscope: any = null;
-    try {
-      const response = await fetch(`${JHORA_API_URL}/horoscope`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(jhoraBody)
-      });
-      if (response.ok) {
-        jhoraHoroscope = await response.json();
-      } else {
-        throw new Error(`Remote JHora server returned status ${response.status}`);
-      }
-    } catch (err: any) {
-      console.log(`[UserProfile Gen] JHora API remote fetch failed (${err.message}). Using local engine fallback.`);
-      jhoraHoroscope = calculateAstrology(
-        name || "Nitin",
-        formattedDate,
-        formattedTime,
-        placeStr,
-        latNum,
-        lonNum,
-        tzNum
-      );
+    const response = await fetch(`${JHORA_API_URL}/horoscope`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(jhoraBody)
+    });
+    if (response.ok) {
+      jhoraHoroscope = await response.json();
+    } else {
+      throw new Error(`Remote JHora server returned status ${response.status}`);
     }
 
     // 2. Fetch every available natal/KP/Western VedicAstro endpoint

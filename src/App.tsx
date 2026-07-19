@@ -1026,15 +1026,15 @@ export default function App() {
         console.error("IndexedDB cache save failed:", dbErr);
       }
 
-      // Activate user profile JSON on backend and GitHub
-      if (profileJson) {
+      // Activate raw user profile JSON on backend and GitHub (strictly raw, no calculations, as per instructions)
+      if (rawUserProfile) {
         fetch("/api/user-profile/act", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "add",
             profileName: finalName,
-            profileData: profileJson
+            profileData: rawUserProfile
           })
         }).catch(err => console.error("Failed to activate userprofile on backend:", err));
       }
@@ -1564,13 +1564,31 @@ export default function App() {
       const text = await file.text();
       const parsed = JSON.parse(text);
       
-      if (!parsed.Birth || (!parsed.Vedic && !parsed.systems?.Vedic)) {
-        alert("Invalid Profile structure. Please ensure it follows the correct userprofile.json schema.");
+      const isRawProfile = !!(parsed.Raw && parsed.BirthDetails);
+      let birth: any;
+      let user: any;
+      
+      if (isRawProfile) {
+        birth = {
+          date: parsed.BirthDetails.date,
+          time: parsed.BirthDetails.time,
+          place: parsed.BirthDetails.place || parsed.BirthDetails.location,
+          latitude: parsed.BirthDetails.latitude,
+          longitude: parsed.BirthDetails.longitude,
+          timezone: parsed.BirthDetails.timezone,
+        };
+        user = {
+          profile_name: parsed.BirthDetails.name,
+          email: parsed.BirthDetails.email || "guest@jhora.ai"
+        };
+      } else if (parsed.Birth && (parsed.Vedic || parsed.systems?.Vedic)) {
+        birth = parsed.Birth;
+        user = parsed.User;
+      } else {
+        alert("Invalid Profile structure. Please ensure it follows either the Raw UserProfile or mapped userprofile.json schema.");
         return;
       }
 
-      const birth = parsed.Birth;
-      const user = parsed.User;
       const finalName = user?.profile_name || "Imported Profile";
 
       setInputs({
@@ -1583,29 +1601,36 @@ export default function App() {
         timezone: Number(birth.timezone),
       });
 
-      alert(`✓ Profile imported: ${finalName}. Loading and compiling live coordinates from calculation server...`);
+      alert(`✓ Profile imported: ${finalName}. Processing coordinates...`);
       setLoading(true);
 
-      const formattedDate = convertDateToISO(birth.date);
-      const formattedTime = convertTimeTo24h(birth.time);
+      let result: AstrologyData;
+      
+      if (isRawProfile && parsed.Raw.JHora?.horoscope) {
+        // Direct, high-speed calculation-free parsing from raw stored JHora response
+        result = mapJHoraResponseToAstrologyData(parsed.Raw.JHora.horoscope);
+      } else {
+        const formattedDate = convertDateToISO(birth.date);
+        const formattedTime = convertTimeTo24h(birth.time);
 
-      const response = await fetch("/api/astrology/calculate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: finalName,
-          date: formattedDate,
-          time: formattedTime,
-          location: birth.place,
-          latitude: Number(birth.latitude),
-          longitude: Number(birth.longitude),
-          timezone: Number(birth.timezone),
-        }),
-      });
+        const response = await fetch("/api/astrology/calculate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: finalName,
+            date: formattedDate,
+            time: formattedTime,
+            location: birth.place,
+            latitude: Number(birth.latitude),
+            longitude: Number(birth.longitude),
+            timezone: Number(birth.timezone),
+          }),
+        });
 
-      if (!response.ok) throw new Error("Calculation failure");
-      const rawJson = await response.json();
-      const result = mapJHoraResponseToAstrologyData(rawJson);
+        if (!response.ok) throw new Error("Calculation failure");
+        const rawJson = await response.json();
+        result = mapJHoraResponseToAstrologyData(rawJson);
+      }
 
       let pdfBase64: string | undefined = undefined;
       try {
@@ -1629,22 +1654,23 @@ export default function App() {
         Number(birth.timezone),
         result,
         pdfBase64,
-        parsed
+        isRawProfile ? undefined : parsed,
+        isRawProfile ? parsed : undefined
       );
 
       await loadCacheHistory();
 
       // Activate profile on backend when imported
       try {
-        const fullProfile = mapAstrologyDataToUserProfileJSON(activeUser, result);
-        if (fullProfile) {
+        const profileDataToSave = isRawProfile ? parsed : mapAstrologyDataToUserProfileJSON(activeUser, result);
+        if (profileDataToSave) {
           fetch("/api/user-profile/act", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               action: "add",
               profileName: finalName,
-              profileData: fullProfile
+              profileData: profileDataToSave
             })
           }).catch(err => console.error("Failed to activate imported userprofile on backend:", err));
         }
