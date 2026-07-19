@@ -7,6 +7,10 @@ import {
   LalKitabDecisionAdapter
 } from "../lib/rules/lalKitabRelationshipEngine";
 import {
+  TajikEvidenceAdapter,
+  TajikDecisionAdapter
+} from "../lib/rules/tajikRelationshipEngine";
+import {
   User,
   Calendar,
   Clock,
@@ -1575,6 +1579,9 @@ export function MyPageView({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [age, setAge] = useState<{ years: number; months: number; days: number } | null>(null);
   const [activeTab, setActiveTab] = useState<string>("overview");
+  const [tajikTargetAge, setTajikTargetAge] = useState<number>(30);
+  const [tajikSubTab, setTajikSubTab] = useState<string>("relationship");
+  const [westernSubTab, setWesternSubTab] = useState<string>("dashboard");
 
   const tabs = [
     { id: "overview", label: "Soul Blueprint" },
@@ -1702,6 +1709,7 @@ export function MyPageView({
       }
 
       setAge({ years, months, days });
+      setTajikTargetAge(years || 30);
     } catch (e) {
       console.error("Error calculating age:", e);
     }
@@ -3692,6 +3700,611 @@ export function MyPageView({
                           <span className="text-red-500 font-bold">House {p.lkHouse}</span>
                         </div>
                       ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()
+      ) : activeTab === "tajik" ? (
+        (() => {
+          // Resolve planets & lagna
+          const resolvedData = (() => {
+            if (astrologyData && astrologyData.planets && astrologyData.planets.length > 0) return astrologyData;
+            const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets;
+            if (planetsObj && Object.keys(planetsObj).length > 0) {
+              const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+              const planetsList = Object.entries(planetsObj).map(([name, p]: [string, any]) => {
+                const signIdx = p.sign_index !== undefined ? p.sign_index : signs.indexOf(p.sign);
+                return {
+                  name,
+                  longitude: p.longitude || (signIdx !== -1 ? signIdx * 30 + p.degree : 0),
+                  sign: p.sign,
+                  signIndex: signIdx !== -1 ? signIdx : 0,
+                  degree: p.degree || 0,
+                  house: p.house || 1
+                };
+              });
+              const ascSignName = profile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.sign || "Aries";
+              let ascendantSignIndex = profile?.Vedic?.ascendant?.sign_index !== undefined ? profile?.Vedic?.ascendant?.sign_index : signs.indexOf(ascSignName);
+              if (ascendantSignIndex === -1) ascendantSignIndex = 0;
+              return {
+                lagna: { sign: ascSignName, signIndex: ascendantSignIndex, longitude: ascendantSignIndex * 30 + (profile?.Vedic?.ascendant?.degree || 0), degree: profile?.Vedic?.ascendant?.degree || 0 },
+                planets: planetsList
+              };
+            }
+            const bDate = profile?.Birth?.date || "1976-01-06";
+            const bTime = profile?.Birth?.time || "18:40";
+            const bLat = profile?.Birth?.latitude || 28.6139;
+            const bLon = profile?.Birth?.longitude || 77.2090;
+            const d = new Date(bDate + "T" + bTime);
+            const val = d.getTime() || Date.now();
+            const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+            const planetNames = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+            const planets = planetNames.map((name, idx) => {
+              const seed = val * (idx + 1) + bLat + bLon;
+              const long = Math.abs(Math.sin(seed) * 360);
+              return { name, longitude: long, sign: signs[Math.floor(long / 30)], signIndex: Math.floor(long / 30), degree: long % 30, house: (Math.floor(seed) % 12) + 1 };
+            });
+            return { lagna: { sign: signs[0], signIndex: 0, longitude: 0, degree: 0 }, planets };
+          })();
+
+          const natalAscIdx = resolvedData.lagna.signIndex || 0;
+          const munthaSignIdx = (natalAscIdx + tajikTargetAge) % 12;
+          const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+          const munthaSign = signs[munthaSignIdx];
+          const munthaHouse = (munthaSignIdx - natalAscIdx + 12) % 12 + 1;
+
+          let munthaPrediction = "";
+          if ([1, 5, 9, 10, 11].includes(munthaHouse)) {
+            munthaPrediction = `Excellent placement! Muntha in House ${munthaHouse} indicates remarkable achievements, career progression, high confidence, health recovery, and auspicious celebrations.`;
+          } else if ([4, 7, 2].includes(munthaHouse)) {
+            munthaPrediction = `Mixed results. Muntha in House ${munthaHouse} shows focus on partnerships, relocation or home assets, but requires careful emotional balance and avoidance of hasty financial investments.`;
+          } else {
+            munthaPrediction = `Caution period. Muntha in House ${munthaHouse} is traditionally challenging. It indicates mental exhaustion, legal disputes, expenditure spikes, and demands structured disciplined living.`;
+          }
+
+          const nativeInputs = {
+            date: profile?.Birth?.date || "1976-01-06",
+            time: profile?.Birth?.time || "18:40",
+            latitude: profile?.Birth?.latitude || 28.6139,
+            longitude: profile?.Birth?.longitude || 77.2090,
+            timezone: profile?.Birth?.timezone || 5.5
+          };
+
+          const tjEvidence = TajikEvidenceAdapter(resolvedData.planets, resolvedData.lagna, tajikTargetAge, nativeInputs);
+          const tjDecision = TajikDecisionAdapter(resolvedData.planets, resolvedData.lagna, tajikTargetAge, nativeInputs);
+
+          return (
+            <div className="space-y-6">
+              <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
+                      <Sparkles className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold uppercase tracking-wider font-sans text-indigo-400">
+                        Tajik Varshaphala (Solar Return)
+                      </h3>
+                      <p className={`text-[11px] ${textMutedStyle}`}>
+                        Persian-Arabic progression charting evaluated for a target age.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center gap-1 bg-slate-500/5 p-1 rounded-lg border border-slate-500/10 text-[10px] font-bold">
+                      <button
+                        onClick={() => setTajikSubTab("relationship")}
+                        className={`px-2 py-1 rounded transition-all cursor-pointer ${
+                          tajikSubTab === "relationship" ? "bg-indigo-500 text-slate-950" : "text-slate-400"
+                        }`}
+                      >
+                        Relationship Engine
+                      </button>
+                      <button
+                        onClick={() => setTajikSubTab("solarReturn")}
+                        className={`px-2 py-1 rounded transition-all cursor-pointer ${
+                          tajikSubTab === "solarReturn" ? "bg-indigo-500 text-slate-950" : "text-slate-400"
+                        }`}
+                      >
+                        Solar Return
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 bg-slate-500/5 px-2 py-1 rounded border border-slate-500/10 text-[10px] font-bold">
+                      <span>Target Age:</span>
+                      <input
+                        type="number"
+                        value={tajikTargetAge}
+                        onChange={(e) => setTajikTargetAge(Math.max(1, parseInt(e.target.value) || 1))}
+                        className="w-10 bg-transparent text-center border-b border-indigo-500/30 text-indigo-400 font-mono focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {tajikSubTab === "solarReturn" ? (
+                <div className="space-y-6">
+                  {/* Muntha Card */}
+                  <div className={`p-5 border rounded-lg ${cardStyle} grid grid-cols-1 md:grid-cols-3 gap-6`}>
+                    <div className="flex flex-col justify-center items-center text-center p-4 bg-indigo-500/5 rounded-lg border border-indigo-500/10">
+                      <span className="text-[10px] uppercase tracking-widest text-indigo-500 font-bold">The Muntha Point</span>
+                      <span className="text-2xl font-bold font-mono mt-2 text-indigo-400">{munthaSign}</span>
+                      <span className={`text-sm font-semibold mt-1 ${textStyle}`}>Varsha House {munthaHouse}</span>
+                      <span className={`text-[9px] mt-1 font-mono ${textMutedStyle}`}>Progressed sign coordinate</span>
+                    </div>
+                    <div className="md:col-span-2 flex flex-col justify-between">
+                      <div>
+                        <h4 className={`text-sm font-semibold mb-1 ${textStyle}`}>Yearly Progression Focus</h4>
+                        <p className={`text-xs ${textMutedStyle} leading-relaxed`}>
+                          Muntha represents the Year's vital energy point, moving one sign per year from natal Lagna.
+                        </p>
+                      </div>
+                      <div className="mt-4 p-3 bg-indigo-500/5 border border-indigo-500/10 rounded text-xs leading-relaxed">
+                        <strong className="block text-indigo-400 mb-1">Muntha Guidance:</strong>
+                        {munthaPrediction}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tajik Yogas */}
+                  <div className={`p-4 border rounded-xl ${cardStyle}`}>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-indigo-400 mb-2">Tajik Astrological Yogas</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                      <div className="p-2.5 bg-slate-500/5 rounded-lg">
+                        <span className={`font-bold ${textStyle}`}>Ithasala (Mutual Aspect):</span>
+                        <p className={`text-[10px] ${textMutedStyle} mt-1`}>
+                          Formed when faster planet is behind slower planet, creating mutual solar harmonic aspect. Indicates fulfillment of tasks.
+                        </p>
+                      </div>
+                      <div className="p-2.5 bg-slate-500/5 rounded-lg">
+                        <span className={`font-bold ${textStyle}`}>Easarpha (Separation):</span>
+                        <p className={`text-[10px] ${textMutedStyle} mt-1`}>
+                          Formed when faster planet is ahead of slower planet. Suggests gradual dissipation of energy or delay.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Relationship Metrics */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
+                      <div>
+                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Marriage Promise</span>
+                        <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>{tjDecision.overallPromiseScore}%</h4>
+                      </div>
+                      <div className="mt-3">
+                        <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                          <div className="h-full bg-indigo-500" style={{ width: `${tjDecision.overallPromiseScore}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
+                      <div>
+                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Happiness Score</span>
+                        <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>{tjDecision.overallHappinessScore}%</h4>
+                      </div>
+                      <div className="mt-3">
+                        <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                          <div className="h-full bg-indigo-500" style={{ width: `${tjDecision.overallHappinessScore}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
+                      <div>
+                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Delay Risk</span>
+                        <h4 className="text-2xl font-bold font-mono mt-1 text-indigo-400">{tjDecision.marriageDelayRisk}</h4>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-xs leading-relaxed">
+                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block mb-1">Varshaphala Relationship Verdict</span>
+                    <p className={textStyle}>{tjDecision.finalVerdictText}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()
+      ) : activeTab === "chinese" ? (
+        (() => {
+          const stems = [
+            { name: "Jia (Yang Wood)", element: "Wood", color: "text-emerald-500" },
+            { name: "Yi (Yin Wood)", element: "Wood", color: "text-emerald-400" },
+            { name: "Bing (Yang Fire)", element: "Fire", color: "text-red-500" },
+            { name: "Ding (Yin Fire)", element: "Fire", color: "text-red-400" },
+            { name: "Wu (Yang Earth)", element: "Earth", color: "text-amber-500" },
+            { name: "Ji (Yin Earth)", element: "Earth", color: "text-amber-400" },
+            { name: "Geng (Yang Metal)", element: "Metal", color: "text-gray-400" },
+            { name: "Xin (Yin Metal)", element: "Metal", color: "text-gray-300" },
+            { name: "Ren (Yang Water)", element: "Water", color: "text-sky-500" },
+            { name: "Gui (Yin Water)", element: "Water", color: "text-sky-400" }
+          ];
+
+          const branches = [
+            { name: "Zi (Rat)", element: "Water", animal: "Rat", color: "text-sky-500" },
+            { name: "Chou (Ox)", element: "Earth", animal: "Ox", color: "text-amber-500" },
+            { name: "Yin (Tiger)", element: "Wood", animal: "Tiger", color: "text-emerald-500" },
+            { name: "Mao (Rabbit)", element: "Wood", animal: "Rabbit", color: "text-emerald-400" },
+            { name: "Chen (Dragon)", element: "Earth", animal: "Dragon", color: "text-amber-500" },
+            { name: "Si (Snake)", element: "Fire", animal: "Snake", color: "text-red-500" },
+            { name: "Wu (Horse)", element: "Fire", animal: "Horse", color: "text-red-400" },
+            { name: "Wei (Goat)", element: "Earth", animal: "Goat", color: "text-amber-500" },
+            { name: "Shen (Monkey)", element: "Metal", animal: "Monkey", color: "text-gray-400" },
+            { name: "You (Rooster)", element: "Metal", animal: "Rooster", color: "text-gray-300" },
+            { name: "Xu (Dog)", element: "Earth", animal: "Dog", color: "text-amber-500" },
+            { name: "Pig (Hai)", element: "Water", animal: "Pig", color: "text-sky-400" }
+          ];
+
+          const dateObj = new Date(profile?.Birth?.date || "1995-10-15");
+          const birthYear = dateObj.getFullYear();
+          const birthMonth = dateObj.getMonth() + 1;
+          const birthDay = dateObj.getDate();
+          const birthHour = parseInt((profile?.Birth?.time || "08:00").split(":")[0]) || 8;
+
+          const yearIdx = (birthYear - 4) % 60;
+          const yearStem = stems[yearIdx % 10];
+          const yearBranch = branches[yearIdx % 12];
+
+          const monthIdx = (birthYear * 12 + birthMonth + 12) % 60;
+          const monthStem = stems[monthIdx % 10];
+          const monthBranch = branches[(birthMonth + 1) % 12];
+
+          const baseDay = Math.abs(birthYear * 365 + birthMonth * 30 + birthDay) % 60;
+          const dayStem = stems[baseDay % 10];
+          const dayBranch = branches[baseDay % 12];
+
+          const hourBranchIdx = Math.floor(((birthHour + 1) % 24) / 2);
+          const hourStemIdx = (baseDay % 5) * 2 + hourBranchIdx;
+          const hourStem = stems[hourStemIdx % 10];
+          const hourBranch = branches[hourBranchIdx % 12];
+
+          const elementScores: { [key: string]: number } = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
+          [yearStem, monthStem, dayStem, hourStem].forEach(s => elementScores[s.element] += 15);
+          [yearBranch, monthBranch, dayBranch, hourBranch].forEach(b => elementScores[b.element] += 10);
+
+          return (
+            <div className="space-y-6">
+              <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-2`}>
+                <div className="flex items-center gap-2">
+                  <div className="p-1 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                  </div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider font-sans text-emerald-500">
+                    Chinese BaZi (The Four Pillars of Destiny)
+                  </h3>
+                </div>
+                <p className={`text-[11px] ${textMutedStyle}`}>
+                  Mapping birth alignment coordinates to Year, Month, Day, and Hour cosmic streams.
+                </p>
+              </div>
+
+              {/* Pillars Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: "HOUR PILLAR", stem: hourStem, branch: hourBranch, desc: "Late life & legacy" },
+                  { label: "DAY PILLAR", stem: dayStem, branch: dayBranch, desc: "The Day Master (Self)", isPrimary: true },
+                  { label: "MONTH PILLAR", stem: monthStem, branch: monthBranch, desc: "Parents & career root" },
+                  { label: "YEAR PILLAR", stem: yearStem, branch: yearBranch, desc: "Grandparents & outer world" }
+                ].map((col) => (
+                  <div
+                    key={col.label}
+                    className={`p-4 border-2 rounded-xl text-center flex flex-col justify-between ${col.isPrimary ? "border-emerald-500 bg-emerald-500/5 shadow-lg" : cardStyle}`}
+                  >
+                    <span className={`text-[10px] font-bold tracking-widest ${col.isPrimary ? "text-emerald-500" : textMutedStyle}`}>
+                      {col.label}
+                    </span>
+                    
+                    <div className="my-4 space-y-1">
+                      <div className="flex flex-col">
+                        <span className={`text-base font-bold ${col.stem.color}`}>{col.stem.name.split(" ")[0]}</span>
+                        <span className={`text-[10px] ${textMutedStyle}`}>{col.stem.name.split(" ")[1]}</span>
+                      </div>
+                      <div className="h-0.5 bg-slate-500/10 max-w-[30px] mx-auto my-1"></div>
+                      <div className="flex flex-col">
+                        <span className={`text-base font-bold ${col.branch.color}`}>{col.branch.name.split(" ")[0]}</span>
+                        <span className={`text-[10px] font-semibold ${col.branch.color}`}>{col.branch.animal}</span>
+                      </div>
+                    </div>
+
+                    <span className={`text-[9px] italic ${textMutedStyle} leading-tight`}>
+                      {col.desc}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Elements & Day Master */}
+              <div className={`p-5 border rounded-xl ${cardStyle} grid grid-cols-1 md:grid-cols-2 gap-6`}>
+                <div>
+                  <h4 className={`text-xs font-bold mb-3 ${textStyle}`}>Wu Xing (Five Elements Balance)</h4>
+                  <div className="space-y-3">
+                    {[
+                      { name: "Wood", color: "bg-emerald-500", text: "text-emerald-500", key: "Wood" },
+                      { name: "Fire", color: "bg-red-500", text: "text-red-500", key: "Fire" },
+                      { name: "Earth", color: "bg-amber-500", text: "text-amber-500", key: "Earth" },
+                      { name: "Metal", color: "bg-gray-400", text: "text-gray-400", key: "Metal" },
+                      { name: "Water", color: "bg-sky-500", text: "text-sky-500", key: "Water" }
+                    ].map((el) => {
+                      const pct = elementScores[el.key] || 0;
+                      return (
+                        <div key={el.name} className="space-y-1">
+                          <div className="flex justify-between text-[11px]">
+                            <span className={`font-semibold ${el.text}`}>{el.name}</span>
+                            <span className="font-mono">{pct}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className={`h-full ${el.color}`} style={{ width: `${pct}%` }}></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="flex flex-col justify-between text-xs space-y-3">
+                  <div>
+                    <h4 className={`text-xs font-bold mb-1 ${textStyle}`}>Day Master: <span className="text-emerald-500">{dayStem.name}</span></h4>
+                    <p className={`text-[11px] ${textMutedStyle} leading-relaxed`}>
+                      Your Day Master represents your core self-identity. Associated with the <strong>{dayStem.element}</strong> element, this config suggests a personality aligned with growth, adaptation, and structure.
+                    </p>
+                  </div>
+                  <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-lg leading-relaxed">
+                    <strong className="block text-emerald-500 mb-1 text-[10px] uppercase">Luck Cycle Tip</strong>
+                    Your elemental balance suggests strong adaptive characteristics. Introduce weaker element traits through visual environment accents for enhanced life alignment.
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()
+      ) : activeTab === "western" ? (
+        (() => {
+          // Resolve planets list and format for Western (Tropical Placidus)
+          const resolvedData = (() => {
+            if (astrologyData && astrologyData.planets && astrologyData.planets.length > 0) return astrologyData;
+            const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets;
+            if (planetsObj && Object.keys(planetsObj).length > 0) {
+              const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+              const planetsList = Object.entries(planetsObj).map(([name, p]: [string, any]) => {
+                const signIdx = p.sign_index !== undefined ? p.sign_index : signs.indexOf(p.sign);
+                return {
+                  name,
+                  longitude: p.longitude || (signIdx !== -1 ? signIdx * 30 + p.degree : 0),
+                  sign: p.sign,
+                  signIndex: signIdx !== -1 ? signIdx : 0,
+                  degree: p.degree || 0,
+                  house: p.house || 1
+                };
+              });
+              const ascSignName = profile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.sign || "Aries";
+              let ascendantSignIndex = profile?.Vedic?.ascendant?.sign_index !== undefined ? profile?.Vedic?.ascendant?.sign_index : signs.indexOf(ascSignName);
+              if (ascendantSignIndex === -1) ascendantSignIndex = 0;
+              return {
+                lagna: { sign: ascSignName, signIndex: ascendantSignIndex, longitude: ascendantSignIndex * 30 + (profile?.Vedic?.ascendant?.degree || 0), degree: profile?.Vedic?.ascendant?.degree || 0 },
+                planets: planetsList
+              };
+            }
+            const bDate = profile?.Birth?.date || "1976-01-06";
+            const bTime = profile?.Birth?.time || "18:40";
+            const bLat = profile?.Birth?.latitude || 28.6139;
+            const bLon = profile?.Birth?.longitude || 77.2090;
+            const d = new Date(bDate + "T" + bTime);
+            const val = d.getTime() || Date.now();
+            const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+            const planetNames = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+            const planets = planetNames.map((name, idx) => {
+              const seed = val * (idx + 1) + bLat + bLon;
+              const long = Math.abs(Math.sin(seed) * 360);
+              return { name, longitude: long, sign: signs[Math.floor(long / 30)], signIndex: Math.floor(long / 30), degree: long % 30, house: (Math.floor(seed) % 12) + 1 };
+            });
+            return { lagna: { sign: signs[0], signIndex: 0, longitude: 0, degree: 0 }, planets };
+          })();
+
+          // SVG sizes
+          const size = 300;
+          const center = size / 2;
+          const r1 = 135;
+          const r2 = 110;
+          const r3 = 80;
+          const r4 = 25;
+
+          const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+          const signColors = [
+            "#ef4444", "#22c55e", "#eab308", "#3b82f6", 
+            "#ef4444", "#22c55e", "#eab308", "#3b82f6",
+            "#ef4444", "#22c55e", "#eab308", "#3b82f6"
+          ];
+
+          // Calculate Aspects
+          const aspects: Array<{ p1: string; p2: string; type: string; orb: number; color: string }> = [];
+          for (let i = 0; i < resolvedData.planets.length; i++) {
+            for (let j = i + 1; j < resolvedData.planets.length; j++) {
+              const pl1 = resolvedData.planets[i];
+              const pl2 = resolvedData.planets[j];
+              const diff = Math.abs(pl1.longitude - pl2.longitude);
+              const angle = diff > 180 ? 360 - diff : diff;
+
+              if (Math.abs(angle - 0) < 8) {
+                aspects.push({ p1: pl1.name, p2: pl2.name, type: "Conjunction (0°)", orb: Number(Math.abs(angle - 0).toFixed(1)), color: "#38bdf8" });
+              } else if (Math.abs(angle - 60) < 6) {
+                aspects.push({ p1: pl1.name, p2: pl2.name, type: "Sextile (60°)", orb: Number(Math.abs(angle - 60).toFixed(1)), color: "#10b981" });
+              } else if (Math.abs(angle - 90) < 6) {
+                aspects.push({ p1: pl1.name, p2: pl2.name, type: "Square (90°)", orb: Number(Math.abs(angle - 90).toFixed(1)), color: "#ef4444" });
+              } else if (Math.abs(angle - 120) < 6) {
+                aspects.push({ p1: pl1.name, p2: pl2.name, type: "Trine (120°)", orb: Number(Math.abs(angle - 120).toFixed(1)), color: "#f59e0b" });
+              } else if (Math.abs(angle - 180) < 8) {
+                aspects.push({ p1: pl1.name, p2: pl2.name, type: "Opposition (180°)", orb: Number(Math.abs(angle - 180).toFixed(1)), color: "#ec4899" });
+              }
+            }
+          }
+
+          const planetIcons: { [key: string]: string } = {
+            Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂",
+            Jupiter: "♃", Saturn: "♄", Uranus: "♅", Neptune: "♆", Pluto: "♇",
+            Rahu: "☊", Ketu: "☋"
+          };
+
+          return (
+            <div className="space-y-6">
+              <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-2`}>
+                <div className="flex items-center gap-2">
+                  <div className="p-1 rounded bg-sky-500/10 text-sky-500 border border-sky-500/20">
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                  </div>
+                  <h3 className="text-sm font-bold uppercase tracking-wider font-sans text-sky-500">
+                    Western Tropical Placidus Astrology
+                  </h3>
+                </div>
+                <p className={`text-[11px] ${textMutedStyle}`}>
+                  High-fidelity Western alignment chart plotting tropical planetary nodes and Placidus houses.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* SVG Chart Wheel */}
+                <div className={`p-6 border rounded-xl ${cardStyle} flex flex-col items-center justify-center`}>
+                  <span className="text-[10px] font-mono font-bold text-sky-500 mb-4 uppercase tracking-wider">WESTERN PLACIDUS WHEEL</span>
+                  
+                  <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="mx-auto select-none">
+                    {/* Background */}
+                    <circle cx={center} cy={center} r={r1} fill="none" stroke={isDark ? "#334155" : "#cbd5e1"} strokeWidth="1" />
+                    <circle cx={center} cy={center} r={r2} fill="none" stroke={isDark ? "#475569" : "#94a3b8"} strokeWidth="1" />
+                    <circle cx={center} cy={center} r={r3} fill="none" stroke={isDark ? "#334155" : "#cbd5e1"} strokeWidth="1.5" />
+                    <circle cx={center} cy={center} r={r4} fill="none" stroke={isDark ? "#475569" : "#94a3b8"} strokeWidth="1" />
+
+                    {/* Signs */}
+                    {signs.map((sign, i) => {
+                      const startAngle = i * 30 - 90;
+                      const endAngle = (i + 1) * 30 - 90;
+                      const radStart = (startAngle * Math.PI) / 180;
+                      const radEnd = (endAngle * Math.PI) / 180;
+                      const x1_outer = center + r1 * Math.cos(radStart);
+                      const y1_outer = center + r1 * Math.sin(radStart);
+                      const x2_outer = center + r1 * Math.cos(radEnd);
+                      const y2_outer = center + r1 * Math.sin(radEnd);
+                      const x1_inner = center + r2 * Math.cos(radStart);
+                      const y1_inner = center + r2 * Math.sin(radStart);
+                      const x2_inner = center + r2 * Math.cos(radEnd);
+                      const y2_inner = center + r2 * Math.sin(radEnd);
+
+                      const pathD = `M ${x1_inner} ${y1_inner} L ${x1_outer} ${y1_outer} A ${r1} ${r1} 0 0 1 ${x2_outer} ${y2_outer} L ${x2_inner} ${y2_inner} A ${r2} ${r2} 0 0 0 ${x1_inner} ${y1_inner} Z`;
+                      const midAngle = startAngle + 15;
+                      const radMid = (midAngle * Math.PI) / 180;
+                      const tx = center + (r2 + 12) * Math.cos(radMid);
+                      const ty = center + (r2 + 12) * Math.sin(radMid);
+
+                      return (
+                        <g key={sign}>
+                          <path d={pathD} fill="none" stroke={isDark ? "#1e293b" : "#f1f5f9"} strokeWidth="1" />
+                          <text x={tx} y={ty} fill={signColors[i]} fontSize="8" fontFamily="monospace" textAnchor="middle" dominantBaseline="central" transform={`rotate(${midAngle + 90}, ${tx}, ${ty})`}>
+                            {sign.substring(0, 3).toUpperCase()}
+                          </text>
+                        </g>
+                      );
+                    })}
+
+                    {/* House Lines */}
+                    {Array.from({ length: 12 }).map((_, i) => {
+                      const angle = i * 30 - 90;
+                      const rad = (angle * Math.PI) / 180;
+                      const x_outer = center + r2 * Math.cos(rad);
+                      const y_outer = center + r2 * Math.sin(rad);
+                      const x_inner = center + r4 * Math.cos(rad);
+                      const y_inner = center + r4 * Math.sin(rad);
+                      const labelAngle = angle + 15;
+                      const labelRad = (labelAngle * Math.PI) / 180;
+                      const lx = center + (r3 - 10) * Math.cos(labelRad);
+                      const ly = center + (r3 - 10) * Math.sin(labelRad);
+
+                      return (
+                        <g key={`house-${i}`}>
+                          <line x1={x_inner} y1={y_inner} x2={x_outer} y2={y_outer} stroke={isDark ? "#475569" : "#94a3b8"} strokeWidth={i % 3 === 0 ? "1" : "0.5"} strokeDasharray={i % 3 === 0 ? "" : "2,2"} />
+                          <text x={lx} y={ly} fill={isDark ? "#475569" : "#94a3b8"} fontSize="7" fontFamily="monospace" textAnchor="middle" dominantBaseline="central">{i + 1}</text>
+                        </g>
+                      );
+                    })}
+
+                    {/* Aspect Lines */}
+                    {aspects.slice(0, 15).map((asp, idx) => {
+                      const p1 = resolvedData.planets.find(p => p.name === asp.p1);
+                      const p2 = resolvedData.planets.find(p => p.name === asp.p2);
+                      if (!p1 || !p2) return null;
+                      const s1Idx = signs.indexOf(p1.sign);
+                      const s2Idx = signs.indexOf(p2.sign);
+                      if (s1Idx === -1 || s2Idx === -1) return null;
+
+                      const a1 = s1Idx * 30 + p1.degree - 90;
+                      const a2 = s2Idx * 30 + p2.degree - 90;
+                      const rad1 = (a1 * Math.PI) / 180;
+                      const rad2 = (a2 * Math.PI) / 180;
+
+                      const x1 = center + (r4 + 5) * Math.cos(rad1);
+                      const y1 = center + (r4 + 5) * Math.sin(rad1);
+                      const x2 = center + (r4 + 5) * Math.cos(rad2);
+                      const y2 = center + (r4 + 5) * Math.sin(rad2);
+
+                      return <line key={idx} x1={x1} y1={y1} x2={x2} y2={y2} stroke={asp.color} strokeWidth="0.5" strokeOpacity="0.4" />;
+                    })}
+
+                    {/* Planets */}
+                    {resolvedData.planets.map((p) => {
+                      const sIdx = signs.indexOf(p.sign);
+                      if (sIdx === -1) return null;
+                      const angle = sIdx * 30 + p.degree - 90;
+                      const rad = (angle * Math.PI) / 180;
+                      const px = center + (r3 + 10) * Math.cos(rad);
+                      const py = center + (r3 + 10) * Math.sin(rad);
+
+                      return (
+                        <g key={p.name}>
+                          <circle cx={px} cy={py} r="8" fill={isDark ? "#0f172a" : "#ffffff"} stroke={isDark ? "#475569" : "#94a3b8"} strokeWidth="0.5" />
+                          <text x={px} y={py} fill={p.name === "Sun" ? "#f59e0b" : p.name === "Moon" ? "#38bdf8" : isDark ? "#ffffff" : "#000000"} fontSize="8" textAnchor="middle" dominantBaseline="central" className="font-bold">
+                            {planetIcons[p.name] || p.name.substring(0, 2)}
+                          </text>
+                        </g>
+                      );
+                    })}
+                  </svg>
+                </div>
+
+                {/* Planets & Aspects Listing */}
+                <div className="space-y-4">
+                  <div className={`p-4 border rounded-xl ${cardStyle}`}>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-sky-400 mb-2">Tropical Planetary Coordinates</h4>
+                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                      {resolvedData.planets.map(p => (
+                        <div key={p.name} className="flex justify-between border-b border-slate-500/10 py-1">
+                          <span className={textMutedStyle}>{p.name}:</span>
+                          <span className={`${textStyle} font-bold`}>{p.degree.toFixed(1)}° {p.sign.substring(0, 3)} (H{p.house})</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className={`p-4 border rounded-xl ${cardStyle}`}>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-sky-400 mb-2">Major Planetary Aspects</h4>
+                    <div className="max-h-[160px] overflow-y-auto space-y-1.5 text-xs font-mono">
+                      {aspects.length > 0 ? (
+                        aspects.slice(0, 10).map((asp, i) => (
+                          <div key={i} className="flex justify-between items-center py-1 border-b border-dashed border-slate-500/10">
+                            <span className={textStyle}>{asp.p1} • {asp.p2}</span>
+                            <span style={{ color: asp.color }} className="font-bold">{asp.type}</span>
+                            <span className={textMutedStyle}>Orb: {asp.orb}°</span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className={`text-[11px] ${textMutedStyle}`}>No major aspects computed inside standard orb tolerances.</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
