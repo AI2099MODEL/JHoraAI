@@ -1592,10 +1592,7 @@ export function MyPageView({
     { id: "dasha", label: "Vimshottari Dasha" },
     { id: "charts", label: "Charts" },
     { id: "table_index", label: "Table Index" },
-    { id: "daily", label: "Daily Analysis" },
-    { id: "future", label: "Future Analysis" },
     { id: "vedic", label: "Vedic Data" },
-    { id: "transits_data", label: "Transits data" },
     { id: "jaimini", label: "Jaimini Data" },
     { id: "kp", label: "KP Data" },
     { id: "lalkitab", label: "Lalkitab" },
@@ -3456,85 +3453,6 @@ export function MyPageView({
             <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
               {renderIndexedTable("table_22", null, profile, astrologyData)}
             </div>
-          </div>
-        </div>
-      ) : activeTab === "transits_data" ? (
-        <div className="space-y-6">
-          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
-                    Real-Time Transit Panchanga (Current Sky)
-                  </h3>
-                  <p className={`text-[11px] ${textMutedStyle}`}>
-                    The five attributes of time: Tithi, Vara, Nakshatra, Yoga, and Karana reflecting current celestial patterns.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm font-mono text-xs space-y-4`}>
-            <div className="border-b border-slate-800 pb-2">
-              <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider block">
-                🟢 Live Transit Panchang Pillars
-              </span>
-            </div>
-
-            {(() => {
-              const pData = astrologyData?.panchanga || profile?.Vedic?.panchanga || {};
-              const astroDetails = astrologyData?.astronomical_details || profile?.Astronomical || {};
-              return (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3.5 mt-2">
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Tithi (Lunar Day):</span>
-                    <span className="text-slate-100 font-bold font-sans">{pData.tithi || "Sukla Ekadashi"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Nakshatra (Asterism):</span>
-                    <span className="text-slate-100 font-bold font-sans">{pData.nakshatra || "Rohini"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Yoga (Luni-Solar Angle):</span>
-                    <span className="text-slate-100 font-bold font-sans">{pData.yoga || "Preeti"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Karana (Half-Tithi):</span>
-                    <span className="text-slate-100 font-bold font-sans">{pData.karana || "Bava"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Vara (Weekday):</span>
-                    <span className="text-slate-100 font-bold font-sans">
-                      {pData.vara || (profile?.Birth?.date ? new Date(profile.Birth.date).toLocaleDateString("en-US", { weekday: "long" }) : "Friday")}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Sunrise:</span>
-                    <span className="text-slate-200">{astroDetails.sunrise || "05:42 AM"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Sunset:</span>
-                    <span className="text-slate-200">{astroDetails.sunset || "06:55 PM"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Lunar Month:</span>
-                    <span className="text-slate-200 font-sans">{astroDetails.lunar_month || astroDetails.lunarMonth || "Kartika"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Samvatsara (Year Name):</span>
-                    <span className="text-slate-200 font-sans">{astroDetails.year_name || astroDetails.yearName || "Krodhi"}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-800/60">
-                    <span className="text-slate-400">Season (Vedic Ritu):</span>
-                    <span className="text-slate-200 font-sans">{astroDetails.season || "Sharad"}</span>
-                  </div>
-                </div>
-              );
-            })()}
           </div>
         </div>
       ) : activeTab === "jaimini" ? (
