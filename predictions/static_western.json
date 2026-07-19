@@ -1,0 +1,137 @@
+{
+  "schema": {
+    "name": "Static Western Astrology",
+    "version": "1.0.0",
+    "description": "Master index and immutable reference catalog for Western Astrology."
+  },
+
+  "system": {
+    "name": "Western Astrology",
+    "category": "Tropical Astrology",
+    "zodiac": "Tropical",
+    "house_system_default": "Placidus"
+  },
+
+  "supported_house_systems": [
+    "Placidus",
+    "Whole Sign",
+    "Equal",
+    "Koch",
+    "Porphyry",
+    "Campanus",
+    "Regiomontanus",
+    "Meridian",
+    "Topocentric",
+    "Alcabitius",
+    "Morinus",
+    "Vehlow"
+  ],
+
+  "supported_modules": [
+    "Natal Chart",
+    "Transit",
+    "Secondary Progressions",
+    "Solar Arc",
+    "Solar Return",
+    "Lunar Return",
+    "Synastry",
+    "Composite Chart",
+    "Davison Chart",
+    "Relationship Analysis",
+    "Electional Astrology",
+    "Horary Astrology"
+  ],
+
+  "supported_planets": [
+    "Sun",
+    "Moon",
+    "Mercury",
+    "Venus",
+    "Mars",
+    "Jupiter",
+    "Saturn",
+    "Uranus",
+    "Neptune",
+    "Pluto",
+    "North Node",
+    "South Node",
+    "Chiron"
+  ],
+
+  "supported_points": [
+    "Ascendant",
+    "Midheaven",
+    "IC",
+    "Descendant",
+    "Part of Fortune",
+    "Black Moon Lilith",
+    "Vertex",
+    "East Point"
+  ],
+
+  "supported_aspects": [
+    "Conjunction",
+    "Opposition",
+    "Trine",
+    "Square",
+    "Sextile",
+    "Quincunx",
+    "Semi Sextile",
+    "Semi Square",
+    "Sesquiquadrate",
+    "Quintile",
+    "Biquintile"
+  ],
+
+  "supported_prediction_methods": [
+    "Transit Analysis",
+    "Progressions",
+    "Solar Arc",
+    "Solar Return",
+    "Lunar Return",
+    "Synastry",
+    "Composite Analysis",
+    "Timing Techniques",
+    "Electional",
+    "Horary"
+  ],
+
+  "supported_entities": [
+    "Planet",
+    "Sign",
+    "House",
+    "Aspect",
+    "Angle",
+    "Node",
+    "Asteroid",
+    "Point",
+    "Return Chart"
+  ],
+
+  "supported_classical_sources": [
+    "Ptolemy - Tetrabiblos",
+    "William Lilly - Christian Astrology",
+    "Alan Leo",
+    "Dane Rudhyar",
+    "Stephen Arroyo",
+    "Robert Hand"
+  ],
+
+  "supported_outputs": [
+    "Natal Report",
+    "Transit Report",
+    "Progression Report",
+    "Relationship Report",
+    "Career Report",
+    "Personality Report",
+    "PDF Report",
+    "JSON Export"
+  ],
+
+  "dependencies": [
+    "static_core.json",
+    "static_planets.json",
+    "static_signs.json",
+    "static_houses.json"
+  ]
+}
