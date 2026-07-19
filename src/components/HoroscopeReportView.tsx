@@ -346,7 +346,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     if (!query || query.trim().length < 2) return;
     setSearchingTransitLocation(true);
     try {
-      const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=6&language=en&format=json`);
+      const res = await fetch(`/api/jhora/location/autocomplete?query=${encodeURIComponent(query)}`);
       const data = await res.json();
       if (data.results) {
         setTransitLocationResults(data.results);

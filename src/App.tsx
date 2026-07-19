@@ -282,7 +282,7 @@ export default function App() {
           loading: true,
         }));
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+          const res = await fetch(`/api/jhora/location/reverse?lat=${lat}&lon=${lon}`);
           const data = await res.json();
           const dispName = data.address 
             ? `${data.address.city || data.address.town || data.address.village || 'Location'}, ${data.address.country || ''}`.replace(/,\s*,/g, ',').trim()
@@ -578,7 +578,7 @@ export default function App() {
     if (!query || query.trim().length < 2) return;
     setSearchingLocation(true);
     try {
-      const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=6&language=en&format=json`);
+      const res = await fetch(`/api/jhora/location/autocomplete?query=${encodeURIComponent(query)}`);
       const data = await res.json();
       if (data.results) {
         setLocationResults(data.results);
@@ -639,7 +639,7 @@ export default function App() {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+          const res = await fetch(`/api/jhora/location/reverse?lat=${lat}&lon=${lon}`);
           const data = await res.json();
           const dispName = data.address 
             ? `${data.address.city || data.address.town || data.address.village || 'Location'}, ${data.address.state || ''}, ${data.address.country || ''}`.replace(/,\s*,/g, ',').trim()

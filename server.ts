@@ -580,6 +580,30 @@ app.get("/api/jhora/location/autocomplete", async (req, res) => {
   }
 });
 
+// Reverse geocoding proxy to bypass client-side CORS / sandbox blockages
+app.get("/api/jhora/location/reverse", async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) {
+      return res.status(400).json({ error: "Missing latitude or longitude parameters" });
+    }
+    const targetUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+    const response = await fetch(targetUrl, {
+      headers: {
+        "User-Agent": "JHoraAI/1.0 (kanakjain2309@gmail.com)"
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Nominatim returned status ${response.status}`);
+    }
+    const data = await response.json();
+    res.json(data);
+  } catch (error: any) {
+    console.error("Reverse geocoding error:", error);
+    res.status(500).json({ error: error.message || "Failed to reverse geocode" });
+  }
+});
+
 // Endpoint to proxy horoscope calculations to official JHora API
 app.post("/api/jhora/horoscope", async (req, res) => {
   try {
