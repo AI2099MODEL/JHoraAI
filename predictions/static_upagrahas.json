@@ -1,0 +1,140 @@
+{
+  "schema": {
+    "name": "Static Upagrahas",
+    "version": "1.0.0",
+    "description": "Master catalog of Upagrahas, Aprakasha Grahas and secondary mathematical points."
+  },
+
+  "supported_upagrahas": [
+    "Gulika",
+    "Mandi",
+    "Dhuma",
+    "Vyatipata",
+    "Parivesha",
+    "Indra Chapa",
+    "Upaketu",
+    "Yamakantaka",
+    "Kala",
+    "Mrityu",
+    "Artha Prahara",
+    "Yama Ghantaka"
+  ],
+
+  "classification": {
+
+    "saturnian": [
+      "Gulika",
+      "Mandi"
+    ],
+
+    "solar": [
+      "Dhuma",
+      "Vyatipata",
+      "Parivesha",
+      "Indra Chapa",
+      "Upaketu"
+    ],
+
+    "time_based": [
+      "Kala",
+      "Mrityu",
+      "Yamakantaka",
+      "Artha Prahara",
+      "Yama Ghantaka"
+    ]
+
+  },
+
+  "calculation_methods": [
+
+    "Sun Longitude",
+
+    "Day Birth",
+
+    "Night Birth",
+
+    "Planetary Division",
+
+    "Time Division"
+
+  ],
+
+  "supported_charts": [
+
+    "D1",
+
+    "D9",
+
+    "D10",
+
+    "D60"
+
+  ],
+
+  "supported_attributes": [
+
+    "Name",
+
+    "Sanskrit Name",
+
+    "Category",
+
+    "Calculation Method",
+
+    "Associated Planet",
+
+    "Associated House",
+
+    "Associated Sign",
+
+    "Natural Signification",
+
+    "Prediction Importance",
+
+    "Strength",
+
+    "Reference"
+
+  ],
+
+  "life_areas": [
+
+    "Health",
+
+    "Disease",
+
+    "Longevity",
+
+    "Obstacles",
+
+    "Accidents",
+
+    "Spirituality",
+
+    "Hidden Karma",
+
+    "Profession",
+
+    "Marriage",
+
+    "General Life"
+
+  ],
+
+  "evaluation": {
+
+    "support_day_night_rules": true,
+
+    "support_chart_specific_analysis": true,
+
+    "support_multiple_upagrahas": true,
+
+    "support_strength_analysis": true,
+
+    "support_prediction_weight": true,
+
+    "support_cross_validation": true
+
+  }
+
+}
