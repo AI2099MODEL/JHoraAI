@@ -9,11 +9,11 @@ This document provides a comprehensive technical overview of the JHoraAI platfor
 The JHoraAI platform features a real-time server-side synchronization engine that keeps user profiles and raw astrological payloads perfectly in sync with the GitHub repository (`https://github.com/AI2099MODEL/JHoraAI`).
 
 ### How Synchronization Works
-Whenever a user profile is added, modified, or deleted through the website/application UI, the backend server triggers an automated Git workflow:
+Whenever a user profile is added, modified, or deleted through the website/application UI, the backend server triggers an automated Git workflow in real-time, completely dynamically and without requiring any server restarts:
 
 1. **File Generation/Modification**:
-   - For **additions/updates**, the server writes the raw payload to `/Users/userprofile.json` and a dedicated file `/Users/[profile_name][metadata].json`.
-   - For **deletions**, the server deactivates or removes the files locally from the `/Users` folder.
+   - For **additions/updates**, the server writes the raw payload to `/Users/userprofile.json` and a dedicated file `/Users/[profile_name][metadata].json` based on the robust name-mapping scheme.
+   - For **deletions/deactivations**, the server identifies the active profile, dynamically scans the files in the `/Users` folder matching either the nested `User.profile_name` or `BirthDetails.name` fields, and deletes both the individual file and `/Users/userprofile.json`.
 
 2. **Automated Commit Workflow**:
    - The server stages the modified or deleted files using standard Git operations (`git add` or `git rm`).
@@ -22,6 +22,7 @@ Whenever a user profile is added, modified, or deleted through the website/appli
 3. **Secure Instant Push**:
    - The server pushes the commits directly to the `main` branch of the remote repository (`origin`) using the authenticated secure remote URL containing the Personal Access Token (PAT):
      `https://<PAT>@github.com/AI2099MODEL/JHoraAI.git`
+   - All synchronization occurs in a separate, non-blocking asynchronous child process. This means the server stays fully online and operational, and **no development server or application container restarts are required** to apply or synchronize profile updates.
 
 ### Configured Git Environment
 - **Git User Name**: `AI Astrologer`
