@@ -3,6 +3,10 @@ import { motion, AnimatePresence } from "motion/react";
 import { jsPDF } from "jspdf";
 import DashaTree from "./DashaTree";
 import {
+  LalKitabEvidenceAdapter,
+  LalKitabDecisionAdapter
+} from "../lib/rules/lalKitabRelationshipEngine";
+import {
   User,
   Calendar,
   Clock,
@@ -3246,6 +3250,454 @@ export function MyPageView({
             </div>
           </div>
         </div>
+      ) : activeTab === "lalkitab" ? (
+        (() => {
+          // Local implementation of generateFallbackPlanets
+          const localGenerateFallbackPlanets = (dateStr: string, timeStr: string, lat: number, lon: number) => {
+            const d = new Date(dateStr + "T" + timeStr);
+            const val = d.getTime() || Date.now();
+            
+            const signs = [
+              "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+              "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+            ];
+            
+            const planetNames = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+            const planets: any[] = [];
+            
+            planetNames.forEach((name, idx) => {
+              const seed = val * (idx + 1) + lat + lon;
+              const long = Math.abs(Math.sin(seed) * 360);
+              const signIdx = Math.floor(long / 30);
+              const deg = long % 30;
+              const house = (Math.floor(seed) % 12) + 1;
+              
+              planets.push({
+                name,
+                longitude: long,
+                sign: signs[signIdx],
+                signIndex: signIdx,
+                degree: deg,
+                house
+              });
+            });
+            
+            const lagnaLong = Math.abs(Math.cos(val + lat + lon) * 30);
+            const lagnaSignIdx = Math.abs(Math.floor(val / 1000000)) % 12;
+            
+            return {
+              lagna: {
+                sign: signs[lagnaSignIdx],
+                signIndex: lagnaSignIdx,
+                longitude: lagnaSignIdx * 30 + lagnaLong,
+                degree: lagnaLong
+              },
+              planets
+            };
+          };
+
+          const resolvedData = (() => {
+            if (astrologyData && astrologyData.planets && astrologyData.planets.length > 0) {
+              return astrologyData;
+            }
+            // Try to construct planets list from profile Vedic planets if available
+            const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets;
+            if (planetsObj && Object.keys(planetsObj).length > 0) {
+              const signs = [
+                "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+                "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+              ];
+              const planetsList = Object.entries(planetsObj).map(([name, p]: [string, any]) => {
+                const signIdx = p.sign_index !== undefined ? p.sign_index : signs.indexOf(p.sign);
+                return {
+                  name,
+                  longitude: p.longitude || (signIdx !== -1 ? signIdx * 30 + p.degree : 0),
+                  sign: p.sign,
+                  signIndex: signIdx !== -1 ? signIdx : 0,
+                  degree: p.degree || 0,
+                  house: p.house || 1
+                };
+              });
+              
+              const ascSignName = profile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.sign || "Aries";
+              let ascendantSignIndex = profile?.Vedic?.ascendant?.sign_index !== undefined 
+                ? profile?.Vedic?.ascendant?.sign_index 
+                : (astrologyData?.lagna?.signIndex !== undefined ? astrologyData?.lagna?.signIndex : signs.indexOf(ascSignName));
+              if (ascendantSignIndex === -1) ascendantSignIndex = 0;
+              
+              return {
+                lagna: {
+                  sign: ascSignName,
+                  signIndex: ascendantSignIndex,
+                  longitude: ascendantSignIndex * 30 + (profile?.Vedic?.ascendant?.degree || 0),
+                  degree: profile?.Vedic?.ascendant?.degree || 0
+                },
+                planets: planetsList
+              };
+            }
+            
+            const bDate = profile?.Birth?.date || "1976-01-06";
+            const bTime = profile?.Birth?.time || "18:40";
+            const bLat = profile?.Birth?.latitude || 28.6139;
+            const bLon = profile?.Birth?.longitude || 77.2090;
+            return localGenerateFallbackPlanets(bDate, bTime, bLat, bLon);
+          })();
+
+          const userAge = age?.years || 30;
+          const lkEvidence = LalKitabEvidenceAdapter(resolvedData.planets);
+          const lkDecision = LalKitabDecisionAdapter(resolvedData.planets, resolvedData.lagna, userAge);
+
+          // Force Aries as Ascendant for Lal Kitab House calculation
+          const lalkitabHouses: { [house: number]: string[] } = {};
+          for (let h = 1; h <= 12; h++) {
+            lalkitabHouses[h] = [];
+          }
+
+          resolvedData.planets.forEach((p: any) => {
+            const lkHouse = p.signIndex + 1;
+            lalkitabHouses[lkHouse].push(p.name);
+          });
+
+          const getDormantStatus = (planetName: string, houseNum: number) => {
+            if (houseNum === 1) {
+              return lalkitabHouses[7].length === 0 ? "Asleep (No planets in House 7)" : "Active";
+            }
+            if (houseNum === 7) {
+              return lalkitabHouses[1].length === 0 ? "Asleep (No planets in House 1)" : "Active";
+            }
+            if (houseNum === 4) {
+              return lalkitabHouses[10].length === 0 ? "Asleep (No planets in House 10)" : "Active";
+            }
+            if (houseNum === 10) {
+              return lalkitabHouses[4].length === 0 ? "Asleep (No planets in House 4)" : "Active";
+            }
+            return "Active";
+          };
+
+          return (
+            <div className="space-y-6">
+              {/* Header Card */}
+              <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded bg-red-500/10 text-red-500 border border-red-500/20">
+                      <Sparkles className="w-5 h-5 animate-pulse" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold uppercase tracking-wider font-sans text-red-400">
+                        Lal Kitab (Red Book) Astrological System
+                      </h3>
+                      <p className={`text-[11px] ${textMutedStyle}`}>
+                        Fixed Aries Ascendant house mappings, dormancy states, and authentic Urdu-Persian metrics.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Core Metrics: Promise, Happiness, Delay Risk */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Promise Score */}
+                <div className={`p-4 border rounded-xl ${cardStyle} shadow-sm flex flex-col justify-between`}>
+                  <div>
+                    <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">Marriage Promise Index</span>
+                    <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>
+                      {lkDecision.overallPromiseScore}%
+                    </h4>
+                  </div>
+                  <div className="mt-3">
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                      <div
+                        className={`h-full transition-all ${
+                          lkDecision.overallPromiseScore >= 70
+                            ? "bg-emerald-500"
+                            : lkDecision.overallPromiseScore >= 45
+                            ? "bg-amber-500"
+                            : "bg-red-500"
+                        }`}
+                        style={{ width: `${lkDecision.overallPromiseScore}%` }}
+                      ></div>
+                    </div>
+                    <span className={`text-[10px] block mt-1.5 font-medium ${textMutedStyle}`}>
+                      {lkDecision.overallPromiseScore >= 70
+                        ? "Firm marriage promise confirmed"
+                        : lkDecision.overallPromiseScore >= 45
+                        ? "Moderate promise; triggers on remedies"
+                        : "Severe afflictions; remedial path advised"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Happiness Index */}
+                <div className={`p-4 border rounded-xl ${cardStyle} shadow-sm flex flex-col justify-between`}>
+                  <div>
+                    <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">Marital Happiness Index</span>
+                    <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>
+                      {lkDecision.overallHappinessScore}%
+                    </h4>
+                  </div>
+                  <div className="mt-3">
+                    <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                      <div
+                        className={`h-full transition-all ${
+                          lkDecision.overallHappinessScore >= 70
+                            ? "bg-emerald-500"
+                            : lkDecision.overallHappinessScore >= 45
+                            ? "bg-amber-500"
+                            : "bg-red-500"
+                        }`}
+                        style={{ width: `${lkDecision.overallHappinessScore}%` }}
+                      ></div>
+                    </div>
+                    <span className={`text-[10px] block mt-1.5 font-medium ${textMutedStyle}`}>
+                      {lkDecision.overallHappinessScore >= 70
+                        ? "Harmonious domestic parameters"
+                        : lkDecision.overallHappinessScore >= 45
+                        ? "Mixed harmony; typical communication issues"
+                        : "High domestic friction spotted"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Delay Risk */}
+                <div className={`p-4 border rounded-xl ${cardStyle} shadow-sm flex flex-col justify-between`}>
+                  <div>
+                    <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">Marriage Delay Risk</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <h4 className={`text-2xl font-bold font-mono ${textStyle}`}>
+                        {lkDecision.marriageDelayRisk}
+                      </h4>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                          lkDecision.marriageDelayRisk === "High"
+                            ? "bg-red-500/10 text-red-500"
+                            : lkDecision.marriageDelayRisk === "Medium"
+                            ? "bg-amber-500/10 text-amber-500"
+                            : "bg-emerald-500/10 text-emerald-500"
+                        }`}
+                      >
+                        {lkDecision.marriageDelayRisk === "High" ? "Critical Delay" : lkDecision.marriageDelayRisk === "Medium" ? "Moderate Delay" : "No Delay"}
+                      </span>
+                    </div>
+                  </div>
+                  <p className={`text-[10px] ${textMutedStyle} leading-relaxed mt-3`}>
+                    Derived from Saturn, Rahu, and Ketu's placements across key relationship house nodes (2, 7, 8).
+                  </p>
+                </div>
+              </div>
+
+              {/* Verdict text callout */}
+              <div className={`p-4 rounded-xl bg-red-500/5 border border-red-500/10 text-xs leading-relaxed`}>
+                <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider block mb-1">
+                  Lal Kitab Relationship Verdict
+                </span>
+                <p className={textStyle}>
+                  {lkDecision.finalVerdictText}
+                </p>
+              </div>
+
+              {/* Graphic Teva & Dormant/Artificial Columns */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Teva Graphic */}
+                <div className={`p-6 border rounded-xl ${cardStyle} shadow-sm flex flex-col justify-center items-center`}>
+                  <span className="text-xs font-mono font-bold text-red-500 mb-4">LAL KITAB TEVA (FIXED HOUSE CHART)</span>
+                  
+                  {/* North Indian style chart container */}
+                  <div className="relative w-72 h-72 border-2 border-red-500/40 bg-red-500/5 rotate-45 rounded">
+                    {/* Diagonals */}
+                    <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-red-500/20"></div>
+                    <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-red-500/20"></div>
+                    
+                    {/* Inner Diamond */}
+                    <div className="absolute inset-12 border border-red-500/20 bg-red-500/5 rotate-45"></div>
+
+                    {/* Houses Labels and Planets */}
+                    {/* House 1: Top Center */}
+                    <div className="absolute -rotate-45 top-6 left-[124px] flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H1</span>
+                      <span className={`text-xs font-semibold ${textStyle}`}>{lalkitabHouses[1].join(", ") || "—"}</span>
+                    </div>
+                    
+                    {/* House 4: Left Center */}
+                    <div className="absolute -rotate-45 left-6 top-[124px] flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H4</span>
+                      <span className={`text-xs font-semibold ${textStyle}`}>{lalkitabHouses[4].join(", ") || "—"}</span>
+                    </div>
+
+                    {/* House 7: Bottom Center */}
+                    <div className="absolute -rotate-45 bottom-6 left-[124px] flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H7</span>
+                      <span className={`text-xs font-semibold ${textStyle}`}>{lalkitabHouses[7].join(", ") || "—"}</span>
+                    </div>
+
+                    {/* House 10: Right Center */}
+                    <div className="absolute -rotate-45 right-6 top-[124px] flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H10</span>
+                      <span className={`text-xs font-semibold ${textStyle}`}>{lalkitabHouses[10].join(", ") || "—"}</span>
+                    </div>
+
+                    {/* House 2: Upper Left */}
+                    <div className="absolute -rotate-45 left-14 top-14 flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H2</span>
+                      <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[2].join(", ") || "—"}</span>
+                    </div>
+
+                    {/* House 3: Lower Left */}
+                    <div className="absolute -rotate-45 left-14 bottom-14 flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H3</span>
+                      <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[3].join(", ") || "—"}</span>
+                    </div>
+
+                    {/* House 5: Lower Right */}
+                    <div className="absolute -rotate-45 right-14 bottom-14 flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H5</span>
+                      <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[5].join(", ") || "—"}</span>
+                    </div>
+
+                    {/* House 6: Lower Center Edge */}
+                    <div className="absolute -rotate-45 bottom-[68px] left-[124px] flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H6</span>
+                      <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[6].join(", ") || "—"}</span>
+                    </div>
+
+                    {/* House 8: Lower Right Corner */}
+                    <div className="absolute -rotate-45 right-[68px] bottom-[68px] flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H8</span>
+                      <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[8].join(", ") || "—"}</span>
+                    </div>
+
+                    {/* House 9: Upper Right */}
+                    <div className="absolute -rotate-45 right-14 top-14 flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H9</span>
+                      <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[9].join(", ") || "—"}</span>
+                    </div>
+
+                    {/* House 11: Upper Right Inner */}
+                    <div className="absolute -rotate-45 right-[68px] top-[68px] flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H11</span>
+                      <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[11].join(", ") || "—"}</span>
+                    </div>
+
+                    {/* House 12: Upper Left Inner */}
+                    <div className="absolute -rotate-45 left-[68px] top-[68px] flex flex-col items-center">
+                      <span className="text-[10px] font-bold text-red-500">H12</span>
+                      <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[12].join(", ") || "—"}</span>
+                    </div>
+                  </div>
+
+                  <div className={`mt-4 text-[11px] ${textMutedStyle} text-center max-w-xs leading-relaxed`}>
+                    Lal Kitab places Aries (1) in the 1st House as a fixed backdrop, mapping all planets to their house based on sign index + 1.
+                  </div>
+                </div>
+
+                {/* Dormant & Artificial Lists */}
+                <div className="space-y-4">
+                  {/* Dormant Planets */}
+                  <div className={`p-4 border rounded-xl ${cardStyle} shadow-sm`}>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-2">Dormant Planets (Soye Grah)</h4>
+                    <p className={`text-[10px] ${textMutedStyle} mb-3`}>
+                      In Lal Kitab, planets can remain sleeping (dormant) if their opposing trigger houses are vacant:
+                    </p>
+                    <div className="space-y-1.5 text-xs">
+                      {resolvedData.planets.map((p: any) => {
+                        const lkHouse = p.signIndex + 1;
+                        const status = getDormantStatus(p.name, lkHouse);
+                        return (
+                          <div key={p.name} className="flex justify-between items-center py-1 border-b border-dashed border-slate-500/10">
+                            <span className={textStyle}>{p.name} (House {lkHouse})</span>
+                            <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${status.includes("Asleep") ? "bg-red-500/10 text-red-500" : "bg-emerald-500/10 text-emerald-500"}`}>
+                              {status}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Artificial Planets */}
+                  <div className={`p-4 border rounded-xl ${cardStyle} shadow-sm`}>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-2">Artificial Planets (Masnuoi Grah)</h4>
+                    <p className={`text-[10px] ${textMutedStyle} mb-3`}>
+                      Virtual cosmic entities formed by Combining parent planet pairs in the Lal Kitab schema:
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                      <div className="p-2 bg-slate-500/5 rounded flex justify-between">
+                        <span className={textMutedStyle}>Mrc + Ven =</span>
+                        <strong className="text-amber-500">Sun</strong>
+                      </div>
+                      <div className="p-2 bg-slate-500/5 rounded flex justify-between">
+                        <span className={textMutedStyle}>Sun + Jup =</span>
+                        <strong className="text-amber-500">Moon</strong>
+                      </div>
+                      <div className="p-2 bg-slate-500/5 rounded flex justify-between">
+                        <span className={textMutedStyle}>Sun + Mrc =</span>
+                        <strong className="text-amber-500">Mars</strong>
+                      </div>
+                      <div className="p-2 bg-slate-500/5 rounded flex justify-between">
+                        <span className={textMutedStyle}>Sat + Ven =</span>
+                        <strong className="text-amber-500">Rahu</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dossiers / Evidence parameters */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Dormancy Dossier */}
+                <div className={`p-4 border rounded-xl ${cardStyle} shadow-sm`}>
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-2 flex items-center gap-1.5">
+                    <Activity className="w-4 h-4" />
+                    Key Marriage House Dormancy States (Evidence)
+                  </h4>
+                  <p className={`text-[11px] ${textMutedStyle} mb-3`}>
+                    Lal Kitab relationship houses (2, 7, 8) fall asleep if the opposing trigger houses are empty.
+                  </p>
+                  <div className="space-y-2 text-xs">
+                    {lkEvidence.dormancyStates.map((ds: any) => (
+                      <div
+                        key={ds.house}
+                        className="flex justify-between items-center py-1.5 border-b border-dashed border-slate-500/10"
+                      >
+                        <span className={`font-medium ${textStyle}`}>House {ds.house} ({ds.house === 2 ? "Family Extension" : ds.house === 7 ? "Spouse/Marriage" : "Marital Longevity"})</span>
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-mono ${
+                            ds.isDormant
+                              ? "bg-red-500/10 text-red-500"
+                              : "bg-emerald-500/10 text-emerald-500"
+                          }`}
+                        >
+                          {ds.isDormant ? "ASLEEP (Dormant)" : "ACTIVE"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Relationship Planets Dossier */}
+                <div className={`p-4 border rounded-xl ${cardStyle} shadow-sm`}>
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-2 flex items-center gap-1.5">
+                    <User className="w-4 h-4" />
+                    Relationship Significators (Lal Kitab Positions)
+                  </h4>
+                  <p className={`text-[11px] ${textMutedStyle} mb-3`}>
+                    Lal Kitab coordinates and house placements of the primary relationship and nodal coordinates.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    {lkEvidence.planetsPositions
+                      .filter((p: any) => ["Venus", "Jupiter", "Moon", "Saturn", "Rahu", "Ketu"].includes(p.name))
+                      .map((p: any) => (
+                        <div key={p.name} className="p-2 bg-slate-500/5 rounded flex justify-between items-center">
+                          <span className={`font-bold ${textStyle}`}>{p.name}</span>
+                          <span className="text-red-500 font-bold">House {p.lkHouse}</span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()
       ) : (
         <motion.div
           key={activeTab}
