@@ -1,0 +1,96 @@
+{
+  "ascendant_degree": 14.25,
+  "ascendant_sign": "Libra",
+  "planets": [
+    {
+      "name": "Sun",
+      "sign": "Virgo",
+      "degree": 27.85,
+      "house": 12,
+      "star_lord": "Mars",
+      "sub_lord": "Jupiter",
+      "sub_sub_lord": "Saturn",
+      "is_retrograde": false
+    },
+    {
+      "name": "Moon",
+      "sign": "Gemini",
+      "degree": 12.45,
+      "house": 9,
+      "star_lord": "Rahu",
+      "sub_lord": "Mercury",
+      "sub_sub_lord": "Venus",
+      "is_retrograde": false
+    },
+    {
+      "name": "Mars",
+      "sign": "Libra",
+      "degree": 5.12,
+      "house": 1,
+      "star_lord": "Mars",
+      "sub_lord": "Sun",
+      "sub_sub_lord": "Moon",
+      "is_retrograde": false
+    },
+    {
+      "name": "Mercury",
+      "sign": "Virgo",
+      "degree": 18.92,
+      "house": 12,
+      "star_lord": "Moon",
+      "sub_lord": "Saturn",
+      "sub_sub_lord": "Rahu",
+      "is_retrograde": false
+    },
+    {
+      "name": "Jupiter",
+      "sign": "Scorpio",
+      "degree": 14.36,
+      "house": 2,
+      "star_lord": "Saturn",
+      "sub_lord": "Rahu",
+      "sub_sub_lord": "Jupiter",
+      "is_retrograde": false
+    },
+    {
+      "name": "Venus",
+      "sign": "Leo",
+      "degree": 22.15,
+      "house": 11,
+      "star_lord": "Venus",
+      "sub_lord": "Moon",
+      "sub_sub_lord": "Sun",
+      "is_retrograde": false
+    },
+    {
+      "name": "Saturn",
+      "sign": "Aquarius",
+      "degree": 24.58,
+      "house": 5,
+      "star_lord": "Jupiter",
+      "sub_lord": "Mercury",
+      "sub_sub_lord": "Mars",
+      "is_retrograde": true
+    },
+    {
+      "name": "Rahu",
+      "sign": "Virgo",
+      "degree": 4.18,
+      "house": 12,
+      "star_lord": "Sun",
+      "sub_lord": "Saturn",
+      "sub_sub_lord": "Venus",
+      "is_retrograde": true
+    },
+    {
+      "name": "Ketu",
+      "sign": "Pisces",
+      "degree": 4.18,
+      "house": 6,
+      "star_lord": "Saturn",
+      "sub_lord": "Saturn",
+      "sub_sub_lord": "Venus",
+      "is_retrograde": true
+    }
+  ]
+}

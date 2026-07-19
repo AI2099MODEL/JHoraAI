@@ -41,6 +41,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
   const [kpChart, setKpChart] = useState<any>(null);
   const [kpSignificators, setKpSignificators] = useState<any>(null);
   const [westernChart, setWesternChart] = useState<any>(null);
+  const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -632,60 +633,118 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
               </div>
             );
 
-          case "jhora_divisional":
+          case "jhora_divisional": {
+            const vargaNames: { [key: string]: string } = {
+              "D1": "Rasi (Birth Chart)",
+              "D2": "Hora (Assets & Wealth)",
+              "D3": "Drekkana (Siblings & Talents)",
+              "D4": "Chaturthamsa (Properties)",
+              "D5": "Panchamsa (Spiritual/Karma)",
+              "D6": "Shashthamsa (Debts & Diseases)",
+              "D7": "Saptamsa (Progeny & Creations)",
+              "D8": "Ashtamsa (Longevity & Obstacles)",
+              "D9": "Navamsa (Spouse & Potential)",
+              "D10": "Dasamsa (Profession & Status)",
+              "D11": "Rudramsa (Unexpected Gains/Losses)",
+              "D12": "Dwadasamsa (Parents & Ancestors)",
+              "D16": "Shodasamsa (Vehicles & Luxury)",
+              "D20": "Vimsamsa (Spiritual Alignment)",
+              "D24": "Chaturvimsamsa (Education)",
+              "D27": "Saptavimsamsa (Weaknesses)",
+              "D30": "Trimsamsa (Challenges & Evils)",
+              "D40": "Khavedamsa (Auspiciousness)",
+              "D45": "Akshavedamsa (General Fortune)",
+              "D60": "Shastiamsa (Past Life Balances)"
+            };
+
+            const vargaChart = astrologyData.divisionalCharts?.[selectedVarga];
+            const lagnaSignIdx = astrologyData.vargaLagnas?.[selectedVarga] ?? 0;
+
+            const rows = Array.from({ length: 12 }, (_, idx) => {
+              const houseNum = idx + 1;
+              const signIndex = (lagnaSignIdx + idx) % 12;
+              const signName = zodiacSigns[signIndex] || "Unknown";
+              const planetsList = vargaChart?.[houseNum] || [];
+              return {
+                houseNum,
+                signName,
+                planets: planetsList.join(", ")
+              };
+            });
+
             return (
               <div className="space-y-4 animate-fade-in" id="table-6-divisional-vargas">
-                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
-                    <Map className="w-4 h-4" />
-                    JH6: Divisional Vargas (D1 to D60) Planetary House Distributions
-                  </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Harmonics System</span>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-indigo-500/10 pb-3">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                      <Map className="w-4 h-4" />
+                      JH6: Divisional Vargas (D1 to D60) Planetary House Distributions
+                    </h3>
+                    <p className="text-[10px] text-slate-500 font-mono">
+                      Harmonics System • Selecting and displaying active divisional chart
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-[10px] uppercase tracking-wider font-mono font-bold text-slate-400">Select Varga:</label>
+                    <select
+                      value={selectedVarga}
+                      onChange={(e) => setSelectedVarga(e.target.value)}
+                      className={`text-xs px-3 py-1.5 rounded-xl border font-mono ${
+                        isDark 
+                          ? "bg-slate-950 border-slate-800 text-slate-300 focus:border-amber-500/50" 
+                          : "bg-white border-neutral-300 text-neutral-800 focus:border-amber-500"
+                      } outline-none cursor-pointer`}
+                    >
+                      {astrologyData.divisionalCharts ? (
+                        Object.keys(astrologyData.divisionalCharts).map((vKey) => (
+                          <option key={vKey} value={vKey}>
+                            {vKey} - {vargaNames[vKey] || vKey}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="D1">D1 - Rasi (Birth Chart)</option>
+                      )}
+                    </select>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {astrologyData.divisionalCharts ? (
-                    Object.entries(astrologyData.divisionalCharts).map(([varga, chart]: [string, any]) => {
-                      const vargaNames: { [key: string]: string } = {
-                        "D1": "Rasi (Birth Chart)",
-                        "D2": "Hora (Assets & Wealth)",
-                        "D3": "Drekkana (Siblings & Talents)",
-                        "D4": "Chaturthamsa (Properties)",
-                        "D7": "Saptamsa (Progeny & Creations)",
-                        "D9": "Navamsa (Spouse & Potential)",
-                        "D10": "Dasamsa (Profession & Status)",
-                        "D12": "Dwadasamsa (Parents & Ancestors)",
-                        "D16": "Shodasamsa (Vehicles & Luxury)",
-                        "D20": "Vimsamsa (Spiritual Alignment)",
-                        "D24": "Chaturvimsamsa (Education)",
-                        "D27": "Saptavimsamsa (Weaknesses)",
-                        "D30": "Trimsamsa (Challenges & Evils)",
-                        "D40": "Khavedamsa (Auspiciousness)",
-                        "D45": "Akshavedamsa (General Fortune)",
-                        "D60": "Shastiamsa (Past Life Balances)"
-                      };
-                      return (
-                        <div key={varga} className={`p-4 rounded-xl border ${cardStyle} space-y-2`}>
-                          <h4 className="text-xs font-bold text-amber-500 font-mono flex justify-between">
-                            <span>{varga} - {vargaNames[varga] || varga}</span>
-                          </h4>
-                          <div className="text-[10.5px] space-y-1.5 font-mono text-slate-300">
-                            {Object.entries(chart).map(([house, plList]: [string, any]) => (
-                              <div key={house} className="flex justify-between border-b border-slate-900/40 pb-1 last:border-0 last:pb-0">
-                                <span className="text-slate-500">House {house}:</span>
-                                <span className="font-semibold text-white">{(plList || []).join(", ") || "Empty"}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="col-span-full py-12 text-center text-slate-500">No divisional harmonic tables detected.</div>
-                  )}
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className={tableHeaderStyle}>
+                        <th className="py-3 px-4 font-medium">House Number</th>
+                        <th className="py-3 px-4 font-medium text-amber-500">Zodiac Sign</th>
+                        <th className="py-3 px-4 font-medium text-slate-200">Occupying Planets</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {astrologyData.divisionalCharts && vargaChart ? (
+                        rows.map((row) => (
+                          <tr key={row.houseNum} className={tableRowStyle}>
+                            <td className="py-3 px-4 font-mono font-bold text-slate-200">
+                              House {row.houseNum} {row.houseNum === 1 ? "(Lagna)" : ""}
+                            </td>
+                            <td className="py-3 px-4 font-mono font-bold text-amber-400">
+                              {row.signName}
+                            </td>
+                            <td className="py-3 px-4 font-semibold text-slate-100 font-mono">
+                              {row.planets || "—"}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={3} className="py-8 text-center text-slate-500">
+                            No divisional chart data available.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             );
+          }
 
           case "jhora_vimshottari":
             return (

@@ -1179,7 +1179,7 @@ export default function App() {
         { id: "jhora_shadbala", label: "Shadbala Matrix", description: "JH3: Shadbala Planet Strength Matrix.", systemId: "astro", category: "JHORA" },
         { id: "jhora_bhava_balas", label: "Bhava Strengths", description: "JH4: Bhava Balas (House Strengths).", systemId: "astro", category: "JHORA" },
         { id: "jhora_ashtakavarga", label: "SAV Ashtakavarga", description: "JH5: Samudhaya Ashtakavarga Points.", systemId: "astro", category: "JHORA" },
-        { id: "jhora_divisional", label: "Divisional Vargas", description: "JH6: Divisional Vargas D1 to D60.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_divisional", label: "Charts", description: "JH6: Divisional Vargas D1 to D60.", systemId: "astro", category: "JHORA" },
         { id: "jhora_vimshottari", label: "Vimshottari Dasha", description: "JH7: Vimshottari Mahadasha Timelines.", systemId: "astro", category: "JHORA" },
 
         // Category 2: KP STELLAR

@@ -128,3 +128,7 @@ Once a user profile has successfully pulled all raw data from the APIs, the user
 
 ### Rule 4: Exclusive JHora Usage & VedicAstro Decommissioning
 The external `VedicAstro` API service is decommissioned and is entirely excluded from the raw user profile JSON files. All agents must fetch raw data solely using the stable `JHora` API. No `VedicAstro` keys, parameters, or endpoints (such as `/kp/*` or `/western/*` from the broken external service) are to be injected, retained, or queried within the user profile payload structures. This keeps user profile files perfectly lightweight, clean, and 100% stable.
+
+### Rule 5: Update Astro Menu & Submenu Charts
+The submenu "Divisional Vargas" within the "Astro" menu must be updated and labeled precisely as "Charts". This view must expose the raw API varga divisional charts data strictly in a clean, standard HTML tabular layout (table format). If any divisional chart or varga data is missing, the tables must be left completely blank, and no client-side computations or manual/synthetic calculations are permitted.
+
