@@ -15,6 +15,12 @@ This index catalogs the primary data tables, variables, and calculation schemas 
 * **Primary Information Source:** **Dashboard Page** (User birth inputs: Date, Time, Place/Coordinates, and selected Ayanamsa)
 * **Status:** Dynamically populated based on active selected profile session.
 
+#### Strict UserProfile Data Strategy:
+1. **No Calculation/Derivation Storage**: Do NOT generate, calculate, or store any derived astrological models, mappings, interpretations, harmonics, divisional charts, friendships, dignities, strengths, yogas, doshas, remedies, or reports inside the persisted UserProfile. The UserProfile is strictly a persistent archive of raw API responses only (from the JHora/VedicAstro endpoints).
+2. **Zero In-Profile Calculations**: All calculations, conversions, or interpretive rules (including KP stellar division and event rulebooks) must be run purely at render-time/runtime on the client dashboard. No pre-calculated data or static placeholder dates should be injected or hardcoded inside the stored profile payload.
+3. **No Transit / Sky JSON Data**: Do NOT store or append transit coordinate data, daily sky state JSON, or daily muhurtas into the UserProfile. The profile must remain perfectly focused on the static, raw natal birth particulars and JHora's raw API horoscope output.
+4. **Authentic Data Preservation**: Keep fetched raw data exactly as returned by the API with zero client-side or server-side structural tampering during the profile creation and storage phase. Mappings are implemented dynamically in downstream viewer layers.
+
 #### Table 1: Birth Details & Lagna (Ascendant Coordinates)
 This table represents the layout schema of the primary birth particulars and lagna (ascendant) coordinates. The engine maps these parameters as the absolute mathematical foundation for divisional chart calculations, dasha timelines, and planetary transits.
 
