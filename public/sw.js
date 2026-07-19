@@ -8,9 +8,7 @@ const CACHE_NAME = "jhoraai-cache-v1.0.0";
 const ASSETS_TO_CACHE = [
   "/",
   "/index.html",
-  "/src/main.tsx",
-  "/src/App.tsx",
-  "/src/index.css",
+  "/manifest.json",
   "/update.json"
 ];
 
