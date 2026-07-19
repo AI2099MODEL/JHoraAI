@@ -1955,38 +1955,152 @@ app.post("/api/astrology/master-ask", async (req, res) => {
       .map((h: any) => `${h.sender === "user" ? "User" : "Astrologer"}: ${h.text}`)
       .join("\n");
 
-    const userName = mergedProfile.User?.profile_name || "Seeker";
+    const userName = mergedProfile.User?.profile_name || mergedProfile.BirthDetails?.name || mergedProfile.Birth?.name || "Seeker";
     const userEmail = mergedProfile.User?.email || "guest@jhora.ai";
-    const soulSynthesis = mergedProfile.User?.SoulSynthesis || "None cached yet.";
-    const birthDate = mergedProfile.Birth?.date || "Unknown";
-    const birthTime = mergedProfile.Birth?.time || "Unknown";
-    const birthPlace = mergedProfile.Birth?.place || "Unknown";
+    const soulSynthesis = mergedProfile.User?.SoulSynthesis || mergedProfile.SoulSynthesis || "None cached yet.";
+    
+    // Parse birth particulars safely
+    const birthDetails = 
+      mergedProfile.BirthDetails || 
+      mergedProfile.Birth || 
+      mergedProfile.birthDetails || 
+      (userProfile && (userProfile.BirthDetails || userProfile.Birth));
+      
+    const birthDate = birthDetails?.date || mergedProfile.Birth?.date || "1976-01-06";
+    const birthTime = birthDetails?.time || mergedProfile.Birth?.time || "18:40:00";
+    const latitude = Number(birthDetails?.latitude ?? birthDetails?.lat ?? mergedProfile.Birth?.latitude ?? 30.3165);
+    const longitude = Number(birthDetails?.longitude ?? birthDetails?.lon ?? mergedProfile.Birth?.longitude ?? 78.0322);
+    const timezone = Number(birthDetails?.timezone ?? mergedProfile.Birth?.timezone ?? 5.5);
+    const place = birthDetails?.location || birthDetails?.place || mergedProfile.Birth?.place || "Dehradun, Uttarakhand, India";
     
     // Extract key Vedic and Astronomical metrics
-    const moonPhase = mergedProfile.Astronomical?.moon_phase || "Unknown";
+    const moonPhase = mergedProfile.Astronomical?.moon_phase || mergedProfile.Raw?.JHora?.horoscope?.horoscope?.calendar_info?.Tithi || "Unknown";
     const ascendantSign = mergedProfile.Vedic?.ascendant?.sign || "Unknown";
     const ascendantNakshatra = mergedProfile.Vedic?.ascendant?.nakshatra || "Unknown";
-    const season = mergedProfile.Astronomical?.season || "Unknown";
-    const yearName = mergedProfile.Astronomical?.year_name || "Unknown";
+    const season = mergedProfile.Astronomical?.season || mergedProfile.Raw?.JHora?.horoscope?.horoscope?.calendar_info?.Season || "Unknown";
+    const yearName = mergedProfile.Astronomical?.year_name || mergedProfile.Raw?.JHora?.horoscope?.horoscope?.calendar_info?.["Lunar Year/Month:"] || "Unknown";
+
+    // Compile active pages & multi-system dataset dynamically on the fly to support full-page reading
+    const calcParams = {
+      date: birthDate,
+      time: birthTime,
+      latitude,
+      longitude,
+      timezone,
+      place
+    };
+
+    let kpCusps: any = null;
+    let kpChart: any = null;
+    let kpPlanetSignificators: any = null;
+    let kpHouseSignificators: any = null;
+    let westernChart: any = null;
+
+    try {
+      const kpService = KpService.getInstance();
+      const kpRepo = kpService.getRepository();
+      const [cuspsRes, chartRes, pSigRes, hSigRes] = await Promise.allSettled([
+        kpRepo.getCusps(calcParams),
+        kpRepo.getChart(calcParams),
+        kpRepo.getPlanetSignificators(calcParams),
+        kpRepo.getHouseSignificators(calcParams)
+      ]);
+
+      if (cuspsRes.status === "fulfilled") kpCusps = cuspsRes.value;
+      if (chartRes.status === "fulfilled") kpChart = chartRes.value;
+      if (pSigRes.status === "fulfilled") kpPlanetSignificators = pSigRes.value;
+      if (hSigRes.status === "fulfilled") kpHouseSignificators = hSigRes.value;
+    } catch (kpErr) {
+      console.error("Failed to compile KP systems in master-ask:", kpErr);
+    }
+
+    try {
+      const westernService = WesternService.getInstance();
+      const westernRepo = westernService.getRepository();
+      const chartRes = await westernRepo.getChart(calcParams);
+      westernChart = chartRes;
+    } catch (westErr) {
+      console.error("Failed to compile Western systems in master-ask:", westErr);
+    }
+
+    // Load master rules handbook dynamically
+    const handbookPath = path.join(process.cwd(), "documents", "master_astro_handbook.md");
+    let handbookContent = "";
+    if (fs.existsSync(handbookPath)) {
+      try {
+        handbookContent = fs.readFileSync(handbookPath, "utf-8");
+      } catch (err) {
+        console.error("Failed to read master_astro_handbook.md:", err);
+      }
+    }
+
+    // Workspace profiles summary
+    let savedProfilesSummary = "";
+    try {
+      const usersDir = path.join(process.cwd(), "Users");
+      if (fs.existsSync(usersDir)) {
+        const files = fs.readdirSync(usersDir);
+        const profileNames = files
+          .filter(f => f.endsWith(".json") && f !== "userprofile.json")
+          .map(f => f.replace(".json", "").split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "));
+        if (profileNames.length > 0) {
+          savedProfilesSummary = `Saved Profiles in user's workspace: ${profileNames.join(", ")}`;
+        }
+      }
+    } catch (err) {
+      console.error("Failed to read users directory:", err);
+    }
 
     const systemInstruction = `You are JHoraAI's Master AI Astrologer, the unified intelligence core of the entire application.
 You are directly connected to all 7 relationship systems (Vedic, KP, Jaimini, Nadi, Lal Kitab, Tajik, Western), the Unified Evidence and Decision Engines, the Astrological Reasoning Engine, and the Knowledge Center.
-You have direct, full-read access to the user's static profile JSON and their custom "Soul Blueprint Synthesis" page data.
-Use the active birth profile, dasha periods, planetary coordinates, and evaluation age to answer their questions with complete precision and deep empathetic insight.
-Return your response structured in a clean JSON format matching the schema.`;
+You have direct, full-read access to all of the user's dashboard pages, astrological systems, calculations, and tables.
+You are trained to read and synthesize ALL application page data:
+- **Vedic / JHora System Pages**: Including raw natal coords, Vimshottari/Ashtottari/Yogini dasha tables, Shadbala, Ashtakavarga, Bhava balas, divisional charts, etc.
+- **KP Stellar Dashboard**: Placidus cusps, cuspal sub-lords, planet sub-lords, planet significators, and house significators.
+- **Western Astrology Tab**: Tropical placements and aspect orbs.
+- **Jaimini System**: Jaimini karakas, arudha padas, and sensitive special lagnas.
+- **Lal Kitab**: Teva placement tables and pucca ghar mappings.
+- **Tajika Varshaphal**: Harshabala and year lord strengths.
+
+You have access to the complete **Astrological Rules Handbook** which indexes all tables from JH1 to JH19 consecutively, and lists core relationship promise rules and dasha activation triggers. You also reference the **KP Eventbook** which maps primary, supporting, and obstructing house significations for lifetime events.
+
+When answering, always reference and cite specific tables (e.g. [JH1] for Birth details, [JH2] for KP planets, [JH4] for Vimshottari Dasha, [JH19] for Shadbala, etc.), specific rule IDs (e.g. [RULE_PAR_01]), and event codes (e.g. [REL001] for Marriage Promise, [CAR001] for Promotion) from the handbook to maintain complete transparency and precision. Make your counseling response elegant, reassuring, and professional. Return your response structured in a clean JSON format matching the schema.`;
 
     const userPrompt = `
 You are consulting for logged-in user: ${userName} (${userEmail}).
-Birth MOMENT details: Born on ${birthDate} at ${birthTime} in ${birthPlace}.
+Birth MOMENT details: Born on ${birthDate} at ${birthTime} in ${place}.
 Astronomical Metrics: Moon Phase (Tithi): ${moonPhase}, Season: ${season}, Vedic Year: ${yearName}.
 Ascendant (Lagna): ${ascendantSign} in ${ascendantNakshatra} Nakshatra.
+
+WORKSPACE PROFILES:
+${savedProfilesSummary || "No alternative profiles saved yet."}
 
 SOUL BLUEPRINT SYNTHESIS (Page Data):
 "${soulSynthesis}"
 
-Full Nested Astrological Profile Data (Natal coordinates, houses, Dashas, aspects):
+==================================================
+ASTROLOGICAL RULES HANDBOOK (System Rules & Table Index):
+==================================================
+${handbookContent || "No handbook found on disk."}
+
+==================================================
+COMPLETE ACTIVE PAGES & MULTI-SYSTEM DATASET:
+==================================================
+This represents the live calculated state of all screens and pages in the application for the active profile.
+
+1. VEDIC / JHORA HOROSCOPE CORE:
 ${JSON.stringify(mergedProfile, null, 2)}
 
+2. KP STELLAR DASHBOARD:
+- KP Cusps: ${JSON.stringify(kpCusps, null, 2)}
+- KP Chart Planets/Sub-lords: ${JSON.stringify(kpChart, null, 2)}
+- KP Planet Significators: ${JSON.stringify(kpPlanetSignificators, null, 2)}
+- KP House Significators: ${JSON.stringify(kpHouseSignificators, null, 2)}
+
+3. WESTERN ASTROLOGY:
+- Placements & Aspect Orbs: ${JSON.stringify(westernChart, null, 2)}
+
+==================================================
 Active Dialogue History:
 ${formattedHistory || "None."}
 
@@ -1996,7 +2110,7 @@ Current User Message / Question:
 Selected Target Evaluation Age: ${targetAge || 28}
 
 LAWS OF CELESTIAL ANALYSIS:
-1. Deeply read the user's nested JSON profile (above) and their "Soul Blueprint Synthesis" page data.
+1. Deeply read all sections of the active multi-system datasets, pages, and handbook provided above.
 2. Formulate your conversational response with elegant, reassuring, professional counseling-style markdown.
 3. Automatically detect the user's query intent. Cite specific decision codes (e.g. [KP_DEC_PROMISE_01], [VEDIC_DEC_DELAY_01]) or rule IDs in brackets where appropriate to maintain high tracing integrity.
 4. If a new counseling pattern or user-offered correction is discovered in their message, populate candidateKnowledge with categorization. Otherwise, leave it empty or null.
