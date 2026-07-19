@@ -246,11 +246,11 @@ app.post("/api/user-profile/save", async (req, res) => {
 
 function getProfileFileName(profileData: any, fallbackName: string): string {
   // 1. Username
-  const rawUser = profileData?.User?.profile_name || fallbackName;
+  const rawUser = profileData?.User?.profile_name || profileData?.BirthDetails?.name || fallbackName;
   const username = rawUser.toLowerCase().replace(/[^a-z0-9]/g, "");
 
   // 2. DOB (format: DDMMYYYY)
-  const rawDob = profileData?.Birth?.date || "";
+  const rawDob = profileData?.Birth?.date || profileData?.BirthDetails?.date || "";
   let dob = "00000000";
   if (rawDob) {
     const cleanedDob = rawDob.replace(/[^0-9]/g, "");
@@ -263,11 +263,11 @@ function getProfileFileName(profileData: any, fallbackName: string): string {
   }
 
   // 3. Place
-  const rawPlace = profileData?.Birth?.place || "";
+  const rawPlace = profileData?.Birth?.place || profileData?.BirthDetails?.location || "";
   const place = rawPlace ? rawPlace.split(",")[0].trim().toLowerCase().replace(/[^a-z0-9]/g, "") : "unknown";
 
   // 4. Birthtime (format: hhmmAM/PM)
-  const rawTime = profileData?.Birth?.time || "";
+  const rawTime = profileData?.Birth?.time || profileData?.BirthDetails?.time || "";
   let birthtime = "0000am";
   if (rawTime) {
     const hasAmPm = /([ap]m)/i.test(rawTime);
@@ -346,7 +346,8 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
             try {
               const content = fs.readFileSync(fPath, "utf-8");
               const parsed = JSON.parse(content);
-              if (parsed?.User?.profile_name === profileName) {
+              const nameInFile = parsed?.User?.profile_name || parsed?.BirthDetails?.name;
+              if (nameInFile && nameInFile.toLowerCase().trim() === profileName.toLowerCase().trim()) {
                 fs.unlinkSync(fPath);
                 filesToGitRm.push(`Users/${file}`);
                 deletedAny = true;
@@ -363,7 +364,8 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
           try {
             const content = fs.readFileSync(filePath, "utf-8");
             const parsed = JSON.parse(content);
-            if (parsed?.User?.profile_name === profileName) {
+            const nameInFile = parsed?.User?.profile_name || parsed?.BirthDetails?.name;
+            if (nameInFile && nameInFile.toLowerCase().trim() === profileName.toLowerCase().trim()) {
               isMatching = true;
             }
           } catch (e) {
