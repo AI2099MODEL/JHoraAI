@@ -65,7 +65,9 @@ import {
   getAllCachedHoroscopes, 
   deleteCachedHoroscope, 
   clearAllCachedHoroscopes,
-  CachedHoroscopeRecord 
+  CachedHoroscopeRecord,
+  getCachedHoroscope,
+  generateCompositeKey
 } from "./lib/indexedDb";
 import AstroChart from "./components/AstroChart";
 import DashaTree from "./components/DashaTree";
@@ -905,16 +907,52 @@ export default function App() {
     };
   }, []);
 
-  const handleCalculate = async (isInitial = false) => {
+  const handleCalculate = async (isInitial = false, forceRefresh = false) => {
     setLoading(true);
     const finalName = inputs.name.trim() || "Nitin";
     const fullTimeStr = `${localTimeInput} ${localAmpm}`;
     runAutomatedSync({ ...inputs, name: finalName, time: fullTimeStr });
     try {
-      let result: AstrologyData;
       const formattedDate = convertDateToISO(inputs.date);
       const formattedTime = convertTimeTo24h(fullTimeStr);
-      const response = await fetch("/api/astrology/calculate", {
+      const latVal = Number(inputs.latitude);
+      const lngVal = Number(inputs.longitude);
+      const tzVal = Number(inputs.timezone);
+
+      // Check cache first if not explicitly forcing a refresh
+      if (!forceRefresh) {
+        try {
+          const cachedRecord = await getCachedHoroscope(inputs.date, fullTimeStr, latVal, lngVal);
+          if (cachedRecord && cachedRecord.rawUserProfile) {
+            console.log("[Cache System] Hit for canonical Raw UserProfile. Fast-loading...");
+            
+            const astrologyResult = cachedRecord.data;
+            setAstrologyData(astrologyResult);
+            localStorage.setItem("jhora_astrology_data", JSON.stringify(astrologyResult));
+            setInputs(prev => ({ ...prev, time: fullTimeStr }));
+            
+            loadedInputsRef.current = {
+              name: finalName,
+              date: inputs.date,
+              location: inputs.location,
+              localTimeInput,
+              localAmpm,
+              time: fullTimeStr
+            };
+            
+            if (!isInitial) {
+              setActiveMenu("dashboard");
+            }
+            setLoading(false);
+            return; // Exit early
+          }
+        } catch (cacheErr) {
+          console.warn("[Cache System] Cache lookup error, proceeding with API fetch:", cacheErr);
+        }
+      }
+
+      // Fetch the full raw UserProfile from our unified backend pipeline
+      const response = await fetch("/api/user-profile/generate-raw", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -924,17 +962,25 @@ export default function App() {
           date: formattedDate,
           time: formattedTime,
           location: inputs.location,
-          latitude: Number(inputs.latitude),
-          longitude: Number(inputs.longitude),
-          timezone: Number(inputs.timezone),
+          latitude: latVal,
+          longitude: lngVal,
+          timezone: tzVal,
         }),
       });
       
       if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
+        throw new Error(`Unified API error: ${response.statusText}`);
       }
-      const rawJson = await response.json();
-      result = mapJHoraResponseToAstrologyData(rawJson);
+      
+      const rawUserProfile = await response.json();
+
+      // Extract raw JHora horoscope to map into standard AstrologyData for client-side UI dashboards
+      const jhoraRaw = rawUserProfile.Raw.JHora.horoscope;
+      if (!jhoraRaw || jhoraRaw.error) {
+        throw new Error(jhoraRaw?.error || "Invalid JHora horoscope data returned");
+      }
+
+      const result: AstrologyData = mapJHoraResponseToAstrologyData(jhoraRaw);
 
       setAstrologyData(result);
       localStorage.setItem("jhora_astrology_data", JSON.stringify(result));
@@ -960,19 +1006,20 @@ export default function App() {
         console.error("PDF generation or profile mapping failed:", pdfErr);
       }
       
-      // Save to IndexedDB Offline Cache with complete user profile JSON and compiled PDF!
+      // Save to IndexedDB Offline Cache with complete raw UserProfile, user profile JSON and compiled PDF!
       try {
         await saveCachedHoroscope(
           finalName,
           inputs.date,
           fullTimeStr,
           inputs.location,
-          Number(inputs.latitude),
-          Number(inputs.longitude),
-          Number(inputs.timezone),
+          latVal,
+          lngVal,
+          tzVal,
           result,
           pdfBase64,
-          profileJson
+          profileJson,
+          rawUserProfile
         );
         await loadCacheHistory();
       } catch (dbErr) {
@@ -2136,15 +2183,35 @@ export default function App() {
                         />
                       </div>
 
-                      <div className="pt-2">
+                      <div className="pt-2 space-y-2">
                         <button
-                          onClick={() => handleCalculate(false)}
+                          onClick={() => handleCalculate(false, false)}
                           disabled={loading}
                           className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-semibold rounded-xl py-3 text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer shadow-amber-500/10"
                         >
                           <Sparkles className="w-4 h-4 text-slate-950" />
                           {loading ? "Casting Horoscope..." : "Cast & Generate Horoscope"}
                         </button>
+
+                        {(() => {
+                          const fTime = `${localTimeInput} ${localAmpm}`;
+                          const currentKey = generateCompositeKey(inputs.date, fTime, Number(inputs.latitude), Number(inputs.longitude));
+                          const hasCachedRecord = cachedList.some(r => r.id === currentKey && r.rawUserProfile);
+                          
+                          if (hasCachedRecord) {
+                            return (
+                              <button
+                                onClick={() => handleCalculate(false, true)}
+                                disabled={loading}
+                                className="w-full border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 text-amber-400 font-semibold rounded-xl py-2.5 text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                              >
+                                <RefreshCw className={`w-4 h-4 text-amber-500 ${loading ? "animate-spin" : ""}`} />
+                                Refresh Horoscope (Force Reload)
+                              </button>
+                            );
+                          }
+                          return null;
+                        })()}
                       </div>
                     </div>
                   </div>

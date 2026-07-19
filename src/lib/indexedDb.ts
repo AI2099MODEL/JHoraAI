@@ -18,6 +18,7 @@ export interface CachedHoroscopeRecord {
   data: AstrologyData;
   pdfData?: string;       // base64 encoded PDF report
   profileJson?: any;      // mapped userprofile JSON
+  rawUserProfile?: any;   // raw API responses
 }
 
 const DB_NAME = "JHoraAICacheDB";
@@ -84,7 +85,8 @@ export async function saveCachedHoroscope(
   timezone: number,
   data: AstrologyData,
   pdfData?: string,
-  profileJson?: any
+  profileJson?: any,
+  rawUserProfile?: any
 ): Promise<string> {
   const db = await initDB();
   const id = generateCompositeKey(date, time, latitude, longitude);
@@ -101,7 +103,8 @@ export async function saveCachedHoroscope(
     timestamp: Date.now(),
     data,
     pdfData,
-    profileJson
+    profileJson,
+    rawUserProfile
   };
 
   return new Promise((resolve, reject) => {

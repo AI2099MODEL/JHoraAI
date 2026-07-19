@@ -3876,11 +3876,11 @@ export function MyPageView({
                     <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
                       <div>
                         <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Marriage Promise</span>
-                        <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>{tjDecision.overallPromiseScore}%</h4>
+                        <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>{tjDecision.marriagePotentialScore}%</h4>
                       </div>
                       <div className="mt-3">
                         <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
-                          <div className="h-full bg-indigo-500" style={{ width: `${tjDecision.overallPromiseScore}%` }}></div>
+                          <div className="h-full bg-indigo-500" style={{ width: `${tjDecision.marriagePotentialScore}%` }}></div>
                         </div>
                       </div>
                     </div>
@@ -3888,26 +3888,26 @@ export function MyPageView({
                     <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
                       <div>
                         <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Happiness Score</span>
-                        <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>{tjDecision.overallHappinessScore}%</h4>
+                        <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>{tjDecision.timingStrengthScore}%</h4>
                       </div>
                       <div className="mt-3">
                         <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
-                          <div className="h-full bg-indigo-500" style={{ width: `${tjDecision.overallHappinessScore}%` }}></div>
+                          <div className="h-full bg-indigo-500" style={{ width: `${tjDecision.timingStrengthScore}%` }}></div>
                         </div>
                       </div>
                     </div>
 
                     <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
                       <div>
-                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Delay Risk</span>
-                        <h4 className="text-2xl font-bold font-mono mt-1 text-indigo-400">{tjDecision.marriageDelayRisk}</h4>
+                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Conflict Risk</span>
+                        <h4 className="text-2xl font-bold font-mono mt-1 text-indigo-400">{tjDecision.conflictRisk}</h4>
                       </div>
                     </div>
                   </div>
 
                   <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-xs leading-relaxed">
                     <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block mb-1">Varshaphala Relationship Verdict</span>
-                    <p className={textStyle}>{tjDecision.finalVerdictText}</p>
+                    <p className={textStyle}>{tjDecision.verdictText}</p>
                   </div>
                 </div>
               )}
