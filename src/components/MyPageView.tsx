@@ -3166,11 +3166,35 @@ export function MyPageView({
                       </div>
                       <div className="flex justify-between py-1 border-b border-slate-500/5">
                         <span className={textMutedStyle}>Ishta Phala:</span>
-                        <span className={textStyle}>{profile?.Vedic?.strengths?.ishta_phala || "32.5 (Auspicious)"}</span>
+                        <span className={textStyle}>
+                          {(() => {
+                            const ip = profile?.Vedic?.strengths?.ishta_phala || astrologyData?.vedic?.strengths?.ishta_phala;
+                            if (!ip) return "32.5 (Auspicious)";
+                            if (typeof ip === "object") {
+                              const vals = Object.values(ip).map(Number).filter(v => !isNaN(v));
+                              if (vals.length === 0) return "32.5 (Auspicious)";
+                              const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+                              return `${avg.toFixed(1)} (Avg)`;
+                            }
+                            return String(ip);
+                          })()}
+                        </span>
                       </div>
                       <div className="flex justify-between py-1 border-b border-slate-500/5">
                         <span className={textMutedStyle}>Kashta Phala:</span>
-                        <span className={textStyle}>{profile?.Vedic?.strengths?.kashta_phala || "27.2 (Moderate)"}</span>
+                        <span className={textStyle}>
+                          {(() => {
+                            const kp = profile?.Vedic?.strengths?.kashta_phala || astrologyData?.vedic?.strengths?.kashta_phala;
+                            if (!kp) return "27.2 (Moderate)";
+                            if (typeof kp === "object") {
+                              const vals = Object.values(kp).map(Number).filter(v => !isNaN(v));
+                              if (vals.length === 0) return "27.2 (Moderate)";
+                              const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+                              return `${avg.toFixed(1)} (Avg)`;
+                            }
+                            return String(kp);
+                          })()}
+                        </span>
                       </div>
                       <div className="flex justify-between py-1 border-b border-slate-500/5">
                         <span className={textMutedStyle}>Dominant Element:</span>
