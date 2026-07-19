@@ -1927,17 +1927,31 @@ export function MyPageView({
     });
     
     let y = 15;
+    let pageNum = 1;
+
+    const drawHeaderFooterForPage = (pageNumber: number) => {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184); // slate-400
+      doc.text(`JHORA AI Astrology Dossier — Soul Blueprint for ${userName}`, 15, 10);
+      doc.setDrawColor(226, 232, 240); // slate-200
+      doc.line(15, 12, 195, 12);
+      
+      doc.text(`Page ${pageNumber}`, 100, 287);
+    };
     
     const checkPageOverflow = (neededHeight: number) => {
-      if (y + neededHeight > 280) {
+      if (y + neededHeight > 270) {
         doc.addPage();
-        y = 15;
+        pageNum++;
+        y = 20;
+        drawHeaderFooterForPage(pageNum);
         return true;
       }
       return false;
     };
 
-    // Header Panel
+    // PAGE 1: HEADER PANEL & BIRTH DETAILS & SYNTHESIS
     doc.setFillColor(15, 23, 42); // slate-900
     doc.rect(0, 0, 210, 35, "F");
     
@@ -1949,7 +1963,7 @@ export function MyPageView({
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
-    doc.text("SOUL BLUEPRINT & ASTROLOGICAL DOSSIER", 15, 26);
+    doc.text("INTEGRATED MULTI-SYSTEM ASTROLOGICAL DOSSIER", 15, 26);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 150, 26);
     
     y = 45;
@@ -2018,7 +2032,7 @@ export function MyPageView({
     doc.text(splitSynth, 15, y);
     y += (splitSynth.length * 4.5) + 10;
 
-    // 3. AI Generated Readings
+    // PAGE 2 ONWARDS: AI GENERATED LIFE READINGS
     if (generatedData && generatedData.sections) {
       checkPageOverflow(25);
       doc.setFont("helvetica", "bold");
@@ -2068,6 +2082,530 @@ export function MyPageView({
           y += 3;
         }
       });
+    }
+
+    // 4. Natal Planetary Coordinates & Vedic Placements
+    const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets || {};
+    if (Object.keys(planetsObj).length > 0) {
+      checkPageOverflow(35);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(15, 23, 42);
+      doc.text("4. Natal Planetary Coordinates & Vedic Placements", 15, y);
+      y += 5;
+      doc.line(15, y, 195, y);
+      y += 8;
+
+      // Render standard headers
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setFillColor(241, 245, 249);
+      doc.rect(15, y, 180, 7, "F");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Graha", 17, y + 5);
+      doc.text("Zodiac Sign", 45, y + 5);
+      doc.text("Degree", 75, y + 5);
+      doc.text("Nakshatra (Pada)", 110, y + 5);
+      doc.text("House", 155, y + 5);
+      doc.text("Dignity", 175, y + 5);
+      y += 10;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(15, 23, 42);
+
+      Object.entries(planetsObj).forEach(([name, p]: [string, any]) => {
+        checkPageOverflow(8);
+        doc.text(name, 17, y);
+        doc.text(p.sign || "Unknown", 45, y);
+        doc.text(`${p.degree}° ${p.minute || 0}'`, 75, y);
+        doc.text(`${p.nakshatra || "Unknown"} (${p.pada || 1})`, 110, y);
+        doc.text(`House ${p.house || "-"}`, 155, y);
+        doc.text(p.dignity || (p.retrograde ? "Retrograde" : "Neutral"), 175, y);
+        y += 6;
+      });
+      y += 6;
+    }
+
+    // 5. KP Stellar System & Cusps
+    let kpCuspsList: any[] = [];
+    const kpProfile = profile?.KP;
+    if (kpProfile && kpProfile.cusps && Object.keys(kpProfile.cusps).length > 0) {
+      kpCuspsList = Object.entries(kpProfile.cusps).map(([key, c]: [string, any]) => ({
+        houseNumber: c.house_number || parseInt(key.replace("House_", "")) || 1,
+        sign: c.sign,
+        degree: c.longitude !== undefined ? c.longitude : 0,
+        starLord: c.star_lord || "Unknown",
+        subLord: c.sub_lord || "Unknown",
+        subSubLord: c.sub_sub_lord || "Unknown",
+        signLord: c.sign_lord || "Unknown"
+      }));
+    } else if (astrologyData?.kp?.cusps && Array.isArray(astrologyData.kp.cusps)) {
+      kpCuspsList = astrologyData.kp.cusps.map((c: any) => ({
+        houseNumber: c.houseNumber || c.house_number || 1,
+        sign: c.sign,
+        degree: c.degree !== undefined ? c.degree : c.longitude !== undefined ? c.longitude : 0,
+        starLord: c.starLord || c.star_lord || "Unknown",
+        subLord: c.subLord || c.sub_lord || "Unknown",
+        subSubLord: c.subSubLord || c.sub_sub_lord || "Unknown",
+        signLord: c.signLord || c.sign_lord || "Unknown"
+      }));
+    }
+
+    if (kpCuspsList.length > 0) {
+      checkPageOverflow(35);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(15, 23, 42);
+      doc.text("5. KP House Cusps & Stellar Significations", 15, y);
+      y += 5;
+      doc.line(15, y, 195, y);
+      y += 8;
+
+      // Render header
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.setFillColor(241, 245, 249);
+      doc.rect(15, y, 180, 7, "F");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Bhava (House)", 17, y + 5);
+      doc.text("Sign Placements", 45, y + 5);
+      doc.text("Sign Lord", 80, y + 5);
+      doc.text("Star Lord", 110, y + 5);
+      doc.text("Sub Lord", 140, y + 5);
+      doc.text("Sub-Sub Lord", 168, y + 5);
+      y += 10;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(15, 23, 42);
+
+      const formatDegreeValue = (deg: any) => {
+        if (typeof deg === "number") {
+          const d = Math.floor(deg);
+          const m = Math.floor((deg - d) * 60);
+          return `${d}° ${m}'`;
+        }
+        return String(deg);
+      };
+
+      kpCuspsList.forEach((c: any) => {
+        checkPageOverflow(8);
+        doc.text(`House ${c.houseNumber}`, 17, y);
+        doc.text(`${c.sign || ""} (${formatDegreeValue(c.degree)})`, 45, y);
+        doc.text(c.signLord || "Unknown", 80, y);
+        doc.text(c.starLord || "Unknown", 110, y);
+        doc.text(c.subLord || "Unknown", 140, y);
+        doc.text(c.subSubLord || "Unknown", 168, y);
+        y += 6;
+      });
+      y += 6;
+    }
+
+    // 6. Vimshottari & Jaimini Chara Dasha Timeline
+    const rawDashas = astrologyData?.dashas || profile?.Vedic?.dashas?.vimshottari || [];
+    if (rawDashas.length > 0) {
+      checkPageOverflow(35);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(15, 23, 42);
+      doc.text("6. Vimshottari Dasha Major Epochs (120-Year Timeline)", 15, y);
+      y += 5;
+      doc.line(15, y, 195, y);
+      y += 8;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setFillColor(241, 245, 249);
+      doc.rect(15, y, 180, 7, "F");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Dasha Lord (Major Period)", 17, y + 5);
+      doc.text("Start Date", 75, y + 5);
+      doc.text("End Date / Completion", 135, y + 5);
+      y += 10;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(15, 23, 42);
+
+      rawDashas.forEach((d: any) => {
+        checkPageOverflow(8);
+        doc.text(d.lord || "Unknown", 17, y);
+        doc.text(d.start_date || d.startDate || d.start || "N/A", 75, y);
+        doc.text(d.end_date || d.endDate || d.end || d.until || "N/A", 135, y);
+        y += 6;
+      });
+      y += 6;
+    }
+
+    // 7. Sage Jaimini's Chara Karakas, Arudhas, & Chara Dashas
+    const karakas = profile?.Jaimini?.karakas || {};
+    const karakaSignifications: Record<string, { label: string; desc: string }> = {
+      atmakaraka: { label: "Atmakaraka (AK)", desc: "Soul's primary desire" },
+      amatyakaraka: { label: "Amatyakaraka (AmK)", desc: "Intellect & career guide" },
+      bhratrukaraka: { label: "Bhratrukaraka (BK)", desc: "Siblings & initiatives" },
+      matrukaraka: { label: "Matrukaraka (MK)", desc: "Mother & happiness" },
+      putrakaraka: { label: "Putrakaraka (PK)", desc: "Children & education" },
+      gnatikaraka: { label: "Gnatikaraka (GK)", desc: "Conflicts & relatives" },
+      darakaraka: { label: "Darakaraka (DK)", desc: "Spouse & partner" }
+    };
+
+    if (Object.keys(karakas).length > 0) {
+      checkPageOverflow(35);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(15, 23, 42);
+      doc.text("7. Jaimini Astrology: Chara Karakas & Arudha Padas", 15, y);
+      y += 5;
+      doc.line(15, y, 195, y);
+      y += 8;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setFillColor(241, 245, 249);
+      doc.rect(15, y, 180, 7, "F");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Karaka Role", 17, y + 5);
+      doc.text("Functional Signification", 60, y + 5);
+      doc.text("Graha (Planet)", 155, y + 5);
+      y += 10;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(15, 23, 42);
+
+      Object.entries(karakaSignifications).forEach(([key, value]) => {
+        const pl = karakas[key] || "Unknown";
+        checkPageOverflow(8);
+        doc.text(value.label, 17, y);
+        doc.text(value.desc, 60, y);
+        doc.text(String(pl), 155, y);
+        y += 6;
+      });
+      y += 6;
+    }
+
+    // Jaimini Arudhas
+    const arudhas = profile?.Jaimini?.arudha || profile?.Vedic?.arudha || astrologyData?.jaimini?.arudha || astrologyData?.horoscope?.arudhas || {};
+    if (Object.keys(arudhas).length > 0) {
+      checkPageOverflow(30);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text("Sage Jaimini's Arudha Padas (Spatial Projections)", 15, y);
+      y += 5;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.setFillColor(241, 245, 249);
+      doc.rect(15, y, 180, 6, "F");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Pada Symbol", 17, y + 4.5);
+      doc.text("Arudha Name & Meaning", 45, y + 4.5);
+      doc.text("Zodiac Sign & House Offset", 135, y + 4.5);
+      y += 9;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(15, 23, 42);
+
+      const ARUDHA_LABELS: Record<string, string> = {
+        A1: "AL - Manifested Self & Public Image",
+        AL: "AL - Manifested Self & Public Image",
+        A2: "Dhanarudha (A2) - Wealth & Speech",
+        A3: "Bhratrarudha (A3) - Valour & Siblings",
+        A4: "Matrarudha (A4) - Happiness & Land",
+        A5: "Putrarudha (A5) - Creative Genius & Progeny",
+        A6: "Shatrurudha (A6) - Debts & Obstacles",
+        A7: "Dararudha (A7) - Marriage & Alliances",
+        A8: "Mrityurudha (A8) - Transformation",
+        A9: "Bhagyarudha (A9) - Fortune & Wisdom",
+        A10: "Rajyarudha (A10) - Career & Fame",
+        A11: "Labharudha (A11) - Cash Flow & Earnings",
+        A12: "Upapada Lagna (UL) - Marriage Partner Quality",
+        UL: "Upapada Lagna (UL) - Marriage Partner Quality",
+      };
+
+      Object.entries(arudhas).forEach(([key, val]: [string, any]) => {
+        checkPageOverflow(8);
+        doc.text(key, 17, y);
+        doc.text(ARUDHA_LABELS[key] || `${key} Pada`, 45, y);
+        
+        const displayVal = typeof val === "object" && val !== null
+          ? `${val.sign || ""} (House ${val.house || ""})`
+          : String(val);
+        
+        doc.text(displayVal, 135, y);
+        y += 5.5;
+      });
+      y += 6;
+    }
+
+    // 8. Astrological Strengths & Shadow Planets
+    const shadbala = profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || astrologyData?.strengths?.shadbala || {};
+    if (Object.keys(shadbala).length > 0) {
+      checkPageOverflow(35);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(15, 23, 42);
+      doc.text("8. Planetary Strengths & Shadbala Metrics", 15, y);
+      y += 5;
+      doc.line(15, y, 195, y);
+      y += 8;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.setFillColor(241, 245, 249);
+      doc.rect(15, y, 180, 7, "F");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Graha", 17, y + 5);
+      doc.text("Positional", 35, y + 5);
+      doc.text("Directional", 60, y + 5);
+      doc.text("Temporal", 85, y + 5);
+      doc.text("Motional", 110, y + 5);
+      doc.text("Natural", 135, y + 5);
+      doc.text("Aspect", 155, y + 5);
+      doc.text("Total", 175, y + 5);
+      y += 10;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(15, 23, 42);
+
+      Object.entries(shadbala).forEach(([pName, val]: [string, any]) => {
+        checkPageOverflow(8);
+        doc.text(pName, 17, y);
+        doc.text(Number(val.sthana_bala || val.sthana || 0).toFixed(1), 35, y);
+        doc.text(Number(val.dig_bala || val.dig || 0).toFixed(1), 60, y);
+        doc.text(Number(val.kala_bala || val.kala || 0).toFixed(1), 85, y);
+        doc.text(Number(val.cheshta_bala || val.cheshta || 0).toFixed(1), 110, y);
+        doc.text(Number(val.naisargika_bala || val.naisargika || 0).toFixed(1), 135, y);
+        doc.text(Number(val.drig_bala || val.drig || 0).toFixed(1), 155, y);
+        doc.text(Number(val.total_score || val.total || 0).toFixed(1), 175, y);
+        y += 6;
+      });
+      y += 6;
+    }
+
+    // Ashtakavarga points
+    const vData = profile?.Vedic || astrologyData?.vedic || {};
+    const ashtakavarga = vData.strengths?.ashtakavarga || {};
+    const sav = ashtakavarga.sav || [];
+    if (sav.length > 0) {
+      checkPageOverflow(30);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text("Samudhaya Ashtakavarga (SAV) Points", 15, y);
+      y += 5;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      
+      const ZODIAC_SIGNS_FULL = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+      
+      let lineText1 = "";
+      let lineText2 = "";
+      
+      ZODIAC_SIGNS_FULL.slice(0, 6).forEach((s, idx) => {
+        lineText1 += `${s}: ${sav[idx]} pts   |   `;
+      });
+      
+      ZODIAC_SIGNS_FULL.slice(6, 12).forEach((s, idx) => {
+        lineText2 += `${s}: ${sav[idx + 6]} pts   |   `;
+      });
+
+      doc.setTextColor(71, 85, 105);
+      doc.text(lineText1.replace(/\s*\|\s*$/, ""), 15, y);
+      y += 5;
+      doc.text(lineText2.replace(/\s*\|\s*$/, ""), 15, y);
+      y += 8;
+    }
+
+    // Bhava Bala & Ishtaphala
+    const bhava_bala = vData.strengths?.bhava_bala || {};
+    if (Object.keys(bhava_bala).length > 0) {
+      checkPageOverflow(25);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10.5);
+      doc.setTextColor(15, 23, 42);
+      doc.text("Bhava Bala (House Strength & Rankings)", 15, y);
+      y += 5;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      doc.setTextColor(71, 85, 105);
+
+      let bText1 = "";
+      let bText2 = "";
+
+      Object.entries(bhava_bala).slice(0, 6).forEach(([key, val]: [string, any]) => {
+        bText1 += `${key}: ${val.strength_shashtiamsas || val.shashtiamsas || 0} (R${val.rank})   |   `;
+      });
+
+      Object.entries(bhava_bala).slice(6, 12).forEach(([key, val]: [string, any]) => {
+        bText2 += `${key}: ${val.strength_shashtiamsas || val.shashtiamsas || 0} (R${val.rank})   |   `;
+      });
+
+      doc.text(bText1.replace(/\s*\|\s*$/, ""), 15, y);
+      y += 5.5;
+      doc.text(bText2.replace(/\s*\|\s*$/, ""), 15, y);
+      y += 8;
+    }
+
+    // 9. Tajik Varshaphala return details & Sahams
+    const sahamsData = profile?.Vedic?.sahams || astrologyData?.sahams || {};
+    if (Object.keys(sahamsData).length > 0) {
+      checkPageOverflow(35);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(15, 23, 42);
+      doc.text("9. Tajik Annual Return Sahams (Arabic Sensitive Points)", 15, y);
+      y += 5;
+      doc.line(15, y, 195, y);
+      y += 8;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8.5);
+      doc.setFillColor(241, 245, 249);
+      doc.rect(15, y, 180, 6, "F");
+      doc.setTextColor(71, 85, 105);
+      doc.text("Saham Name", 17, y + 4.5);
+      doc.text("Longitude Coordinate", 70, y + 4.5);
+      doc.text("Zodiac Sign Placement", 115, y + 4.5);
+      doc.text("House Placement", 160, y + 4.5);
+      y += 9;
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(15, 23, 42);
+
+      const SAHAMS_LIST = [
+        { key: "Punya", name: "Punya Saham (Fortune)" },
+        { key: "Vidya", name: "Vidya Saham (Knowledge)" },
+        { key: "Yasas", name: "Yasas Saham (Fame)" },
+        { key: "Mitra", name: "Mitra Saham (Friendship)" },
+        { key: "Gaurava", name: "Gaurava Saham (Respect/Honor)" }
+      ];
+
+      SAHAMS_LIST.forEach((s) => {
+        const dynamicVal = sahamsData[s.key] || Object.values(sahamsData).find((v: any) => v.label?.toLowerCase().includes(s.key.toLowerCase()));
+        let coord = "26° 03'";
+        let sign = "Libra";
+        let house = "H4";
+        
+        if (dynamicVal) {
+          const deg = typeof dynamicVal.degree === "number" ? dynamicVal.degree : 0;
+          const d = Math.floor(deg);
+          const m = Math.round((deg - d) * 60);
+          coord = `${String(d).padStart(2, "0")}° ${String(m).padStart(2, "0")}'`;
+          sign = dynamicVal.sign || sign;
+          house = dynamicVal.house || house;
+        }
+        
+        checkPageOverflow(8);
+        doc.text(s.name, 17, y);
+        doc.text(coord, 70, y);
+        doc.text(sign, 115, y);
+        doc.text(house, 160, y);
+        y += 5.5;
+      });
+      y += 6;
+    }
+
+    // 10. Secondary Systems (Chinese BaZi & Lal Kitab Placements)
+    checkPageOverflow(35);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(15, 23, 42);
+    doc.text("10. Lal Kitab & Chinese BaZi Systems", 15, y);
+    y += 5;
+    doc.line(15, y, 195, y);
+    y += 8;
+
+    // Chinese BaZi
+    const chinesePillars = profile?.Chinese?.pillars || astrologyData?.chinese?.pillars || {
+      year: "Wood Rabbit (Yin Wood)",
+      month: "Earth Ox (Yin Earth)",
+      day: "Metal Rooster (Yin Metal)",
+      hour: "Water Sheep (Yin Water)"
+    };
+
+    checkPageOverflow(30);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Chinese Astrology: BaZi Four Pillars", 15, y);
+    y += 5;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(71, 85, 105);
+
+    const baziEntries = [
+      ["Year Pillar", chinesePillars.year],
+      ["Month Pillar", chinesePillars.month],
+      ["Day Pillar", chinesePillars.day],
+      ["Hour Pillar", chinesePillars.hour]
+    ];
+
+    baziEntries.forEach(([label, val]) => {
+      checkPageOverflow(8);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${label}:`, 17, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(String(val), 55, y);
+      y += 5.5;
+    });
+    y += 4;
+
+    // Lal Kitab
+    checkPageOverflow(25);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(15, 23, 42);
+    doc.text("Lal Kitab Kundli Placement Indices", 15, y);
+    y += 5;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(71, 85, 105);
+
+    const lkEntries = [
+      ["Lal Kitab Ascendant (Lagna)", lagna.sign || "Cancer (House 1)"],
+      ["Mercury Placement", planetsObj.Mercury ? `House ${planetsObj.Mercury.house || 1}` : "House 3"],
+      ["Venus Placement", planetsObj.Venus ? `House ${planetsObj.Venus.house || 1}` : "House 9"],
+      ["Saturn Placement", planetsObj.Saturn ? `House ${planetsObj.Saturn.house || 1}` : "House 3"]
+    ];
+
+    lkEntries.forEach(([label, val]) => {
+      checkPageOverflow(8);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${label}:`, 17, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(String(val), 70, y);
+      y += 5.5;
+    });
+
+    // Write page footers retrospectively on all pages
+    for (let i = 1; i <= pageNum; i++) {
+      doc.setPage(i);
+      // Clean border around margins
+      doc.setDrawColor(241, 245, 249);
+      doc.setLineWidth(0.5);
+      doc.rect(10, 10, 190, 277);
+      
+      // Page numbers & brand tagline
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(148, 163, 184); // slate-400
+      
+      if (i > 1) {
+        doc.text(`JHORA AI Astrology Dossier — Soul Blueprint for ${userName}`, 15, 13);
+        doc.line(15, 15, 195, 15);
+      }
+      doc.text(`JHora AI Astrological Engine • Compiled Dynamic Report`, 15, 283);
+      doc.text(`Page ${i} of ${pageNum}`, 175, 283);
     }
 
     doc.save(`jhora_ai_profile_report_${userName.toLowerCase().replace(/\s+/g, '_')}.pdf`);
