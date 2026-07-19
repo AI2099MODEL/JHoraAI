@@ -1713,71 +1713,28 @@ export function MyPageView({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [age, setAge] = useState<{ years: number; months: number; days: number } | null>(null);
   const [activeTab, setActiveTab] = useState<string>("overview");
-  const [activeMenu, setActiveMenu] = useState<string>("soul");
   const [tajikTargetAge, setTajikTargetAge] = useState<number>(30);
   const [tajikSubTab, setTajikSubTab] = useState<string>("relationship");
   const [westernSubTab, setWesternSubTab] = useState<string>("dashboard");
   const [selectedDateOffset, setSelectedDateOffset] = useState<number>(0);
   const [futurePage, setFuturePage] = useState<number>(0);
 
-  const MENUS = [
-    { id: "soul", label: "Soul", icon: Sparkles },
-    { id: "journey", label: "My Journey", icon: Compass },
-    { id: "life", label: "My Life", icon: User },
-    { id: "astro", label: "My Astro", icon: Grid },
-  ];
-
-  const MENU_TABS: { [key: string]: { id: string; label: string }[] } = {
-    soul: [
-      { id: "overview", label: "Soul Blueprint" },
-      { id: "jaimini", label: "Jaimini / Soul Karakas" }
-    ],
-    journey: [
-      { id: "dasha", label: "Vimshottari Dasha" },
-      { id: "transits_data", label: "Gochara / Transits" },
-      { id: "future", label: "Future / Timeline" }
-    ],
-    life: [
-      { id: "daily", label: "Daily / Muhurtas" },
-      { id: "lalkitab", label: "Lal Kitab" },
-      { id: "tajik", label: "Tajik Annual" },
-      { id: "chinese", label: "Chinese Zodiac" },
-      { id: "western", label: "Western Birth" }
-    ],
-    astro: [
-      { id: "charts", label: "Natal Charts" },
-      { id: "vedic", label: "Vedic Strengths" },
-      { id: "kp", label: "KP System" },
-      { id: "table_index", label: "Table Index (JH1-19)" }
-    ]
-  };
-
   const tabs = [
-    { id: "overview", label: "Soul Blueprint" },
-    { id: "jaimini", label: "Jaimini / Soul Karakas" },
-    { id: "dasha", label: "Vimshottari Dasha" },
-    { id: "transits_data", label: "Gochara / Transits" },
-    { id: "future", label: "Future / Timeline" },
-    { id: "daily", label: "Daily / Muhurtas" },
-    { id: "lalkitab", label: "Lal Kitab" },
-    { id: "tajik", label: "Tajik Annual" },
-    { id: "chinese", label: "Chinese Zodiac" },
-    { id: "western", label: "Western Birth" },
-    { id: "charts", label: "Natal Charts" },
-    { id: "vedic", label: "Vedic Strengths" },
-    { id: "kp", label: "KP System" },
-    { id: "table_index", label: "Table Index (JH1-19)" }
+    { id: "overview", label: "Soul" },
+    { id: "dasha", label: "Vimshottari" },
+    { id: "charts", label: "Charts" },
+    { id: "daily", label: "Daily" },
+    { id: "future", label: "Future" },
+    { id: "vedic", label: "Vedic" },
+    { id: "transits_data", label: "Transits" },
+    { id: "jaimini", label: "Jaimini" },
+    { id: "kp", label: "KP" },
+    { id: "lalkitab", label: "Lalkitab" },
+    { id: "chinese", label: "Chinese" },
+    { id: "tajik", label: "Tajik" },
+    { id: "western", label: "Western" },
+    { id: "table_index", label: "Table Index" },
   ];
-
-  // Keep activeMenu in sync with activeTab
-  useEffect(() => {
-    const foundMenu = Object.keys(MENU_TABS).find((menuId) =>
-      MENU_TABS[menuId].some((t) => t.id === activeTab)
-    );
-    if (foundMenu && foundMenu !== activeMenu) {
-      setActiveMenu(foundMenu);
-    }
-  }, [activeTab]);
 
   // Fetch the active profile from server Users/userprofile.json
   const fetchProfile = async () => {
@@ -2827,50 +2784,21 @@ export function MyPageView({
         </div>
       )}
 
-      {/* Tier 1: Main Astro Navigation Menus */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 pb-2 pt-1" id="astro-tier1-menus">
-        {MENUS.map((menu) => {
-          const Icon = menu.icon;
-          const isSelected = activeMenu === menu.id;
-          return (
-            <button
-              key={menu.id}
-              onClick={() => {
-                setActiveMenu(menu.id);
-                const defaultTab = MENU_TABS[menu.id]?.[0]?.id || "overview";
-                setActiveTab(defaultTab);
-              }}
-              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold uppercase tracking-wider text-[11px] border transition-all cursor-pointer select-none ${
-                isSelected
-                  ? "bg-amber-500 text-slate-950 border-amber-500 shadow-md shadow-amber-500/10"
-                  : "bg-slate-500/5 text-slate-400 border-slate-500/10 hover:bg-slate-500/10 hover:text-slate-300"
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5 shrink-0" />
-              <span>{menu.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Tier 2: Sub-tabs within Selected Menu */}
-      <div className="flex flex-wrap items-center gap-1.5 pb-3 border-b border-slate-800/40" id="astro-tier2-subtabs">
-        {(MENU_TABS[activeMenu] || []).map((sub) => {
-          const isSelected = activeTab === sub.id;
-          return (
-            <button
-              key={sub.id}
-              onClick={() => setActiveTab(sub.id)}
-              className={`px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold tracking-wider uppercase border transition-all cursor-pointer select-none ${
-                isSelected
-                  ? "bg-slate-900 border-indigo-500/40 text-amber-300 shadow-sm"
-                  : "bg-slate-950/20 text-slate-400 border-slate-800/40 hover:bg-slate-900/30 hover:text-slate-300"
-              }`}
-            >
-              {sub.label}
-            </button>
-          );
-        })}
+      {/* Submenu Astrological Tabs */}
+      <div className="flex flex-wrap items-center gap-1.5 pb-2 pt-1 border-b border-slate-500/10">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold tracking-wider uppercase border transition-all cursor-pointer select-none ${
+              activeTab === tab.id
+                ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm shadow-amber-500/10"
+                : "bg-slate-500/5 text-slate-400 border-slate-500/10 hover:bg-slate-500/10 hover:text-slate-300"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {activeTab === "overview" ? (
