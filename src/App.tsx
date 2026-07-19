@@ -96,6 +96,7 @@ import { AstroRawTablesView } from "./components/AstroRawTablesView";
 import { UserProfile, SessionManager, AuthManager, UserProfileRepository } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
 import WorkspaceTab from "./components/WorkspaceTab";
+import { AndroidInstallerPromo } from "./components/AndroidInstallerPromo";
 import UpdateNotification from "./components/UpdateNotification";
 import { UpdateManager, UpdateManifest } from "./lib/androidOta";
 import GithubOtaView from "./components/GithubOtaView";
@@ -2014,8 +2015,8 @@ export default function App() {
       {/* CORE FRAME LAYOUT */}
       <div className="flex-1 w-full flex flex-row max-w-[1400px] mx-auto min-w-0" id="main-content-layout">
         
-        {/* SIDE BAR RAIL (Vertical Side Rail on all screens) */}
-        <nav className={`flex flex-col items-center py-4 border-r transition-all shrink-0 select-none ${
+        {/* SIDE BAR RAIL (Vertical Side Rail on desktop/tablet) */}
+        <nav className={`hidden md:flex flex-col items-center py-4 border-r transition-all shrink-0 select-none ${
           drawerExpanded ? "w-[120px]" : "w-[64px]"
         } ${isDark ? "border-indigo-500/10 bg-slate-950" : "border-neutral-200 bg-white"}`} id="navigation-rail-sidebar">
           
@@ -2074,7 +2075,7 @@ export default function App() {
             isDark ? "bg-slate-900/60 border-r border-indigo-500/15" : "bg-neutral-50/95 border-r border-neutral-200"
           } ${
             isMobileMenuOpen 
-              ? "fixed inset-y-0 left-[64px] z-50 w-64 block md:relative md:inset-auto md:left-auto md:z-auto md:w-[240px] md:block" 
+              ? "fixed inset-y-0 left-0 z-50 w-64 block md:relative md:inset-auto md:left-auto md:z-auto md:w-[240px] md:block animate-in slide-in-from-left duration-200" 
               : "hidden md:block md:relative md:w-[240px]"
           } ${
             !drawerExpanded ? "md:hidden md:w-0 overflow-hidden" : ""
@@ -2151,7 +2152,7 @@ export default function App() {
         )}
 
         {/* MAIN DISPLAY: Dynamic Content Stage */}
-        <main className="flex-1 p-4 sm:p-6 pb-6 min-w-0 overflow-y-auto" id="tab-body-container">
+        <main className="flex-1 p-4 sm:p-6 pb-24 md:pb-6 min-w-0 overflow-y-auto" id="tab-body-container">
           
           {/* Global Data Integrity / Provenance Overlay Panel */}
           {provenanceEnabled && (
@@ -2184,6 +2185,9 @@ export default function App() {
                 exit={{ opacity: 0, y: -5 }}
                 className="space-y-6"
               >
+                {/* Visual Identity & PWA App Installation Promo */}
+                <AndroidInstallerPromo isDark={isDark} />
+
                 {/* Birth Details and Cast Settings Card (First Section) */}
                 <div className={`p-6 rounded-2xl border ${containerStyle}`}>
                   <div className="border-b border-indigo-500/10 pb-4 mb-6">
@@ -3598,6 +3602,39 @@ export default function App() {
           )}
 
         </main>
+      </div>
+
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 bg-slate-950/85 backdrop-blur-md border-t border-indigo-500/10 z-40 px-3 py-2 flex items-center justify-around shadow-2xl safe-bottom" id="mobile-bottom-navigation-bar">
+        {MAIN_MENU_STRUCTURE.map((node) => {
+          const Icon = node.icon;
+          const isActive = node.id === "astro"
+            ? ["horoscope", "kp_stellar", "western_astrology", "esoteric", "marriage", "transit"].includes(activeMenu)
+            : activeMenu === node.id;
+          
+          return (
+            <button
+              key={node.id}
+              onClick={() => {
+                handleMenuSelect(node.id);
+                if (node.submenus && node.submenus.length > 0) {
+                  setIsMobileMenuOpen(true);
+                } else {
+                  setIsMobileMenuOpen(false);
+                }
+              }}
+              className={`flex-1 flex flex-col items-center justify-center py-1 transition-all border-0 bg-transparent cursor-pointer ${
+                isActive ? "text-amber-500" : isDark ? "text-slate-400 hover:text-slate-200" : "text-neutral-500 hover:text-neutral-800"
+              }`}
+              id={`bottom-nav-${node.id}`}
+            >
+              <Icon className="w-5 h-5" />
+              <span className="text-[9px] font-sans font-medium mt-0.5 tracking-tight truncate max-w-[60px]">
+                {node.label}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* FOOTER */}
