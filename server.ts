@@ -1098,11 +1098,8 @@ app.post("/api/user-profile/generate-raw", async (req, res) => {
       "/kp/subsublords",
       "/kp/planet_significators",
       "/kp/house_significators",
-      "/kp/ruling_planets",
       "/kp/dasha",
-      "/western/chart",
-      "/western/solar-return",
-      "/western/transits"
+      "/western/chart"
     ];
 
     const vedicAstroPromises = vedicAstroEndpoints.map(async (endpoint) => {

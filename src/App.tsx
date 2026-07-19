@@ -767,15 +767,15 @@ export default function App() {
 
     // Activate profile on backend when loaded/selected
     try {
-      const pJson = record.profileJson || mapAstrologyDataToUserProfileJSON(activeUser, record.data);
-      if (pJson) {
+      const pDataToSave = record.rawUserProfile || record.profileJson || mapAstrologyDataToUserProfileJSON(activeUser, record.data);
+      if (pDataToSave) {
         fetch("/api/user-profile/act", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "add",
             profileName: record.name,
-            profileData: pJson
+            profileData: pDataToSave
           })
         }).catch(err => console.error("Failed to activate userprofile on backend:", err));
       }
@@ -1644,6 +1644,33 @@ export default function App() {
       setAstrologyData(result);
       localStorage.setItem("jhora_astrology_data", JSON.stringify(result));
 
+      let profileDataToSave: any = null;
+      if (isRawProfile) {
+        profileDataToSave = parsed;
+      } else {
+        // Fetch strictly raw profile from server to save instead of legacy mapped/derived structure
+        try {
+          const rawProfileRes = await fetch("/api/user-profile/generate-raw", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: finalName,
+              date: convertDateToISO(birth.date),
+              time: convertTimeTo24h(birth.time),
+              location: birth.place || "Dehradun",
+              latitude: Number(birth.latitude),
+              longitude: Number(birth.longitude),
+              timezone: Number(birth.timezone),
+            }),
+          });
+          if (rawProfileRes.ok) {
+            profileDataToSave = await rawProfileRes.json();
+          }
+        } catch (rawErr) {
+          console.error("Failed to generate raw profile for legacy import:", rawErr);
+        }
+      }
+
       await saveCachedHoroscope(
         finalName,
         birth.date,
@@ -1655,14 +1682,13 @@ export default function App() {
         result,
         pdfBase64,
         isRawProfile ? undefined : parsed,
-        isRawProfile ? parsed : undefined
+        profileDataToSave || undefined
       );
 
       await loadCacheHistory();
 
       // Activate profile on backend when imported
       try {
-        const profileDataToSave = isRawProfile ? parsed : mapAstrologyDataToUserProfileJSON(activeUser, result);
         if (profileDataToSave) {
           fetch("/api/user-profile/act", {
             method: "POST",
