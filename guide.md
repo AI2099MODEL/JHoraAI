@@ -122,3 +122,6 @@ When a user clicks on "Cast and Generate Horoscope" or "Refresh Horoscope", all 
 `nativename_dateofbirth_timeofbirth_place.json`
 *(Format: [lowercase native name]_[DDMMYYYY date of birth]_[hhmmam/pm time of birth]_[lowercase place name].json, e.g. `nitin_06011976_0640pm_dehradun.json`)*.
 There must be absolutely **NO CALCULATIONS AND NO TRANSIT DATA** in this JSON file. It must only contain the pristine raw data pulled from the external APIs for downstream rendering and run-time interpretation.
+
+### Rule 3: Locking User Profile Post-Fetch & AI Assistant Navigation
+Once a user profile has successfully pulled all raw data from the APIs, the user profile is strictly locked. No further background calculations, automatic form-field change recalculations, periodic updates, or modifications are allowed on it, unless the user explicitly triggers "Cast & Generate Horoscope" or "Refresh Horoscope (Force Reload)" by clicking on those respective tabs. Additionally, once the user triggers either of these cast actions, the application must automatically and immediately transition the active menu view to the **AI Assistant** page to streamline user exploration. This guide serves as the master authority and instruction set for all AI agents working on this application; these rules are final and must not be overridden.

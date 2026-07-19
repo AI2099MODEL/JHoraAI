@@ -485,48 +485,10 @@ export default function App() {
     }
   }, [inputs.time]);
 
-  // Debounced auto-recalculation on manual form input edits
-  useEffect(() => {
-    if (!astrologyData) {
-      handleCalculate(true);
-      return;
-    }
-
-    const isMismatch = 
-      inputs.name !== loadedInputsRef.current.name ||
-      inputs.date !== loadedInputsRef.current.date ||
-      inputs.location !== loadedInputsRef.current.location ||
-      localTimeInput !== loadedInputsRef.current.localTimeInput ||
-      localAmpm !== loadedInputsRef.current.localAmpm;
-
-    if (isMismatch && !loading) {
-      // Debounce the calculation by 1.5 seconds to allow typing/editing without freezing
-      const timer = setTimeout(() => {
-        console.log("[Astro Sync] Form mismatch stable. Auto-recalculating astrology data...");
-        loadedInputsRef.current = {
-          name: inputs.name,
-          date: inputs.date,
-          location: inputs.location,
-          localTimeInput,
-          localAmpm,
-          time: `${localTimeInput} ${localAmpm}`
-        };
-        handleCalculate(true);
-      }, 1500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [inputs.name, inputs.date, inputs.location, localTimeInput, localAmpm, astrologyData, loading]);
-
-  useEffect(() => {
-    const ONE_HOUR = 60 * 60 * 1000;
-    const intervalId = setInterval(() => {
-      console.log("[Astro Sync] 1-hour interval elapsed. Auto-refreshing transits and engine rules...");
-      handleCalculate(false);
-    }, ONE_HOUR);
-
-    return () => clearInterval(intervalId);
-  }, []);
+  // Note: Auto-recalculation on form edits and 1-hour background refresh have been removed
+  // to adhere strictly to Rule 3 (Locking User Profile after data is pulled from API).
+  // No further changes are made to the active profile unless the user explicitly clicks on
+  // "Cast & Generate Horoscope" or "Refresh Horoscope".
 
   // Calculate timezone offsets
   const calculateTimezoneOffset = (timeZoneName: string, dateStr: string) => {
@@ -942,7 +904,7 @@ export default function App() {
             };
             
             if (!isInitial) {
-              setActiveMenu("dashboard");
+              setActiveMenu("ai_assistant");
             }
             setLoading(false);
             return; // Exit early
@@ -1041,7 +1003,7 @@ export default function App() {
       }
 
       if (!isInitial) {
-        setActiveMenu("dashboard");
+        setActiveMenu("ai_assistant");
       }
     } catch (error: any) {
       console.error("Calculation failed:", error);
