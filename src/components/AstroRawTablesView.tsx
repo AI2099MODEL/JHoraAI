@@ -55,17 +55,27 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
     try {
       setPdfCompiling(true);
       const profileJson = mapAstrologyDataToUserProfileJSON(activeUser || {}, astrologyData);
-      const doc = generateRawAstrologyPDF(profileJson, {
+      
+      const fullPayload = {
+        ...profileJson,
+        astrologyData,
+        supplemental_data: {
+          kpCusps,
+          kpChart,
+          kpSignificators,
+          westernChart
+        }
+      };
+
+      const doc = generateRawAstrologyPDF(fullPayload, {
         profileName: profileJson.User?.profile_name || astrologyData?.birthDetails?.name || "Vedic Native",
+        targetAge: targetAge,
         submenus: [
-          "overview", "planetary_positions", "planet_strength", "bhava_strength", 
-          "ashtakavarga", "yogas", "doshas", "vimshottari", "yogini", "ashtottari", 
-          "longevity", "sade_sati", "d1_rasi", "d9_navamsa", "d10_dasamsa", 
-          "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
-          "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
-          "kp_significators", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
-          "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
-          "eso_nadi", "eso_lalkitab", "eso_varshaphala", "eso_bazi", "eso_numerology", "eso_celtic", "eso_mayan"
+          "jhora_birth_details", "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", 
+          "jhora_ashtakavarga", "jhora_divisional", "jhora_vimshottari", 
+          "kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_house_significators", 
+          "jaimini_karakas", "jaimini_arudhas", "western_tropical", "western_aspects", 
+          "tajika_varshaphal", "tajika_harshabala", "lalkitab_houses", "lalkitab_teva"
         ]
       });
       doc.save(`Astro_Raw_Report_JH_${astrologyData?.birthDetails?.name || "native"}_${Date.now()}.pdf`);
@@ -215,66 +225,61 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
     <div className="space-y-6" id="astro-raw-tables-root">
       
       {/* Table Title and Metadata header */}
-      <div className={`p-6 rounded-2xl ${containerStyle} flex flex-col md:flex-row justify-between items-start md:items-center gap-4`}>
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-500">
-              <TableIcon className="w-5 h-5" />
-            </span>
-            <h2 className="text-lg font-bold">Raw Astro Systems Registry</h2>
+      <div className={`p-6 rounded-2xl ${containerStyle} space-y-4`}>
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div className="space-y-1 max-w-xl">
+            <div className="flex items-center gap-2">
+              <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-500">
+                <TableIcon className="w-5 h-5" />
+              </span>
+              <h2 className="text-lg font-bold">Raw Astro Systems Registry</h2>
+            </div>
+            <p className="text-xs text-slate-400">
+              Phase 10.0 Certified Raw Astrological Databases. Free of calculations, transit forecasts, or predictions.
+            </p>
           </div>
-          <p className="text-xs text-slate-400">
-            Phase 10.0 Certified Raw Astrological Databases. Free of calculations, transit forecasts, or predictions.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 text-[11px] font-mono bg-slate-950/45 px-3 py-1.5 rounded-lg border border-slate-800/80">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span>Binds directly to userprofile.json payload</span>
-        </div>
-      </div>
+          <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <div className="flex items-center gap-2 text-[10px] font-mono bg-slate-950/45 px-2.5 py-1.5 rounded-lg border border-slate-800/80 mr-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-slate-400">Binds to userprofile.json</span>
+            </div>
+            
+            <button
+              onClick={handleDownloadJSON}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 text-xs font-bold cursor-pointer transition-all"
+              title="Download JHora/KP raw JSON payload"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Download User JSON
+            </button>
+            
+            <button
+              onClick={handleExportPDF}
+              disabled={pdfCompiling}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold disabled:opacity-50 cursor-pointer transition-all"
+              title="Compile all raw systems into a PDF report"
+            >
+              {pdfCompiling ? (
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <FileText className="w-3.5 h-3.5" />
+              )}
+              {pdfCompiling ? "Compiling..." : "Export PDF"}
+            </button>
 
-      {/* EXPORT AND DOWNLOAD CONTROL ACTION ROW */}
-      <div className={`p-4 rounded-xl ${containerStyle} flex flex-col sm:flex-row justify-between items-center gap-4`}>
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
-          <span className="text-xs font-semibold">Active Profile Actions:</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            onClick={handleDownloadJSON}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 text-xs font-bold cursor-pointer transition-all"
-            title="Download JHora/KP raw JSON payload"
-          >
-            <Download className="w-3.5 h-3.5" />
-            Download User JSON
-          </button>
-          
-          <button
-            onClick={handleExportPDF}
-            disabled={pdfCompiling}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold disabled:opacity-50 cursor-pointer transition-all"
-            title="Compile all raw systems into a PDF report"
-          >
-            {pdfCompiling ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <FileText className="w-3.5 h-3.5" />
-            )}
-            {pdfCompiling ? "Compiling Report..." : "Export Complete PDF"}
-          </button>
-
-          <button
-            onClick={() => setShowRawJson(!showRawJson)}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-xs font-bold cursor-pointer transition-all ${
-              showRawJson 
-                ? "bg-slate-700/50 border-slate-600 text-slate-200" 
-                : "bg-slate-800/20 border-slate-800 text-slate-400 hover:bg-slate-800/50"
-            }`}
-            title="Toggle raw interactive JSON viewer"
-          >
-            <Code className="w-3.5 h-3.5" />
-            {showRawJson ? "Hide JSON Payload" : "Inspect Raw JSON"}
-          </button>
+            <button
+              onClick={() => setShowRawJson(!showRawJson)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-bold cursor-pointer transition-all ${
+                showRawJson 
+                  ? "bg-slate-700/50 border-slate-600 text-slate-200" 
+                  : "bg-slate-800/20 border-slate-800 text-slate-400 hover:bg-slate-800/50"
+              }`}
+              title="Toggle raw interactive JSON viewer"
+            >
+              <Code className="w-3.5 h-3.5" />
+              {showRawJson ? "Hide JSON" : "Inspect Raw JSON"}
+            </button>
+          </div>
         </div>
       </div>
 

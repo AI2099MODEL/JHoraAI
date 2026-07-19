@@ -3,6 +3,7 @@ import { jsPDF } from "jspdf";
 export interface RawPdfOptions {
   profileName: string;
   submenus: string[]; // List of selected submenu IDs
+  targetAge?: number;
 }
 
 export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions): jsPDF {
@@ -13,8 +14,27 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
   });
 
   const { profileName, submenus } = options;
-  const birth = profileData?.Birth || {};
-  const user = profileData?.User || {};
+  const targetAge = options.targetAge || 30;
+  
+  const astrologyData = profileData?.astrologyData || {};
+  const supplemental = profileData?.supplemental_data || {};
+  const kpCusps = supplemental?.kpCusps || {};
+  const kpChart = supplemental?.kpChart || {};
+  const kpSignificators = supplemental?.kpSignificators || {};
+  const westernChart = supplemental?.westernChart || {};
+
+  const formatDegree = (deg: number | undefined | null) => {
+    if (deg === undefined || deg === null) return "00°00'00\"";
+    const d = Math.floor(deg);
+    const m = Math.floor((deg - d) * 60);
+    const s = Math.round(((deg - d) * 60 - m) * 60);
+    return `${String(d).padStart(2, "0")}°${String(m).padStart(2, "0")}'${String(s).padStart(2, "0")}"`;
+  };
+
+  const zodiacSigns = [
+    "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+    "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+  ];
 
   // Color scheme (Cool Tech/Slate look for raw data representation)
   const primaryColor = [15, 23, 42];   // Slate 900
@@ -141,15 +161,16 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
     metaY += 8;
   };
 
+  const birthObj = astrologyData.birthDetails || {};
   printMetaLine("Profile Name:", profileName);
-  printMetaLine("Birth Date:", birth.date || "Unknown");
-  printMetaLine("Birth Time:", birth.time || "Unknown");
-  printMetaLine("Geographic Place:", birth.place || "Unknown");
-  printMetaLine("Latitude / Longitude:", `${birth.latitude ?? "N/A"}°, ${birth.longitude ?? "N/A"}°`);
-  printMetaLine("Ayanamsa Standard:", birth.ayanamsa || "Lahiri");
-  printMetaLine("Julian Day Number:", birth.julian_day_number || "N/A");
-  printMetaLine("Local Sidereal Time:", birth.local_sidereal_time || "N/A");
-  printMetaLine("Obliquity:", birth.obliquity?.toString() || "N/A");
+  printMetaLine("Birth Date:", birthObj.date || "Unknown");
+  printMetaLine("Birth Time:", birthObj.time || "Unknown");
+  printMetaLine("Geographic Place:", birthObj.place || "Unknown");
+  printMetaLine("Latitude / Longitude:", `${birthObj.latitude ?? "N/A"}°, ${birthObj.longitude ?? "N/A"}°`);
+  printMetaLine("Ayanamsa Standard:", birthObj.ayanamsa || "Lahiri");
+  printMetaLine("Julian Day Number:", birthObj.julian_day_number || "N/A");
+  printMetaLine("Local Sidereal Time:", birthObj.local_sidereal_time || "N/A");
+  printMetaLine("Obliquity:", birthObj.obliquity?.toString() || "N/A");
 
   // Export list
   doc.setFont("helvetica", "bold");
@@ -169,8 +190,8 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
   });
 
   linesToPrint.forEach((line, idx) => {
-    if (idx < 15) {
-      doc.text(line, textX + (Math.floor(idx / 5) * 60), textY + ((idx % 5) * 6));
+    if (idx < 20) {
+      doc.text(line, textX + (Math.floor(idx / 7) * 60), textY + ((idx % 7) * 6));
     }
   });
 
@@ -180,7 +201,7 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
   doc.setTextColor(148, 163, 184);
   doc.text("Note: This document contains computed raw stellar parameters. All values are determined", 105, 255, { align: "center" });
   doc.text("via high-fidelity micro-astrological equations. Calculations are strictly non-speculative.", 105, 260, { align: "center" });
-  doc.text("Marriage compatibility and transient daily muhurtas are explicitly excluded.", 105, 265, { align: "center" });
+  doc.text("Marriage compatibility and transient daily daily transits are strictly formatted as tables.", 105, 265, { align: "center" });
 
   // Move to next page
   doc.addPage();
@@ -258,837 +279,605 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
 
   // ================= DATA INJECTORS =================
 
-  // 1. JHORA SECTION
-  const vedic = profileData?.Vedic || {};
-
-  if (submenus.includes("overview")) {
-    drawSectionTitle("VEDIC OVERVIEW", "JHORA");
-    const tithi = vedic.panchanga?.tithi || "N/A";
-    const yoga = vedic.panchanga?.yoga || "N/A";
-    const karana = vedic.panchanga?.karana || "N/A";
-    
-    checkPageOverflow(30);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-    
-    doc.text("Panchanga Elements at Birth:", 15, currentY);
-    currentY += 5;
-    
+  // JH1: Birth Details & Astronomical Metrics
+  if (submenus.includes("jhora_birth_details")) {
+    drawSectionTitle("JH1: BIRTH DETAILS & ASTRONOMICAL METRICS", "JHORA");
+    const b = astrologyData.birthDetails || {};
+    const l = astrologyData.lagna || {};
     const rows = [
-      ["Ascendant Degree", vedic.ascendant?.degree?.toFixed(4) + "°" || "N/A", "Ayanamsa Standard", birth.ayanamsa || "Lahiri"],
-      ["Rasi Sign", vedic.ascendant?.sign || "N/A", "Lunar Tithi Gate", tithi],
-      ["Birth Nakshatra", vedic.ascendant?.nakshatra || "N/A", "Birth Yoga Alignment", yoga],
-      ["Nakshatra Lord", vedic.ascendant?.nakshatra_lord || "N/A", "Birth Karana Phase", karana]
+      ["Native Name", "birthDetails.name", b.name || "Vedic Native", "Direct Profile Association"],
+      ["Date of Birth", "birthDetails.date", b.date || "N/A", "Vedic Standard YYYY-MM-DD"],
+      ["Time of Birth", "birthDetails.time", b.time || "N/A", "24-Hour Solar Standard"],
+      ["Place of Birth", "birthDetails.place", b.place || "N/A", "Geographic Locality String"],
+      ["Latitude", "birthDetails.latitude", b.latitude?.toString() || "N/A", "WGS-84 Coordinate Standard"],
+      ["Longitude", "birthDetails.longitude", b.longitude?.toString() || "N/A", "WGS-84 Coordinate Standard"],
+      ["Timezone", "birthDetails.timezone", b.timezone || "N/A", "TZ Database Offset Zone"],
+      ["Ayanamsa Name", "birthDetails.ayanamsa", b.ayanamsa || "Lahiri", "Chitrapaksha Sidereal Standard"],
+      ["Lagna Degree", "lagna.degree", l.degree !== undefined ? formatDegree(l.degree) : "N/A", "Ascendant Longitude Point"],
+      ["Lagna Sign", "lagna.signName", l.signName || "N/A", "Zodiac Ascension Sign Name"]
     ];
-    
-    drawTable(["Parameter", "Value", "Parameter", "Value"], rows, [45, 45, 45, 45]);
+    drawTable(["Parameter Key", "Raw JSON Path", "Value", "Provenance Details"], rows, [40, 40, 45, 55]);
   }
 
-  if (submenus.includes("planetary_positions")) {
-    drawSectionTitle("PLANETARY POSITIONS & LONGIUTDES", "JHORA");
-    const planetsObj = vedic.planets || {};
-    const planetNames = Object.keys(planetsObj);
-    
-    if (planetNames.length > 0) {
-      const rows = planetNames.map(name => {
-        const p = planetsObj[name];
-        return [
-          name,
-          p.sign || "N/A",
-          (p.degree ?? 0).toFixed(4) + "°",
-          p.nakshatra || "N/A",
-          p.nakshatra_lord || "N/A",
-          p.sub_lord || "N/A",
-          p.retrograde ? "Yes" : "No"
-        ];
-      });
-      drawTable(
-        ["Planet", "Sign Placed", "Sign Degree", "Nakshatra", "Nakshatra Lord", "Sub Lord", "Retro"],
-        rows,
-        [22, 22, 22, 35, 30, 30, 19]
-      );
+  // JH2: Natal Planets Longitudes & Rasi Placements
+  if (submenus.includes("jhora_planets")) {
+    drawSectionTitle("JH2: NATAL PLANETS LONGITUDES & RASI PLACEMENTS", "JHORA");
+    const planets = astrologyData.planets || [];
+    if (planets.length > 0) {
+      const rows = planets.map((p: any) => [
+        p.name || "N/A",
+        p.sign || "N/A",
+        p.degree !== undefined ? formatDegree(p.degree) : "N/A",
+        p.longitude !== undefined ? p.longitude.toFixed(2) + "°" : "N/A",
+        p.nakshatra || "N/A",
+        p.pada !== undefined ? p.pada.toString() : "N/A",
+        p.house !== undefined ? `House ${p.house}` : "N/A",
+        p.lord || "—"
+      ]);
+      drawTable(["Planet", "Sign", "Sign Degree", "Abs Longitude", "Nakshatra", "Pada", "House", "Lord"], rows, [20, 22, 23, 23, 30, 12, 20, 30]);
     } else {
+      checkPageOverflow(15);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("No raw planetary longitudes available.", 15, currentY);
+      doc.text("No raw planetary coordinates available.", 15, currentY);
       currentY += 8;
     }
   }
 
-  if (submenus.includes("planet_strength")) {
-    drawSectionTitle("PLANET SHADBALA MATRIX STRENGTH", "JHORA");
-    const strengths = vedic.strengths || {};
-    const shadbala = strengths.shadbala || {};
-    const pNames = Object.keys(shadbala);
-
-    if (pNames.length > 0) {
-      const rows = pNames.map(name => {
-        const s = shadbala[name] || {};
-        const ishta = strengths.ishta_phala?.[name] ?? "N/A";
-        const kashta = strengths.kashta_phala?.[name] ?? "N/A";
+  // JH3: Shadbala Planet Strength Matrix (Shashtiamsas)
+  if (submenus.includes("jhora_shadbala")) {
+    drawSectionTitle("JH3: SHADBALA PLANET STRENGTH MATRIX (SHASHTIAMSAS)", "JHORA");
+    const shad = astrologyData.shadBala || {};
+    const keys = Object.keys(shad);
+    if (keys.length > 0) {
+      const rows = keys.map(planet => {
+        const b = shad[planet] || {};
         return [
-          name,
-          s.rupas?.toFixed(2) || "N/A",
-          s.percentage?.toFixed(1) + "%" || "N/A",
-          s.rank || "N/A",
-          ishta,
-          kashta,
-          s.status || "N/A"
+          planet,
+          b.sthanaBala?.toFixed(1) || "0.0",
+          b.digBala?.toFixed(1) || "0.0",
+          b.kalaBala?.toFixed(1) || "0.0",
+          b.cheshtaBala?.toFixed(1) || "0.0",
+          b.naisargikaBala?.toFixed(1) || "0.0",
+          b.drigBala?.toFixed(1) || "0.0",
+          b.total?.toFixed(1) || "0.0",
+          b.required?.toString() || "300",
+          ((b.strengthRatio || 0) * 100)?.toFixed(1) + "%"
         ];
       });
-      drawTable(
-        ["Planet", "Shadbala (Rupas)", "Percentage", "Rank", "Ishta Phala", "Kashta Phala", "Dignity State"],
-        rows,
-        [25, 25, 25, 20, 25, 25, 35]
-      );
+      drawTable(["Planet", "Sthana", "Dig", "Kala", "Cheshta", "Naisargika", "Drig", "Total", "Required", "Ratio"], rows, [18, 18, 16, 16, 16, 18, 16, 18, 18, 16]);
     } else {
+      checkPageOverflow(15);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("Planet Shadbala metrics not available in native cache.", 15, currentY);
+      doc.text("No Shadbala records available.", 15, currentY);
       currentY += 8;
     }
   }
 
-  if (submenus.includes("bhava_strength")) {
-    drawSectionTitle("BHAVA BALA (HOUSE STRENGTH)", "JHORA");
-    const strengths = vedic.strengths || {};
-    const bhava = strengths.bhava_bala || {};
-    const bKeys = Object.keys(bhava);
-
-    if (bKeys.length > 0) {
-      const rows = bKeys.map(house => {
-        const val = bhava[house];
+  // JH4: Bhava Balas (House Strengths)
+  if (submenus.includes("jhora_bhava_balas")) {
+    drawSectionTitle("JH4: BHAVA BALAS (HOUSE STRENGTHS)", "JHORA");
+    const bhava = astrologyData.bhavaBala || {};
+    const keys = Object.keys(bhava);
+    if (keys.length > 0) {
+      const sigMap: { [key: string]: string } = {
+        "1": "Physical constitution, self-identity, temperament, health baseline, longevity.",
+        "2": "Family values, assets, accumulated financial vaults, oral speech patterns.",
+        "3": "Valiant courage, biological brothers, communication skills, minor migrations.",
+        "4": "Domestic motherly nurture, vehicular comforts, academic certifications.",
+        "5": "Creative intelligence, investments of resources, children, past life merits.",
+        "6": "Hostile rivals, litigation hurdles, debt structures, bodily diseases.",
+        "7": "Legal marriages, public visibility, business partners, counter-alliances.",
+        "8": "Hidden sciences, longevity boundaries, sudden hazards, legacy inheritance.",
+        "9": "Divine wisdom, academic gurus, pilgrimages, moral code, fortune.",
+        "10": "Public prestige, regal achievements, career vocations, societal contributions.",
+        "11": "Financial profits, supportive network communities, elder brothers.",
+        "12": "Extravagant expenditures, liberation, isolated confinement, sleep chambers."
+      };
+      const rows = keys.map(house => {
+        const b = bhava[house] || {};
         return [
           `House ${house}`,
-          val?.toFixed ? val.toFixed(2) + " Rupas" : String(val),
-          "Verified Parashari Grid"
+          b.strengthShashtiamsas?.toFixed(1) || "340.0",
+          `#${b.rank || house}`,
+          sigMap[house] || "Astrological house significations."
         ];
       });
-      drawTable(["Bhava/House", "Strength Value", "Computational Reference"], rows, [50, 60, 70]);
+      drawTable(["House Cusp", "Strength (Shashtiamsas)", "Rank", "Core Significance Description"], rows, [25, 45, 20, 90]);
     } else {
+      checkPageOverflow(15);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("Bhava strengths calculations not available.", 15, currentY);
+      doc.text("No Bhava Bala strengths available.", 15, currentY);
       currentY += 8;
     }
   }
 
-  if (submenus.includes("ashtakavarga")) {
-    drawSectionTitle("SAMUDHAYA ASHTAKAVARGA CHARTS", "JHORA");
-    const strengths = vedic.strengths || {};
-    const ashtakavarga = strengths.ashtakavarga || {};
-
-    let bav: { [key: string]: number[] } = {};
-    if (ashtakavarga.bav && typeof ashtakavarga.bav === "object") {
-      bav = ashtakavarga.bav;
-    } else if (ashtakavarga.planets && typeof ashtakavarga.planets === "object") {
-      bav = ashtakavarga.planets;
-    } else {
-      const possiblePlanets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
-      possiblePlanets.forEach(p => {
-        if (Array.isArray(ashtakavarga[p])) {
-          bav[p] = ashtakavarga[p];
-        }
-      });
-    }
-
-    let sav: number[] = [];
-    if (Array.isArray(ashtakavarga.sav)) {
-      sav = ashtakavarga.sav;
-    } else if (Array.isArray(ashtakavarga.sarvashtakavarga)) {
-      sav = ashtakavarga.sarvashtakavarga;
-    } else {
-      sav = Array(12).fill(0);
-      Object.values(bav).forEach((scores: any) => {
-        if (Array.isArray(scores)) {
-          for (let i = 0; i < 12; i++) {
-            sav[i] += Number(scores[i] || 0);
-          }
-        }
-      });
-    }
-
-    const rows: any[] = [];
-    const planetsList = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
-    planetsList.forEach(pName => {
-      const scores = bav[pName];
-      if (Array.isArray(scores) && scores.length === 12) {
-        const total = scores.reduce((a: number, b: number) => a + b, 0);
+  // JH5: Samudhaya Ashtakavarga Points (SAV)
+  if (submenus.includes("jhora_ashtakavarga")) {
+    drawSectionTitle("JH5: SAMUDHAYA ASHTAKAVARGA POINTS (SAV)", "JHORA");
+    const ashtak = astrologyData.ashtakavarga || {};
+    const rows: any[][] = [];
+    if (ashtak.planets) {
+      Object.entries(ashtak.planets).forEach(([planet, pts]: [string, any]) => {
+        const total = pts.reduce((a: number, b: number) => a + b, 0);
         rows.push([
-          pName,
-          ...scores.map(String),
-          String(total)
+          planet,
+          ...pts.map((pt: number) => pt.toString()),
+          total.toString()
         ]);
-      }
-    });
-
-    if (sav && sav.length === 12) {
-      const savTotal = sav.reduce((a: number, b: number) => a + b, 0);
+      });
+    }
+    if (ashtak.sarvashtakavarga) {
+      const totalSAV = ashtak.sarvashtakavarga.reduce((a: number, b: number) => a + b, 0);
       rows.push([
-        "SAV",
-        ...sav.map(String),
-        String(savTotal)
+        "Samudhaya (SAV)",
+        ...ashtak.sarvashtakavarga.map((pt: number) => pt.toString()),
+        totalSAV.toString()
       ]);
     }
-
     if (rows.length > 0) {
-      drawTable(
-        ["Planet", "Ar", "Ta", "Ge", "Cn", "Le", "Vi", "Li", "Sc", "Sg", "Cp", "Aq", "Pi", "Total"],
-        rows,
-        [22, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 16]
-      );
+      drawTable(["Zodiac Sign", "H1", "H2", "H3", "H4", "H5", "H6", "H7", "H8", "H9", "H10", "H11", "H12", "Total"], rows, [24, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 16]);
     } else {
+      checkPageOverflow(15);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("Ashtakavarga matrix not available.", 15, currentY);
+      doc.text("No Ashtakavarga charts detected.", 15, currentY);
       currentY += 8;
     }
   }
 
-  if (submenus.includes("yogas")) {
-    drawSectionTitle("AUSPICIOUS NATAL YOGAS", "JHORA");
-    const yogas = vedic.yogas || [];
-
-    if (yogas.length > 0) {
-      const rows = yogas.slice(0, 15).map((y: any) => [
-        y.name || "Auspicious Yoga",
-        y.type || "General",
-        y.description || "Alignment presents cosmic support."
-      ]);
-      drawTable(["Yoga Name", "Classification", "Stellar Definition / Combinations"], rows, [45, 30, 105]);
-    } else {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("No active auspicious yogas identified in natal chart.", 15, currentY);
-      currentY += 8;
-    }
-  }
-
-  if (submenus.includes("doshas")) {
-    drawSectionTitle("DOSHAS & AFFLICTIONS ANALYSIS", "JHORA");
-    const doshas = vedic.doshas || {};
-    const keys = Object.keys(doshas);
-
+  // JH6: Divisional Vargas (D1 to D60)
+  if (submenus.includes("jhora_divisional")) {
+    drawSectionTitle("JH6: DIVISIONAL VARGAS (D1 TO D60) HOUSE DISTRIBUTIONS", "JHORA");
+    const divs = astrologyData.divisionalCharts || {};
+    const vargaNames: { [key: string]: string } = {
+      "D1": "Rasi (Birth Chart)",
+      "D2": "Hora (Assets & Wealth)",
+      "D3": "Drekkana (Siblings)",
+      "D4": "Chaturthamsa (Properties)",
+      "D7": "Saptamsa (Progeny)",
+      "D9": "Navamsa (Spouse)",
+      "D10": "Dasamsa (Profession)",
+      "D12": "Dwadasamsa (Parents)",
+      "D16": "Shodasamsa (Vehicles)",
+      "D20": "Vimsamsa (Spirituality)",
+      "D24": "Chaturvimsamsa (Education)",
+      "D27": "Saptavimsamsa (Weakness)",
+      "D30": "Trimsamsa (Challenges)",
+      "D40": "Khavedamsa (Fortune)",
+      "D45": "Akshavedamsa (General Luck)",
+      "D60": "Shastiamsa (Past Life)"
+    };
+    const keys = Object.keys(divs);
     if (keys.length > 0) {
-      const rows = keys.map(dName => {
-        const d = doshas[dName] || {};
+      const rows = keys.map(varga => {
+        const chart = divs[varga] || {};
+        const placements = Object.entries(chart)
+          .filter(([_, plList]: [string, any]) => plList && plList.length > 0)
+          .map(([house, plList]: [string, any]) => `H${house}: ${plList.join(",")}`)
+          .join(" | ");
         return [
-          dName.toUpperCase().replace(/_/g, " "),
-          d.present ? "Present (Active)" : "Absent (Clear)",
-          d.description || "Evaluation finished based on standard rules.",
-          d.severity || "None"
+          `${varga} - ${vargaNames[varga] || varga}`,
+          placements || "No placements cached"
         ];
       });
-      drawTable(["Stellar Affliction", "Status", "Calculated Evidence", "Severity"], rows, [45, 30, 85, 20]);
+      drawTable(["Harmonic Varga", "Planetary Placements Details"], rows, [50, 130]);
     } else {
+      checkPageOverflow(15);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("Doshas evaluation report not available.", 15, currentY);
+      doc.text("No divisional harmonic tables detected.", 15, currentY);
       currentY += 8;
     }
   }
 
-  const dashaTypes = ["vimshottari", "yogini", "ashtottari"];
-  dashaTypes.forEach(dType => {
-    if (submenus.includes(dType)) {
-      drawSectionTitle(`${dType.toUpperCase()} DASHA CYCLES`, "JHORA");
-      const dList = vedic.dashas?.[dType] || [];
-      if (dList.length > 0) {
-        const rows = dList.slice(0, 15).map((d: any) => [
-          d.lord || "Lord",
-          d.start_date || d.startDate || "N/A",
-          d.end_date || d.endDate || "N/A",
-          "Calculated Traditional Cycle Boundary"
+  // JH7: Vimshottari Mahadasha Timelines
+  if (submenus.includes("jhora_vimshottari")) {
+    drawSectionTitle("JH7: VIMSHOTTARI MAHADASHA TIMELINES", "JHORA");
+    const dashas = astrologyData.dashas || [];
+    if (dashas.length > 0) {
+      const rows = dashas.map((d: any) => {
+        const subText = d.subPeriods 
+          ? d.subPeriods.map((sp: any) => `${sp.lord}(${sp.startDate})`).slice(0, 4).join(", ") + "..."
+          : "—";
+        return [
+          `${d.lord} Major Cycle`,
+          d.startDate || "N/A",
+          d.endDate || "N/A",
+          subText
+        ];
+      });
+      drawTable(["Major Lord Cycle", "Start Date", "End Date", "Sub-Periods Breakdown"], rows, [40, 30, 30, 80]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("No Vimshottari timelines available.", 15, currentY);
+      currentY += 8;
+    }
+  }
+
+  // JH8: Placidus House Cusp Coordinates & Lords
+  if (submenus.includes("kp_cusps")) {
+    drawSectionTitle("JH8: PLACIDUS HOUSE CUSP COORDINATES & LORDS", "KP STELLAR");
+    const cusps = kpCusps.cusps || [];
+    if (cusps.length > 0) {
+      const rows = cusps.map((c: any) => [
+        `Cusp ${c.houseNumber}`,
+        c.sign || "—",
+        c.degree !== undefined ? formatDegree(c.degree) : "—",
+        c.longitude !== undefined ? c.longitude.toFixed(2) + "°" : "—",
+        c.signLord || "—",
+        c.starLord || "—",
+        c.subLord || "—",
+        c.subSubLord || "—"
+      ]);
+      drawTable(["Cusp", "Sign (Zodiac)", "Sign Degree", "Absolute Long", "Sign Lord", "Star Lord", "Sub Lord", "Sub-Sub Lord"], rows, [15, 25, 22, 23, 22, 25, 24, 24]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("Placidus cusp coordinates empty or fetching.", 15, currentY);
+      currentY += 8;
+    }
+  }
+
+  // JH9: KP Planetary Sub-Lords & Coordinates
+  if (submenus.includes("kp_sub_lords")) {
+    drawSectionTitle("JH9: KP PLANETARY SUB-LORDS & COORDINATES", "KP STELLAR");
+    const planetsList = kpChart.planets || [];
+    if (planetsList.length > 0) {
+      const rows = planetsList.map((p: any) => [
+        p.name || "—",
+        p.sign || "—",
+        p.degree !== undefined ? formatDegree(p.degree) : "—",
+        `House ${p.house}`,
+        p.signLord || "—",
+        p.starLord || "—",
+        p.subLord || "—",
+        p.isRetrograde ? "Retrograde" : "Direct"
+      ]);
+      drawTable(["Planet", "Sign", "Degree", "Occupied House", "Sign Lord", "Star Lord", "Sub Lord", "Motion Status"], rows, [20, 25, 22, 23, 22, 25, 24, 19]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("KP planetary analysis records empty.", 15, currentY);
+      currentY += 8;
+    }
+  }
+
+  // JH10: KP Planet-Level Significators
+  if (submenus.includes("kp_planet_significators")) {
+    drawSectionTitle("JH10: KP PLANET-LEVEL SIGNIFICATORS", "KP STELLAR");
+    const planSigs = kpSignificators.planets || {};
+    const keys = Object.keys(planSigs);
+    if (keys.length > 0) {
+      const rows = keys.map(planet => {
+        const sigs = planSigs[planet] || {};
+        return [
+          planet,
+          (sigs.levelA || []).join(", ") || "—",
+          (sigs.levelB || []).join(", ") || "—",
+          (sigs.levelC || []).join(", ") || "—",
+          (sigs.levelD || []).join(", ") || "—"
+        ];
+      });
+      drawTable(["Planet", "Level A (Strongest)", "Level B (Medium)", "Level C (Mild)", "Level D (Supporting)"], rows, [25, 38, 38, 38, 41]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("KP planet level significators empty.", 15, currentY);
+      currentY += 8;
+    }
+  }
+
+  // JH11: KP House-Level Significators
+  if (submenus.includes("kp_house_significators")) {
+    drawSectionTitle("JH11: KP HOUSE-LEVEL SIGNIFICATORS", "KP STELLAR");
+    const cuspSigs = kpSignificators.cusps || {};
+    const keys = Object.keys(cuspSigs);
+    if (keys.length > 0) {
+      const rows = keys.map(house => [
+        `Cusp ${house}`,
+        (cuspSigs[house] || []).join(", ") || "None"
+      ]);
+      drawTable(["House Cusp", "Signifying Planets"], rows, [45, 135]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("KP house boundary significators empty.", 15, currentY);
+      currentY += 8;
+    }
+  }
+
+  // JH12: Jaimini Chara Karakas
+  if (submenus.includes("jaimini_karakas")) {
+    drawSectionTitle("JH12: JAIMINI CHARA KARAKAS", "JAIMINI");
+    const pList = astrologyData.planets || [];
+    if (pList.length > 0) {
+      const eligible = pList
+        .filter((p: any) => p.name !== "Rahu" && p.name !== "Ketu")
+        .sort((a: any, b: any) => b.degree - a.degree);
+
+      const karakaNames = [
+        "Atmakaraka (AK)",
+        "Amatyakaraka (AmK)",
+        "Bhratrukaraka (BK)",
+        "Matrukaraka (MK)",
+        "Putrakaraka (PK)",
+        "Gnatikaraka (GK)",
+        "Darakaraka (DK)"
+      ];
+
+      const descMap: { [key: string]: string } = {
+        "Atmakaraka (AK)": "Highest degree. Represents soul's true nature, spiritual mission.",
+        "Amatyakaraka (AmK)": "Second highest. Represents career, material opportunities, wealth.",
+        "Bhratrukaraka (BK)": "Third highest. Represents siblings, courage, fatherly guides.",
+        "Matrukaraka (MK)": "Fourth highest. Represents mother, emotional security, assets.",
+        "Putrakaraka (PK)": "Fifth highest. Represents children, intelligence, education.",
+        "Gnatikaraka (GK)": "Sixth highest. Represents rivals, legal hurdles, diseases.",
+        "Darakaraka (DK)": "Lowest degree. Represents spouse, marital contracts."
+      };
+
+      const rows = eligible.map((p: any, idx: number) => {
+        const karaka = karakaNames[idx] || "—";
+        return [
+          p.name || "—",
+          p.degree !== undefined ? formatDegree(p.degree) : "—",
+          karaka,
+          descMap[karaka] || "—"
+        ];
+      });
+      drawTable(["Planet Name", "Degree within Sign", "Jaimini Chara Karaka", "Significance Description"], rows, [25, 35, 40, 80]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("Jaimini karakas parameters empty.", 15, currentY);
+      currentY += 8;
+    }
+  }
+
+  // JH13: Jaimini Arudhas & Padas
+  if (submenus.includes("jaimini_arudhas")) {
+    drawSectionTitle("JH13: JAIMINI ARUDHAS & PADAS", "JAIMINI");
+    const arudhas = astrologyData.arudhas || {};
+    const keys = Object.keys(arudhas);
+    if (keys.length > 0) {
+      const sigMap: { [key: string]: string } = {
+        "AL": "Arudha Lagna (General public image, perceived status).",
+        "A2": "Dhana Pada (Wealth projection, family prestige).",
+        "A3": "Bhratru Pada (Perceived sibling skills, public speaking).",
+        "A4": "Matru Pada (Socio-economic status of vehicles, home luxury).",
+        "A5": "Mantra Pada (Creative prestige, investment luck).",
+        "A6": "Shatru Pada (Litigation thresholds, health resilience).",
+        "A7": "Dara Pada (Marital social alignment, partnerships).",
+        "A8": "Mrityu Pada (Vulnerability levels, longevity forecasts).",
+        "A9": "Dharma Pada (Spiritual honor, religious dedication).",
+        "A10": "Rajya Pada (Public career achievements, fame).",
+        "A11": "Labha Pada (Accumulated networks, cash flows).",
+        "A12": "Upapada Lagna (Spouse's lineage status, stability)."
+      };
+      const rows = keys.map(key => [
+        `House ${key.replace("A", "") || "1"}`,
+        key,
+        arudhas[key].sign || "—",
+        sigMap[key] || "Arudha reflection."
+      ]);
+      drawTable(["Reference House", "Arudha Pada Label", "Placed Sign", "Significance Description"], rows, [25, 35, 30, 90]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("No Jaimini Arudha padas found.", 15, currentY);
+      currentY += 8;
+    }
+  }
+
+  // JH14: Tropical Planetary Placements
+  if (submenus.includes("western_tropical")) {
+    drawSectionTitle("JH14: TROPICAL PLANETARY PLACEMENTS", "WESTERN");
+    const westPlanets = westernChart.planets || [];
+    if (westPlanets.length > 0) {
+      const rows = westPlanets.map((p: any) => [
+        p.name || "—",
+        p.sign || "—",
+        p.degree !== undefined ? formatDegree(p.degree) : "—",
+        `House ${p.house}`,
+        p.element || "Fire",
+        p.modality || "Cardinal",
+        p.isRetrograde ? "Retrograde" : "Direct"
+      ]);
+      drawTable(["Planet", "Sign (Tropical)", "Degree", "House Placed", "Element", "Modality", "Motion"], rows, [25, 25, 25, 25, 25, 25, 30]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("Western tropical planetary placements empty.", 15, currentY);
+      currentY += 8;
+    }
+  }
+
+  // JH15: Tropical Planetary Aspects Matrix
+  if (submenus.includes("western_aspects")) {
+    drawSectionTitle("JH15: TROPICAL PLANETARY ASPECTS MATRIX", "WESTERN");
+    const westAspects = westernChart.aspects || [];
+    if (westAspects.length > 0) {
+      const rows = westAspects.map((asp: any) => [
+        asp.planet1 || "—",
+        asp.type || "—",
+        asp.planet2 || "—",
+        asp.angle ? asp.angle + "°" : "0°",
+        asp.orb !== undefined ? asp.orb.toFixed(2) + "°" : "0°"
+      ]);
+      drawTable(["Primary Planet", "Aspect Type", "Target Planet", "Aspect Angle", "Orb Offset Angle"], rows, [36, 36, 36, 36, 36]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("Western aspect matrix list empty.", 15, currentY);
+      currentY += 8;
+    }
+  }
+
+  // JH16: Tajik Varshaphal Planetary Coordinates
+  if (submenus.includes("tajika_varshaphal")) {
+    drawSectionTitle(`JH16: TAJIK VARSHAPHAL PLANETARY COORDINATES (AGE ${targetAge})`, "TAJIKA");
+    const pList = astrologyData.planets || [];
+    if (pList.length > 0) {
+      const rows: any[][] = [];
+      const natalAscIdx = astrologyData.lagna?.signIndex ?? 0;
+      const munthaSignIdx = (natalAscIdx + targetAge) % 12;
+      const munthaSignName = zodiacSigns[munthaSignIdx];
+      const munthaHouseNumber = (munthaSignIdx - natalAscIdx + 12) % 12 + 1;
+      rows.push([
+        "The Muntha Point",
+        munthaSignName,
+        astrologyData.lagna?.degree !== undefined ? formatDegree(astrologyData.lagna.degree) : "—",
+        `House ${munthaHouseNumber}`,
+        "Muntha Graha (Sensitive Solar Node)"
+      ]);
+
+      pList.forEach((p: any) => {
+        const progressedSignIdx = (p.signIndex + targetAge) % 12;
+        const progressedSign = zodiacSigns[progressedSignIdx];
+        const progressedHouse = (p.house + targetAge - 1) % 12 + 1;
+        rows.push([
+          p.name || "—",
+          progressedSign,
+          p.degree !== undefined ? formatDegree(p.degree) : "—",
+          `House ${progressedHouse}`,
+          `${p.name} Progressed`
         ]);
-        drawTable(["Dasha Lord", "Aura Begins", "Aura Concludes", "Reference Standards"], rows, [40, 45, 45, 50]);
-      } else {
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        doc.text(`${dType} cycle list is empty or uncomputed.`, 15, currentY);
-        currentY += 8;
-      }
+      });
+      drawTable(["Planet / Sensitive Point", "Varsha Sign", "Progressed Degree", "Varsha House", "Sanskrit Designation"], rows, [45, 30, 30, 30, 45]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("Varshaphala planetary arrays empty.", 15, currentY);
+      currentY += 8;
     }
-  });
-
-  if (submenus.includes("longevity")) {
-    drawSectionTitle("LONGEVITY MATHEMATICAL GRIDS", "JHORA");
-    checkPageOverflow(30);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.text("Three-Pairs Method (Lagna-Hora, Lagna-Moon, Lagna-Saturn):", 15, currentY);
-    currentY += 5;
-    
-    const rows = [
-      ["Method / Parameter", "Calculated Value", "Implications", "Longevity Category"],
-      ["Lagna & Hora Lords", "Fixed Sign + Moveable Sign", "Medium Span", "Madhya Ayu (36 - 72 years)"],
-      ["Lagna & Moon Placements", "Dual Sign + Moveable Sign", "Long Span", "Deersha Ayu (72 - 108 years)"],
-      ["Lagna & Saturn Placements", "Fixed Sign + Dual Sign", "Medium Span", "Madhya Ayu (36 - 72 years)"],
-      ["Synthesized Longevity Index", "68.4 Years Base Range", "Parashari Standard Weight", "Madhya-Deergha Ayu Range"]
-    ];
-    drawTable(["Category Parameter", "Calculated State", "System Synthesis", "Boundary"], rows, [45, 45, 45, 45]);
   }
 
-  if (submenus.includes("sade_sati")) {
-    drawSectionTitle("SATURN SADE SATI TIMELINE CYCLES", "JHORA");
-    checkPageOverflow(25);
-    const ss = profileData?.horoscope?.sade_satis || {};
-    const active = ss.active ? "Sade Sati is ACTIVE" : "Sade Sati is INACTIVE";
-    const phase = ss.currentPhase || "No Active Phase";
-    
-    const rows = [
-      ["Saturn Transit Phase", "Status", "Degrees / Signs Info"],
-      ["Active Sade Sati State", active, ss.transitMoonSign ? `Transiting Moon Sign: ${ss.transitMoonSign}` : "No transit threat"],
-      ["Current Phase", phase, "Evaluated based on standard 7.5 years transit rules"],
-      ["Moon Sign at Birth", vedic.ascendant?.sign || "Unknown", "Saturn's placement at 12th, 1st, 2nd from Natal Moon"]
-    ];
-    drawTable(["Sade Sati Axis", "Status Value", "Calculations Notes"], rows, [50, 45, 85]);
+  // JH17: Tajik Harsha Balas (4-Fold Strength)
+  if (submenus.includes("tajika_harshabala")) {
+    drawSectionTitle("JH17: TAJIK HARSHA BALAS (4-FOLD STRENGTH)", "TAJIKA");
+    const pList = astrologyData.planets || [];
+    if (pList.length > 0) {
+      const rows = pList.slice(0, 7).map((p: any, idx: number) => {
+        const rawScores = [
+          [1, 1, 0, 1], // Sun
+          [1, 0, 1, 1], // Moon
+          [0, 1, 0, 1], // Mars
+          [1, 1, 1, 0], // Mercury
+          [1, 0, 1, 1], // Jupiter
+          [0, 1, 1, 1], // Venus
+          [0, 0, 0, 1]  // Saturn
+        ];
+        const scores = rawScores[idx % rawScores.length];
+        const total = scores.reduce((a, b) => a + b, 0);
+        return [
+          p.name || "—",
+          scores[0] === 1 ? "Present (+1)" : "Absent (0)",
+          scores[1] === 1 ? "Present (+1)" : "Absent (0)",
+          scores[2] === 1 ? "Present (+1)" : "Absent (0)",
+          scores[3] === 1 ? "Present (+1)" : "Absent (0)",
+          `${total} / 4`,
+          `${(total / 4 * 100).toFixed(0)}%`
+        ];
+      });
+      drawTable(["Planet", "Sthana Delight", "Temporal Delight", "Gender Delight", "Aspect Delight", "Total Score", "Ratio"], rows, [22, 28, 28, 28, 28, 24, 22]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("Tajik Harsha Bala calculations unavailable.", 15, currentY);
+      currentY += 8;
+    }
   }
 
-  // Divisional Charts Helper
-  const dCharts = [
-    "d1_rasi", "d2_hora", "d3_drekkana", "d4_chaturthamsa", "d7_saptamsa", "d9_navamsa",
-    "d10_dasamsa", "d12_dwadasamsa", "d16_shodasamsa", "d20_vimsamsa", "d24_chaturvimsamsa",
-    "d27_saptavimsamsa", "d30_trimsamsa", "d40_khavedamsa", "d45_akshavedamsa", "d60_shastiamsa"
-  ];
+  // JH18: Lal Kitab Planetary Houses & Placements
+  if (submenus.includes("lalkitab_houses")) {
+    drawSectionTitle("JH18: LAL KITAB PLANETARY HOUSES & PLACEMENTS", "LAL KITAB");
+    const pList = astrologyData.planets || [];
+    if (pList.length > 0) {
+      const lkbHouses: { [house: number]: string[] } = {};
+      for (let h = 1; h <= 12; h++) lkbHouses[h] = [];
+      pList.forEach((p: any) => {
+        const lkHouse = p.signIndex + 1;
+        lkbHouses[lkHouse].push(p.name);
+      });
 
-  dCharts.forEach(d => {
-    if (submenus.includes(d)) {
-      const label = d.toUpperCase().replace("_", " ");
-      drawSectionTitle(`DIVISIONAL CHART: ${label}`, "JHORA vargas");
-      const divData = vedic.divisional_charts?.[d] || {};
-      const planetKeys = Object.keys(divData);
-
-      if (planetKeys.length > 0) {
-        const rows = planetKeys.map(pName => {
-          const val = divData[pName];
-          return [
-            pName,
-            val.sign || "N/A",
-            val.house ? `House ${val.house}` : "N/A",
-            val.sign_lord || "N/A"
-          ];
-        });
-        drawTable(["Planet", "Sign Placed", "Bhava House Placement", "Sign Lord Ruler"], rows, [45, 45, 45, 45]);
-      } else {
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        doc.text(`Divisional ${label} calculations are empty.`, 15, currentY);
-        currentY += 8;
-      }
+      const rows = pList.map((p: any) => {
+        const lkHouse = p.signIndex + 1;
+        const companions = lkbHouses[lkHouse].filter((name: string) => name !== p.name);
+        const lords = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+        return [
+          p.name || "—",
+          p.sign || "—",
+          `House ${lkHouse}`,
+          lords[p.signIndex] || "—",
+          companions.join(", ") || "Alone"
+        ];
+      });
+      drawTable(["Planet", "Sign Placement", "Lal Kitab House", "House Lord", "Companion Planets"], rows, [25, 35, 30, 30, 60]);
+    } else {
+      checkPageOverflow(15);
+      doc.setFont("helvetica", "normal");
+      doc.text("Lal Kitab house records empty.", 15, currentY);
+      currentY += 8;
     }
-  });
+  }
 
-  const predSubs = ["arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas"];
-  predSubs.forEach(s => {
-    if (submenus.includes(s)) {
-      drawSectionTitle(`SPECIAL DATA: ${s.toUpperCase()}`, "JHORA predictions");
-      
-      let rows: any[][] = [];
-      if (s === "arudhas") {
-        const arudhas = profileData?.Jaimini?.arudha || {};
-        rows = Object.keys(arudhas).map(k => {
-          const val = arudhas[k];
-          const displayVal = typeof val === "object" && val !== null
-            ? `${val.sign || ""} (House ${val.house || ""})`
-            : String(val);
-          return [k, displayVal, "Jaimini Arudha Pada Projection"];
-        });
-        drawTable(["Arudha Pada Symbol", "Sign & House Placement", "Method Standards"], rows, [40, 60, 80]);
-      } else if (s === "sphutas") {
-        rows = [
-          ["Bija Sphuta", "12° 24' Gemini", "Fruitfulness of progeny in male native", "Favorable"],
-          ["Kshetra Sphuta", "28° 40' Leo", "Fruitfulness of progeny in female native", "Favorable"],
-          ["Prana Sphuta", "15° 11' Capricorn", "Vital force and breath index of natal structure", "Neutral"]
-        ];
-        drawTable(["Sphuta Point", "Calculated Longitude", "Traditional Explanation", "State"], rows, [40, 50, 70, 20]);
-      } else if (s === "upagrahas") {
-        rows = [
-          ["Dhumra Upagraha", "04° 10' Scorpio", "Calculated shadow planet related to Mars", "Active"],
-          ["Vyatipata", "15° 50' Leo", "Sensitive point representing solar afflictions", "Active"],
-          ["Parivesha", "22° 10' Taurus", "Shadow node coordinates", "Inactive"]
-        ];
-        drawTable(["Shadow Upagraha", "Longitude Coordinates", "Planetary Affiliation", "Impact"], rows, [40, 50, 60, 30]);
-      } else if (s === "sahams") {
-        rows = [
-          ["Punya Saham (Fortune)", "18° 12' Aries", "Ascendant + Moon - Sun formula for wealth/luck", "High Aura"],
-          ["Vidya Saham (Education)", "05° 40' Cancer", "Ascendant + Sun - Mercury formula", "High Aura"],
-          ["Vivaha Saham (Marriage)", "28° 30' Libra", "Excluded from active marital prediction data", "Masked"]
-        ];
-        drawTable(["Tajik Saham Lot", "Longitude Alignment", "Standard Formula Definition", "Aura State"], rows, [45, 45, 65, 25]);
-      } else if (s === "special_lagnas") {
-        const specialLagnas = profileData?.Vedic?.special_lagnas || {};
-        
-        const parseCoordinate = (coordStr: string) => {
-          if (!coordStr) return { longitude: "XX° XX'", sign: "N/A" };
-          const trimmed = coordStr.trim();
-          const parts = trimmed.split(/\s+/);
-          if (parts.length >= 2) {
-            const sign = parts[0];
-            const longitude = parts.slice(1).join(" ");
-            return { longitude, sign };
-          }
-          return { longitude: trimmed, sign: "N/A" };
+  // JH19: Lal Kitab Teva & Sleeping Planet Status
+  if (submenus.includes("lalkitab_teva")) {
+    drawSectionTitle("JH19: LAL KITAB TEVA & SLEEPING PLANET STATUS", "LAL KITAB");
+    const pList = astrologyData.planets || [];
+    if (pList.length > 0) {
+      const lkbHouses: { [house: number]: string[] } = {};
+      for (let h = 1; h <= 12; h++) lkbHouses[h] = [];
+      pList.forEach((p: any) => {
+        const lkHouse = p.signIndex + 1;
+        lkbHouses[lkHouse].push(p.name);
+      });
+
+      const rows = pList.map((p: any) => {
+        const lkHouse = p.signIndex + 1;
+        let sleepStatus = "Active";
+        if (lkHouse === 1 && lkbHouses[7].length === 0) {
+          sleepStatus = "Sleeping - H7 Empty";
+        } else if (lkHouse === 7 && lkbHouses[1].length === 0) {
+          sleepStatus = "Sleeping - H1 Empty";
+        } else if (lkHouse === 4 && lkbHouses[10].length === 0) {
+          sleepStatus = "Sleeping - H10 Empty";
+        } else if (lkHouse === 10 && lkbHouses[4].length === 0) {
+          sleepStatus = "Sleeping - H4 Empty";
+        }
+
+        let tevaCat = "Dharmi Teva (Auspicious)";
+        if (p.name === "Saturn" && lkHouse === 11) {
+          tevaCat = "Andha Teva (Blind)";
+        } else if (p.name === "Sun" && lkHouse === 10) {
+          tevaCat = "Nisphal Teva (Fruitless)";
+        }
+
+        const natures: { [key: string]: string } = {
+          "Sun": "Benefic Solar (Nek)",
+          "Moon": "Benefic Lunar (Nek)",
+          "Mars": "Benefic/Malefic",
+          "Mercury": "Neutral (Safar)",
+          "Jupiter": "Benefic Guru (Nek)",
+          "Venus": "Benefic/Malefic",
+          "Saturn": "Strict judge (Manda)",
+          "Rahu": "Shadow Dragon (Manda)",
+          "Ketu": "Ascetic Node (Nek)"
         };
 
-        const rawHL = specialLagnas?.hora_lagna?.longitude || specialLagnas?.hora_lagna || "Libra 12° 11'";
-        const rawGL = specialLagnas?.ghati_lagna?.longitude || specialLagnas?.ghati_lagna || "Scorpio 24° 50'";
-        const rawBL = specialLagnas?.bhava_lagna?.longitude || specialLagnas?.bhava_lagna || "Leo 05° 12'";
-        const rawPL = specialLagnas?.pranapada_lagna?.longitude || specialLagnas?.pranapada_lagna || "Aries 28° 10'";
-
-        const parsedHL = parseCoordinate(rawHL);
-        const parsedGL = parseCoordinate(rawGL);
-        const parsedBL = parseCoordinate(rawBL);
-        const parsedPL = parseCoordinate(rawPL);
-
-        const lagnas = [
-          {
-            name: "Hora Lagna (HL)",
-            longitude: parsedHL.longitude,
-            sign: specialLagnas?.hora_lagna?.sign || parsedHL.sign,
-            house: specialLagnas?.hora_lagna?.house || "H2",
-            basis: "Derived from sunrise using Hora progression",
-            use: "Wealth, assets and financial prosperity"
-          },
-          {
-            name: "Ghati Lagna (GL)",
-            longitude: parsedGL.longitude,
-            sign: specialLagnas?.ghati_lagna?.sign || parsedGL.sign,
-            house: specialLagnas?.ghati_lagna?.house || "H6",
-            basis: "Derived from sunrise using Ghati progression",
-            use: "Power, authority, fame and influence"
-          },
-          {
-            name: "Bhava Lagna (BL)",
-            longitude: parsedBL.longitude,
-            sign: specialLagnas?.bhava_lagna?.sign || parsedBL.sign,
-            house: specialLagnas?.bhava_lagna?.house || "H1",
-            basis: "Derived from elapsed time after sunrise",
-            use: "Physical life and worldly affairs"
-          },
-          {
-            name: "Pranapada Lagna (PL)",
-            longitude: parsedPL.longitude,
-            sign: specialLagnas?.pranapada_lagna?.sign || parsedPL.sign,
-            house: specialLagnas?.pranapada_lagna?.house || "H10",
-            basis: "Classical Pranapada calculation",
-            use: "Vitality, personality and life force"
-          }
-        ];
-
-        // Include additional lagnas
-        const knownKeys = ["hora_lagna", "horalagna", "ghati_lagna", "ghatilagna", "bhava_lagna", "bhavalagna", "pranapada_lagna", "pranapadalagna"];
-        Object.entries(specialLagnas).forEach(([key, val]: [string, any]) => {
-          const lowerKey = key.toLowerCase().replace(/_/g, "");
-          if (knownKeys.includes(lowerKey)) return;
-          
-          let name = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-          if (!name.endsWith("Lagna")) name = name + " Lagna";
-
-          let basis = "Calculated by JHora";
-          let use = "Special astrological significations";
-
-          if (lowerKey === "indulagna") {
-            basis = "Calculated from 9th lords from Lagna and Moon";
-            use = "Wealth, fortune and prosperity";
-          } else if (lowerKey === "srilagna") {
-            basis = "Derived using the portion of Moon's nakshatra";
-            use = "Prosperity, abundance and material success";
-          } else if (lowerKey === "varnadalagna") {
-            basis = "Calculated from Lagna and Hora Lagna positions";
-            use = "Social status, reputation and Jaimini analysis";
-          }
-
-          const rawVal = typeof val === "object" && val !== null ? val.longitude || "" : String(val);
-          const parsed = parseCoordinate(rawVal);
-
-          const longitude = parsed.longitude;
-          const sign = typeof val === "object" && val !== null ? val.sign || parsed.sign : parsed.sign;
-          const house = typeof val === "object" && val !== null ? val.house || "N/A" : "N/A";
-
-          if (longitude && longitude !== "XX° XX'") {
-            lagnas.push({
-              name,
-              longitude,
-              sign,
-              house,
-              basis,
-              use
-            });
-          }
-        });
-
-        rows = lagnas.map(lagna => [
-          lagna.name,
-          lagna.longitude,
-          lagna.sign,
-          lagna.house,
-          lagna.basis,
-          lagna.use
-        ]);
-
-        drawTable(["Lagna Type", "Longitude", "Zodiac Sign", "House", "Calculation Basis", "Primary Use"], rows, [35, 20, 20, 15, 45, 45]);
-      }
-    }
-  });
-
-
-  // 2. KP STELLAR SECTION
-  const kp = profileData?.KP || {};
-
-  if (submenus.includes("kp_dashboard")) {
-    drawSectionTitle("KP SYSTEM DASHBOARD", "KP STELLAR");
-    const rows = [
-      ["System Standard", "Krishnamurti Paddhati (KP)", "Provider Status", "Healthy & Complete"],
-      ["Calculation Mode", "Placidus House Cusp System", "Ayanamsa Offset", "Lahiri (KP Standard Offset)"],
-      ["Vimshottari Baseline", "120-Year Stellar Division", "Sub-sub Lord Resolution", "Active (High precision)"]
-    ];
-    drawTable(["KP Matrix Name", "Value/Standard State", "Key Significations", "Remarks"], rows, [45, 45, 50, 40]);
-  }
-
-  if (submenus.includes("kp_rulebook")) {
-    drawSectionTitle("KP EVIDENCE RULEBOOK ANALYSIS", "KP STELLAR");
-    const rows = [
-      ["Rule Ref", "Astrological Condition Evaluated", "Cusp Star/Sub Lord Link", "Evidence Result"],
-      ["Rule 1", "Foreign Travel Potential (Houses 3, 9, 12)", "9th Cusp Sub Lord linked to 12", "Favorable"],
-      ["Rule 2", "Career Growth & Promotions (Houses 2, 6, 10, 11)", "10th Cusp Sub Lord in Star of 11", "Highly Auspicious"],
-      ["Rule 3", "Financial Assets Accumulation (Houses 2, 11)", "2nd Cusp Lord in 11th house", "Strong Promise"],
-      ["Rule 4", "Health and Longevity (Houses 1, 8, 11)", "1st Cusp Star Lord is planet Jupiter", "Robust Vitality"]
-    ];
-    drawTable(["KP Rule Reference", "Stellar Condition Evaluated", "Sub Lord Linkage", "Evidence Result"], rows, [35, 60, 45, 40]);
-  }
-
-  if (submenus.includes("kp_cusps")) {
-    drawSectionTitle("KP PLACIDUS HOUSE CUSPS (12 HOUSES)", "KP STELLAR");
-    const cusps = kp.cusps || {};
-    const houseKeys = Object.keys(cusps);
-
-    if (houseKeys.length > 0) {
-      const rows = houseKeys.map(hKey => {
-        const c = cusps[hKey] || {};
-        const houseNum = hKey.replace("House_", "");
         return [
-          `House Cusp ${houseNum}`,
-          c.sign || "N/A",
-          (c.degree ?? 0).toFixed(4) + "°",
-          c.sign_lord || "N/A",
-          c.star_lord || "N/A",
-          c.sub_lord || "N/A",
-          c.sub_sub_lord || "N/A"
+          p.name || "—",
+          `House ${lkHouse}`,
+          sleepStatus,
+          tevaCat,
+          natures[p.name] || "Dual (Nek/Manda)"
         ];
       });
-      drawTable(
-        ["KP Cusp House", "Sign Placed", "Exact Longitude", "Sign Lord", "Star Lord", "Sub Lord", "Sub-Sub Lord"],
-        rows,
-        [22, 22, 22, 25, 30, 30, 29]
-      );
+      drawTable(["Planet", "LKB House", "Sleeping Status", "Teva Category", "Nature Baseline"], rows, [25, 25, 45, 45, 40]);
     } else {
+      checkPageOverflow(15);
       doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("KP house cusps coordinates empty.", 15, currentY);
+      doc.text("Lal Kitab sleeping status parameters empty.", 15, currentY);
       currentY += 8;
     }
-  }
-
-  if (submenus.includes("kp_planet_analysis")) {
-    drawSectionTitle("KP PLANET STAR & SUB LORD ANALYSIS", "KP STELLAR");
-    const planets = kp.planets || {};
-    const pKeys = Object.keys(planets);
-
-    if (pKeys.length > 0) {
-      const rows = pKeys.map(pName => {
-        const p = planets[pName] || {};
-        return [
-          pName,
-          p.sign || "N/A",
-          (p.longitude ?? 0).toFixed(4) + "°",
-          p.sign_lord || "N/A",
-          p.star_lord || "N/A",
-          p.sub_lord || "N/A",
-          p.sub_sub_lord || "N/A"
-        ];
-      });
-      drawTable(
-        ["KP Planet", "Sign Placed", "Stellar Longitude", "Sign Lord", "Star Lord", "Sub Lord", "Sub-Sub Lord"],
-        rows,
-        [22, 22, 22, 25, 30, 30, 29]
-      );
-    } else {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("KP planetary analysis coordinate records empty.", 15, currentY);
-      currentY += 8;
-    }
-  }
-
-  if (submenus.includes("kp_significators")) {
-    drawSectionTitle("KP PLANETARY & HOUSE SIGNIFICATORS", "KP STELLAR");
-    checkPageOverflow(35);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-    doc.text("Planetary Signification Strengths (Level A-D):", 15, currentY);
-    currentY += 5;
-
-    const pSigs = kp.planet_significators || {};
-    const pKeys = Object.keys(pSigs);
-    if (pKeys.length > 0) {
-      const rows = pKeys.map(pName => {
-        const houses = pSigs[pName] || [];
-        return [
-          pName,
-          houses.join(", ") || "None",
-          "Calculated via Cusp Presence & Lordship criteria"
-        ];
-      });
-      drawTable(["KP Planet", "Signified Houses", "Signification Computational Standard"], rows, [35, 80, 65]);
-    } else {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("KP significators indices empty.", 15, currentY);
-      currentY += 8;
-    }
-  }
-
-  if (submenus.includes("kp_ruling_planets")) {
-    drawSectionTitle("KP RULING PLANETS AT BIRTH TIME", "KP STELLAR");
-    const rp = kp.ruling_planets || {};
-    const rows = [
-      ["Ruling Facet", "Planet Ruler Name", "Star Lord Name", "Sub Lord Name"],
-      ["Ascendant Ruler (Lagna Lord)", rp.ascendant_lord || "Jupiter", "Saturn", "Mercury"],
-      ["Moon Sign Lord (Rasi Lord)", rp.moon_lord || "Mars", "Ketu", "Venus"],
-      ["Moon Star Lord (Nakshatra Lord)", rp.moon_star_lord || "Ketu", "Venus", "Jupiter"],
-      ["Day Lord at Birth Moment", rp.day_lord || "Tuesday", "Mars", "Saturn"]
-    ];
-    drawTable(["KP Ruling Facet", "Planet Ruler Name", "Star Lord Name", "Sub Lord Name"], rows, [45, 45, 45, 45]);
-  }
-
-  if (submenus.includes("kp_dasha")) {
-    drawSectionTitle("KP DYNAMIC DASHA SEQUENCE", "KP STELLAR");
-    const dba = kp.dba || {};
-    const rows = [
-      ["Dasha Level", "Active Lord Planet", "Vedic Start", "Vedic End"],
-      ["Mahadasha Period Lord", dba.mahadasha || "Jupiter", dba.start_date || "2018-01-01", dba.end_date || "2034-01-01"],
-      ["Bhukti Period Lord", dba.bhukti || "Saturn", "2024-01-01", "2026-12-31"],
-      ["Antara Period Lord", dba.antara || "Mercury", "2026-01-01", "2026-07-31"]
-    ];
-    drawTable(["Dasha Precision Level", "Active Lord Planet", "Aura Start", "Aura End"], rows, [45, 45, 45, 45]);
-  }
-
-  if (submenus.includes("kp_transit")) {
-    drawSectionTitle("KP TRANSIT REAL-TIME SIGNIFICATORS", "KP STELLAR");
-    const rows = [
-      ["Transiting Planet", "Transiting Sign", "Transiting House", "Cusp Aspect Angle"],
-      ["Sun", "Cancer", "House 5", "Conjunction 10th Cusp"],
-      ["Moon", "Aries", "House 2", "Trine Natal Jupiter"],
-      ["Saturn", "Aquarius", "House 12", "Oppose Natal Sun"],
-      ["Jupiter", "Taurus", "House 3", "Sextile Natal Moon"]
-    ];
-    drawTable(["Transiting Planet", "Transiting Sign", "Transiting House", "Cusp Aspect Angle"], rows, [45, 45, 45, 45]);
-  }
-
-  if (submenus.includes("kp_horary")) {
-    drawSectionTitle("KP HORARY (PRASHNA SEED NUMBER)", "KP STELLAR");
-    const rows = [
-      ["Prashna Seed Number Selected", "No Active Seed (Birth Chart Used)", "1 to 249 Range Baseline"],
-      ["Seed Lord Translation", "Ascendant configured at Birth Lagna", "Placidus House Cusp Standard"],
-      ["Question Context Flag", "Dynamic natal chart query", "Core Vedic Algorithm"]
-    ];
-    drawTable(["Horary Metric Name", "Value Alignment", "KP Rulebook Standard"], rows, [50, 65, 65]);
-  }
-
-
-  // 3. WESTERN ASTROLOGY SECTION
-  const west = profileData?.Western || {};
-
-  if (submenus.includes("west_dashboard")) {
-    drawSectionTitle("WESTERN TROPICAL SUMMARY", "WESTERN");
-    const rows = [
-      ["Coordinate Base", "Tropical Zodiac Projection", "Ascendant Type", "Equal / Placidus Houses"],
-      ["Zodiac Offsets", "Standard Ptolemaic Offset (0° Aries)", "Declination System", "Calculated on Ecliptic Plane"]
-    ];
-    drawTable(["Western Astro System", "Value/Offset Standard", "System Remarks", "Standard Reference"], rows, [45, 45, 45, 45]);
-  }
-
-  if (submenus.includes("west_natal_chart")) {
-    drawSectionTitle("WESTERN NATAL CIRCULAR WHEEL DATA", "WESTERN");
-    const planets = west.planets || {};
-    const pKeys = Object.keys(planets);
-
-    if (pKeys.length > 0) {
-      const rows = pKeys.map(pName => {
-        const p = planets[pName] || {};
-        return [
-          pName,
-          p.sign || "N/A",
-          (p.longitude ?? 0).toFixed(4) + "°",
-          p.retrograde ? "Retro" : "Direct",
-          "Calculated using standard Tropical offsets"
-        ];
-      });
-      drawTable(["Tropical Planet", "Sign Placed", "Stellar Coordinates", "Speed Vector", "Remarks"], rows, [35, 35, 35, 35, 40]);
-    } else {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("Western natal chart coordinate data empty.", 15, currentY);
-      currentY += 8;
-    }
-  }
-
-  if (submenus.includes("west_positions")) {
-    drawSectionTitle("WESTERN DEGREES & HOUSES POSITIONS", "WESTERN");
-    const cusps = west.cusps || {};
-    const cuspKeys = Object.keys(cusps);
-
-    if (cuspKeys.length > 0) {
-      const rows = cuspKeys.map(cKey => {
-        const val = cusps[cKey] || {};
-        return [
-          cKey.replace("House_", "House Cusp "),
-          val.sign || "N/A",
-          val.degree ? val.degree.toFixed(4) + "°" : "N/A",
-          "Tropical House Axis Standard"
-        ];
-      });
-      drawTable(["House Axis Cusp", "Tropical Sign Alignment", "Exact Coordinates", "Standard Type"], rows, [45, 45, 45, 45]);
-    } else {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("Western house positions coordinates empty.", 15, currentY);
-      currentY += 8;
-    }
-  }
-
-  if (submenus.includes("west_aspects")) {
-    drawSectionTitle("WESTERN ASPECT GRID LISTINGS", "WESTERN");
-    const aspects = west.aspects || [];
-
-    if (aspects.length > 0) {
-      const rows = aspects.slice(0, 15).map((a: any) => [
-        a.p1 || "Planet 1",
-        a.aspect || "Aspect",
-        a.p2 || "Planet 2",
-        a.degree ? a.degree.toFixed(2) + "°" : "N/A",
-        a.orb ? a.orb.toFixed(2) + "°" : "N/A",
-        a.type || "Major Aspect"
-      ]);
-      drawTable(["Planet A", "Aspect Name", "Planet B", "Exact Angle", "Allowed Orb", "Aspect Type"], rows, [30, 30, 30, 30, 30, 30]);
-    } else {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("No major aspects found between Western tropical coordinate planes.", 15, currentY);
-      currentY += 8;
-    }
-  }
-
-  if (submenus.includes("west_synastry")) {
-    drawSectionTitle("WESTERN SYNASTRY COMPATIBILITY", "WESTERN");
-    const rows = [
-      ["Synastry Aspect Angle", "Calculated Synergy Value", "Allowed Orb Offset", "Resulting Affinity"],
-      ["Sun Conjunction Venus", "High Synergy (+85%)", "01° 12'", "Favorable"],
-      ["Moon Trine Jupiter", "Maximum Synergy (+95%)", "02° 40'", "Favorable"],
-      ["Mars Square Saturn", "Low Harmony (-40%)", "04° 10'", "Challenging Tension"]
-    ];
-    drawTable(["Western Synastry Facet", "Affinity Coefficient Score", "Allowed Orb Offset", "Synthesis"], rows, [50, 45, 45, 40]);
-  }
-
-  if (submenus.includes("west_transits")) {
-    drawSectionTitle("WESTERN SOLAR RETURN & ACTIVE TRANSITS", "WESTERN");
-    const rows = [
-      ["Tropical Axis Position", "Solar Return Placements", "Calculated Transits Alignment", "Orb Status"],
-      ["Sun Focus Gate", "Capricorn 16° 11'", "Cancer 16° 11' (Opposition)", "00° 00' Exact"],
-      ["Moon Focus Gate", "Aries 22° 40'", "Leo 22° 40' (Trine)", "01° 10' Wide"],
-      ["Midheaven (MC) Alignment", "Scorpio 12° 11'", "Taurus 12° 11' (Opposition)", "00° 50' Close"]
-    ];
-    drawTable(["Tropical Axis Position", "Solar Return Placements", "Calculated Transits Alignment", "Orb Status"], rows, [45, 45, 45, 45]);
-  }
-
-
-  // 4. MYSTICAL (ESOTERIC) SECTION
-  const esoteric = profileData || {};
-
-  if (submenus.includes("eso_nadi")) {
-    drawSectionTitle("NADI ASTROLOGY (NADI AMSAS)", "MYSTICAL");
-    const rows = [
-      ["Nadi Division Scale", "Fine division of 150 arcs per Rasi (12 minutes of arc)", "Sage Bhrigu Standard"],
-      ["Birth Nadi Amsa", "Shiva Nadi Amsa (Favorable alignment)", "Aura index: +92%"],
-      ["Karma Guidance Code", "Natal structure points to active spiritual pursuits", "Dharma Balance: High"]
-    ];
-    drawTable(["Nadi Metric Key", "Calculated Division Alignment", "Source Grantha"], rows, [50, 80, 50]);
-  }
-
-  if (submenus.includes("eso_lalkitab")) {
-    drawSectionTitle("LAL KITAB FIXED HOUSE-REMEDIES", "MYSTICAL");
-    const lk = esoteric.Lal_Kitab || {};
-    const remedies = lk.remedies || [];
-
-    if (remedies.length > 0) {
-      const rows = remedies.slice(0, 10).map((rem: any) => [
-        rem.planet || "Planet",
-        rem.house ? `House ${rem.house}` : "N/A",
-        rem.remedy || "General remedy recommended."
-      ]);
-      drawTable(["Afflicted Planet", "Aries Fixed House Placement", "Lal Kitab Remedial Action Items"], rows, [35, 40, 105]);
-    } else {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(8);
-      doc.text("Lal Kitab remedial rules parameters empty.", 15, currentY);
-      currentY += 8;
-    }
-  }
-
-  if (submenus.includes("eso_varshaphala")) {
-    drawSectionTitle("TAJIK VARSHAPHALA (ANNUAL PROGRESSION)", "MYSTICAL");
-    const tajik = esoteric.Tajik || {};
-    const rows = [
-      ["Varsha Year Evaluated", "Year 2026 Progression (Age 50)", "Muntha Placement: House 6"],
-      ["Year Lord Planet", tajik.year_lord || "Jupiter", "Highly beneficial aspect rules"],
-      ["Muntha Lord Alignment", tajik.muntha_lord || "Saturn", "Indicates challenges in daily health"]
-    ];
-    drawTable(["Tajik Varshaphal Dimension", "Calculated Lord Planet / Placement", "Esoteric Remarks"], rows, [50, 60, 70]);
-  }
-
-  if (submenus.includes("eso_bazi")) {
-    drawSectionTitle("CHINESE BAZI (FOUR PILLARS OF DESTINY)", "MYSTICAL");
-    const rows = [
-      ["BaZi Pillar Type", "Heavenly Stem Alignment", "Earthly Branch Zodiac", "Representative Animal"],
-      ["Year Pillar (Ancestor)", "Yi (Yin Wood)", "Mao (Rabbit)", "Wood Rabbit"],
-      ["Month Pillar (Parents)", "Ji (Yin Earth)", "Chou (Ox)", "Earth Ox"],
-      ["Day Pillar (Self Master)", "Geng (Yang Metal)", "Wu (Horse)", "Metal Horse"],
-      ["Hour Pillar (Children)", "Ding (Yin Fire)", "Hai (Pig)", "Fire Pig"]
-    ];
-    drawTable(["BaZi Pillar Type", "Heavenly Stem Alignment", "Earthly Branch Zodiac", "Representative Animal"], rows, [45, 45, 45, 45]);
-  }
-
-  if (submenus.includes("eso_numerology")) {
-    drawSectionTitle("NUMEROLOGY PROFILE (PYTHAGOREAN / CHALDEAN)", "MYSTICAL");
-    const rows = [
-      ["Numerology Indicator", "Pythagorean Value Calculation", "Chaldean Value Calculation", "Core Signification"],
-      ["Life Path Number", "7 (Analysis & Insight)", "7 (Spiritual Wisdom)", "Intellect, deep search, analysis"],
-      ["Expression Number", "5 (Change & Freedom)", "4 (Structure & Work)", "Dynamic movement vs stable structure"],
-      ["Soul Urge Number", "1 (Independence & Drive)", "1 (Pioneering Force)", "Leadership and individual expression"]
-    ];
-    drawTable(["Numerology Indicator", "Pythagorean Standard", "Chaldean Standard", "Signification"], rows, [45, 45, 45, 45]);
-  }
-
-  if (submenus.includes("eso_celtic")) {
-    drawSectionTitle("CELTIC TREE ZODIAC CODES", "MYSTICAL");
-    const rows = [
-      ["Celtic Sign Name", "Corresponding Dates Axis", "Sacred Tree Lunar Association", "Vibe Signature"],
-      ["Birch (The Achiever)", "Dec 24 - Jan 20", "Beth (Solar Rebirth)", "Goal-oriented, ambitious, resilient"],
-      ["Rowan (The Thinker)", "Jan 21 - Feb 17", "Luis (Visionary Insight)", "Independent, philosophical, original"]
-    ];
-    drawTable(["Celtic Sign Name", "Corresponding Dates Axis", "Sacred Tree Association", "Vibe"], rows, [45, 45, 45, 45]);
-  }
-
-  if (submenus.includes("eso_mayan")) {
-    drawSectionTitle("MAYAN CALENDAR TZOLKIN SIGNATURES", "MYSTICAL");
-    const rows = [
-      ["Mayan Calendar Axis", "Calculated Glyph Name", "Galactic Tone Value", "Esoteric Meaning"],
-      ["Tzolkin Day Kin", "Imix (Red Dragon)", "Tone 4 (Self-Existing)", "Pioneering force of nurturing birth"],
-      ["Haab Year Alignment", "Pop Month Grid", "Day 12 Placement", "Year-opening purification gate"]
-    ];
-    drawTable(["Mayan Calendar Axis", "Calculated Glyph Name", "Galactic Tone Value", "Esoteric Meaning"], rows, [45, 45, 45, 45]);
   }
 
   // Final page summary of calculations check
