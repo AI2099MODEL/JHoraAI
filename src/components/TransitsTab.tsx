@@ -872,28 +872,30 @@ export default function TransitsTab({
   return (
     <div className="space-y-6" id="transits-tab-container">
       {/* Title block */}
-      <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-indigo-500/20 p-6 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-xl font-sans font-medium text-amber-100 flex items-center gap-2">
-              <RefreshCw className="w-5 h-5 text-amber-500" />
-              Gochara Subsystem
-            </h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Complete divisional transit alignments, real-time aspects, sensitive points, and Vimshottari dasha intersection.
-              {lat && lng && (
-                <span className="block mt-1 text-[11px] text-amber-400/80 font-mono flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-amber-500" />
-                  Gps Spot: {Number(lat).toFixed(4)}°N, {Number(lng).toFixed(4)}°E (TZ: {tz >= 0 ? `+${tz}` : tz})
-                </span>
-              )}
-            </p>
-          </div>
+      {!propSubTab && (
+        <div className="bg-slate-900/60 backdrop-blur-md rounded-2xl border border-indigo-500/20 p-6 shadow-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-xl font-sans font-medium text-amber-100 flex items-center gap-2">
+                <RefreshCw className="w-5 h-5 text-amber-500" />
+                Gochara Subsystem
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Complete divisional transit alignments, real-time aspects, sensitive points, and Vimshottari dasha intersection.
+                {lat && lng && (
+                  <span className="block mt-1 text-[11px] text-amber-400/80 font-mono flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-amber-500" />
+                    Gps Spot: {Number(lat).toFixed(4)}°N, {Number(lng).toFixed(4)}°E (TZ: {tz >= 0 ? `+${tz}` : tz})
+                  </span>
+                )}
+              </p>
+            </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 13 Horizontal Scrollable Submenus */}
       {!propSubTab && (

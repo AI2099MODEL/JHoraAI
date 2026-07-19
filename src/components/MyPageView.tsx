@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { jsPDF } from "jspdf";
 import DashaTree from "./DashaTree";
+import TransitsTab from "./TransitsTab";
 import {
   mapJHoraResponseToAstrologyData,
   mapAstrologyDataToUserProfileJSON
@@ -4068,6 +4069,19 @@ export function MyPageView({
               );
             })()}
           </div>
+
+          {astrologyData ? (
+            <div className="mt-6">
+              <TransitsTab
+                astrologyData={astrologyData}
+                subTab="current_transits"
+              />
+            </div>
+          ) : (
+            <div className="text-center py-8 text-xs text-slate-500 font-mono">
+              ⚠️ Please cast a horoscope first to view real-time transits.
+            </div>
+          )}
         </div>
       ) : activeTab === "jaimini" ? (
         <div className="space-y-6">
