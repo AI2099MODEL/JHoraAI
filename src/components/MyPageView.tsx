@@ -1700,12 +1700,7 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
 
 const lifeTabs = [
   { id: "daily", label: "Daily" },
-  { id: "current_dasha", label: "Current Dasha" },
-  { id: "current_yogas", label: "Yogas" },
-  { id: "current_doshas", label: "Doshas" },
-  { id: "house_activation", label: "House Activation" },
-  { id: "sensitive_points", label: "Sensitive Points" },
-  { id: "transit_summary", label: "Transit Summary" }
+  { id: "current_dasha", label: "Current Dasha" }
 ];
 
 const journeyTabs = [

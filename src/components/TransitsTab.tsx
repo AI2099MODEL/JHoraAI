@@ -1535,38 +1535,206 @@ export default function TransitsTab({
 
           {/* TAB 2: CURRENT DASHA */}
           {subTab === "current_dasha" && (
-            <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-6">
-              <div className="border-b border-slate-800 pb-3">
-                <h4 className="text-base font-semibold text-amber-100">Vimshottari Dasha Alignments (Selected Moment)</h4>
-                <p className="text-xs text-slate-400 mt-1">
-                  Active Mahadasha, Bhukti, Antara, Sukshma, and Prana levels running on <span className="text-amber-400 font-mono">{transitDate} {transitTime}</span>.
-                </p>
+            <div className="space-y-6">
+              {/* Vimshottari Dasha Alignments Card */}
+              <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-6">
+                <div className="border-b border-slate-800 pb-3">
+                  <h4 className="text-base font-semibold text-amber-100">Vimshottari Dasha Alignments (Selected Moment)</h4>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Active Mahadasha, Bhukti, Antara, Sukshma, and Prana levels running on <span className="text-amber-400 font-mono">{transitDate} {transitTime}</span>.
+                  </p>
+                </div>
+
+                {dashaAlignment ? (
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    {[
+                      { title: "Maha (Level 1)", lord: dashaAlignment.maha.lord, start: dashaAlignment.maha.startDate, end: dashaAlignment.maha.endDate, color: "border-indigo-500/40 text-indigo-300" },
+                      { title: "Bhukti / Antar (Level 2)", lord: dashaAlignment.antar?.lord || "None", start: dashaAlignment.antar?.startDate, end: dashaAlignment.antar?.endDate, color: "border-amber-500/40 text-amber-400" },
+                      { title: "Antara (Level 3)", lord: dashaAlignment.pratyantar?.lord || "None", start: dashaAlignment.pratyantar?.startDate || dashaAlignment.pratyantar?.start, end: dashaAlignment.pratyantar?.endDate || dashaAlignment.pratyantar?.end, color: "border-emerald-500/40 text-emerald-400" },
+                      { title: "Sukshma (Level 4)", lord: dashaAlignment.sookshma?.lord || "None", start: dashaAlignment.sookshma?.start, end: dashaAlignment.sookshma?.end, color: "border-cyan-500/40 text-cyan-400" },
+                      { title: "Prana (Level 5)", lord: dashaAlignment.prana?.lord || "None", start: dashaAlignment.prana?.start, end: dashaAlignment.prana?.end, color: "border-purple-500/40 text-purple-400" }
+                    ].map((level, i) => (
+                      <div key={i} className={`p-4 rounded-xl border bg-slate-900/30 flex flex-col justify-between h-40 hover:bg-slate-900/60 transition-all shadow-md`}>
+                        <div>
+                          <span className="text-[10px] uppercase font-mono text-slate-500">{level.title}</span>
+                          <h5 className={`text-lg font-bold mt-2 ${level.color}`}>{level.lord}</h5>
+                        </div>
+                        <div className="text-[10px] text-slate-400 space-y-0.5 font-mono">
+                          <div>Start: {level.start ? new Date(level.start).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</div>
+                          <div>End: {level.end ? new Date(level.end).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-slate-500 text-xs italic">No Vimshottari dasha found inside native profile.</div>
+                )}
               </div>
 
-              {dashaAlignment ? (
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                  {[
-                    { title: "Maha (Level 1)", lord: dashaAlignment.maha.lord, start: dashaAlignment.maha.startDate, end: dashaAlignment.maha.endDate, color: "border-indigo-500/40 text-indigo-300" },
-                    { title: "Bhukti / Antar (Level 2)", lord: dashaAlignment.antar?.lord || "None", start: dashaAlignment.antar?.startDate, end: dashaAlignment.antar?.endDate, color: "border-amber-500/40 text-amber-400" },
-                    { title: "Antara (Level 3)", lord: dashaAlignment.pratyantar?.lord || "None", start: dashaAlignment.pratyantar?.startDate || dashaAlignment.pratyantar?.start, end: dashaAlignment.pratyantar?.endDate || dashaAlignment.pratyantar?.end, color: "border-emerald-500/40 text-emerald-400" },
-                    { title: "Sukshma (Level 4)", lord: dashaAlignment.sookshma?.lord || "None", start: dashaAlignment.sookshma?.start, end: dashaAlignment.sookshma?.end, color: "border-cyan-500/40 text-cyan-400" },
-                    { title: "Prana (Level 5)", lord: dashaAlignment.prana?.lord || "None", start: dashaAlignment.prana?.start, end: dashaAlignment.prana?.end, color: "border-purple-500/40 text-purple-400" }
-                  ].map((level, i) => (
-                    <div key={i} className={`p-4 rounded-xl border bg-slate-900/30 flex flex-col justify-between h-40 hover:bg-slate-900/60 transition-all shadow-md`}>
-                      <div>
-                        <span className="text-[10px] uppercase font-mono text-slate-500">{level.title}</span>
-                        <h5 className={`text-lg font-bold mt-2 ${level.color}`}>{level.lord}</h5>
+              {/* Yogas Active Due to Current Transit */}
+              <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-4">
+                <h4 className="text-base font-semibold text-amber-100">Yogas Active Due to Current Transit</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {getActiveTransitYogas().map((yoga, i) => (
+                    <div key={i} className="p-4 rounded-xl border border-indigo-500/15 bg-slate-900/30 hover:border-amber-500/25 transition-all space-y-2">
+                      <div className="flex items-center gap-2 text-amber-400">
+                        <Sparkles className="w-4 h-4 shrink-0" />
+                        <strong className="text-sm font-semibold">{yoga.name}</strong>
                       </div>
-                      <div className="text-[10px] text-slate-400 space-y-0.5 font-mono">
-                        <div>Start: {level.start ? new Date(level.start).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</div>
-                        <div>End: {level.end ? new Date(level.end).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</div>
+                      <p className="text-xs text-slate-300 leading-relaxed">{yoga.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Transit-Related Celestial Doshas */}
+              <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-4">
+                <h4 className="text-base font-semibold text-amber-100">Transit-Related Celestial Doshas</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {getActiveTransitDoshas().map((dosha, i) => (
+                    <div key={i} className="p-4 rounded-xl border border-rose-500/15 bg-slate-900/30 hover:border-rose-500/30 transition-all space-y-3">
+                      <div className="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <span className="font-bold text-rose-400 text-sm flex items-center gap-1.5">
+                          <AlertTriangle className="w-4 h-4" />
+                          {dosha.name}
+                        </span>
+                        <span className="text-[9px] font-mono bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded uppercase font-bold">{dosha.severity} Severity</span>
+                      </div>
+
+                      <p className="text-xs text-slate-300 leading-relaxed">{dosha.desc}</p>
+
+                      <div className="p-2.5 rounded bg-slate-950/65 border border-slate-850">
+                        <span className="text-[10px] text-amber-400 uppercase block font-bold font-mono">Remedial Suggestion:</span>
+                        <span className="text-slate-300 text-xs mt-0.5 block leading-normal">{dosha.remedy}</span>
                       </div>
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="text-slate-500 text-xs italic">No Vimshottari dasha found inside native profile.</div>
-              )}
+              </div>
+
+              {/* Bhava House Activations */}
+              <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-4">
+                <h4 className="text-base font-semibold text-amber-100">Bhava House Activations</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {houseActivation.map((item) => (
+                    <div key={item.house} className="p-4 rounded-xl border border-indigo-500/10 bg-slate-900/20 hover:border-indigo-500/30 transition-all flex flex-col justify-between h-40">
+                      <div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-bold text-amber-400 font-mono">House {item.house}</span>
+                          <span className="text-xs font-semibold text-slate-300">{item.title}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">{item.focus}</p>
+                      </div>
+
+                      <div className="bg-indigo-950/15 border border-indigo-900/30 p-2 rounded text-[11px] font-mono text-indigo-300 text-center">
+                        {item.trigger}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Coordinate Sensitive Points */}
+              <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-4">
+                <h4 className="text-base font-semibold text-amber-100">Coordinate Sensitive Points</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {sensitivePointsList.map((pt, i) => (
+                    <div key={i} className="p-4 rounded-xl border border-slate-800 bg-slate-900/30 hover:border-indigo-500/10 transition-all flex flex-col justify-between space-y-3">
+                      <div>
+                        <div className="flex justify-between items-center">
+                          <strong className="text-sm text-slate-200">{pt.name}</strong>
+                          <span className="text-xs font-bold font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/25">{pt.coord}</span>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-2.5 leading-relaxed">{pt.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Interactive Transit Health, Spirit & Career Synthesizer */}
+              <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-6">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 gap-4">
+                  <div>
+                    <h4 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-indigo-400" />
+                      Interactive Transit Health, Spirit & Career Synthesizer
+                    </h4>
+                    <p className="text-xs text-slate-400 mt-1">Real-time calculations for mental, physical and spiritual alignments</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  {/* Visual score bars */}
+                  <div className="lg:col-span-7 space-y-5">
+                    <h4 className="text-xs font-mono text-indigo-400 uppercase tracking-widest font-bold">
+                      Cosmic Health Energy Scores
+                    </h4>
+                    {[
+                      { label: "Mental Clarity & Communication", score: dynamicEnergy.mental.score, tone: dynamicEnergy.mental.tone, color: "bg-cyan-500" },
+                      { label: "Physical Stamina & Action Drive", score: dynamicEnergy.physical.score, tone: dynamicEnergy.physical.tone, color: "bg-rose-500" },
+                      { label: "Financial Flow & Asset Strength", score: dynamicEnergy.financial.score, tone: dynamicEnergy.financial.tone, color: "bg-emerald-500" },
+                      { label: "Relationship Harmony & Bonding", score: dynamicEnergy.relationship.score, tone: dynamicEnergy.relationship.tone, color: "bg-pink-500" },
+                      { label: "Career Focus & Authority Power", score: dynamicEnergy.career.score, tone: dynamicEnergy.career.tone, color: "bg-amber-500" },
+                      { label: "Spiritual Alignment & Reflection", score: dynamicEnergy.spiritual.score, tone: dynamicEnergy.spiritual.tone, color: "bg-violet-500" },
+                    ].map((bar, idx) => (
+                      <div key={idx} className="space-y-1.5 bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
+                        <div className="flex justify-between items-center text-xs font-semibold">
+                          <span className="text-slate-300">{bar.label}</span>
+                          <div className="flex items-center gap-2 font-mono">
+                            <span className="text-slate-400 text-[11px]">({bar.tone})</span>
+                            <span className="text-indigo-400">{(bar.score * 10).toFixed(1)}/10</span>
+                          </div>
+                        </div>
+                        <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                          <div className={`h-full ${bar.color} transition-all`} style={{ width: `${bar.score * 100}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Dominant Houses and Planets */}
+                  <div className="lg:col-span-5 space-y-4">
+                    <h4 className="text-xs font-mono text-indigo-400 uppercase tracking-widest font-bold">
+                      Dominant Cosmic Anchors
+                    </h4>
+
+                    <div className="space-y-3.5">
+                      {/* Dominant House */}
+                      {dynamicMood.dominantHouses.map((house, idx) => (
+                        <div key={idx} className="p-4 rounded-xl border border-slate-800 bg-slate-900/30">
+                          <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest block">Active Transit Focus House</span>
+                          <h5 className="text-xs font-bold text-white mt-1.5">House {house.houseNumber} Transit</h5>
+                          <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                            {house.significance}. Amplifying focus and active planetary alignments.
+                          </p>
+                        </div>
+                      ))}
+
+                      {/* Dominant Planet */}
+                      {dynamicMood.dominantPlanets.map((planet, idx) => (
+                        <div key={idx} className="p-4 rounded-xl border border-slate-800 bg-slate-900/30">
+                          <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest block">Dominant Planet Anchor</span>
+                          <h5 className="text-xs font-bold text-amber-400 mt-1.5">{planet.planet} (Strength: {planet.strength})</h5>
+                          <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                            {planet.influenceType}. Highly supportive of deep analytical and intuitive clarity.
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Synthesis from dynamic calculations */}
+                <div className="mt-6 p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 space-y-2">
+                  <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest font-extrabold block">
+                    Vedic Sky Synthesis
+                  </span>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    The active sky indicates peak <strong className="text-indigo-400">Spiritual Alignment ({(dynamicEnergy.spiritual.score * 100).toFixed(0)}%)</strong> and high <strong className="text-cyan-400">Mental Clarity ({(dynamicEnergy.mental.score * 100).toFixed(0)}%)</strong>. Dominated by {dynamicMood.dominantPlanets[0]?.planet || "Jupiter"}'s supportive transit across your natal horizon, you are gifted with heightened intuition. Excellent day for domestic consolidation, organizing intellectual projects, and practicing mantra sadhana. Avoid long taxing journeys or physical confrontations during inauspicious solar transit sectors.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
