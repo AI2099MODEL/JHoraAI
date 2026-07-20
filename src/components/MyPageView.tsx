@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { jsPDF } from "jspdf";
 import DashaTree from "./DashaTree";
 import TransitsTab from "./TransitsTab";
+import { MasterArchitectureView } from "./MasterArchitectureView";
 import {
   mapJHoraResponseToAstrologyData,
   mapAstrologyDataToUserProfileJSON
@@ -1703,6 +1704,7 @@ const lifeTabs = [
 
 const journeyTabs = [
   { id: "overview", label: "My Soul" },
+  { id: "predictions", label: "Predictions" },
   { id: "future", label: "Future" }
 ];
 
@@ -5962,6 +5964,13 @@ export function MyPageView({
             </div>
           );
         })()
+      ) : activeTab === "predictions" ? (
+        <div className="space-y-6 animate-fade-in">
+          <MasterArchitectureView
+            astrologyData={astrologyData}
+            isDark={isDark}
+          />
+        </div>
       ) : activeTab === "future" ? (
         (() => {
           // Future Analysis Tab local helpers (re-uses local date helpers)
