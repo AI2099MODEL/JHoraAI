@@ -558,6 +558,58 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
         </div>
       </div>
 
+      {/* DAILY HOROSCOPE ENGINE (KP ONLY) SPECIFICATION */}
+      <div className="p-5 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 space-y-4">
+        <div className="flex items-center gap-2 pb-2.5 border-b border-indigo-500/10">
+          <Activity className="w-4 h-4 text-indigo-400" />
+          <div>
+            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+              DAILY HOROSCOPE ENGINE Specification (KP ONLY)
+            </h4>
+            <p className="text-[10px] text-slate-400 font-sans">
+              Registered Architecture & Flow Blueprint • Status: Documented & Registered (Do Not Run Now)
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans">
+          {/* Inputs Column */}
+          <div className="space-y-2 border-r border-indigo-500/5 pr-2">
+            <span className="text-[10px] font-bold uppercase text-indigo-300 font-mono block">1. ENGINE INPUT CACHING</span>
+            <div className="space-y-1 text-[10px] text-slate-400 font-mono list-disc">
+              <div>• <strong>Current Sky (Run Once)</strong>: Planet Longitudes, Sign, House, Nakshatra, Star, Sub Lord. Moon Coordinates. Panchanga (Tithi, Vara, Yoga, Karana, Hora).</div>
+              <div className="pt-1.5">• <strong>User Cache (Birth)</strong>: DBA Periods (MD/AD/PD/SD/Prana). Natal Planet Coordinates & 6-Fold Significators (L1-L6). Placidus Cuspal Sublords. Natal Promise Cache.</div>
+            </div>
+          </div>
+
+          {/* Engine Workflow */}
+          <div className="space-y-2 border-r border-indigo-500/5 pr-2">
+            <span className="text-[10px] font-bold uppercase text-indigo-300 font-mono block">2. MULTI-STAGE ENGINE WORKFLOW</span>
+            <div className="space-y-1 text-[10px] text-slate-400 font-mono leading-relaxed">
+              <div><strong className="text-slate-300">A. DBA Weight</strong>: period weight scaling for active periods</div>
+              <div className="pt-1"><strong className="text-slate-300">B. Transit Trigger</strong>: transit-to-natal chain (T.Planet → T.Star → T.Sub → N.Planet → N.Star → N.Sub → SSL)</div>
+              <div className="pt-1"><strong className="text-slate-300">C. Convergence</strong>: maps Active Planet Objects</div>
+              <div className="pt-1"><strong className="text-slate-300">D. House Engine</strong>: ranks Primary, Secondary, Background houses</div>
+            </div>
+          </div>
+
+          {/* Outputs */}
+          <div className="space-y-2">
+            <span className="text-[10px] font-bold uppercase text-indigo-300 font-mono block">3. OUTPUT BLOCKS & CLUSTERS</span>
+            <div className="space-y-1 text-[10px] text-slate-400 font-mono">
+              <div><strong className="text-rose-400">Block 1: Mood</strong> (Houses 1, 3, 4, 5, 6, 12) → Mood, Stress, Focus, Emotion, Creativity, Mental Energy</div>
+              <div className="pt-1"><strong className="text-emerald-400">Block 2: Behaviour</strong> (Houses 2, 3, 6, 7, 10, 11) → Comm, Discipline, Aggression, Patience, Leadership, Network</div>
+              <div className="pt-1"><strong className="text-cyan-400">Block 3: Daily Themes</strong> (Primary/Secondary Houses) → Career, Money, Home, Travel, Study, Rest, Planning</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-2 border-t border-indigo-500/10 flex flex-wrap justify-between items-center text-[9px] font-mono text-slate-500 gap-2">
+          <span>EXCLUDED FROM DAILY RUN: Marriage, Promotion, Childbirth, Court, Property, Foreign (Handled exclusively by NJEvent)</span>
+          <span className="text-indigo-400 uppercase font-bold">KP-Only Standard</span>
+        </div>
+      </div>
+
       {/* Categories Horizontal Tabs */}
       <div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1">
         {categories.map((cat) => {

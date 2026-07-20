@@ -2,7 +2,159 @@
   "schemaVersion": "1.0",
   "engine": "KP",
   "version": "1.0",
-  "lastUpdated": "",
-  "description": "KP astrology mood and psychological state indicators",
+  "lastUpdated": "2026-07-20T00:15:00Z",
+  "description": "KP astrology mood and psychological state indicators - Daily Horoscope Engine Specification",
+  "daily_horoscope_engine": {
+    "engine_type": "KP_ONLY",
+    "global_input_run_once": {
+      "current_sky": {
+        "transit_planets": {
+          "fields": ["longitude", "sign", "house", "nakshatra", "star_lord", "sub_lord"]
+        },
+        "moon": {
+          "fields": ["longitude", "sign", "house", "nakshatra", "star_lord", "sub_lord"]
+        },
+        "panchanga": {
+          "fields": ["tithi", "vara", "yoga", "karana", "hora"]
+        }
+      }
+    },
+    "user_input_cache": {
+      "birth_data": {},
+      "current_vimshottari": {
+        "fields": ["MD", "AD", "PD", "SD", "Prana"]
+      },
+      "natal_planets": {
+        "fields": [
+          "longitude",
+          "sign",
+          "house_occupied",
+          "house_ownership",
+          "nakshatra",
+          "star_lord",
+          "sub_lord",
+          "SSL",
+          "6_fold_significators",
+          "natural_karaka"
+        ]
+      },
+      "cuspal_sublords": {},
+      "natal_promise_cache": {}
+    },
+    "engine_architecture": {
+      "step_1": {
+        "name": "DBA Engine",
+        "inputs": ["MD", "AD", "PD", "SD", "Prana"],
+        "output": "Vimshottari weights"
+      },
+      "step_2": {
+        "name": "Transit Trigger Engine",
+        "flow": [
+          "Transit Planet",
+          "Transit Nakshatra",
+          "Transit Star Lord",
+          "Transit Sub Lord",
+          "Natal Planet",
+          "Natal Star Lord",
+          "Natal Sub Lord",
+          "Natal SSL"
+        ],
+        "output": "Trigger Score"
+      },
+      "step_3": {
+        "name": "Convergence Engine",
+        "combination": "DBA + Trigger",
+        "output_objects": "Active Planet Objects",
+        "active_planet_object_structure": {
+          "planet": "string",
+          "dba_weight": "number",
+          "transit_nakshatra": "string",
+          "transit_star": "string",
+          "transit_sub": "string",
+          "natal_nakshatra": "string",
+          "natal_star": "string",
+          "natal_sub": "string",
+          "natal_ssl": "string",
+          "occupation": "number",
+          "ownership": "number[]",
+          "six_fold_significators": "number[]"
+        }
+      },
+      "step_4": {
+        "name": "House Engine",
+        "inputs": ["occupation", "ownership", "6_fold_significators"],
+        "process": "Merge into House Frequency and classify houses",
+        "output_classes": {
+          "primary_houses": "number[]",
+          "secondary_houses": "number[]",
+          "background_houses": "number[]"
+        }
+      }
+    },
+    "output_blocks": {
+      "block_1_mood": {
+        "inputs": [
+          "moon",
+          "moon_star",
+          "moon_sub",
+          "active_planet_objects",
+          "houses_1_3_4_5_6_12"
+        ],
+        "outputs": [
+          "Mood",
+          "Stress",
+          "Focus",
+          "Emotion",
+          "Creativity",
+          "Mental Energy"
+        ]
+      },
+      "block_2_behaviour": {
+        "inputs": [
+          "active_planet_objects",
+          "houses_2_3_6_7_10_11"
+        ],
+        "outputs": [
+          "Communication",
+          "Discipline",
+          "Aggression",
+          "Patience",
+          "Leadership",
+          "Networking",
+          "Negotiation",
+          "Learning"
+        ]
+      },
+      "block_3_daily_themes": {
+        "inputs": [
+          "primary_houses",
+          "secondary_houses",
+          "planet_objects"
+        ],
+        "outputs": [
+          "Career",
+          "Money",
+          "Home",
+          "Travel",
+          "Study",
+          "Communication",
+          "Health Routine",
+          "Social Activity",
+          "Rest",
+          "Planning",
+          "Documentation"
+        ]
+      }
+    },
+    "excluded_domains": [
+      "Marriage",
+      "Promotion",
+      "Childbirth",
+      "Court",
+      "Property Purchase",
+      "Foreign Settlement"
+    ],
+    "exclusion_rule": "Handled exclusively by NJEvent only"
+  },
   "items": []
 }

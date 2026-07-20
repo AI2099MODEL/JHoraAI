@@ -248,3 +248,115 @@ The JHora AI Astrological Engine evaluates these logic gates against Table 1 and
   * Condition: Active Vimshottari Mahadasha Lord is friend of 7th Lord -> Output Status: Auspicious Relationship Window Open
   * Condition: Saturn transit aspects Natal 7th Cusp -> Output Status: Reality-Check and Constructive Relationship Duty
   * Condition: Jupiter transit aspects Natal 7th Lord -> Output Status: Auspicious Celestial Alignment (Go-Ahead)
+
+---
+
+## III. DAILY HOROSCOPE ENGINE (KP ONLY)
+
+This section outlines the blueprint, data parameters, and structural execution pipeline for the **Daily Horoscope Engine**, designed strictly under the Krishnamurti Paddhati (KP) astrological framework.
+
+### 1. Global Input (Run Once)
+
+The engine receives and parses the live sky transit coordinates at the start of each daily run:
+
+* **Current Sky**:
+  * For each Transit Planet: Longitude, Sign, House, Nakshatra, Star Lord, Sub Lord.
+  * **Moon**: Longitude, Sign, House, Nakshatra, Star Lord, Sub Lord.
+* **Panchanga**: Tithi, Vara, Yoga, Karana, Hora.
+
+### 2. User Input Cache
+
+Raw birth particulars and natal metrics are queried dynamically from the persistent user profile cache:
+
+* **Birth Data**: Latitude, Longitude, Timezone, Place.
+* **Current Vimshottari Dasha**:
+  * Mahadasha (MD), Antardasha (AD), Pratyantardasha (PD), Sookshmadasha (SD), Pranadasha (Prana).
+* **Natal Planet Coordinates & Indicators** (For every Natal Planet):
+  * Longitude, Sign, House Occupied, House Ownership, Nakshatra, Star Lord, Sub Lord, Sub-Sub Lord (SSL), 6-Fold Significators (L1 to L6), Natural Karaka.
+* **Cuspal Sublords**: Placidus house sublords for houses 1 to 12.
+* **Natal Promise Cache**: Lifetime promises compiled for various life sectors.
+
+### 3. Core Engine Pipeline
+
+The prediction workflow progresses sequentially through four specialized processing engines:
+
+```
+┌────────────────────────────────────────────────────────┐
+│                     1. DBA Engine                      │
+│        Applies relative time-weights to active         │
+│          MD, AD, PD, SD, and Prana period lords        │
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│               2. Transit Trigger Engine                │
+│       Traces transit-to-natal planet trigger links     │
+│        (Transit Planet -> Transit Star/Sub Lords ->    │
+│        Natal Planet -> Natal Star/Sub/SSL -> Score)    │
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│                 3. Convergence Engine                  │
+│       Merges DBA weights and transit trigger scores    │
+│      producing highly specialized Active Planet Objects│
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│                    4. House Engine                     │
+│         Aggregates active planet significators         │
+│       to classify Primary, Secondary, and Background   │
+│                 operational houses                     │
+└────────────────────────────────────────────────────────┘
+```
+
+1. **DBA Engine**: Calculates period weights for Vimshottari lords down to Prana level.
+2. **Transit Trigger Engine**: Traces the dynamic transit trigger chain:
+   $$\text{Transit Planet} \rightarrow \text{Transit Nakshatra} \rightarrow \text{Transit Star Lord} \rightarrow \text{Transit Sub Lord} \rightarrow \text{Natal Planet} \rightarrow \text{Natal Star Lord} \rightarrow \text{Natal Sub Lord} \rightarrow \text{Natal SSL} \rightarrow \text{Trigger Score}$$
+3. **Convergence Engine**: Blends active DBA periods with Transit Triggers. It yields a structured array of **Active Planet Objects**, each encapsulating:
+   * Planet
+   * DBA Weight
+   * Transit Nakshatra, Star, Sub
+   * Natal Nakshatra, Star, Sub, SSL
+   * House Occupation & Ownership
+   * 6-Fold Significators
+4. **House Engine**: Merges active planetary house occupation, ownership, and 6-fold significators to determine:
+   * **House Frequency**: Cumulative strength counts for houses 1 to 12.
+   * **Primary Houses**: Houses activated with highest frequencies.
+   * **Secondary Houses**: Supporting house combinations.
+   * **Background Houses**: Passive or dormant houses.
+
+---
+
+### 4. Output Blocks & Clusters
+
+The engine distributes converged results across three user-facing blocks based on specific house clusters:
+
+#### Output Block 1: Mood & Psychological State
+* **Inputs**: Transiting Moon position, Moon Star Lord, Moon Sub Lord, Active Planet Objects, House activations of **Houses 1, 3, 4, 5, 6, and 12**.
+* **Outputs**: Mood, Stress, Focus, Emotion, Creativity, and Mental Energy metrics.
+
+#### Output Block 2: Behavioral Tendencies
+* **Inputs**: Active Planet Objects, House activations of **Houses 2, 3, 6, 7, 10, and 11**.
+* **Outputs**: Communication style, Discipline, Aggression, Patience, Leadership, Networking, Negotiation, and Learning capacities.
+
+#### Output Block 3: Daily Theme Probability
+* **Inputs**: Classified Primary Houses, Secondary Houses, Active Planet Objects.
+* **Outputs**: Probability trends across Career, Money, Home, Travel, Study, Communication, Health Routine, Social Activity, Rest, Planning, and Documentation.
+
+---
+
+### 5. Domain Exclusions & Handlers
+
+To maintain high focus and analytical integrity, major life events are strictly excluded from the Daily Horoscope Engine calculations:
+
+* **Excluded Domains**:
+  * Marriage
+  * Promotion
+  * Childbirth
+  * Court Litigation
+  * Property Purchase
+  * Foreign Settlement
+* **Handling Rule**: These long-term lifetime events are evaluated exclusively by the **NJEvent Engine** (lifetime events/promise analyzers) and are completely filtered out of daily mood/theme cycles.
+

@@ -24,3 +24,15 @@ Agents working on this repository MUST strictly abide by these baseline instruct
 1. **FETCH RAW DATA FROM API**: Under no circumstances should agents run client-side or server-side pre-computations, calculations, or generate any transit forecasts or overlays during data fetch. The raw responses from JHora or VedicAstro REST gateways must be fetched precisely as they are and stored locally inside the UserProfile.
 2. **DISPLAY ALL DATA IN THE FORM OF TABLES**: Within the Astro systems menu structures, all displayed data must be formatted and presented cleanly in the form of tabular, raw data tables without any on-the-fly calculations, transits, or dynamic overlays. This ensures a 100% stable presentation matching the stored JSON payloads exactly.
 3. **INDEX ALL TABLES STARTING FROM JH1 TILL END**: In the Astro systems registry menu, tables must be strictly indexed from JH1 to JH19 consecutively to maintain cohesive mapping reference bounds. Ensure complete raw JSON payloads can be inspected, and keep the PDF export and raw JSON download functions fully preserved and integrated inside this Astro module.
+
+## Daily Horoscope Engine (KP Only) Architecture Rules
+
+Whenever developing, maintaining, or documenting the Daily Horoscope Engine:
+1. **INPUT SPECIFICATION**: Ensure the engine only runs when provided with both the Global Current Sky (transit coordinates, Moon details, Panchanga) and the User Input Cache (birth parameters, current Vimshottari period, natal planet coordinates, cuspal sublords, natal promise).
+2. **CONVERGENCE PROCESSING**: Calculate period weights and trigger scores sequentially through DBA -> Transit -> Convergence (Active Planet Objects) -> House Engines.
+3. **MODULAR OUTPUT CLUSTERS**: Ensure daily trends are strictly distributed across:
+   - **Mood Block**: Uses Houses 1, 3, 4, 5, 6, 12 to yield emotional metrics.
+   - **Behaviour Block**: Uses Houses 2, 3, 6, 7, 10, 11 to yield behavioral metrics.
+   - **Daily Themes Block**: Uses Primary and Secondary house activations to yield theme probabilities.
+4. **DOMAIN EXCLUSION**: Absolutely exclude major life events (Marriage, Promotion, Childbirth, Court, Property Purchase, Foreign Settlement) from daily forecasts, as they are strictly reserved for long-term NJEvent evaluations.
+

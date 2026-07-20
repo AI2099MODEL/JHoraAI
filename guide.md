@@ -135,3 +135,25 @@ The submenu "Divisional Vargas" within the "Astro" menu must be updated and labe
 ### Rule 6: Mandatory Google Authentication & Account-Bound User Profile Persistence
 All users accessing the JHora AI Professional platform are required to authenticate via Google Account credentials upon site entry. Under no circumstances should any static, hardcoded, or pre-loaded default profiles (such as the legacy "Nitin" profile) be baked into the application's code, fallback states, initial input fields, dropdown selectors, or stored file repository (e.g. `/Users/`). The active user profile and all generated or saved astrological charts must be strictly attached, dynamically synced, and persistently stored under the authenticated user's unique Google account credentials. All database and API operations must map directly to the Google UID to maintain absolute account isolation and data security.
 
+---
+
+## 6. Daily Horoscope Engine (KP Only) Specification
+
+The platform features the design for a highly advanced, KP-focused **Daily Horoscope Engine** structured across precise inputs, specialized calculation stages, and curated output blocks.
+
+### Core Calculation Flow & Engines
+1. **DBA Engine**: Period weightings for Active Mahadasha (MD), Antardasha (AD), Pratyantardasha (PD), Sookshmadasha (SD), and Pranadasha (Prana) planets.
+2. **Transit Trigger Engine**: Calculates dynamic trigger scores through the path:
+   $$\text{Transit Planet} \rightarrow \text{Transit Nakshatra} \rightarrow \text{Transit Star} \rightarrow \text{Transit Sub} \rightarrow \text{Natal Planet} \rightarrow \text{Natal Star} \rightarrow \text{Natal Sub} \rightarrow \text{Natal SSL}$$
+3. **Convergence Engine**: Merges active DBA periods and Transit triggers into **Active Planet Objects**. Each contains planet weights, transit positions, natal positions, and 6-Fold significators.
+4. **House Engine**: Aggregates and merges active planetary significations (Occupation + Ownership + 6-Fold Significators) to rank house frequencies into Primary, Secondary, and Background houses.
+
+### Output Clusters & Targets
+* **Mood Output Block**: Maps transiting Moon, its Star/Sub lords, active planets, and houses **1, 3, 4, 5, 6, 12** to produce Mood, Stress, Focus, Emotion, Creativity, and Mental Energy indicators.
+* **Behaviour Output Block**: Maps active planets and houses **2, 3, 6, 7, 10, 11** to evaluate Communication, Discipline, Aggression, Patience, Leadership, Networking, Negotiation, and Learning.
+* **Daily Themes Block**: Evaluates Primary and Secondary house activations against planet objects to output daily probabilities for Career, Money, Home, Travel, Study, Communication, Health Routine, Social Activity, Rest, Planning, and Documentation.
+
+### Major Life Event Exclusions
+To prevent cluttering short-term trends, the following are strictly excluded from the Daily Horoscope Engine calculations: **Marriage, Promotion, Childbirth, Court, Property Purchase, and Foreign Settlement**. These are handled exclusively by the long-term **NJEvent Engine**.
+
+
