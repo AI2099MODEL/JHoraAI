@@ -86,7 +86,22 @@ let app;
 let auth: Auth;
 let db: Firestore;
 
-const customFirebaseConfig = {
+const isAiStudioPreview = typeof window !== "undefined" && (
+  window.location.hostname.includes("ais-dev-") || 
+  window.location.hostname.includes("ais-pre-") ||
+  window.location.hostname.includes("asia-east1.run.app")
+);
+
+const useSandbox = isAiStudioPreview || !import.meta.env.VITE_FIREBASE_PROJECT_ID;
+
+const customFirebaseConfig = useSandbox ? {
+  apiKey: firebaseConfig.apiKey,
+  authDomain: firebaseConfig.authDomain,
+  projectId: firebaseConfig.projectId,
+  storageBucket: firebaseConfig.storageBucket,
+  messagingSenderId: firebaseConfig.messagingSenderId,
+  appId: firebaseConfig.appId,
+} : {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || firebaseConfig.apiKey,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig.authDomain,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseConfig.projectId,
@@ -95,9 +110,9 @@ const customFirebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfig.appId,
 };
 
-const firestoreDbId = import.meta.env.VITE_FIREBASE_PROJECT_ID 
-  ? undefined 
-  : ((firebaseConfig as any).firestoreDatabaseId || "ai-studio-jhoraai-b515adab-0d0d-4cd6-aed5-99cdb77486ac");
+const firestoreDbId = useSandbox 
+  ? ((firebaseConfig as any).firestoreDatabaseId || "ai-studio-jhoraai-b515adab-0d0d-4cd6-aed5-99cdb77486ac")
+  : undefined;
 
 try {
   if (getApps().length === 0) {
