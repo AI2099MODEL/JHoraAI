@@ -230,24 +230,28 @@ This table indexes the mathematical auspiciousness (Ishta) versus difficulty (Ka
 
 ## II. ASTROLOGICAL RULES & LOGIC GATES
 
-The JHora AI Astrological Engine evaluates these logic gates against Table 1 and our natal planetary coordinate matrices.
+All core astrological rules and logical trigger gates have been successfully compiled, indexed, and migrated from this handbook into the live **Event Book Engine** inside `/src/components/EventBookView.tsx`. This ensures single-source-of-truth integrity and live evaluation within our dynamic user-profile forecast structures.
 
-### 200. Core Relationship Promise Rules
-* **Vedic Rules:**
-  * Condition: Venus is in Friendly Sign -> Output Status: Supportive Relationship Spark
-  * Condition: Jupiter aspects 7th House -> Output Status: Relationship Protection & Divine Accord
-  * Condition: 7th Lord in Dusthana House (6th/8th/12th) -> Output Status: Karmic Relationship Delays
+### Compiled & Transferred System Rules Index:
 
-* **KP Stellar Rules:**
-  * Condition: 7th Cuspal Sub-Lord signifies 2nd, 7th, 11th houses -> Output Status: Positive Marriage Promise (KP_DEC_PROMISE_01)
-  * Condition: 7th Cuspal Sub-Lord signifies 1st, 6th, 10th houses -> Output Status: Career Focus Over Relationship
-  * Condition: 7th Cuspal Sub-Lord signifies 4th, 10th, 12th houses -> Output Status: Obstacles and Detachment
-
-### 300. Dasha & Transit Activation Rules
-* **Timeline Rules:**
-  * Condition: Active Vimshottari Mahadasha Lord is friend of 7th Lord -> Output Status: Auspicious Relationship Window Open
-  * Condition: Saturn transit aspects Natal 7th Cusp -> Output Status: Reality-Check and Constructive Relationship Duty
-  * Condition: Jupiter transit aspects Natal 7th Lord -> Output Status: Auspicious Celestial Alignment (Go-Ahead)
+1. **REL101 (Vedic Rules)**:
+   * `Condition:` Venus is in Friendly Sign ➔ **Output Status:** `Supportive Relationship Spark`
+2. **REL102 (Vedic Rules)**:
+   * `Condition:` Jupiter aspects 7th House ➔ **Output Status:** `Relationship Protection & Divine Accord`
+3. **REL103 (Vedic Rules)**:
+   * `Condition:` 7th Lord in Dusthana House (6th/8th/12th) ➔ **Output Status:** `Karmic Relationship Delays`
+4. **REL104 (KP Stellar Rules)**:
+   * `Condition:` 7th Cuspal Sub-Lord signifies 2nd, 7th, 11th houses ➔ **Output Status:** `Positive Marriage Promise (KP_DEC_PROMISE_01)`
+5. **REL105 (KP Stellar Rules)**:
+   * `Condition:` 7th Cuspal Sub-Lord signifies 1st, 6th, 10th houses ➔ **Output Status:** `Career Focus Over Relationship`
+6. **REL106 (KP Stellar Rules)**:
+   * `Condition:` 7th Cuspal Sub-Lord signifies 4th, 10th, 12th houses ➔ **Output Status:** `Obstacles and Detachment`
+7. **REL107 (Timeline Rules)**:
+   * `Condition:` Active Vimshottari Mahadasha Lord is friend of 7th Lord ➔ **Output Status:** `Auspicious Relationship Window Open`
+8. **REL108 (Timeline Rules)**:
+   * `Condition:` Saturn transit aspects Natal 7th Cusp ➔ **Output Status:** `Reality-Check and Constructive Relationship Duty`
+9. **REL109 (Timeline Rules)**:
+   * `Condition:` Jupiter transit aspects Natal 7th Lord ➔ **Output Status:** `Auspicious Celestial Alignment (Go-Ahead)`
 
 ---
 

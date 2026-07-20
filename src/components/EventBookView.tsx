@@ -260,6 +260,98 @@ const relEvents: KPEvent[] = [
     description: "Severe distress, emotional or physical hostility within the household."
   },
 
+  // Compiled & Indexed Astrological Logic Gates & Rules
+  { 
+    id: "REL101", 
+    category: "relationship",
+    name: "Supportive Relationship Spark (Vedic)", 
+    primary: "Friendly Sign", 
+    supporting: "Venus", 
+    obstructing: "-", 
+    mainCsl: "Venus",
+    description: "Condition: Venus is in Friendly Sign. Output Status: Supportive Relationship Spark."
+  },
+  { 
+    id: "REL102", 
+    category: "relationship",
+    name: "Relationship Protection & Divine Accord (Vedic)", 
+    primary: "7th Aspect", 
+    supporting: "Jupiter", 
+    obstructing: "-", 
+    mainCsl: "7",
+    description: "Condition: Jupiter aspects 7th House. Output Status: Relationship Protection & Divine Accord."
+  },
+  { 
+    id: "REL103", 
+    category: "relationship",
+    name: "Karmic Relationship Delays (Vedic)", 
+    primary: "6,8,12", 
+    supporting: "7th Lord", 
+    obstructing: "2,7,11", 
+    mainCsl: "7",
+    description: "Condition: 7th Lord in Dusthana House (6th/8th/12th). Output Status: Karmic Relationship Delays."
+  },
+  { 
+    id: "REL104", 
+    category: "relationship",
+    name: "Positive Marriage Promise (KP)", 
+    primary: "2,7,11", 
+    supporting: "5,9", 
+    obstructing: "1,6,10", 
+    mainCsl: "7",
+    description: "Condition: 7th Cuspal Sub-Lord signifies 2nd, 7th, 11th houses. Output Status: Positive Marriage Promise (KP_DEC_PROMISE_01)."
+  },
+  { 
+    id: "REL105", 
+    category: "relationship",
+    name: "Career Focus Over Relationship (KP)", 
+    primary: "1,6,10", 
+    supporting: "-", 
+    obstructing: "2,7,11", 
+    mainCsl: "7",
+    description: "Condition: 7th Cuspal Sub-Lord signifies 1st, 6th, 10th houses. Output Status: Career Focus Over Relationship."
+  },
+  { 
+    id: "REL106", 
+    category: "relationship",
+    name: "Obstacles and Detachment (KP)", 
+    primary: "4,10,12", 
+    supporting: "-", 
+    obstructing: "2,7,11", 
+    mainCsl: "7",
+    description: "Condition: 7th Cuspal Sub-Lord signifies 4th, 10th, 12th houses. Output Status: Obstacles and Detachment."
+  },
+  { 
+    id: "REL107", 
+    category: "relationship",
+    name: "Auspicious Relationship Window Open (Timeline)", 
+    primary: "7", 
+    supporting: "MD Lord Friend", 
+    obstructing: "-", 
+    mainCsl: "7",
+    description: "Condition: Active Vimshottari Mahadasha Lord is friend of 7th Lord. Output Status: Auspicious Relationship Window Open."
+  },
+  { 
+    id: "REL108", 
+    category: "relationship",
+    name: "Reality-Check & Constructive Duty (Timeline)", 
+    primary: "7 Cusp", 
+    supporting: "Saturn Transit", 
+    obstructing: "-", 
+    mainCsl: "7",
+    description: "Condition: Saturn transit aspects Natal 7th Cusp. Output Status: Reality-Check and Constructive Relationship Duty."
+  },
+  { 
+    id: "REL109", 
+    category: "relationship",
+    name: "Auspicious Celestial Alignment (Timeline)", 
+    primary: "7 Lord", 
+    supporting: "Jupiter Transit", 
+    obstructing: "-", 
+    mainCsl: "7",
+    description: "Condition: Jupiter transit aspects Natal 7th Lord. Output Status: Auspicious Celestial Alignment (Go-Ahead)."
+  },
+
   // Career (CAR)
   {
     id: "CAR001",
