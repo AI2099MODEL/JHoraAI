@@ -554,7 +554,519 @@ ACTIVATION decides WHEN.
 
 DAILY decides TODAY.
 
-These three stages NEVER override one another.`;
+These three stages NEVER override one another.
+
+###############################################################
+# PART 13 — EXECUTION PIPELINE
+# Unified Astrological Processing Flow
+###############################################################
+
+STEP 1
+LOAD CHART
+
+↓
+
+Birth Details
+
+Date
+
+Time
+
+Latitude
+
+Longitude
+
+Timezone
+
+↓
+
+Generate
+
+D1
+
+D9
+
+D10
+
+D7
+
+D4
+
+KP Cusps
+
+Planet Positions
+
+Nakshatras
+
+Subs
+
+SSL
+
+House Lords
+
+Natural Karakas
+
+Jaimini Karakas
+
+Arudha
+
+Upapada
+
+Planet Strength
+
+Doshas
+
+Yogas
+
+Planet DNA
+
+↓
+
+Cache All Data
+
+###############################################################
+
+STEP 2
+
+RULE COMPILATION
+
+↓
+
+Load
+
+master_astro_handbook.md
+
+↓
+
+Syntax Validation
+
+↓
+
+Conflict Detection
+
+↓
+
+Rule Compilation
+
+↓
+
+compiled_rules.json
+
+↓
+
+Memory Cache
+
+###############################################################
+
+STEP 3
+
+NATAL PROMISE ENGINE
+
+KP
+
+↓
+
+Evaluate KP Rules
+
+↓
+
+Parashari
+
+↓
+
+Evaluate Classical Rules
+
+↓
+
+Jaimini
+
+↓
+
+Evaluate Jaimini Rules
+
+↓
+
+Decision Engine
+
+↓
+
+Event Promise
+
+PASS
+
+FAIL
+
+WEAK
+
+MODERATE
+
+STRONG
+
+###############################################################
+
+STEP 4
+
+ACTIVATION ENGINE
+
+Load Current
+
+Vimshottari
+
+DBA
+
+Chara Dasha
+
+Transit Jupiter
+
+Transit Saturn
+
+Transit Rahu
+
+Transit Ketu
+
+↓
+
+Evaluate
+
+Activation Rules
+
+↓
+
+Output
+
+Inactive
+
+Weak Window
+
+Moderate Window
+
+Strong Window
+
+###############################################################
+
+STEP 5
+
+DAILY ENGINE
+
+Load
+
+Current Date
+
+↓
+
+Transit Planet
+
+↓
+
+Transit Star
+
+↓
+
+Transit Sub
+
+↓
+
+Natal Planet
+
+↓
+
+Natal Star
+
+↓
+
+Natal Sub
+
+↓
+
+SSL
+
+↓
+
+Planet DNA
+
+↓
+
+House Activation
+
+↓
+
+Daily Rule Evaluation
+
+↓
+
+Daily Output
+
+Mood
+
+Behaviour
+
+Focus
+
+Energy
+
+Travel
+
+Communication
+
+Finance
+
+Meditation
+
+Stress
+
+Creativity
+
+###############################################################
+
+STEP 6
+
+EVENT FILTER
+
+IF Event = Daily
+
+Allow only
+
+Mood
+
+Behaviour
+
+Energy
+
+Communication
+
+Travel
+
+Learning
+
+Productivity
+
+Health Trend
+
+Creativity
+
+Social
+
+ELSE
+
+Reject
+
+Marriage
+
+Promotion
+
+Child Birth
+
+Property
+
+Litigation
+
+Settlement
+
+Divorce
+
+Inheritance
+
+Major Surgery
+
+###############################################################
+
+STEP 7
+
+EVIDENCE ENGINE
+
+Collect
+
+Matched Rules
+
+Failed Rules
+
+House Evidence
+
+Planet Evidence
+
+Transit Evidence
+
+Strength Evidence
+
+Dosha Evidence
+
+Yoga Evidence
+
+↓
+
+Generate
+
+Evidence Report
+
+###############################################################
+
+STEP 8
+
+DECISION ENGINE
+
+KP
+
+PASS/FAIL
+
+↓
+
+Parashari
+
+PASS/FAIL
+
+↓
+
+Jaimini
+
+PASS/FAIL
+
+↓
+
+Decision Matrix
+
+PASS PASS PASS
+
+→ STRONG
+
+PASS PASS FAIL
+
+→ MODERATE
+
+PASS FAIL FAIL
+
+→ WEAK
+
+FAIL PASS PASS
+
+→ CONTRADICTORY
+
+FAIL FAIL FAIL
+
+→ NOT PROMISED
+
+###############################################################
+
+STEP 9
+
+EXPLANATION ENGINE
+
+Generate
+
+Human Explanation
+
+Technical Explanation
+
+Evidence
+
+Failed Rules
+
+Successful Rules
+
+Suggested Timing
+
+Confidence
+
+###############################################################
+
+STEP 10
+
+EVENT BOOK
+
+Store
+
+Event ID
+
+Timestamp
+
+Natal Verdict
+
+Activation Verdict
+
+Daily Verdict
+
+Evidence
+
+Explanation
+
+History
+
+User Notes
+
+###############################################################
+
+STEP 11
+
+USER INTERFACE
+
+Life Report
+
+↓
+
+Today's Forecast
+
+↓
+
+Activation Windows
+
+↓
+
+Evidence Viewer
+
+↓
+
+Rule Viewer
+
+↓
+
+Timeline
+
+↓
+
+Export PDF
+
+###############################################################
+
+CORE PRINCIPLE
+
+IF
+
+↓
+
+NATAL ENGINE
+
+Determines
+
+"Can this event happen?"
+
+WHEN
+
+↓
+
+ACTIVATION ENGINE
+
+Determines
+
+"When is the window open?"
+
+TODAY
+
+↓
+
+DAILY ENGINE
+
+Determines
+
+"What is active today?"
+
+These engines are completely independent.
+
+No Daily Rule can override a failed Natal Promise.
+
+No Transit can create an event that does not exist in the Natal Promise.
+
+Activation only releases what Natal has already promised.
+
+###############################################################`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(rawSpec);
