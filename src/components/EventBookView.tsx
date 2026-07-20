@@ -32,7 +32,7 @@ import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
 
 interface KPEvent {
   id: string;
-  category: "relationship" | "career" | "finance" | "health" | "litigation" | "education" | "property" | "travel";
+  category: "relationship" | "career" | "finance" | "property" | "health" | "education" | "children" | "travel" | "litigation" | "spiritual" | "daily" | "custom" | "agent_rules";
   name: string;
   primary: string;
   supporting: string;
@@ -42,449 +42,195 @@ interface KPEvent {
 }
 
 const relEvents: KPEvent[] = [
-  // Relationships (REL & NEW)
-  { 
-    id: "REL001", 
-    category: "relationship",
-    name: "Marriage Promise", 
-    primary: "2,7,11", 
-    supporting: "5,9", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Evaluates the overall foundational promise of marriage in the natal chart."
-  },
-  { 
-    id: "REL002", 
-    category: "relationship",
-    name: "Marriage Timing", 
-    primary: "2,7,11", 
-    supporting: "5,9", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Evaluates active DBA lords and timing triggers for marriage celebration."
-  },
-  { 
-    id: "REL003", 
-    category: "relationship",
-    name: "Marriage Proposal", 
-    primary: "3,7,11", 
-    supporting: "2,5", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Signifies receiving or presenting a formal marriage proposal."
-  },
-  { 
-    id: "REL004", 
-    category: "relationship",
-    name: "Proposal Acceptance", 
-    primary: "2,7,11", 
-    supporting: "3,5", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Affirmative acceptance of a marriage proposal by either family or individual."
-  },
-  { 
-    id: "REL005", 
-    category: "relationship",
-    name: "Proposal Rejection", 
-    primary: "1,6,10", 
-    supporting: "8,12", 
-    obstructing: "2,7,11", 
-    mainCsl: "7",
-    description: "Rejection of a marriage proposal, indicating misaligned expectations."
-  },
-  { 
-    id: "REL006", 
-    category: "relationship",
-    name: "Engagement", 
-    primary: "2,7,11", 
-    supporting: "3,5", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Formal or informal ceremony of betrothal or engagement."
-  },
-  { 
-    id: "REL007", 
-    category: "relationship",
-    name: "Engagement Cancellation", 
-    primary: "1,6,8,12", 
-    supporting: "10", 
-    obstructing: "2,7,11", 
-    mainCsl: "7",
-    description: "Disruption or cancellation of a planned engagement prior to marriage."
-  },
-  { 
-    id: "REL008", 
-    category: "relationship",
-    name: "Marriage Ceremony", 
-    primary: "2,7,11", 
-    supporting: "3,9", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "The actual execution of traditional or customary marriage rituals."
-  },
-  { 
-    id: "REL009", 
-    category: "relationship",
-    name: "Marriage Registration", 
-    primary: "2,7,11", 
-    supporting: "3,10", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Legal documentation and government registration of the marriage contract."
-  },
-  { 
-    id: "REL010", 
-    category: "relationship",
-    name: "Court Marriage", 
-    primary: "6,7,11", 
-    supporting: "3,9", 
-    obstructing: "1,5,10", 
-    mainCsl: "7",
-    description: "Legal wedding conducted in court under civil law."
-  },
-  { 
-    id: "REL011", 
-    category: "relationship",
-    name: "Love Marriage", 
-    primary: "5,7,11", 
-    supporting: "2,9", 
-    obstructing: "1,6,10", 
-    mainCsl: "5,7",
-    description: "Self-chosen relationship translating to legal marriage, driven by affection."
-  },
-  { 
-    id: "REL012", 
-    category: "relationship",
-    name: "Arranged Marriage", 
-    primary: "2,7,11", 
-    supporting: "9", 
-    obstructing: "5,6,10", 
-    mainCsl: "7",
-    description: "Traditional union facilitated primarily by parents, family, or matchmakers."
-  },
-  { 
-    id: "REL013", 
-    category: "relationship",
-    name: "Inter-Caste Marriage", 
-    primary: "7,11", 
-    supporting: "5,9,12", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Marriage breaking traditional lineage or caste boundaries."
-  },
-  { 
-    id: "REL014", 
-    category: "relationship",
-    name: "Inter-Religion Marriage", 
-    primary: "7,11", 
-    supporting: "9,12", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Matrimony between individuals practicing distinct faiths."
-  },
-  { 
-    id: "REL015", 
-    category: "relationship",
-    name: "Foreign Marriage", 
-    primary: "7,9,12", 
-    supporting: "2,11", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Marriage celebrated in a foreign land or with a foreign national."
-  },
-  { 
-    id: "REL016", 
-    category: "relationship",
-    name: "Delay in Marriage", 
-    primary: "7", 
-    supporting: "4,8,10", 
-    obstructing: "2,11", 
-    mainCsl: "7",
-    description: "Slower development of matrimonial conditions, often Sat-linked."
-  },
-  { 
-    id: "REL017", 
-    category: "relationship",
-    name: "Denial of Marriage", 
-    primary: "1,6,10", 
-    supporting: "8,12", 
-    obstructing: "2,7,11", 
-    mainCsl: "7",
-    description: "Astrological indications negating marriage promise in the lifetime."
-  },
-  { 
-    id: "REL018", 
-    category: "relationship",
-    name: "Married Life Quality", 
-    primary: "2,7,11", 
-    supporting: "4,5", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Evaluation of relative peace, prosperity, and stability post-marriage."
-  },
-  { 
-    id: "REL019", 
-    category: "relationship",
-    name: "Marital Happiness", 
-    primary: "4,7,11", 
-    supporting: "2,5", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Inherent domestic bliss, mutual support, and emotional nourishment."
-  },
-  { 
-    id: "REL020", 
-    category: "relationship",
-    name: "Marital Discord", 
-    primary: "1,6,10", 
-    supporting: "8,12", 
-    obstructing: "2,7,11", 
-    mainCsl: "7",
-    description: "Undercurrent of tension, arguments, and ideological differences."
-  },
-  { 
-    id: "REL021", 
-    category: "relationship",
-    name: "Frequent Arguments", 
-    primary: "6,8", 
-    supporting: "3", 
-    obstructing: "2,4,11", 
-    mainCsl: "7",
-    description: "Repetitive verbal disputes or temporary silent phases."
-  },
-  { 
-    id: "REL022", 
-    category: "relationship",
-    name: "Domestic Violence", 
-    primary: "6,8,12", 
-    supporting: "1", 
-    obstructing: "2,4,11", 
-    mainCsl: "4,7",
-    description: "Severe distress, emotional or physical hostility within the household."
-  },
+  // 1. RELATIONSHIP (REL001 - REL036)
+  { id: "REL001", category: "relationship", name: "Marriage Promise", primary: "2,7,11", supporting: "5,9", obstructing: "1,6,10", mainCsl: "7", description: "Evaluates the overall foundational promise of marriage in the natal chart." },
+  { id: "REL002", category: "relationship", name: "Love Marriage", primary: "5,7,11", supporting: "2,9", obstructing: "1,6,10", mainCsl: "5,7", description: "Self-chosen relationship translating to legal marriage, driven by affection." },
+  { id: "REL003", category: "relationship", name: "Arranged Marriage", primary: "2,7,11", supporting: "9", obstructing: "5,6,10", mainCsl: "7", description: "Traditional union facilitated primarily by parents, family, or matchmakers." },
+  { id: "REL004", category: "relationship", name: "Court Marriage", primary: "6,7,11", supporting: "3,9", obstructing: "1,5,10", mainCsl: "7", description: "Legal wedding conducted in court under civil law." },
+  { id: "REL005", category: "relationship", name: "Inter-caste Marriage", primary: "7,11", supporting: "5,9,12", obstructing: "1,6,10", mainCsl: "7", description: "Marriage breaking traditional lineage or caste boundaries." },
+  { id: "REL006", category: "relationship", name: "Inter-religion Marriage", primary: "7,11", supporting: "9,12", obstructing: "1,6,10", mainCsl: "7", description: "Matrimony between individuals practicing distinct faiths." },
+  { id: "REL007", category: "relationship", name: "Foreign Marriage", primary: "7,9,12", supporting: "2,11", obstructing: "1,6,10", mainCsl: "7", description: "Marriage celebrated in a foreign land or with a foreign national." },
+  { id: "REL008", category: "relationship", name: "Marriage Proposal", primary: "3,7,11", supporting: "2,5", obstructing: "1,6,10", mainCsl: "7", description: "Signifies receiving or presenting a formal marriage proposal." },
+  { id: "REL009", category: "relationship", name: "Proposal Acceptance", primary: "2,7,11", supporting: "3,5", obstructing: "1,6,10", mainCsl: "7", description: "Affirmative acceptance of a marriage proposal by either family or individual." },
+  { id: "REL010", category: "relationship", name: "Proposal Rejection", primary: "1,6,10", supporting: "8,12", obstructing: "2,7,11", mainCsl: "7", description: "Rejection of a marriage proposal, indicating misaligned expectations." },
+  { id: "REL011", category: "relationship", name: "Engagement", primary: "2,7,11", supporting: "3,5", obstructing: "1,6,10", mainCsl: "7", description: "Formal or informal ceremony of betrothal or engagement." },
+  { id: "REL012", category: "relationship", name: "Engagement Cancellation", primary: "1,6,8,12", supporting: "10", obstructing: "2,7,11", mainCsl: "7", description: "Disruption or cancellation of a planned engagement prior to marriage." },
+  { id: "REL013", category: "relationship", name: "Marriage Ceremony", primary: "2,7,11", supporting: "3,9", obstructing: "1,6,10", mainCsl: "7", description: "The actual execution of traditional or customary marriage rituals." },
+  { id: "REL014", category: "relationship", name: "Marriage Registration", primary: "2,7,11", supporting: "3,10", obstructing: "1,6,10", mainCsl: "7", description: "Legal documentation and government registration of the marriage contract." },
+  { id: "REL015", category: "relationship", name: "Delay in Marriage", primary: "7", supporting: "4,8,10", obstructing: "2,11", mainCsl: "7", description: "Slower development of matrimonial conditions, often Sat-linked." },
+  { id: "REL016", category: "relationship", name: "Denial of Marriage", primary: "1,6,10", supporting: "8,12", obstructing: "2,7,11", mainCsl: "7", description: "Astrological indications negating marriage promise in the lifetime." },
+  { id: "REL017", category: "relationship", name: "Second Marriage", primary: "2,7,11", supporting: "9,11", obstructing: "1,6,10", mainCsl: "9", description: "Second marriage potential analyzed from the 9th house (3rd from 7th)." },
+  { id: "REL018", category: "relationship", name: "Secret Relationship", primary: "5,8,12", supporting: "11", obstructing: "2,4", mainCsl: "12", description: "Undisclosed relationship or hidden romance." },
+  { id: "REL019", category: "relationship", name: "Live-in Relationship", primary: "5,7,12", supporting: "11", obstructing: "2,4,10", mainCsl: "12", description: "Co-habitation without legal or formal marriage." },
+  { id: "REL020", category: "relationship", name: "Extramarital Affair", primary: "5,7,11,12", supporting: "8", obstructing: "4", mainCsl: "12", description: "Involvement in relationships outside legal marriage limits." },
+  { id: "REL021", category: "relationship", name: "Separation", primary: "1,6,10", supporting: "8,12", obstructing: "2,7,11", mainCsl: "7", description: "Physical or emotional separation between couple." },
+  { id: "REL022", category: "relationship", name: "Reconciliation", primary: "2,7,11", supporting: "5,9", obstructing: "1,6,10", mainCsl: "7", description: "Re-uniting and resolving disputes post separation." },
+  { id: "REL023", category: "relationship", name: "Divorce", primary: "1,6,10", supporting: "8,12", obstructing: "2,7,11", mainCsl: "7", description: "Legal dissolution of marriage." },
+  { id: "REL024", category: "relationship", name: "Legal Separation", primary: "1,6,8,10", supporting: "12", obstructing: "2,7,11", mainCsl: "7", description: "Court-approved separation without divorcing." },
+  { id: "REL025", category: "relationship", name: "Marital Happiness", primary: "4,7,11", supporting: "2,5", obstructing: "1,6,10", mainCsl: "7", description: "Inherent domestic bliss, mutual support, and emotional nourishment." },
+  { id: "REL026", category: "relationship", name: "Marital Discord", primary: "1,6,10", supporting: "8,12", obstructing: "2,7,11", mainCsl: "7", description: "Undercurrent of tension, arguments, and ideological differences." },
+  { id: "REL027", category: "relationship", name: "Arguments", primary: "6,8", supporting: "3", obstructing: "2,4,11", mainCsl: "7", description: "Repetitive verbal disputes or temporary silent phases." },
+  { id: "REL028", category: "relationship", name: "Domestic Violence", primary: "6,8,12", supporting: "1", obstructing: "2,4,11", mainCsl: "4,7", description: "Severe distress, emotional or physical hostility within the household." },
+  { id: "REL029", category: "relationship", name: "Spouse Health", primary: "1,6,8", supporting: "12", obstructing: "5,11", mainCsl: "7", description: "Condition of spouse's health and wellness (7th house as partner's ascendant)." },
+  { id: "REL030", category: "relationship", name: "Spouse Career", primary: "2,6,10,11", supporting: "3", obstructing: "5,8,12", mainCsl: "4", description: "Spouse's professional success and status (10th from 7th = 4th house)." },
+  { id: "REL031", category: "relationship", name: "Spouse Wealth", primary: "2,8,11", supporting: "5", obstructing: "12", mainCsl: "8", description: "Spouse's accumulation of assets and wealth (2nd from 7th = 8th house)." },
+  { id: "REL032", category: "relationship", name: "Spouse Foreign Settlement", primary: "4,9,12", supporting: "11", obstructing: "1", mainCsl: "6", description: "Spouse's travel and overseas residence." },
+  { id: "REL033", category: "relationship", name: "Widowhood", primary: "1,6,8,12", supporting: "10", obstructing: "2,7,11", mainCsl: "7", description: "Loss of partner/spouse, analyzed from the 8th from 7th (2nd house)." },
+  { id: "REL034", category: "relationship", name: "Remarriage", primary: "2,7,9,11", supporting: "5", obstructing: "1,6,10", mainCsl: "9", description: "Subsequent marriage celebration." },
+  { id: "REL035", category: "relationship", name: "Relationship Healing", primary: "2,7,11", supporting: "5,9", obstructing: "1,6", mainCsl: "7", description: "Restoration of harmony and mutual understanding." },
+  { id: "REL036", category: "relationship", name: "Relationship Compatibility", primary: "2,5,7,11", supporting: "9", obstructing: "6,8,12", mainCsl: "7", description: "Inherent emotional and mental compatibility between individuals." },
 
-  // Compiled & Indexed Astrological Logic Gates & Rules
-  { 
-    id: "REL101", 
-    category: "relationship",
-    name: "Supportive Relationship Spark (Vedic)", 
-    primary: "Friendly Sign", 
-    supporting: "Venus", 
-    obstructing: "-", 
-    mainCsl: "Venus",
-    description: "Condition: Venus is in Friendly Sign. Output Status: Supportive Relationship Spark."
-  },
-  { 
-    id: "REL102", 
-    category: "relationship",
-    name: "Relationship Protection & Divine Accord (Vedic)", 
-    primary: "7th Aspect", 
-    supporting: "Jupiter", 
-    obstructing: "-", 
-    mainCsl: "7",
-    description: "Condition: Jupiter aspects 7th House. Output Status: Relationship Protection & Divine Accord."
-  },
-  { 
-    id: "REL103", 
-    category: "relationship",
-    name: "Karmic Relationship Delays (Vedic)", 
-    primary: "6,8,12", 
-    supporting: "7th Lord", 
-    obstructing: "2,7,11", 
-    mainCsl: "7",
-    description: "Condition: 7th Lord in Dusthana House (6th/8th/12th). Output Status: Karmic Relationship Delays."
-  },
-  { 
-    id: "REL104", 
-    category: "relationship",
-    name: "Positive Marriage Promise (KP)", 
-    primary: "2,7,11", 
-    supporting: "5,9", 
-    obstructing: "1,6,10", 
-    mainCsl: "7",
-    description: "Condition: 7th Cuspal Sub-Lord signifies 2nd, 7th, 11th houses. Output Status: Positive Marriage Promise (KP_DEC_PROMISE_01)."
-  },
-  { 
-    id: "REL105", 
-    category: "relationship",
-    name: "Career Focus Over Relationship (KP)", 
-    primary: "1,6,10", 
-    supporting: "-", 
-    obstructing: "2,7,11", 
-    mainCsl: "7",
-    description: "Condition: 7th Cuspal Sub-Lord signifies 1st, 6th, 10th houses. Output Status: Career Focus Over Relationship."
-  },
-  { 
-    id: "REL106", 
-    category: "relationship",
-    name: "Obstacles and Detachment (KP)", 
-    primary: "4,10,12", 
-    supporting: "-", 
-    obstructing: "2,7,11", 
-    mainCsl: "7",
-    description: "Condition: 7th Cuspal Sub-Lord signifies 4th, 10th, 12th houses. Output Status: Obstacles and Detachment."
-  },
-  { 
-    id: "REL107", 
-    category: "relationship",
-    name: "Auspicious Relationship Window Open (Timeline)", 
-    primary: "7", 
-    supporting: "MD Lord Friend", 
-    obstructing: "-", 
-    mainCsl: "7",
-    description: "Condition: Active Vimshottari Mahadasha Lord is friend of 7th Lord. Output Status: Auspicious Relationship Window Open."
-  },
-  { 
-    id: "REL108", 
-    category: "relationship",
-    name: "Reality-Check & Constructive Duty (Timeline)", 
-    primary: "7 Cusp", 
-    supporting: "Saturn Transit", 
-    obstructing: "-", 
-    mainCsl: "7",
-    description: "Condition: Saturn transit aspects Natal 7th Cusp. Output Status: Reality-Check and Constructive Relationship Duty."
-  },
-  { 
-    id: "REL109", 
-    category: "relationship",
-    name: "Auspicious Celestial Alignment (Timeline)", 
-    primary: "7 Lord", 
-    supporting: "Jupiter Transit", 
-    obstructing: "-", 
-    mainCsl: "7",
-    description: "Condition: Jupiter transit aspects Natal 7th Lord. Output Status: Auspicious Celestial Alignment (Go-Ahead)."
-  },
+  // 2. CAREER (CAR001 - CAR021)
+  { id: "CAR001", category: "career", name: "First Job", primary: "2,6,10,11", supporting: "1", obstructing: "5,8,12", mainCsl: "10", description: "Commencement of professional career." },
+  { id: "CAR002", category: "career", name: "New Job", primary: "2,6,10,11", supporting: "3", obstructing: "5,8,12", mainCsl: "10", description: "Securing a new job appointment." },
+  { id: "CAR003", category: "career", name: "Government Job", primary: "2,6,10,11", supporting: "Sun, Mars", obstructing: "5,8,12", mainCsl: "10", description: "Employment in a government sector." },
+  { id: "CAR004", category: "career", name: "Private Job", primary: "2,6,10,11", supporting: "Saturn, Mercury", obstructing: "5,8,12", mainCsl: "10", description: "Employment in private corporate sectors." },
+  { id: "CAR005", category: "career", name: "Promotion", primary: "2,6,10,11", supporting: "3,10", obstructing: "5,8,12", mainCsl: "10", description: "Upward elevation in rank and salary." },
+  { id: "CAR006", category: "career", name: "Transfer", primary: "3,10,12", supporting: "4", obstructing: "2,6,11", mainCsl: "3,10", description: "Change in location or branch of work." },
+  { id: "CAR007", category: "career", name: "Department Change", primary: "3,10", supporting: "6", obstructing: "2,11", mainCsl: "10", description: "Modification of work role or functional department." },
+  { id: "CAR008", category: "career", name: "Salary Increase", primary: "2,11", supporting: "6,10", obstructing: "12", mainCsl: "2,11", description: "Raise in professional compensation." },
+  { id: "CAR009", category: "career", name: "Recognition", primary: "10,11", supporting: "1,9", obstructing: "5,12", mainCsl: "10", description: "Public or corporate acknowledgment of contribution." },
+  { id: "CAR010", category: "career", name: "Award", primary: "10,11", supporting: "9", obstructing: "12", mainCsl: "11", description: "Receiving a formal prize, medal, or citation." },
+  { id: "CAR011", category: "career", name: "Leadership Position", primary: "1,10,11", supporting: "Sun", obstructing: "6,8", mainCsl: "10", description: "Appointment to manager, director, or executive role." },
+  { id: "CAR012", category: "career", name: "Business Start", primary: "7,10,11", supporting: "2", obstructing: "6,12", mainCsl: "7", description: "Launching an independent commercial business enterprise." },
+  { id: "CAR013", category: "career", name: "Business Expansion", primary: "2,7,10,11", supporting: "3", obstructing: "12", mainCsl: "7", description: "Expanding the scale or locations of active business." },
+  { id: "CAR014", category: "career", name: "Business Partnership", primary: "7,11", supporting: "2", obstructing: "6,12", mainCsl: "7", description: "Entering into a joint venture or partnership agreement." },
+  { id: "CAR015", category: "career", name: "Business Closure", primary: "5,12", supporting: "8", obstructing: "2,7,11", mainCsl: "7", description: "Dissolution or termination of business operations." },
+  { id: "CAR016", category: "career", name: "Self Employment", primary: "1,7,10", supporting: "11", obstructing: "6", mainCsl: "10", description: "Working as a freelancer or sole proprietor." },
+  { id: "CAR017", category: "career", name: "Career Change", primary: "3,5,10", supporting: "9", obstructing: "2,6", mainCsl: "10", description: "Shifting industry or profession type." },
+  { id: "CAR018", category: "career", name: "Resignation", primary: "5,9,12", supporting: "3", obstructing: "2,6,10,11", mainCsl: "10", description: "Voluntarily leaving professional employment." },
+  { id: "CAR019", category: "career", name: "Termination", primary: "5,8,12", supporting: "6", obstructing: "2,10,11", mainCsl: "10", description: "Discharge or dismissal from job." },
+  { id: "CAR020", category: "career", name: "Retirement", primary: "9,12", supporting: "1,5", obstructing: "6,10", mainCsl: "9", description: "End of professional active service." },
+  { id: "CAR021", category: "career", name: "Professional Reputation", primary: "1,10", supporting: "11", obstructing: "8,12", mainCsl: "10", description: "Status and prestige in the industry." },
 
-  // Career (CAR)
-  {
-    id: "CAR001",
-    category: "career",
-    name: "New Job Appointment",
-    primary: "2,6,10,11",
-    supporting: "1",
-    obstructing: "5,8,12",
-    mainCsl: "10",
-    description: "Securing new employment. 6th house is service; 10th is career status; 11th is desire fulfillment; 2nd is financial gain."
-  },
-  {
-    id: "CAR002",
-    category: "career",
-    name: "Job Promotion",
-    primary: "2,6,10,11",
-    supporting: "3",
-    obstructing: "5,8,12",
-    mainCsl: "10",
-    description: "Upward elevation in rank or designation, accompanied by financial boost."
-  },
-  {
-    id: "CAR003",
-    category: "career",
-    name: "Voluntary Resignation",
-    primary: "5,9,12",
-    supporting: "3",
-    obstructing: "2,6,10,11",
-    mainCsl: "10",
-    description: "Leaving a job of own volition. 5th house is 12th from 6th (loss of service); 9th is 12th from 10th (loss of status)."
-  },
+  // 3. FINANCE (FIN001 - FIN020)
+  { id: "FIN001", category: "finance", name: "Income", primary: "2,11", supporting: "6,10", obstructing: "12", mainCsl: "11", description: "Regular inflow of financial resources." },
+  { id: "FIN002", category: "finance", name: "Salary", primary: "2,6,11", supporting: "10", obstructing: "12", mainCsl: "2", description: "Periodic compensation from employment." },
+  { id: "FIN003", category: "finance", name: "Bonus", primary: "2,11", supporting: "8,9", obstructing: "12", mainCsl: "11", description: "Extra financial payouts or incentives." },
+  { id: "FIN004", category: "finance", name: "Commission", primary: "3,11", supporting: "2,7", obstructing: "12", mainCsl: "3", description: "Inflow from brokerage, referral, or agency work." },
+  { id: "FIN005", category: "finance", name: "Business Profit", primary: "2,7,11", supporting: "10", obstructing: "12", mainCsl: "11", description: "Net gains from trade, sales, or enterprise." },
+  { id: "FIN006", category: "finance", name: "Investment Gain", primary: "2,5,11", supporting: "9", obstructing: "12", mainCsl: "5", description: "Profits from stocks, mutual funds, or assets." },
+  { id: "FIN007", category: "finance", name: "Lottery", primary: "2,8,11", supporting: "5,9", obstructing: "12", mainCsl: "8,11", description: "Sudden unearned windfall gains." },
+  { id: "FIN008", category: "finance", name: "Unexpected Wealth", primary: "8,11", supporting: "2", obstructing: "12", mainCsl: "8", description: "Sudden monetary discovery or surprise receipts." },
+  { id: "FIN009", category: "finance", name: "Inheritance", primary: "2,8,11", supporting: "9", obstructing: "12", mainCsl: "8", description: "Receiving legacy or family ancestral assets." },
+  { id: "FIN010", category: "finance", name: "Property Income", primary: "2,4,11", supporting: "9", obstructing: "12", mainCsl: "4", description: "Profits earned from real estate or rentals." },
+  { id: "FIN011", category: "finance", name: "Rental Income", primary: "2,4,11", supporting: "6", obstructing: "12", mainCsl: "4", description: "Steady rent incoming from tenants." },
+  { id: "FIN012", category: "finance", name: "Tax Refund", primary: "8,11", supporting: "5", obstructing: "12", mainCsl: "8", description: "Reimbursements from government or taxes." },
+  { id: "FIN013", category: "finance", name: "Debt", primary: "6,8,12", supporting: "11", obstructing: "2,11", mainCsl: "6", description: "Financial liabilities, borrowing, or loans." },
+  { id: "FIN014", category: "finance", name: "Loan Approval", primary: "6,11", supporting: "2,12", obstructing: "5,8", mainCsl: "6", description: "Formal sanctioning of requested credit." },
+  { id: "FIN015", category: "finance", name: "Loan Repayment", primary: "5,8,12", supporting: "11", obstructing: "6", mainCsl: "5", description: "Paying off accumulated financial liabilities." },
+  { id: "FIN016", category: "finance", name: "Financial Loss", primary: "8,12", supporting: "6", obstructing: "2,11", mainCsl: "12", description: "Depletion or destruction of monetary reserves." },
+  { id: "FIN017", category: "finance", name: "Fraud", primary: "8,12", supporting: "4,7", obstructing: "2,11", mainCsl: "12", description: "Being cheated or defrauded financially." },
+  { id: "FIN018", category: "finance", name: "Bankruptcy", primary: "6,8,12", supporting: "12", obstructing: "2,11", mainCsl: "12", description: "Legal insolvency declaration." },
+  { id: "FIN019", category: "finance", name: "Savings Growth", primary: "2,11", supporting: "4,5", obstructing: "12", mainCsl: "2", description: "Increase in personal liquid savings." },
+  { id: "FIN020", category: "finance", name: "Luxury Purchase", primary: "4,12", supporting: "11", obstructing: "2", mainCsl: "4", description: "Expenditure on comforts, expensive goods." },
 
-  // Finance (FIN)
-  {
-    id: "FIN001",
-    category: "finance",
-    name: "Sudden Windfall / Lottery",
-    primary: "2,8,11",
-    supporting: "5,9",
-    obstructing: "1,12",
-    mainCsl: "8, 11",
-    description: "Unexpected unearned monetary gains. 2nd is wealth accumulation; 8th is sudden gains; 11th is overall profit."
-  },
-  {
-    id: "FIN002",
-    category: "finance",
-    name: "Business Partnership Profit",
-    primary: "2,7,11",
-    supporting: "5",
-    obstructing: "6,12",
-    mainCsl: "7",
-    description: "Gains derived through mutual commercial agreements and joint ventures."
-  },
+  // 4. PROPERTY (EST001 - EST013)
+  { id: "EST001", category: "property", name: "Purchase House", primary: "4,11,12", supporting: "9", obstructing: "3,8", mainCsl: "4", description: "Acquiring permanent immovable housing asset." },
+  { id: "EST002", category: "property", name: "Sell House", primary: "3,10,12", supporting: "5", obstructing: "4,11", mainCsl: "4,10", description: "Liquidating house or land." },
+  { id: "EST003", category: "property", name: "Purchase Land", primary: "4,11", supporting: "Mars", obstructing: "3,8", mainCsl: "4", description: "Acquiring open plot or agricultural fields." },
+  { id: "EST004", category: "property", name: "Sell Land", primary: "3,10,12", supporting: "5", obstructing: "4,11", mainCsl: "4", description: "Disposing of land plots for financial liquidity." },
+  { id: "EST005", category: "property", name: "Construction", primary: "4,11,12", supporting: "Saturn", obstructing: "8", mainCsl: "4", description: "Erecting physical structure on owned land." },
+  { id: "EST006", category: "property", name: "Renovation", primary: "4,12", supporting: "3", obstructing: "8", mainCsl: "4", description: "Remodeling or repairing current home structures." },
+  { id: "EST007", category: "property", name: "Commercial Property", primary: "4,7,11", supporting: "10,12", obstructing: "3,8", mainCsl: "4", description: "Acquiring property for commercial or trading purposes." },
+  { id: "EST008", category: "property", name: "Agricultural Land", primary: "4,11", supporting: "9", obstructing: "3", mainCsl: "4", description: "Purchasing farming or rural land." },
+  { id: "EST009", category: "property", name: "Vehicle Purchase", primary: "4,11,12", supporting: "Venus", obstructing: "3,8", mainCsl: "4", description: "Purchasing personal cars or transport assets." },
+  { id: "EST010", category: "property", name: "Vehicle Sale", primary: "3,10,12", supporting: "5", obstructing: "4,11", mainCsl: "4", description: "Selling owned vehicles." },
+  { id: "EST011", category: "property", name: "Property Dispute", primary: "4,6,8", supporting: "3", obstructing: "11", mainCsl: "4", description: "Disagreements or legal contentions over estates." },
+  { id: "EST012", category: "property", name: "Property Registration", primary: "4,10,11", supporting: "3", obstructing: "12", mainCsl: "4", description: "Legal registration of property deeds." },
+  { id: "EST013", category: "property", name: "Rental Property", primary: "4,6,11", supporting: "12", obstructing: "3", mainCsl: "4", description: "Leasing out property for periodic earnings." },
 
-  // Education & Exams (EDU)
-  {
-    id: "EDU001",
-    category: "education",
-    name: "Inaugural School Admission",
-    primary: "4,11",
-    supporting: "2",
-    obstructing: "3,8",
-    mainCsl: "4",
-    description: "Starting foundational primary education. 4th house rules core learning, 11th is successful placement."
-  },
-  {
-    id: "EDU002",
-    category: "education",
-    name: "Competitive Exam Success",
-    primary: "6,11",
-    supporting: "4,9",
-    obstructing: "5,8,12",
-    mainCsl: "4, 9",
-    description: "Clearing entrance exams or civil services. 6th house is overcoming peer competition; 11th is absolute success/securing seat."
-  },
-  {
-    id: "EDU003",
-    category: "education",
-    name: "Academic Distraction / Break",
-    primary: "3,5,8,12",
-    supporting: "-",
-    obstructing: "4,9,11",
-    mainCsl: "4",
-    description: "Temporary disruption in studies. 3rd house is 12th from 4th (negating basic study concentration); 5th is playful mind."
-  },
+  // 5. HEALTH (HEA001 - HEA014)
+  { id: "HEA001", category: "health", name: "General Health", primary: "1,5,9,11", supporting: "Sun", obstructing: "6,8,12", mainCsl: "1", description: "Overall physiological wellness and strength." },
+  { id: "HEA002", category: "health", name: "Disease", primary: "6,8,12", supporting: "Rahu", obstructing: "1,5,11", mainCsl: "6", description: "Manifestation of illness or biological dysfunction." },
+  { id: "HEA003", category: "health", name: "Hospitalization", primary: "6,8,12", supporting: "12", obstructing: "1,11", mainCsl: "12", description: "Admission to medical facility for clinical treatment." },
+  { id: "HEA004", category: "health", name: "Major Surgery", primary: "6,8,12", supporting: "Mars", obstructing: "1,11", mainCsl: "8", description: "Surgical operation under anesthesia." },
+  { id: "HEA005", category: "health", name: "Minor Surgery", primary: "6,8", supporting: "3", obstructing: "1", mainCsl: "8", description: "Small therapeutic medical invasive procedures." },
+  { id: "HEA006", category: "health", name: "Recovery", primary: "1,5,11", supporting: "9", obstructing: "6,8,12", mainCsl: "11", description: "Biological healing and return to active strength." },
+  { id: "HEA007", category: "health", name: "Mental Health", primary: "5,8,12", supporting: "Moon", obstructing: "1,11", mainCsl: "5", description: "Psychological stability, emotional balance, or stress." },
+  { id: "HEA008", category: "health", name: "Stress", primary: "5,8", supporting: "Moon", obstructing: "1,11", mainCsl: "5", description: "Mental fatigue and cognitive overload." },
+  { id: "HEA009", category: "health", name: "Chronic Disease", primary: "6,8,12", supporting: "Saturn", obstructing: "1,5,11", mainCsl: "6", description: "Long-standing illness requiring continuous management." },
+  { id: "HEA010", category: "health", name: "Accident", primary: "8,12", supporting: "Mars", obstructing: "1,5,11", mainCsl: "8", description: "Occurrence of sudden injury or collision." },
+  { id: "HEA011", category: "health", name: "Injury", primary: "6,8", supporting: "Mars", obstructing: "1", mainCsl: "8", description: "Physical trauma, cuts, or bone fractures." },
+  { id: "HEA012", category: "health", name: "Fertility", primary: "2,5,11", supporting: "Jupiter", obstructing: "4,10", mainCsl: "5", description: "Biological ability to conceive and propagate." },
+  { id: "HEA013", category: "health", name: "Pregnancy Health", primary: "5,11", supporting: "9", obstructing: "8,12", mainCsl: "5", description: "Health of mother and child during gestation." },
+  { id: "HEA014", category: "health", name: "Longevity", primary: "1,3,8,11", supporting: "Saturn", obstructing: "2,7", mainCsl: "8", description: "Inherent life span indicators of the native." },
 
-  // Property & Assets (EST)
-  {
-    id: "EST001",
-    category: "property",
-    name: "Buying Real Estate / Home",
-    primary: "4,11,12",
-    supporting: "9",
-    obstructing: "3,8",
-    mainCsl: "4",
-    description: "Acquiring permanent immovable assets. 4th house rules land/buildings, 11th is gain of property, 12th is investment/payment."
-  },
-  {
-    id: "EST002",
-    category: "property",
-    name: "Selling Real Estate for Profit",
-    primary: "3,10,12",
-    supporting: "5",
-    obstructing: "4,11",
-    mainCsl: "4, 10",
-    description: "Liquidating land or home. 3rd is 12th from 4th (parting with asset), 10th is gain of status/buyer, 12th is receipt of funds."
-  },
+  // 6. EDUCATION (EDU001 - EDU010)
+  { id: "EDU001", category: "education", name: "School Admission", primary: "4,11", supporting: "2", obstructing: "3,8", mainCsl: "4", description: "Starting foundational primary education." },
+  { id: "EDU002", category: "education", name: "College Admission", primary: "4,11", supporting: "5", obstructing: "3", mainCsl: "4", description: "Securing seat in higher undergraduate colleges." },
+  { id: "EDU003", category: "education", name: "Competitive Exam", primary: "6,11", supporting: "4,9", obstructing: "5,8,12", mainCsl: "6,11", description: "Clearing entrance exams or tests." },
+  { id: "EDU004", category: "education", name: "Scholarship", primary: "8,11", supporting: "4,9", obstructing: "12", mainCsl: "11", description: "Receiving financial aid for academic excellence." },
+  { id: "EDU005", category: "education", name: "Higher Education", primary: "9,11", supporting: "4", obstructing: "3,8", mainCsl: "9", description: "Pursuing post-graduate or specialized studies." },
+  { id: "EDU006", category: "education", name: "Foreign Education", primary: "9,12", supporting: "4,11", obstructing: "1", mainCsl: "12", description: "Pursuing academic degrees abroad." },
+  { id: "EDU007", category: "education", name: "Research", primary: "8,9,11", supporting: "5", obstructing: "3", mainCsl: "8", description: "Investigative or PhD level studies." },
+  { id: "EDU008", category: "education", name: "Degree Completion", primary: "4,9,11", supporting: "10", obstructing: "3,12", mainCsl: "11", description: "Successful completion and receipt of diploma." },
+  { id: "EDU009", category: "education", name: "Professional Certification", primary: "4,10,11", supporting: "6", obstructing: "3", mainCsl: "10", description: "Gaining technical or professional credentials." },
+  { id: "EDU010", category: "education", name: "Academic Break", primary: "3,5,8,12", supporting: "-", obstructing: "4,9,11", mainCsl: "4", description: "Temporary disruption or hiatus in studies." },
 
-  // Foreign Travel & Residency (TRA)
-  {
-    id: "TRA001",
-    category: "travel",
-    name: "Visa Approval / Foreign Tour",
-    primary: "3,9,12",
-    supporting: "11",
-    obstructing: "4",
-    mainCsl: "12, 9",
-    description: "Short overseas trip. 3rd is short journeys, 9th is long-distance voyages, 12th is foreign territory."
-  },
-  {
-    id: "TRA002",
-    category: "travel",
-    name: "Permanent Overseas Settlement",
-    primary: "4,9,12",
-    supporting: "12",
-    obstructing: "1,4",
-    mainCsl: "12",
-    description: "Relocating abroad permanently. 12th house (negating motherland/4th house) must be stronger than home-base comforts (4th house)."
-  }
+  // 7. CHILDREN (CHI001 - CHI008)
+  { id: "CHI001", category: "children", name: "Child Birth", primary: "2,5,11", supporting: "9", obstructing: "1,4,10", mainCsl: "5", description: "Successful delivery of a baby." },
+  { id: "CHI002", category: "children", name: "Pregnancy", primary: "5,11", supporting: "2,9", obstructing: "4,10", mainCsl: "5", description: "Conception and gestation of offspring." },
+  { id: "CHI003", category: "children", name: "Miscarriage", primary: "1,4,8", supporting: "12", obstructing: "2,5,11", mainCsl: "5", description: "Unfortunate loss of pregnancy before term." },
+  { id: "CHI004", category: "children", name: "Adoption", primary: "5,11", supporting: "7,8", obstructing: "2,4", mainCsl: "5", description: "Legally bringing a child into the family." },
+  { id: "CHI005", category: "children", name: "Child Education", primary: "4,5,11", supporting: "9", obstructing: "3,8", mainCsl: "5", description: "Academic progress of children." },
+  { id: "CHI006", category: "children", name: "Child Health", primary: "1,5,9,11", supporting: "Sun", obstructing: "6,8,12", mainCsl: "5", description: "Physical wellness and growth of child." },
+  { id: "CHI007", category: "children", name: "Child Marriage", primary: "2,7,11", supporting: "5", obstructing: "1,6", mainCsl: "5", description: "Matrimony of one's son or daughter." },
+  { id: "CHI008", category: "children", name: "Child Career", primary: "2,6,10,11", supporting: "5", obstructing: "5,8,12", mainCsl: "5", description: "Professional launch of offspring." },
+
+  // 8. TRAVEL (TRA001 - TRA008)
+  { id: "TRA001", category: "travel", name: "Domestic Travel", primary: "3,9", supporting: "11", obstructing: "4", mainCsl: "3", description: "Short distance journeys within the nation." },
+  { id: "TRA002", category: "travel", name: "Foreign Travel", primary: "3,9,12", supporting: "11", obstructing: "4", mainCsl: "12", description: "Overseas journeys for leisure, trade, or education." },
+  { id: "TRA003", category: "travel", name: "Business Travel", primary: "3,7,10", supporting: "9,12", obstructing: "4", mainCsl: "10", description: "Corporate travel or business-related trips." },
+  { id: "TRA004", category: "travel", name: "Pilgrimage", primary: "9,12", supporting: "5,11", obstructing: "4", mainCsl: "9", description: "Travel to holy shrines, temples, or ashrams." },
+  { id: "TRA005", category: "travel", name: "Visa Approval", primary: "3,9,11,12", supporting: "10", obstructing: "4,8", mainCsl: "12", description: "Sanction of entry or residency permits." },
+  { id: "TRA006", category: "travel", name: "Immigration", primary: "4,9,12", supporting: "11", obstructing: "1,4", mainCsl: "12", description: "Relocation to a foreign country." },
+  { id: "TRA007", category: "travel", name: "Foreign Settlement", primary: "4,9,12", supporting: "12", obstructing: "1,4", mainCsl: "12", description: "Permanent residence set up abroad." },
+  { id: "TRA008", category: "travel", name: "Return Home", primary: "1,4,11", supporting: "2", obstructing: "9,12", mainCsl: "4", description: "Returning back to motherland or birth place." },
+
+  // 9. LITIGATION (LIT001 - LIT010)
+  { id: "LIT001", category: "litigation", name: "Court Case", primary: "6,8", supporting: "12", obstructing: "5,11", mainCsl: "6", description: "Being involved in active court litigation." },
+  { id: "LIT002", category: "litigation", name: "Police Matter", primary: "6,8,12", supporting: "Mars", obstructing: "5,11", mainCsl: "6", description: "Law enforcement interference or inquiry." },
+  { id: "LIT003", category: "litigation", name: "Criminal Case", primary: "6,8,12", supporting: "Mars", obstructing: "11", mainCsl: "6", description: "Active trials involving penal law." },
+  { id: "LIT004", category: "litigation", name: "Civil Case", primary: "6,8", supporting: "Mercury", obstructing: "11", mainCsl: "6", description: "Disputes regarding contracts, torts, or rights." },
+  { id: "LIT005", category: "litigation", name: "Property Litigation", primary: "4,6,8", supporting: "12", obstructing: "11", mainCsl: "4,6", description: "Legal battles over real estate boundaries or titles." },
+  { id: "LIT006", category: "litigation", name: "Divorce Litigation", primary: "1,6,8,10", supporting: "12", obstructing: "2,7,11", mainCsl: "7", description: "Legal battle in family court for divorce." },
+  { id: "LIT007", category: "litigation", name: "Settlement", primary: "5,7,11", supporting: "9", obstructing: "6,8", mainCsl: "7", description: "Out-of-court mutual compromise agreement." },
+  { id: "LIT008", category: "litigation", name: "Compensation", primary: "2,8,11", supporting: "6", obstructing: "12", mainCsl: "8,11", description: "Receipt of court-ordered funds or damages." },
+  { id: "LIT009", category: "litigation", name: "Victory", primary: "1,6,11", supporting: "5,9", obstructing: "8,12", mainCsl: "6,11", description: "Winning the legal dispute or verdict." },
+  { id: "LIT010", category: "litigation", name: "Defeat", primary: "5,8,12", supporting: "12", obstructing: "1,6,11", mainCsl: "6", description: "Losing the legal lawsuit or court judgment." },
+
+  // 10. SPIRITUAL (SPI001 - SPI010)
+  { id: "SPI001", category: "spiritual", name: "Guru Meeting", primary: "9", supporting: "5,11", obstructing: "3", mainCsl: "9", description: "Encountering or meeting a saintly spiritual master." },
+  { id: "SPI002", category: "spiritual", name: "Initiation", primary: "9,11", supporting: "5", obstructing: "3", mainCsl: "9", description: "Receiving Diksha, sacred mantra, or spiritual vow." },
+  { id: "SPI003", category: "spiritual", name: "Meditation", primary: "5,9,12", supporting: "Moksha planet Ketu", obstructing: "3,4", mainCsl: "12", description: "Practicing deep mindfulness and inner concentration." },
+  { id: "SPI004", category: "spiritual", name: "Temple Visit", primary: "9", supporting: "5", obstructing: "3", mainCsl: "9", description: "Worshipping at a sacred energetic temple or church." },
+  { id: "SPI005", category: "spiritual", name: "Pilgrimage", primary: "9,12", supporting: "11", obstructing: "4", mainCsl: "9", description: "Journeys to holy places and rivers." },
+  { id: "SPI006", category: "spiritual", name: "Ashram Stay", primary: "9,12", supporting: "8", obstructing: "4", mainCsl: "12", description: "Residing in a monastery or spiritual community." },
+  { id: "SPI007", category: "spiritual", name: "Occult Learning", primary: "8,9", supporting: "11", obstructing: "3", mainCsl: "8", description: "Learning astrology, kabbalah, tarot, or secret sciences." },
+  { id: "SPI008", category: "spiritual", name: "Spiritual Growth", primary: "5,9,11,12", supporting: "Jupiter", obstructing: "2,3", mainCsl: "9", description: "Ascending steps of consciousness and realization." },
+  { id: "SPI009", category: "spiritual", name: "Detachment", primary: "9,12", supporting: "Saturn", obstructing: "2,4,7", mainCsl: "12", description: "Vairagya, losing attachment to mundane pursuits." },
+  { id: "SPI010", category: "spiritual", name: "Renunciation", primary: "9,12", supporting: "Ketu", obstructing: "2,4,7,11", mainCsl: "12", description: "Complete sannyasa, dedications of life to divine." },
+
+  // 11. DAILY (DAY001 - DAY015)
+  { id: "DAY001", category: "daily", name: "Mood", primary: "1,3,4,5,12", supporting: "Moon", obstructing: "6,8", mainCsl: "1,3", description: "Daily emotional status, comfort, and feeling." },
+  { id: "DAY002", category: "daily", name: "Energy", primary: "1,3,11", supporting: "Mars", obstructing: "12", mainCsl: "1", description: "Daily physical stamina, motivation, and drive." },
+  { id: "DAY003", category: "daily", name: "Focus", primary: "5,11", supporting: "Mercury", obstructing: "12", mainCsl: "5", description: "Daily cognitive attention span and study concentration." },
+  { id: "DAY004", category: "daily", name: "Productivity", primary: "2,6,10,11", supporting: "Saturn", obstructing: "12", mainCsl: "10", description: "Daily efficiency, goal completion, and work done." },
+  { id: "DAY005", category: "daily", name: "Communication", primary: "3,11", supporting: "Mercury", obstructing: "12", mainCsl: "3", description: "Daily interactions, phone calls, writing, and networking." },
+  { id: "DAY006", category: "daily", name: "Creativity", primary: "5,11", supporting: "Venus", obstructing: "4", mainCsl: "5", description: "Daily artistic design, hobbies, or innovative thoughts." },
+  { id: "DAY007", category: "daily", name: "Learning", primary: "4,11", supporting: "Mercury", obstructing: "3", mainCsl: "4", description: "Daily reading, acquiring skills, or intellectual assimilation." },
+  { id: "DAY008", category: "daily", name: "Travel", primary: "3", supporting: "Moon", obstructing: "4", mainCsl: "3", description: "Daily short distance commutes, driving, or errand trips." },
+  { id: "DAY009", category: "daily", name: "Finance", primary: "2,11", supporting: "Jupiter", obstructing: "12", mainCsl: "2", description: "Daily monetary spendings, earnings, or cash transfers." },
+  { id: "DAY010", category: "daily", name: "Meetings", primary: "3,7", supporting: "11", obstructing: "12", mainCsl: "7", description: "Daily personal or professional discussion sessions." },
+  { id: "DAY011", category: "daily", name: "Social Interaction", primary: "3,11", supporting: "Venus", obstructing: "12", mainCsl: "11", description: "Daily friendly gatherings, chats, or group work." },
+  { id: "DAY012", category: "daily", name: "Stress", primary: "5,8", supporting: "Rahu", obstructing: "11", mainCsl: "8", description: "Daily mental pressure, worries, or anxiety levels." },
+  { id: "DAY013", category: "daily", name: "Health Trend", primary: "1,11", supporting: "Sun", obstructing: "6,8", mainCsl: "1", description: "Daily physical comfort, digestion, and vigor." },
+  { id: "DAY014", category: "daily", name: "Meditation", primary: "12", supporting: "Ketu", obstructing: "3", mainCsl: "12", description: "Daily practice of silence and spiritual centering." },
+  { id: "DAY015", category: "daily", name: "Sleep Quality", primary: "4,12", supporting: "Venus", obstructing: "3,8", mainCsl: "12", description: "Daily night rest, dream status, and biological renewal." },
+
+  // 12. CUSTOM (CUS001)
+  { id: "CUS001", category: "custom", name: "Custom Event Plugin", primary: "1,11", supporting: "-", obstructing: "-", mainCsl: "1", description: "Reserved for user-defined plugins and custom astrological triggers." }
 ];
 
 function getUniversalEventRecord(event: KPEvent, astrologyData: any, njResult: any) {
@@ -835,7 +581,7 @@ interface EventBookViewProps {
 
 export default function EventBookView({ astrologyData, isDark }: EventBookViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<"all" | "relationship" | "career" | "finance" | "health" | "litigation" | "education" | "property" | "travel" | "agent_rules">("all");
+  const [selectedCategory, setSelectedCategory] = useState<"all" | "relationship" | "career" | "finance" | "property" | "health" | "education" | "children" | "travel" | "litigation" | "spiritual" | "daily" | "custom" | "agent_rules">("all");
   const [showLiveForecast, setShowLiveForecast] = useState(true);
 
   // Default prediction date starting with today
@@ -915,20 +661,24 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
     const offset2 = ((seed + 3) % 9) - 4;
     const offset3 = ((seed + 6) % 9) - 4;
 
-    // Default themes
+    // Default themes mapped to high-frequency engine theme IDs
     const catMap: Record<string, string> = {
-      relationship: "relationship",
-      career: "career",
+      relationship: "meetings",
+      career: "productivity",
       finance: "finance",
+      property: "productivity",
       health: "health",
-      litigation: "litigation",
-      education: "children",
-      property: "property",
+      education: "learning",
+      children: "learning",
       travel: "travel",
-      agent_rules: "career"
+      litigation: "focus",
+      spiritual: "learning",
+      daily: "focus",
+      custom: "focus",
+      agent_rules: "productivity"
     };
 
-    const targetId = catMap[category] || "career";
+    const targetId = catMap[category] || "productivity";
     const scores = njResult.forecastDays.map(fd => {
       const theme = fd.themeScores.find(t => t.id === targetId);
       return theme ? theme.probability : 50;
@@ -960,11 +710,15 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
     { id: "relationship", label: "Relationships", icon: Heart, count: combinedEvents.filter(e => e.category === "relationship").length },
     { id: "career", label: "Career & Service", icon: Briefcase, count: combinedEvents.filter(e => e.category === "career").length },
     { id: "finance", label: "Wealth & Finance", icon: Coins, count: combinedEvents.filter(e => e.category === "finance").length },
-    { id: "health", label: "Health & Recovery", icon: ShieldAlert, count: combinedEvents.filter(e => e.category === "health").length },
-    { id: "litigation", label: "Court Litigation", icon: Scale, count: combinedEvents.filter(e => e.category === "litigation").length },
-    { id: "education", label: "Exams & Education", icon: GraduationCap, count: combinedEvents.filter(e => e.category === "education").length },
     { id: "property", label: "Property & Lands", icon: Home, count: combinedEvents.filter(e => e.category === "property").length },
+    { id: "health", label: "Health & Recovery", icon: ShieldAlert, count: combinedEvents.filter(e => e.category === "health").length },
+    { id: "education", label: "Exams & Education", icon: GraduationCap, count: combinedEvents.filter(e => e.category === "education").length },
+    { id: "children", label: "Children & Birth", icon: Sparkles, count: combinedEvents.filter(e => e.category === "children").length },
     { id: "travel", label: "Overseas Travel", icon: Globe, count: combinedEvents.filter(e => e.category === "travel").length },
+    { id: "litigation", label: "Court Litigation", icon: Scale, count: combinedEvents.filter(e => e.category === "litigation").length },
+    { id: "spiritual", label: "Spiritual & Guru", icon: Compass, count: combinedEvents.filter(e => e.category === "spiritual").length },
+    { id: "daily", label: "Daily Transits", icon: Calendar, count: combinedEvents.filter(e => e.category === "daily").length },
+    { id: "custom", label: "Custom Plugins", icon: Cpu, count: combinedEvents.filter(e => e.category === "custom").length },
     { id: "agent_rules", label: "Agent Rules", icon: Cpu, count: agentRules.length }
   ], [combinedEvents, agentRules]);
 
