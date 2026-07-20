@@ -3035,7 +3035,7 @@ export function MyPageView({
               </div>
             )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Card 1: Vimshottari Dasha Chronicles */}
               <button
                 disabled={compilingRelReport !== null}
@@ -3055,24 +3055,38 @@ export function MyPageView({
                     setCompilingRelReport(null);
                   }
                 }}
-                className={`p-4 rounded-xl border text-left ${isDark ? "border-amber-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-amber-500/40 transition-all flex flex-col justify-between h-40 group cursor-pointer disabled:opacity-50`}
+                className={`p-5 rounded-2xl border text-left md:col-span-2 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
+                  isDark 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
+                    : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
+                }`}
               >
                 <div className="w-full">
                   <div className="flex justify-between items-start">
-                    <Clock className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
-                    <span className="text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-mono font-bold">CHRONOLOGY</span>
+                    <Clock className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+                    <span className={`text-[9px] border px-2 py-0.5 rounded font-mono font-bold ${
+                      isDark 
+                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20" 
+                        : "bg-amber-500/5 text-amber-600 border-amber-500/20"
+                    }`}>
+                      CHRONOLOGY
+                    </span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-200 mt-2">50-Year Vimshottari Dasha</h4>
-                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Recursive timing chronology down to Prana level for your active period.</p>
+                  <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                    50-Year Vimshottari Dasha
+                  </h4>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                    Recursive timing chronology down to Prana level for your active period. Explores Mahadasha, Bhukti, and Antara timelines with high-precision.
+                  </p>
                 </div>
-                <div className="text-[10px] font-bold text-amber-400 flex items-center gap-1 mt-2">
+                <div className="text-[11px] font-bold text-amber-500 flex items-center gap-1.5 mt-2">
                   {compilingRelReport === "vimshottari" ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
                     </>
                   ) : (
                     <>
-                      <Download className="w-3.5 h-3.5" /> Download PDF
+                      <Download className="w-3.5 h-3.5" /> Download PDF Report
                     </>
                   )}
                 </div>
@@ -3097,24 +3111,38 @@ export function MyPageView({
                     setCompilingRelReport(null);
                   }
                 }}
-                className={`p-4 rounded-xl border text-left ${isDark ? "border-rose-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-rose-500/40 transition-all flex flex-col justify-between h-40 group cursor-pointer disabled:opacity-50`}
+                className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
+                  isDark 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-rose-500/40" 
+                    : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-rose-500/40 shadow-sm shadow-neutral-100"
+                }`}
               >
                 <div className="w-full">
                   <div className="flex justify-between items-start">
-                    <Heart className="w-5 h-5 text-rose-400 group-hover:scale-110 transition-transform" />
-                    <span className="text-[9px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded font-mono font-bold">EMOTIONS</span>
+                    <Heart className="w-5 h-5 text-rose-500 group-hover:scale-110 transition-transform" />
+                    <span className={`text-[9px] border px-2 py-0.5 rounded font-mono font-bold ${
+                      isDark 
+                        ? "bg-rose-500/10 text-rose-400 border-rose-500/20" 
+                        : "bg-rose-500/5 text-rose-600 border-rose-500/20"
+                    }`}>
+                      EMOTIONS
+                    </span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-200 mt-2">Emotional & Mood Cycles</h4>
-                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Esoteric mood and emotional state indicators tracking Houses 1, 3, 4, 5, 6, and 12.</p>
+                  <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                    Emotional & Mood Cycles
+                  </h4>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                    Esoteric mood and emotional state indicators tracking Houses 1, 3, 4, 5, 6, and 12.
+                  </p>
                 </div>
-                <div className="text-[10px] font-bold text-rose-400 flex items-center gap-1 mt-2">
+                <div className="text-[11px] font-bold text-rose-500 flex items-center gap-1.5 mt-2">
                   {compilingRelReport === "mood" ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
                     </>
                   ) : (
                     <>
-                      <Download className="w-3.5 h-3.5" /> Download PDF
+                      <Download className="w-3.5 h-3.5" /> Download PDF Report
                     </>
                   )}
                 </div>
@@ -3139,24 +3167,38 @@ export function MyPageView({
                     setCompilingRelReport(null);
                   }
                 }}
-                className={`p-4 rounded-xl border text-left ${isDark ? "border-teal-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-teal-500/40 transition-all flex flex-col justify-between h-40 group cursor-pointer disabled:opacity-50`}
+                className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
+                  isDark 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-teal-500/40" 
+                    : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-teal-500/40 shadow-sm shadow-neutral-100"
+                }`}
               >
                 <div className="w-full">
                   <div className="flex justify-between items-start">
-                    <Briefcase className="w-5 h-5 text-teal-400 group-hover:scale-110 transition-transform" />
-                    <span className="text-[9px] bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2 py-0.5 rounded font-mono font-bold">BEHAVIOR</span>
+                    <Briefcase className="w-5 h-5 text-teal-500 group-hover:scale-110 transition-transform" />
+                    <span className={`text-[9px] border px-2 py-0.5 rounded font-mono font-bold ${
+                      isDark 
+                        ? "bg-teal-500/10 text-teal-400 border-teal-500/20" 
+                        : "bg-teal-500/5 text-teal-600 border-teal-500/20"
+                    }`}>
+                      BEHAVIOR
+                    </span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-200 mt-2">Behavioral Patterns</h4>
-                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Career vocations, communication styles, and themes mapping Houses 2, 3, 6, 7, 10, and 11.</p>
+                  <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                    Behavioral Patterns
+                  </h4>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                    Career vocations, communication styles, and themes mapping Houses 2, 3, 6, 7, 10, and 11.
+                  </p>
                 </div>
-                <div className="text-[10px] font-bold text-teal-400 flex items-center gap-1 mt-2">
+                <div className="text-[11px] font-bold text-teal-500 flex items-center gap-1.5 mt-2">
                   {compilingRelReport === "behavior" ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
                     </>
                   ) : (
                     <>
-                      <Download className="w-3.5 h-3.5" /> Download PDF
+                      <Download className="w-3.5 h-3.5" /> Download PDF Report
                     </>
                   )}
                 </div>
@@ -3181,24 +3223,38 @@ export function MyPageView({
                     setCompilingRelReport(null);
                   }
                 }}
-                className={`p-4 rounded-xl border text-left ${isDark ? "border-sky-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-sky-500/40 transition-all flex flex-col justify-between h-40 group cursor-pointer disabled:opacity-50`}
+                className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
+                  isDark 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-sky-500/40" 
+                    : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-sky-500/40 shadow-sm shadow-neutral-100"
+                }`}
               >
                 <div className="w-full">
                   <div className="flex justify-between items-start">
-                    <Compass className="w-5 h-5 text-sky-400 group-hover:scale-110 transition-transform" />
-                    <span className="text-[9px] bg-sky-500/10 text-sky-400 border border-sky-500/20 px-2 py-0.5 rounded font-mono font-bold">JOURNEY PATH</span>
+                    <Compass className="w-5 h-5 text-sky-500 group-hover:scale-110 transition-transform" />
+                    <span className={`text-[9px] border px-2 py-0.5 rounded font-mono font-bold ${
+                      isDark 
+                        ? "bg-sky-500/10 text-sky-400 border-sky-500/20" 
+                        : "bg-sky-500/5 text-sky-600 border-sky-500/20"
+                    }`}>
+                      JOURNEY PATH
+                    </span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-200 mt-2">Transit DBA Alignment</h4>
-                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Maps actual transit movements of Saturn, Jupiter, and Moon over natal period rulers.</p>
+                  <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                    Transit DBA Alignment
+                  </h4>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                    Maps actual transit movements of Saturn, Jupiter, and Moon over natal period rulers.
+                  </p>
                 </div>
-                <div className="text-[10px] font-bold text-sky-400 flex items-center gap-1 mt-2">
+                <div className="text-[11px] font-bold text-sky-500 flex items-center gap-1.5 mt-2">
                   {compilingRelReport === "journey" ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
                     </>
                   ) : (
                     <>
-                      <Download className="w-3.5 h-3.5" /> Download PDF
+                      <Download className="w-3.5 h-3.5" /> Download PDF Report
                     </>
                   )}
                 </div>
@@ -3256,24 +3312,38 @@ export function MyPageView({
                     setCompilingRelReport(null);
                   }
                 }}
-                className={`p-4 rounded-xl border text-left ${isDark ? "border-indigo-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-indigo-500/40 transition-all flex flex-col justify-between h-40 group cursor-pointer disabled:opacity-50`}
+                className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
+                  isDark 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-indigo-500/40" 
+                    : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-indigo-500/40 shadow-sm shadow-neutral-100"
+                }`}
               >
                 <div className="w-full">
                   <div className="flex justify-between items-start">
-                    <Shield className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
-                    <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded font-mono font-bold">360° TOTAL</span>
+                    <Shield className="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform" />
+                    <span className={`text-[9px] border px-2 py-0.5 rounded font-mono font-bold ${
+                      isDark 
+                        ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" 
+                        : "bg-indigo-500/5 text-indigo-600 border-indigo-500/20"
+                    }`}>
+                      360° TOTAL
+                    </span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-200 mt-2">All Aspects Alignment</h4>
-                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Dynamic tabular dump aligning Parashari, KP, Jaimini, Lalkitab and Western based on active tabs.</p>
+                  <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                    All Aspects Alignment
+                  </h4>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                    Dynamic tabular dump aligning Parashari, KP, Jaimini, Lalkitab and Western based on active tabs.
+                  </p>
                 </div>
-                <div className="text-[10px] font-bold text-indigo-400 flex items-center gap-1 mt-2">
+                <div className="text-[11px] font-bold text-indigo-500 flex items-center gap-1.5 mt-2">
                   {compilingRelReport === "all_aspects" ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
                     </>
                   ) : (
                     <>
-                      <Download className="w-3.5 h-3.5" /> Download PDF
+                      <Download className="w-3.5 h-3.5" /> Download PDF Report
                     </>
                   )}
                 </div>
@@ -3283,11 +3353,11 @@ export function MyPageView({
             {/* Bottom Section: Active JSON Export */}
             <div className="mt-6 pt-6 border-t border-slate-500/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="space-y-0.5">
-                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <h4 className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${isDark ? "text-slate-300" : "text-neutral-800"}`}>
                   <Shield className="w-4 h-4 text-indigo-400" />
                   Vedic Data Model Export
                 </h4>
-                <p className="text-[10px] text-slate-400 font-sans">
+                <p className={`text-[10px] font-sans ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
                   Export the active calculated high-fidelity JSON payload containing all traditional astronomical structures.
                 </p>
               </div>
@@ -3305,7 +3375,11 @@ export function MyPageView({
                     alert("No active astrology profile loaded to export JSON.");
                   }
                 }}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-500/20 rounded-xl text-xs font-bold cursor-pointer transition-all flex items-center justify-center gap-1.5 self-start sm:self-auto shadow-md shadow-indigo-500/5"
+                className={`px-4 py-2 border rounded-xl text-xs font-bold cursor-pointer transition-all flex items-center justify-center gap-1.5 self-start sm:self-auto shadow-md ${
+                  isDark 
+                    ? "bg-slate-900 hover:bg-slate-800 text-indigo-300 border-indigo-500/20 shadow-indigo-500/5" 
+                    : "bg-white hover:bg-neutral-50/50 text-indigo-600 border-neutral-200 shadow-neutral-100"
+                }`}
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Export Active JSON</span>
