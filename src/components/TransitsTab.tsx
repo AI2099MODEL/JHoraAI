@@ -1556,25 +1556,105 @@ export default function TransitsTab({
                 </div>
 
                 {dashaAlignment ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-                    {[
-                      { title: "Maha (L1)", lord: dashaAlignment.maha.lord, start: dashaAlignment.maha.startDate, end: dashaAlignment.maha.endDate, color: "text-indigo-300", bg: "from-indigo-500/10 to-transparent", border: "border-indigo-500/30" },
-                      { title: "Bhukti / Antar (L2)", lord: dashaAlignment.antar?.lord || "None", start: dashaAlignment.antar?.startDate, end: dashaAlignment.antar?.endDate, color: "text-amber-400", bg: "from-amber-500/10 to-transparent", border: "border-amber-500/30" },
-                      { title: "Antara (L3)", lord: dashaAlignment.pratyantar?.lord || "None", start: dashaAlignment.pratyantar?.startDate || dashaAlignment.pratyantar?.start, end: dashaAlignment.pratyantar?.endDate || dashaAlignment.pratyantar?.end, color: "text-emerald-400", bg: "from-emerald-500/10 to-transparent", border: "border-emerald-500/30" },
-                      { title: "Sukshma (L4)", lord: dashaAlignment.sookshma?.lord || "None", start: dashaAlignment.sookshma?.start, end: dashaAlignment.sookshma?.end, color: "text-cyan-400", bg: "from-cyan-500/10 to-transparent", border: "border-cyan-500/30" },
-                      { title: "Prana (L5)", lord: dashaAlignment.prana?.lord || "None", start: dashaAlignment.prana?.start, end: dashaAlignment.prana?.end, color: "text-purple-400", bg: "from-purple-500/10 to-transparent", border: "border-purple-500/30" }
-                    ].map((level, i) => (
-                      <div key={i} className={`p-4 rounded-xl border ${level.border} bg-gradient-to-b ${level.bg} flex flex-col justify-between h-36 hover:scale-[1.02] transition-all shadow-md`}>
-                        <div>
-                          <span className="text-[9px] uppercase font-bold font-mono text-slate-500 tracking-wider block">{level.title}</span>
-                          <h5 className={`text-xl font-extrabold mt-2 ${level.color}`}>{level.lord}</h5>
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                      {[
+                        { title: "Maha (L1)", lord: dashaAlignment.maha.lord, start: dashaAlignment.maha.startDate, end: dashaAlignment.maha.endDate, color: "text-indigo-300", bg: "from-indigo-500/10 to-transparent", border: "border-indigo-500/30" },
+                        { title: "Bhukti / Antar (L2)", lord: dashaAlignment.antar?.lord || "None", start: dashaAlignment.antar?.startDate, end: dashaAlignment.antar?.endDate, color: "text-amber-400", bg: "from-amber-500/10 to-transparent", border: "border-amber-500/30" },
+                        { title: "Antara (L3)", lord: dashaAlignment.pratyantar?.lord || "None", start: dashaAlignment.pratyantar?.startDate || dashaAlignment.pratyantar?.start, end: dashaAlignment.pratyantar?.endDate || dashaAlignment.pratyantar?.end, color: "text-emerald-400", bg: "from-emerald-500/10 to-transparent", border: "border-emerald-500/30" },
+                        { title: "Sukshma (L4)", lord: dashaAlignment.sookshma?.lord || "None", start: dashaAlignment.sookshma?.start, end: dashaAlignment.sookshma?.end, color: "text-cyan-400", bg: "from-cyan-500/10 to-transparent", border: "border-cyan-500/30" },
+                        { title: "Prana (L5)", lord: dashaAlignment.prana?.lord || "None", start: dashaAlignment.prana?.start, end: dashaAlignment.prana?.end, color: "text-purple-400", bg: "from-purple-500/10 to-transparent", border: "border-purple-500/30" }
+                      ].map((level, i) => (
+                        <div key={i} className={`p-4 rounded-xl border ${level.border} bg-gradient-to-b ${level.bg} flex flex-col justify-between h-36 hover:scale-[1.02] transition-all shadow-md`}>
+                          <div>
+                            <span className="text-[9px] uppercase font-bold font-mono text-slate-500 tracking-wider block">{level.title}</span>
+                            <h5 className={`text-xl font-extrabold mt-2 ${level.color}`}>{level.lord}</h5>
+                          </div>
+                          <div className="text-[10px] text-slate-400 space-y-0.5 font-mono border-t border-slate-800/60 pt-2">
+                            <div className="flex justify-between"><span className="text-slate-500">From:</span> {level.start ? new Date(level.start).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</div>
+                            <div className="flex justify-between"><span className="text-slate-500">To:</span> {level.end ? new Date(level.end).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</div>
+                          </div>
                         </div>
-                        <div className="text-[10px] text-slate-400 space-y-0.5 font-mono border-t border-slate-800/60 pt-2">
-                          <div className="flex justify-between"><span className="text-slate-500">From:</span> {level.start ? new Date(level.start).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</div>
-                          <div className="flex justify-between"><span className="text-slate-500">To:</span> {level.end ? new Date(level.end).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</div>
+                      ))}
+                    </div>
+
+                    {/* Progress Bars Section for Mahadasha & Antardasha */}
+                    {(() => {
+                      const targetDate = new Date(transitDate + "T" + transitTime).getTime();
+
+                      // Mahadasha progress
+                      const mStart = new Date(dashaAlignment.maha.startDate).getTime();
+                      const mEnd = new Date(dashaAlignment.maha.endDate).getTime();
+                      const mTotal = mEnd - mStart;
+                      const mElapsed = targetDate - mStart;
+                      const mPercent = Math.min(100, Math.max(0, (mElapsed / mTotal) * 100));
+
+                      // Antardasha progress
+                      let aPercent = 0;
+                      let hasAntar = false;
+                      let aStart = 0;
+                      let aEnd = 0;
+                      if (dashaAlignment.antar) {
+                        hasAntar = true;
+                        aStart = new Date(dashaAlignment.antar.startDate).getTime();
+                        aEnd = new Date(dashaAlignment.antar.endDate).getTime();
+                        const aTotal = aEnd - aStart;
+                        const aElapsed = targetDate - aStart;
+                        aPercent = Math.min(100, Math.max(0, (aElapsed / aTotal) * 100));
+                      }
+
+                      return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-5 border-t border-slate-800/60">
+                          {/* Mahadasha Progress */}
+                          <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-5 space-y-3 shadow-md relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
+                            <div className="flex justify-between items-center relative z-10">
+                              <div className="space-y-0.5">
+                                <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-wider font-extrabold">Mahadasha Timeline Progress</span>
+                                <h5 className="text-sm font-bold text-slate-200">{dashaAlignment.maha.lord} Period</h5>
+                              </div>
+                              <span className="text-xs font-mono font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/25">
+                                {mPercent.toFixed(1)}% Elapsed
+                              </span>
+                            </div>
+                            
+                            <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800/60 relative z-10">
+                              <div className="h-full bg-indigo-500 rounded-full transition-all duration-500" style={{ width: `${mPercent}%` }} />
+                            </div>
+
+                            <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 relative z-10">
+                              <span>Start: {new Date(dashaAlignment.maha.startDate).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                              <span>End: {new Date(dashaAlignment.maha.endDate).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                            </div>
+                          </div>
+
+                          {/* Antardasha Progress */}
+                          {hasAntar && (
+                            <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-5 space-y-3 shadow-md relative overflow-hidden">
+                              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
+                              <div className="flex justify-between items-center relative z-10">
+                                <div className="space-y-0.5">
+                                  <span className="text-[10px] font-mono text-amber-400 uppercase tracking-wider font-extrabold">Antardasha Timeline Progress</span>
+                                  <h5 className="text-sm font-bold text-slate-200">{dashaAlignment.antar.lord} Period</h5>
+                                </div>
+                                <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/25">
+                                  {aPercent.toFixed(1)}% Elapsed
+                                </span>
+                              </div>
+                              
+                              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800/60 relative z-10">
+                                <div className="h-full bg-amber-500 rounded-full transition-all duration-500" style={{ width: `${aPercent}%` }} />
+                              </div>
+
+                              <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 relative z-10">
+                                <span>Start: {new Date(aStart).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                                <span>End: {new Date(aEnd).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })()}
                   </div>
                 ) : (
                   <div className="text-slate-500 text-xs italic bg-slate-900/20 p-4 rounded-xl border border-dashed border-slate-800">
