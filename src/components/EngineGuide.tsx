@@ -1323,6 +1323,290 @@ The Rule Decision Engine never modifies rules.
 The Rule Decision Engine only evaluates the outcomes produced by the
 Rule Engine and produces a deterministic final verdict.
 
+###############################################################
+
+###############################################################
+PART 16 — RULE EXECUTION ENGINE
+Rule Processing Framework
+###############################################################
+
+PURPOSE
+
+The Rule Execution Engine is responsible for executing compiled
+astrological rules in a deterministic sequence and returning
+validated rule results to the Rule Decision Engine.
+
+The execution engine does not interpret results.
+It only evaluates rules.
+
+###############################################################
+
+INPUT
+
+Compiled Rule Library
+
+↓
+
+Natal Chart Data
+
+↓
+
+Planetary Data
+
+↓
+
+House Data
+
+↓
+
+KP Cusps
+
+↓
+
+Nakshatra Data
+
+↓
+
+Sub Lords
+
+↓
+
+Sub-Sub Lords
+
+↓
+
+Divisional Charts
+
+↓
+
+Dasha Data
+
+↓
+
+Transit Data
+
+###############################################################
+
+EXECUTION ORDER
+
+Initialize Engine
+
+↓
+
+Load Compiled Rules
+
+↓
+
+Validate Inputs
+
+↓
+
+Select Applicable Rules
+
+↓
+
+Execute Rules
+
+↓
+
+Generate Rule Results
+
+↓
+
+Generate Evidence
+
+↓
+
+Return Results
+
+###############################################################
+
+RULE EXECUTION PHASES
+
+Phase 1
+
+Input Validation
+
+↓
+
+Phase 2
+
+Rule Selection
+
+↓
+
+Phase 3
+
+Rule Evaluation
+
+↓
+
+Phase 4
+
+Evidence Collection
+
+↓
+
+Phase 5
+
+Result Generation
+
+↓
+
+Phase 6
+
+Return Execution Results
+
+###############################################################
+
+RULE SELECTION
+
+Only enabled rules are executed.
+
+Rules are filtered by
+
+Stage
+
+System
+
+Category
+
+Event
+
+Priority
+
+Dependencies
+
+###############################################################
+
+RULE EXECUTION
+
+Each rule is executed independently.
+
+Rules never modify another rule.
+
+Rules never modify chart data.
+
+Rules only evaluate supplied inputs.
+
+###############################################################
+
+EXECUTION RESULT
+
+RuleID
+
+Execution Status
+
+PASS
+
+FAIL
+
+PARTIAL
+
+UNKNOWN
+
+Evidence
+
+Execution Time
+
+###############################################################
+
+DEPENDENCY CHECK
+
+If dependency exists
+
+↓
+
+Verify dependency
+
+↓
+
+Execute Rule
+
+Otherwise
+
+↓
+
+Skip Rule
+
+###############################################################
+
+ERROR HANDLING
+
+Invalid Input
+
+↓
+
+Missing Data
+
+↓
+
+Missing Dependency
+
+↓
+
+Disabled Rule
+
+↓
+
+Execution Timeout
+
+↓
+
+Return Error Status
+
+###############################################################
+
+PERFORMANCE
+
+Compiled rules remain memory cached.
+
+Chart data is immutable during execution.
+
+Repeated calculations are avoided through cache reuse.
+
+###############################################################
+
+OUTPUT
+
+The Rule Execution Engine returns
+
+Rule Results
+
+Evidence Objects
+
+Execution Metadata
+
+Dependency Status
+
+to
+
+Rule Decision Engine
+
+###############################################################
+
+REFERENCE
+
+Next Module
+
+Rule Decision Engine
+
+Refer to
+
+Rule Decision Engine Manual
+
+###############################################################
+
+ENGINE PRINCIPLES
+
+• Execution is deterministic.
+• Execution order is fixed.
+• Rules are independent.
+• Chart data is read-only.
+• No interpretation occurs during execution.
+• No Event Book operations occur during execution.
+• No UI operations occur during execution.
+
 ###############################################################`;
 
   const copyToClipboard = () => {
