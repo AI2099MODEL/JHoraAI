@@ -39,6 +39,16 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
   const [sendingEmail, setSendingEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [copiedDomain, setCopiedDomain] = useState<string | null>(null);
+
+  const handleCopy = (domain: string) => {
+    navigator.clipboard.writeText(domain).then(() => {
+      setCopiedDomain(domain);
+      setTimeout(() => setCopiedDomain(null), 2000);
+    }).catch(err => {
+      console.error("Copy failed", err);
+    });
+  };
   
   // Form fields for editing user profile
   const [phone, setPhone] = useState("");
@@ -406,6 +416,14 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
   }
 
   // Render Material 3 Auth Panel (GOOGLE ONLY)
+  const currentDevHost = typeof window !== "undefined" ? window.location.hostname : "ais-dev-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app";
+  const currentPreHost = currentDevHost.includes("-dev-") 
+    ? currentDevHost.replace("-dev-", "-pre-") 
+    : (currentDevHost.includes("-pre-") ? currentDevHost : "ais-pre-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app");
+  const currentActualDevHost = currentDevHost.includes("-pre-") 
+    ? currentDevHost.replace("-pre-", "-dev-") 
+    : currentDevHost;
+
   return (
     <div className="bg-slate-950/60 border border-indigo-500/10 rounded-2xl p-6 max-w-md mx-auto space-y-6 text-left shadow-2xl" id="m3-auth-screen-container">
       {/* Header */}
@@ -443,30 +461,32 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
                 To sign in, simply click <strong>"Advanced"</strong> (bottom-left of the Google popup) and then click <strong>"Go to gen-lang-client-0193743078.firebaseapp.com (unsafe)"</strong>.
               </li>
               <li>
-                <strong>Authorize Preview Domains:</strong> If you see an <code>auth/unauthorized-domain</code> error, you must add these preview URLs to your <strong>Firebase Console → Authentication → Settings → Authorized Domains</strong>:
-                <div className="mt-1.5 p-2 bg-slate-950 rounded border border-slate-800 font-mono text-[10px] space-y-1 select-all break-all text-slate-400">
-                  {typeof window !== "undefined" ? (
-                    <>
-                      <div>{window.location.hostname}</div>
-                      {window.location.hostname.includes("-dev-") && (
-                        <div>{window.location.hostname.replace("-dev-", "-pre-")}</div>
-                      )}
-                      {window.location.hostname.includes("-pre-") && (
-                        <div>{window.location.hostname.replace("-pre-", "-dev-")}</div>
-                      )}
-                      {!window.location.hostname.includes("-dev-") && !window.location.hostname.includes("-pre-") && (
-                        <>
-                          <div>ais-dev-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app</div>
-                          <div>ais-pre-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app</div>
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <div>ais-dev-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app</div>
-                      <div>ais-pre-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app</div>
-                    </>
-                  )}
+                <strong>Authorize Preview Domains:</strong> If you see an <code>auth/unauthorized-domain</code> error:
+                <div className="mt-2 space-y-2 border-l border-amber-500/20 pl-3">
+                  <p className="text-[11px] text-amber-300/90 leading-normal">
+                    💡 <strong>Critical Tab Location:</strong> In your Firebase Console, click on the <strong className="underline">Settings</strong> tab (located directly in the top sub-menu bar, between <em>Usage</em> and <em>Extensions</em>). Then click <strong>Authorized domains</strong> in the side list.
+                  </p>
+                  <p className="text-[10px] text-slate-400">
+                    Click the buttons below to copy each required domain, then click "Add domain" in Firebase Console to paste them:
+                  </p>
+                  <div className="space-y-1.5 mt-2">
+                    {[currentActualDevHost, currentPreHost].map((domain) => (
+                      <div key={domain} className="flex items-center justify-between gap-2 p-1.5 bg-slate-950 rounded-lg border border-slate-800 text-[10px]">
+                        <span className="font-mono text-slate-300 break-all select-all">{domain}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(domain)}
+                          className={`shrink-0 px-2.5 py-1 rounded text-[10px] font-semibold transition-all cursor-pointer ${
+                            copiedDomain === domain
+                              ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                              : "bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 hover:text-amber-300"
+                          }`}
+                        >
+                          {copiedDomain === domain ? "✓ Copied" : "📋 Copy"}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </li>
               <li>
