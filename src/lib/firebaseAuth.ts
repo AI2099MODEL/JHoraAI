@@ -108,6 +108,13 @@ try {
   auth = getAuth(app);
   db = getFirestore(app, firestoreDbId);
   
+  console.log("🌌 JHoraAI: Firebase active configuration:", {
+    projectId: customFirebaseConfig.projectId,
+    authDomain: customFirebaseConfig.authDomain,
+    firestoreDatabaseId: firestoreDbId,
+    apiKeyMasked: customFirebaseConfig.apiKey ? `${customFirebaseConfig.apiKey.substring(0, 6)}...${customFirebaseConfig.apiKey.substring(customFirebaseConfig.apiKey.length - 4)}` : "missing"
+  });
+  
   // Test connection on boot using getDocFromServer
   const testConnection = async () => {
     try {

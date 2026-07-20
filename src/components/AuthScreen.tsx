@@ -40,6 +40,11 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [copiedDomain, setCopiedDomain] = useState<string | null>(null);
+  const [isInIframe, setIsInIframe] = useState(false);
+
+  useEffect(() => {
+    setIsInIframe(typeof window !== "undefined" && window.self !== window.top);
+  }, []);
 
   const handleCopy = (domain: string) => {
     navigator.clipboard.writeText(domain).then(() => {
@@ -416,6 +421,9 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
   }
 
   // Render Material 3 Auth Panel (GOOGLE ONLY)
+  const activeProjectId = AuthManager.auth?.app?.options?.projectId || "gen-lang-client-0193743078";
+  const activeAuthDomain = AuthManager.auth?.app?.options?.authDomain || "gen-lang-client-0193743078.firebaseapp.com";
+
   const currentDevHost = typeof window !== "undefined" ? window.location.hostname : "ais-dev-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app";
   const currentPreHost = currentDevHost.includes("-dev-") 
     ? currentDevHost.replace("-dev-", "-pre-") 
@@ -458,13 +466,13 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
             <ul className="space-y-2.5 list-decimal list-inside text-slate-300 text-[11px] leading-relaxed">
               <li>
                 <strong>Bypass Google Warning screen:</strong> Since this app is in the development environment, Google displays a warning <em>"This app is in development / hasn't been verified by Google yet"</em>. 
-                To sign in, simply click <strong>"Advanced"</strong> (bottom-left of the Google popup) and then click <strong>"Go to gen-lang-client-0193743078.firebaseapp.com (unsafe)"</strong>.
+                To sign in, simply click <strong>"Advanced"</strong> (bottom-left of the Google popup) and then click <strong>"Go to {activeAuthDomain} (unsafe)"</strong>.
               </li>
               <li>
                 <strong>Authorize Preview Domains:</strong> If you see an <code>auth/unauthorized-domain</code> error:
                 <div className="mt-2 space-y-2 border-l border-amber-500/20 pl-3">
                   <p className="text-[11px] text-amber-300/90 leading-normal">
-                    💡 <strong>Critical Tab Location:</strong> In your Firebase Console, click on the <strong className="underline">Settings</strong> tab (located directly in the top sub-menu bar, between <em>Usage</em> and <em>Extensions</em>). Then click <strong>Authorized domains</strong> in the side list.
+                    💡 <strong>Critical Tab Location:</strong> In your Firebase Console for project <strong className="font-mono text-amber-400 select-all">{activeProjectId}</strong>, click on the <strong className="underline">Settings</strong> tab (located directly in the top sub-menu bar, between <em>Usage</em> and <em>Extensions</em>). Then click <strong>Authorized domains</strong> in the side list.
                   </p>
                   <p className="text-[10px] text-slate-400">
                     Click the buttons below to copy each required domain, then click "Add domain" in Firebase Console to paste them:
@@ -490,7 +498,7 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
                 </div>
               </li>
               <li>
-                <strong>Configure Google Consent Test Users:</strong> Because the Google Cloud App is in <em>"Testing"</em> mode, only registered users can sign in. Open the <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline inline-flex items-center gap-0.5">Google Cloud OAuth Consent Screen</a>, select your project <code>gen-lang-client-0193743078</code>, and click <strong>"Add Users"</strong> under Test Users to add:
+                <strong>Configure Google Consent Test Users:</strong> Because the Google Cloud App is in <em>"Testing"</em> mode, only registered users can sign in. Open the <a href={`https://console.cloud.google.com/apis/credentials/consent?project=${activeProjectId}`} target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline inline-flex items-center gap-0.5">Google Cloud OAuth Consent Screen</a>, select your project <code>{activeProjectId}</code>, and click <strong>"Add Users"</strong> under Test Users to add:
                 <div className="mt-1 font-mono text-amber-300">anuakku2013@gmail.com</div>
                 Alternatively, click the <strong>"Publish App"</strong> button under the consent settings to move it to Production, making it available to any Google user instantly.
               </li>
@@ -507,6 +515,23 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
 
       {/* Social Google Login Button (The exclusive login option) */}
       <div className="space-y-4 py-2">
+        {isInIframe && (
+          <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-200 space-y-2" id="iframe-auth-warning">
+            <div className="flex items-center gap-2 font-semibold text-amber-300">
+              <span className="animate-pulse">⚠️</span>
+              <span>Iframe Preview Warning</span>
+            </div>
+            <p className="text-[11px] leading-relaxed text-slate-300">
+              You are currently viewing this application inside the editor's sandbox iframe. Google Sign-In popups are <strong>blocked</strong> inside iframes by modern browser security policies.
+            </p>
+            <div className="pt-1">
+              <p className="text-[11px] text-amber-400 font-medium">
+                👉 <strong>How to fix:</strong> Click the <strong>"Open in new tab"</strong> button at the top-right of your preview iframe to run Google Sign-In successfully.
+              </p>
+            </div>
+          </div>
+        )}
+
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
