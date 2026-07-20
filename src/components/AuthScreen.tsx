@@ -87,6 +87,47 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
     }
   };
 
+  const handleBypassLogin = () => {
+    setError(null);
+    setSuccess(null);
+    try {
+      const guestUser: UserProfile = {
+        uid: "guest_user_bypass",
+        name: "Guest Seeker",
+        email: "guest@jhora.ai",
+        phoneNumber: "+15550000000",
+        photoURL: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150",
+        createdDate: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        savedProfiles: [],
+        favorites: [],
+        history: [],
+        settings: {
+          theme: "light",
+          ayanamsa: "Lahiri (Chitra Paksha)",
+          chartStyle: "north",
+          language: "English",
+          autoUpdate: true
+        }
+      };
+      
+      localStorage.setItem("jhora_user_profile", JSON.stringify(guestUser));
+      
+      SessionManager.saveSession({
+        uid: "guest_user_bypass",
+        email: "guest@jhora.ai",
+        displayName: "Guest Seeker",
+        photoURL: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150",
+      } as any, "mock_guest_token");
+
+      onAuthSuccess(guestUser);
+      setSuccess("Bypassed Google Sign-In! Welcome in Guest Mode.");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to bypass Google Sign-In.");
+    }
+  };
+
   const handleSaveAndSync = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeUser) return;
@@ -196,6 +237,7 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
     setLoading(true);
     try {
       await AuthManager.logout();
+      localStorage.removeItem("jhora_user_profile");
       onAuthSuccess(null);
       setSuccess("Successfully logged out!");
       setPhone("");
@@ -619,6 +661,22 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
               Continue with Google Account
             </>
           )}
+        </button>
+
+        <div className="relative my-2 flex py-1 items-center">
+          <div className="flex-grow border-t border-slate-800"></div>
+          <span className="flex-shrink mx-3 text-slate-500 text-[10px] uppercase font-mono tracking-widest">Or Bypass / Test Mode</span>
+          <div className="flex-grow border-t border-slate-800"></div>
+        </div>
+
+        <button
+          onClick={handleBypassLogin}
+          type="button"
+          className="w-full py-2.5 bg-slate-900/90 hover:bg-slate-800 text-amber-400 font-sans font-semibold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2 border border-slate-800 hover:border-amber-500/30 shadow-md active:scale-95 animate-fade-in"
+          id="bypass-google-btn"
+        >
+          <CloudLightning className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+          <span>Bypass Google Sign-In (Guest Mode)</span>
         </button>
 
         <p className="text-[10px] text-center text-slate-500 leading-relaxed max-w-xs mx-auto">

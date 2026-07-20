@@ -1083,6 +1083,17 @@ export default function App() {
           console.error("Error fetching remote profile on auth change:", err);
         }
       } else {
+        // If there's a guest/bypassed user in localstorage, don't clear it!
+        const cachedProfileStr = localStorage.getItem("jhora_user_profile");
+        if (cachedProfileStr) {
+          try {
+            const cached = JSON.parse(cachedProfileStr);
+            if (cached && cached.uid === "guest_user_bypass") {
+              // It's a guest/bypassed user, keep them logged in!
+              return;
+            }
+          } catch (e) {}
+        }
         setActiveUser(null);
         localStorage.removeItem("jhora_user_profile");
       }
@@ -2069,6 +2080,7 @@ export default function App() {
                   onClick={async () => {
                     try {
                       await AuthManager.logout();
+                      localStorage.removeItem("jhora_user_profile");
                       setActiveUser(null);
                     } catch (e) {
                       console.error("Logout failed:", e);
