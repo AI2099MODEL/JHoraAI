@@ -1066,6 +1066,263 @@ No Transit can create an event that does not exist in the Natal Promise.
 
 Activation only releases what Natal has already promised.
 
+###############################################################
+
+###############################################################
+RULE DECISION ENGINE
+Decision Processing Framework
+###############################################################
+
+PURPOSE
+
+The Rule Decision Engine receives validated rule results from the
+Rule Engine and determines the final astrological verdict for each
+event without modifying or creating new rules.
+
+###############################################################
+
+INPUT
+
+Compiled Rules
+
+↓
+
+Rule Evaluation Results
+
+↓
+
+Evidence Objects
+
+↓
+
+Planetary Data
+
+↓
+
+House Data
+
+↓
+
+Dasha Data
+
+↓
+
+Transit Data
+
+###############################################################
+
+PROCESS
+
+Load Rule Results
+
+↓
+
+Group by Event ID
+
+↓
+
+Evaluate Rule Dependencies
+
+↓
+
+Check Blocking Rules
+
+↓
+
+Check Supporting Rules
+
+↓
+
+Count Evidence
+
+↓
+
+Resolve Conflicts
+
+↓
+
+Generate Final Verdict
+
+###############################################################
+
+DECISION STATES
+
+PASS
+
+FAIL
+
+PARTIAL
+
+WEAK
+
+MODERATE
+
+STRONG
+
+CONTRADICTORY
+
+NOT PROMISED
+
+###############################################################
+
+SUPPORTING RULES
+
+Supporting rules increase confidence for an event.
+
+Example
+
+Marriage Promise
+
+↓
+
+KP Rule
+
+PASS
+
+↓
+
+Parashari Rule
+
+PASS
+
+↓
+
+Jaimini Rule
+
+PASS
+
+↓
+
+Supporting Evidence = HIGH
+
+###############################################################
+
+BLOCKING RULES
+
+Blocking rules reduce or deny confidence.
+
+Example
+
+Marriage Promise
+
+↓
+
+Severe Affliction Rule
+
+PASS
+
+↓
+
+Marriage Delay Rule
+
+PASS
+
+↓
+
+Marriage Denial Rule
+
+PASS
+
+↓
+
+Decision = CONTRADICTORY
+
+###############################################################
+
+RULE DEPENDENCY
+
+Some rules require another rule to pass before evaluation.
+
+Example
+
+Marriage Timing Rule
+
+depends on
+
+Marriage Promise Rule
+
+If Marriage Promise = FAIL
+
+↓
+
+Marriage Timing = NOT EVALUATED
+
+###############################################################
+
+CONFLICT RESOLUTION
+
+If multiple rules produce opposing results
+
+↓
+
+Evaluate Rule Priority
+
+↓
+
+Evaluate Supporting Evidence
+
+↓
+
+Evaluate Blocking Evidence
+
+↓
+
+Generate Final Decision
+
+###############################################################
+
+DECISION OBJECT
+
+EventID
+
+Rule Results
+
+Supporting Rules
+
+Blocking Rules
+
+Evidence Count
+
+Final Verdict
+
+Confidence Level
+
+Explanation Reference
+
+Timestamp
+
+###############################################################
+
+OUTPUT
+
+The Rule Decision Engine returns a validated decision object to the
+next processing stage.
+
+No user-facing interpretation is generated in this module.
+
+###############################################################
+
+REFERENCE
+
+The validated decision object is forwarded to the Event Book module
+for storage, explanation generation, timeline management, reporting,
+and presentation.
+
+Refer to:
+
+Event Book Manual
+
+###############################################################
+
+ENGINE PRINCIPLE
+
+The Rule Decision Engine never creates rules.
+
+The Rule Decision Engine never modifies rules.
+
+The Rule Decision Engine only evaluates the outcomes produced by the
+Rule Engine and produces a deterministic final verdict.
+
 ###############################################################`;
 
   const copyToClipboard = () => {
