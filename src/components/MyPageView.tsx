@@ -48,6 +48,8 @@ interface MyPageViewProps {
   containerStyle: string;
   cardStyle: string;
   textMuted: string;
+  activeSubmenuId?: string;
+  onSubmenuSelect?: (id: string) => void;
 }
 
 const IconMap: { [key: string]: React.ComponentType<any> } = {
@@ -1702,6 +1704,8 @@ export function MyPageView({
   containerStyle,
   cardStyle,
   textMuted,
+  activeSubmenuId,
+  onSubmenuSelect,
 }: MyPageViewProps) {
   const textStyle = isDark ? "text-slate-100" : "text-neutral-800";
   const textMutedStyle = textMuted;
@@ -1714,6 +1718,19 @@ export function MyPageView({
   const [age, setAge] = useState<{ years: number; months: number; days: number } | null>(null);
   const [activeTab, setActiveTab] = useState<string>("overview");
   const [activeSubmenu, setActiveSubmenu] = useState<"my_life" | "my_journey" | "my_astro">("my_astro");
+
+  useEffect(() => {
+    if (activeSubmenuId) {
+      if (activeSubmenuId === "my_life" || activeSubmenuId === "my_journey") {
+        setActiveSubmenu(activeSubmenuId);
+      } else {
+        setActiveSubmenu("my_astro");
+        if (activeSubmenuId !== activeTab) {
+          setActiveTab(activeSubmenuId);
+        }
+      }
+    }
+  }, [activeSubmenuId]);
   const [tajikTargetAge, setTajikTargetAge] = useState<number>(30);
   const [tajikSubTab, setTajikSubTab] = useState<string>("relationship");
   const [westernSubTab, setWesternSubTab] = useState<string>("dashboard");
@@ -2790,7 +2807,7 @@ export function MyPageView({
         {/* Primary Submenus Switcher */}
         <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-950/60 rounded-xl border border-slate-800/40" id="primary-submenu-bar-early">
           <button
-            onClick={() => setActiveSubmenu("my_life")}
+            onClick={() => { setActiveSubmenu("my_life"); onSubmenuSelect?.("my_life"); }}
             className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
               activeSubmenu === "my_life"
                 ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
@@ -2802,7 +2819,7 @@ export function MyPageView({
             <span>My Life</span>
           </button>
           <button
-            onClick={() => setActiveSubmenu("my_journey")}
+            onClick={() => { setActiveSubmenu("my_journey"); onSubmenuSelect?.("my_journey"); }}
             className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
               activeSubmenu === "my_journey"
                 ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
@@ -2814,7 +2831,7 @@ export function MyPageView({
             <span>My Journey</span>
           </button>
           <button
-            onClick={() => setActiveSubmenu("my_astro")}
+            onClick={() => { setActiveSubmenu("my_astro"); onSubmenuSelect?.(activeTab); }}
             className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
               activeSubmenu === "my_astro"
                 ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
@@ -2912,7 +2929,7 @@ export function MyPageView({
       {/* Primary Submenus Switcher */}
       <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-950/60 rounded-xl border border-slate-800/40" id="primary-submenu-bar">
         <button
-          onClick={() => setActiveSubmenu("my_life")}
+          onClick={() => { setActiveSubmenu("my_life"); onSubmenuSelect?.("my_life"); }}
           className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
             activeSubmenu === "my_life"
               ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
@@ -2924,7 +2941,7 @@ export function MyPageView({
           <span>My Life</span>
         </button>
         <button
-          onClick={() => setActiveSubmenu("my_journey")}
+          onClick={() => { setActiveSubmenu("my_journey"); onSubmenuSelect?.("my_journey"); }}
           className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
             activeSubmenu === "my_journey"
               ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
@@ -2936,7 +2953,7 @@ export function MyPageView({
           <span>My Journey</span>
         </button>
         <button
-          onClick={() => setActiveSubmenu("my_astro")}
+          onClick={() => { setActiveSubmenu("my_astro"); onSubmenuSelect?.(activeTab); }}
           className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
             activeSubmenu === "my_astro"
               ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
@@ -2954,7 +2971,10 @@ export function MyPageView({
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              setActiveTab(tab.id);
+              onSubmenuSelect?.(tab.id);
+            }}
             className={`px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold tracking-wider uppercase border transition-all cursor-pointer select-none ${
               activeTab === tab.id
                 ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm shadow-amber-500/10"
