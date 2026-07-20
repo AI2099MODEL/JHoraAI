@@ -5,6 +5,7 @@ import DashaTree from "./DashaTree";
 import TransitsTab from "./TransitsTab";
 import { AstroRawTablesView } from "./AstroRawTablesView";
 import { MasterArchitectureView } from "./MasterArchitectureView";
+import currentSkyJson from "../knowledgebase/checklist_engine/current_sky.json";
 import {
   mapJHoraResponseToAstrologyData,
   mapAstrologyDataToUserProfileJSON
@@ -2987,6 +2988,15 @@ export function MyPageView({
               <span className="opacity-30">|</span>
               <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Prana:</span>
               <span className="font-bold">{headerLords.prana}</span>
+            </div>
+          )}
+          {currentSkyJson?.moon && (
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/10 font-mono text-xs">
+              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Transit Moon Nakshatra:</span>
+              <span className="font-bold text-indigo-300">{currentSkyJson.moon.currentNakshatra?.displayName || "Pushya"}</span>
+              <span className="opacity-30">|</span>
+              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Sub:</span>
+              <span className="font-bold text-indigo-300">{currentSkyJson.moon.currentSubLord?.displayName || "Venus"}</span>
             </div>
           )}
         </div>
