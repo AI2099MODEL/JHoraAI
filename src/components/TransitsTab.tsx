@@ -1258,29 +1258,25 @@ export default function TransitsTab({
 
   return (
     <div className="space-y-6" id="transits-tab-container">
-      {/* 13 Horizontal Scrollable Submenus */}
+      {/* 18 Beautiful Wrapping Submenus */}
       {!propSubTab && (
-        <div className="bg-slate-950/65 rounded-xl border border-indigo-500/10 p-2 shadow-inner">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
-            {SUB_TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isSelected = subTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setSubTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg whitespace-nowrap transition-all border ${
-                    isSelected
-                      ? "bg-indigo-600/20 border-indigo-500/50 text-amber-300 font-bold"
-                      : "border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/30"
-                  }`}
-                >
-                  <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-amber-400 animate-pulse" : "text-slate-500"}`} />
-                  {tab.name}
-                </button>
-              );
-            })}
-          </div>
+        <div className="flex flex-wrap gap-2 py-2" id="transits-submenu-grid">
+          {SUB_TABS.map((tab) => {
+            const isSelected = subTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setSubTab(tab.id)}
+                className={`px-3.5 py-1.5 text-xs font-mono rounded-lg transition-all border cursor-pointer select-none ${
+                  isSelected
+                    ? "bg-indigo-50 dark:bg-indigo-950/40 border-indigo-300 dark:border-indigo-500/50 text-orange-600 dark:text-orange-400 font-bold shadow-sm"
+                    : "bg-white dark:bg-slate-900/40 border-slate-200 dark:border-slate-800/80 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900/60 shadow-sm"
+                }`}
+              >
+                {tab.name}
+              </button>
+            );
+          })}
         </div>
       )}
 
