@@ -1,6 +1,5 @@
 import React from "react";
 import { 
-  Sparkles, 
   User, 
   Briefcase, 
   Shield, 
@@ -9,10 +8,9 @@ import {
   Compass, 
   Award, 
   Activity, 
-  Layers, 
-  HelpCircle,
-  Home,
-  Users,
+  Sparkles, 
+  Home, 
+  Users, 
   Feather
 } from "lucide-react";
 
@@ -22,8 +20,8 @@ interface VargaAnalysisViewProps {
 
 export function VargaAnalysisView({ isDark }: VargaAnalysisViewProps) {
   const containerBg = isDark ? "bg-slate-900/20 border-slate-800/80" : "bg-neutral-50 border-neutral-200/80";
-  const cardBg = isDark ? "bg-slate-950/40 border-slate-800/50 hover:border-amber-500/20" : "bg-white border-neutral-200 hover:border-amber-500/20";
-  const textTitle = isDark ? "text-amber-400" : "text-amber-600";
+  const cardBg = isDark ? "bg-slate-950/40 border-slate-800/50 hover:border-amber-500/10" : "bg-white border-neutral-200 hover:border-amber-500/10";
+  const textTitle = isDark ? "text-slate-200" : "text-neutral-800";
   const textDesc = isDark ? "text-slate-300" : "text-neutral-700";
   const textMuted = isDark ? "text-slate-400" : "text-neutral-500";
   const bulletColor = isDark ? "text-amber-500/80" : "text-amber-600/80";
@@ -34,66 +32,89 @@ export function VargaAnalysisView({ isDark }: VargaAnalysisViewProps) {
       title: "D-1 Rashi (Life Blueprint)",
       icon: User,
       bullets: [
-        "Primary anchor of your physical existence, vitality, and overall life-path trajectory.",
-        "Represents a personality defined by high emotional sensitivity and deep empathy, which requires establishing healthy personal boundaries.",
-        "Indicates early-life challenges and additional family responsibilities, which build strong self-discipline, resilience, and patience.",
-        "Yields a highly intuitive, deep psychological approach to life with a natural talent for research, mystery, and uncovering hidden truths.",
-        "Grants exceptional spiritual wisdom, natural grace, and philosophical maturity that guide your path to prosperity and right action."
+        "Your life path is marked by significant early-life responsibilities and structural challenges that forge an exceptionally resilient, patient, and self-reliant character.",
+        "You possess a highly intuitive, deep, and psychological approach to life, giving you a natural talent for research, mystery, and uncovering hidden truths.",
+        "Profound spiritual protection and philosophical maturity guide your path, enabling you to transform obstacles into lasting prosperity and right action."
       ]
     },
     {
       id: "d2",
-      title: "D-2 Hora (Wealth & Resource Security)",
+      title: "D-2 Hora (Wealth & Security)",
       icon: Zap,
       bullets: [
-        "Focuses on your capacity for wealth accumulation, financial resources, and speech.",
-        "Indicates that your wealth is closely tied to persistent effort, structured management, and strategic partnerships.",
-        "Highlights a strong connection to ancestral values and speech-based leadership, allowing you to influence others through precise, measured communication.",
-        "Shows that financial stability grows steadily over time rather than in sudden spikes, rewarding systemic savings and careful asset management."
+        "Financial accumulation is built through systematic, patient, and highly disciplined efforts rather than quick, speculative gains.",
+        "Your communication carries a serious, measured, and authoritative weight that commands respect in advisory or corporate environments.",
+        "True material security and peace of mind grow through structured asset stewardship and gradual, long-term investments."
       ]
     },
     {
       id: "d3",
-      title: "D-3 Drekkana (Enterprise & Inner Drive)",
+      title: "D-3 Drekkana (Courage & Enterprise)",
       icon: Compass,
       bullets: [
-        "Governs your siblings, immediate peer circles, and personal courage or drive.",
-        "Represents a self-made destiny where success and personal enterprise are born directly from your courage and inner initiatives.",
-        "Shows a high degree of persistence and dedication to technical or analytical skills, ensuring you can tackle complex undertakings independently.",
-        "Indicates short-distance travels or local ventures play a critical role in expanding your network and activating your potential."
+        "You possess a self-made destiny where success is carved out directly through painstaking personal effort and inner drive.",
+        "Your initiative is channeled into mastering highly technical or analytical skills, ensuring independence in your endeavors.",
+        "Short-distance travels, local networks, and persistent small actions serve as vital catalysts that activate your career growth."
       ]
     },
     {
       id: "d4",
-      title: "D-4 Chaturthamsa (Stability & Peace)",
+      title: "D-4 Chaturthamsa (Stability & Foundations)",
       icon: Home,
       bullets: [
-        "Reflects property ownership, real estate, fixed assets, and your core psychological peace.",
-        "Assures a strong focus on building permanent foundations, with steady gains in property and fixed assets, particularly in the later part of life.",
-        "Highlights that your true inner peace is attained through domestic harmony, close ties to your mother or motherland, and maintaining a spiritually clean living space.",
-        "Shows protection against sudden residential instabilities, establishing a solid anchor for personal and professional growth."
+        "Real estate foundations and fixed assets require persistent early-life efforts to establish permanent, secure roots.",
+        "True emotional peace is attained by establishing a highly structured, clean, and spiritually grounded home environment.",
+        "You enjoy reliable protection against sudden residential or domestic instabilities, providing a solid anchor for professional expansion."
+      ]
+    },
+    {
+      id: "d5",
+      title: "D-5 Panchamsa (Intellect & Recognition)",
+      icon: Award,
+      bullets: [
+        "Your mind operates with high analytical clarity, showing a natural talent for organizing complex or esoteric systems of knowledge.",
+        "Public recognition and intellectual authority are established through patient research, advisory counseling, or specialized teaching.",
+        "Fame and professional respect are earned slowly and stably through deep expertise rather than sudden exposure."
+      ]
+    },
+    {
+      id: "d6",
+      title: "D-6 Shastamsa (Challenges & Vitality)",
+      icon: Activity,
+      bullets: [
+        "Health vulnerabilities and hidden challenges are systematically managed and cleared through structured daily routines.",
+        "You naturally overcome competitors and open opposition not by raw aggression, but through patient endurance and methodical problem-solving.",
+        "Daily physical discipline and self-care routines serve as your primary shield of high vitality."
       ]
     },
     {
       id: "d7",
-      title: "D-7 Saptamsa (Creativity & Progeny)",
+      title: "D-7 Saptamsa (Legacy & Mentorship)",
       icon: Feather,
       bullets: [
-        "Explores creative outputs, children, and your spiritual legacy.",
-        "Indicates deep emotional bonds and high expectations in raising children or guiding projects, prompting you to act as a mentor, counselor, and protective guide.",
-        "Focuses on creative fertility, showing that your ideas and intellect thrive when applied to teaching, systematic mentoring, or deep research.",
-        "Represents a legacy built not just on material lineage, but on transferring ancient or technical wisdom to future generations."
+        "Your creative outputs and relationships with offspring are marked by a deep protective instinct and a sense of sacred mentoring.",
+        "Creative projects and guidance of others teach you valuable lessons of emotional balance, counseling, and patience.",
+        "Your legacy is built on transferring deep, systemized methods or spiritual wisdom to future generations."
+      ]
+    },
+    {
+      id: "d8",
+      title: "D-8 Ashtamsa (Transformation & Rebirth)",
+      icon: Shield,
+      bullets: [
+        "You experience a powerful, natural attraction to exploring occult sciences, esoteric secrets, and the deeper mysteries of life.",
+        "Sudden life transitions or crises are navigated through exceptional inner resilience, turning intense challenges into spiritual rebirth.",
+        "Psychological regeneration is achieved by approaching unexpected changes with calm, structured detachment."
       ]
     },
     {
       id: "d9",
-      title: "D-9 Navamsa (Dharmic Path & Marriage)",
+      title: "D-9 Navamsa (Dharmic Blueprint & Soul Path)",
       icon: Heart,
       bullets: [
-        "Defines the inner soul path, partner dynamics, and your development post-thirty.",
-        "Reveals a life partner who acts as an intellectual mirror, challenging you to seek deep, authentic compatibility and shared dharmic values.",
-        "Indicates a massive activation of hidden talents and spiritual clarity after your mid-thirties, aligning you with your true life purpose.",
-        "Confirms a powerful focus on internal balance, suggesting that external success is a direct reflection of your inner emotional alignment."
+        "Your inner soul path and marital alignment unfold as a serious journey toward mutual emotional compatibility and shared principles.",
+        "A profound activation of hidden talents, spiritual clarity, and real-life purpose occurs in your post-thirty phase of life.",
+        "Personal relationships act as intellectual mirrors, guiding you to align your material duties with deep internal values."
       ]
     },
     {
@@ -101,32 +122,39 @@ export function VargaAnalysisView({ isDark }: VargaAnalysisViewProps) {
       title: "D-10 Dasamsa (Career & Public Authority)",
       icon: Briefcase,
       bullets: [
-        "Represents professional standing, public authority, and your career blueprint.",
-        "Governs career trajectories highlighting professional growth in analytical, advisory, public service, or specialized teaching roles.",
-        "Indicates that your public recognition is built on wisdom, patience, and technical expertise rather than aggressive competition.",
-        "Shows a steady rise to leadership or consulting positions where you guide others using systemized knowledge or astrological systems."
+        "Your career progression is characterized by a steady, highly structured climb to positions of advisory prominence and public authority.",
+        "Professional respect is built on technical depth, administrative patience, and systemized knowledge.",
+        "You are naturally suited to guide organizations or individuals through structured consulting rather than aggressive political competition."
+      ]
+    },
+    {
+      id: "d11",
+      title: "D-11 Rudramsa (Material Gains & Desires)",
+      icon: Sparkles,
+      bullets: [
+        "Material gains and the fulfillment of major desires are unlocked through structured, collective associations and spiritual networks.",
+        "Prosperity grows steadily, finding maximum expression when aligned with advisory leadership or group mentoring.",
+        "Unexpected financial windfalls or opportunities are managed with disciplined stewardship."
       ]
     },
     {
       id: "d12",
-      title: "D-12 Dwadasamsa (Heritage & Lineage)",
+      title: "D-12 Dwadasamsa (Ancestral Heritage & Karma)",
       icon: Users,
       bullets: [
-        "Unlocks ancestral lineage, parental influences, and deep genetic memory.",
-        "Represents a strong spiritual and ethical inheritance from parents and ancestral mentors, serving as a guiding compass in life.",
-        "Indicates that resolving parental duties and honoring ancestral lineage unlocks profound inner strength and clears long-standing family karmas.",
-        "Connects you to traditional knowledge bases, ensuring that your pursuits are supported by ancestral blessings."
+        "Deep parental ties and ancestral memories serve as major structural anchors in your life trajectory.",
+        "Honoring parental responsibilities and ancestral heritage clears deep-seated karmic debts and unlocks inherited protective blessings.",
+        "You serve as a natural channel for preserving traditional wisdom and family lineage values."
       ]
     },
     {
       id: "d16",
-      title: "D-16 Shodasamsa (Comforts & Luxuries)",
+      title: "D-16 Shodasamsa (Luxuries & Comforts)",
       icon: Sparkles,
       bullets: [
-        "Mapped to vehicles, physical luxuries, and overall material comfort.",
-        "Assures steady progress in acquiring modern comforts, luxury items, and reliable vehicles without getting lost in materialistic desires.",
-        "Emphasizes that your enjoyment of material comforts depends directly on your mental peace and spiritual alignment.",
-        "Mentions a potential to enjoy harmonious travels and comfortable, high-quality, aesthetic vehicles."
+        "The acquisition of modern comforts, high-quality vehicles, and luxury items is stable, provided mental peace is prioritized.",
+        "Material luxuries serve as comfortable vehicles for your life journey rather than an empty pursuit of vanity.",
+        "Traveling is harmonious and aligns with your inner sense of aesthetic balance."
       ]
     },
     {
@@ -134,32 +162,39 @@ export function VargaAnalysisView({ isDark }: VargaAnalysisViewProps) {
       title: "D-20 Vimsamsa (Spiritual Milestones)",
       icon: Shield,
       bullets: [
-        "Governs spiritual evolution, mantra sadhana, and deep esoteric study.",
-        "Indicates a powerful, natural connection to spiritual disciplines, meditation, and ancient knowledge such as astrology.",
-        "Highlights a soul-level pursuit of higher consciousness, showing that success in your spiritual practice brings ultimate stability to all other areas of your life.",
-        "Promotes natural skills in reading planetary patterns or esoteric signs, fueled by regular, disciplined meditation."
+        "You have a profound, soul-level alignment with meditation, spiritual disciplines, and ancient systems like astrology.",
+        "Deep study of esoteric sciences brings ultimate stability and protection to all other material areas of your life.",
+        "Progress in spiritual practices or mantra sadhana acts as your ultimate shield against life's external storms."
       ]
     },
     {
       id: "d24",
-      title: "D-24 Chaturvimsamsa (Intellect & Knowledge)",
+      title: "D-24 Chaturvimsamsa (Higher Learning & Wisdom)",
       icon: Award,
       bullets: [
-        "Focuses on higher academic learning, intellectual expansion, and wisdom.",
-        "Represents an exceptionally analytical, deep, and scholarly mind with an endless thirst for mastering complex sciences.",
-        "Shows that your true wisdom is attained through self-study, research, and integrating ancient wisdom with modern systems.",
-        "Indicates success in higher educational pursuits, giving you the credentials to teach, write, or consult authoritatively."
+        "Your intellect thrives on scholarly patience, deep research, and mastering complex, traditional branches of knowledge.",
+        "True wisdom is earned through disciplined self-study and integrating ancient sciences with modern systems.",
+        "You possess the intellectual authority to write, teach, or consult on highly specialized subjects."
+      ]
+    },
+    {
+      id: "d27",
+      title: "D-27 Nakshatramsa (Emotional Strength)",
+      icon: Sparkles,
+      bullets: [
+        "Emotional resilience is developed by mastering mental anxieties and anchoring yourself in structured philosophies.",
+        "Peak energy and vitality are activated when you channel your thoughts into advisory counseling or deep analytical research.",
+        "Relationships with peers and networks are balanced through calm, objective, and mature communication."
       ]
     },
     {
       id: "d30",
-      title: "D-30 Trimsamsa (Challenges & Resilience)",
+      title: "D-30 Trimsamsa (Resilience & Obstacles)",
       icon: Activity,
       bullets: [
-        "Explores hidden challenges, health vulnerabilities, and overcoming obstacles.",
-        "Indicates that any physical or professional challenges are overcome through rigorous self-discipline, structured daily habits, and high patience.",
-        "Focuses on transforming sudden obstacles into deep spiritual growth, showing that your challenges act as catalysts for profound personal wisdom.",
-        "Assures natural resilience against open or hidden oppositions, allowing you to rise above adversity with grace."
+        "Subconscious blockages, health vulnerabilities, or moral tests are systematically cleared through rigorous self-discipline.",
+        "High resilience is granted, allowing you to convert sudden setbacks into profound personal strength.",
+        "You have an innate capacity to rise above hidden oppositions with quiet grace and integrity."
       ]
     },
     {
@@ -167,9 +202,8 @@ export function VargaAnalysisView({ isDark }: VargaAnalysisViewProps) {
       title: "D-40 Khavedamsa (Auspicious Cycles)",
       icon: Sparkles,
       bullets: [
-        "Tracks fine-grained material and spiritual auspiciousness and destiny alignment.",
-        "Highlights the presence of positive cosmic cycles that bring timely assistance during difficult phases.",
-        "Shows that your general well-being and life path remain protected, ensuring that your primary endeavors find success through unexpected alignments."
+        "Underlying cosmic grace brings timely assistance and protection during challenging phases of life.",
+        "Your primary endeavors are guided by positive cycles, ensuring that your long-term path remains safe and progressive."
       ]
     },
     {
@@ -177,32 +211,30 @@ export function VargaAnalysisView({ isDark }: VargaAnalysisViewProps) {
       title: "D-45 Akshavedamsa (Conscience & Integrity)",
       icon: Shield,
       bullets: [
-        "Inspects character integrity, deep ethics, and pure conscience.",
-        "Reflects a personality rooted in absolute truth, high moral fortitude, and strong personal ethics.",
-        "Indicates that your personal reputation and spiritual progression are fully supported by your commitment to transparency and ethical dealings."
+        "Your personality is deeply rooted in truth, high moral principles, and a clean conscience.",
+        "Public reputation and spiritual evolution are fully supported by your commitment to transparency and ethical actions."
       ]
     },
     {
       id: "d60",
-      title: "D-60 Shastyamsa (Past Life & Soul Destiny)",
+      title: "D-60 Shastyamsa (Soul Seed & Past Karma)",
       icon: Sparkles,
       bullets: [
-        "The ultimate seed of karma, detailing past life patterns and total destiny.",
-        "Reveals a highly evolved soul that has returned to settle specific professional and spiritual responsibilities, especially by mentoring others.",
-        "Indicates that the highest self-realization is achieved by serving as a counselor, guide, or astrologer, helping others navigate their life charts.",
-        "Highlights that your deepest soul-level peace is attained when you align your material duties with selfless service."
+        "Your ultimate soul destiny is defined by settling specific karmic responsibilities by serving as a mentor, counselor, or guide to others.",
+        "True self-realization is achieved when you align your professional activities with selfless guidance and the dissemination of ancient wisdom.",
+        "Your deepest soul-level peace is attained through service, helping others navigate their life paths."
       ]
     }
   ];
 
   return (
     <div className={`space-y-6 rounded-2xl border p-5 ${containerBg} backdrop-blur-md`}>
-      <div className="space-y-1.5 border-b border-dashed border-slate-500/10 pb-4">
+      <div className="space-y-1 pb-4 border-b border-dashed border-slate-500/10">
         <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-md border border-indigo-500/10 inline-block">
           Divisional Chart (Varga) Analysis
         </span>
-        <p className={`text-xs ${textMuted} font-sans leading-relaxed`}>
-          A detailed, points-based examination of your natal promise across all the primary levels of astrological division.
+        <p className={`text-[11px] ${textMuted} font-sans leading-relaxed`}>
+          A detailed, points-based examination of your natal promise across all 20 primary levels of divisional astrology.
         </p>
       </div>
 
@@ -210,12 +242,11 @@ export function VargaAnalysisView({ isDark }: VargaAnalysisViewProps) {
         {vargas.map((varga) => {
           const Icon = varga.icon;
           return (
-            <div key={varga.id} className={`rounded-xl border p-4.5 space-y-3 transition-all duration-300 ${cardBg} shadow-sm`}>
+            <div key={varga.id} className={`rounded-xl border p-4 space-y-3 transition-all duration-300 ${cardBg} shadow-sm`}>
               <div className="flex items-center gap-2">
                 <div className="p-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/25 shrink-0">
                   <Icon className="w-3.5 h-3.5" />
                 </div>
-                {/* Sleek, tiny heading label instead of a big h2 or h3 */}
                 <span className="text-xs font-bold text-slate-300 font-sans tracking-wide">
                   {varga.title}
                 </span>
