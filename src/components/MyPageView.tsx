@@ -4177,31 +4177,11 @@ export function MyPageView({
         </div>
       ) : activeTab === "transits_data" ? (
         <div className="space-y-6">
-          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
-                    Real-Time Transit Panchanga (Current Sky)
-                  </h3>
-                  <p className={`text-[11px] ${textMutedStyle}`}>
-                    The five attributes of time: Tithi, Vara, Nakshatra, Yoga, and Karana reflecting current celestial patterns.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {astrologyData ? (
-            <div className="mt-6">
-              <TransitsTab
-                astrologyData={astrologyData}
-                profile={profile}
-              />
-            </div>
+            <TransitsTab
+              astrologyData={astrologyData}
+              profile={profile}
+            />
           ) : (
             <div className="text-center py-8 text-xs text-slate-500 font-mono">
               ⚠️ Please cast a horoscope first to view real-time transits.
