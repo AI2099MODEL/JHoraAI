@@ -93,6 +93,7 @@ import { AstrologicalReasoningEngine } from "./components/AstrologicalReasoningE
 import { RelationshipConsultationFramework } from "./components/RelationshipConsultationFramework";
 import { MyPageView } from "./components/MyPageView";
 import { AstroRawTablesView } from "./components/AstroRawTablesView";
+import EventBookView from "./components/EventBookView";
 import { UserProfile, SessionManager, AuthManager, UserProfileRepository } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
 import WorkspaceTab from "./components/WorkspaceTab";
@@ -1441,7 +1442,10 @@ export default function App() {
 
         // Category 6: LAL KITAB
         { id: "lalkitab_houses", label: "LKB Houses", description: "JH18: Lal Kitab Planetary Houses.", systemId: "astro", category: "LAL KITAB" },
-        { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "JH19: Lal Kitab Teva & Sleeping Status.", systemId: "astro", category: "LAL KITAB" }
+        { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "JH19: Lal Kitab Teva & Sleeping Status.", systemId: "astro", category: "LAL KITAB" },
+
+        // Category 7: EVENTS
+        { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "astro", category: "EVENTS" }
       ]
     },
     {
@@ -2840,12 +2844,19 @@ export default function App() {
                 exit={{ opacity: 0, y: -5 }}
                 className="space-y-6"
               >
-                <AstroRawTablesView 
-                  astrologyData={astrologyData} 
-                  activeSubmenuId={activeSubmenuId} 
-                  isDark={isDark} 
-                  activeUser={activeUser}
-                />
+                {activeSubmenuId === "event_book" ? (
+                  <EventBookView 
+                    astrologyData={astrologyData} 
+                    isDark={isDark} 
+                  />
+                ) : (
+                  <AstroRawTablesView 
+                    astrologyData={astrologyData} 
+                    activeSubmenuId={activeSubmenuId} 
+                    isDark={isDark} 
+                    activeUser={activeUser}
+                  />
+                )}
               </motion.div>
             </AnimatePresence>
           ) : activeMenu === "marriage" ? (
