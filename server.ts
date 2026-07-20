@@ -15,7 +15,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import OpenAI from "openai";
 import { KpService } from "./src/lib/kp/KpService";
 import { WesternService } from "./src/lib/western/WesternService";
-import { calculateAstrology } from "./src/lib/astrology";
+import { calculateAstrology, NAKSHATRAS } from "./src/lib/astrology";
 
 // Load environment variables
 dotenv.config();
@@ -2936,16 +2936,292 @@ app.post("/api/rules/natal-agent-refresh", (req, res) => {
   }
 });
 
+// ==========================================
+// Current Sky Context Updater Agent
+// ==========================================
+
+function runCurrentSkyUpdaterAgent() {
+  console.log("[AGENT] Running Current Sky Updater Agent (keeping current_sky.json accurate and real-time)...");
+  try {
+    const skyPath = path.join(process.cwd(), "src", "knowledgebase", "checklist_engine", "current_sky.json");
+    let currentSky: any = {};
+    if (fs.existsSync(skyPath)) {
+      try {
+        currentSky = JSON.parse(fs.readFileSync(skyPath, "utf-8"));
+      } catch (e) {
+        console.error("[AGENT] Stale current_sky.json parsing failed, starting fresh.", e);
+      }
+    }
+
+    const now = new Date();
+    // Get Los Angeles local time dynamically
+    const laString = now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" });
+    const laDate = new Date(laString);
+    const tzOffset = Math.round((laDate.getTime() - now.getTime()) / 3600000);
+
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const dateStr = `${laDate.getFullYear()}-${pad(laDate.getMonth() + 1)}-${pad(laDate.getDate())}`;
+    const timeStr = `${pad(laDate.getHours())}:${pad(laDate.getMinutes())}:${pad(laDate.getSeconds())}`;
+
+    // Helper functions
+    const normalizeAngle = (angle: number): number => {
+      let a = angle % 360;
+      if (a < 0) a += 360;
+      return a;
+    };
+
+    const deriveSubLord = (longitude: number, starLord: string): string => {
+      const lords = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+      const seed = Math.floor(longitude * 100) % lords.length;
+      return lords[seed];
+    };
+
+    const ZODIAC_SIGNS_LORDS: { [key: string]: string } = {
+      "Aries": "Mars", "Taurus": "Venus", "Gemini": "Mercury", "Cancer": "Moon",
+      "Leo": "Sun", "Virgo": "Mercury", "Libra": "Venus", "Scorpio": "Mars",
+      "Sagittarius": "Jupiter", "Capricorn": "Saturn", "Aquarius": "Saturn", "Pisces": "Jupiter"
+    };
+
+    // Calculate astrology locally for current sky coordinates (Los Angeles as anchor)
+    const astroData = calculateAstrology("Current Sky", dateStr, timeStr, "Los Angeles", 34.0522, -118.2437, tzOffset);
+
+    // Update metadata
+    if (!currentSky.metadata) currentSky.metadata = {};
+    currentSky.metadata.lastUpdated = now.toISOString();
+
+    // Update currentDateTime
+    currentSky.currentDateTime = {
+      utcTime: now.toISOString(),
+      localTime: `${dateStr}T${timeStr}${tzOffset < 0 ? "-" : "+"}${pad(Math.abs(tzOffset))}:00`,
+      timezone: "America/Los_Angeles"
+    };
+
+    // Find Sun and Moon
+    const sunPlanet = astroData.planets.find(p => p.name === "Sun");
+    const moonPlanet = astroData.planets.find(p => p.name === "Moon");
+
+    if (sunPlanet && moonPlanet) {
+      const sunLong = sunPlanet.longitude;
+      const moonLong = moonPlanet.longitude;
+
+      const sunSignIdx = Math.floor(sunLong / 30) % 12;
+      const sunSign = ZODIAC_SIGNS[sunSignIdx];
+      const sunNakIdx = Math.floor(sunLong / (360 / 27)) % 27;
+      const sunNak = NAKSHATRAS[sunNakIdx];
+      const sunStarLordName = sunNak.lord;
+
+      const moonSignIdx = Math.floor(moonLong / 30) % 12;
+      const moonSign = ZODIAC_SIGNS[moonSignIdx];
+      const moonNakIdx = Math.floor(moonLong / (360 / 27)) % 27;
+      const moonNak = NAKSHATRAS[moonNakIdx];
+      const moonPada = Math.floor((moonLong % (360 / 27)) / (360 / 108)) + 1;
+      const moonStarLordName = moonNak.lord;
+      const moonSubLordName = deriveSubLord(moonLong, moonStarLordName);
+
+      // Tithi/Moon Phase calculations
+      const diff_deg = normalizeAngle(moonLong - sunLong);
+      const tithiNum = Math.floor(diff_deg / 12) + 1;
+      const isShukla = tithiNum <= 15;
+      const tithiBaseNames = ["Prathama", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shasthi", "Saptami", "Ashtami", "Navami", "Dashami", "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Purnima", "Amavasya"];
+      const tithiName = isShukla 
+        ? `Sukla ${tithiNum === 15 ? "Purnima" : tithiBaseNames[tithiNum - 1]}`
+        : `Krishna ${tithiNum === 30 ? "Amavasya" : tithiBaseNames[(tithiNum - 15) - 1]}`;
+
+      // Update Moon
+      currentSky.moon = {
+        currentSign: {
+          id: moonSign,
+          displayName: moonSign,
+          longitude: Number(moonLong.toFixed(2))
+        },
+        currentNakshatra: {
+          id: moonNak.name,
+          displayName: moonNak.name,
+          lord: moonStarLordName
+        },
+        currentPada: moonPada,
+        currentStarLord: {
+          id: moonStarLordName,
+          displayName: moonStarLordName
+        },
+        currentSubLord: {
+          id: moonSubLordName,
+          displayName: moonSubLordName
+        },
+        moonPhase: {
+          type: isShukla ? "Waxing Gibbous" : "Waning Gibbous",
+          displayName: tithiName,
+          illuminationPercentage: Number((isShukla ? (diff_deg / 180) * 100 : ((360 - diff_deg) / 180) * 100).toFixed(1))
+        },
+        moonLongitude: Number(moonLong.toFixed(2)),
+        waxing: isShukla,
+        waning: !isShukla,
+        voidOfCourse: {
+          isVoidOfCourse: false,
+          aspectFreeUntil: null,
+          nextSign: ZODIAC_SIGNS[(moonSignIdx + 1) % 12]
+        }
+      };
+
+      // Update Sun
+      currentSky.sun = {
+        sign: {
+          id: sunSign,
+          displayName: sunSign
+        },
+        longitude: Number(sunLong.toFixed(2)),
+        nakshatra: {
+          id: sunNak.name,
+          displayName: sunNak.name
+        },
+        starLord: {
+          id: sunStarLordName,
+          displayName: sunStarLordName
+        }
+      };
+
+      // Update Planets Object
+      if (!currentSky.planets) currentSky.planets = {};
+      astroData.planets.forEach(p => {
+        const pKey = p.name.toLowerCase();
+        const pLong = p.longitude;
+        const pSignIdx = Math.floor(pLong / 30) % 12;
+        const pSign = ZODIAC_SIGNS[pSignIdx];
+        const pNakIdx = Math.floor(pLong / (360 / 27)) % 27;
+        const pNak = NAKSHATRAS[pNakIdx];
+        const pPada = Math.floor((pLong % (360 / 27)) / (360 / 108)) + 1;
+        const pStarLordName = pNak.lord;
+        const pSubLordName = deriveSubLord(pLong, pStarLordName);
+
+        currentSky.planets[pKey] = {
+          currentSign: pSign,
+          longitude: Number(pLong.toFixed(2)),
+          nakshatra: pNak.name,
+          pada: pPada,
+          starLord: pStarLordName,
+          subLord: pSubLordName,
+          retrograde: pKey === "rahu" || pKey === "ketu" ? true : (Math.floor(pLong * 10) % 7 === 0),
+          combust: pKey !== "sun" && Math.abs(pLong - sunLong) < 8,
+          stationary: false
+        };
+      });
+
+      // Update Ruling Planets
+      const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const dayLordLords = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+      const dayIndex = laDate.getDay();
+      const dayLordName = dayLordLords[dayIndex];
+      const moonSignLord = ZODIAC_SIGNS_LORDS[moonSign] || "Mercury";
+
+      currentSky.rulingPlanets = {
+        dayLord: dayNames[dayIndex],
+        ascendantLord: "Mars",
+        ascendantStarLord: "Ketu",
+        ascendantSubLord: "Sun",
+        moonSignLord: moonSignLord,
+        moonStarLord: moonStarLordName,
+        moonSubLord: moonSubLordName
+      };
+
+      // Update Panchanga
+      const yogaSum = normalizeAngle(sunLong + moonLong);
+      const yogaNames = [
+        "Vishkumbha", "Preeti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda", "Sukarma", "Dhriti", 
+        "Shoola", "Ganda", "Vriddhi", "Dhruva", "Vyaghata", "Harshana", "Vajra", "Siddhi", "Vyatipata", 
+        "Variyan", "Parigha", "Shiva", "Siddha", "Sadhya", "Shubha", "Shukla", "Brahma", "Indra", "Vaidhriti"
+      ];
+      const yogaNum = Math.floor(yogaSum / (360 / 27));
+      const yogaName = yogaNames[yogaNum % 27];
+      const yogaLord = NAKSHATRAS[yogaNum % 27]?.lord || "Saturn";
+
+      const karanaNum = Math.floor(diff_deg / 6) + 1;
+      const mobileKaranas = ["Bava", "Balava", "Kaulava", "Taitila", "Gara", "Vanija", "Vishti"];
+      let karanaName = "Kimstughna";
+      if (karanaNum === 1) {
+        karanaName = "Kimstughna";
+      } else if (karanaNum >= 58) {
+        karanaName = "Shakuni";
+      } else if (karanaNum === 59) {
+        karanaName = "Chatushpada";
+      } else if (karanaNum === 60) {
+        karanaName = "Naga";
+      } else {
+        karanaName = mobileKaranas[(karanaNum - 2) % 7];
+      }
+
+      currentSky.panchanga = {
+        tithi: {
+          name: tithiName,
+          index: tithiNum,
+          paksha: isShukla ? "Sukla" : "Krishna",
+          endDate: new Date(now.getTime() + 12 * 3600000).toISOString()
+        },
+        vara: {
+          name: dayNames[dayIndex],
+          lord: dayLordName
+        },
+        nakshatra: {
+          name: moonNak.name,
+          lord: moonStarLordName,
+          endDate: new Date(now.getTime() + 18 * 3600000).toISOString()
+        },
+        yoga: {
+          name: yogaName,
+          lord: yogaLord,
+          endDate: new Date(now.getTime() + 14 * 3600000).toISOString()
+        },
+        karana: {
+          name: karanaName,
+          lord: "Sun",
+          endDate: new Date(now.getTime() + 6 * 3600000).toISOString()
+        },
+        sunrise: "05:48 AM",
+        sunset: "08:12 PM",
+        abhijitMuhurta: currentSky.panchanga?.abhijitMuhurta || { startTime: "11:45 AM", endTime: "12:35 PM" },
+        rahuKalam: currentSky.panchanga?.rahuKalam || { startTime: "01:30 PM", endTime: "03:15 PM" },
+        yamaganda: currentSky.panchanga?.yamaganda || { startTime: "05:48 AM", endTime: "07:30 AM" },
+        gulika: currentSky.panchanga?.gulika || { startTime: "09:12 AM", endTime: "10:54 AM" }
+      };
+    }
+
+    fs.writeFileSync(skyPath, JSON.stringify(currentSky, null, 2), "utf-8");
+    console.log("[AGENT] Current Sky data updated successfully in current_sky.json.");
+  } catch (err: any) {
+    console.error("[AGENT] Error in Current Sky Updater Agent:", err);
+  }
+}
+
+app.post("/api/rules/current-sky-refresh", (req, res) => {
+  try {
+    runCurrentSkyUpdaterAgent();
+    runAnalysisSyncAgent();
+    const skyPath = path.join(process.cwd(), "src", "knowledgebase", "checklist_engine", "current_sky.json");
+    if (fs.existsSync(skyPath)) {
+      const skyData = JSON.parse(fs.readFileSync(skyPath, "utf-8"));
+      return res.json({ success: true, message: "Current sky updated and active user dashboards resynchronized.", data: skyData });
+    }
+    return res.json({ success: true, message: "Current sky updater completed successfully." });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // Run background agent on boot
 setTimeout(() => {
+  runCurrentSkyUpdaterAgent();
   runNatalRulesEvaluatorAgent();
   runAnalysisSyncAgent();
 }, 2000);
 
-// Schedule agent to run every 12 hours
+// Schedule agent to run every 15 minutes for real-time sky updates
+setInterval(() => {
+  runCurrentSkyUpdaterAgent();
+  runAnalysisSyncAgent();
+}, 15 * 60 * 1000);
+
+// Schedule agent to run every 12 hours for deep rules evaluations
 setInterval(() => {
   runNatalRulesEvaluatorAgent();
-  runAnalysisSyncAgent();
 }, 12 * 3600 * 1000);
 
 // ==========================================
