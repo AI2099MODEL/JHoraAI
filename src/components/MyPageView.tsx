@@ -3970,24 +3970,6 @@ export function MyPageView({
         </div>
       ) : activeTab === "charts" ? (
         <div className="space-y-4">
-          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                  <Grid className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
-                    Table 13: Vedic Divisional Charts (Shodashavargas) Matrix
-                  </h3>
-                  <p className={`text-[11px] ${textMutedStyle}`}>
-                    A comprehensive matrix of the 20 primary divisional charts (Vargas) representing specific dimensions of karma, destiny, and life potential.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
             {(() => {
               const divisional = profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts || {};
