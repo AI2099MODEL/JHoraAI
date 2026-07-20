@@ -1611,7 +1611,10 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
               { id: "validation_qa", label: "VALIDATION & QA" },
               { id: "msm", label: "METADATA & SEMANTIC MODEL" },
               { id: "config_feature", label: "CONFIG & FEATURE MGMT" },
-              { id: "kp_rules_vol1", label: "KP RULE LIBRARY VOL 1" }
+              { id: "kp_rules_vol1", label: "KP RULE LIBRARY VOL 1" },
+              { id: "kp_rules_vol2", label: "KP RULE LIBRARY VOL 2" },
+              { id: "implementation_phase", label: "IMPLEMENTATION PHASE" },
+              { id: "mdrs", label: "DET. RULE SPEC (MDRS)" }
             ].map((section) => (
               <button
                 key={section.id}
@@ -2687,6 +2690,268 @@ if (signifiesCareer && !transit.blockedByRetrograde()) {
                     <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300 font-mono text-[10px]">
                       <span className="text-amber-400 font-bold mb-1 block">ENGINE PRINCIPLES</span>
                       This document is the executable knowledge base of KP Astrology. Rules shall never contradict the Astrological Knowledge Base. Rules shall never contain duplicated logic. Rules shall be deterministic, modular, reusable, versioned, and fully auditable.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "kp_rules_vol2" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Master KP Rule Library Volume 2
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Status: CANONICAL EVENT-SPECIFIC RULES</p>
+                  </div>
+
+                  <div className="space-y-3 font-mono">
+                    <div className="p-2.5 rounded bg-slate-900/60 border border-slate-800 text-[11px] font-sans text-slate-300">
+                      <strong className="text-amber-300 block font-mono font-bold mb-1">PURPOSE</strong>
+                      Implement the complete deterministic event prediction rule base for KP Astrology. Every event shall be evaluated independently using deterministic KP principles, tracing directly from promise to transit trigger.
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800 space-y-2">
+                      <span className="text-amber-300 font-bold block uppercase text-[10px]">Event Categories (Section 1 - 13)</span>
+                      <div className="grid grid-cols-3 gap-1.5 text-[9px] text-slate-400">
+                        <div>1. Marriage & Divorce</div>
+                        <div>2. Children & Birth</div>
+                        <div>3. Career & Business</div>
+                        <div>4. Finance & Speculation</div>
+                        <div>5. Property & House</div>
+                        <div>6. Vehicle & Accident</div>
+                        <div>7. Education & Breaks</div>
+                        <div>8. Foreign & Immigration</div>
+                        <div>9. Health & Hospitalization</div>
+                        <div>10. Litigation & Civil</div>
+                        <div>11. Spiritual & Occult</div>
+                        <div>12. Longevity & Threat</div>
+                        <div>13. Daily Routine Events</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800 space-y-1.5">
+                      <span className="text-amber-300 font-bold block uppercase text-[10px]">Rule Engine Execution Requirements</span>
+                      <p className="text-[10px] text-slate-300 leading-normal font-sans text-slate-400">
+                        Every event prediction is processed sequentially using deterministic rules to compute unified promise, activation, and final triggers:
+                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5 text-[8px] text-emerald-400 bg-slate-950 p-2 rounded border border-slate-900 overflow-x-auto whitespace-nowrap">
+                        <span>Evaluate Natal Promise</span>
+                        <span className="text-slate-600">→</span>
+                        <span>Evaluate DBA</span>
+                        <span className="text-slate-600">→</span>
+                        <span>Evaluate Transit</span>
+                        <span className="text-slate-600">→</span>
+                        <span>Evaluate Supporting Rules</span>
+                        <span className="text-slate-600">→</span>
+                        <span>Evaluate Blocking Rules</span>
+                        <span className="text-slate-600">→</span>
+                        <span>Generate Evidence</span>
+                        <span className="text-slate-600">→</span>
+                        <span>Calculate Confidence</span>
+                        <span className="text-slate-600">→</span>
+                        <span>Generate Decision</span>
+                        <span className="text-slate-600">→</span>
+                        <span>Update Timeline</span>
+                        <span className="text-slate-600">→</span>
+                        <span>Store Event</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2.5">
+                      <span className="text-amber-300 font-bold block uppercase text-[10px]">Canonical Executable Rule Examples</span>
+
+                      {/* Rule 1 */}
+                      <div className="p-3 bg-slate-950 rounded-lg border border-amber-500/20 space-y-1 text-[9px] leading-relaxed">
+                        <div className="flex justify-between items-center border-b border-slate-800 pb-1 mb-1">
+                          <strong className="text-amber-400">KP_EV_MARR_002 (Late Marriage)</strong>
+                          <span className="bg-emerald-500/10 text-emerald-400 px-1.5 rounded font-bold">APPROVED</span>
+                        </div>
+                        <div>• <strong className="text-slate-300">Name:</strong> Late Marriage Indicator Rule</div>
+                        <div>• <strong className="text-slate-300">Purpose:</strong> Determine if marriage will be delayed beyond age 28.</div>
+                        <div>• <strong className="text-slate-300">Astrological Principle:</strong> Saturn, Mercury or Rahu/Ketu influencing the 7th CSL or marital houses.</div>
+                        <div>• <strong className="text-slate-300">Evaluation Logic:</strong>
+                          <pre className="mt-1 bg-slate-900 p-1.5 rounded border border-slate-800 text-[8.5px] text-emerald-300 overflow-x-auto">
+{`const csl7 = CSL[7];
+const influencedBySaturn = csl7.hasAspectOrConjunction("Saturn") || csl7.starLord === "Saturn";
+const supportsMarriage = csl7.signifies(2) || csl7.signifies(7) || csl7.signifies(11);
+const blockingHouses = csl7.signifies(1) || csl7.signifies(6) || csl7.signifies(10);
+
+if (supportsMarriage && influencedBySaturn && blockingHouses) {
+  return { 
+    decision: "DELAYED_PROMISE", 
+    evidence: "Marriage promised but heavily delayed by Saturn's direct influence", 
+    confidence: 0.95 
+  };
+}`}
+                          </pre>
+                        </div>
+                        <div>• <strong className="text-slate-300">Supporting:</strong> Saturn in 7th/11th, Rahu in 2nd | <strong className="text-slate-300">Blocking:</strong> Jupiter's strong aspect</div>
+                      </div>
+
+                      {/* Rule 2 */}
+                      <div className="p-3 bg-slate-950 rounded-lg border border-amber-500/20 space-y-1 text-[9px] leading-relaxed">
+                        <div className="flex justify-between items-center border-b border-slate-800 pb-1 mb-1">
+                          <strong className="text-amber-400">KP_EV_KID_004 (Child Birth denial)</strong>
+                          <span className="bg-emerald-500/10 text-emerald-400 px-1.5 rounded font-bold">APPROVED</span>
+                        </div>
+                        <div>• <strong className="text-slate-300">Name:</strong> Childbirth Promise Denial</div>
+                        <div>• <strong className="text-slate-300">Purpose:</strong> Verify absolute denial of childbirth.</div>
+                        <div>• <strong className="text-slate-300">Astrological Principle:</strong> 5th CSL signifies barren/negating houses (1, 4, 10, 12) without 2, 5, 11 support.</div>
+                        <div>• <strong className="text-slate-300">Evaluation Logic:</strong>
+                          <pre className="mt-1 bg-slate-900 p-1.5 rounded border border-slate-800 text-[8.5px] text-emerald-300 overflow-x-auto">
+{`const csl5 = CSL[5];
+const fertileHouses = [2, 5, 11];
+const barrenHouses = [1, 4, 10, 12];
+const fertileCount = fertileHouses.filter(h => csl5.signifies(h)).length;
+const barrenCount = barrenHouses.filter(h => csl5.signifies(h)).length;
+
+if (fertileCount === 0 && barrenCount >= 3) {
+  return { 
+    decision: "DENIED", 
+    evidence: "5th CSL signifies negating and barren houses only", 
+    confidence: 0.98 
+  };
+}`}
+                          </pre>
+                        </div>
+                        <div>• <strong className="text-slate-300">Supporting barren signs:</strong> Gemini, Leo, Virgo, Scorpio</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300 font-mono text-[10px]">
+                      <span className="text-amber-400 font-bold mb-1 block">ENGINE PRINCIPLES</span>
+                      Every event prediction shall be independently executable. Every rule shall be deterministic and fully traceable. Every decision shall be explainable and reproducible. No hidden assumptions are allowed.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "implementation_phase" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Implementation Phase & Roadmap
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Status: ACTIVE WORKFLOW (ARCHITECTURE V1 FROZEN)</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
+                      <strong className="text-emerald-400 font-mono block mb-0.5 uppercase">Architecture Freeze Decree</strong>
+                      <p className="text-[10px] leading-normal text-slate-300">
+                        JHora AI Architecture Version 1.0 is now completely frozen. No further design or framework documents shall be created. All efforts are routed to executing the production deterministic rules!
+                      </p>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800 space-y-2 font-mono text-[10px]">
+                      <span className="text-amber-300 font-bold block uppercase text-[10px]">Core Deliverable Phases</span>
+                      <div className="space-y-1 text-slate-400">
+                        <div>• <strong className="text-slate-200">Phase 1: Astrological Knowledge Base (AKB)</strong> - Full mapping of planets, signs, houses, nakshatras, padas, sublords, and significations.</div>
+                        <div>• <strong className="text-slate-200">Phase 2: Master KP Rule Set</strong> - Fully deterministic Cuspal Sub Lord, Star Lord, Planet Signification, Occupancy, Aspect, Retrograde, DBA, and Transit rules.</div>
+                        <div>• <strong className="text-slate-200">Phase 3: Master Event Rule Set</strong> - Event rules for Career, Marriage, Children, Finance, Education, Health, Travel, and Litigations.</div>
+                        <div>• <strong className="text-slate-200">Phase 4: Master Parashari Rule Set</strong> - Yogas, divisional charts, dasha evaluation, and strength calculators.</div>
+                        <div>• <strong className="text-slate-200">Phase 5: Master Jaimini Rule Set</strong> - Karakas, Argalas, Rasi Drishti, and Chara Dasha.</div>
+                        <div>• <strong className="text-slate-200">Phase 6: Historical Validation</strong> - Testing against database of historical charts with known event timelines to measure accuracy.</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800 space-y-2 font-mono text-[10px]">
+                      <span className="text-amber-300 font-bold block uppercase text-[10px]">Master Rule Development Roadmap Levels</span>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[9px] text-slate-400">
+                        <div className="p-2 bg-slate-950 rounded border border-slate-850">
+                          <strong className="text-amber-400 block mb-0.5 uppercase">Level 1: Foundation Rules</strong>
+                          House, planet, sign, nakshatra, star lord, aspect, conjunction, occupancy, ownership, significators, karakas, and yogas.
+                        </div>
+                        <div className="p-2 bg-slate-950 rounded border border-slate-850">
+                          <strong className="text-amber-400 block mb-0.5 uppercase">Level 2: Natal Promise Rules</strong>
+                          Evaluating structural chart configurations promising Marriage, Children, Career, Property, or Foreign travels.
+                        </div>
+                        <div className="p-2 bg-slate-950 rounded border border-slate-850">
+                          <strong className="text-amber-400 block mb-0.5 uppercase">Level 3: Activation Rules</strong>
+                          Vimshottari DBA (Mahadasha, Bhukti, Antara) activation windows and transit-level gate opening triggers.
+                        </div>
+                        <div className="p-2 bg-slate-950 rounded border border-slate-850">
+                          <strong className="text-amber-400 block mb-0.5 uppercase">Level 4: Event Engine Rules</strong>
+                          Final convergence evaluating love affairs, engagement, job change, business losses, promotions, and surgeries.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300 font-mono text-[10px]">
+                      <span className="text-amber-400 font-bold mb-1 block">RULE AUTHORING PRINCIPLES</span>
+                      Every rule must be deterministic, have a unique ID, reference AKB, generate structured evidence/decisions, and update the event book/timeline. No probabilistic logic or AI interpretations are permitted.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "mdrs" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Master Deterministic Rule Specification (MDRS)
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Status: FINAL COMPLIANCE STANDARD</p>
+                  </div>
+
+                  <div className="space-y-3 font-mono text-[10px]">
+                    <div className="p-2.5 rounded bg-slate-900/60 border border-slate-800 text-[11px] font-sans text-slate-300">
+                      <strong className="text-amber-300 block font-mono font-bold mb-1 uppercase">Mandatory Rule Structure</strong>
+                      All implemented rules in the JHora AI core, whether KP, Parashari, Jaimini, or Transit, must strictly adhere to the MDRS schema to ensure 100% traceability and execution parity.
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800 space-y-1">
+                        <span className="text-amber-300 font-bold block uppercase">1. Rule Header</span>
+                        • <strong className="text-slate-200">Rule ID</strong> (e.g. KP_CSL_0001)<br />
+                        • <strong className="text-slate-200">Rule Name / Version / Status</strong><br />
+                        • <strong className="text-slate-200">Rule System / Category / Subcategory</strong><br />
+                        • <strong className="text-slate-200">Priority, Weight & Severity</strong>
+                      </div>
+
+                      <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800 space-y-1">
+                        <span className="text-amber-300 font-bold block uppercase">2. Business Metadata</span>
+                        • <strong className="text-slate-200">Purpose & Principle Description</strong><br />
+                        • <strong className="text-slate-200">Applicable Systems & Charts</strong><br />
+                        • <strong className="text-slate-200">Target Houses, Planets & Dashas</strong>
+                      </div>
+
+                      <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800 space-y-1">
+                        <span className="text-amber-300 font-bold block uppercase">3. Input & Preconditions</span>
+                        • <strong className="text-slate-200">Required/Optional Inputs</strong><br />
+                        • <strong className="text-slate-200">AKB Entity Mappings</strong><br />
+                        • <strong className="text-slate-200">Mandatory / Blocking Preconditions</strong>
+                      </div>
+
+                      <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800 space-y-1">
+                        <span className="text-amber-300 font-bold block uppercase">4. Rule Logic & Output</span>
+                        • <strong className="text-slate-200">Evaluation Sequence & Calculations</strong><br />
+                        • <strong className="text-slate-200">Decision & Evidence Objects</strong><br />
+                        • <strong className="text-slate-200">Confidence Contribution & Explanations</strong>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800 space-y-1.5">
+                      <span className="text-amber-300 font-bold block uppercase text-[10px]">Universal Rule Execution Contract</span>
+                      <p className="text-[10px] text-slate-300 leading-normal font-sans text-slate-400">
+                        The engine guarantees identical output for identical inputs, executing rules through a strict validation pipeline:
+                      </p>
+                      <div className="grid grid-cols-3 gap-1.5 text-[8.5px] text-amber-400 bg-slate-950 p-2.5 rounded border border-slate-900 text-center">
+                        <div className="bg-slate-900 p-1 rounded border border-slate-800">1. Input Validation</div>
+                        <div className="bg-slate-900 p-1 rounded border border-slate-800">2. Validate Preconditions</div>
+                        <div className="bg-slate-900 p-1 rounded border border-slate-800">3. Evaluate Logic</div>
+                        <div className="bg-slate-900 p-1 rounded border border-slate-800">4. Generate Evidence</div>
+                        <div className="bg-slate-900 p-1 rounded border border-slate-800">5. Generate Decision</div>
+                        <div className="bg-slate-900 p-1 rounded border border-slate-800">6. Update Timeline</div>
+                        <div className="bg-slate-900 p-1 rounded border border-slate-800">7. Generate Event</div>
+                        <div className="bg-slate-900 p-1 rounded border border-slate-800">8. Write Audit Trail</div>
+                        <div className="bg-slate-900 p-1 rounded border border-slate-800">9. Return Result</div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300 font-mono text-[10px]">
+                      <span className="text-amber-400 font-bold mb-1 block">QUALITY MANDATE</span>
+                      No executable rule may be implemented unless it complies with this MDRS standard. This specification is the permanent implementation contract for JHora AI platform.
                     </div>
                   </div>
                 </div>
