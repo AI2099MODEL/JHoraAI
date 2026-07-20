@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-20T10:41:55.528Z",
+    "lastUpdated": "2026-07-20T11:13:47.042Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-20T10:41:55.528Z",
-    "localTime": "2026-07-20T03:41:55-07:00",
+    "utcTime": "2026-07-20T11:13:47.042Z",
+    "localTime": "2026-07-20T04:13:47-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Virgo",
       "displayName": "Virgo",
-      "longitude": 173.8
+      "longitude": 174.1
     },
     "currentNakshatra": {
       "id": "Chitra",
@@ -28,15 +28,15 @@
       "displayName": "Mars"
     },
     "currentSubLord": {
-      "id": "Venus",
-      "displayName": "Venus"
+      "id": "Moon",
+      "displayName": "Moon"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Saptami",
-      "illuminationPercentage": 44.5
+      "illuminationPercentage": 44.7
     },
-    "moonLongitude": 173.8,
+    "moonLongitude": 174.1,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 93.65,
+    "longitude": 93.67,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,44 +63,44 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 93.65,
+      "longitude": 93.67,
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
-      "subLord": "Mars",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Virgo",
-      "longitude": 173.8,
+      "longitude": 174.1,
       "nakshatra": "Chitra",
       "pada": 1,
       "starLord": "Mars",
-      "subLord": "Venus",
+      "subLord": "Moon",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Leo",
-      "longitude": 132.01,
-      "nakshatra": "Magha",
-      "pada": 4,
-      "starLord": "Ketu",
-      "subLord": "Jupiter",
+      "longitude": 137.63,
+      "nakshatra": "Purva Phalguni",
+      "pada": 2,
+      "starLord": "Venus",
+      "subLord": "Sun",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 196.86,
+      "longitude": 196.97,
       "nakshatra": "Swati",
       "pada": 4,
       "starLord": "Rahu",
-      "subLord": "Moon",
+      "subLord": "Rahu",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 114.84,
+      "longitude": 114.89,
       "nakshatra": "Ashlesha",
       "pada": 3,
       "starLord": "Mercury",
-      "subLord": "Mercury",
+      "subLord": "Rahu",
       "retrograde": true,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Mercury",
     "moonStarLord": "Mars",
-    "moonSubLord": "Venus"
+    "moonSubLord": "Moon"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Saptami",
       "index": 7,
       "paksha": "Sukla",
-      "endDate": "2026-07-20T22:41:55.528Z"
+      "endDate": "2026-07-20T23:13:47.042Z"
     },
     "vara": {
       "name": "Monday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Chitra",
       "lord": "Mars",
-      "endDate": "2026-07-21T04:41:55.528Z"
+      "endDate": "2026-07-21T05:13:47.042Z"
     },
     "yoga": {
       "name": "Siddha",
       "lord": "Sun",
-      "endDate": "2026-07-21T00:41:55.528Z"
+      "endDate": "2026-07-21T01:13:47.042Z"
     },
     "karana": {
       "name": "Vanija",
       "lord": "Sun",
-      "endDate": "2026-07-20T16:41:55.528Z"
+      "endDate": "2026-07-20T17:13:47.042Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -327,115 +327,121 @@
   },
   "currentEnergy": {
     "overallEnergy": {
-      "score": 8.5,
-      "tone": "High Harmonious",
-      "description": "Favorable cosmic currents align for deep analytical focus and structural discipline."
+      "score": 6.5,
+      "tone": "Balanced",
+      "description": "Sun in Cancer establishes a balanced vitality layer for standard operations."
     },
     "mentalEnergy": {
-      "score": 9,
-      "tone": "Peak Focus",
-      "description": "Mercury's placement in Leo boosts bold communication and sharp decision-making."
+      "score": 6,
+      "tone": "Balanced",
+      "description": "Mercury in Libra drives balanced mental stamina and communication focus."
     },
     "physicalEnergy": {
-      "score": 7.5,
-      "tone": "Steady",
-      "description": "Mars in Taurus ensures high endurance and persistent physical effort."
+      "score": 5.5,
+      "tone": "Balanced",
+      "description": "Mars in Leo yields a balanced reserve of physical resilience."
     },
     "relationshipEnergy": {
-      "score": 8,
-      "tone": "Caring",
-      "description": "Venus and Moon in Cancer stimulate high empathy and deep emotional connection."
+      "score": 8.5,
+      "tone": "Peak Focus",
+      "description": "Venus in Cancer channels peak focus empathy and social ties."
     },
     "careerEnergy": {
       "score": 8.5,
-      "tone": "Structural Rise",
-      "description": "Saturn aspects provide strong structural stability and professional authority."
+      "tone": "Peak Focus",
+      "description": "Jupiter in Sagittarius and Saturn in Leo sustain peak focus career structures."
     },
     "financialEnergy": {
-      "score": 7,
-      "tone": "Prudent",
-      "description": "Jupiter in Gemini favors multi-channel communication but warrants careful analysis."
+      "score": 4.5,
+      "tone": "Subdued / Vulnerable",
+      "description": "Moon in Virgo indicates subdued / vulnerable capital liquidity and trade dynamics."
     },
     "spiritualEnergy": {
-      "score": 9.5,
-      "tone": "Deep Alignment",
-      "description": "Highly spiritual day suitable for meditation, mantra sadhana, and self-study."
+      "score": 7,
+      "tone": "Balanced",
+      "description": "Transit alignments trigger a balanced resonance suitable for introspective focus."
     }
   },
   "currentMood": {
     "dominantHouses": [
       {
+        "houseNumber": 6,
+        "significance": "Daily routines, health, service, obstacles"
+      },
+      {
         "houseNumber": 4,
-        "significance": "Home, emotions, peace of mind, family roots"
+        "significance": "Home, emotions, peace of mind, mother"
       }
     ],
     "dominantPlanets": [
       {
         "planet": "Moon",
-        "strength": 1.45,
-        "influenceType": "Emotional anchor, intuitive insights"
+        "strength": 1.2,
+        "influenceType": "Emotional anchor in Virgo"
+      },
+      {
+        "planet": "Sun",
+        "strength": 1.2000000000000002,
+        "influenceType": "Vital force in Cancer"
       }
     ],
     "positiveThemes": [
-      "Emotional healing",
-      "Intuitive clarity",
-      "Family gatherings"
+      "Intellectual growth",
+      "Deep meditation",
+      "Analytical precision"
     ],
     "negativeThemes": [
-      "Over-sensitivity",
-      "Restlessness in communication"
+      "Over-thinking",
+      "Restlessness"
     ],
-    "emotionalTone": "Nurturing, focused, protective, and reflective"
+    "emotionalTone": "The sky carries a highly reflective and analytical emotional tone governed by Moon in Virgo."
   },
   "currentFocus": {
     "career": {
       "priority": "high",
-      "description": "Focus on establishing stable professional routines and structuring workflows."
+      "description": "Leverage Jupiter and Saturn transits to structure workflows and secure milestones."
     },
     "business": {
       "priority": "medium",
-      "description": "Good time for marketing and launching communications initiatives."
+      "description": "Mercury transits favor reviewing strategy and communication plans."
     },
     "finance": {
       "priority": "medium",
-      "description": "Avoid hasty investments; prioritize liquid wealth preservation."
+      "description": "Moon transits advise capital conservation and prudent budgeting."
     },
     "relationship": {
       "priority": "high",
-      "description": "Nurture domestic relationships and address family emotional security."
+      "description": "Nurture domestic relationships under active Venus forces."
     },
     "family": {
       "priority": "high",
-      "description": "Engage in home decoration, family dinners, and resolving elder disputes."
+      "description": "Engage with family and focus on home environment stability."
     },
     "children": {
       "priority": "medium",
-      "description": "Encourage academic reading and creative, hands-on educational tasks."
+      "description": "Encourage learning and creative activities."
     },
     "health": {
       "priority": "medium",
-      "description": "Consume warm meals, practice deep breathing, and protect chest/lungs."
+      "description": "Practice wellness routines, eat warm meals, and maintain sleep schedules."
     },
     "education": {
-      "priority": "high",
-      "description": "Excellent day for studying philosophy, technical scripts, and languages."
+      "priority": "medium",
+      "description": "Ideal day for deep reading, research, and skill courses."
     },
     "travel": {
       "priority": "low",
-      "description": "Short near-water travel is highly refreshing; avoid long taxing journeys."
+      "description": "Plan short journeys to refresh focus; avoid heavy over-taxing transits."
     },
     "spirituality": {
-      "priority": "high",
-      "description": "Perfect day for mantra chanting, meditation, and visiting spiritual centers."
+      "priority": "medium",
+      "description": "Excellent day for meditation, introspection, and self-study."
     }
   },
   "currentChallenges": {
     "delays": {
-      "active": true,
-      "affectedAreas": [
-        "Long distance travel",
-        "Government documentation approval"
-      ]
+      "active": false,
+      "affectedAreas": []
     },
     "stress": {
       "active": false,
@@ -450,103 +456,102 @@
       "affectedAreas": []
     },
     "health": {
-      "active": true,
-      "affectedAreas": [
-        "Digestive acidity",
-        "Irregular sleep cycle"
-      ]
+      "active": false,
+      "affectedAreas": []
     },
     "career": {
       "active": false,
       "affectedAreas": []
     },
     "finance": {
-      "active": false,
-      "affectedAreas": []
+      "active": true,
+      "affectedAreas": [
+        "Unexpected outflows",
+        "Investment delays"
+      ]
     }
   },
   "currentOpportunities": {
     "marriageWindow": {
-      "active": false,
-      "timeframe": "Next auspicious window opens in mid-August 2026"
+      "active": true,
+      "timeframe": "Highly favorable for relationship initiatives"
     },
     "careerOpportunity": {
       "active": true,
-      "timeframe": "Active for the next 12 days; take initiative"
+      "timeframe": "Auspicious career window active; take charge"
     },
     "businessOpportunity": {
-      "active": true,
-      "timeframe": "Favorable for digital sign-offs this week"
+      "active": false,
+      "timeframe": "Review contracts; verify system requirements first"
     },
     "investmentOpportunity": {
       "active": false,
-      "timeframe": "Consolidate cash until July 25th"
+      "timeframe": "Hold cash reserves; defer speculative investments"
     },
     "travelOpportunity": {
-      "active": true,
-      "timeframe": "Refreshes mental clarity immediately"
+      "active": false,
+      "timeframe": "Consolidate energy locally"
     },
     "learningOpportunity": {
-      "active": true,
-      "timeframe": "Excellent for professional skill courses"
+      "active": false,
+      "timeframe": "Perfect for research, reading, and learning complex systems"
     }
   },
   "timeline": {
     "today": {
-      "summary": "A highly intuitive, emotionally grounded day. Excellent for home affairs, structured work, and spiritual meditation.",
+      "summary": "A day characterized by Moon transit in Virgo and Sun transit in Cancer, establishing a balanced flow.",
       "favorableActivities": [
-        "Domestic reorganization",
-        "Filing tax papers",
-        "Mantra meditation"
+        "Self-reflection",
+        "Pruning backlogs",
+        "Structuring daily files"
       ],
       "unfavorableActivities": [
-        "Heavy physical confrontation",
-        "Buying electronic vehicles"
+        "Avoid late night sleeping",
+        "High-stakes speculative trades"
       ]
     },
     "tomorrow": {
-      "summary": "A day shifting towards intense intellectual dialogue. Focus on writing, documentation, and small business networks.",
+      "summary": "The transit Moon continues to shift forward, bringing dynamic changes to the planetary lattice.",
       "favorableActivities": [
-        "Drafting marketing content",
-        "Client consultations",
-        "Short drives"
+        "Engaging in constructive dialogues",
+        "Reviewing metrics"
       ],
       "unfavorableActivities": [
-        "Signing long-term estate leases"
+        "Committing without proper verification"
       ]
     },
     "thisWeek": {
-      "summary": "Expansion of personal networking but slow resolution of institutional properties.",
+      "summary": "Planetary aspects favor building internal discipline and optimizing routines.",
       "trends": [
-        "Domestic contentment rises",
-        "Short business chats prove highly profitable"
+        "Moon transiting through Virgo stimulates active mental focusing.",
+        "Sun in Cancer highlights leadership potential and career actions."
       ]
     },
     "thisMonth": {
-      "summary": "Strong emphasis on building financial buffers and organizing home environments.",
+      "summary": "Excellent monthly alignments for structuring financial assets and organizing goals.",
       "trends": [
-        "Transit Sun aligns with Venus in Cancer, amplifying comfort",
-        "Discipline is required to manage digestive parameters"
+        "Saturn demands structural perseverance.",
+        "Jupiter coordinates opportunities through strategic communications."
       ]
     },
     "next3Months": {
-      "summary": "Favorable career expansion as Jupiter aspect solidifies.",
+      "summary": "Steady expansion of projects and networks as Jupiter and Sun move into supportive quadrants.",
       "trends": [
-        "Major career shifts around September",
-        "Spiritual exploration deepens"
+        "Consolidation of workspace systems",
+        "Auspicious growth in skills"
       ]
     },
     "next6Months": {
-      "summary": "Saturn retrogrades to finish pending tasks before embarking on major ventures.",
+      "summary": "Long-term Saturn transit encourages finishing pending obligations before launching major ventures.",
       "trends": [
-        "Clearance of old financial loans",
-        "Improvement in bone/joint health parameters"
+        "Clearing old organizational bottlenecks",
+        "Solidifying bone and cardiovascular health"
       ]
     },
     "thisYear": {
-      "summary": "A year of steady growth and structural consolidation.",
+      "summary": "A foundational year of steady professional stabilization and inner spiritual refinement.",
       "trends": [
-        "Increased focus on internal wellness and mantra siddhi"
+        "Strong alignment with mantra siddhi and personal development"
       ]
     }
   },

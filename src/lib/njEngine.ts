@@ -462,17 +462,17 @@ export function runNJEngine(
       return { house: h, count, category };
     }).sort((a, b) => b.count - a.count || a.house - b.house);
 
-    // THEME ENGINE
+    // THEME ENGINE - Filtered strictly by DAILY EVENT FILTER (V1.0)
+    // Major life events (Marriage, Promotion, Child Birth, Court Case, Property Purchase, etc.) are blocked.
     const themeDefinitions = [
-      { id: "relationship", name: "Relationship / Romance", primary: [2, 5, 7, 11], support: [9], obstruct: [1, 6, 10], events: ["Romantic meeting", "Auspicious proposal discussion", "Deep connection bonding"] },
-      { id: "marriage", name: "Marriage Ceremony", primary: [2, 7, 11], support: [3, 9], obstruct: [1, 6, 10], events: ["Engagement party", "Vows exchange", "Marital bonding alignment"] },
-      { id: "career", name: "Career Progress", primary: [2, 6, 10, 11], support: [9], obstruct: [5, 8, 12], events: ["Auspicious interview", "Promotion signifier", "Leadership expansion"] },
-      { id: "finance", name: "Wealth & Finance", primary: [2, 6, 11], support: [8], obstruct: [1, 12], events: ["Gain of wealth", "Financial returns", "Successful investment"] },
-      { id: "health", name: "Health & Recovery", primary: [1, 5, 11], support: [11], obstruct: [6, 8, 12], events: ["Symptomatic recovery", "Excellent vitality", "Optimal energy flow"] },
-      { id: "property", name: "Property & Land Purchase", primary: [4, 11, 12], support: [9], obstruct: [3, 8], events: ["Buying real estate", "Securing home loan", "Property registration"] },
-      { id: "children", name: "Children & Education", primary: [2, 5, 11], support: [4, 9], obstruct: [3, 8], events: ["Academic achievement", "Creative success", "Family harmony"] },
-      { id: "travel", name: "Travel & Relocation", primary: [3, 9, 12], support: [11], obstruct: [4], events: ["Visa approval", "Short weekend tour", "Long-distance itinerary"] },
-      { id: "litigation", name: "Court Disputes & Litigation", primary: [6, 11], support: [10], obstruct: [5, 8, 12], events: ["Auspicious legal verdict", "Out-of-court patch up", "Peer settlement"] },
+      { id: "productivity", name: "Work & Productivity", primary: [2, 6, 10, 11], support: [9], obstruct: [12], events: ["Frictionless task completion", "Enhanced workflow focus", "Auspicious routine execution"] },
+      { id: "meetings", name: "Meetings & Social", primary: [3, 7, 11], support: [2], obstruct: [12], events: ["Constructive interactions", "Fruitful group alignments", "Harmonious exchange of views"] },
+      { id: "learning", name: "Learning & Research", primary: [4, 5, 9], support: [11], obstruct: [8], events: ["Deep academic insight", "Mental absorption success", "Inspirative wisdom gain"] },
+      { id: "travel", name: "Travel & Commute", primary: [3, 9, 12], support: [11], obstruct: [4], events: ["Smooth transit commute", "Timely arrival window", "Rejuvenating short travel"] },
+      { id: "finance", name: "Daily Finance & Budget", primary: [2, 6, 11], support: [8], obstruct: [12], events: ["Auspicious utility payment", "Optimized expense tracking", "Minor budgetary savings"] },
+      { id: "health", name: "Health & Vitality Trends", primary: [1, 5, 11], support: [11], obstruct: [6, 8, 12], events: ["Refreshed physical energy", "Enhanced dietary routine", "Harmonious stress release"] },
+      { id: "creativity", name: "Creativity & Art", primary: [5, 9], support: [1], obstruct: [6, 8], events: ["Inspired artistic impulse", "Creative problem solving", "Auspicious design creation"] },
+      { id: "focus", name: "Focus & Discipline", primary: [1, 6, 10], support: [11], obstruct: [12], events: ["Unyielding concentration", "Structured time management", "Self-mastery victory"] },
     ];
 
     const themeScores = themeDefinitions.map(def => {

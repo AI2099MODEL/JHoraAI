@@ -102,7 +102,6 @@ import UpdateNotification from "./components/UpdateNotification";
 import { UpdateManager, UpdateManifest } from "./lib/androidOta";
 import GithubOtaView from "./components/GithubOtaView";
 import { apiFetch as fetch } from "./lib/api";
-import RulesTerminal from "./components/RulesTerminal";
 import EngineGuide from "./components/EngineGuide";
 
 const SETTINGS_SUBMENU_IDS = [
@@ -1519,8 +1518,7 @@ export default function App() {
 
         // Category 7: EVENTS
         { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "astro", category: "EVENTS" },
-        { id: "engine_guide", label: "Engine & Rulebook Guide", description: "Learn how the predictive convergence engine & rules work.", systemId: "astro", category: "EVENTS" },
-        { id: "rules_terminal", label: "Rules Terminal", description: "Review and edit core astrological logic gates.", systemId: "astro", category: "EVENTS" },
+        { id: "engine_guide", label: "Astrological Rule Engine", description: "Master Astrological Rule Engine Specification v1.0.", systemId: "astro", category: "EVENTS" },
 
         // Category 8: SETTINGS
         { id: "theme", label: "Theme", description: "Dark, Light, and custom styling.", systemId: "astro", category: "SETTINGS" },
@@ -2943,8 +2941,6 @@ export default function App() {
                         }
                       />
                     )
-                  ) : activeSubmenuId === "rules_terminal" ? (
-                    <RulesTerminal isDarkTheme={isDark} />
                   ) : activeSubmenuId === "google_account" ? (
                     <AuthScreen onAuthSuccess={(user) => setActiveUser(user)} activeUser={activeUser} />
                   ) : [
@@ -3170,10 +3166,6 @@ export default function App() {
                 ) : activeSubmenuId === "engine_guide" ? (
                   <EngineGuide 
                     isDark={isDark} 
-                  />
-                ) : activeSubmenuId === "rules_terminal" ? (
-                  <RulesTerminal 
-                    isDarkTheme={isDark} 
                   />
                 ) : (
                   <AstroRawTablesView 

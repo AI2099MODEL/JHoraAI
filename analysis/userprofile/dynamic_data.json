@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "userprofile",
-    "lastUpdated": "2026-07-20T11:32:52.130Z",
+    "lastUpdated": "2026-07-20T11:13:47.253Z",
     "evaluationDate": "2026-07-20",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-20T11:32:52.058Z",
-      "localTime": "2026-07-20T04:32:52-07:00",
+      "utcTime": "2026-07-20T11:13:47.042Z",
+      "localTime": "2026-07-20T04:13:47-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Virgo",
         "displayName": "Virgo",
-        "longitude": 174.27
+        "longitude": 174.1
       },
       "currentNakshatra": {
         "id": "Chitra",
@@ -36,9 +36,9 @@
       "moonPhase": {
         "type": "Waxing Gibbous",
         "displayName": "Sukla Saptami",
-        "illuminationPercentage": 44.8
+        "illuminationPercentage": 44.7
       },
-      "moonLongitude": 174.27,
+      "moonLongitude": 174.1,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -52,7 +52,7 @@
         "id": "Cancer",
         "displayName": "Cancer"
       },
-      "longitude": 93.68,
+      "longitude": 93.67,
       "nakshatra": {
         "id": "Pushya",
         "displayName": "Pushya"
@@ -65,18 +65,18 @@
     "planets": {
       "sun": {
         "currentSign": "Cancer",
-        "longitude": 93.68,
+        "longitude": 93.67,
         "nakshatra": "Pushya",
         "pada": 1,
         "starLord": "Saturn",
-        "subLord": "Mercury",
+        "subLord": "Jupiter",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "moon": {
         "currentSign": "Virgo",
-        "longitude": 174.27,
+        "longitude": 174.1,
         "nakshatra": "Chitra",
         "pada": 1,
         "starLord": "Mars",
@@ -87,29 +87,29 @@
       },
       "mars": {
         "currentSign": "Leo",
-        "longitude": 140.97,
+        "longitude": 137.63,
         "nakshatra": "Purva Phalguni",
-        "pada": 3,
+        "pada": 2,
         "starLord": "Venus",
-        "subLord": "Moon",
+        "subLord": "Sun",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mercury": {
         "currentSign": "Libra",
-        "longitude": 197.04,
+        "longitude": 196.97,
         "nakshatra": "Swati",
         "pada": 4,
         "starLord": "Rahu",
-        "subLord": "Sun",
+        "subLord": "Rahu",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "jupiter": {
         "currentSign": "Sagittarius",
-        "longitude": 267.25,
+        "longitude": 267.24,
         "nakshatra": "Uttara Ashadha",
         "pada": 1,
         "starLord": "Sun",
@@ -120,12 +120,12 @@
       },
       "venus": {
         "currentSign": "Cancer",
-        "longitude": 114.93,
+        "longitude": 114.89,
         "nakshatra": "Ashlesha",
         "pada": 3,
         "starLord": "Mercury",
-        "subLord": "Mercury",
-        "retrograde": false,
+        "subLord": "Rahu",
+        "retrograde": true,
         "combust": false,
         "stationary": false
       },
@@ -246,22 +246,7 @@
   ],
   "eventsLog": [
     {
-      "timestamp": "2026-07-20T11:32:52.130Z",
-      "evaluationDate": "2026-07-20",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Cuspal Sub Lord of 7th House for Marriage Timing",
-        "10th Cuspal Sub Lord for Career and Profession Sector",
-        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-20T11:17:52.131Z",
+      "timestamp": "2026-07-20T11:13:47.253Z",
       "evaluationDate": "2026-07-20",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
