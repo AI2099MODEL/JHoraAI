@@ -106,7 +106,7 @@ try {
     app = getApp();
   }
   auth = getAuth(app);
-  db = getFirestore(app, firestoreDbId);
+  db = firestoreDbId ? getFirestore(app, firestoreDbId) : getFirestore(app);
   
   console.log("🌌 JHoraAI: Firebase active configuration:", {
     projectId: customFirebaseConfig.projectId,
