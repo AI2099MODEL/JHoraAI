@@ -3,42 +3,42 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-20T03:04:00Z",
+    "lastUpdated": "2026-07-20T10:24:14.520Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-20T10:04:00Z",
-    "localTime": "2026-07-20T03:04:00-07:00",
+    "utcTime": "2026-07-20T10:24:14.520Z",
+    "localTime": "2026-07-20T03:24:14-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Virgo",
       "displayName": "Virgo",
-      "longitude": 162.0
+      "longitude": 173.64
     },
     "currentNakshatra": {
-      "id": "Hasta",
-      "displayName": "Hasta",
-      "lord": "Moon"
+      "id": "Chitra",
+      "displayName": "Chitra",
+      "lord": "Mars"
     },
     "currentPada": 1,
     "currentStarLord": {
+      "id": "Mars",
+      "displayName": "Mars"
+    },
+    "currentSubLord": {
       "id": "Moon",
       "displayName": "Moon"
     },
-    "currentSubLord": {
-      "id": "Jupiter",
-      "displayName": "Jupiter"
-    },
     "moonPhase": {
-      "type": "Waning Gibbous",
-      "displayName": "Krishna Pratipada",
-      "illuminationPercentage": 98.5
+      "type": "Waxing Gibbous",
+      "displayName": "Sukla Saptami",
+      "illuminationPercentage": 44.4
     },
-    "moonLongitude": 162.0,
-    "waxing": false,
-    "waning": true,
+    "moonLongitude": 173.64,
+    "waxing": true,
+    "waning": false,
     "voidOfCourse": {
       "isVoidOfCourse": false,
       "aspectFreeUntil": null,
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 94.5,
+    "longitude": 93.63,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,54 +63,54 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 94.5,
+      "longitude": 93.63,
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
-      "subLord": "Venus",
+      "subLord": "Moon",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Virgo",
-      "longitude": 162.0,
-      "nakshatra": "Hasta",
+      "longitude": 173.64,
+      "nakshatra": "Chitra",
       "pada": 1,
-      "starLord": "Moon",
-      "subLord": "Jupiter",
-      "retrograde": false,
+      "starLord": "Mars",
+      "subLord": "Moon",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "mars": {
-      "currentSign": "Taurus",
-      "longitude": 42.4,
-      "nakshatra": "Rohini",
-      "pada": 1,
-      "starLord": "Moon",
-      "subLord": "Jupiter",
+      "currentSign": "Leo",
+      "longitude": 129.02,
+      "nakshatra": "Magha",
+      "pada": 3,
+      "starLord": "Ketu",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
-      "currentSign": "Leo",
-      "longitude": 124.6,
-      "nakshatra": "Makha",
-      "pada": 2,
-      "starLord": "Ketu",
-      "subLord": "Mars",
-      "retrograde": false,
-      "combust": true,
+      "currentSign": "Libra",
+      "longitude": 196.8,
+      "nakshatra": "Swati",
+      "pada": 4,
+      "starLord": "Rahu",
+      "subLord": "Rahu",
+      "retrograde": true,
+      "combust": false,
       "stationary": false
     },
     "jupiter": {
-      "currentSign": "Gemini",
-      "longitude": 88.1,
-      "nakshatra": "Punarvasu",
-      "pada": 3,
-      "starLord": "Jupiter",
+      "currentSign": "Sagittarius",
+      "longitude": 267.24,
+      "nakshatra": "Uttara Ashadha",
+      "pada": 1,
+      "starLord": "Sun",
       "subLord": "Sun",
       "retrograde": false,
       "combust": false,
@@ -118,44 +118,44 @@
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 112.3,
+      "longitude": 114.8,
       "nakshatra": "Ashlesha",
-      "pada": 2,
+      "pada": 3,
       "starLord": "Mercury",
-      "subLord": "Saturn",
-      "retrograde": false,
-      "combust": false,
-      "stationary": false
-    },
-    "saturn": {
-      "currentSign": "Aries",
-      "longitude": 2.8,
-      "nakshatra": "Ashwini",
-      "pada": 1,
-      "starLord": "Ketu",
-      "subLord": "Sun",
+      "subLord": "Rahu",
       "retrograde": true,
       "combust": false,
       "stationary": false
     },
-    "rahu": {
-      "currentSign": "Aquarius",
-      "longitude": 329.5,
-      "nakshatra": "Purvabhadra",
+    "saturn": {
+      "currentSign": "Leo",
+      "longitude": 144.69,
+      "nakshatra": "Purva Phalguni",
       "pada": 4,
-      "starLord": "Jupiter",
-      "subLord": "Mercury",
+      "starLord": "Venus",
+      "subLord": "Jupiter",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "rahu": {
+      "currentSign": "Leo",
+      "longitude": 131.88,
+      "nakshatra": "Magha",
+      "pada": 4,
+      "starLord": "Ketu",
+      "subLord": "Moon",
       "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "ketu": {
-      "currentSign": "Leo",
-      "longitude": 149.5,
-      "nakshatra": "Purvaphalguni",
+      "currentSign": "Aquarius",
+      "longitude": 311.88,
+      "nakshatra": "Shatabhisha",
       "pada": 2,
-      "starLord": "Venus",
-      "subLord": "Jupiter",
+      "starLord": "Rahu",
+      "subLord": "Moon",
       "retrograde": true,
       "combust": false,
       "stationary": false
@@ -260,14 +260,14 @@
       {
         "planet": "Sun",
         "sign": "Aries",
-        "exaltationDegree": 10.0
+        "exaltationDegree": 10
       }
     ],
     "planetDebilitated": [
       {
         "planet": "Saturn",
         "sign": "Aries",
-        "debilitationDegree": 20.0
+        "debilitationDegree": 20
       }
     ]
   },
@@ -277,34 +277,34 @@
     "ascendantStarLord": "Ketu",
     "ascendantSubLord": "Sun",
     "moonSignLord": "Mercury",
-    "moonStarLord": "Moon",
-    "moonSubLord": "Jupiter"
+    "moonStarLord": "Mars",
+    "moonSubLord": "Moon"
   },
   "panchanga": {
     "tithi": {
-      "name": "Krishna Pratipada",
-      "index": 16,
-      "paksha": "Krishna",
-      "endDate": "2026-07-20T18:30:00Z"
+      "name": "Sukla Saptami",
+      "index": 7,
+      "paksha": "Sukla",
+      "endDate": "2026-07-20T22:24:14.520Z"
     },
     "vara": {
       "name": "Monday",
       "lord": "Moon"
     },
     "nakshatra": {
-      "name": "Hasta",
-      "lord": "Moon",
-      "endDate": "2026-07-21T04:41:00Z"
+      "name": "Chitra",
+      "lord": "Mars",
+      "endDate": "2026-07-21T04:24:14.520Z"
     },
     "yoga": {
-      "name": "Preeti",
-      "lord": "Mercury",
-      "endDate": "2026-07-20T18:15:00Z"
+      "name": "Siddha",
+      "lord": "Sun",
+      "endDate": "2026-07-21T00:24:14.520Z"
     },
     "karana": {
-      "name": "Bava",
+      "name": "Vanija",
       "lord": "Sun",
-      "endDate": "2026-07-20T18:30:00Z"
+      "endDate": "2026-07-20T16:24:14.520Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -332,7 +332,7 @@
       "description": "Favorable cosmic currents align for deep analytical focus and structural discipline."
     },
     "mentalEnergy": {
-      "score": 9.0,
+      "score": 9,
       "tone": "Peak Focus",
       "description": "Mercury's placement in Leo boosts bold communication and sharp decision-making."
     },
@@ -342,7 +342,7 @@
       "description": "Mars in Taurus ensures high endurance and persistent physical effort."
     },
     "relationshipEnergy": {
-      "score": 8.0,
+      "score": 8,
       "tone": "Caring",
       "description": "Venus and Moon in Cancer stimulate high empathy and deep emotional connection."
     },
@@ -352,7 +352,7 @@
       "description": "Saturn aspects provide strong structural stability and professional authority."
     },
     "financialEnergy": {
-      "score": 7.0,
+      "score": 7,
       "tone": "Prudent",
       "description": "Jupiter in Gemini favors multi-channel communication but warrants careful analysis."
     },
