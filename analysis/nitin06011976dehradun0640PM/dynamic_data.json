@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin06011976dehradun0640PM",
-    "lastUpdated": "2026-07-20T11:47:25.483Z",
+    "lastUpdated": "2026-07-20T11:47:36.896Z",
     "evaluationDate": "2026-07-20",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-20T11:47:25.382Z",
-      "localTime": "2026-07-20T04:47:25-07:00",
+      "utcTime": "2026-07-20T11:47:36.808Z",
+      "localTime": "2026-07-20T04:47:36-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Virgo",
         "displayName": "Virgo",
-        "longitude": 174.4
+        "longitude": 174.41
       },
       "currentNakshatra": {
         "id": "Chitra",
@@ -38,7 +38,7 @@
         "displayName": "Sukla Saptami",
         "illuminationPercentage": 44.8
       },
-      "moonLongitude": 174.4,
+      "moonLongitude": 174.41,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -76,7 +76,7 @@
       },
       "moon": {
         "currentSign": "Virgo",
-        "longitude": 174.4,
+        "longitude": 174.41,
         "nakshatra": "Chitra",
         "pada": 1,
         "starLord": "Mars",
@@ -246,7 +246,7 @@
   ],
   "eventsLog": [
     {
-      "timestamp": "2026-07-20T11:47:25.483Z",
+      "timestamp": "2026-07-20T11:47:36.896Z",
       "evaluationDate": "2026-07-20",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
