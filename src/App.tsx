@@ -1408,27 +1408,9 @@ export default function App() {
       label: "My Page",
       icon: User,
       submenus: [
-        // Category: MY LIFE & JOURNEY
-        { id: "my_life", label: "My Life", description: "Personal profiles, dynamic logs & private diary.", systemId: "my_page", category: "MY LIFE & JOURNEY" },
-        { id: "my_journey", label: "My Journey", description: "Extended timelines, milestone tracks & map.", systemId: "my_page", category: "MY LIFE & JOURNEY" },
-
-        // Category: SOUL & DYNAMICS
-        { id: "overview", label: "Soul Blueprint", description: "Dynamic natal analysis & core predictions.", systemId: "my_page", category: "SOUL & DYNAMICS" },
-        { id: "dasha", label: "Vimshottari Timeline", description: "Full Vimshottari Mahadasha timelines.", systemId: "my_page", category: "SOUL & DYNAMICS" },
-        { id: "charts", label: "Divisional Charts", description: "Varga charts from D1 to D60.", systemId: "my_page", category: "SOUL & DYNAMICS" },
-        { id: "daily", label: "Daily Insights", description: "Real-time transit and daily indicators.", systemId: "my_page", category: "SOUL & DYNAMICS" },
-        { id: "future", label: "Future Forecast", description: "Extended long-term life progressions.", systemId: "my_page", category: "SOUL & DYNAMICS" },
-
-        // Category: ASTRO SYSTEMS
-        { id: "vedic", label: "Vedic Metrics", description: "Planetary strengths & Shadbala details.", systemId: "my_page", category: "ASTRO SYSTEMS" },
-        { id: "transits_data", label: "Transit Planets", description: "Zodiac coordinates of current transits.", systemId: "my_page", category: "ASTRO SYSTEMS" },
-        { id: "jaimini", label: "Jaimini Systems", description: "Chara Karakas and Jaimini metrics.", systemId: "my_page", category: "ASTRO SYSTEMS" },
-        { id: "kp", label: "KP Placements", description: "Placidus cusps and sub-lords.", systemId: "my_page", category: "ASTRO SYSTEMS" },
-        { id: "lalkitab", label: "Lal Kitab", description: "Tevas & sleeping status calculations.", systemId: "my_page", category: "ASTRO SYSTEMS" },
-        { id: "chinese", label: "Chinese Bazi", description: "Bazi pillars and Chinese zodiac signs.", systemId: "my_page", category: "ASTRO SYSTEMS" },
-        { id: "tajik", label: "Tajik Varshaphal", description: "Solar returns & Tajik coordinates.", systemId: "my_page", category: "ASTRO SYSTEMS" },
-        { id: "western", label: "Western Tropical", description: "Tropical degrees & planetary aspects.", systemId: "my_page", category: "ASTRO SYSTEMS" },
-        { id: "table_index", label: "Data Table Index", description: "Full indexed database tables overview.", systemId: "my_page", category: "ASTRO SYSTEMS" }
+        { id: "my_life", label: "My Life", description: "Personal profiles, dynamic logs & private diary.", systemId: "my_page" },
+        { id: "my_journey", label: "My Journey", description: "Extended timelines, milestone tracks & map.", systemId: "my_page" },
+        { id: "my_astro", label: "My Astro", description: "Vedic, KP, Jaimini, Lal Kitab and more astro systems.", systemId: "my_page" }
       ]
     },
     {

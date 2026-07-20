@@ -1721,13 +1721,24 @@ export function MyPageView({
 
   useEffect(() => {
     if (activeSubmenuId) {
-      if (activeSubmenuId === "my_life" || activeSubmenuId === "my_journey") {
-        setActiveSubmenu(activeSubmenuId);
-      } else {
-        setActiveSubmenu("my_astro");
-        if (activeSubmenuId !== activeTab) {
-          setActiveTab(activeSubmenuId);
+      if (activeSubmenuId === "my_life") {
+        setActiveSubmenu("my_life");
+      } else if (activeSubmenuId === "my_journey") {
+        setActiveSubmenu("my_journey");
+        if (!journeyTabs.some(t => t.id === activeTab)) {
+          setActiveTab("overview");
         }
+      } else if (activeSubmenuId === "my_astro") {
+        setActiveSubmenu("my_astro");
+        if (!astroTabs.some(t => t.id === activeTab)) {
+          setActiveTab("vedic");
+        }
+      } else if (journeyTabs.some(t => t.id === activeSubmenuId)) {
+        setActiveSubmenu("my_journey");
+        setActiveTab(activeSubmenuId);
+      } else if (astroTabs.some(t => t.id === activeSubmenuId)) {
+        setActiveSubmenu("my_astro");
+        setActiveTab(activeSubmenuId);
       }
     }
   }, [activeSubmenuId]);
@@ -1737,12 +1748,15 @@ export function MyPageView({
   const [selectedDateOffset, setSelectedDateOffset] = useState<number>(0);
   const [futurePage, setFuturePage] = useState<number>(0);
 
-  const tabs = [
-    { id: "overview", label: "Soul" },
+  const journeyTabs = [
+    { id: "overview", label: "My Soul" },
     { id: "dasha", label: "Vimshottari" },
     { id: "charts", label: "Charts" },
     { id: "daily", label: "Daily" },
-    { id: "future", label: "Future" },
+    { id: "future", label: "Future" }
+  ];
+
+  const astroTabs = [
     { id: "vedic", label: "Vedic" },
     { id: "transits_data", label: "Transits" },
     { id: "jaimini", label: "Jaimini" },
@@ -1751,8 +1765,10 @@ export function MyPageView({
     { id: "chinese", label: "Chinese" },
     { id: "tajik", label: "Tajik" },
     { id: "western", label: "Western" },
-    { id: "table_index", label: "Table Index" },
+    { id: "table_index", label: "Table Index" }
   ];
+
+  const tabs = [...journeyTabs, ...astroTabs];
 
   // Fetch the active profile from server Users/userprofile.json
   const fetchProfile = async () => {
@@ -2762,7 +2778,7 @@ export function MyPageView({
     doc.save(`jhora_ai_profile_report_${userName.toLowerCase().replace(/\s+/g, '_')}.pdf`);
   };
 
-  if (activeSubmenu !== "my_astro") {
+  if (activeSubmenu === "my_life") {
     return (
       <div className="space-y-4 animate-fade-in">
         {/* COMPACT FIRST LINE: USER NAME, DOB DETAILS, AND AGE */}
@@ -2844,46 +2860,28 @@ export function MyPageView({
           </button>
         </div>
 
-        {activeSubmenu === "my_life" ? (
-          <motion.div
-            key="my_life"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`p-8 rounded-xl border ${cardStyle} shadow-sm flex flex-col items-center justify-center text-center space-y-4 min-h-[300px]`}
-            id="my-life-placeholder"
-          >
-            <div className="p-3 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
-              <User className="w-6 h-6" />
-            </div>
-            <div className="space-y-1">
-              <h4 className={`text-base font-bold font-sans ${textStyle}`}>My Life</h4>
-              <p className={`text-xs ${textMutedStyle} max-w-md`}>
-                This section is ready. No content has been added yet as requested.
-              </p>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="my_journey"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`p-8 rounded-xl border ${cardStyle} shadow-sm flex flex-col items-center justify-center text-center space-y-4 min-h-[300px]`}
-            id="my-journey-placeholder"
-          >
-            <div className="p-3 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
-              <Compass className="w-6 h-6" />
-            </div>
-            <div className="space-y-1">
-              <h4 className={`text-base font-bold font-sans ${textStyle}`}>My Journey</h4>
-              <p className={`text-xs ${textMutedStyle} max-w-md`}>
-                This section is ready. No content has been added yet as requested.
-              </p>
-            </div>
-          </motion.div>
-        )}
+        <motion.div
+          key="my_life"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`p-8 rounded-xl border ${cardStyle} shadow-sm flex flex-col items-center justify-center text-center space-y-4 min-h-[300px]`}
+          id="my-life-placeholder"
+        >
+          <div className="p-3 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+            <User className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h4 className={`text-base font-bold font-sans ${textStyle}`}>My Life</h4>
+            <p className={`text-xs ${textMutedStyle} max-w-md`}>
+              This section is ready. No content has been added yet as requested.
+            </p>
+          </div>
+        </motion.div>
       </div>
     );
   }
+
+  const currentTabs = activeSubmenu === "my_journey" ? journeyTabs : astroTabs;
 
   return (
     <div className="space-y-4">
@@ -2968,7 +2966,7 @@ export function MyPageView({
 
       {/* Submenu Astrological Tabs */}
       <div className="flex flex-wrap items-center gap-1.5 pb-2 pt-1 border-b border-slate-500/10">
-        {tabs.map((tab) => (
+        {currentTabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => {
