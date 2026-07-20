@@ -93,7 +93,7 @@ try {
     app = getApp();
   }
   auth = getAuth(app);
-  db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+  db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
   
   // Test connection on boot using getDocFromServer
   const testConnection = async () => {
