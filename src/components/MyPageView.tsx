@@ -5,8 +5,6 @@ import DashaTree from "./DashaTree";
 import TransitsTab from "./TransitsTab";
 import { AstroRawTablesView } from "./AstroRawTablesView";
 import { MasterArchitectureView } from "./MasterArchitectureView";
-import EventBookView from "./EventBookView";
-import { FinalResultsView } from "./FinalResultsView";
 import {
   mapJHoraResponseToAstrologyData,
   mapAstrologyDataToUserProfileJSON
@@ -19,6 +17,10 @@ import {
   TajikEvidenceAdapter,
   TajikDecisionAdapter
 } from "../lib/rules/tajikRelationshipEngine";
+import { generateAstrologyPDF } from "../lib/pdfGenerator";
+import { generateRelationshipPDF } from "../lib/relationshipReportGenerator";
+import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
+import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelationshipEvidenceEngine";
 import {
   User,
   Calendar,
@@ -43,7 +45,9 @@ import {
   ChevronDown,
   ChevronUp,
   Grid,
-  Layers
+  Layers,
+  Download,
+  FileText
 } from "lucide-react";
 
 interface MyPageViewProps {
@@ -1709,8 +1713,6 @@ const lifeTabs = [
 
 const journeyTabs = [
   { id: "overview", label: "My Soul" },
-  { id: "event_book", label: "Event Book" },
-  { id: "final_results", label: "Final Results" },
   { id: "predictions", label: "Predictions" },
   { id: "future", label: "Future" },
   { id: "my_life_analysis", label: "My Life Analysis" }
@@ -1752,7 +1754,8 @@ export function MyPageView({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [age, setAge] = useState<{ years: number; months: number; days: number } | null>(null);
   const [activeTab, setActiveTab] = useState<string>("overview");
-  const [activeSubmenu, setActiveSubmenu] = useState<"my_life" | "my_journey" | "my_astro">("my_astro");
+  const [activeSubmenu, setActiveSubmenu] = useState<"my_life" | "my_journey" | "my_astro" | "my_reports">("my_astro");
+  const [compilingRelReport, setCompilingRelReport] = useState<"marriage" | "complete" | "vedic" | "raw360" | null>(null);
 
   useEffect(() => {
     if (activeSubmenuId) {
@@ -1771,6 +1774,9 @@ export function MyPageView({
         if (!astroTabs.some(t => t.id === activeTab)) {
           setActiveTab("dasha");
         }
+      } else if (activeSubmenuId === "my_reports" || activeSubmenuId === "reports_hub") {
+        setActiveSubmenu("my_reports");
+        setActiveTab("reports_hub");
       } else if (lifeTabs.some(t => t.id === activeSubmenuId)) {
         setActiveSubmenu("my_life");
         setActiveTab(activeSubmenuId);
@@ -2797,7 +2803,7 @@ export function MyPageView({
     doc.save(`jhora_ai_profile_report_${userName.toLowerCase().replace(/\s+/g, '_')}.pdf`);
   };
 
-  const currentTabs = activeSubmenu === "my_life" ? lifeTabs : (activeSubmenu === "my_journey" ? journeyTabs : astroTabs);
+  const currentTabs = activeSubmenu === "my_life" ? lifeTabs : (activeSubmenu === "my_journey" ? journeyTabs : (activeSubmenu === "my_astro" ? astroTabs : []));
 
   return (
     <div className="space-y-4">
@@ -2841,14 +2847,14 @@ export function MyPageView({
       )}
 
       {/* Primary Submenus Switcher */}
-      <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-950/60 rounded-xl border border-slate-800/40" id="primary-submenu-bar">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-1.5 bg-slate-950/60 rounded-xl border border-slate-800/40" id="primary-submenu-bar">
         <button
           onClick={() => {
             setActiveSubmenu("my_life");
             setActiveTab("daily");
             onSubmenuSelect?.("daily");
           }}
-          className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
+          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
             activeSubmenu === "my_life"
               ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
               : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
@@ -2864,7 +2870,7 @@ export function MyPageView({
             setActiveTab("overview");
             onSubmenuSelect?.("overview");
           }}
-          className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
+          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
             activeSubmenu === "my_journey"
               ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
               : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
@@ -2880,7 +2886,7 @@ export function MyPageView({
             setActiveTab("dasha");
             onSubmenuSelect?.("dasha");
           }}
-          className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
+          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
             activeSubmenu === "my_astro"
               ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
               : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
@@ -2890,29 +2896,332 @@ export function MyPageView({
           <Sparkles className="w-4 h-4 shrink-0" />
           <span>My Astro</span>
         </button>
+        <button
+          onClick={() => {
+            setActiveSubmenu("my_reports");
+            setActiveTab("reports_hub");
+            onSubmenuSelect?.("reports_hub");
+          }}
+          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
+            activeSubmenu === "my_reports"
+              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
+          }`}
+          id="submenu-my-reports"
+        >
+          <FileText className="w-4 h-4 shrink-0" />
+          <span>My Reports</span>
+        </button>
       </div>
 
       {/* Submenu Astrological Tabs */}
-      <div className="flex flex-wrap items-center gap-1.5 pb-2 pt-1 border-b border-slate-500/10">
-        {currentTabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => {
-              setActiveTab(tab.id);
-              onSubmenuSelect?.(tab.id);
-            }}
-            className={`px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold tracking-wider uppercase border transition-all cursor-pointer select-none ${
-              activeTab === tab.id
-                ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm shadow-amber-500/10"
-                : "bg-slate-500/5 text-slate-400 border-slate-500/10 hover:bg-slate-500/10 hover:text-slate-300"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {currentTabs.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 pb-2 pt-1 border-b border-slate-500/10">
+          {currentTabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                onSubmenuSelect?.(tab.id);
+              }}
+              className={`px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold tracking-wider uppercase border transition-all cursor-pointer select-none ${
+                activeTab === tab.id
+                  ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm shadow-amber-500/10"
+                  : "bg-slate-500/5 text-slate-400 border-slate-500/10 hover:bg-slate-500/10 hover:text-slate-300"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {activeTab === "overview" ? (
+      {activeSubmenu === "my_reports" ? (
+        <div className="space-y-6 animate-fade-in">
+          <div className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
+            
+            <div className="border-b border-amber-500/10 pb-4 mb-6">
+              <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                Automated PDF Reports Download Hub
+              </span>
+              <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-amber-500" />
+                PRE-COMPILED SYSTEM REVEALS & REPORTS
+              </h2>
+              <p className={`text-xs ${textMutedStyle} mt-1`}>
+                All reports are compiled dynamically for your birth coordinates. Click directly to download your personalized dossiers.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Card 1: Complete 360° Report */}
+              <button
+                disabled={compilingRelReport !== null}
+                onClick={async () => {
+                  try {
+                    setCompilingRelReport("raw360");
+                    const targetProfile = profile || mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
+                    if (!targetProfile) {
+                      throw new Error("Unable to load astrology profile data.");
+                    }
+                    const allSubmenuIds = [
+                      "overview", "planetary_positions", "planet_strength", "bhava_strength", 
+                      "ashtakavarga", "yogas", "doshas", "vimshottari", "yogini", "ashtottari", 
+                      "longevity", "sade_sati", "d1_rasi", "d9_navamsa", "d10_dasamsa", 
+                      "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
+                      "argalas", "charaDasha", "panchapakshi", "lalkitab", "gemstones", "numerology",
+                      "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
+                      "kp_significators", "kp_houses_significators", "kp_planet_to_house", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
+                      "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
+                      "eso_nadi", "eso_lalkitab", "eso_varshaphala", "eso_bazi", "eso_numerology", "eso_celtic", "eso_mayan"
+                    ];
+                    const doc = generateRawAstrologyPDF(targetProfile, {
+                      profileName: userName,
+                      submenus: allSubmenuIds
+                    });
+                    doc.save(`Complete_360_Astrological_Systems_Report_${userName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+                  } catch (err: any) {
+                    console.error("360 PDF compile failed:", err);
+                    alert("Failed to compile 360° PDF: " + err.message);
+                  } finally {
+                    setCompilingRelReport(null);
+                  }
+                }}
+                className={`p-4 rounded-xl border text-left ${isDark ? "border-indigo-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-indigo-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer disabled:opacity-50`}
+              >
+                <div className="w-full">
+                  <div className="flex justify-between items-start">
+                    <FileText className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded font-mono font-bold">360° TOTAL</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-200 mt-2">Complete 360° Report</h4>
+                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Tabular astrological metrics across JHora, KP, and Western.</p>
+                </div>
+                <div className="text-[10px] font-bold text-indigo-400 flex items-center gap-1 mt-2">
+                  {compilingRelReport === "raw360" ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </>
+                  )}
+                </div>
+              </button>
+
+              {/* Card 2: Authoritative Vedic Report */}
+              <button
+                disabled={compilingRelReport !== null}
+                onClick={async () => {
+                  try {
+                    setCompilingRelReport("vedic");
+                    const targetProfile = profile || mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
+                    if (!targetProfile) {
+                      throw new Error("Unable to load astrology profile data.");
+                    }
+                    const doc = generateAstrologyPDF(targetProfile);
+                    doc.save(`Vedic_Astrology_Authoritative_Report_${userName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+                  } catch (err: any) {
+                    console.error("Vedic PDF compile failed:", err);
+                    alert("Failed to compile Vedic PDF: " + err.message);
+                  } finally {
+                    setCompilingRelReport(null);
+                  }
+                }}
+                className={`p-4 rounded-xl border text-left ${isDark ? "border-amber-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-amber-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer disabled:opacity-50`}
+              >
+                <div className="w-full">
+                  <div className="flex justify-between items-start">
+                    <FileText className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded font-mono font-bold">SIDEREAL VEDIC</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-200 mt-2">Authoritative Vedic Report</h4>
+                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Traditional Parashari calculations, planetary strengths, and dasha trees.</p>
+                </div>
+                <div className="text-[10px] font-bold text-amber-500 flex items-center gap-1 mt-2">
+                  {compilingRelReport === "vedic" ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </>
+                  )}
+                </div>
+              </button>
+
+              {/* Card 3: Marriage Promise Report */}
+              <button
+                disabled={compilingRelReport !== null}
+                onClick={async () => {
+                  try {
+                    setCompilingRelReport("marriage");
+                    const targetData = astrologyData;
+                    if (!targetData) {
+                      throw new Error("Unable to load astrology data for compiling report.");
+                    }
+                    const evidence = calculateUnifiedRelationshipEvidence(targetData, undefined, 28);
+                    
+                    const apiResponse = await fetch("/api/astrology/ai-relationship-expert", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        evidence,
+                        question: "Provide an elegant esoterically precise relationship analysis focusing on Marriage Promise, Delay aspects, and dasha timing triggers."
+                      })
+                    });
+
+                    let expertData = { reply: "Astrological alignment indicates favorable cosmic resonance across Vedic and KP parameters." };
+                    if (apiResponse.ok) {
+                      expertData = await apiResponse.json();
+                    }
+
+                    const doc = generateRelationshipPDF({
+                      profileName: userName,
+                      partnerName: "Auspicious Partner",
+                      reportType: "Marriage Promise Report",
+                      reportOption: "Professional",
+                      targetAge: 28,
+                      evidence,
+                      expertData
+                    });
+
+                    doc.save(`Marriage_Promise_Report_${userName.replace(/\s+/g, "_")}_${Date.now()}.pdf`);
+                  } catch (err: any) {
+                    console.error("Marriage PDF compile failed:", err);
+                    alert("Failed to compile Marriage PDF: " + err.message);
+                  } finally {
+                    setCompilingRelReport(null);
+                  }
+                }}
+                className={`p-4 rounded-xl border text-left ${isDark ? "border-rose-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-rose-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer disabled:opacity-50`}
+              >
+                <div className="w-full">
+                  <div className="flex justify-between items-start">
+                    <FileText className="w-5 h-5 text-rose-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded font-mono font-bold">PROMISE & TIMING</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-200 mt-2">Marriage Promise & Timing</h4>
+                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Relationship timing, marital promise ratings, and sub-lord evidence logs.</p>
+                </div>
+                <div className="text-[10px] font-bold text-rose-400 flex items-center gap-1 mt-2">
+                  {compilingRelReport === "marriage" ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </>
+                  )}
+                </div>
+              </button>
+
+              {/* Card 4: 15-Topic Partner Diagnostics */}
+              <button
+                disabled={compilingRelReport !== null}
+                onClick={async () => {
+                  try {
+                    setCompilingRelReport("complete");
+                    const targetData = astrologyData;
+                    if (!targetData) {
+                      throw new Error("Unable to load astrology data for compiling report.");
+                    }
+                    const evidence = calculateUnifiedRelationshipEvidence(targetData, undefined, 28);
+                    
+                    const apiResponse = await fetch("/api/astrology/ai-relationship-expert", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        evidence,
+                        question: "Provide a detailed multi-system diagnostic of partnership potential across Vedic, KP, and Jaimini parameters."
+                      })
+                    });
+
+                    let expertData = { reply: "Astrological alignments indicate overall positive balance and harmonic resonance." };
+                    if (apiResponse.ok) {
+                      expertData = await apiResponse.json();
+                    }
+
+                    const doc = generateRelationshipPDF({
+                      profileName: userName,
+                      partnerName: "Auspicious Partner",
+                      reportType: "Complete Relationship Report",
+                      reportOption: "Professional",
+                      targetAge: 28,
+                      evidence,
+                      expertData
+                    });
+
+                    doc.save(`Complete_Relationship_Report_${userName.replace(/\s+/g, "_")}_${Date.now()}.pdf`);
+                  } catch (err: any) {
+                    console.error("Partner Diagnostics PDF compile failed:", err);
+                    alert("Failed to compile Partner Diagnostics PDF: " + err.message);
+                  } finally {
+                    setCompilingRelReport(null);
+                  }
+                }}
+                className={`p-4 rounded-xl border text-left ${isDark ? "border-purple-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-purple-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer disabled:opacity-50`}
+              >
+                <div className="w-full">
+                  <div className="flex justify-between items-start">
+                    <FileText className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded font-mono font-bold">15-TOPIC PAIRINGS</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-200 mt-2">15-Topic Partner Diagnostics</h4>
+                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Complete multi-system compatibility assessment and partner synastry.</p>
+                </div>
+                <div className="text-[10px] font-bold text-purple-400 flex items-center gap-1 mt-2">
+                  {compilingRelReport === "complete" ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </>
+                  )}
+                </div>
+              </button>
+            </div>
+
+            {/* Bottom Section: Active JSON Export */}
+            <div className="mt-6 pt-6 border-t border-slate-500/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="space-y-0.5">
+                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Shield className="w-4 h-4 text-indigo-400" />
+                  Vedic Data Model Export
+                </h4>
+                <p className="text-[10px] text-slate-400 font-sans">
+                  Export the active calculated high-fidelity JSON payload containing all traditional astronomical structures.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  if (astrologyData) {
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(astrologyData, null, 2));
+                    const downloadAnchor = document.createElement('a');
+                    downloadAnchor.setAttribute("href", dataStr);
+                    downloadAnchor.setAttribute("download", `Vedic_Astrology_Profile_Active_${userName.toLowerCase().replace(/\s+/g, '_')}.json`);
+                    document.body.appendChild(downloadAnchor);
+                    downloadAnchor.click();
+                    downloadAnchor.remove();
+                  } else {
+                    alert("No active astrology profile loaded to export JSON.");
+                  }
+                }}
+                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-indigo-300 border border-indigo-500/20 rounded-xl text-xs font-bold cursor-pointer transition-all flex items-center justify-center gap-1.5 self-start sm:self-auto shadow-md shadow-indigo-500/5"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>Export Active JSON</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : activeTab === "overview" ? (
         <div className="space-y-4">
           {/* SECOND SECTION: SOUL BLUEPRINT SYNTHESIS (INSTANT STATIC LOAD) */}
           <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-3`}>
@@ -6169,20 +6478,6 @@ export function MyPageView({
               ⚠️ Please cast a horoscope first to view real-time transits.
             </div>
           )}
-        </div>
-      ) : activeTab === "event_book" ? (
-        <div className="space-y-6 animate-fade-in">
-          <EventBookView
-            astrologyData={astrologyData}
-            isDark={isDark}
-          />
-        </div>
-      ) : activeTab === "final_results" ? (
-        <div className="space-y-6 animate-fade-in">
-          <FinalResultsView
-            astrologyData={astrologyData}
-            isDark={isDark}
-          />
         </div>
       ) : activeTab === "predictions" ? (
         <div className="space-y-6 animate-fade-in">
