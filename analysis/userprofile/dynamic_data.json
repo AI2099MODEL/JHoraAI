@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "userprofile",
-    "lastUpdated": "2026-07-20T14:14:49.157Z",
+    "lastUpdated": "2026-07-20T14:22:06.118Z",
     "evaluationDate": "2026-07-20",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-20T14:14:48.952Z",
-      "localTime": "2026-07-20T07:14:48-07:00",
+      "utcTime": "2026-07-20T14:22:05.943Z",
+      "localTime": "2026-07-20T07:22:05-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Virgo",
         "displayName": "Virgo",
-        "longitude": 175.75
+        "longitude": 175.82
       },
       "currentNakshatra": {
         "id": "Chitra",
@@ -30,15 +30,15 @@
         "displayName": "Mars"
       },
       "currentSubLord": {
-        "id": "Saturn",
-        "displayName": "Saturn"
+        "id": "Mars",
+        "displayName": "Mars"
       },
       "moonPhase": {
         "type": "Waxing Gibbous",
         "displayName": "Sukla Saptami",
-        "illuminationPercentage": 45.5
+        "illuminationPercentage": 45.6
       },
-      "moonLongitude": 175.75,
+      "moonLongitude": 175.82,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -52,7 +52,7 @@
         "id": "Cancer",
         "displayName": "Cancer"
       },
-      "longitude": 93.79,
+      "longitude": 93.8,
       "nakshatra": {
         "id": "Pushya",
         "displayName": "Pushya"
@@ -65,7 +65,7 @@
     "planets": {
       "sun": {
         "currentSign": "Cancer",
-        "longitude": 93.79,
+        "longitude": 93.8,
         "nakshatra": "Pushya",
         "pada": 1,
         "starLord": "Saturn",
@@ -76,40 +76,40 @@
       },
       "moon": {
         "currentSign": "Virgo",
-        "longitude": 175.75,
+        "longitude": 175.82,
         "nakshatra": "Chitra",
         "pada": 1,
         "starLord": "Mars",
-        "subLord": "Saturn",
-        "retrograde": true,
+        "subLord": "Mars",
+        "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mars": {
         "currentSign": "Virgo",
-        "longitude": 169.46,
+        "longitude": 170.87,
         "nakshatra": "Hasta",
-        "pada": 3,
+        "pada": 4,
         "starLord": "Moon",
-        "subLord": "Mercury",
+        "subLord": "Mars",
         "retrograde": true,
         "combust": false,
         "stationary": false
       },
       "mercury": {
         "currentSign": "Libra",
-        "longitude": 197.61,
+        "longitude": 197.64,
         "nakshatra": "Swati",
         "pada": 4,
         "starLord": "Rahu",
-        "subLord": "Jupiter",
+        "subLord": "Mercury",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "jupiter": {
         "currentSign": "Sagittarius",
-        "longitude": 267.26,
+        "longitude": 267.27,
         "nakshatra": "Uttara Ashadha",
         "pada": 1,
         "starLord": "Sun",
@@ -120,11 +120,11 @@
       },
       "venus": {
         "currentSign": "Cancer",
-        "longitude": 115.22,
+        "longitude": 115.23,
         "nakshatra": "Ashlesha",
         "pada": 3,
         "starLord": "Mercury",
-        "subLord": "Venus",
+        "subLord": "Moon",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -245,6 +245,21 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-20T14:22:06.118Z",
+      "evaluationDate": "2026-07-20",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
+    },
     {
       "timestamp": "2026-07-20T14:14:49.157Z",
       "evaluationDate": "2026-07-20",
