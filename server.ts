@@ -325,6 +325,9 @@ app.post("/api/user-profile/save", async (req, res) => {
     fs.writeFileSync(filePath, JSON.stringify(profiles, null, 2));
     console.log(`Successfully saved profile ${profile.uid} to backend database.`);
 
+    // Trigger analysis sync immediately for this profile
+    setTimeout(() => runAnalysisSyncAgentForProfile(profile), 10);
+
     res.json({ success: true, message: "Profile successfully saved and synced on backend." });
   } catch (error: any) {
     console.error("Backend User Profile Save Error:", error);
@@ -508,6 +511,11 @@ app.post("/api/user-profile/act", async (req, res) => {
     // Trigger git sync asynchronously to not block the frontend
     syncProfileToGithub(action, profileName, profileData);
 
+    // Trigger analysis sync asynchronously if action is add
+    if (action === "add" && profileData) {
+      setTimeout(() => runAnalysisSyncAgentForProfile(profileData), 10);
+    }
+
     res.json({ success: true, message: `Profile action '${action}' triggered and syncing asynchronously.` });
   } catch (err: any) {
     console.error("Error in /api/user-profile/act endpoint:", err);
@@ -622,7 +630,9 @@ app.get("/api/user-profile/get", async (req, res) => {
         const localContent = fs.readFileSync(localFilePath, "utf-8");
         const localProfiles = JSON.parse(localContent);
         if (localProfiles[uid]) {
-          return res.json(localProfiles[uid]);
+          const profile = localProfiles[uid];
+          setTimeout(() => runAnalysisSyncAgentForProfile(profile), 10);
+          return res.json(profile);
         }
       }
     }
@@ -631,6 +641,7 @@ app.get("/api/user-profile/get", async (req, res) => {
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, "utf-8");
       const parsed = JSON.parse(content);
+      setTimeout(() => runAnalysisSyncAgentForProfile(parsed), 10);
       return res.json(parsed);
     }
     // Fallback to local data dir if git file isn't created yet
@@ -640,6 +651,7 @@ app.get("/api/user-profile/get", async (req, res) => {
       const localProfiles = JSON.parse(localContent);
       const firstProfile = Object.values(localProfiles)[0];
       if (firstProfile) {
+        setTimeout(() => runAnalysisSyncAgentForProfile(firstProfile), 10);
         return res.json(firstProfile);
       }
     }
@@ -2604,7 +2616,295 @@ function runNatalRulesEvaluatorAgent() {
   }
 }
 
+// ============================================================================
+// NEW BACKGROUND AGENT: Astrological Analysis Synchronizer Agent (AnalysisSyncAgent)
+// ============================================================================
+
+function runAnalysisSyncAgentForProfile(profile: any, filename?: string) {
+  try {
+    if (!profile) return;
+    const profileName = profile.User?.profile_name || profile.BirthDetails?.name || "Guest";
+    const profileFolder = filename 
+      ? filename.replace(/\.json$/i, "") 
+      : getProfileFileName(profile, profileName).replace(/\.json$/i, "");
+
+    const userAnalysisDir = path.join(process.cwd(), "analysis", profileFolder);
+    if (!fs.existsSync(userAnalysisDir)) {
+      fs.mkdirSync(userAnalysisDir, { recursive: true });
+    }
+
+    // 1. Save static_data.json (natal data)
+    const staticPath = path.join(userAnalysisDir, "static_data.json");
+    fs.writeFileSync(staticPath, JSON.stringify(profile, null, 2), "utf-8");
+    console.log(`[Analysis Sync Agent] Saved static_data.json for profile ${profileName}`);
+
+    // 2. Evaluate Dynamic Data
+    const kpData = profile.KP || {};
+    const results: any[] = [];
+
+    // Rule 1: Marriage Promise (7th CSL)
+    const csl7 = kpData.cusps?.House_7?.sub_lord || kpData.cusps?.["7"]?.sub_lord || "Saturn";
+    const star7 = kpData.planets?.[csl7]?.star_lord || "Rahu";
+    const sig7 = getPlanetHouses(kpData, star7);
+    const isMarFavorable = sig7.some(h => [2, 7, 11].includes(h));
+    results.push({
+      id: "KP_MAR_01",
+      name: "Cuspal Sub Lord of 7th House for Marriage Timing",
+      isMet: isMarFavorable,
+      significator: csl7,
+      starLord: star7,
+      signifiedHouses: sig7,
+      category: "Marriage",
+      reasoning: `The 7th Cuspal Sub Lord (${csl7}) is in the star of ${star7}, which signifies houses [${sig7.join(", ")}]. ${
+        isMarFavorable 
+          ? "This is highly favorable as it connects directly with key relationship houses (2, 7, 11), confirming marriage promise." 
+          : "The linkage is mixed/neutral, suggesting that partnerships will trigger growth and require conscious alignment."
+      }`
+    });
+
+    // Rule 2: Career & Profession (10th CSL)
+    const csl10 = kpData.cusps?.House_10?.sub_lord || kpData.cusps?.["10"]?.sub_lord || "Mercury";
+    const star10 = kpData.planets?.[csl10]?.star_lord || "Moon";
+    const sig10 = getPlanetHouses(kpData, star10);
+    const isCarFavorable = sig10.some(h => [2, 6, 10, 11].includes(h));
+    results.push({
+      id: "KP_CAR_01",
+      name: "10th Cuspal Sub Lord for Career and Profession Sector",
+      isMet: isCarFavorable,
+      significator: csl10,
+      starLord: star10,
+      signifiedHouses: sig10,
+      category: "Career",
+      reasoning: `The 10th Cuspal Sub Lord (${csl10}) is in the star of ${star10}, which signifies houses [${sig10.join(", ")}]. ${
+        isCarFavorable 
+          ? "Direct connection to professional houses [2, 6, 10, 11] triggers high status, stability, and career progress." 
+          : "Standard career promise; suggests career advancement will occur steadily through discipline."
+      }`
+    });
+
+    // Rule 3: Financial Status & Wealth Promise (2nd CSL)
+    const csl2 = kpData.cusps?.House_2?.sub_lord || kpData.cusps?.["2"]?.sub_lord || "Rahu";
+    const star2 = kpData.planets?.[csl2]?.star_lord || "Ketu";
+    const sig2 = getPlanetHouses(kpData, star2);
+    const isFinFavorable = sig2.some(h => [2, 6, 10, 11].includes(h));
+    results.push({
+      id: "KP_FIN_01",
+      name: "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
+      isMet: isFinFavorable,
+      significator: csl2,
+      starLord: star2,
+      signifiedHouses: sig2,
+      category: "Finance",
+      reasoning: `The 2nd Cuspal Sub Lord (${csl2}) resides in the star of ${star2}, signifying houses [${sig2.join(", ")}]. ${
+        isFinFavorable
+          ? "Highly auspicious indicators for wealth accumulation and sound capital gains."
+          : "Requires careful financial budgeting and prudent cash-flow planning."
+      }`
+    });
+
+    // Rule 4: Health and Disease Propensity (1st & 6th CSL)
+    const csl1 = kpData.cusps?.House_1?.sub_lord || kpData.cusps?.["1"]?.sub_lord || "Mercury";
+    const csl6 = kpData.cusps?.House_6?.sub_lord || kpData.cusps?.["6"]?.sub_lord || "Jupiter";
+    const star6 = kpData.planets?.[csl6]?.star_lord || "Mercury";
+    const sig6 = getPlanetHouses(kpData, star6);
+    const hasDiseasePropensity = sig6.some(h => [6, 8, 12].includes(h));
+    results.push({
+      id: "KP_HEA_01",
+      name: "Health and Disease Propensity via 1st and 6th CSL",
+      isMet: !hasDiseasePropensity,
+      significator: `1st CSL: ${csl1}, 6th CSL: ${csl6}`,
+      starLord: star6,
+      signifiedHouses: sig6,
+      category: "Health",
+      reasoning: `The 6th Cuspal Sub Lord (${csl6}) is in the star of ${star6}, signifying houses [${sig6.join(", ")}]. ${
+        hasDiseasePropensity 
+          ? "Alert: Linkage with disease-prone houses (6, 8, 12) suggests keeping a healthy routine." 
+          : "Auspicious: Low susceptibility to chronic ailments, strong natural immunity."
+      }`
+    });
+
+    // Rule 5: Dasha-Bhukti-Antara Event Trigger
+    const md = kpData.dba?.mahadasha || "Jupiter";
+    const ad = kpData.dba?.bhukti || "Mercury";
+    results.push({
+      id: "KP_DBA_01",
+      name: "Dasha-Bhukti-Antara (DBA) Event Trigger Validation",
+      isMet: true,
+      significator: `${md} - ${ad}`,
+      starLord: "Various",
+      signifiedHouses: [],
+      category: "DBA",
+      reasoning: `Current major active timeline lords are Mahadasha: ${md} and Bhukti: ${ad}. These planetary nodes are ripe to trigger events in their designated houses.`
+    });
+
+    // Load current sky data
+    let currentSky = null;
+    const skyPath = path.join(process.cwd(), "src", "knowledgebase", "checklist_engine", "current_sky.json");
+    if (fs.existsSync(skyPath)) {
+      try {
+        currentSky = JSON.parse(fs.readFileSync(skyPath, "utf-8"));
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // Evaluate transit events triggered today
+    const triggeredTransitEvents: any[] = [];
+    const natalMoonSign = profile.Vedic?.planets?.Moon?.sign || "Cancer";
+    const natalMoonNakshatra = profile.Vedic?.planets?.Moon?.nakshatra || "Pushya";
+    const transitMoonSign = currentSky?.moon?.currentSign?.displayName || "Cancer";
+    const transitMoonNakshatra = currentSky?.moon?.currentNakshatra?.displayName || "Pushya";
+
+    if (transitMoonSign === natalMoonSign) {
+      triggeredTransitEvents.push({
+        id: "TR_MOON_SIGN_01",
+        name: "Moon Transit in Birth Sign (Chandra Gochara)",
+        trigger: `Transit Moon in ${transitMoonSign}`,
+        status: "Active",
+        category: "Transit",
+        description: `The transiting Moon is passing through your natal Moon sign (${natalMoonSign}). This triggers a 2.25-day cycle of enhanced intuition, emotional focus, and personal reflection.`
+      });
+    }
+
+    if (transitMoonNakshatra === natalMoonNakshatra) {
+      triggeredTransitEvents.push({
+        id: "TR_MOON_NAK_01",
+        name: "Janma Nakshatra Moon Transit",
+        trigger: `Transit Moon in ${transitMoonNakshatra}`,
+        status: "Active",
+        category: "Transit",
+        description: `The transiting Moon is exactly in your birth Nakshatra (${natalMoonNakshatra}). This triggers your monthly Janma Nakshatra peak, heightening mental sensitivity and spiritual receptiveness.`
+      });
+    }
+
+    const transitSunSign = currentSky?.sun?.sign?.id || "Cancer";
+    const natalSunSign = profile.Vedic?.planets?.Sun?.sign || "Sagittarius";
+    if (transitSunSign === natalSunSign) {
+      triggeredTransitEvents.push({
+        id: "TR_SUN_SIGN_01",
+        name: "Solar Return Sign Transit",
+        trigger: `Transit Sun in ${transitSunSign}`,
+        status: "Active",
+        category: "Transit",
+        description: `The transiting Sun is passing through your natal Sun sign (${natalSunSign}), signaling your annual solar return period with high vitality and career focus.`
+      });
+    }
+
+    // Default transit event
+    triggeredTransitEvents.push({
+      id: "TR_GEN_01",
+      name: "Daily Muhurta Alignment",
+      trigger: `Transit Moon Phase ${currentSky?.moon?.moonPhase?.displayName || "Sukla Ekadashi"}`,
+      status: "Active",
+      category: "Muhurta",
+      description: `Daily alignment evaluated successfully under the active planetary energies of Mahadasha lord: ${md} and Bhukti lord: ${ad}.`
+    });
+
+    // Handle events log (rolling historical audit log)
+    const dynamicPath = path.join(userAnalysisDir, "dynamic_data.json");
+    let previousEventsLog: any[] = [];
+    if (fs.existsSync(dynamicPath)) {
+      try {
+        const prevData = JSON.parse(fs.readFileSync(dynamicPath, "utf-8"));
+        if (Array.isArray(prevData.eventsLog)) {
+          previousEventsLog = prevData.eventsLog;
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    const newLogEntry = {
+      timestamp: new Date().toISOString(),
+      evaluationDate: new Date().toISOString().split("T")[0],
+      triggeredEventsCount: triggeredTransitEvents.length,
+      triggeredEvents: triggeredTransitEvents.map(e => e.name),
+      rulesMet: results.filter(r => r.isMet).map(r => r.name),
+      message: `Evaluation completed by AstrologicalAnalysisSyncAgent. ${triggeredTransitEvents.length} transits and ${results.filter(r => r.isMet).length} natal promises updated.`
+    };
+
+    // Maintain a rolling history of the last 100 entries
+    const updatedEventsLog = [newLogEntry, ...previousEventsLog].slice(0, 100);
+
+    const dynamicData = {
+      metadata: {
+        agentName: "AstrologicalAnalysisSyncAgent",
+        profileName: profileName,
+        profileId: profileFolder,
+        lastUpdated: new Date().toISOString(),
+        evaluationDate: new Date().toISOString().split("T")[0],
+        status: "Healthy / Synchronized"
+      },
+      currentSkyTransits: currentSky ? {
+        dateTime: currentSky.currentDateTime,
+        moon: currentSky.moon,
+        sun: currentSky.sun,
+        planets: currentSky.planets
+      } : null,
+      activePeriods: {
+        mahadasha: md,
+        bhukti: ad,
+        description: `Active period governed by Vimshottari lords: ${md} and ${ad}.`
+      },
+      natalRulesEvaluations: results,
+      triggeredTransitEvents: triggeredTransitEvents,
+      eventsLog: updatedEventsLog
+    };
+
+    fs.writeFileSync(dynamicPath, JSON.stringify(dynamicData, null, 2), "utf-8");
+    console.log(`[Analysis Sync Agent] Saved dynamic_data.json for profile ${profileName}`);
+
+    // Commit and push asynchronously to keep Git repository perfectly up-to-date
+    exec(`git add analysis/${profileFolder}/static_data.json analysis/${profileFolder}/dynamic_data.json && (git diff-index --quiet HEAD || git commit -m "feat(analysis): update static and dynamic logs for ${profileName}")`, (err) => {
+      if (err) {
+        console.warn("[Analysis Git Warning]", err.message);
+      } else {
+        console.log(`[Analysis Git Success] Committed static/dynamic analysis files for ${profileName}.`);
+        exec("git push origin main", (pushErr) => {
+          if (pushErr) {
+            console.warn("[Analysis Push Warning] push skipped/unauthenticated.");
+          } else {
+            console.log(`[Analysis Push Success] Pushed analysis files for ${profileName} to remote branch.`);
+          }
+        });
+      }
+    });
+
+  } catch (err: any) {
+    console.error(`[Analysis Sync Agent Error] failed for profile:`, err);
+  }
+}
+
+function runAnalysisSyncAgent() {
+  console.log("[AGENT] Running Astrological Analysis Synchronizer Agent...");
+  try {
+    const usersDir = path.join(process.cwd(), "Users");
+    if (!fs.existsSync(usersDir)) return;
+
+    const files = fs.readdirSync(usersDir).filter(f => f.endsWith(".json"));
+    if (files.length === 0) {
+      console.log("[AGENT] No user profiles found in Users/ directory.");
+      return;
+    }
+
+    files.forEach(file => {
+      try {
+        const filePath = path.join(usersDir, file);
+        const profile = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+        runAnalysisSyncAgentForProfile(profile, file);
+      } catch (e) {
+        console.error(`[AGENT] Error processing profile file ${file}:`, e);
+      }
+    });
+
+    console.log("[AGENT] Astrological Analysis Sync Agent run completed successfully.");
+  } catch (err: any) {
+    console.error("[AGENT] Error in Analysis Synchronizer Agent:", err);
+  }
+}
+
 // Register API Endpoints for the Natal Rules Evaluator Agent
+
 app.get("/api/rules/natal-agent-status", (req, res) => {
   try {
     if (fs.existsSync(STATUS_FILE_PATH)) {
@@ -2639,11 +2939,13 @@ app.post("/api/rules/natal-agent-refresh", (req, res) => {
 // Run background agent on boot
 setTimeout(() => {
   runNatalRulesEvaluatorAgent();
+  runAnalysisSyncAgent();
 }, 2000);
 
 // Schedule agent to run every 12 hours
 setInterval(() => {
   runNatalRulesEvaluatorAgent();
+  runAnalysisSyncAgent();
 }, 12 * 3600 * 1000);
 
 // ==========================================

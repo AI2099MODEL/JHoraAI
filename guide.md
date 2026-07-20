@@ -159,4 +159,24 @@ The platform features the design for a highly advanced, KP-focused **Daily Horos
 ### Major Life Event Exclusions
 To prevent cluttering short-term trends, the following are strictly excluded from the Daily Horoscope Engine calculations: **Marriage, Promotion, Childbirth, Court, Property Purchase, and Foreign Settlement**. These are handled exclusively by the long-term **NJEvent Engine**.
 
+---
+
+## 7. Split-Partitioned User Analysis and Dynamic Synchronization Agent
+
+To support real-time user-specific transit intelligence while preserving absolute stability of core historical archives, the platform implements a partitioned static-dynamic user analysis file repository.
+
+### A. Directory Hierarchy
+Every active profile in the `/Users` folder has a corresponding, identically named subfolder inside `/analysis/[profile_filename]/`. Within this folder, the system maintains two separate, high-fidelity JSON files:
+1. **`static_data.json` (Natal Blueprint)**: Holds the pristine, locked-down natal coordinate data, planetary house positions, Vimshottari dasha roots, and JHora-Cast metadata.
+2. **`dynamic_data.json` (Transit Log & Active Events)**: House of real-time sky coordinates (the transiting sun, moon, and nakshatra configurations), active Vimshottari periods, on-the-fly evaluated natal promises (Marriage, Career, Finance, and Health), and a rolling chronological log of all triggered transits.
+
+### B. Astrological Analysis Synchronizer Agent (`AnalysisSyncAgent`)
+A dedicated background daemon, `AnalysisSyncAgent`, operates as the core synchronization and analytical engine:
+- **On Boot Execution**: Runs immediately 2 seconds after the node server starts up, scanning the `/Users` directory and auto-creating folders and files for every registered profile.
+- **12-Hour Interval Scheduler**: Repeats complete diagnostic evaluations every 12 hours to capture daily planetary shifts and nakshatra-sublord changes.
+- **On-Login Real-Time Refresh**: Intercepts active profile retrieval endpoints (`/api/user-profile/get`), save actions (`/api/user-profile/save`), and creation requests (`/api/user-profile/act`), triggering a background update to regenerate transit parameters and log entries the split-second the user enters or modifies their chart.
+- **Rolling Chronological Event Logging**: Persists a historical array `eventsLog` tracking previously evaluated and triggered transits, maintaining up to 100 historical snapshots.
+- **Git Push Automation**: Stages, commits, and pushes updated static/dynamic analysis files directly to the remote repository (`git push origin main`) to ensure persistent tracking across server container cycles.
+
+
 

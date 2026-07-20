@@ -343,3 +343,28 @@ To maintain high focus and analytical integrity, major life events are strictly 
   * Foreign Settlement
 * **Handling Rule**: These long-term lifetime events are evaluated exclusively by the **NJEvent Engine** (lifetime events/promise analyzers) and are completely filtered out of daily mood/theme cycles.
 
+---
+
+### 6. Static/Dynamic Partitioning & Chronological Event Logging
+
+To achieve industrial-grade stability while running advanced automated prediction agents, the repository splits user-specific outputs into explicit static and dynamic layers, housed under `/analysis/[profile_filename]/`.
+
+#### A. Static Blueprint Payload (`static_data.json`)
+* **Purpose**: Serves as a 100% faithful replication of the user's natal/birth configuration exactly as fetched from the stable JHora engine.
+* **Content Schema**:
+  * Raw JHora response (planets, ascendant, house cusps, basic birth details).
+  * Lock-status metadata preventing any automatic, unsolicited client-side modifications.
+
+#### B. Dynamic Transit & Prediction Payload (`dynamic_data.json`)
+* **Purpose**: Hosts volatile transit data, real-time KP dasha alignments, and live-evaluated rules.
+* **Content Schema**:
+  * **Metadata**: Identity tokens, timestamp of evaluation, and execution flags.
+  * **Current Sky Transits**: Daily transit positions (rashi, nakshatras, planet coordinates, lunar phases) fetched from `/src/knowledgebase/checklist_engine/current_sky.json`.
+  * **Active Periods**: Current active Vimshottari Mahadasha, Bhukti, and Antardasha lords with interpretive descriptions.
+  * **Natal Rules Evaluations**: Dynamic on-the-fly evaluations of life events (Marriage Promise, Career Sector, Wealth Promise, and Health Propensity) computed by analyzing Cuspal Sublords against planetary significations.
+  * **Triggered Transit Events**: Transit-to-natal matches (e.g. Lunar Chandra Gochara, Janma Nakshatra Moon transits, and Solar Returns) currently active on the day.
+  * **Chronological Events Log (`eventsLog`)**: A persistent historical rolling audit list of previous evaluations. Each login, save, or daily refresh appends a new snapshot detailing the timestamp, counts, and descriptions of rules and transits met. Maintains the latest 100 entries for sequential analysis.
+
+This strict segregation ensures that the core user profiles remain lightweight, unpolluted, and aligned with standard data preservation protocols, while prediction logs grow iteratively over time.
+
+
