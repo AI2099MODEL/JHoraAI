@@ -3549,23 +3549,6 @@ export function MyPageView({
         </div>
       ) : activeTab === "table_index" ? (
         <div className="space-y-6">
-          <div className={`p-5 rounded-xl border ${containerStyle} shadow-sm space-y-3`}>
-            <div className="flex items-center justify-between border-b border-slate-500/10 pb-3 flex-wrap gap-2">
-              <div className="flex items-center gap-2">
-                <Database className="w-4 h-4 text-amber-500" />
-                <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
-                  Unified Master Evaluation Index (22 Tables)
-                </h3>
-              </div>
-              <span className="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/25 px-2 py-0.5 rounded font-mono font-bold uppercase">
-                Status: SYNC_ACTIVE
-              </span>
-            </div>
-            <p className={`text-xs leading-relaxed ${textMutedStyle}`}>
-              Below is the live registry of all 22 primary data tables computed by the JHora AI engine for your active profile. Each table is indexed, validated, and stored in your persistent user record.
-            </p>
-          </div>
-
           <div className="space-y-4">
             {(profile?.TableIndex?.tables || [
               {
@@ -3929,29 +3912,14 @@ export function MyPageView({
         </div>
       ) : activeTab === "dasha" ? (
         <div className="space-y-4">
-          <div className={`p-5 rounded-xl border ${containerStyle} shadow-sm space-y-4`}>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                  <Calendar className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
-                    Table 3: Vimshottari Dasha Timeline
-                  </h3>
-                  <p className={`text-[11px] ${textMutedStyle}`}>
-                    A 120-year planetary cycle mapping major life epochs, micro-trends, and active prana streams.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={downloadDashaCSV}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-all text-xs font-mono font-bold cursor-pointer select-none"
-              >
-                <FileDown className="w-3.5 h-3.5" />
-                <span>Download 50-Year Prana Dasha (CSV)</span>
-              </button>
-            </div>
+          <div className="flex justify-end">
+            <button
+              onClick={downloadDashaCSV}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-all text-xs font-mono font-bold cursor-pointer select-none"
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              <span>Download 50-Year Prana Dasha (CSV)</span>
+            </button>
           </div>
 
           {/* Dasha Tree View */}
@@ -4031,24 +3999,6 @@ export function MyPageView({
         </div>
       ) : activeTab === "vedic" ? (
         <div className="space-y-4">
-          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                  <Grid className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans text-amber-500`}>
-                    Vedic Data
-                  </h3>
-                  <p className={`text-[11px] ${textMutedStyle}`}>
-                    A comprehensive registry of natal planetary longitudes, sign placements, nakshatras, padas, and houses with computed astronomical dignities.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Table JH1: Birth Details */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
@@ -4229,25 +4179,6 @@ export function MyPageView({
         </div>
       ) : activeTab === "jaimini" ? (
         <div className="space-y-6">
-          {/* Header Card */}
-          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                  <Compass className="w-5 h-5 animate-spin-slow" />
-                </div>
-                <div>
-                  <h3 className={`text-base font-bold uppercase tracking-wider font-sans text-amber-500`}>
-                    Jaimini Astrological & Planetary Strength Matrix
-                  </h3>
-                  <p className={`text-[11px] ${textMutedStyle}`}>
-                    A comprehensive analysis of Sage Jaimini's Chara Karakas, Arudhas, Argalas, and computed Shadbala strengths.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Top Section: Chara Karakas & Core Jaimini Coordinates */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Left Column: Chara Karakas */}
@@ -4492,25 +4423,6 @@ export function MyPageView({
         </div>
       ) : activeTab === "kp" ? (
         <div className="space-y-6">
-          {/* Header Card */}
-          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-            <div className="flex items-center justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded bg-cyan-500/10 text-cyan-500 border border-cyan-500/20">
-                  <Activity className="w-5 h-5 animate-spin-slow" />
-                </div>
-                <div>
-                  <h3 className={`text-base font-bold uppercase tracking-wider font-sans text-cyan-400`}>
-                    Krishnamurti Paddhati (KP) Stellar Division System
-                  </h3>
-                  <p className={`text-[11px] ${textMutedStyle}`}>
-                    A high-precision sub-lord based astrological system using Placidus house division and 249 stellar subdivisions.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Table JH8: KP Placidus Cusps */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
@@ -4721,25 +4633,6 @@ export function MyPageView({
 
           return (
             <div className="space-y-6">
-              {/* Header Card */}
-              <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded bg-red-500/10 text-red-500 border border-red-500/20">
-                      <Sparkles className="w-5 h-5 animate-pulse" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold uppercase tracking-wider font-sans text-red-400">
-                        Lal Kitab (Red Book) Astrological System
-                      </h3>
-                      <p className={`text-[11px] ${textMutedStyle}`}>
-                        Fixed Aries Ascendant house mappings, dormancy states, and authentic Urdu-Persian metrics.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Core Metrics: Promise, Happiness, Delay Risk */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Promise Score */}
@@ -5156,52 +5049,34 @@ export function MyPageView({
 
           return (
             <div className="space-y-6">
-              <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">
-                      <Sparkles className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold uppercase tracking-wider font-sans text-indigo-400">
-                        Tajik Varshaphala (Solar Return)
-                      </h3>
-                      <p className={`text-[11px] ${textMutedStyle}`}>
-                        Persian-Arabic progression charting evaluated for a target age.
-                      </p>
-                    </div>
-                  </div>
+              <div className="flex justify-end gap-2 flex-wrap">
+                <div className="flex items-center gap-1 bg-slate-500/5 p-1 rounded-lg border border-slate-500/10 text-[10px] font-bold">
+                  <button
+                    onClick={() => setTajikSubTab("relationship")}
+                    className={`px-2 py-1 rounded transition-all cursor-pointer ${
+                      tajikSubTab === "relationship" ? "bg-indigo-500 text-slate-950" : "text-slate-400"
+                    }`}
+                  >
+                    Relationship Engine
+                  </button>
+                  <button
+                    onClick={() => setTajikSubTab("solarReturn")}
+                    className={`px-2 py-1 rounded transition-all cursor-pointer ${
+                      tajikSubTab === "solarReturn" ? "bg-indigo-500 text-slate-950" : "text-slate-400"
+                    }`}
+                  >
+                    Solar Return
+                  </button>
+                </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className="flex items-center gap-1 bg-slate-500/5 p-1 rounded-lg border border-slate-500/10 text-[10px] font-bold">
-                      <button
-                        onClick={() => setTajikSubTab("relationship")}
-                        className={`px-2 py-1 rounded transition-all cursor-pointer ${
-                          tajikSubTab === "relationship" ? "bg-indigo-500 text-slate-950" : "text-slate-400"
-                        }`}
-                      >
-                        Relationship Engine
-                      </button>
-                      <button
-                        onClick={() => setTajikSubTab("solarReturn")}
-                        className={`px-2 py-1 rounded transition-all cursor-pointer ${
-                          tajikSubTab === "solarReturn" ? "bg-indigo-500 text-slate-950" : "text-slate-400"
-                        }`}
-                      >
-                        Solar Return
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-1.5 bg-slate-500/5 px-2 py-1 rounded border border-slate-500/10 text-[10px] font-bold">
-                      <span>Target Age:</span>
-                      <input
-                        type="number"
-                        value={tajikTargetAge}
-                        onChange={(e) => setTajikTargetAge(Math.max(1, parseInt(e.target.value) || 1))}
-                        className="w-10 bg-transparent text-center border-b border-indigo-500/30 text-indigo-400 font-mono focus:outline-none"
-                      />
-                    </div>
-                  </div>
+                <div className="flex items-center gap-1.5 bg-slate-500/5 px-2 py-1 rounded border border-slate-500/10 text-[10px] font-bold">
+                  <span>Target Age:</span>
+                  <input
+                    type="number"
+                    value={tajikTargetAge}
+                    onChange={(e) => setTajikTargetAge(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-10 bg-transparent text-center border-b border-indigo-500/30 text-indigo-400 font-mono focus:outline-none"
+                  />
                 </div>
               </div>
 
@@ -5394,20 +5269,6 @@ export function MyPageView({
 
           return (
             <div className="space-y-6">
-              <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-2`}>
-                <div className="flex items-center gap-2">
-                  <div className="p-1 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                    <Sparkles className="w-4 h-4 animate-pulse" />
-                  </div>
-                  <h3 className="text-sm font-bold uppercase tracking-wider font-sans text-emerald-500">
-                    Chinese BaZi (The Four Pillars of Destiny)
-                  </h3>
-                </div>
-                <p className={`text-[11px] ${textMutedStyle}`}>
-                  Mapping birth alignment coordinates to Year, Month, Day, and Hour cosmic streams.
-                </p>
-              </div>
-
               {/* Pillars Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
@@ -5576,20 +5437,6 @@ export function MyPageView({
 
           return (
             <div className="space-y-6">
-              <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-2`}>
-                <div className="flex items-center gap-2">
-                  <div className="p-1 rounded bg-sky-500/10 text-sky-500 border border-sky-500/20">
-                    <Sparkles className="w-4 h-4 animate-pulse" />
-                  </div>
-                  <h3 className="text-sm font-bold uppercase tracking-wider font-sans text-sky-500">
-                    Western Tropical Placidus Astrology
-                  </h3>
-                </div>
-                <p className={`text-[11px] ${textMutedStyle}`}>
-                  High-fidelity Western alignment chart plotting tropical planetary nodes and Placidus houses.
-                </p>
-              </div>
-
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* SVG Chart Wheel */}
                 <div className={`p-6 border rounded-xl ${cardStyle} flex flex-col items-center justify-center`}>
