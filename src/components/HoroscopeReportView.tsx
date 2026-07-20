@@ -5207,7 +5207,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         )}
 
         {/* ================= SYSTEM 1: BIRTH PARTICULARS & PANCHANGA ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && ["table_1", "panchanga"].includes(vedicSubTab))) && (
           <div id="report-section-1" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
             
@@ -5352,7 +5352,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 2: VEDIC DIVISIONAL CHARTS & VARGAS MATRIX ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "divisionalCharts")) && (
           <div id="report-section-2" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-indigo-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl" />
             
@@ -5531,7 +5531,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 3: VEDIC PLANETARY POSITIONS ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && ["table_2", "special_lagnas", "sphutas", "upagrahas", "sahams"].includes(vedicSubTab))) && (
           <div id="report-section-3" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-emerald-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl" />
             
@@ -5622,7 +5622,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 4: PLANETARY & BHAVA BALAS ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && ["shadBala", "ishtaPhala", "bhavaBala"].includes(vedicSubTab))) && (
           <div id="report-section-4" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-orange-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl" />
             
@@ -5726,7 +5726,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 5: ASHTAKAVARGA BINDUS MATRIX ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "ashtakavarga")) && (
           <div id="report-section-5" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
@@ -5780,7 +5780,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 6: PLANETARY ARGALAS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_10")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && (vedicSubTab === "table_10" || vedicSubTab === "argalas"))) && (
           <div id="report-section-6" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
@@ -5861,7 +5861,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 7: JAIMINI SUTRAS & CHARA DASHAS ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && ["jaimini", "arudhas", "charaDasha"].includes(vedicSubTab))) && (
           <div id="report-section-7" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
             
@@ -5953,7 +5953,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 7 (KP): KRISHNAMURTI PADDHATI (KP) ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_6")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && (vedicSubTab === "table_6" || vedicSubTab.startsWith("kp_")))) && (
           <div id="report-section-7_kp" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
@@ -7201,7 +7201,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         )}
 
         {/* ================= SYSTEM 8: PLANET TO HOUSE SIGNIFICATOR MAPPINGS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_7")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && (vedicSubTab === "table_7" || vedicSubTab === "kp_planet_to_house"))) && (
           <div id="report-section-8" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-cyan-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl" />
             
@@ -7644,7 +7644,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         )}
 
         {/* ================= SYSTEM 9: WESTERN TROPICAL ASTROLOGY ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_8")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && (vedicSubTab === "table_8" || vedicSubTab === "westernTropical"))) && (
           <div id="report-section-9" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-purple-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl" />
             
@@ -7748,7 +7748,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 10: ESOTERIC & ALTERNATIVE MYSTICAL SYSTEMS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_9")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && (vedicSubTab === "table_9" || ["panchapakshi", "lalkitab", "gemstones", "numerology", "mysticalSystems"].includes(vedicSubTab)))) && (
           <div id="report-section-10" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-pink-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/5 rounded-full blur-2xl" />
             
@@ -7904,7 +7904,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 11: VIMSHOTTARI, YOGINI & ASHTOTTARI DASHAS ================= */}
-        {showAllAstroSystems && (
+        {(showAllAstroSystems || (majorTab === "jhora" && ["table_3", "table_4", "table_5"].includes(vedicSubTab))) && (
           <div id="report-section-11" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-teal-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full blur-2xl" />
             
@@ -7997,7 +7997,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 12: YOGAS & DOSHAS ANALYSIS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_11")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && ["table_11", "yogas", "doshas", "sadeSati"].includes(vedicSubTab))) && (
           <div id="report-section-12" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-rose-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 rounded-full blur-2xl" />
             
@@ -8066,7 +8066,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       )}
 
         {/* ================= SYSTEM 13: TRADITIONAL LIFE PATHWAYS ================= */}
-        {(showAllAstroSystems || (majorTab === "jhora" && vedicSubTab === "table_12")) && (
+        {(showAllAstroSystems || (majorTab === "jhora" && ["table_12", "longevity"].includes(vedicSubTab))) && (
           <div id="report-section-13" className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
             

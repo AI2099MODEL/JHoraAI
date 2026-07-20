@@ -1852,6 +1852,52 @@ export default function App() {
     return plugin ? plugin.status === "Active" : false;
   };
 
+  const gpsClockWidget = (
+    <div className={`flex items-center gap-2 sm:gap-3 border rounded-xl px-2.5 py-1.5 text-xs shrink-0 ${
+      isDark ? "bg-slate-900/40 border-indigo-500/10" : "bg-neutral-50/80 border-neutral-200"
+    }`}>
+      {/* Date & Time */}
+      <div className="flex items-center gap-1 sm:gap-1.5 font-medium">
+        <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+        <span className={`hidden md:inline ${isDark ? "text-slate-300" : "text-neutral-700"}`}>
+          {currentDateTime.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+        </span>
+        <span className={`hidden md:inline mx-1 text-slate-400 ${isDark ? "opacity-30" : "opacity-50"}`}>|</span>
+        <span className="font-mono text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider text-[11px] sm:text-xs">
+          {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+        </span>
+      </div>
+      
+      {/* Separator */}
+      <div className={`h-4 border-l ${isDark ? "border-indigo-500/15" : "border-neutral-200"}`} />
+      
+      {/* GPS Location */}
+      <button
+        onClick={fetchHeaderGps}
+        className="flex items-center gap-1 sm:gap-1.5 hover:text-indigo-500 transition-colors cursor-pointer group shrink-0 animate-fade-in"
+        title="Click to refresh GPS location"
+      >
+        <MapPin className={`w-3.5 h-3.5 group-hover:scale-110 transition-transform ${
+          headerGps.loading ? "text-amber-500 animate-pulse" : "text-indigo-500"
+        }`} />
+        {headerGps.loading ? (
+          <span className="text-[10px] text-slate-400 animate-pulse hidden xs:inline">Acquiring...</span>
+        ) : headerGps.error ? (
+          <span className="text-[10px] text-rose-500 font-medium">GPS Off</span>
+        ) : headerGps.address ? (
+          <span className={`text-[11px] font-semibold tracking-tight truncate max-w-[100px] sm:max-w-[150px] ${isDark ? "text-slate-300" : "text-neutral-700"}`}>
+            {headerGps.address}
+          </span>
+        ) : (
+          <span className="text-[10px] text-slate-400 group-hover:text-indigo-500">GPS</span>
+        )}
+        <RefreshCw className={`w-2.5 h-2.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity ${
+          headerGps.loading ? "animate-spin opacity-100" : ""
+        }`} />
+      </button>
+    </div>
+  );
+
   return (
     <div 
       className={`min-h-screen flex flex-col transition-colors duration-300 ${
@@ -1865,55 +1911,62 @@ export default function App() {
       <ThemeStyles />
       
       {/* HEADER BAR */}
-      <header className={`border-b backdrop-blur-md sticky top-0 z-50 py-3.5 px-6 transition-colors ${
+      <header className={`border-b backdrop-blur-md sticky top-0 z-50 py-3 px-4 sm:px-6 transition-colors ${
         isDark ? "border-indigo-500/10 bg-slate-950/80" : "border-neutral-200 bg-white/80"
       }`}>
-        <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-4">
           
-          {/* Logo Brand */}
-          <div className="flex items-center gap-3">
-            <button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl border border-transparent hover:bg-slate-500/10 transition-colors cursor-pointer"
-            >
-              <Menu className="w-5 h-5 text-amber-500" />
-            </button>
-            <div className="bg-gradient-to-br from-amber-500 to-indigo-600 p-2 rounded-xl shadow-lg shadow-amber-500/5 shrink-0">
-              <span className="text-lg font-bold font-mono text-slate-950 leading-none block select-none">ॐ</span>
+          {/* Logo Brand / Top line on mobile/tablet */}
+          <div className="flex items-center justify-between w-full lg:w-auto gap-4">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="md:hidden p-1.5 rounded-xl border border-transparent hover:bg-slate-500/10 transition-colors cursor-pointer"
+              >
+                <Menu className="w-5 h-5 text-amber-500" />
+              </button>
+              <div className="bg-gradient-to-br from-amber-500 to-indigo-600 p-2 rounded-xl shadow-lg shadow-amber-500/5 shrink-0">
+                <span className="text-base sm:text-lg font-bold font-mono text-slate-950 leading-none block select-none">ॐ</span>
+              </div>
+              <div>
+                <h1 className="text-xs sm:text-sm md:text-base font-sans font-semibold tracking-tight flex items-center gap-1.5 sm:gap-2">
+                  <span className={isDark ? "text-amber-100" : "text-neutral-800"}>JHora AI</span>
+                  <span className="text-[8px] sm:text-[9px] uppercase font-mono font-bold tracking-widest px-1.5 py-0.5 bg-amber-500/15 text-amber-500 rounded-md border border-amber-500/20">
+                    Professional
+                  </span>
+                  {isOnline ? (
+                    <span className="hidden sm:flex text-[8px] sm:text-[9px] items-center gap-1 uppercase font-mono font-bold tracking-wider px-1.5 py-0.5 bg-green-500/10 text-green-500 rounded-md border border-green-500/20">
+                      <Wifi className="w-2.5 h-2.5" />
+                      Online
+                    </span>
+                  ) : (
+                    <span className="hidden sm:flex text-[8px] sm:text-[9px] items-center gap-1 uppercase font-mono font-bold tracking-wider px-1.5 py-0.5 bg-rose-500/10 text-rose-500 rounded-md border border-rose-500/20">
+                      <WifiOff className="w-2.5 h-2.5" />
+                      Offline
+                    </span>
+                  )}
+                </h1>
+                <p className={`text-[8px] sm:text-[9px] font-mono mt-0.5 uppercase tracking-wider ${isDark ? "text-slate-500" : "text-neutral-400"}`}>
+                  Advanced Jyotish Computational Intelligence
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-sm sm:text-base font-sans font-medium tracking-tight flex items-center gap-2">
-                <span className={isDark ? "text-amber-100" : "text-neutral-800"}>JHora AI</span>
-                <span className="text-[9px] uppercase font-mono font-bold tracking-widest px-1.5 py-0.5 bg-amber-500/15 text-amber-500 rounded-md border border-amber-500/20">
-                  Professional
-                </span>
-                {isOnline ? (
-                  <span className="hidden sm:flex text-[9px] items-center gap-1 uppercase font-mono font-bold tracking-wider px-1.5 py-0.5 bg-green-500/10 text-green-500 rounded-md border border-green-500/20">
-                    <Wifi className="w-2.5 h-2.5" />
-                    Online
-                  </span>
-                ) : (
-                  <span className="hidden sm:flex text-[9px] items-center gap-1 uppercase font-mono font-bold tracking-wider px-1.5 py-0.5 bg-rose-500/10 text-rose-500 rounded-md border border-rose-500/20">
-                    <WifiOff className="w-2.5 h-2.5" />
-                    Offline (Cache Active)
-                  </span>
-                )}
-              </h1>
-              <p className={`text-[9px] font-mono mt-0.5 uppercase tracking-wider ${isDark ? "text-slate-500" : "text-neutral-400"}`}>
-                Advanced Jyotish Computational Intelligence
-              </p>
+
+            {/* GPS & Live DateTime Widget (Shown on top-right for Mobile/Tablet) */}
+            <div className="lg:hidden shrink-0">
+              {gpsClockWidget}
             </div>
           </div>
 
-          {/* Global App-Level Selectors & Controls */}
-          <div className="flex items-center gap-4 flex-wrap">
+          {/* Global App-Level Selectors & Controls (Horizontal line with scrolling on super narrow screens) */}
+          <div className="flex items-center justify-start lg:justify-center gap-3 sm:gap-4 overflow-x-auto scrollbar-none py-1.5 w-full lg:w-auto flex-nowrap">
             {/* Active Profile Selector */}
-            <div className="flex items-center gap-1.5">
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Active Profile:</span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Active Profile:</span>
               <select
                 value={astrologyData?.birthDetails?.name || "Nitin"}
                 onChange={(e) => handleLoadProfileByName(e.target.value)}
-                className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
+                className={`text-[11px] sm:text-xs font-semibold rounded-lg px-2 py-1 sm:px-2.5 sm:py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
                   isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
                 }`}
               >
@@ -1925,8 +1978,8 @@ export default function App() {
             </div>
 
             {/* Chart Style Selector */}
-            <div className="flex items-center gap-1.5">
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Chart:</span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Chart:</span>
               <select
                 value={chartStyle}
                 onChange={(e) => {
@@ -1934,7 +1987,7 @@ export default function App() {
                   setChartStyle(val);
                   localStorage.setItem("jhora_chart_style", val);
                 }}
-                className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
+                className={`text-[11px] sm:text-xs font-semibold rounded-lg px-2 py-1 sm:px-2.5 sm:py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
                   isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
                 }`}
               >
@@ -1944,8 +1997,8 @@ export default function App() {
             </div>
 
             {/* Multi-Theme Selector */}
-            <div className="flex items-center gap-1.5">
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-neutral-400"}`}>Theme:</span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : "text-neutral-400"}`}>Theme:</span>
               <select
                 value={theme}
                 onChange={(e) => {
@@ -1953,7 +2006,7 @@ export default function App() {
                   setTheme(val);
                   localStorage.setItem("jhora_theme", val);
                 }}
-                className={`text-xs font-semibold rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
+                className={`text-[11px] sm:text-xs font-semibold rounded-lg px-2 py-1 sm:px-2.5 sm:py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
                   isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : "bg-neutral-50 border-neutral-200 text-neutral-800"
                 }`}
               >
@@ -1965,49 +2018,9 @@ export default function App() {
             </div>
           </div>
 
-          {/* GPS & Live DateTime Widget */}
-          <div className={`flex items-center gap-2 sm:gap-3 border rounded-xl px-2.5 py-1.5 text-xs ${
-            isDark ? "bg-slate-900/40 border-indigo-500/10" : "bg-neutral-50/80 border-neutral-200"
-          }`}>
-            {/* Date & Time */}
-            <div className="flex items-center gap-1 sm:gap-1.5 font-medium">
-              <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-              <span className={`hidden md:inline ${isDark ? "text-slate-300" : "text-neutral-700"}`}>
-                {currentDateTime.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-              </span>
-              <span className={`hidden md:inline mx-1 text-slate-400 ${isDark ? "opacity-30" : "opacity-50"}`}>|</span>
-              <span className="font-mono text-indigo-600 dark:text-indigo-400 font-semibold tracking-wider text-[11px] sm:text-xs">
-                {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-              </span>
-            </div>
-            
-            {/* Separator */}
-            <div className={`h-4 border-l ${isDark ? "border-indigo-500/15" : "border-neutral-200"}`} />
-            
-            {/* GPS Location */}
-            <button
-              onClick={fetchHeaderGps}
-              className="flex items-center gap-1 sm:gap-1.5 hover:text-indigo-500 transition-colors cursor-pointer group shrink-0 animate-fade-in"
-              title="Click to refresh GPS location"
-            >
-              <MapPin className={`w-3.5 h-3.5 group-hover:scale-110 transition-transform ${
-                headerGps.loading ? "text-amber-500 animate-pulse" : "text-indigo-500"
-              }`} />
-              {headerGps.loading ? (
-                <span className="text-[10px] text-slate-400 animate-pulse hidden xs:inline">Acquiring...</span>
-              ) : headerGps.error ? (
-                <span className="text-[10px] text-rose-500 font-medium">GPS Off</span>
-              ) : headerGps.address ? (
-                <span className={`text-[11px] font-semibold tracking-tight truncate max-w-[100px] sm:max-w-[150px] ${isDark ? "text-slate-300" : "text-neutral-700"}`}>
-                  {headerGps.address}
-                </span>
-              ) : (
-                <span className="text-[10px] text-slate-400 group-hover:text-indigo-500">GPS</span>
-              )}
-              <RefreshCw className={`w-2.5 h-2.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity ${
-                headerGps.loading ? "animate-spin opacity-100" : ""
-              }`} />
-            </button>
+          {/* GPS & Live DateTime Widget (Shown on far-right for Desktop only) */}
+          <div className="hidden lg:flex shrink-0">
+            {gpsClockWidget}
           </div>
         </div>
       </header>
