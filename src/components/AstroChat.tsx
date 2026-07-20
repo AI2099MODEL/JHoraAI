@@ -203,7 +203,7 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-4 px-4 sm:px-6 space-y-4">
+    <div className="w-full max-w-6xl mx-auto py-4 px-4 sm:px-6 space-y-4">
       {/* HEADER SECTION (Compact layout, small fonts) */}
       <div className="flex items-center justify-between border-b border-slate-800/50 pb-3">
         <div>
@@ -223,187 +223,198 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
         </div>
       </div>
 
-      {/* LIFE-CENTRIC SELECTABLE PILLS */}
-      <div className="space-y-2">
-        <span className="block text-[9px] text-slate-400 font-bold font-mono uppercase tracking-wider">
-          Query My Life Indicators Today:
-        </span>
-        <div className="flex flex-wrap gap-1.5">
-          {quickPrompts.map((prompt) => {
-            const IconComponent = prompt.icon;
-            const isSelected = selectedPrompt === prompt.title;
-            return (
-              <button
-                key={prompt.title}
-                type="button"
-                disabled={analysisLoading}
-                onClick={() => {
-                  setInput("");
-                  if (prompt.title === "Daily Life & Mood Synthesis") {
-                    setSelectedPrompt(prompt.title);
-                    setAnalysisResult(defaultSampleResult);
-                  } else {
-                    runAnalysis(prompt.query, prompt.title);
+      {/* TWO-COLUMN GRID LAYOUT */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* LEFT COLUMN: Prompts & Input Form (Spans 5 cols on lg) */}
+        <div className="lg:col-span-5 space-y-4">
+          {/* LIFE-CENTRIC SELECTABLE PILLS */}
+          <div className="space-y-2">
+            <span className="block text-[9px] text-slate-400 font-bold font-mono uppercase tracking-wider">
+              Query My Life Indicators Today:
+            </span>
+            <div className="flex flex-col gap-2">
+              {quickPrompts.map((prompt) => {
+                const IconComponent = prompt.icon;
+                const isSelected = selectedPrompt === prompt.title;
+                return (
+                  <button
+                    key={prompt.title}
+                    type="button"
+                    disabled={analysisLoading}
+                    onClick={() => {
+                      setInput("");
+                      if (prompt.title === "Daily Life & Mood Synthesis") {
+                        setSelectedPrompt(prompt.title);
+                        setAnalysisResult(defaultSampleResult);
+                      } else {
+                        runAnalysis(prompt.query, prompt.title);
+                      }
+                    }}
+                    className={`flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-xl border text-[10px] font-semibold tracking-wide transition-all cursor-pointer ${
+                      isSelected
+                        ? "bg-[#5c4df2]/20 border-[#5c4df2] text-white shadow-lg shadow-indigo-500/5"
+                        : "bg-slate-950/40 border-slate-900 hover:border-slate-800 text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    <IconComponent className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span className="truncate">{prompt.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* COMPACT CUSTOM QUESTION FORM */}
+          <form onSubmit={handleCustomSubmit} className="space-y-2">
+            <span className="block text-[9px] text-slate-400 font-bold font-mono uppercase tracking-wider">
+              Ask a Custom Question:
+            </span>
+            <div className="relative rounded-xl border border-slate-800 bg-slate-950/40 focus-within:border-indigo-500/40 transition-all overflow-hidden">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleCustomSubmit(e);
                   }
                 }}
-                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-[10px] font-semibold tracking-wide transition-all cursor-pointer ${
-                  isSelected
-                    ? "bg-[#5c4df2]/20 border-[#5c4df2] text-white"
-                    : "bg-slate-950/60 border-slate-800/80 hover:border-slate-700 text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                <IconComponent className="w-3 h-3 text-amber-500" />
-                <span>{prompt.title}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* COMPACT CUSTOM QUESTION FORM */}
-      <form onSubmit={handleCustomSubmit} className="space-y-2">
-        <div className="relative rounded-xl border border-slate-800 bg-slate-950/60 focus-within:border-indigo-500/50 transition-all overflow-hidden">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleCustomSubmit(e);
-              }
-            }}
-            rows={2}
-            placeholder="Ask anything regarding your career, transit impact, wealth houses, or remedies..."
-            disabled={analysisLoading}
-            className="w-full bg-transparent border-none outline-none p-2.5 pr-10 text-[11px] leading-relaxed text-slate-200 placeholder-slate-500 resize-none min-h-[50px]"
-          />
-          
-          <div className="absolute right-2 bottom-2 flex items-center">
-            <button
-              type="submit"
-              disabled={analysisLoading || !input.trim()}
-              className="p-1.5 bg-[#5c4df2] hover:bg-[#4b3de0] disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-lg transition-all cursor-pointer"
-            >
-              <Send className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
-      </form>
-
-      {/* DEDICATED RESULTS ANALYSIS CARD */}
-      <div ref={analysisRef} className="pt-1">
-        {analysisLoading && (
-          <div className="p-6 border border-indigo-500/10 rounded-xl bg-slate-950/40 backdrop-blur-md flex flex-col items-center justify-center gap-3 text-center min-h-[160px]">
-            <RefreshCw className="w-5 h-5 text-[#5c4df2] animate-spin" />
-            <div className="space-y-0.5">
-              <h5 className="text-[10px] font-bold text-slate-200 uppercase tracking-wide">
-                Computing {selectedPrompt}...
-              </h5>
-              <p className="text-[9px] text-slate-500 font-mono animate-pulse">
-                {currentStatusMsg}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {!analysisLoading && analysisResult && (
-          <div className="border border-amber-500/15 rounded-xl bg-slate-900/30 backdrop-blur-md overflow-hidden relative animate-fade-in flex flex-col">
-            {/* Top accent line */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-violet-600 via-amber-500 to-[#5c4df2]" />
-            
-            <div className="p-4 space-y-3">
-              {/* Header */}
-              <div className="flex justify-between items-center gap-2">
-                <div className="space-y-0.5">
-                  <div className="text-[8px] text-amber-500 font-bold font-mono uppercase tracking-widest">
-                    <span>Celestial Report</span>
-                  </div>
-                  <h4 className="text-[11px] font-bold text-slate-200 tracking-wide uppercase">
-                    {selectedPrompt}
-                  </h4>
-                </div>
-                
+                rows={3}
+                placeholder="Ask anything regarding your career, transit impact, wealth houses, or remedies..."
+                disabled={analysisLoading}
+                className="w-full bg-transparent border-none outline-none p-2.5 pr-10 text-[11px] leading-relaxed text-slate-200 placeholder-slate-500 resize-none min-h-[60px]"
+              />
+              
+              <div className="absolute right-2 bottom-2 flex items-center">
                 <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedPrompt(null);
-                    setAnalysisResult(null);
-                  }}
-                  className="px-1.5 py-0.5 text-[8px] font-bold font-mono uppercase rounded border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                  type="submit"
+                  disabled={analysisLoading || !input.trim()}
+                  className="p-1.5 bg-[#5c4df2] hover:bg-[#4b3de0] disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-lg transition-all cursor-pointer"
                 >
-                  Clear
+                  <Send className="w-3 h-3" />
                 </button>
               </div>
+            </div>
+          </form>
+        </div>
 
-              {/* Text Content */}
-              <div className="p-3.5 rounded-lg bg-slate-950/80 border border-slate-850 text-[11px] leading-relaxed text-slate-300 font-sans overflow-y-auto max-h-[360px] scrollbar-thin">
-                <div className="whitespace-pre-wrap space-y-1.5">
-                  {analysisResult.split("\n").map((line, lineIdx) => {
-                    if (line.startsWith("### ")) {
-                      return <h5 key={lineIdx} className="text-[11px] font-bold text-amber-200 mt-2 mb-0.5">{line.replace("### ", "")}</h5>;
-                    }
-                    if (line.startsWith("## ")) {
-                      return <h4 key={lineIdx} className="text-[12px] font-bold text-amber-300 mt-3 mb-1">{line.replace("## ", "")}</h4>;
-                    }
-                    if (line.startsWith("# ")) {
-                      return <h3 key={lineIdx} className="text-xs font-bold text-amber-400 mt-3 mb-1">{line.replace("# ", "")}</h3>;
-                    }
-                    const bolded = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-                    return (
-                      <p
-                        key={lineIdx}
-                        className="mb-1"
-                        dangerouslySetInnerHTML={{ __html: bolded }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/40">
-                <p className="text-[8px] text-slate-500 font-mono">
-                  Synthesized with live Moon transit & active Vimshottari Mahadasha.
+        {/* RIGHT COLUMN: Dedicated Results Analysis (Spans 7 cols on lg) */}
+        <div ref={analysisRef} className="lg:col-span-7 space-y-4">
+          {analysisLoading && (
+            <div className="p-6 border border-indigo-500/10 rounded-xl bg-slate-950/40 backdrop-blur-md flex flex-col items-center justify-center gap-3 text-center min-h-[300px]">
+              <RefreshCw className="w-5 h-5 text-[#5c4df2] animate-spin" />
+              <div className="space-y-0.5">
+                <h5 className="text-[10px] font-bold text-slate-200 uppercase tracking-wide">
+                  Computing {selectedPrompt}...
+                </h5>
+                <p className="text-[9px] text-slate-500 font-mono animate-pulse">
+                  {currentStatusMsg}
                 </p>
+              </div>
+            </div>
+          )}
 
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={copyToClipboard}
-                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold rounded border border-slate-800 bg-slate-900/60 text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all cursor-pointer"
-                  >
-                    {copied ? (
-                      <>
-                        <Check className="w-2.5 h-2.5 text-emerald-400" />
-                        <span className="text-emerald-400 text-[9px]">Copied</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-2.5 h-2.5" />
-                        <span>Copy</span>
-                      </>
-                    )}
-                  </button>
+          {!analysisLoading && analysisResult && (
+            <div className="border border-amber-500/15 rounded-xl bg-slate-900/30 backdrop-blur-md overflow-hidden relative animate-fade-in flex flex-col min-h-[300px]">
+              {/* Top accent line */}
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-violet-600 via-amber-500 to-[#5c4df2]" />
+              
+              <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                <div className="space-y-3 flex-1 flex flex-col">
+                  {/* Header */}
+                  <div className="flex justify-between items-center gap-2">
+                    <div className="space-y-0.5">
+                      <div className="text-[8px] text-amber-500 font-bold font-mono uppercase tracking-widest">
+                        <span>Celestial Report</span>
+                      </div>
+                      <h4 className="text-[11px] font-bold text-slate-200 tracking-wide uppercase">
+                        {selectedPrompt}
+                      </h4>
+                    </div>
+                    
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPrompt(null);
+                        setAnalysisResult(null);
+                      }}
+                      className="px-1.5 py-0.5 text-[8px] font-bold font-mono uppercase rounded border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={downloadAnalysisText}
-                    className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold rounded border border-[#5c4df2]/20 bg-[#5c4df2]/10 text-[#7c6ff6] hover:bg-[#5c4df2]/20 hover:text-white transition-all cursor-pointer"
-                  >
-                    <Download className="w-2.5 h-2.5" />
-                    <span>Download</span>
-                  </button>
+                  {/* Text Content */}
+                  <div className="p-3.5 rounded-lg bg-slate-950/80 border border-slate-850 text-[11px] leading-relaxed text-slate-300 font-sans overflow-y-auto max-h-[380px] flex-1 scrollbar-thin">
+                    <div className="whitespace-pre-wrap space-y-1.5">
+                      {analysisResult.split("\n").map((line, lineIdx) => {
+                        if (line.startsWith("### ")) {
+                          return <h5 key={lineIdx} className="text-[11px] font-bold text-amber-200 mt-2 mb-0.5">{line.replace("### ", "")}</h5>;
+                        }
+                        if (line.startsWith("## ")) {
+                          return <h4 key={lineIdx} className="text-[12px] font-bold text-amber-300 mt-3 mb-1">{line.replace("## ", "")}</h4>;
+                        }
+                        if (line.startsWith("# ")) {
+                          return <h3 key={lineIdx} className="text-xs font-bold text-amber-400 mt-3 mb-1">{line.replace("# ", "")}</h3>;
+                        }
+                        const bolded = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+                        return (
+                          <p
+                            key={lineIdx}
+                            className="mb-1"
+                            dangerouslySetInnerHTML={{ __html: bolded }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/40">
+                  <p className="text-[8px] text-slate-500 font-mono">
+                    Synthesized with live Moon transit & active Vimshottari Mahadasha.
+                  </p>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={copyToClipboard}
+                      className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold rounded border border-slate-800 bg-slate-900/60 text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all cursor-pointer"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-2.5 h-2.5 text-emerald-400" />
+                          <span className="text-emerald-400 text-[9px]">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-2.5 h-2.5" />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={downloadAnalysisText}
+                      className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold rounded border border-[#5c4df2]/20 bg-[#5c4df2]/10 text-[#7c6ff6] hover:bg-[#5c4df2]/20 hover:text-white transition-all cursor-pointer"
+                    >
+                      <Download className="w-2.5 h-2.5" />
+                      <span>Download</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {!analysisLoading && !analysisResult && (
-          <div className="p-6 border border-slate-800 border-dashed rounded-xl bg-slate-950/10 text-center text-slate-500 text-[10px]">
-            Select any personal query badge above or ask a custom question regarding your daily status.
-          </div>
-        )}
+          {!analysisLoading && !analysisResult && (
+            <div className="p-6 border border-slate-800 border-dashed rounded-xl bg-slate-950/10 text-center text-slate-500 text-[10px] min-h-[300px] flex flex-col justify-center items-center">
+              <span>Select any personal query badge on the left or ask a custom question regarding your daily status.</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

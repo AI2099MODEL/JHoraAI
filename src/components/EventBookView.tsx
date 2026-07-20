@@ -23,7 +23,8 @@ import {
   CheckCircle,
   HelpCircle,
   FileText,
-  RefreshCw
+  RefreshCw,
+  Compass
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { runNJEngine, NJEngineResult } from "../lib/njEngine";
