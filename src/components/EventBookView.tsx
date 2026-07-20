@@ -507,6 +507,7 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
   const [isLoadingRules, setIsLoadingRules] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
+  const [activeEventBookSection, setActiveEventBookSection] = useState<string>("summary");
 
   const fetchAgentRules = async () => {
     setIsLoadingRules(true);
@@ -976,55 +977,443 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
         </div>
       </div>
 
-      {/* DAILY HOROSCOPE ENGINE (KP ONLY) SPECIFICATION */}
-      <div className="p-5 rounded-2xl border border-indigo-500/20 bg-indigo-500/5 space-y-4">
-        <div className="flex items-center gap-2 pb-2.5 border-b border-indigo-500/10">
-          <Activity className="w-4 h-4 text-indigo-400" />
-          <div>
-            <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
-              DAILY HOROSCOPE ENGINE Specification (KP ONLY)
-            </h4>
-            <p className="text-[10px] text-slate-400 font-sans">
-              Registered Architecture & Flow Blueprint • Status: Documented & Registered (Do Not Run Now)
-            </p>
+      {/* KP SYSTEM MASTER EVENT BOOK SPECIFICATION */}
+      <div className="p-6 rounded-2xl border border-amber-500/30 bg-slate-900/40 space-y-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-800 gap-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-amber-500/10 rounded-xl border border-amber-500/20">
+              <BookOpen className="w-5 h-5 text-amber-500" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-slate-100 uppercase tracking-wider font-mono">
+                KP SYSTEM MASTER EVENT BOOK
+              </h4>
+              <p className="text-[11px] text-amber-400 font-mono">
+                Single Source of Truth Reference Database & Live Transit-Convergence Forecast Engine
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase">
+              Engine Standard v2.1
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase">
+              Unified Schema
+            </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans">
-          {/* Inputs Column */}
-          <div className="space-y-2 border-r border-indigo-500/5 pr-2">
-            <span className="text-[10px] font-bold uppercase text-indigo-300 font-mono block">1. ENGINE INPUT CACHING</span>
-            <div className="space-y-1 text-[10px] text-slate-400 font-mono list-disc">
-              <div>• <strong>Current Sky (Run Once)</strong>: Planet Longitudes, Sign, House, Nakshatra, Star, Sub Lord. Moon Coordinates. Panchanga (Tithi, Vara, Yoga, Karana, Hora).</div>
-              <div className="pt-1.5">• <strong>User Cache (Birth)</strong>: DBA Periods (MD/AD/PD/SD/Prana). Natal Planet Coordinates & 6-Fold Significators (L1-L6). Placidus Cuspal Sublords. Natal Promise Cache.</div>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-[360px]">
+          {/* Sidebar Tabs */}
+          <div className="lg:col-span-4 flex flex-col gap-1 overflow-y-auto max-h-[380px] pr-2 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 py-1 block">Architecture Modules</span>
+            
+            <button
+              onClick={() => setActiveEventBookSection("principles")}
+              className={`flex items-center justify-between px-3 py-2 text-[11px] font-mono font-bold rounded-lg transition-all text-left ${
+                activeEventBookSection === "principles"
+                  ? "bg-amber-500/10 text-amber-400 border-l-2 border-amber-500 pl-4"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
+              }`}
+            >
+              <span>● ENGINE PRINCIPLES</span>
+              <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+            </button>
+
+            {[
+              { id: "header", label: "1. Report Header" },
+              { id: "summary", label: "2. Engine Summary" },
+              { id: "index", label: "3. Event Index" },
+              { id: "record", label: "4. Event Record" },
+              { id: "foundation", label: "5. Astro Foundation" },
+              { id: "rules", label: "6. Rule References" },
+              { id: "execution", label: "7. Rule Execution" },
+              { id: "natal", label: "8. Natal Result" },
+              { id: "activation", label: "9. Activation Result" },
+              { id: "daily", label: "10. Daily Result" },
+              { id: "evidence", label: "11. Evidence Log" },
+              { id: "decision", label: "12. Decision Verdict" },
+              { id: "explanation", label: "13. Explanation Output" },
+              { id: "timeline", label: "14. Timeline & DBA Path" },
+              { id: "history", label: "15. Historical Audit" },
+              { id: "export", label: "16. Export Interfacing" },
+            ].map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveEventBookSection(section.id)}
+                className={`flex items-center justify-between px-3 py-2 text-[11px] font-mono rounded-lg transition-all text-left ${
+                  activeEventBookSection === section.id
+                    ? "bg-amber-500/10 text-amber-400 border-l-2 border-amber-500 pl-4 font-bold"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/30"
+                }`}
+              >
+                <span>{section.label}</span>
+                <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+              </button>
+            ))}
           </div>
 
-          {/* Engine Workflow */}
-          <div className="space-y-2 border-r border-indigo-500/5 pr-2">
-            <span className="text-[10px] font-bold uppercase text-indigo-300 font-mono block">2. MULTI-STAGE ENGINE WORKFLOW</span>
-            <div className="space-y-1 text-[10px] text-slate-400 font-mono leading-relaxed">
-              <div><strong className="text-slate-300">A. DBA Weight</strong>: period weight scaling for active periods</div>
-              <div className="pt-1"><strong className="text-slate-300">B. Transit Trigger</strong>: transit-to-natal chain (T.Planet → T.Star → T.Sub → N.Planet → N.Star → N.Sub → SSL)</div>
-              <div className="pt-1"><strong className="text-slate-300">C. Convergence</strong>: maps Active Planet Objects</div>
-              <div className="pt-1"><strong className="text-slate-300">D. House Engine</strong>: ranks Primary, Secondary, Background houses</div>
+          {/* Details Content Panel */}
+          <div className="lg:col-span-8 bg-slate-950/40 p-5 rounded-xl border border-slate-800/60 flex flex-col justify-between min-h-[300px]">
+            <div className="space-y-3.5">
+              {activeEventBookSection === "principles" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                    <span>★</span> Core Engine Principles
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    The Event Book has evolved into the single master repository of all astrological events and predictions.
+                  </p>
+                  <ul className="space-y-1.5 text-[10px] font-mono text-slate-400 list-disc pl-4 leading-relaxed">
+                    <li><strong className="text-slate-200">Single Source of Truth:</strong> The Event Book handles storage, indexing, and end-to-end trace auditing. No other rulebook databases are maintained.</li>
+                    <li><strong className="text-slate-200">Execution and Decisions:</strong> The Rule Engine strictly executes, the Decision Engine determines verdicts, and the Event Book stores the audit records.</li>
+                    <li><strong className="text-slate-200">Complete Traceability:</strong> Every single predictive output is completely auditable back to the underlying Rule IDs.</li>
+                    <li><strong className="text-slate-200">Zero Definition Duplication:</strong> Rule definitions are mapped dynamically; only compact Rule IDs are kept on record.</li>
+                    <li><strong className="text-slate-200">Future-Proof Integration:</strong> New astrological models (KP, Jaimini, Western, Tajika) plug directly into this unified schema without architecture redesign.</li>
+                  </ul>
+                </div>
+              )}
+
+              {activeEventBookSection === "header" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    1. Report Header Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Captures high-fidelity runtime parameters and environment state to guarantee perfect repeatability of calculations.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-400">
+                    <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                      <span className="text-slate-200 block font-bold mb-1">Engine Metadata</span>
+                      • Engine Version (e.g. v2.1)<br />
+                      • Rule Version (e.g. r2.0)<br />
+                      • Report Version (e.g. rep-1.1)<br />
+                      • Timestamp & Anchor Date
+                    </div>
+                    <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                      <span className="text-slate-200 block font-bold mb-1">Native birth metrics</span>
+                      • Name, Birth Coordinates<br />
+                      • Charts & Planets Config<br />
+                      • Current Running DBA<br />
+                      • Current Transit Position
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "summary" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    2. Engine Summary Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Declares the high-level scope and processing intent of the active astrological run.
+                  </p>
+                  <ul className="space-y-1.5 text-[10px] font-mono text-slate-400 list-disc pl-4">
+                    <li><strong className="text-slate-200">Purpose Statement:</strong> Defines why the evaluation is being executed (e.g., lifetime marriage analysis).</li>
+                    <li><strong className="text-slate-200">Execution Flow:</strong> Chronological log of step-by-step pipeline stages completed.</li>
+                    <li><strong className="text-slate-200">Astrological Systems:</strong> Explicitly lists running engines (e.g., KP, Parashari, Jaimini, Tajika, Transit-Convergence).</li>
+                    <li><strong className="text-slate-200">Scope constraints:</strong> Limits and parameters of the dynamic predictive window.</li>
+                  </ul>
+                </div>
+              )}
+
+              {activeEventBookSection === "index" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    3. Event Index Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Organizes and clusters astrological event types consecutively across 12 distinct domains:
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 text-[10px] font-mono text-slate-400">
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Relationships</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Career & Job</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Wealth & Finance</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Property & Lands</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Exams & Education</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Children & Family</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Health & recovery</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Overseas Travel</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Court Litigation</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Spiritual Paths</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Daily Horoscope</div>
+                    <div className="p-1.5 bg-slate-900/40 rounded border border-slate-800/80">• Custom Events</div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "record" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    4. Event Record Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Defines the atomic schema of each unique event logged within the Master Event Book.
+                  </p>
+                  <div className="bg-slate-900/60 p-3 rounded border border-slate-800 font-mono text-[10px] text-slate-300 space-y-1">
+                    <div><span className="text-amber-400">Event ID:</span> Unique string identifier (e.g. REL001)</div>
+                    <div><span className="text-amber-400">Event Name:</span> Formal title of the event (e.g. Marriage Promise)</div>
+                    <div><span className="text-amber-400">Description:</span> Scope details and conditional logic boundary</div>
+                    <div><span className="text-amber-400">Category / Stage:</span> Domain alignment & current processing state</div>
+                    <div><span className="text-amber-400">Priority / Enabled:</span> Numeric priority rank and boolean active flag</div>
+                    <div><span className="text-amber-400">Systems Used:</span> Flags for systems activated (e.g., KP, Parashari)</div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "foundation" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    5. Astrological Foundation Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Specifies the comprehensive multi-system mathematical coordinates and karakas required to map the event.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-400">
+                    <ul className="list-disc pl-4 space-y-0.5">
+                      <li>Primary / Supporting / Blocking Houses</li>
+                      <li>Primary / Supporting / Blocking Planets</li>
+                      <li>Cuspal Sub-Lord (CSL) & Sub-Sub-Lord (SSL)</li>
+                      <li>Star Lord / Sub Lord details</li>
+                    </ul>
+                    <ul className="list-disc pl-4 space-y-0.5">
+                      <li>Natural Karaka (e.g., Venus for marriage)</li>
+                      <li>Jaimini Karaka (Chara & Sthira)</li>
+                      <li>Active planetary Yogas</li>
+                      <li>Afflicting Doshas (e.g. Kuja Dosha)</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "rules" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    6. Rule References Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Enforces the strict rule-referencing standard. To prevent rule definition bloating, the Event Book stores <strong className="text-amber-400">compact rule-IDs only</strong>.
+                  </p>
+                  <div className="p-3 bg-slate-900/60 rounded border border-slate-800">
+                    <span className="text-[9px] text-slate-500 uppercase tracking-wide block mb-1">Example Reference Array:</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {["KP_REL001", "KP_REL002", "PAR_REL001", "JAI_REL001", "DBA_REL001", "TR_REL001", "DAY_REL001"].map((rid) => (
+                        <span key={rid} className="px-2 py-0.5 bg-slate-800 text-slate-300 rounded border border-slate-700/60 text-[9px] font-mono">
+                          {rid}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "execution" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    7. Rule Execution Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Maintains the trace-state of every rule compiled for evaluation. Completely tracks:
+                  </p>
+                  <div className="grid grid-cols-3 gap-2.5 text-[9px] font-mono text-slate-400">
+                    <div className="p-2 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-0.5">Executed Rules</span>
+                      Rules called in this evaluation pass.
+                    </div>
+                    <div className="p-2 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-emerald-400 font-bold block mb-0.5">Matched Rules</span>
+                      Rules whose conditions were met.
+                    </div>
+                    <div className="p-2 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-rose-400 font-bold block mb-0.5">Failed Rules</span>
+                      Rules whose conditions evaluated to false.
+                    </div>
+                    <div className="p-2 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-amber-400 font-bold block mb-0.5">Blocked Rules</span>
+                      Rules overridden by higher negators.
+                    </div>
+                    <div className="p-2 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-slate-500 font-bold block mb-0.5">Skipped Rules</span>
+                      Rules skipped due to system parameters.
+                    </div>
+                    <div className="p-2 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-indigo-400 font-bold block mb-0.5">Dependency Rules</span>
+                      Nested prerequisite rules.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "natal" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    8. Natal Result Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Determines if an event is fundamentally promised in the natal chart. Does NOT imply active timing.
+                  </p>
+                  <ul className="space-y-1.5 text-[10px] font-mono text-slate-400 list-disc pl-4">
+                    <li><strong className="text-slate-200">Promise Status:</strong> Final natal resolution rating (PASS, FAIL, WEAK, STRONG).</li>
+                    <li><strong className="text-slate-200">Strength Score:</strong> Quantified weight of primary and supporting house linkages (0% to 100%).</li>
+                    <li><strong className="text-slate-200">Status flags:</strong> Detailed indicators mapping specific divisional chart strengths (D1, D9, D10).</li>
+                  </ul>
+                </div>
+              )}
+
+              {activeEventBookSection === "activation" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    9. Activation Result Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Integrates Vimshottari dasha periods and sky transits to calculate WHEN a promised event manifests.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-400">
+                    <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">DBA / Transit Status</span>
+                      • DBA Lords significations<br />
+                      • Transit Jupiter & Saturn aspect checks<br />
+                      • Star and Sub lord transit alignments
+                    </div>
+                    <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">Timing Metrics</span>
+                      • Exact Activation Windows<br />
+                      • Peak Timing strength dates<br />
+                      • Chronological trigger windows
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "daily" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    10. Daily Result Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Logs highly dynamic transient daily scores based on Fast-Moving celestial transits (primarily Moon coordinates).
+                  </p>
+                  <div className="flex flex-wrap gap-2 text-[10px] font-mono text-slate-400">
+                    {["Today", "Tomorrow", "Day +2", "Week", "Month"].map((day) => (
+                      <span key={day} className="px-3 py-1 bg-slate-900 text-slate-300 border border-slate-800 rounded">
+                        • {day} Trend Score
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "evidence" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    11. Evidence Log Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Compiles hard astronomical facts supporting or negating the predictive outcome to allow full expert audits.
+                  </p>
+                  <ul className="space-y-1 text-[10px] font-mono text-slate-400 pl-4 list-decimal">
+                    <li>Supporting & Blocking rule triggers</li>
+                    <li>Planetary longitudes & House placements</li>
+                    <li>Cuspal Sub-Lord (CSL), Star, Sub, and SSL connections</li>
+                    <li>Transit alignments & active Vimshottari DBA lords</li>
+                  </ul>
+                </div>
+              )}
+
+              {activeEventBookSection === "decision" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    12. Decision Verdict Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    The final synthesized outcome resolved by the Rule Decision Engine.
+                  </p>
+                  <div className="bg-slate-900/60 p-3 rounded border border-slate-800 font-mono text-[10px] text-slate-300 space-y-1">
+                    <div><span className="text-amber-400">Final Verdict:</span> e.g. Positive Marriage Promise Confirmed (PASS)</div>
+                    <div><span className="text-amber-400">Confidence:</span> Mathematically derived index (e.g. 92% Confirmed)</div>
+                    <div><span className="text-amber-400">Priority:</span> Severity level for front-end rendering</div>
+                    <div><span className="text-amber-400">Reason:</span> Primary logic path that yielded the final verdict</div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "explanation" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    13. Explanation Output Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Provides dual summaries to satisfy both the casual user and professional astrologer.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-400">
+                    <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">Human Explanation</span>
+                      Simple, conversational, jargon-free summary outlining exactly what the outcome means in plain language.
+                    </div>
+                    <div className="p-2.5 rounded bg-slate-900/50 border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">Technical Explanation</span>
+                      Deep mathematical and rules-linked breakdown for advanced scholars, detailing house linkages and lords.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "timeline" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    14. Timeline & DBA Path Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Provides chronologically mapped predictions displaying sequential activation milestones over time.
+                  </p>
+                  <ul className="space-y-1.5 text-[10px] font-mono text-slate-400 list-disc pl-4">
+                    <li><strong className="text-slate-200">Current DBA:</strong> Evaluation under active Mahadasha, Bhukti, and Antardasha.</li>
+                    <li><strong className="text-slate-200">Upcoming DBA:</strong> Tracing next dasha shifts and future promise potentials.</li>
+                    <li><strong className="text-slate-200">Transit Windows:</strong> Identifies upcoming slow-planet transits that trigger the promise.</li>
+                  </ul>
+                </div>
+              )}
+
+              {activeEventBookSection === "history" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    15. Historical Audit Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Tracks changes and historical predictions to measure decision stability across previous execution cycles.
+                  </p>
+                  <ul className="space-y-1 text-[10px] font-mono text-slate-400 pl-4 list-decimal">
+                    <li>Logs prior final decisions & confidence scores</li>
+                    <li>Saves previous evidence structures for drift analysis</li>
+                    <li>Tracks Rule Engine & Schema versioning milestones</li>
+                  </ul>
+                </div>
+              )}
+
+              {activeEventBookSection === "export" && (
+                <div className="space-y-3">
+                  <h5 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                    16. Export Interfacing Specification
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Enables exporting complete auditable trace-data in standard structured schemas.
+                  </p>
+                  <div className="grid grid-cols-4 gap-2 text-[10px] font-mono text-center">
+                    <span className="p-2 bg-slate-900 border border-slate-800 rounded text-emerald-400">PDF Export</span>
+                    <span className="p-2 bg-slate-900 border border-slate-800 rounded text-blue-400">JSON Payload</span>
+                    <span className="p-2 bg-slate-900 border border-slate-800 rounded text-purple-400">CSV Sheet</span>
+                    <span className="p-2 bg-slate-900 border border-slate-800 rounded text-pink-400">Research Doc</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-3 border-t border-slate-800/80 text-[10px] font-mono text-slate-500 flex justify-between items-center">
+              <span>Status: Unified Engine Standard Approved</span>
+              <span className="text-amber-500/80">★ JHora AI Core Spec</span>
             </div>
           </div>
-
-          {/* Outputs */}
-          <div className="space-y-2">
-            <span className="text-[10px] font-bold uppercase text-indigo-300 font-mono block">3. OUTPUT BLOCKS & CLUSTERS</span>
-            <div className="space-y-1 text-[10px] text-slate-400 font-mono">
-              <div><strong className="text-rose-400">Block 1: Mood</strong> (Houses 1, 3, 4, 5, 6, 12) → Mood, Stress, Focus, Emotion, Creativity, Mental Energy</div>
-              <div className="pt-1"><strong className="text-emerald-400">Block 2: Behaviour</strong> (Houses 2, 3, 6, 7, 10, 11) → Comm, Discipline, Aggression, Patience, Leadership, Network</div>
-              <div className="pt-1"><strong className="text-cyan-400">Block 3: Daily Themes</strong> (Primary/Secondary Houses) → Career, Money, Home, Travel, Study, Rest, Planning</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-2 border-t border-indigo-500/10 flex flex-wrap justify-between items-center text-[9px] font-mono text-slate-500 gap-2">
-          <span>EXCLUDED FROM DAILY RUN: Marriage, Promotion, Childbirth, Court, Property, Foreign (Handled exclusively by NJEvent)</span>
-          <span className="text-indigo-400 uppercase font-bold">KP-Only Standard</span>
         </div>
       </div>
 
