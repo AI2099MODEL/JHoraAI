@@ -59,6 +59,7 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
   const [activeTab, setActiveTab] = useState<string>("career");
 
   const [rulesOpen, setRulesOpen] = useState(false);
+  const [selectedSystem, setSelectedSystem] = useState<string>("KP Stellar");
 
   // Map the raw astrology data to user profile JSON
   const mappedProfile = useMemo(() => {
@@ -291,6 +292,129 @@ export const PresentDayEngineView: React.FC<PresentDayEngineViewProps> = ({
         
         {/* LEFT COLUMN: THE ADVANCED 14-STEP REASONING ENGINE FLOW */}
         <div className="xl:col-span-8 space-y-6">
+
+          {/* MULTI-SYSTEM PREDICTIONS (6 SCHOOLS OF WISDOM) */}
+          {activeDayData.multiSystemPredictions && (
+            <div className={`p-6 rounded-2xl border ${
+              isDark ? "bg-slate-900/40 border-slate-800 shadow-xl" : "bg-white border-slate-200 shadow-sm"
+            } space-y-5`}>
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pb-3 border-b border-slate-800/40">
+                <div className="flex items-center gap-2.5">
+                  <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">
+                    <Compass className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <h3 className={`text-sm font-sans font-bold ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                      Multi-System Wisdom Dashboard
+                    </h3>
+                    <p className="text-[10px] text-slate-500 font-mono">Natal promise & real-time transit alignment across 6 schools</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 bg-slate-950/40 px-2.5 py-1 rounded border border-slate-800/30 text-[10px] font-mono text-slate-400">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Interactive System Matrix</span>
+                </div>
+              </div>
+
+              {/* System selector buttons */}
+              <div className="flex flex-wrap gap-1.5 p-1 bg-slate-950/40 rounded-xl border border-slate-900">
+                {activeDayData.multiSystemPredictions.map((pred) => {
+                  const isSelected = selectedSystem === pred.system;
+                  return (
+                    <button
+                      key={pred.system}
+                      onClick={() => setSelectedSystem(pred.system)}
+                      className={`flex-1 min-w-[100px] text-center px-3 py-2 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                        isSelected
+                          ? "bg-amber-500/15 border border-amber-500/35 text-amber-400 font-bold shadow-md shadow-amber-500/5"
+                          : "border border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/30"
+                      }`}
+                    >
+                      {pred.system}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Active System Details Card */}
+              {(() => {
+                const activePred = activeDayData.multiSystemPredictions.find(p => p.system === selectedSystem) || activeDayData.multiSystemPredictions[0];
+                if (!activePred) return null;
+
+                const scoreColor = activePred.score >= 70
+                  ? "text-emerald-400"
+                  : activePred.score >= 50
+                  ? "text-amber-400"
+                  : "text-rose-400";
+
+                const badgeBg = activePred.verdict.includes("Highly Favorable")
+                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  : activePred.verdict.includes("Favorable")
+                  ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                  : "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+
+                return (
+                  <div className="space-y-4 font-sans animate-fadeIn">
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <h4 className={`text-base font-bold flex items-center gap-2 ${isDark ? "text-slate-200" : "text-neutral-900"}`}>
+                          {activePred.title}
+                        </h4>
+                        <p className="text-xs text-slate-400 mt-1">Core tenets of {activePred.system} school applied to active planetary alignments.</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <span className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${badgeBg}`}>
+                          {activePred.verdict}
+                        </span>
+                        <div className="mt-1.5 text-xs font-mono text-slate-400">
+                          Resonance: <strong className={`font-bold ${scoreColor}`}>{activePred.score}/100</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Natal Promise Card */}
+                      <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/60 border-slate-800/60" : "bg-slate-50 border-slate-200"} space-y-2`}>
+                        <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-400">
+                          <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                          <span>NATAL BLUEPRINT PROMISE</span>
+                        </div>
+                        <p className={`text-xs leading-relaxed ${isDark ? "text-slate-300" : "text-neutral-700"}`}>
+                          {activePred.promiseAnalysis}
+                        </p>
+                      </div>
+
+                      {/* Transit Evaluation Card */}
+                      <div className={`p-4 rounded-xl border ${isDark ? "bg-slate-950/60 border-slate-800/60" : "bg-slate-50 border-slate-200"} space-y-2`}>
+                        <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-400">
+                          <TrendingUp className="w-3.5 h-3.5 text-amber-500" />
+                          <span>DYNAMIC TRANSIT MATCHING</span>
+                        </div>
+                        <p className={`text-xs leading-relaxed ${isDark ? "text-slate-300" : "text-neutral-700"}`}>
+                          {activePred.transitEvaluation}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Technical Parameter list */}
+                    <div className="space-y-1.5 pt-2 border-t border-slate-800/40">
+                      <span className="block text-[10px] text-slate-500 uppercase font-mono font-bold">Technical Significators Evaluated:</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {activePred.technicalParameters.map((param, i) => (
+                          <span
+                            key={i}
+                            className="text-[9px] font-mono bg-slate-950/60 text-slate-400 border border-slate-800 px-2 py-0.5 rounded"
+                          >
+                            {param}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
           
           {/* Active Event Banner */}
           <div className={`p-5 rounded-2xl border ${

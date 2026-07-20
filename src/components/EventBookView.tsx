@@ -505,6 +505,7 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
   const [agentRules, setAgentRules] = useState<any[]>([]);
   const [isLoadingRules, setIsLoadingRules] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
 
   const fetchAgentRules = async () => {
     setIsLoadingRules(true);
@@ -1116,83 +1117,140 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
               {filteredEvents.map((event) => {
                 const forecast = getEvent3DayForecast(event.category, event.id);
                 return (
-                  <tr key={event.id} className="hover:bg-slate-900/10 transition-colors">
-                    {/* ID */}
-                    <td className="px-4 py-3">
-                      <span className="font-mono text-xs font-bold text-amber-500">{event.id}</span>
-                    </td>
+                  <React.Fragment key={event.id}>
+                    <tr
+                      onClick={() => setExpandedEventId(expandedEventId === event.id ? null : event.id)}
+                      className={`hover:bg-slate-900/40 transition-colors cursor-pointer ${
+                        expandedEventId === event.id ? "bg-slate-900/25 border-l-2 border-amber-500" : ""
+                      }`}
+                    >
+                      {/* ID */}
+                      <td className="px-4 py-3">
+                        <span className="font-mono text-xs font-bold text-amber-500">{event.id}</span>
+                      </td>
 
-                    {/* Event Name & Description */}
-                    <td className="px-4 py-3">
-                      <div className="space-y-1 pr-4">
-                        <span className="text-xs font-bold text-slate-200 block">{event.name}</span>
-                        <span className="text-[10px] text-slate-400 font-sans block leading-relaxed">{event.description}</span>
-                      </div>
-                    </td>
-
-                    {/* Primary Houses */}
-                    <td className="px-4 py-3 text-center">
-                      <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/10">
-                        {event.primary}
-                      </span>
-                    </td>
-
-                    {/* Supporting Houses */}
-                    <td className="px-4 py-3 text-center">
-                      <span className={`text-xs font-mono ${event.supporting === "-" ? "text-slate-600" : "text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded border border-sky-500/10"}`}>
-                        {event.supporting}
-                      </span>
-                    </td>
-
-                    {/* Obstructing Houses */}
-                    <td className="px-4 py-3 text-center">
-                      <span className={`text-xs font-mono ${
-                        event.category === "agent_rules"
-                          ? event.obstructing === "Rule Met"
-                            ? "text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/10 font-bold"
-                            : "text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded border border-rose-500/10 font-bold"
-                          : event.obstructing === "-"
-                            ? "text-slate-600"
-                            : "text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded border border-rose-500/10"
-                      }`}>
-                        {event.obstructing}
-                      </span>
-                    </td>
-
-                    {/* Main CSL */}
-                    <td className="px-4 py-3 text-center">
-                      <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded border border-amber-500/10">
-                        {event.category === "agent_rules" ? event.mainCsl : `CSL ${event.mainCsl}`}
-                      </span>
-                    </td>
-
-                    {/* Dynamic 3-day forecast columns */}
-                    {showLiveForecast && (
-                      <>
-                        <td className="px-4 py-3 text-center">
-                          <span className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${
-                            forecast[0] > 70 ? "text-emerald-400 bg-emerald-500/10" : forecast[0] > 45 ? "text-amber-400 bg-amber-500/10" : "text-rose-400 bg-rose-500/10"
-                          }`}>
-                            {forecast[0]}%
+                      {/* Event Name & Description */}
+                      <td className="px-4 py-3">
+                        <div className="space-y-1 pr-4">
+                          <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                            {event.name}
+                            <span className="text-[9px] text-slate-500 font-mono">
+                              {expandedEventId === event.id ? "▲ hide diagnostic" : "▼ click to analyze"}
+                            </span>
                           </span>
+                          <span className="text-[10px] text-slate-400 font-sans block leading-relaxed">{event.description}</span>
+                        </div>
+                      </td>
+
+                      {/* Primary Houses */}
+                      <td className="px-4 py-3 text-center">
+                        <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/10">
+                          {event.primary}
+                        </span>
+                      </td>
+
+                      {/* Supporting Houses */}
+                      <td className="px-4 py-3 text-center">
+                        <span className={`text-xs font-mono ${event.supporting === "-" ? "text-slate-600" : "text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded border border-sky-500/10"}`}>
+                          {event.supporting}
+                        </span>
+                      </td>
+
+                      {/* Obstructing Houses */}
+                      <td className="px-4 py-3 text-center">
+                        <span className={`text-xs font-mono ${
+                          event.category === "agent_rules"
+                            ? event.obstructing === "Rule Met"
+                              ? "text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/10 font-bold"
+                              : "text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded border border-rose-500/10 font-bold"
+                            : event.obstructing === "-"
+                              ? "text-slate-600"
+                              : "text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded border border-rose-500/10"
+                        }`}>
+                          {event.obstructing}
+                        </span>
+                      </td>
+
+                      {/* Main CSL */}
+                      <td className="px-4 py-3 text-center">
+                        <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded border border-amber-500/10">
+                          {event.category === "agent_rules" ? event.mainCsl : `CSL ${event.mainCsl}`}
+                        </span>
+                      </td>
+
+                      {/* Dynamic 3-day forecast columns */}
+                      {showLiveForecast && (
+                        <>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${
+                              forecast[0] > 70 ? "text-emerald-400 bg-emerald-500/10" : forecast[0] > 45 ? "text-amber-400 bg-amber-500/10" : "text-rose-400 bg-rose-500/10"
+                            }`}>
+                              {forecast[0]}%
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${
+                              forecast[1] > 70 ? "text-emerald-400 bg-emerald-500/10" : forecast[1] > 45 ? "text-amber-400 bg-amber-500/10" : "text-rose-400 bg-rose-500/10"
+                            }`}>
+                              {forecast[1]}%
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${
+                              forecast[2] > 70 ? "text-emerald-400 bg-emerald-500/10" : forecast[2] > 45 ? "text-amber-400 bg-amber-500/10" : "text-rose-400 bg-rose-500/10"
+                            }`}>
+                              {forecast[2]}%
+                            </span>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+
+                    {expandedEventId === event.id && (
+                      <tr className="bg-slate-950/40 border-l-2 border-amber-500/60">
+                        <td colSpan={showLiveForecast ? 9 : 6} className="px-6 py-5">
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-2 pb-2 border-b border-slate-800/40">
+                              <Compass className="w-4 h-4 text-amber-500" />
+                              <span className="text-xs font-bold font-mono text-slate-300 uppercase tracking-wider">
+                                Multi-System Astrological Promise & Dynamic Transit Matcher
+                              </span>
+                            </div>
+
+                            {njResult && njResult.forecastDays?.[0]?.multiSystemPredictions ? (
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans">
+                                {njResult.forecastDays[0].multiSystemPredictions.slice(0, 3).map((pred) => {
+                                  const isFavorable = !pred.verdict.includes("Challenging");
+                                  return (
+                                    <div key={pred.system} className="p-4 rounded-xl border border-slate-800 bg-slate-950/60 space-y-2.5">
+                                      <div className="flex justify-between items-center">
+                                        <span className="font-bold text-slate-200">{pred.system}</span>
+                                        <span className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                                          isFavorable ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"
+                                        }`}>
+                                          {pred.verdict}
+                                        </span>
+                                      </div>
+                                      <div className="text-[10px] text-slate-400 leading-relaxed space-y-1">
+                                        <strong className="text-slate-300 block text-[9px] uppercase font-mono tracking-wide">Natal Blueprint Promise:</strong>
+                                        <p>{pred.promiseAnalysis}</p>
+                                      </div>
+                                      <div className="text-[10px] text-slate-400 leading-relaxed space-y-1">
+                                        <strong className="text-slate-300 block text-[9px] uppercase font-mono tracking-wide">Transit Resonance:</strong>
+                                        <p>{pred.transitEvaluation}</p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ) : (
+                              <p className="text-slate-500 text-xs italic">Calculating dynamic multi-system vectors...</p>
+                            )}
+                          </div>
                         </td>
-                        <td className="px-4 py-3 text-center">
-                          <span className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${
-                            forecast[1] > 70 ? "text-emerald-400 bg-emerald-500/10" : forecast[1] > 45 ? "text-amber-400 bg-amber-500/10" : "text-rose-400 bg-rose-500/10"
-                          }`}>
-                            {forecast[1]}%
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <span className={`text-xs font-mono font-bold px-1.5 py-0.5 rounded ${
-                            forecast[2] > 70 ? "text-emerald-400 bg-emerald-500/10" : forecast[2] > 45 ? "text-amber-400 bg-amber-500/10" : "text-rose-400 bg-rose-500/10"
-                          }`}>
-                            {forecast[2]}%
-                          </span>
-                        </td>
-                      </>
+                      </tr>
                     )}
-                  </tr>
+                  </React.Fragment>
                 );
               })}
               
