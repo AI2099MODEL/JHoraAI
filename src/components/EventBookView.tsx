@@ -866,6 +866,15 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
   const [simulatedStatuses, setSimulatedStatuses] = useState<Record<string, string>>({});
   const [simulationLogs, setSimulationLogs] = useState<Record<string, any[]>>({});
 
+  // KP Foundation Pack 001 State Variables
+  const [kpSim7thCslHouses, setKpSim7thCslHouses] = useState<number[]>([2, 7, 11]);
+  const [kpSim5thCslHouses, setKpSim5thCslHouses] = useState<number[]>([5, 11]);
+  const [kpSimSaturnInfluenced, setKpSimSaturnInfluenced] = useState<boolean>(true);
+  const [kpSimDbaHouses, setKpSimDbaHouses] = useState<number[]>([2, 7]);
+  const [kpSimTransitCsl7Active, setKpSimTransitCsl7Active] = useState<boolean>(true);
+  const [kpSimPlanetHouses, setKpSimPlanetHouses] = useState<number[]>([2, 7, 11]);
+  const [kpSimStarLordHouses, setKpSimStarLordHouses] = useState<number[]>([2, 11]);
+
   const fetchAgentRules = async () => {
     setIsLoadingRules(true);
     try {
@@ -1614,7 +1623,8 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
               { id: "kp_rules_vol1", label: "KP RULE LIBRARY VOL 1" },
               { id: "kp_rules_vol2", label: "KP RULE LIBRARY VOL 2" },
               { id: "implementation_phase", label: "IMPLEMENTATION PHASE" },
-              { id: "mdrs", label: "DET. RULE SPEC (MDRS)" }
+              { id: "mdrs", label: "DET. RULE SPEC (MDRS)" },
+              { id: "kp_foundation_pack_001", label: "KP FOUNDATION PACK 001" }
             ].map((section) => (
               <button
                 key={section.id}
@@ -2956,6 +2966,384 @@ if (fertileCount === 0 && barrenCount >= 3) {
                   </div>
                 </div>
               )}
+
+              {activeEventBookSection === "kp_foundation_pack_001" && (() => {
+                const isPromised = kpSim7thCslHouses.includes(2) && kpSim7thCslHouses.includes(7) && kpSim7thCslHouses.includes(11);
+                const isDenied = (kpSim7thCslHouses.includes(1) && kpSim7thCslHouses.includes(6) && kpSim7thCslHouses.includes(10)) && !(kpSim7thCslHouses.includes(2) || kpSim7thCslHouses.includes(7) || kpSim7thCslHouses.includes(11));
+                const isDelayed = isPromised && kpSimSaturnInfluenced;
+                const isLove = kpSim5thCslHouses.includes(5) && kpSim7thCslHouses.includes(7) && kpSim7thCslHouses.includes(11);
+                const isArranged = isPromised && !kpSim5thCslHouses.includes(5);
+                
+                const isPlanetStrong = (kpSimPlanetHouses.includes(2) || kpSimPlanetHouses.includes(7) || kpSimPlanetHouses.includes(11)) && 
+                                       (kpSimStarLordHouses.includes(2) || kpSimStarLordHouses.includes(7) || kpSimStarLordHouses.includes(11));
+                const isPlanetWeak = (kpSimPlanetHouses.includes(1) || kpSimPlanetHouses.includes(6) || kpSimPlanetHouses.includes(10)) && 
+                                     !(kpSimPlanetHouses.includes(2) || kpSimPlanetHouses.includes(7) || kpSimPlanetHouses.includes(11));
+
+                const isDbaActive = isPromised && !isDenied && (kpSimDbaHouses.includes(2) || kpSimDbaHouses.includes(7) || kpSimDbaHouses.includes(11));
+                const isTransitActive = isDbaActive && kpSimTransitCsl7Active;
+                const isEventGenerated = isPromised && isDbaActive && isTransitActive && !isDenied;
+
+                const toggleHouse = (house: number, list: number[], setter: (v: number[]) => void) => {
+                  if (list.includes(house)) {
+                    setter(list.filter(h => h !== house));
+                  } else {
+                    setter([...list, house].sort((a, b) => a - b));
+                  }
+                };
+
+                return (
+                  <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                    <div className="border-b border-slate-800 pb-2 flex justify-between items-center">
+                      <div>
+                        <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                          <span>★</span> KP Foundation Rule Pack 001 Simulator
+                        </h5>
+                        <p className="text-[10px] text-slate-500 font-mono mt-0.5">Status: LIVE EXECUTABLE DECISION PIPELINE</p>
+                      </div>
+                      <div className="text-[9px] bg-slate-900 border border-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">
+                        Active Profile Sync
+                      </div>
+                    </div>
+
+                    {/* Interactive Input Dashboard */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 bg-slate-900/40 p-3.5 rounded-xl border border-slate-800">
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-[10px] text-amber-300 font-bold block uppercase mb-1 font-mono">
+                            1. 7th Cusp Sub Lord (CSL) Significations
+                          </label>
+                          <div className="flex flex-wrap gap-1">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(h => (
+                              <button
+                                key={h}
+                                onClick={() => toggleHouse(h, kpSim7thCslHouses, setKpSim7thCslHouses)}
+                                className={`w-6 h-6 rounded flex items-center justify-center font-bold text-[10px] border transition-all ${
+                                  kpSim7thCslHouses.includes(h)
+                                    ? "bg-amber-500/20 border-amber-500 text-amber-400"
+                                    : "bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700"
+                                }`}
+                              >
+                                {h}
+                              </button>
+                            ))}
+                          </div>
+                          <span className="text-[8.5px] text-slate-500 mt-1 block">
+                            Standard KP rule: Marriage requires 2, 7, 11 significations. Denial happens if only 1, 6, 10 are signified.
+                          </span>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] text-amber-300 font-bold block uppercase mb-1 font-mono">
+                            2. 5th Cusp Sub Lord (CSL) Significations
+                          </label>
+                          <div className="flex flex-wrap gap-1">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(h => (
+                              <button
+                                key={h}
+                                onClick={() => toggleHouse(h, kpSim5thCslHouses, setKpSim5thCslHouses)}
+                                className={`w-6 h-6 rounded flex items-center justify-center font-bold text-[10px] border transition-all ${
+                                  kpSim5thCslHouses.includes(h)
+                                    ? "bg-pink-500/20 border-pink-500 text-pink-400"
+                                    : "bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700"
+                                }`}
+                              >
+                                {h}
+                              </button>
+                            ))}
+                          </div>
+                          <span className="text-[8.5px] text-slate-500 mt-1 block">
+                            Evaluated alongside 7th & 11th for Love Marriage (Rule KP_CSL_0004).
+                          </span>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] text-amber-300 font-bold block uppercase mb-1 font-mono">
+                            3. Saturn Connection & Influences
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setKpSimSaturnInfluenced(!kpSimSaturnInfluenced)}
+                              className={`px-3 py-1 text-[9px] font-mono font-bold rounded border transition-all ${
+                                kpSimSaturnInfluenced
+                                  ? "bg-purple-500/25 border-purple-500 text-purple-300"
+                                  : "bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700"
+                              }`}
+                            >
+                              Saturn Aspecting/Conjoining 7th CSL: {kpSimSaturnInfluenced ? "YES" : "NO"}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 border-l border-slate-800 pl-3 md:pl-3.5">
+                        <div>
+                          <label className="text-[10px] text-emerald-400 font-bold block uppercase mb-1 font-mono">
+                            4. Current Vimshottari DBA Planet Signifies
+                          </label>
+                          <div className="flex flex-wrap gap-1">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(h => (
+                              <button
+                                key={h}
+                                onClick={() => toggleHouse(h, kpSimDbaHouses, setKpSimDbaHouses)}
+                                className={`w-6 h-6 rounded flex items-center justify-center font-bold text-[10px] border transition-all ${
+                                  kpSimDbaHouses.includes(h)
+                                    ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
+                                    : "bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700"
+                                }`}
+                              >
+                                {h}
+                              </button>
+                            ))}
+                          </div>
+                          <span className="text-[8.5px] text-slate-500 mt-1 block">
+                            If natal promise is active, DBA planet must signify 2, 7, or 11 to open the dasha timing window.
+                          </span>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] text-emerald-400 font-bold block uppercase mb-1 font-mono">
+                            5. Transit Gate Trigger
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => setKpSimTransitCsl7Active(!kpSimTransitCsl7Active)}
+                              className={`px-3 py-1 text-[9px] font-mono font-bold rounded border transition-all ${
+                                kpSimTransitCsl7Active
+                                  ? "bg-sky-500/25 border-sky-500 text-sky-300"
+                                  : "bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700"
+                              }`}
+                            >
+                              Transit Activates 7th CSL Cuspal Point: {kpSimTransitCsl7Active ? "ACTIVE" : "INACTIVE"}
+                            </button>
+                          </div>
+                          <span className="text-[8.5px] text-slate-500 mt-1 block">
+                            Acts as the final key to release the life event on the day.
+                          </span>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] text-amber-300 font-bold block uppercase mb-1 font-mono">
+                            6. Significator Strength Validator
+                          </label>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5 text-[8.5px]">
+                              <span className="text-slate-400">Planet Occupies/Owns Houses:</span>
+                              <div className="flex gap-0.5">
+                                {[2, 7, 11].map(h => (
+                                  <button
+                                    key={h}
+                                    onClick={() => toggleHouse(h, kpSimPlanetHouses, setKpSimPlanetHouses)}
+                                    className={`px-1.5 rounded text-[8.5px] font-mono border ${
+                                      kpSimPlanetHouses.includes(h) ? "bg-amber-500/20 text-amber-300 border-amber-500/30" : "bg-slate-950 text-slate-500 border-slate-850"
+                                    }`}
+                                  >
+                                    {h}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[8.5px]">
+                              <span className="text-slate-400">Star Lord Signifies Houses:</span>
+                              <div className="flex gap-0.5">
+                                {[2, 7, 11].map(h => (
+                                  <button
+                                    key={h}
+                                    onClick={() => toggleHouse(h, kpSimStarLordHouses, setKpSimStarLordHouses)}
+                                    className={`px-1.5 rounded text-[8.5px] font-mono border ${
+                                      kpSimStarLordHouses.includes(h) ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30" : "bg-slate-950 text-slate-500 border-slate-850"
+                                    }`}
+                                  >
+                                    {h}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Interactive Pipeline Trace Chart */}
+                    <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl space-y-3 font-mono">
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center justify-between">
+                        <span>Astrological Logic Pipeline & Calculations Flow</span>
+                        <span className="text-[8.5px] text-amber-500">Live Feedback Engine</span>
+                      </div>
+
+                      <div className="flex flex-col md:flex-row items-stretch gap-2.5 text-[9px]">
+                        {/* Column 1: Inputs */}
+                        <div className="flex-1 bg-slate-900/50 p-2.5 rounded border border-slate-850 space-y-1.5">
+                          <strong className="text-slate-300 block text-[9px] uppercase border-b border-slate-800 pb-1">Input Coordinates</strong>
+                          <div className="space-y-1">
+                            <div>• <span className="text-slate-500">CSL 7 Houses:</span> [{kpSim7thCslHouses.join(", ")}]</div>
+                            <div>• <span className="text-slate-500">CSL 5 Houses:</span> [{kpSim5thCslHouses.join(", ")}]</div>
+                            <div>• <span className="text-slate-500">DBA Houses:</span> [{kpSimDbaHouses.join(", ")}]</div>
+                            <div>• <span className="text-slate-500">Saturn Link:</span> {kpSimSaturnInfluenced ? "YES" : "NO"}</div>
+                            <div>• <span className="text-slate-500">Transit CSL7:</span> {kpSimTransitCsl7Active ? "ACTIVE" : "INACTIVE"}</div>
+                          </div>
+                        </div>
+
+                        {/* Column 2: Evaluated Rules */}
+                        <div className="flex-1 bg-slate-900/50 p-2.5 rounded border border-slate-850 space-y-1.5">
+                          <strong className="text-slate-300 block text-[9px] uppercase border-b border-slate-800 pb-1">Rule Engine Evaluations</strong>
+                          <div className="space-y-1 font-mono text-[8.5px]">
+                            <div className="flex justify-between items-center">
+                              <span>KP_CSL_0001 (Promise)</span>
+                              <span className={`px-1 rounded font-bold ${isPromised ? "bg-emerald-500/10 text-emerald-400" : "bg-slate-800 text-slate-500"}`}>
+                                {isPromised ? "TRUE (PROMISED)" : "FALSE"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span>KP_CSL_0002 (Denial)</span>
+                              <span className={`px-1 rounded font-bold ${isDenied ? "bg-red-500/10 text-red-400" : "bg-slate-800 text-slate-500"}`}>
+                                {isDenied ? "DENIED" : "FALSE"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span>KP_CSL_0003 (Delay)</span>
+                              <span className={`px-1 rounded font-bold ${isDelayed ? "bg-amber-500/10 text-amber-400" : "bg-slate-800 text-slate-500"}`}>
+                                {isDelayed ? "DELAYED" : "FALSE"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span>KP_CSL_0004 (Love Type)</span>
+                              <span className={`px-1 rounded font-bold ${isLove ? "bg-pink-500/10 text-pink-400" : "bg-slate-800 text-slate-500"}`}>
+                                {isLove ? "LOVE PROMISED" : "FALSE"}
+                              </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span>KP_CSL_0005 (Arranged Type)</span>
+                              <span className={`px-1 rounded font-bold ${isArranged ? "bg-blue-500/10 text-blue-400" : "bg-slate-800 text-slate-500"}`}>
+                                {isArranged ? "ARRANGED" : "FALSE"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Column 3: Outputs */}
+                        <div className="flex-1 bg-slate-900/50 p-2.5 rounded border border-slate-850 space-y-1.5">
+                          <strong className="text-slate-300 block text-[9px] uppercase border-b border-slate-800 pb-1">Downstream Output</strong>
+                          <div className="space-y-1">
+                            <div>• <span className="text-slate-500">DBA Window:</span> <span className={isDbaActive ? "text-emerald-400 font-bold" : "text-slate-500"}>{isDbaActive ? "OPEN" : "CLOSED"}</span></div>
+                            <div>• <span className="text-slate-500">Transit Status:</span> <span className={isTransitActive ? "text-sky-400 font-bold" : "text-slate-500"}>{isTransitActive ? "TRIGGER ACTIVE" : "INACTIVE"}</span></div>
+                            <div className="pt-1.5 border-t border-slate-800">
+                              <span className="text-slate-400 block text-[8px] uppercase">Final Generated Event:</span>
+                              {isEventGenerated ? (
+                                <span className="bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded text-[8.5px] font-bold block text-center mt-1">
+                                  REL_MARRIAGE : LIKELY
+                                </span>
+                              ) : (
+                                <span className="bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded text-[8.5px] font-bold block text-center mt-1">
+                                  PENDING (NO ACTIVE EVENT)
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Visual Flow diagram */}
+                      <div className="border border-slate-800 rounded-lg p-3 bg-slate-950/60 font-mono text-[9px] space-y-2">
+                        <span className="text-slate-400 text-[10px] block font-bold uppercase tracking-wider">Visual Execution Roadmap</span>
+                        <div className="flex flex-col space-y-2.5 relative pl-4 border-l border-slate-800">
+                          {/* Birth Chart Node */}
+                          <div className="relative">
+                            <span className="absolute -left-5 top-1 w-2.5 h-2.5 rounded-full bg-amber-500" />
+                            <div className="flex justify-between items-center">
+                              <span className="text-amber-400 font-bold">1. Birth Chart & Coordinates</span>
+                              <span className="text-slate-500">Ayanamsa: Lahiri Standard</span>
+                            </div>
+                          </div>
+
+                          {/* Planet Calculator Node */}
+                          <div className="relative">
+                            <span className="absolute -left-5 top-1 w-2.5 h-2.5 rounded-full bg-amber-500" />
+                            <div className="flex justify-between items-center">
+                              <span className="text-amber-400 font-bold">2. Planet Calculator</span>
+                              <span className="text-emerald-400 text-[8.5px]">
+                                Planet occupying 2,7,11: {kpSimPlanetHouses.some(h => [2,7,11].includes(h)) ? "YES" : "NO"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* House Significators Node */}
+                          <div className="relative">
+                            <span className="absolute -left-5 top-1 w-2.5 h-2.5 rounded-full bg-amber-500" />
+                            <div className="flex justify-between items-center">
+                              <span className="text-amber-400 font-bold">3. House Significators</span>
+                              <span className="text-emerald-400 text-[8.5px]">
+                                Significator Strength (KP_SIG_0001): {isPlanetStrong ? "HIGH" : isPlanetWeak ? "LOW" : "STANDARD"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Rule Engine Node */}
+                          <div className="relative">
+                            <span className="absolute -left-5 top-1 w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse" />
+                            <div className="p-2.5 bg-slate-900 border border-slate-800 rounded space-y-1">
+                              <span className="text-indigo-400 font-bold block">4. Rule Engine Execution (Rule Pack 001)</span>
+                              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[8px] text-slate-400">
+                                <div className={isPromised ? "text-emerald-400" : ""}>• KP_CSL_0001 (Promise): {isPromised ? "PROMISED" : "FAILED"}</div>
+                                <div className={isDenied ? "text-red-400 font-bold" : ""}>• KP_CSL_0002 (Denial): {isDenied ? "DENIED" : "PASSED"}</div>
+                                <div className={isDelayed ? "text-amber-400" : ""}>• KP_CSL_0003 (Delay): {isDelayed ? "DELAYED" : "NO_DELAY"}</div>
+                                <div className={isLove ? "text-pink-400" : ""}>• KP_CSL_0004 (Love Marriage): {isLove ? "YES" : "NO"}</div>
+                                <div className={isArranged ? "text-blue-400" : ""}>• KP_CSL_0005 (Arranged Marriage): {isArranged ? "YES" : "NO"}</div>
+                                <div className={isDbaActive ? "text-emerald-400" : ""}>• KP_DBA_0001 (DBA Activation): {isDbaActive ? "OPEN" : "CLOSED"}</div>
+                                <div className={isTransitActive ? "text-sky-400 font-bold" : ""}>• KP_TR_0001 (Transit Trigger): {isTransitActive ? "TRIGGERED" : "WAITING"}</div>
+                                <div className={isEventGenerated ? "text-emerald-400 font-bold animate-pulse" : ""}>• KP_EVENT_0001 (Event Gen): {isEventGenerated ? "GENERATED" : "PENDING"}</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Evidence Engine Node */}
+                          <div className="relative">
+                            <span className="absolute -left-5 top-1 w-2.5 h-2.5 rounded-full bg-amber-500" />
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-300 font-bold">5. Evidence Engine</span>
+                              <span className="text-slate-500">
+                                {isPromised ? "Added +2,+7,+11 signatures" : "Insufficient signatures"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Decision Engine Node */}
+                          <div className="relative">
+                            <span className="absolute -left-5 top-1 w-2.5 h-2.5 rounded-full bg-amber-500" />
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-300 font-bold">6. Decision Engine</span>
+                              <span className="text-slate-500">
+                                Verdict: {isDenied ? "DENIED" : isEventGenerated ? "VERY_LIKELY" : isPromised ? "PROMISED" : "UNPROMISED"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Timeline Engine Node */}
+                          <div className="relative">
+                            <span className="absolute -left-5 top-1 w-2.5 h-2.5 rounded-full bg-amber-500" />
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-300 font-bold">7. Timeline Engine</span>
+                              <span className="text-slate-500">
+                                Window: {isDbaActive ? "OPEN [ACTIVE PERIODS]" : "STANDBY"}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Event Book Node */}
+                          <div className="relative">
+                            <span className="absolute -left-5 top-1 w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                            <div className="flex justify-between items-center">
+                              <span className="text-emerald-400 font-bold">8. Event Book Registry</span>
+                              <span className="text-slate-400 font-bold text-[8.5px]">
+                                {isEventGenerated ? "1 EVENT ADDED [REL_MARRIAGE]" : "0 NEW EVENTS"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             <div className="pt-3 border-t border-slate-800/80 text-[10px] font-mono text-slate-500 flex justify-between items-center">
