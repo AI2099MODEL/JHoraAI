@@ -124,6 +124,99 @@ export default function TransitsTab({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 1. Validation function for currentsky payload
+  const validateCurrentSky = (payload: any) => {
+    const errorsList: Array<{ field: string; message: string }> = [];
+
+    if (!payload) {
+      errorsList.push({ field: "payload", message: "Payload is entirely missing, null, or undefined." });
+      return { isValid: false, errors: errorsList };
+    }
+
+    // A. Moon Position Checks
+    if (!payload.moon) {
+      errorsList.push({ field: "Moon Position", message: "Moon position node ('moon') is missing." });
+    } else {
+      if (payload.moon.moonLongitude === undefined || payload.moon.moonLongitude === null) {
+        errorsList.push({ field: "Moon Position", message: "Moon longitude is missing or null." });
+      }
+      if (!payload.moon.currentSign || !payload.moon.currentSign.displayName) {
+        errorsList.push({ field: "Moon Position", message: "Moon current sign information is missing or incomplete." });
+      }
+
+      // B. Moon Star Checks
+      if (!payload.moon.currentStarLord || !payload.moon.currentStarLord.displayName) {
+        errorsList.push({ field: "Moon Star", message: "Moon star lord information is missing or null." });
+      }
+      if (!payload.moon.currentNakshatra || !payload.moon.currentNakshatra.displayName) {
+        errorsList.push({ field: "Moon Star", message: "Moon current nakshatra information is missing or null." });
+      }
+
+      // C. Moon Sub Checks
+      if (!payload.moon.currentSubLord || !payload.moon.currentSubLord.displayName) {
+        errorsList.push({ field: "Moon Sub", message: "Moon sub lord information is missing or null." });
+      }
+    }
+
+    // D. Transit Planets & Placements Checks
+    if (!payload.planets) {
+      errorsList.push({ field: "Transit Planets", message: "Transit planets database node ('planets') is missing." });
+    } else {
+      const requiredPlanetsList = ["sun", "moon", "mars", "mercury", "jupiter", "venus", "saturn"];
+      requiredPlanetsList.forEach((planetName) => {
+        const p = payload.planets[planetName];
+        if (!p) {
+          errorsList.push({ field: `Transit Planet (${planetName})`, message: `Transit data for planet '${planetName}' is missing.` });
+        } else {
+          if (p.longitude === undefined || p.longitude === null) {
+            errorsList.push({ field: `Transit Planet Position (${planetName})`, message: `Longitude position for planet '${planetName}' is missing or null.` });
+          }
+          if (!p.currentSign) {
+            errorsList.push({ field: `Transit Planet Sign (${planetName})`, message: `Zodiac sign for planet '${planetName}' is missing or null.` });
+          }
+          if (!p.nakshatra) {
+            errorsList.push({ field: `Transit Nakshatra (${planetName})`, message: `Nakshatra placement for planet '${planetName}' is missing or null.` });
+          }
+          if (!p.starLord) {
+            errorsList.push({ field: `Transit Star Lord (${planetName})`, message: `Star Lord (Nakshatra Lord) for planet '${planetName}' is missing or null.` });
+          }
+          if (!p.subLord) {
+            errorsList.push({ field: `Transit Sub Lord (${planetName})`, message: `KP Sub Lord for planet '${planetName}' is missing or null.` });
+          }
+        }
+      });
+    }
+
+    // E. Panchanga Checks
+    if (!payload.panchanga) {
+      errorsList.push({ field: "Panchanga", message: "Panchanga calculations node ('panchanga') is missing." });
+    } else {
+      const p = payload.panchanga;
+      if (!p.tithi || !p.tithi.name) {
+        errorsList.push({ field: "Panchanga (Tithi)", message: "Lunar day (Tithi) name is missing or null." });
+      }
+      if (!p.vara || !p.vara.name) {
+        errorsList.push({ field: "Panchanga (Vara)", message: "Solar weekday (Vara) name is missing or null." });
+      }
+      if (!p.nakshatra || !p.nakshatra.name) {
+        errorsList.push({ field: "Panchanga (Nakshatra)", message: "Lunar constellation (Nakshatra) name is missing or null." });
+      }
+      if (!p.yoga || !p.yoga.name) {
+        errorsList.push({ field: "Panchanga (Yoga)", message: "Solilunar Yoga name is missing or null." });
+      }
+      if (!p.karana || !p.karana.name) {
+        errorsList.push({ field: "Panchanga (Karana)", message: "Half-tithi Karana name is missing or null." });
+      }
+    }
+
+    return {
+      isValid: errorsList.length === 0,
+      errors: errorsList
+    };
+  };
+
+  const validationResult = React.useMemo(() => validateCurrentSky(currentSkyJson), []);
+
   useEffect(() => {
     if (propTransitDate) setTransitDate(propTransitDate);
   }, [propTransitDate]);
@@ -1126,6 +1219,42 @@ export default function TransitsTab({
     { id: "daily_muhurta", name: "Daily Muhurta", icon: Clock },
     { id: "event_muhurta", name: "Event Muhurta", icon: Calendar },
   ];
+
+  if (!validationResult.isValid) {
+    return (
+      <div className="bg-slate-950/60 border border-rose-500/30 rounded-2xl p-6 space-y-4 shadow-xl font-sans" id="schema-validation-failure">
+        <div className="flex items-center gap-3 border-b border-rose-500/20 pb-4">
+          <div className="p-3 bg-rose-500/15 text-rose-400 rounded-xl border border-rose-500/20">
+            <AlertTriangle className="w-6 h-6 animate-pulse text-rose-500" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-rose-300">Transit Payload Schema Validation Error</h3>
+            <p className="text-xs text-rose-400/80 mt-1">
+              Critical fields required for rendering the transit dashboard are missing or null in the active sky context.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <p className="text-xs font-semibold text-slate-300">
+            The Gochara Subsystem is locked until the following schema requirements are resolved:
+          </p>
+          <div className="bg-slate-900/40 rounded-xl border border-slate-800 divide-y divide-slate-800/60 max-h-80 overflow-y-auto">
+            {validationResult.errors.map((err, idx) => (
+              <div key={idx} className="p-3 flex items-start gap-2.5 text-xs">
+                <span className="font-bold text-rose-400 font-mono shrink-0">[{err.field}]</span>
+                <span className="text-slate-300">{err.message}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-3 rounded-lg bg-indigo-500/5 border border-indigo-500/10 text-[11px] text-indigo-300/80 leading-relaxed font-mono">
+          Required Schema: Moon Position, Moon Star, Moon Sub, Transit Planets (Sun-Saturn Placements, Nakshatra, Star/Sub Lords), and Panchanga (Tithi, Vara, Nakshatra, Yoga, Karana).
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6" id="transits-tab-container">
