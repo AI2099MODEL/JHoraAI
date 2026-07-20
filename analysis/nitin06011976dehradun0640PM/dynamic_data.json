@@ -3,14 +3,14 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin06011976dehradun0640PM",
-    "lastUpdated": "2026-07-20T13:36:16.168Z",
+    "lastUpdated": "2026-07-20T13:36:03.466Z",
     "evaluationDate": "2026-07-20",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-20T13:36:16.142Z",
-      "localTime": "2026-07-20T06:36:16-07:00",
+      "utcTime": "2026-07-20T13:36:03.367Z",
+      "localTime": "2026-07-20T06:36:03-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
@@ -98,7 +98,7 @@
       },
       "mercury": {
         "currentSign": "Libra",
-        "longitude": 197.48,
+        "longitude": 197.47,
         "nakshatra": "Swati",
         "pada": 4,
         "starLord": "Rahu",
@@ -246,7 +246,7 @@
   ],
   "eventsLog": [
     {
-      "timestamp": "2026-07-20T13:36:16.168Z",
+      "timestamp": "2026-07-20T13:36:03.466Z",
       "evaluationDate": "2026-07-20",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
