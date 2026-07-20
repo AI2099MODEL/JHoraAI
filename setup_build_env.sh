@@ -5,7 +5,7 @@ echo "=== System Package Installation ==="
 # Avoid apt-get locking issues or prompt blocking
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y
-apt-get install -y openjdk-17-jdk-headless unzip wget
+apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" openjdk-17-jdk-headless unzip wget
 
 echo "=== Verifying Java ==="
 java -version

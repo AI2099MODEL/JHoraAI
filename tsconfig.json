@@ -25,5 +25,12 @@
     "types": [
       "vite/client"
     ]
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "android",
+    "_cloudflare",
+    "backend"
+  ]
 }

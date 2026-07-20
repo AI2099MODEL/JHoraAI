@@ -2082,14 +2082,10 @@ export default function App() {
           </div>
         </nav>
 
-        {/* RESPONSIVE SUBMENU DRAWER (Second Column) */}
+        {/* DESKTOP-ONLY SUBMENU DRAWER (Second Column) */}
         {activeSubmenus.length > 0 && (
-          <aside className={`transition-all duration-300 shrink-0 select-none border-r ${
+          <aside className={`transition-all duration-300 shrink-0 select-none border-r hidden md:block md:relative md:w-[240px] ${
             isDark ? "bg-slate-900/60 border-r border-indigo-500/15" : "bg-neutral-50/95 border-r border-neutral-200"
-          } ${
-            isMobileMenuOpen 
-              ? "fixed inset-y-0 left-0 z-50 w-64 block md:relative md:inset-auto md:left-auto md:z-auto md:w-[240px] md:block animate-in slide-in-from-left duration-200" 
-              : "hidden md:block md:relative md:w-[240px]"
           } ${
             !drawerExpanded ? "md:hidden md:w-0 overflow-hidden" : ""
           }`} id="submenu-drawer-container">
@@ -2101,12 +2097,6 @@ export default function App() {
                 </span>
                 <h2 className="text-sm font-bold text-amber-500 mt-0.5">{activeNode.label}</h2>
               </div>
-              <button 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="md:hidden p-1.5 rounded-lg hover:bg-slate-500/10"
-              >
-                <ChevronLeft className="w-5 h-5 text-amber-500" />
-              </button>
             </div>
 
             <div className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-160px)] scrollbar-thin">
@@ -2156,13 +2146,166 @@ export default function App() {
           </aside>
         )}
 
-        {/* MOBILE MENU PORTAL */}
-        {isMobileMenuOpen && (
-          <div 
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" 
-            onClick={() => setIsMobileMenuOpen(false)} 
-          />
-        )}
+        {/* UNIFIED CLEAN MOBILE DRAWER */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm md:hidden" 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                id="mobile-drawer-backdrop"
+              />
+
+              {/* Drawer Container */}
+              <motion.aside 
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 220 }}
+                className={`fixed inset-y-0 left-0 z-50 w-[280px] sm:w-[320px] flex flex-col md:hidden select-none border-r ${
+                  isDark ? "bg-slate-950 border-r border-indigo-500/15" : "bg-white border-r border-neutral-200"
+                }`}
+                id="unified-mobile-drawer"
+              >
+                {/* Header */}
+                <div className="p-4 border-b border-indigo-500/10 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-gradient-to-br from-amber-500 to-indigo-600 p-1.5 rounded-lg shadow-lg shadow-amber-500/5 shrink-0">
+                      <span className="text-sm font-bold font-mono text-slate-950 leading-none block select-none">ॐ</span>
+                    </div>
+                    <div>
+                      <h2 className="text-xs font-bold text-amber-500">JHora AI Professional</h2>
+                      <p className={`text-[8px] font-mono uppercase tracking-wider ${isDark ? "text-slate-500" : "text-neutral-400"}`}>
+                        Astrological Portal
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="p-1.5 rounded-lg hover:bg-slate-500/10 cursor-pointer text-amber-500 border border-transparent"
+                    id="mobile-drawer-close-btn"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Content: Main Sections & Submenus Scrollable */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-6 scrollbar-thin">
+                  
+                  {/* Part 1: Main Sections */}
+                  <div className="space-y-2">
+                    <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold block mb-1">
+                      Main Sections
+                    </span>
+                    <div className="grid grid-cols-2 gap-2">
+                      {MAIN_MENU_STRUCTURE.map((node) => {
+                        const Icon = node.icon;
+                        const isActive = node.id === "astro"
+                          ? ["horoscope", "kp_stellar", "western_astrology", "esoteric", "marriage", "transit"].includes(activeMenu)
+                          : activeMenu === node.id;
+                        
+                        return (
+                          <button
+                            key={node.id}
+                            onClick={() => {
+                              handleMenuSelect(node.id);
+                              // Keep drawer open if it has submenus so user can select, otherwise close it
+                              if (!node.submenus || node.submenus.length === 0) {
+                                setIsMobileMenuOpen(false);
+                              }
+                            }}
+                            className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all text-center cursor-pointer group ${
+                              isActive
+                                ? "bg-amber-500/10 text-amber-500 border-amber-500/30 font-semibold"
+                                : isDark
+                                  ? "bg-slate-900/40 text-slate-400 hover:text-slate-200 border-indigo-500/5"
+                                  : "bg-neutral-50 text-neutral-600 hover:text-neutral-800 border-neutral-200"
+                            }`}
+                            id={`drawer-main-node-${node.id}`}
+                          >
+                            <Icon className="w-4 h-4 mb-1" />
+                            <span className="text-[10px] font-sans tracking-tight">
+                              {node.label}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Part 2: Submenus of Active Section */}
+                  {activeSubmenus.length > 0 && (
+                    <div className="space-y-2 border-t border-indigo-500/10 pt-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[9px] font-mono text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold block">
+                          {activeNode.label} Submenus
+                        </span>
+                        <span className="text-[8px] font-mono bg-amber-500/15 text-amber-500 px-1.5 py-0.5 rounded-md border border-amber-500/10 font-bold">
+                          {activeSubmenus.length} Tables
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-1.5">
+                        {(() => {
+                          let lastCategory = "";
+                          return activeSubmenus.map((sub) => {
+                            const showHeader = sub.category && sub.category !== lastCategory;
+                            if (sub.category) {
+                              lastCategory = sub.category;
+                            }
+                            
+                            const isSubActive = sub.systemId
+                              ? (activeMenu === sub.systemId && activeSubMenu[sub.systemId] === (sub.originalId || sub.id))
+                              : (activeSubmenuId === sub.id);
+
+                            return (
+                              <React.Fragment key={sub.id}>
+                                {showHeader && (
+                                  <div className="pt-3 pb-1 first:pt-0">
+                                    <span className="text-[9px] font-mono font-bold tracking-widest text-amber-500/90 dark:text-amber-400/80 uppercase">
+                                      {sub.category}
+                                    </span>
+                                  </div>
+                                )}
+                                <button
+                                  onClick={() => {
+                                    handleSubmenuSelect(sub.id);
+                                    setIsMobileMenuOpen(false); // Close drawer after selection
+                                  }}
+                                  className={`w-full text-left p-2.5 rounded-xl transition-all border text-xs flex flex-col cursor-pointer ${
+                                    isSubActive
+                                      ? "bg-amber-500/10 text-amber-500 border-amber-500/30 font-semibold shadow-inner"
+                                      : isDark
+                                        ? "bg-slate-900/20 text-slate-400 hover:text-slate-200 hover:bg-slate-900/40 border-transparent"
+                                        : "bg-transparent text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 border-transparent"
+                                  }`}
+                                  id={`drawer-sub-node-${sub.id}`}
+                                >
+                                  <span className="block font-medium">{sub.label}</span>
+                                  {sub.description && (
+                                    <span className="text-[9px] text-slate-500 block font-normal mt-0.5 max-w-full truncate">
+                                      {sub.description}
+                                    </span>
+                                  )}
+                                </button>
+                              </React.Fragment>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              </motion.aside>
+            </>
+          )}
+        </AnimatePresence>
+
 
         {/* MAIN DISPLAY: Dynamic Content Stage */}
         <main className="flex-1 p-4 sm:p-6 pb-24 md:pb-6 min-w-0 overflow-y-auto" id="tab-body-container">

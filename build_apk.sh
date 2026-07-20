@@ -6,16 +6,16 @@ echo "          JHoraAI APK Build Automation            "
 echo "=================================================="
 
 # 1. Setup Android SDK Directory
-export ANDROID_HOME=/android-sdk
+export ANDROID_HOME=/opt/android-sdk
 export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
 
-if [ ! -d "/android-sdk/cmdline-tools/latest" ]; then
+if [ ! -d "/opt/android-sdk/cmdline-tools/latest" ]; then
     echo "[1/6] Downloading Android Command Line Tools..."
-    mkdir -p /android-sdk/cmdline-tools
+    mkdir -p /opt/android-sdk/cmdline-tools
     wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O /tmp/cmdline-tools.zip
     echo "Extracting command line tools..."
-    unzip -q /tmp/cmdline-tools.zip -d /android-sdk/cmdline-tools
-    mv /android-sdk/cmdline-tools/cmdline-tools /android-sdk/cmdline-tools/latest
+    unzip -q /tmp/cmdline-tools.zip -d /opt/android-sdk/cmdline-tools
+    mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest
     rm -f /tmp/cmdline-tools.zip
     echo "Android Command Line Tools downloaded and extracted successfully."
 else
@@ -60,7 +60,7 @@ npx cap sync
 
 # 8. Configure local.properties and memory limits for Gradle
 echo "Configuring local.properties..."
-echo "sdk.dir=/android-sdk" > android/local.properties
+echo "sdk.dir=/opt/android-sdk" > android/local.properties
 
 echo "Configuring gradle.properties with memory optimization..."
 mkdir -p ~/.gradle
