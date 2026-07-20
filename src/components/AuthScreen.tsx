@@ -423,9 +423,39 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
 
       {/* Notifications */}
       {error && (
-        <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-          <span className="break-all">{error}</span>
+        <div className="space-y-3">
+          <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <span className="font-semibold block">Sign-In Notice:</span>
+              <span className="break-all">{error}</span>
+            </div>
+          </div>
+
+          <div className="p-4 bg-slate-900/90 border border-amber-500/20 rounded-xl text-xs text-slate-300 space-y-3">
+            <h4 className="font-mono text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[10px]">
+              🛠️ Google Auth & Firebase Resolution Steps
+            </h4>
+            
+            <ul className="space-y-2.5 list-decimal list-inside text-slate-300 text-[11px] leading-relaxed">
+              <li>
+                <strong>Bypass Google Warning screen:</strong> Since this app is in the development environment, Google displays a warning <em>"This app is in development / hasn't been verified by Google yet"</em>. 
+                To sign in, simply click <strong>"Advanced"</strong> (bottom-left of the Google popup) and then click <strong>"Go to gen-lang-client-0193743078.firebaseapp.com (unsafe)"</strong>.
+              </li>
+              <li>
+                <strong>Authorize Preview Domains:</strong> If you see an <code>auth/unauthorized-domain</code> error, you must add these preview URLs to your <strong>Firebase Console → Authentication → Settings → Authorized Domains</strong>:
+                <div className="mt-1.5 p-2 bg-slate-950 rounded border border-slate-800 font-mono text-[10px] space-y-1 select-all break-all text-slate-400">
+                  <div>ais-dev-6ic57h7v4jqiekwc7gbmxh-368964429506.asia-east1.run.app</div>
+                  <div>ais-pre-6ic57h7v4jqiekwc7gbmxh-368964429506.asia-east1.run.app</div>
+                </div>
+              </li>
+              <li>
+                <strong>Configure Google Consent Test Users:</strong> Because the Google Cloud App is in <em>"Testing"</em> mode, only registered users can sign in. Open the <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline inline-flex items-center gap-0.5">Google Cloud OAuth Consent Screen</a>, select your project <code>gen-lang-client-0193743078</code>, and click <strong>"Add Users"</strong> under Test Users to add:
+                <div className="mt-1 font-mono text-amber-300">anuakku2013@gmail.com</div>
+                Alternatively, click the <strong>"Publish App"</strong> button under the consent settings to move it to Production, making it available to any Google user instantly.
+              </li>
+            </ul>
+          </div>
         </div>
       )}
       {success && (
