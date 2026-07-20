@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { 
   BookOpen, 
   Search, 
@@ -21,8 +21,11 @@ import {
   Cpu,
   Clock,
   CheckCircle,
-  HelpCircle
+  HelpCircle,
+  FileText,
+  RefreshCw
 } from "lucide-react";
+import { jsPDF } from "jspdf";
 import { runNJEngine, NJEngineResult } from "../lib/njEngine";
 import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
 
@@ -490,13 +493,52 @@ interface EventBookViewProps {
 
 export default function EventBookView({ astrologyData, isDark }: EventBookViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<"all" | "relationship" | "career" | "finance" | "health" | "litigation" | "education" | "property" | "travel">("all");
+  const [selectedCategory, setSelectedCategory] = useState<"all" | "relationship" | "career" | "finance" | "health" | "litigation" | "education" | "property" | "travel" | "agent_rules">("all");
   const [showLiveForecast, setShowLiveForecast] = useState(true);
 
   // Default prediction date starting with today
   const [predictionDate] = useState(() => {
     return new Date().toISOString().split("T")[0];
   });
+
+  // State for dynamic agent rules
+  const [agentRules, setAgentRules] = useState<any[]>([]);
+  const [isLoadingRules, setIsLoadingRules] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchAgentRules = async () => {
+    setIsLoadingRules(true);
+    try {
+      const res = await fetch("/api/rules/natal-agent-status");
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.results)) {
+          setAgentRules(data.results);
+        }
+      }
+    } catch (e) {
+      console.error("Error fetching agent rules:", e);
+    } finally {
+      setIsLoadingRules(false);
+    }
+  };
+
+  const handleRefreshRules = async () => {
+    setRefreshing(true);
+    try {
+      // Trigger a manual agent re-evaluation so any newly added handbook rules are computed
+      await fetch("/api/rules/natal-agent-refresh", { method: "POST" });
+      await fetchAgentRules();
+    } catch (e) {
+      console.error("Error refreshing agent rules:", e);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAgentRules();
+  }, []);
 
   // Map profile data
   const mappedProfile = useMemo(() => {
@@ -537,7 +579,8 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
       litigation: "litigation",
       education: "children",
       property: "property",
-      travel: "travel"
+      travel: "travel",
+      agent_rules: "career"
     };
 
     const targetId = catMap[category] || "career";
@@ -553,20 +596,35 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
     ];
   };
 
+  const combinedEvents = useMemo<KPEvent[]>(() => {
+    const mappedAgentEvents: KPEvent[] = agentRules.map((rule, idx) => ({
+      id: rule.id || `AGN${String(idx + 1).padStart(3, '0')}`,
+      category: "agent_rules",
+      name: rule.name || "Unnamed Agent Rule",
+      primary: Array.isArray(rule.signifiedHouses) ? rule.signifiedHouses.join(",") : "-",
+      supporting: rule.starLord ? `${rule.significator} in star of ${rule.starLord}` : "-",
+      obstructing: rule.isMet ? "Rule Met" : "Rule Not Met",
+      mainCsl: rule.significator || "-",
+      description: rule.reasoning || "Evaluated by Natal Rules Agent."
+    }));
+    return [...relEvents, ...mappedAgentEvents];
+  }, [agentRules]);
+
   const categories = useMemo(() => [
-    { id: "all", label: "All Events", icon: Layers, count: relEvents.length },
-    { id: "relationship", label: "Relationships", icon: Heart, count: relEvents.filter(e => e.category === "relationship").length },
-    { id: "career", label: "Career & Service", icon: Briefcase, count: relEvents.filter(e => e.category === "career").length },
-    { id: "finance", label: "Wealth & Finance", icon: Coins, count: relEvents.filter(e => e.category === "finance").length },
-    { id: "health", label: "Health & Recovery", icon: ShieldAlert, count: relEvents.filter(e => e.category === "health").length },
-    { id: "litigation", label: "Court Litigation", icon: Scale, count: relEvents.filter(e => e.category === "litigation").length },
-    { id: "education", label: "Exams & Education", icon: GraduationCap, count: relEvents.filter(e => e.category === "education").length },
-    { id: "property", label: "Property & Lands", icon: Home, count: relEvents.filter(e => e.category === "property").length },
-    { id: "travel", label: "Overseas Travel", icon: Globe, count: relEvents.filter(e => e.category === "travel").length }
-  ], []);
+    { id: "all", label: "All Events", icon: Layers, count: combinedEvents.length },
+    { id: "relationship", label: "Relationships", icon: Heart, count: combinedEvents.filter(e => e.category === "relationship").length },
+    { id: "career", label: "Career & Service", icon: Briefcase, count: combinedEvents.filter(e => e.category === "career").length },
+    { id: "finance", label: "Wealth & Finance", icon: Coins, count: combinedEvents.filter(e => e.category === "finance").length },
+    { id: "health", label: "Health & Recovery", icon: ShieldAlert, count: combinedEvents.filter(e => e.category === "health").length },
+    { id: "litigation", label: "Court Litigation", icon: Scale, count: combinedEvents.filter(e => e.category === "litigation").length },
+    { id: "education", label: "Exams & Education", icon: GraduationCap, count: combinedEvents.filter(e => e.category === "education").length },
+    { id: "property", label: "Property & Lands", icon: Home, count: combinedEvents.filter(e => e.category === "property").length },
+    { id: "travel", label: "Overseas Travel", icon: Globe, count: combinedEvents.filter(e => e.category === "travel").length },
+    { id: "agent_rules", label: "Agent Rules", icon: Cpu, count: agentRules.length }
+  ], [combinedEvents, agentRules]);
 
   const filteredEvents = useMemo(() => {
-    return relEvents.filter((ev) => {
+    return combinedEvents.filter((ev) => {
       const matchesSearch = 
         ev.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         ev.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -578,7 +636,248 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
 
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [combinedEvents, searchTerm, selectedCategory]);
+
+  const drawTableHeaderAtY = (doc: jsPDF, y: number, showForecast: boolean) => {
+    doc.setFillColor(30, 41, 59); // slate-800
+    doc.rect(15, y, 180, 8, "F");
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    
+    const textY = y + 5.5;
+    
+    if (showForecast) {
+      doc.text("ID", 16, textY);
+      doc.text("EVENT NAME & DESCRIPTION", 31, textY);
+      doc.text("PRIMARY", 92.5, textY, { align: "center" });
+      doc.text("SUPPORT", 111, textY, { align: "center" });
+      doc.text("OBSTRUCT", 132, textY, { align: "center" });
+      doc.text("CSL", 149.5, textY, { align: "center" });
+      doc.text("DAY 1", 163, textY, { align: "center" });
+      doc.text("DAY 2", 175, textY, { align: "center" });
+      doc.text("DAY 3", 188, textY, { align: "center" });
+    } else {
+      doc.text("ID", 16, textY);
+      doc.text("EVENT NAME & DESCRIPTION", 36, textY);
+      doc.text("PRIMARY HOUSES", 125, textY, { align: "center" });
+      doc.text("SUPPORT HOUSES", 145, textY, { align: "center" });
+      doc.text("OBSTRUCT HOUSES", 165, textY, { align: "center" });
+      doc.text("MAIN CSL", 185, textY, { align: "center" });
+    }
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF("p", "mm", "a4");
+
+    // Decorative top header bars
+    doc.setFillColor(15, 23, 42); // deep slate `#0f172a`
+    doc.rect(0, 0, 210, 4, "F");
+    doc.setFillColor(245, 158, 11); // amber `#f59e0b`
+    doc.rect(0, 4, 210, 1.5, "F");
+
+    // Primary Header Title
+    doc.setTextColor(15, 23, 42);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("KP SYSTEM MASTER EVENTBOOK REPORT", 15, 16);
+
+    doc.setTextColor(100, 116, 139); // slate-500
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9);
+    doc.text("Reference Database & Live Transit-Convergence Forecast Engine v2.0", 15, 21);
+
+    // Dynamic User Profile Meta Summary (if available)
+    let currentY = 28;
+    if (mappedProfile) {
+      doc.setFillColor(248, 250, 252); // slate-50
+      doc.setDrawColor(226, 232, 240); // slate-200
+      doc.rect(15, currentY, 180, 24, "FD");
+
+      doc.setTextColor(15, 23, 42);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.text(`NATIVE: ${mappedProfile.User?.profile_name || "Vedic Native"}`, 18, currentY + 6);
+      
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(71, 85, 105); // slate-600
+      
+      const bDate = mappedProfile.Birth?.date || "-";
+      const bTime = mappedProfile.Birth?.time || "-";
+      const bPlace = mappedProfile.Birth?.place || "Default Coordinates";
+      const bLat = mappedProfile.Birth?.latitude?.toFixed(4) || "-";
+      const bLon = mappedProfile.Birth?.longitude?.toFixed(4) || "-";
+      const ayanamsa = mappedProfile.Birth?.ayanamsa || "Lahiri";
+
+      doc.text(`Birth Details: ${bDate} at ${bTime}`, 18, currentY + 12);
+      doc.text(`Location: ${bPlace} (${bLat}°N, ${bLon}°E)`, 18, currentY + 18);
+
+      // Right-side columns inside the panel
+      doc.text(`Ayanamsa: ${ayanamsa}`, 110, currentY + 6);
+      doc.text(`Forecast Anchor Date: ${predictionDate}`, 110, currentY + 12);
+      doc.text(`Report Generation Time: ${new Date().toLocaleString()} (Local)`, 110, currentY + 18);
+
+      currentY += 28;
+    } else {
+      currentY += 4;
+    }
+
+    // Filter status bar
+    doc.setFillColor(239, 246, 255); // blue-50
+    doc.setDrawColor(191, 219, 254); // blue-200
+    doc.rect(15, currentY, 180, 7, "FD");
+    
+    doc.setTextColor(30, 64, 175); // blue-800
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    const filterText = `FILTERED VIEW: Category: ${categories.find(c => c.id === selectedCategory)?.label?.toUpperCase() || "ALL"} | Search: "${searchTerm || 'None'}"`;
+    doc.text(filterText, 18, currentY + 4.8);
+
+    doc.setTextColor(100, 116, 139);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total Matching Events: ${filteredEvents.length}`, 192, currentY + 4.8, { align: "right" });
+
+    currentY += 12;
+
+    // Draw Table Headers
+    drawTableHeaderAtY(doc, currentY, showLiveForecast);
+    currentY += 8;
+
+    // Loop through events
+    filteredEvents.forEach((event, idx) => {
+      const forecast = getEvent3DayForecast(event.category, event.id);
+      
+      // Split description to size
+      const descWidth = showLiveForecast ? 52 : 77;
+      const wrappedDesc = doc.splitTextToSize(event.description, descWidth);
+      const wrappedName = doc.splitTextToSize(event.name, descWidth);
+      
+      const totalTextLines = wrappedDesc.length + wrappedName.length;
+      const rowHeight = Math.max(9, 4.5 + totalTextLines * 3.5);
+
+      // Check pagination boundary
+      if (currentY + rowHeight > 275) {
+        // Page number before adding new page
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(7);
+        doc.setTextColor(148, 163, 184);
+        doc.text(`JHora AI Astrological Engine • Master Eventbook Report`, 15, 288);
+        doc.text(`Page ${doc.getNumberOfPages()}`, 195, 288, { align: "right" });
+
+        doc.addPage();
+        
+        // Decorative top header bars on new page
+        doc.setFillColor(15, 23, 42);
+        doc.rect(0, 0, 210, 4, "F");
+        doc.setFillColor(245, 158, 11);
+        doc.rect(0, 4, 210, 1.5, "F");
+
+        currentY = 15;
+        drawTableHeaderAtY(doc, currentY, showLiveForecast);
+        currentY += 8;
+      }
+
+      // Alternate row backgrounds
+      if (idx % 2 === 0) {
+        doc.setFillColor(248, 250, 252); // slate-50
+        doc.rect(15, currentY, 180, rowHeight, "F");
+      }
+
+      // Draw bottom row border
+      doc.setDrawColor(241, 245, 249); // slate-100
+      doc.line(15, currentY + rowHeight, 195, currentY + rowHeight);
+
+      // Write Cell Content
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      
+      // ID (Col 1)
+      doc.setTextColor(245, 158, 11); // Amber
+      doc.text(event.id, 16, currentY + 5.5);
+
+      // Event Name & Description (Col 2)
+      doc.setTextColor(15, 23, 42); // Deep Slate
+      let nameY = currentY + 5.5;
+      wrappedName.forEach((line) => {
+        doc.text(line, showLiveForecast ? 31 : 36, nameY);
+        nameY += 3.5;
+      });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139); // Slate Gray
+      let descY = nameY - 0.5;
+      wrappedDesc.forEach((line) => {
+        doc.text(line, showLiveForecast ? 31 : 36, descY);
+        descY += 3.5;
+      });
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+
+      // Depending on whether live forecast is on, position other columns
+      if (showLiveForecast) {
+        // Primary
+        doc.setTextColor(16, 185, 129); // Emerald
+        doc.text(event.primary, 92.5, currentY + 5.5, { align: "center" });
+
+        // Supporting
+        doc.setTextColor(14, 165, 233); // Sky
+        doc.text(event.supporting, 111, currentY + 5.5, { align: "center" });
+
+        // Obstructing
+        doc.setTextColor(244, 63, 94); // Rose
+        doc.text(event.obstructing, 132, currentY + 5.5, { align: "center" });
+
+        // Main CSL
+        doc.setTextColor(245, 158, 11); // Amber
+        doc.text(event.mainCsl, 149.5, currentY + 5.5, { align: "center" });
+
+        // Forecast Day 1, 2, 3
+        doc.setFont("helvetica", "bold");
+        
+        doc.setTextColor(forecast[0] > 70 ? 16 : forecast[0] > 45 ? 217 : 225, forecast[0] > 70 ? 185 : forecast[0] > 45 ? 119 : 29, forecast[0] > 70 ? 129 : forecast[0] > 45 ? 6 : 72);
+        doc.text(`${forecast[0]}%`, 163, currentY + 5.5, { align: "center" });
+
+        doc.setTextColor(forecast[1] > 70 ? 16 : forecast[1] > 45 ? 217 : 225, forecast[1] > 70 ? 185 : forecast[1] > 45 ? 119 : 29, forecast[1] > 70 ? 129 : forecast[1] > 45 ? 6 : 72);
+        doc.text(`${forecast[1]}%`, 175, currentY + 5.5, { align: "center" });
+
+        doc.setTextColor(forecast[2] > 70 ? 16 : forecast[2] > 45 ? 217 : 225, forecast[2] > 70 ? 185 : forecast[2] > 45 ? 119 : 29, forecast[2] > 70 ? 129 : forecast[2] > 45 ? 6 : 72);
+        doc.text(`${forecast[2]}%`, 188, currentY + 5.5, { align: "center" });
+      } else {
+        // Primary
+        doc.setTextColor(16, 185, 129); // Emerald
+        doc.text(event.primary, 125, currentY + 5.5, { align: "center" });
+
+        // Supporting
+        doc.setTextColor(14, 165, 233); // Sky
+        doc.text(event.supporting, 145, currentY + 5.5, { align: "center" });
+
+        // Obstructing
+        doc.setTextColor(244, 63, 94); // Rose
+        doc.text(event.obstructing, 165, currentY + 5.5, { align: "center" });
+
+        // Main CSL
+        doc.setTextColor(245, 158, 11); // Amber
+        doc.text(event.mainCsl, 185, currentY + 5.5, { align: "center" });
+      }
+
+      currentY += rowHeight;
+    });
+
+    // Add final page number / footer for the last page
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(148, 163, 184);
+    doc.text(`JHora AI Astrological Engine • Master Eventbook Report`, 15, 288);
+    doc.text(`Page ${doc.getNumberOfPages()}`, 195, 288, { align: "right" });
+
+    // Save document
+    const nativeName = mappedProfile?.User?.profile_name?.replace(/\s+/g, "_") || "Native";
+    doc.save(`JHora_AI_Eventbook_${nativeName}.pdf`);
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -603,17 +902,42 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
             </p>
           </div>
 
-          <button
-            onClick={() => setShowLiveForecast(!showLiveForecast)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 border transition-all ${
-              showLiveForecast 
-                ? "bg-amber-500/15 border-amber-500/50 text-amber-400" 
-                : "bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <Activity className="w-4 h-4 animate-pulse" />
-            <span>Show Live 3-Day Forecast v2.0</span>
-          </button>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => setShowLiveForecast(!showLiveForecast)}
+              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 border transition-all ${
+                showLiveForecast 
+                  ? "bg-amber-500/15 border-amber-500/50 text-amber-400" 
+                  : "bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <Activity className="w-4 h-4 animate-pulse" />
+              <span>Show Live 3-Day Forecast v2.0</span>
+            </button>
+
+            <button
+              onClick={handleRefreshRules}
+              disabled={refreshing || isLoadingRules}
+              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 border transition-all ${
+                refreshing 
+                  ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-400 cursor-not-allowed" 
+                  : "bg-slate-900/40 border-slate-800 text-slate-400 hover:text-slate-200 hover:border-slate-700"
+              }`}
+              title="Triggers the Natal Rules Agent to re-evaluate rules against the current profile."
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`} />
+              <span>{refreshing ? "Syncing..." : "Sync Rules"}</span>
+            </button>
+
+            <button
+              onClick={exportToPDF}
+              className="px-3.5 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 border bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 hover:text-emerald-300 transition-all"
+              title="Download this Eventbook report as a PDF."
+            >
+              <FileText className="w-4 h-4" />
+              <span>Export to PDF</span>
+            </button>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -822,7 +1146,15 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
 
                     {/* Obstructing Houses */}
                     <td className="px-4 py-3 text-center">
-                      <span className={`text-xs font-mono ${event.obstructing === "-" ? "text-slate-600" : "text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded border border-rose-500/10"}`}>
+                      <span className={`text-xs font-mono ${
+                        event.category === "agent_rules"
+                          ? event.obstructing === "Rule Met"
+                            ? "text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/10 font-bold"
+                            : "text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded border border-rose-500/10 font-bold"
+                          : event.obstructing === "-"
+                            ? "text-slate-600"
+                            : "text-rose-400 bg-rose-500/10 px-2.5 py-0.5 rounded border border-rose-500/10"
+                      }`}>
                         {event.obstructing}
                       </span>
                     </td>
@@ -830,7 +1162,7 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
                     {/* Main CSL */}
                     <td className="px-4 py-3 text-center">
                       <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded border border-amber-500/10">
-                        CSL {event.mainCsl}
+                        {event.category === "agent_rules" ? event.mainCsl : `CSL ${event.mainCsl}`}
                       </span>
                     </td>
 
