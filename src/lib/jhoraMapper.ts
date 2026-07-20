@@ -1524,13 +1524,10 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
   // Calculate Chara Dashas
   const charaDashas: any[] = [];
   let startYear = new Date(bDate).getFullYear();
+  const bDateParts = bDate.split("-");
+  const dateSuffix = `-${bDateParts[1] || "01"}-${bDateParts[2] || "06"}`;
   let currentSignIdx = ascendant.sign_index;
   const isEvenLagna = ascendant.sign_index % 2 === 1;
-
-  const isVishamapada = (signIdx: number): boolean => {
-    // Aries (0), Taurus (1), Gemini (2), Libra (6), Scorpio (7), Sagittarius (8)
-    return [0, 1, 2, 6, 7, 8].includes(signIdx);
-  };
 
   const getStrongerLordAndPos = (signIdx: number): { lordName: string; lordSignIdx: number } => {
     if (signIdx === 7) { // Scorpio: Mars and Ketu
@@ -1638,23 +1635,21 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
     const { lordName, lordSignIdx } = getStrongerLordAndPos(currentSignIdx);
     
     let dashaYears = 0;
-    const isVisham = isVishamapada(currentSignIdx);
-    const indexDiff = isVisham
+    const isOdd = currentSignIdx % 2 === 0;
+    const indexDiff = isOdd
       ? (lordSignIdx - currentSignIdx + 12) % 12
       : (currentSignIdx - lordSignIdx + 12) % 12;
 
     if (indexDiff === 0) {
       dashaYears = 12;
-    } else if (indexDiff === 6) {
-      dashaYears = 10;
     } else {
       dashaYears = indexDiff;
     }
 
     charaDashas.push({
       sign: dashaSign,
-      start_date: `${startYear}-01-01`,
-      end_date: `${startYear + dashaYears}-01-01`,
+      start_date: `${startYear}${dateSuffix}`,
+      end_date: `${startYear + dashaYears}${dateSuffix}`,
       duration_years: dashaYears
     });
     startYear += dashaYears;

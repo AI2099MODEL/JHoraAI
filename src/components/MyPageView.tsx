@@ -134,10 +134,6 @@ function CharaDashaInteractiveTable({ profile, astrologyData, isDark }: { profil
     let runningYear = birthYear;
     let currentSignIdx = ascendantSignIndex;
 
-    const isVishamapada = (signIdx: number): boolean => {
-      return [0, 1, 2, 6, 7, 8].includes(signIdx);
-    };
-
     const getStrongerLordSignIdx = (signIdx: number): number => {
       if (signIdx === 7) { // Scorpio: Mars or Ketu
         const marsIdx = getLordSignIdx("Mars");
@@ -161,15 +157,13 @@ function CharaDashaInteractiveTable({ profile, astrologyData, isDark }: { profil
       const lordSignIdx = getStrongerLordSignIdx(currentSignIdx);
       
       let dashaYears = 0;
-      const isVisham = isVishamapada(currentSignIdx);
-      const indexDiff = isVisham
+      const isOdd = currentSignIdx % 2 === 0;
+      const indexDiff = isOdd
         ? (lordSignIdx - currentSignIdx + 12) % 12
         : (currentSignIdx - lordSignIdx + 12) % 12;
 
       if (indexDiff === 0) {
         dashaYears = 12;
-      } else if (indexDiff === 6) {
-        dashaYears = 10;
       } else {
         dashaYears = indexDiff;
       }
