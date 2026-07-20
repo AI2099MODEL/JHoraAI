@@ -500,6 +500,53 @@ export default function App() {
     return localStorage.getItem("user_openai_api_key") || "";
   });
 
+  // Free mobile push notifications settings (via ntfy.sh)
+  const [ntfyNotificationsActive, setNtfyNotificationsActive] = useState<boolean>(() => {
+    return localStorage.getItem("ntfy_notifications_active") === "true";
+  });
+  const [ntfyTopic, setNtfyTopic] = useState<string>(() => {
+    return localStorage.getItem("ntfy_topic") || `jhoraai_${Math.random().toString(36).substring(2, 10)}`;
+  });
+  const [copiedTopic, setCopiedTopic] = useState<boolean>(false);
+  const [testPushStatus, setTestPushStatus] = useState<string>("");
+
+  const handleNtfyToggle = (active: boolean) => {
+    setNtfyNotificationsActive(active);
+    localStorage.setItem("ntfy_notifications_active", String(active));
+  };
+
+  const handleNtfyTopicChange = (topic: string) => {
+    const clean = topic.replace(/[^a-zA-Z0-9_-]/g, "");
+    setNtfyTopic(clean);
+    localStorage.setItem("ntfy_topic", clean);
+  };
+
+  const sendTestNotification = async () => {
+    if (!ntfyTopic) return;
+    setTestPushStatus("sending");
+    try {
+      const res = await fetch(`https://ntfy.sh/${ntfyTopic}`, {
+        method: "POST",
+        body: "✨ JHoraAI Connection Active! Your free mobile cosmic alerts are now fully synchronized with the heavens.",
+        headers: {
+          "Title": "🪐 JHoraAI Cosmic Alert",
+          "Priority": "high",
+          "Tags": "crystal_ball,star,galaxy"
+        }
+      });
+      if (res.ok) {
+        setTestPushStatus("success");
+        setTimeout(() => setTestPushStatus(""), 4000);
+      } else {
+        throw new Error(`HTTP ${res.status}`);
+      }
+    } catch (err: any) {
+      console.error("Test notification failed:", err);
+      setTestPushStatus("error");
+      setTimeout(() => setTestPushStatus(""), 4000);
+    }
+  };
+
   const handleOpenaiKeyChange = (key: string) => {
     setUserOpenaiApiKey(key);
     localStorage.setItem("user_openai_api_key", key);
@@ -2982,7 +3029,7 @@ export default function App() {
 
                           <div>
                             <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Ingress Notification Alerts</label>
-                            <div className="flex items-center justify-between p-2 rounded-lg border border-indigo-500/5 bg-slate-950/20">
+                            <div className="flex items-center justify-between p-2 rounded-lg border border-indigo-500/5 bg-slate-950/20 mb-4">
                               <span className="text-xs text-slate-400">Push notification on major ingress</span>
                               <input
                                 type="checkbox"
@@ -2990,6 +3037,94 @@ export default function App() {
                                 onChange={(e) => setNotificationsActive(e.target.checked)}
                                 className="w-4 h-4 cursor-pointer text-amber-500 focus:ring-amber-500"
                               />
+                            </div>
+
+                            <label className="block text-[11px] text-amber-500 font-bold font-mono uppercase mb-1 flex items-center gap-1">
+                              <Bell className="w-3.5 h-3.5 text-amber-500" /> Free Mobile Push Alerts (via ntfy.sh)
+                            </label>
+                            
+                            <div className="space-y-3 p-3 rounded-xl border border-amber-500/10 bg-amber-500/5">
+                              <div className="flex items-center justify-between">
+                                <div className="flex flex-col">
+                                  <span className="text-xs font-semibold text-slate-200">Enable Mobile Notifications</span>
+                                  <span className="text-[10px] text-slate-400 leading-tight">Send instant transit & ingress notifications to your phone free of cost</span>
+                                </div>
+                                <input
+                                  type="checkbox"
+                                  checked={ntfyNotificationsActive}
+                                  onChange={(e) => handleNtfyToggle(e.target.checked)}
+                                  className="w-4 h-4 cursor-pointer accent-amber-500 rounded focus:ring-amber-500 shrink-0 ml-2"
+                                />
+                              </div>
+
+                              {ntfyNotificationsActive && (
+                                <div className="space-y-2 pt-2 border-t border-amber-500/10">
+                                  <div className="flex flex-col">
+                                    <label className="text-[10px] text-slate-400 font-mono uppercase mb-1">Your Unique Notification Topic</label>
+                                    <div className="flex gap-1.5">
+                                      <div className="flex items-center flex-1 bg-slate-950 border border-slate-800 rounded-lg px-2 text-xs text-slate-400 font-mono overflow-hidden">
+                                        <span className="opacity-40 select-none">ntfy.sh/</span>
+                                        <input
+                                          type="text"
+                                          value={ntfyTopic}
+                                          onChange={(e) => handleNtfyTopicChange(e.target.value)}
+                                          className="bg-transparent border-0 outline-none text-slate-200 py-1.5 w-full focus:ring-0"
+                                          placeholder="topic-name"
+                                        />
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(`https://ntfy.sh/${ntfyTopic}`);
+                                          setCopiedTopic(true);
+                                          setTimeout(() => setCopiedTopic(false), 2000);
+                                        }}
+                                        className="p-2 rounded-lg border border-slate-800 bg-slate-950 hover:bg-slate-900 transition-colors text-slate-300"
+                                        title="Copy ntfy URL"
+                                      >
+                                        {copiedTopic ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex gap-2 pt-1">
+                                    <button
+                                      type="button"
+                                      onClick={sendTestNotification}
+                                      disabled={testPushStatus === "sending"}
+                                      className="flex-1 py-1.5 px-3 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold transition-all flex items-center justify-center gap-1 disabled:opacity-50"
+                                    >
+                                      {testPushStatus === "sending" ? (
+                                        <span>Sending...</span>
+                                      ) : testPushStatus === "success" ? (
+                                        <span className="flex items-center gap-1 text-[11px]"><Check className="w-3 h-3" /> Sent!</span>
+                                      ) : testPushStatus === "error" ? (
+                                        <span>Failed</span>
+                                      ) : (
+                                        <span>Send Test Push</span>
+                                      )}
+                                    </button>
+                                    <a
+                                      href={`https://ntfy.sh/${ntfyTopic}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="py-1.5 px-3 rounded-lg border border-slate-800 bg-slate-950 hover:bg-slate-900 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1"
+                                    >
+                                      <span>Feed</span>
+                                    </a>
+                                  </div>
+
+                                  <div className="bg-slate-950/45 p-2.5 rounded-lg border border-slate-900/60 text-[10px] text-slate-400 space-y-1 mt-1 leading-relaxed">
+                                    <div className="font-bold text-slate-300 flex items-center gap-1 mb-1 font-sans">
+                                      <Smartphone className="w-3 h-3 text-amber-500" /> SETUP GUIDE (100% FREE):
+                                    </div>
+                                    <p>1. Install the <strong>ntfy</strong> app from Google Play or iOS App Store.</p>
+                                    <p>2. Tap <strong>"+"</strong> in the mobile app to subscribe.</p>
+                                    <p>3. Enter <strong>{ntfyTopic}</strong> and subscribe.</p>
+                                    <p className="text-amber-500/80 font-semibold mt-1">Receive planetary transits, ingress, and agent updates on your lock screen instantly!</p>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
