@@ -16,7 +16,8 @@ import {
   CloudLightning,
   Save,
   FileText,
-  Send
+  Send,
+  ExternalLink
 } from "lucide-react";
 import { 
   AuthManager, 
@@ -554,19 +555,35 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
       {/* Social Google Login Button (The exclusive login option) */}
       <div className="space-y-4 py-2">
         {isInIframe && (
-          <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-200 space-y-2" id="iframe-auth-warning">
-            <div className="flex items-center gap-2 font-semibold text-amber-300">
-              <span className="animate-pulse">⚠️</span>
-              <span>Iframe Preview Warning</span>
-            </div>
-            <p className="text-[11px] leading-relaxed text-slate-300">
-              You are currently viewing this application inside the editor's sandbox iframe. Google Sign-In popups are <strong>blocked</strong> inside iframes by modern browser security policies.
-            </p>
-            <div className="pt-1">
-              <p className="text-[11px] text-amber-400 font-medium">
-                👉 <strong>How to fix:</strong> Click the <strong>"Open in new tab"</strong> button at the top-right of your preview iframe to run Google Sign-In successfully.
+          <div className="space-y-3">
+            <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs text-amber-200 space-y-2" id="iframe-auth-warning">
+              <div className="flex items-center gap-2 font-semibold text-amber-300">
+                <span className="animate-pulse">⚠️</span>
+                <span>Iframe Preview Warning</span>
+              </div>
+              <p className="text-[11px] leading-relaxed text-slate-300">
+                You are currently viewing this application inside the editor's sandbox iframe. Google Sign-In popups are <strong>blocked</strong> inside iframes by modern browser security policies.
               </p>
+              <div className="pt-1">
+                <p className="text-[11px] text-amber-400 font-medium">
+                  👉 <strong>How to fix:</strong> Click the <strong>"Open in new tab"</strong> button at the top-right of your preview iframe, or click the direct button below:
+                </p>
+              </div>
             </div>
+            
+            <button
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  window.open(window.location.href, "_blank");
+                }
+              }}
+              type="button"
+              className="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-sans font-bold rounded-xl text-xs transition-all cursor-pointer flex items-center justify-center gap-2 border border-amber-600 shadow-md hover:shadow-lg active:scale-95"
+              id="iframe-bypass-open-tab"
+            >
+              <ExternalLink className="w-4 h-4 shrink-0" />
+              Open Application in New Tab to Sign In
+            </button>
           </div>
         )}
 
