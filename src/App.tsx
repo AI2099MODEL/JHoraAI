@@ -1406,12 +1406,7 @@ export default function App() {
     {
       id: "my_page",
       label: "My Page",
-      icon: User,
-      submenus: [
-        { id: "my_life", label: "My Life", description: "Personal profiles, dynamic logs & private diary.", systemId: "my_page" },
-        { id: "my_journey", label: "My Journey", description: "Extended timelines, milestone tracks & map.", systemId: "my_page" },
-        { id: "my_astro", label: "My Astro", description: "Vedic, KP, Jaimini, Lal Kitab and more astro systems.", systemId: "my_page" }
-      ]
+      icon: User
     },
     {
       id: "analysis",
