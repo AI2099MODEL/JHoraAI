@@ -14,9 +14,7 @@ import { generateRelationshipPDF } from "../lib/relationshipReportGenerator";
 import { MasterArchitectureView } from "./MasterArchitectureView";
 import { PresentDayEngineView } from "./PresentDayEngineView";
 import { FinalResultsView } from "./FinalResultsView";
-import { EventEngineView } from "./EventEngineView";
 import { UserProfileSubmenuView } from "./UserProfileSubmenuView";
-import RulesTerminal from "./RulesTerminal";
 import EventBookView from "./EventBookView";
 import AstroChart from "./AstroChart";
 import { KPRulebook } from "../lib/rules/kpRulebook";
@@ -233,7 +231,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
   const [profilesList, setProfilesList] = useState<CachedHoroscopeRecord[]>([]);
   const [majorTab, setMajorTab] = useState<"advanced" | "present" | "jhora" | "transit" | "kp" | "western" | "all" | "reports">("present");
   const [transitSubTab, setTransitSubTab] = useState<string>("current_gochara");
-  const [eventsSubTab, setEventsSubTab] = useState<"final_results" | "present_day" | "rules" | "event_book" | "event_muhurta" | "current_events" | "engine">("final_results");
+  const [eventsSubTab, setEventsSubTab] = useState<"final_results" | "present_day" | "event_book" | "event_muhurta" | "current_events">("event_book");
   const [selectedVarga, setSelectedVarga] = useState<string>("D1");
   const [selectedBavPlanet, setSelectedBavPlanet] = useState<string>("Sun");
   const [activeDashaSystem, setActiveDashaSystem] = useState<"vimshottari" | "yogini" | "ashtottari">("vimshottari");
@@ -2466,11 +2464,9 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
       {majorTab === "present" && (
         <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40 animate-fade-in">
           {[
+            { id: "event_book", label: "Event Book" },
             { id: "final_results", label: "Final Results" },
             { id: "present_day", label: "Present Day Engine" },
-            { id: "rules", label: "Astrological Rules" },
-            { id: "event_book", label: "Event Book" },
-            { id: "engine", label: "Engine" },
             { id: "event_muhurta", label: "Event Muhurta Finder" },
             { id: "current_events", label: "Space Weather Alerts" }
           ].map((tab) => (
@@ -2561,6 +2557,12 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         {/* ================= EVENTS DYNAMIC WORKSPACE ================= */}
         {majorTab === "present" && (
           <div className="space-y-6 animate-fade-in">
+            {eventsSubTab === "event_book" && (
+              <EventBookView
+                astrologyData={astrologyData}
+                isDark={isDark}
+              />
+            )}
             {eventsSubTab === "final_results" && (
               <FinalResultsView
                 astrologyData={astrologyData}
@@ -2571,23 +2573,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               <PresentDayEngineView
                 astrologyData={astrologyData}
                 isDark={isDark}
-              />
-            )}
-            {eventsSubTab === "rules" && (
-              <RulesTerminal
-                isDarkTheme={isDark}
-              />
-            )}
-            {eventsSubTab === "event_book" && (
-              <EventBookView
-                astrologyData={astrologyData}
-                isDark={isDark}
-              />
-            )}
-            {eventsSubTab === "engine" && (
-              <EventEngineView
-                isDark={isDark}
-                astrologyData={astrologyData}
               />
             )}
             {eventsSubTab === "event_muhurta" && (
