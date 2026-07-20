@@ -2859,11 +2859,112 @@ export function MyPageView({
     doc.save(`jhora_ai_profile_report_${userName.toLowerCase().replace(/\s+/g, '_')}.pdf`);
   };
 
+  const getHeaderDashaLords = () => {
+    const rawDashas = astrologyData?.dashas || profile?.Vedic?.dashas?.vimshottari || [];
+    if (!rawDashas || rawDashas.length === 0) {
+      return { maha: "Ketu", antar: "Venus", pratyantar: "Sun", sookshma: "Moon", prana: "Mars" };
+    }
+    const date = new Date();
+    
+    const activeMaha = rawDashas.find((d: any) => {
+      const s = new Date(d.startDate);
+      const e = new Date(d.endDate);
+      return date >= s && date <= e;
+    }) || rawDashas[0];
+
+    let activeAntar = null;
+    if (activeMaha && activeMaha.subPeriods) {
+      activeAntar = activeMaha.subPeriods.find((sub: any) => {
+        const s = new Date(sub.startDate);
+        const e = new Date(sub.endDate);
+        return date >= s && date <= e;
+      });
+    }
+    if (!activeAntar && activeMaha && activeMaha.subPeriods && activeMaha.subPeriods.length > 0) {
+      activeAntar = activeMaha.subPeriods[0];
+    }
+
+    let activePratyantar = null;
+    if (activeAntar && activeAntar.subPeriods) {
+      activePratyantar = activeAntar.subPeriods.find((p: any) => {
+        const s = new Date(p.startDate || p.start);
+        const e = new Date(p.endDate || p.end);
+        return date >= s && date <= e;
+      });
+    }
+    if (!activePratyantar && activeAntar && activeAntar.subPeriods && activeAntar.subPeriods.length > 0) {
+      activePratyantar = activeAntar.subPeriods[0];
+    }
+
+    const LOCAL_PLANETS_CYCLE = [
+      "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+      "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury",
+      "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"
+    ];
+    const LOCAL_PLANET_YEARS: Record<string, number> = {
+      Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
+    };
+
+    let sookshmaLord = "Moon";
+    let sookshmaPeriod = null;
+    if (activePratyantar) {
+      const start = new Date(activePratyantar.startDate || activePratyantar.start || activeMaha.startDate);
+      const end = new Date(activePratyantar.endDate || activePratyantar.end || activeMaha.endDate);
+      const idx = LOCAL_PLANETS_CYCLE.indexOf(activePratyantar.lord);
+      if (idx !== -1) {
+        const totalMs = end.getTime() - start.getTime();
+        let currentStart = start.getTime();
+        for (let i = 0; i < 9; i++) {
+          const lord = LOCAL_PLANETS_CYCLE[(idx + i) % 9];
+          const dur = totalMs * (LOCAL_PLANET_YEARS[lord] / 120);
+          const currentEnd = currentStart + dur;
+          if (date.getTime() >= currentStart && date.getTime() <= currentEnd) {
+            sookshmaLord = lord;
+            sookshmaPeriod = { lord, start: new Date(currentStart), end: new Date(currentEnd) };
+            break;
+          }
+          currentStart = currentEnd;
+        }
+      }
+    }
+
+    let pranaLord = "Mars";
+    if (sookshmaPeriod) {
+      const start = sookshmaPeriod.start;
+      const end = sookshmaPeriod.end;
+      const idx = LOCAL_PLANETS_CYCLE.indexOf(sookshmaPeriod.lord);
+      if (idx !== -1) {
+        const totalMs = end.getTime() - start.getTime();
+        let currentStart = start.getTime();
+        for (let i = 0; i < 9; i++) {
+          const lord = LOCAL_PLANETS_CYCLE[(idx + i) % 9];
+          const dur = totalMs * (LOCAL_PLANET_YEARS[lord] / 120);
+          const currentEnd = currentStart + dur;
+          if (date.getTime() >= currentStart && date.getTime() <= currentEnd) {
+            pranaLord = lord;
+            break;
+          }
+          currentStart = currentEnd;
+        }
+      }
+    }
+
+    return {
+      maha: activeMaha?.lord || "Ketu",
+      antar: activeAntar?.lord || "Venus",
+      pratyantar: activePratyantar?.lord || "Sun",
+      sookshma: sookshmaLord,
+      prana: pranaLord
+    };
+  };
+
+  const headerLords = getHeaderDashaLords();
+
   const currentTabs = activeSubmenu === "my_life" ? lifeTabs : (activeSubmenu === "my_journey" ? journeyTabs : (activeSubmenu === "my_astro" ? astroTabs : []));
 
   return (
     <div className="space-y-4">
-      {/* COMPACT FIRST LINE: USER NAME, DOB DETAILS, AND AGE */}
+      {/* COMPACT FIRST LINE: USER NAME, DOB DETAILS, AND ACTIVE DASHA LORDS */}
       <div className={`px-4 py-3 rounded-xl border ${containerStyle} shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs`}>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <div className="flex items-center gap-1.5">
@@ -2879,10 +2980,13 @@ export function MyPageView({
         </div>
 
         <div className="flex items-center gap-3 shrink-0 self-start md:self-auto flex-wrap">
-          {age && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/10 font-mono text-xs">
-              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Age:</span>
-              <span className="font-bold">{age.years} Y, {age.months} M, {age.days} D</span>
+          {headerLords && (
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/10 font-mono text-xs">
+              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Antara:</span>
+              <span className="font-bold">{headerLords.pratyantar}</span>
+              <span className="opacity-30">|</span>
+              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Prana:</span>
+              <span className="font-bold">{headerLords.prana}</span>
             </div>
           )}
           <button
