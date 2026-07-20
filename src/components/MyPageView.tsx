@@ -2989,13 +2989,6 @@ export function MyPageView({
               <span className="font-bold">{headerLords.prana}</span>
             </div>
           )}
-          <button
-            onClick={exportMyPagePDF}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500 text-slate-950 hover:bg-amber-600 font-bold transition-all text-[11px] uppercase tracking-wider cursor-pointer select-none shadow-md shadow-amber-500/10 border border-amber-500"
-          >
-            <FileDown className="w-3.5 h-3.5" />
-            <span>Export PDF</span>
-          </button>
         </div>
       </div>
 
@@ -3140,7 +3133,58 @@ export function MyPageView({
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Card 1: Vimshottari Dasha Chronicles */}
+              {/* Card 1: Comprehensive Soul Blueprint Dossier */}
+              <button
+                disabled={compilingRelReport !== null}
+                onClick={async () => {
+                  try {
+                    setCompilingRelReport("soul_blueprint");
+                    exportMyPagePDF();
+                  } catch (err: any) {
+                    console.error("Soul Blueprint PDF compile failed:", err);
+                    alert("Failed to compile Soul Blueprint PDF: " + err.message);
+                  } finally {
+                    setCompilingRelReport(null);
+                  }
+                }}
+                className={`p-5 rounded-2xl border text-left md:col-span-2 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
+                  isDark 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
+                    : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
+                }`}
+              >
+                <div className="w-full">
+                  <div className="flex justify-between items-start">
+                    <FileDown className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+                    <span className={`text-[9px] border px-2 py-0.5 rounded font-mono font-bold ${
+                      isDark 
+                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20" 
+                        : "bg-amber-500/5 text-amber-600 border-amber-500/20"
+                    }`}>
+                      COMPLETE DOSSIER
+                    </span>
+                  </div>
+                  <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                    Comprehensive Soul Blueprint Dossier
+                  </h4>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                    Full astrological synthesis report compiling Panchanga, Divisional Charts, Shodashavarga, Jaimini, Lal Kitab, and Varshaphal.
+                  </p>
+                </div>
+                <div className="text-[11px] font-bold text-amber-500 flex items-center gap-1.5 mt-2">
+                  {compilingRelReport === "soul_blueprint" ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
+                    </>
+                  ) : (
+                    <>
+                      <FileDown className="w-3.5 h-3.5" /> Download PDF Report
+                    </>
+                  )}
+                </div>
+              </button>
+
+              {/* Card 2: Vimshottari Dasha Chronicles */}
               <button
                 disabled={compilingRelReport !== null}
                 onClick={async () => {
@@ -3159,7 +3203,7 @@ export function MyPageView({
                     setCompilingRelReport(null);
                   }
                 }}
-                className={`p-5 rounded-2xl border text-left md:col-span-2 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
+                className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
                     ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
@@ -3416,7 +3460,7 @@ export function MyPageView({
                     setCompilingRelReport(null);
                   }
                 }}
-                className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
+                className={`p-5 rounded-2xl border text-left md:col-span-3 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
                     ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-indigo-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-indigo-500/40 shadow-sm shadow-neutral-100"
