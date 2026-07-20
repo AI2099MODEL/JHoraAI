@@ -53,7 +53,8 @@ import {
   Printer,
   Copy,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  LogOut
 } from "lucide-react";
 import { AstrologyData, convertTimeTo24h, convertDateToISO } from "./lib/astrology";
 import { mapJHoraResponseToAstrologyData, mapAstrologyDataToUserProfileJSON } from "./lib/jhoraMapper";
@@ -1460,7 +1461,6 @@ export default function App() {
       submenus: [
         { id: "rules_terminal", label: "Rules Terminal", description: "Review and edit core astrological logic gates." },
         { id: "theme", label: "Theme", description: "Dark, Light, and custom styling." },
-        { id: "google_account", label: "Google Account", description: "Enable Google Sign-In & Sync." },
         { id: "google_drive", label: "Google Drive Backup", description: "Save and load birth charts on Google Drive." },
         { id: "google_calendar", label: "Google Calendar Sync", description: "Sync Vimshottari dasha events to calendar." },
         { id: "google_gmail", label: "Google Gmail Dispatcher", description: "Send astrological reports via Gmail." },
@@ -1898,6 +1898,34 @@ export default function App() {
     </div>
   );
 
+  if (!activeUser) {
+    return (
+      <div 
+        className={`min-h-screen flex flex-col items-center justify-center transition-colors duration-300 ${
+          isDark 
+            ? "dark bg-slate-950 text-slate-100 selection:bg-amber-500/30 selection:text-amber-200" 
+            : "light bg-neutral-50 text-neutral-900 selection:bg-amber-600/20 selection:text-amber-800"
+        }`} 
+        id="auth-root-container"
+        data-app-theme={theme}
+      >
+        <ThemeStyles />
+        <div className="w-full max-w-md p-6 space-y-6">
+          <div className="text-center space-y-2">
+            <div className="inline-block bg-gradient-to-br from-amber-500 to-indigo-600 p-3 rounded-2xl shadow-xl shadow-amber-500/10 mb-2">
+              <span className="text-2xl font-bold font-mono text-slate-950 leading-none block select-none">ॐ</span>
+            </div>
+            <h1 className="text-2xl font-sans font-bold text-amber-500 tracking-tight">JHora AI Professional</h1>
+            <p className={`text-xs font-mono uppercase tracking-wider mt-1 ${isDark ? "text-slate-500" : "text-neutral-500"}`}>
+              Advanced Jyotish Computational Intelligence
+            </p>
+          </div>
+          <AuthScreen onAuthSuccess={(user) => setActiveUser(user)} activeUser={activeUser} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div 
       className={`min-h-screen flex flex-col transition-colors duration-300 ${
@@ -2016,6 +2044,37 @@ export default function App() {
                 <option value="vedic-sandalwood">🪔 Vedic Sandalwood</option>
               </select>
             </div>
+
+            {/* User Profile / Logout */}
+            {activeUser && (
+              <div className="flex items-center gap-2 border-l border-indigo-500/10 pl-3 shrink-0">
+                <img 
+                  src={activeUser.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150"} 
+                  alt={activeUser.name} 
+                  className="w-6 h-6 rounded-full border border-amber-500 object-cover shadow-sm" 
+                  referrerPolicy="no-referrer"
+                />
+                <span className={`text-xs font-medium hidden sm:inline max-w-[80px] truncate ${isDark ? "text-slate-300" : "text-neutral-700"}`}>
+                  {activeUser.name}
+                </span>
+                <button
+                  onClick={async () => {
+                    try {
+                      await AuthManager.logout();
+                      setActiveUser(null);
+                    } catch (e) {
+                      console.error("Logout failed:", e);
+                    }
+                  }}
+                  className={`p-1.5 rounded-lg border border-transparent hover:bg-slate-500/10 transition-colors cursor-pointer ${
+                    isDark ? "text-slate-400 hover:text-slate-200" : "text-neutral-500 hover:text-neutral-800"
+                  }`}
+                  title="Logout Profile"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* GPS & Live DateTime Widget (Shown on far-right for Desktop only) */}
