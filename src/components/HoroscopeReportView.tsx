@@ -2460,16 +2460,6 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         >
           Transit
         </button>
-        <button
-          onClick={() => setMajorTab("reports")}
-          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
-            majorTab === "reports"
-              ? "border-amber-500 text-amber-500 font-extrabold bg-slate-900/20"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          Reports
-        </button>
       </div>
 
       {/* Sub-tabs bar for Events */}
@@ -2701,117 +2691,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           </div>
         )}
 
-        {/* ================= REPORTS HUB ================= */}
-        {majorTab === "reports" && (
-          <div className="space-y-6">
-            {/* Automated PDF Reports Hub */}
-            <div className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
-              
-              <div className="border-b border-amber-500/10 pb-4 mb-6">
-                <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                  Phase 9.95 Compliance • Automated PDF Reports Download Hub
-                </span>
-                <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-amber-500" />
-                  PRE-COMPILED SYSTEM REVEALS & REPORTS
-                </h2>
-                <p className={`text-xs ${mutedText} mt-1`}>
-                  All reports have been compiled dynamically for your astronomical coordinates. Click directly to download without further configurations.
-                </p>
-              </div>
-
-              {compilingStatus === "compiling" ? (
-                <div className="flex items-center gap-2.5 p-6 rounded-xl border border-dashed border-indigo-500/30 bg-slate-950/40 text-slate-300 font-mono text-xs">
-                  <RefreshCw className="w-4 h-4 animate-spin text-amber-500" />
-                  <span>Compiling celestial alignments and writing PDF streams automatically...</span>
-                </div>
-              ) : compilingStatus === "ready" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <a
-                    href={generatedPdfs.complete360}
-                    download={`Complete_360_Astrological_Systems_Report_${Date.now()}.pdf`}
-                    className={`p-4 rounded-xl border ${isDark ? "border-indigo-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-indigo-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer`}
-                  >
-                    <div>
-                      <div className="flex justify-between items-start">
-                        <FileText className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded font-mono">360° TOTAL</span>
-                      </div>
-                      <h4 className="text-xs font-bold text-slate-200 mt-2">Complete 360° Report</h4>
-                      <p className="text-[10px] text-slate-400 mt-1 line-clamp-2"> Tabular astrological metrics across JHora, KP, and Western.</p>
-                    </div>
-                    <div className="text-[10px] font-bold text-indigo-400 flex items-center gap-1 mt-2">
-                      <Download className="w-3.5 h-3.5" /> Download PDF (Direct)
-                    </div>
-                  </a>
-
-                  <a
-                    href={generatedPdfs.vedic}
-                    download={`Vedic_Astrology_Authoritative_Report_${Date.now()}.pdf`}
-                    className={`p-4 rounded-xl border ${isDark ? "border-amber-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-amber-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer`}
-                  >
-                    <div>
-                      <div className="flex justify-between items-start">
-                        <FileText className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded font-mono">SIDEREAL VEDIC</span>
-                      </div>
-                      <h4 className="text-xs font-bold text-slate-200 mt-2">Authoritative Vedic Report</h4>
-                      <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Traditional Parashari calculations, planetary strengths, and dasha trees.</p>
-                    </div>
-                    <div className="text-[10px] font-bold text-amber-500 flex items-center gap-1 mt-2">
-                      <Download className="w-3.5 h-3.5" /> Download PDF (Direct)
-                    </div>
-                  </a>
-
-                  <a
-                    href={generatedPdfs.marriage}
-                    download={`Marriage_Promise_Timing_Chronicles_${Date.now()}.pdf`}
-                    className={`p-4 rounded-xl border ${isDark ? "border-rose-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-rose-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer`}
-                  >
-                    <div>
-                      <div className="flex justify-between items-start">
-                        <FileText className="w-5 h-5 text-rose-400 group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded font-mono">PROMISE & TIMING</span>
-                      </div>
-                      <h4 className="text-xs font-bold text-slate-200 mt-2">Marriage Promise & Timing</h4>
-                      <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Relationship timing, marital promise ratings, and sub-lord evidence logs.</p>
-                    </div>
-                    <div className="text-[10px] font-bold text-rose-400 flex items-center gap-1 mt-2">
-                      <Download className="w-3.5 h-3.5" /> Download PDF (Direct)
-                    </div>
-                  </a>
-
-                  <a
-                    href={generatedPdfs.partner}
-                    download={`15_Topic_Multi_System_Partner_Diagnostics_${Date.now()}.pdf`}
-                    className={`p-4 rounded-xl border ${isDark ? "border-purple-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-purple-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer`}
-                  >
-                    <div>
-                      <div className="flex justify-between items-start">
-                        <FileText className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
-                        <span className="text-[9px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded font-mono">15-TOPIC PAIRINGS</span>
-                      </div>
-                      <h4 className="text-xs font-bold text-slate-200 mt-2">15-Topic Partner Diagnostics</h4>
-                      <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Complete multi-system compatibility assessment and partner synastry.</p>
-                    </div>
-                    <div className="text-[10px] font-bold text-purple-400 flex items-center gap-1 mt-2">
-                      <Download className="w-3.5 h-3.5" /> Download PDF (Direct)
-                    </div>
-                  </a>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 p-4 rounded-xl border border-dashed border-rose-500/30 bg-rose-500/5 text-rose-500 font-mono text-xs">
-                  <AlertTriangle className="w-4 h-4 text-rose-500" />
-                  <span>Failed to automatically compile reports. Please try reloading the profile.</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-        
         {/* ================= MULTI-SYSTEM LAYOUT (WITHOUT STICKY CHART RAIL TO PREVENT DISPLAY ERRORS AND OVERLAPS) ================= */}
-        {majorTab !== "advanced" && majorTab !== "transit" && majorTab !== "reports" && (
+        {majorTab !== "advanced" && majorTab !== "transit" && (
           <div className="space-y-6">
             {/* Sub-tab / System Specific Content Column */}
             <div className="w-full space-y-6">

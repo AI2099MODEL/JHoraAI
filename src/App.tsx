@@ -1451,6 +1451,11 @@ export default function App() {
       ]
     },
     {
+      id: "reports",
+      label: "My Reports",
+      icon: FileText
+    },
+    {
       id: "settings",
       label: "Settings",
       icon: SettingsIcon,
