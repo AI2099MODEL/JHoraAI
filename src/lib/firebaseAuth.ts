@@ -86,14 +86,27 @@ let app;
 let auth: Auth;
 let db: Firestore;
 
+const customFirebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || firebaseConfig.apiKey,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || firebaseConfig.authDomain,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseConfig.projectId,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || firebaseConfig.storageBucket,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || firebaseConfig.messagingSenderId,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || firebaseConfig.appId,
+};
+
+const firestoreDbId = import.meta.env.VITE_FIREBASE_PROJECT_ID 
+  ? undefined 
+  : ((firebaseConfig as any).firestoreDatabaseId || "ai-studio-jhoraai-b515adab-0d0d-4cd6-aed5-99cdb77486ac");
+
 try {
   if (getApps().length === 0) {
-    app = initializeApp(firebaseConfig);
+    app = initializeApp(customFirebaseConfig);
   } else {
     app = getApp();
   }
   auth = getAuth(app);
-  db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId || "ai-studio-jhoraai-b515adab-0d0d-4cd6-aed5-99cdb77486ac");
+  db = getFirestore(app, firestoreDbId);
   
   // Test connection on boot using getDocFromServer
   const testConnection = async () => {
