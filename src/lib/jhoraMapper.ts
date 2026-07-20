@@ -1526,19 +1526,130 @@ export function mapAstrologyDataToUserProfileJSON(activeUser: any, data: any): a
   let startYear = new Date(bDate).getFullYear();
   let currentSignIdx = ascendant.sign_index;
   const isEvenLagna = ascendant.sign_index % 2 === 1;
+
+  const isVishamapada = (signIdx: number): boolean => {
+    // Aries (0), Taurus (1), Gemini (2), Libra (6), Scorpio (7), Sagittarius (8)
+    return [0, 1, 2, 6, 7, 8].includes(signIdx);
+  };
+
+  const getStrongerLordAndPos = (signIdx: number): { lordName: string; lordSignIdx: number } => {
+    if (signIdx === 7) { // Scorpio: Mars and Ketu
+      const mars = planetsMap["Mars"];
+      const ketu = planetsMap["Ketu"];
+      
+      if (!mars && !ketu) {
+        return { lordName: "Mars", lordSignIdx: 1 };
+      }
+      if (!mars) return { lordName: "Ketu", lordSignIdx: ketu.sign_index };
+      if (!ketu) return { lordName: "Mars", lordSignIdx: mars.sign_index };
+
+      // Rule 1: If one lord is in Scorpio (7) and the other is not, the one NOT in Scorpio is considered the lord.
+      const marsInScorpio = mars.sign_index === 7;
+      const ketuInScorpio = ketu.sign_index === 7;
+      if (marsInScorpio && !ketuInScorpio) {
+        return { lordName: "Ketu", lordSignIdx: ketu.sign_index };
+      }
+      if (ketuInScorpio && !marsInScorpio) {
+        return { lordName: "Mars", lordSignIdx: mars.sign_index };
+      }
+
+      // Rule 2: Compare number of planets conjoined with Mars vs Ketu.
+      let marsConjoinedCount = 0;
+      let ketuConjoinedCount = 0;
+      Object.entries(planetsMap).forEach(([name, p]: [string, any]) => {
+        if (name !== "Mars" && p.sign_index === mars.sign_index) marsConjoinedCount++;
+        if (name !== "Ketu" && p.sign_index === ketu.sign_index) ketuConjoinedCount++;
+      });
+
+      if (marsConjoinedCount > ketuConjoinedCount) {
+        return { lordName: "Mars", lordSignIdx: mars.sign_index };
+      }
+      if (ketuConjoinedCount > marsConjoinedCount) {
+        return { lordName: "Ketu", lordSignIdx: ketu.sign_index };
+      }
+
+      // Rule 3: Compare Jaimini degrees (retrograde Ketu degree subtracted from 30)
+      const marsDegree = mars.degree + mars.minute / 60 + mars.second / 3600;
+      const ketuDegreeInSign = ketu.degree + ketu.minute / 60 + ketu.second / 3600;
+      const ketuJaiminiDegree = 30 - ketuDegreeInSign;
+
+      if (marsDegree >= ketuJaiminiDegree) {
+        return { lordName: "Mars", lordSignIdx: mars.sign_index };
+      } else {
+        return { lordName: "Ketu", lordSignIdx: ketu.sign_index };
+      }
+    }
+
+    if (signIdx === 10) { // Aquarius: Saturn and Rahu
+      const saturn = planetsMap["Saturn"];
+      const rahu = planetsMap["Rahu"];
+      
+      if (!saturn && !rahu) {
+        return { lordName: "Saturn", lordSignIdx: 9 };
+      }
+      if (!saturn) return { lordName: "Rahu", lordSignIdx: rahu.sign_index };
+      if (!rahu) return { lordName: "Saturn", lordSignIdx: saturn.sign_index };
+
+      // Rule 1: If one lord is in Aquarius (10) and the other is not, the one NOT in Aquarius is considered the lord.
+      const saturnInAquarius = saturn.sign_index === 10;
+      const rahuInAquarius = rahu.sign_index === 10;
+      if (saturnInAquarius && !rahuInAquarius) {
+        return { lordName: "Rahu", lordSignIdx: rahu.sign_index };
+      }
+      if (rahuInAquarius && !saturnInAquarius) {
+        return { lordName: "Saturn", lordSignIdx: saturn.sign_index };
+      }
+
+      // Rule 2: Compare number of planets conjoined with Saturn vs Rahu.
+      let saturnConjoinedCount = 0;
+      let rahuConjoinedCount = 0;
+      Object.entries(planetsMap).forEach(([name, p]: [string, any]) => {
+        if (name !== "Saturn" && p.sign_index === saturn.sign_index) saturnConjoinedCount++;
+        if (name !== "Rahu" && p.sign_index === rahu.sign_index) rahuConjoinedCount++;
+      });
+
+      if (saturnConjoinedCount > rahuConjoinedCount) {
+        return { lordName: "Saturn", lordSignIdx: saturn.sign_index };
+      }
+      if (rahuConjoinedCount > saturnConjoinedCount) {
+        return { lordName: "Rahu", lordSignIdx: rahu.sign_index };
+      }
+
+      // Rule 3: Compare Jaimini degrees (retrograde Rahu degree subtracted from 30)
+      const saturnDegree = saturn.degree + saturn.minute / 60 + saturn.second / 3600;
+      const rahuDegreeInSign = rahu.degree + rahu.minute / 60 + rahu.second / 3600;
+      const rahuJaiminiDegree = 30 - rahuDegreeInSign;
+
+      if (saturnDegree >= rahuJaiminiDegree) {
+        return { lordName: "Saturn", lordSignIdx: saturn.sign_index };
+      } else {
+        return { lordName: "Rahu", lordSignIdx: rahu.sign_index };
+      }
+    }
+
+    const signLord = SIGN_LORDS[signIdx];
+    const lordPlanet = planetsMap[signLord];
+    const lordSignIdx = lordPlanet ? lordPlanet.sign_index : signIdx;
+    return { lordName: signLord, lordSignIdx };
+  };
+
   for (let i = 0; i < 12; i++) {
     const dashaSign = SIGN_NAMES[currentSignIdx];
-    const signLord = SIGN_LORDS[currentSignIdx];
-    const lordPlanet = data.planets?.find((pl: any) => pl.name === signLord);
-    const lordSignIdx = lordPlanet?.signIndex || 0;
+    const { lordName, lordSignIdx } = getStrongerLordAndPos(currentSignIdx);
     
     let dashaYears = 0;
-    if (currentSignIdx % 2 === 0) { // odd sign (direct counting)
-      dashaYears = (lordSignIdx - currentSignIdx + 12) % 12;
-    } else { // even sign (reverse counting)
-      dashaYears = (currentSignIdx - lordSignIdx + 12) % 12;
+    const isVisham = isVishamapada(currentSignIdx);
+    const indexDiff = isVisham
+      ? (lordSignIdx - currentSignIdx + 12) % 12
+      : (currentSignIdx - lordSignIdx + 12) % 12;
+
+    if (indexDiff === 0) {
+      dashaYears = 12;
+    } else if (indexDiff === 6) {
+      dashaYears = 10;
+    } else {
+      dashaYears = indexDiff;
     }
-    if (dashaYears === 0) dashaYears = 12;
 
     charaDashas.push({
       sign: dashaSign,

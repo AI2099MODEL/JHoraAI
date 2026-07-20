@@ -134,18 +134,45 @@ function CharaDashaInteractiveTable({ profile, astrologyData, isDark }: { profil
     let runningYear = birthYear;
     let currentSignIdx = ascendantSignIndex;
 
+    const isVishamapada = (signIdx: number): boolean => {
+      return [0, 1, 2, 6, 7, 8].includes(signIdx);
+    };
+
+    const getStrongerLordSignIdx = (signIdx: number): number => {
+      if (signIdx === 7) { // Scorpio: Mars or Ketu
+        const marsIdx = getLordSignIdx("Mars");
+        const ketuIdx = getLordSignIdx("Ketu");
+        if (marsIdx === 7 && ketuIdx !== 7) return ketuIdx;
+        if (ketuIdx === 7 && marsIdx !== 7) return marsIdx;
+        return marsIdx;
+      }
+      if (signIdx === 10) { // Aquarius: Saturn or Rahu
+        const saturnIdx = getLordSignIdx("Saturn");
+        const rahuIdx = getLordSignIdx("Rahu");
+        if (saturnIdx === 10 && rahuIdx !== 10) return rahuIdx;
+        if (rahuIdx === 10 && saturnIdx !== 10) return saturnIdx;
+        return saturnIdx;
+      }
+      return getLordSignIdx(SIGN_LORDS[signIdx]);
+    };
+
     for (let i = 0; i < 12; i++) {
       const dashaSign = SIGN_NAMES[currentSignIdx];
-      const signLord = SIGN_LORDS[currentSignIdx];
-      const lordSignIdx = getLordSignIdx(signLord);
+      const lordSignIdx = getStrongerLordSignIdx(currentSignIdx);
       
       let dashaYears = 0;
-      if (currentSignIdx % 2 === 0) { // odd sign (direct counting)
-        dashaYears = (lordSignIdx - currentSignIdx + 12) % 12;
-      } else { // even sign (reverse counting)
-        dashaYears = (currentSignIdx - lordSignIdx + 12) % 12;
+      const isVisham = isVishamapada(currentSignIdx);
+      const indexDiff = isVisham
+        ? (lordSignIdx - currentSignIdx + 12) % 12
+        : (currentSignIdx - lordSignIdx + 12) % 12;
+
+      if (indexDiff === 0) {
+        dashaYears = 12;
+      } else if (indexDiff === 6) {
+        dashaYears = 10;
+      } else {
+        dashaYears = indexDiff;
       }
-      if (dashaYears === 0) dashaYears = 12;
 
       dynamicDashas.push({
         sign: dashaSign,
