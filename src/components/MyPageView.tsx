@@ -39,7 +39,8 @@ import {
   FileDown,
   ChevronDown,
   ChevronUp,
-  Grid
+  Grid,
+  Layers
 } from "lucide-react";
 
 interface MyPageViewProps {
@@ -1706,7 +1707,8 @@ const lifeTabs = [
 const journeyTabs = [
   { id: "overview", label: "My Soul" },
   { id: "predictions", label: "Predictions" },
-  { id: "future", label: "Future" }
+  { id: "future", label: "Future" },
+  { id: "my_life_analysis", label: "My Life Analysis" }
 ];
 
 const astroTabs = [
@@ -5967,6 +5969,20 @@ export function MyPageView({
             astrologyData={astrologyData}
             isDark={isDark}
           />
+        </div>
+      ) : activeTab === "my_life_analysis" ? (
+        <div className="space-y-6 animate-fade-in">
+          <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
+            <div className="p-3.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <Layers className="w-6 h-6 animate-pulse" />
+            </div>
+            <div className="space-y-1.5 max-w-sm">
+              <h4 className="text-base font-bold text-slate-200">My Life Analysis</h4>
+              <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                This section is reserved for your comprehensive life analysis. Custom charts, transit trends, and predictive matrices will reside here.
+              </p>
+            </div>
+          </div>
         </div>
       ) : activeTab === "future" ? (
         (() => {
