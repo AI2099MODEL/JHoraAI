@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
 import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
+import { TableIndexView } from "./TableIndexView";
 
 interface AstroRawTablesViewProps {
   astrologyData: any;
@@ -1469,6 +1470,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                   </table>
                 </div>
               </div>
+            );
+
+          case "table_index":
+            return (
+              <TableIndexView
+                astrologyData={astrologyData}
+                activeUser={activeUser}
+                isDark={isDark}
+                onExportPDF={handleExportPDF}
+                onDownloadJSON={handleDownloadJSON}
+              />
             );
 
           default:

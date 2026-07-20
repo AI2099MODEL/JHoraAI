@@ -93,6 +93,7 @@ import { AstrologicalReasoningEngine } from "./components/AstrologicalReasoningE
 import { RelationshipConsultationFramework } from "./components/RelationshipConsultationFramework";
 import { MyPageView } from "./components/MyPageView";
 import { AstroRawTablesView } from "./components/AstroRawTablesView";
+import { TableIndexView } from "./components/TableIndexView";
 import EventBookView from "./components/EventBookView";
 import { UserProfile, SessionManager, AuthManager, UserProfileRepository } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
@@ -1520,7 +1521,10 @@ export default function App() {
         { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "astro", category: "EVENTS" },
         { id: "engine_guide", label: "Astrological Rule Engine", description: "Master Astrological Rule Engine Specification v1.0.", systemId: "astro", category: "EVENTS" },
 
-        // Category 8: SETTINGS
+        // Category 8: DEPLOYMENT
+        { id: "table_index", label: "Table Index", description: "JH1 to JH19 Master Tables Registry & Mapping.", systemId: "astro", category: "DEPLOYMENT" },
+
+        // Category 9: SETTINGS
         { id: "theme", label: "Theme", description: "Dark, Light, and custom styling.", systemId: "astro", category: "SETTINGS" },
         { id: "google_drive", label: "Google Drive Backup", description: "Save and load birth charts on Google Drive.", systemId: "astro", category: "SETTINGS" },
         { id: "google_calendar", label: "Google Calendar Sync", description: "Sync Vimshottari dasha events to calendar.", systemId: "astro", category: "SETTINGS" },

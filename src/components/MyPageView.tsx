@@ -380,7 +380,7 @@ function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, 
   );
 }
 
-function renderIndexedTable(tableId: string, data: any, profile?: any, astrologyData?: any) {
+export function renderIndexedTable(tableId: string, data: any, profile?: any, astrologyData?: any) {
   let planetsArray = data;
   if (!planetsArray && tableId === "table_2") {
     const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets || {};
@@ -1735,8 +1735,7 @@ const astroTabs = [
   { id: "lalkitab", label: "Lalkitab" },
   { id: "chinese", label: "Chinese" },
   { id: "tajik", label: "Tajik" },
-  { id: "western", label: "Western" },
-  { id: "table_index", label: "Table Index" }
+  { id: "western", label: "Western" }
 ];
 
 const tabs = [...lifeTabs, ...journeyTabs, ...astroTabs];
