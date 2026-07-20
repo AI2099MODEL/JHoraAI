@@ -1697,6 +1697,31 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
   }
 }
 
+const lifeTabs = [
+  { id: "daily", label: "Daily" }
+];
+
+const journeyTabs = [
+  { id: "overview", label: "My Soul" },
+  { id: "future", label: "Future" }
+];
+
+const astroTabs = [
+  { id: "dasha", label: "Vimshottari" },
+  { id: "charts", label: "Charts" },
+  { id: "vedic", label: "Vedic" },
+  { id: "transits_data", label: "Transits" },
+  { id: "jaimini", label: "Jaimini" },
+  { id: "kp", label: "KP" },
+  { id: "lalkitab", label: "Lalkitab" },
+  { id: "chinese", label: "Chinese" },
+  { id: "tajik", label: "Tajik" },
+  { id: "western", label: "Western" },
+  { id: "table_index", label: "Table Index" }
+];
+
+const tabs = [...lifeTabs, ...journeyTabs, ...astroTabs];
+
 export function MyPageView({
   astrologyData,
   activeUser,
@@ -1723,6 +1748,9 @@ export function MyPageView({
     if (activeSubmenuId) {
       if (activeSubmenuId === "my_life") {
         setActiveSubmenu("my_life");
+        if (!lifeTabs.some(t => t.id === activeTab)) {
+          setActiveTab("daily");
+        }
       } else if (activeSubmenuId === "my_journey") {
         setActiveSubmenu("my_journey");
         if (!journeyTabs.some(t => t.id === activeTab)) {
@@ -1731,8 +1759,11 @@ export function MyPageView({
       } else if (activeSubmenuId === "my_astro") {
         setActiveSubmenu("my_astro");
         if (!astroTabs.some(t => t.id === activeTab)) {
-          setActiveTab("vedic");
+          setActiveTab("dasha");
         }
+      } else if (lifeTabs.some(t => t.id === activeSubmenuId)) {
+        setActiveSubmenu("my_life");
+        setActiveTab(activeSubmenuId);
       } else if (journeyTabs.some(t => t.id === activeSubmenuId)) {
         setActiveSubmenu("my_journey");
         setActiveTab(activeSubmenuId);
@@ -1747,28 +1778,6 @@ export function MyPageView({
   const [westernSubTab, setWesternSubTab] = useState<string>("dashboard");
   const [selectedDateOffset, setSelectedDateOffset] = useState<number>(0);
   const [futurePage, setFuturePage] = useState<number>(0);
-
-  const journeyTabs = [
-    { id: "overview", label: "My Soul" },
-    { id: "dasha", label: "Vimshottari" },
-    { id: "charts", label: "Charts" },
-    { id: "daily", label: "Daily" },
-    { id: "future", label: "Future" }
-  ];
-
-  const astroTabs = [
-    { id: "vedic", label: "Vedic" },
-    { id: "transits_data", label: "Transits" },
-    { id: "jaimini", label: "Jaimini" },
-    { id: "kp", label: "KP" },
-    { id: "lalkitab", label: "Lalkitab" },
-    { id: "chinese", label: "Chinese" },
-    { id: "tajik", label: "Tajik" },
-    { id: "western", label: "Western" },
-    { id: "table_index", label: "Table Index" }
-  ];
-
-  const tabs = [...journeyTabs, ...astroTabs];
 
   // Fetch the active profile from server Users/userprofile.json
   const fetchProfile = async () => {
@@ -2778,110 +2787,7 @@ export function MyPageView({
     doc.save(`jhora_ai_profile_report_${userName.toLowerCase().replace(/\s+/g, '_')}.pdf`);
   };
 
-  if (activeSubmenu === "my_life") {
-    return (
-      <div className="space-y-4 animate-fade-in">
-        {/* COMPACT FIRST LINE: USER NAME, DOB DETAILS, AND AGE */}
-        <div className={`px-4 py-3 rounded-xl border ${containerStyle} shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs`}>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <div className="flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full bg-amber-500 animate-pulse`}></span>
-              <span className={`font-bold font-sans text-sm ${textStyle}`}>{userName}</span>
-            </div>
-            <span className="opacity-20 text-slate-500">|</span>
-            <span className={`${textMutedStyle} font-mono`}>DOB:</span>
-            <span className={`font-medium ${textStyle}`}>{birthDate} @ {birthTime}</span>
-            <span className="opacity-20 text-slate-500">|</span>
-            <span className={`${textMutedStyle} font-mono`}>Place:</span>
-            <span className={`font-medium ${textStyle} truncate max-w-[200px]`} title={birthPlace}>{birthPlace}</span>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0 self-start md:self-auto flex-wrap">
-            {age && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/10 font-mono text-xs">
-                <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Age:</span>
-                <span className="font-bold">{age.years} Y, {age.months} M, {age.days} D</span>
-              </div>
-            )}
-            <button
-              onClick={exportMyPagePDF}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500 text-slate-950 hover:bg-amber-600 font-bold transition-all text-[11px] uppercase tracking-wider cursor-pointer select-none shadow-md shadow-amber-500/10 border border-amber-500"
-            >
-              <FileDown className="w-3.5 h-3.5" />
-              <span>Export PDF</span>
-            </button>
-          </div>
-        </div>
-
-        {errorMsg && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-2.5">
-            <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-            <p className="text-xs text-red-400">{errorMsg}</p>
-          </div>
-        )}
-
-        {/* Primary Submenus Switcher */}
-        <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-950/60 rounded-xl border border-slate-800/40" id="primary-submenu-bar-early">
-          <button
-            onClick={() => { setActiveSubmenu("my_life"); onSubmenuSelect?.("my_life"); }}
-            className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-              activeSubmenu === "my_life"
-                ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
-            }`}
-            id="submenu-my-life-early"
-          >
-            <User className="w-4 h-4 shrink-0" />
-            <span>My Life</span>
-          </button>
-          <button
-            onClick={() => { setActiveSubmenu("my_journey"); onSubmenuSelect?.("my_journey"); }}
-            className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-              activeSubmenu === "my_journey"
-                ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
-            }`}
-            id="submenu-my-journey-early"
-          >
-            <Compass className="w-4 h-4 shrink-0" />
-            <span>My Journey</span>
-          </button>
-          <button
-            onClick={() => { setActiveSubmenu("my_astro"); onSubmenuSelect?.(activeTab); }}
-            className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-              activeSubmenu === "my_astro"
-                ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
-            }`}
-            id="submenu-my-astro-early"
-          >
-            <Sparkles className="w-4 h-4 shrink-0" />
-            <span>My Astro</span>
-          </button>
-        </div>
-
-        <motion.div
-          key="my_life"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`p-8 rounded-xl border ${cardStyle} shadow-sm flex flex-col items-center justify-center text-center space-y-4 min-h-[300px]`}
-          id="my-life-placeholder"
-        >
-          <div className="p-3 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
-            <User className="w-6 h-6" />
-          </div>
-          <div className="space-y-1">
-            <h4 className={`text-base font-bold font-sans ${textStyle}`}>My Life</h4>
-            <p className={`text-xs ${textMutedStyle} max-w-md`}>
-              This section is ready. No content has been added yet as requested.
-            </p>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
-  const currentTabs = activeSubmenu === "my_journey" ? journeyTabs : astroTabs;
+  const currentTabs = activeSubmenu === "my_life" ? lifeTabs : (activeSubmenu === "my_journey" ? journeyTabs : astroTabs);
 
   return (
     <div className="space-y-4">
@@ -2927,7 +2833,11 @@ export function MyPageView({
       {/* Primary Submenus Switcher */}
       <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-950/60 rounded-xl border border-slate-800/40" id="primary-submenu-bar">
         <button
-          onClick={() => { setActiveSubmenu("my_life"); onSubmenuSelect?.("my_life"); }}
+          onClick={() => {
+            setActiveSubmenu("my_life");
+            setActiveTab("daily");
+            onSubmenuSelect?.("daily");
+          }}
           className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
             activeSubmenu === "my_life"
               ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
@@ -2939,7 +2849,11 @@ export function MyPageView({
           <span>My Life</span>
         </button>
         <button
-          onClick={() => { setActiveSubmenu("my_journey"); onSubmenuSelect?.("my_journey"); }}
+          onClick={() => {
+            setActiveSubmenu("my_journey");
+            setActiveTab("overview");
+            onSubmenuSelect?.("overview");
+          }}
           className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
             activeSubmenu === "my_journey"
               ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
@@ -2951,7 +2865,11 @@ export function MyPageView({
           <span>My Journey</span>
         </button>
         <button
-          onClick={() => { setActiveSubmenu("my_astro"); onSubmenuSelect?.(activeTab); }}
+          onClick={() => {
+            setActiveSubmenu("my_astro");
+            setActiveTab("dasha");
+            onSubmenuSelect?.("dasha");
+          }}
           className={`py-3 px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
             activeSubmenu === "my_astro"
               ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
