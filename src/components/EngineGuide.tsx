@@ -1855,6 +1855,789 @@ ENGINE PRINCIPLES
 • Invalid rule results are rejected before decision making.
 • All validation actions are deterministic and repeatable.
 
+###############################################################
+
+###############################################################
+PART 18 — CONFIDENCE ENGINE
+Confidence Assessment Framework
+###############################################################
+
+PURPOSE
+
+The Confidence Engine measures the reliability of the
+Decision Engine verdict.
+
+It never changes the final verdict.
+
+It only measures the confidence of that verdict.
+
+###############################################################
+
+INPUT
+
+Decision Object
+
+↓
+
+Evidence Object
+
+↓
+
+Validation Object
+
+↓
+
+Supporting Rules
+
+↓
+
+Blocking Rules
+
+↓
+
+Planet Strength
+
+↓
+
+House Strength
+
+↓
+
+Dasha Support
+
+↓
+
+Transit Support
+
+###############################################################
+
+CONFIDENCE FACTORS
+
+Supporting Rule Count
+
+Blocking Rule Count
+
+Evidence Strength
+
+Rule Priority
+
+Planet Strength
+
+House Strength
+
+Dasha Alignment
+
+Transit Alignment
+
+Validation Status
+
+Conflict Count
+
+###############################################################
+
+CONFIDENCE LEVELS
+
+VERY HIGH
+
+HIGH
+
+MEDIUM
+
+LOW
+
+VERY LOW
+
+###############################################################
+
+PROCESS
+
+Load Decision
+
+↓
+
+Load Evidence
+
+↓
+
+Evaluate Supporting Rules
+
+↓
+
+Evaluate Blocking Rules
+
+↓
+
+Evaluate Validation
+
+↓
+
+Calculate Confidence
+
+↓
+
+Generate Confidence Object
+
+###############################################################
+
+OUTPUT
+
+Confidence Object
+
+↓
+
+Evidence Engine
+
+###############################################################
+
+ENGINE PRINCIPLES
+
+Confidence never changes
+
+PASS
+
+FAIL
+
+STRONG
+
+WEAK
+
+NOT PROMISED
+
+Confidence only measures reliability.
+
+###############################################################
+PART 19 — EVIDENCE ENGINE
+Evidence Processing Framework
+###############################################################
+
+PURPOSE
+
+The Evidence Engine collects all validated astrological evidence
+supporting or opposing each decision.
+
+###############################################################
+
+INPUT
+
+Validated Rule Results
+
+↓
+
+Decision Object
+
+↓
+
+Confidence Object
+
+↓
+
+Planet Data
+
+↓
+
+House Data
+
+↓
+
+Transit Data
+
+↓
+
+Dasha Data
+
+###############################################################
+
+PROCESS
+
+Collect Supporting Rules
+
+↓
+
+Collect Blocking Rules
+
+↓
+
+Collect Planet Evidence
+
+↓
+
+Collect House Evidence
+
+↓
+
+Collect Transit Evidence
+
+↓
+
+Collect Dasha Evidence
+
+↓
+
+Generate Evidence Object
+
+###############################################################
+
+OUTPUT
+
+Evidence Object
+
+↓
+
+Explanation Engine
+
+###############################################################
+
+EVIDENCE OBJECT
+
+EvidenceID
+
+EventID
+
+Supporting Rules
+
+Blocking Rules
+
+Planet Evidence
+
+House Evidence
+
+Transit Evidence
+
+Dasha Evidence
+
+Strength Evidence
+
+Confidence Level
+
+Timestamp
+
+###############################################################
+
+ENGINE PRINCIPLES
+
+Evidence is factual.
+
+Evidence never creates interpretations.
+
+Evidence only records validated astrological facts.
+
+###############################################################
+PART 20 — EXPLANATION ENGINE
+Explanation Generation Framework
+###############################################################
+
+PURPOSE
+
+Generate human-readable and technical explanations from
+validated evidence.
+
+###############################################################
+
+INPUT
+
+Decision Object
+
+↓
+
+Confidence Object
+
+↓
+
+Evidence Object
+
+###############################################################
+
+PROCESS
+
+Generate Human Explanation
+
+↓
+
+Generate Technical Explanation
+
+↓
+
+Generate Summary
+
+↓
+
+Generate Recommendations
+
+###############################################################
+
+OUTPUT
+
+Explanation Object
+
+↓
+
+Event Book
+
+###############################################################
+
+EXPLANATION OBJECT
+
+ExplanationID
+
+EventID
+
+Human Explanation
+
+Technical Explanation
+
+Summary
+
+Confidence
+
+Evidence Reference
+
+Timestamp
+
+###############################################################
+
+ENGINE PRINCIPLES
+
+Explanation never changes the decision.
+
+Explanation never changes evidence.
+
+Explanation only presents validated information.
+
+###############################################################
+PART 21 — API EXECUTION LAYER
+###############################################################
+
+PURPOSE
+
+Provide a standardized interface between the Astrological
+Rule Engine and external applications.
+
+###############################################################
+
+RESPONSIBILITIES
+
+Receive Chart Requests
+
+↓
+
+Load Cached Rules
+
+↓
+
+Execute Engine
+
+↓
+
+Return Decision Objects
+
+↓
+
+Return Evidence
+
+↓
+
+Return Explanations
+
+↓
+
+Publish Event Book Data
+
+###############################################################
+
+SUPPORTED SERVICES
+
+Birth Chart
+
+Natal Analysis
+
+Activation Analysis
+
+Daily Analysis
+
+Event Search
+
+Timeline
+
+PDF Export
+
+Plugin Requests
+
+###############################################################
+PART 22 — PERFORMANCE & CACHE ENGINE
+###############################################################
+
+PURPOSE
+
+Optimize runtime execution and eliminate redundant calculations.
+
+###############################################################
+
+CACHE
+
+Compiled Rules
+
+Planet Database
+
+House Database
+
+Transit Cache
+
+Dasha Cache
+
+Chart Cache
+
+Evidence Cache
+
+###############################################################
+
+OPTIMIZATION
+
+Lazy Loading
+
+Memory Cache
+
+Hot Reload
+
+Parallel Rule Evaluation
+
+Immutable Chart Objects
+
+###############################################################
+PART 23 — PLUGIN ARCHITECTURE
+###############################################################
+
+PURPOSE
+
+Allow external computational modules without changing
+the core engine.
+
+###############################################################
+
+SUPPORTED PLUGINS
+
+Western Astrology
+
+Research Modules
+
+Machine Learning
+
+Experimental Rule Sets
+
+Future Astrology Systems
+
+###############################################################
+
+PLUGIN LIFE CYCLE
+
+Install
+
+↓
+
+Validate
+
+↓
+
+Register
+
+↓
+
+Load
+
+↓
+
+Execute
+
+↓
+
+Unload
+
+###############################################################
+PART 24 — CONFIGURATION ENGINE
+###############################################################
+
+PURPOSE
+
+Manage runtime configuration.
+
+###############################################################
+
+CONFIGURATION
+
+Rule Priority
+
+Confidence Thresholds
+
+Enabled Systems
+
+Plugin Settings
+
+API Settings
+
+Cache Settings
+
+Logging Settings
+
+###############################################################
+PART 25 — LOGGING & DIAGNOSTICS
+###############################################################
+
+PURPOSE
+
+Maintain complete execution traceability.
+
+###############################################################
+
+LOGS
+
+Execution Logs
+
+Validation Logs
+
+Decision Logs
+
+API Logs
+
+Cache Logs
+
+Plugin Logs
+
+Error Logs
+
+###############################################################
+PART 26 — TESTING & VALIDATION FRAMEWORK
+###############################################################
+
+PURPOSE
+
+Verify deterministic behaviour of every engine.
+
+###############################################################
+
+TEST TYPES
+
+Unit Tests
+
+Rule Tests
+
+Regression Tests
+
+Historical Chart Tests
+
+Performance Tests
+
+Stress Tests
+
+Integration Tests
+
+###############################################################
+PART 27 — SECURITY & VERSIONING
+###############################################################
+
+PURPOSE
+
+Maintain integrity of the computational engine.
+
+###############################################################
+
+SECURITY
+
+Rule Integrity
+
+Compiled Rule Verification
+
+Checksum Validation
+
+Access Control
+
+Audit Trail
+
+###############################################################
+
+VERSIONING
+
+Rule Version
+
+Engine Version
+
+Plugin Version
+
+API Version
+
+Database Version
+
+###############################################################
+PART 28 — APPENDIX
+###############################################################
+
+APPENDIX A
+
+Rule Object Specification
+
+APPENDIX B
+
+Decision Object Specification
+
+APPENDIX C
+
+Evidence Object Specification
+
+APPENDIX D
+
+Validation Object Specification
+
+APPENDIX E
+
+Confidence Object Specification
+
+APPENDIX F
+
+Explanation Object Specification
+
+APPENDIX G
+
+API Object Specification
+
+APPENDIX H
+
+Status Codes
+
+APPENDIX I
+
+Error Codes
+
+APPENDIX J
+
+Naming Conventions
+
+APPENDIX K
+
+Glossary
+
+APPENDIX L
+
+Cross References
+
+###############################################################
+FINAL ENGINE EXECUTION FLOW
+###############################################################
+
+Birth Data
+
+↓
+
+Chart Generation
+
+↓
+
+Rule Compiler
+
+↓
+
+Rule Cache
+
+↓
+
+Rule Execution Engine
+
+↓
+
+Rule Validation Engine
+
+↓
+
+Rule Decision Engine
+
+↓
+
+Confidence Engine
+
+↓
+
+Evidence Engine
+
+↓
+
+Explanation Engine
+
+↓
+
+Event Book
+
+↓
+
+API Layer
+
+↓
+
+User Interface
+
+↓
+
+Reports
+
+↓
+
+Timeline
+
+↓
+
+PDF Export
+
+###############################################################
+
+CORE ENGINE PRINCIPLE
+
+NATAL ENGINE
+Determines IF an event is promised.
+
+↓
+
+ACTIVATION ENGINE
+Determines WHEN the promise becomes active.
+
+↓
+
+DAILY ENGINE
+Determines TODAY'S transient influences.
+
+↓
+
+RULE EXECUTION ENGINE
+Executes deterministic rules.
+
+↓
+
+RULE VALIDATION ENGINE
+Verifies correctness and consistency.
+
+↓
+
+RULE DECISION ENGINE
+Produces the final astrological verdict.
+
+↓
+
+CONFIDENCE ENGINE
+Measures reliability of the verdict.
+
+↓
+
+EVIDENCE ENGINE
+Collects all supporting and blocking facts.
+
+↓
+
+EXPLANATION ENGINE
+Produces human-readable and technical explanations.
+
+↓
+
+EVENT BOOK
+Stores, indexes, and presents the validated results.
+
+No downstream engine may modify an upstream decision.
+All processing is deterministic, traceable, auditable, and repeatable.
+
 ###############################################################`;
 
   const copyToClipboard = () => {
@@ -1981,7 +2764,9 @@ ENGINE PRINCIPLES
       { name: "RuleCompiler", desc: "Ingests raw markdown guidelines from the Master Handbook, validates syntax, identifies conflicts, and builds compiled JSON rulebooks." },
       { name: "RuleCache", desc: "In-memory database storing compiled rules for fast retrieval, supporting hot reloading without server downtime." },
       { name: "DecisionEngine", desc: "Resolves conflicting multi-system rulesets into a unified final promise evaluation: STRONG, MODERATE, WEAK, or CONTRADICTORY." },
+      { name: "ConfidenceEngine", desc: "Measures the reliability of the Decision Engine verdict (PASS, FAIL, STRONG, WEAK, NOT PROMISED) without altering the outcome." },
       { name: "EvidenceEngine", desc: "Generates clear natural-language human and technical explanations by summarizing matched, failed, supporting, and obstructing house rules." },
+      { name: "ExplanationEngine", desc: "Produces beautifully parsed human-readable and technical explanations from validated evidence, syncing with the Event Book." },
       { name: "EventBook", desc: "Maintains a secure, persistent historical chronological log of all rules parsed and events triggered, enabling full audits." }
     ];
 
@@ -2291,7 +3076,9 @@ ENGINE PRINCIPLES
               { name: "RuleCompiler", desc: "Ingests raw markdown guidelines from the Master Handbook, validates syntax, identifies conflicts, and builds compiled JSON rulebooks." },
               { name: "RuleCache", desc: "In-memory database storing compiled rules for fast retrieval, supporting hot reloading without server downtime." },
               { name: "DecisionEngine", desc: "Resolves conflicting multi-system rulesets into a unified final promise evaluation: STRONG, MODERATE, WEAK, or CONTRADICTORY." },
+              { name: "ConfidenceEngine", desc: "Measures the reliability of the Decision Engine verdict (PASS, FAIL, STRONG, WEAK, NOT PROMISED) without altering the outcome." },
               { name: "EvidenceEngine", desc: "Generates clear natural-language human and technical explanations by summarizing matched, failed, supporting, and obstructing house rules." },
+              { name: "ExplanationEngine", desc: "Produces beautifully parsed human-readable and technical explanations from validated evidence, syncing with the Event Book." },
               { name: "EventBook", desc: "Maintains a secure, persistent historical chronological log of all rules parsed and events triggered, enabling full audits." }
             ].map((mod, i) => (
               <div key={i} className={`p-4 rounded-xl border ${cardStyle} flex gap-3`}>
