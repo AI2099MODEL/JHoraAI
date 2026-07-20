@@ -93,13 +93,14 @@ try {
     app = getApp();
   }
   auth = getAuth(app);
-  db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId);
+  db = getFirestore(app, (firebaseConfig as any).firestoreDatabaseId || "ai-studio-jhoraai-b515adab-0d0d-4cd6-aed5-99cdb77486ac");
   
   // Test connection on boot using getDocFromServer
   const testConnection = async () => {
     try {
       await getDocFromServer(doc(db, 'test', 'connection'));
     } catch (error) {
+      console.warn("Firestore connection test completed (expected if database is unseeded/empty or client is offline):", error);
       if (error instanceof Error && error.message.includes('the client is offline')) {
         console.error("Please check your Firebase configuration.");
       }
