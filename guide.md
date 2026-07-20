@@ -132,3 +132,6 @@ The external `VedicAstro` API service is decommissioned and is entirely excluded
 ### Rule 5: Update Astro Menu & Submenu Charts
 The submenu "Divisional Vargas" within the "Astro" menu must be updated and labeled precisely as "Charts". This view must expose the raw API varga divisional charts data strictly in a clean, standard HTML tabular layout (table format). If any divisional chart or varga data is missing, the tables must be left completely blank, and no client-side computations or manual/synthetic calculations are permitted.
 
+### Rule 6: Mandatory Google Authentication & Account-Bound User Profile Persistence
+All users accessing the JHora AI Professional platform are required to authenticate via Google Account credentials upon site entry. Under no circumstances should any static, hardcoded, or pre-loaded default profiles (such as the legacy "Nitin" profile) be baked into the application's code, fallback states, initial input fields, dropdown selectors, or stored file repository (e.g. `/Users/`). The active user profile and all generated or saved astrological charts must be strictly attached, dynamically synced, and persistently stored under the authenticated user's unique Google account credentials. All database and API operations must map directly to the Google UID to maintain absolute account isolation and data security.
+

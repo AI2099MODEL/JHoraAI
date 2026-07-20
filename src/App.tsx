@@ -419,25 +419,35 @@ export interface MainMenuNode {
 }
 
 export default function App() {
-  // Input form state starting with Nitin as default profile
-  const [inputs, setInputs] = useState({
-    name: "Nitin",
-    date: "1976-01-06",
-    time: "06:40 PM",
-    location: "Dehradun, Uttarakhand, India",
-    latitude: 30.3165,
-    longitude: 78.0322,
-    timezone: 5.5,
+  // Input form state starting with a clean default profile
+  const [inputs, setInputs] = useState(() => {
+    const cachedProfileStr = localStorage.getItem("jhora_user_profile");
+    let initialName = "";
+    if (cachedProfileStr) {
+      try {
+        const cachedProfile = JSON.parse(cachedProfileStr);
+        initialName = cachedProfile.name || "";
+      } catch {}
+    }
+    return {
+      name: initialName,
+      date: new Date().toISOString().split('T')[0],
+      time: "12:00 PM",
+      location: "New Delhi, Delhi, India",
+      latitude: 28.6139,
+      longitude: 77.2090,
+      timezone: 5.5,
+    };
   });
 
   // Track currently calculated/loaded inputs to prevent redundant recalculations & timing mismatches
   const loadedInputsRef = useRef({
-    name: "Nitin",
-    date: "1976-01-06",
-    location: "Dehradun, Uttarakhand, India",
-    localTimeInput: "06:40",
+    name: "",
+    date: new Date().toISOString().split('T')[0],
+    location: "New Delhi, Delhi, India",
+    localTimeInput: "12:00",
     localAmpm: "PM",
-    time: "06:40 PM"
+    time: "12:00 PM"
   });
 
   const [astrologyData, setAstrologyData] = useState<AstrologyData | null>(null);
@@ -997,35 +1007,9 @@ export default function App() {
   };
 
   const handleLoadProfileByName = (name: string) => {
-    if (name === "Nitin") {
-      const nitinInputs = {
-        name: "Nitin",
-        date: "1976-01-06",
-        time: "06:40 PM",
-        location: "Dehradun, Uttarakhand, India",
-        latitude: 30.3165,
-        longitude: 78.0322,
-        timezone: 5.5,
-      };
-      setInputs(nitinInputs);
-      setLocalTimeInput("06:40");
-      setLocalAmpm("PM");
-      loadedInputsRef.current = {
-        name: "Nitin",
-        date: "1976-01-06",
-        location: "Dehradun, Uttarakhand, India",
-        localTimeInput: "06:40",
-        localAmpm: "PM",
-        time: "06:40 PM"
-      };
-      setTimeout(() => {
-        handleCalculate(false);
-      }, 50);
-    } else {
-      const matchedRecord = cachedList.find(r => r.name === name);
-      if (matchedRecord) {
-        handleLoadProfileDirect(matchedRecord);
-      }
+    const matchedRecord = cachedList.find(r => r.name === name);
+    if (matchedRecord) {
+      handleLoadProfileDirect(matchedRecord);
     }
   };
 
@@ -1121,7 +1105,7 @@ export default function App() {
 
   const handleCalculate = async (isInitial = false, forceRefresh = false) => {
     setLoading(true);
-    const finalName = inputs.name.trim() || "Nitin";
+    const finalName = inputs.name.trim() || activeUser?.name || "Seeker";
     const fullTimeStr = `${localTimeInput} ${localAmpm}`;
     runAutomatedSync({ ...inputs, name: finalName, time: fullTimeStr });
     try {
@@ -1992,14 +1976,14 @@ export default function App() {
             <div className="flex items-center gap-1.5 shrink-0">
               <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${isDark ? "text-slate-500" : isDating ? "text-[#8E6872]" : "text-neutral-400"}`}>Active Profile:</span>
               <select
-                value={astrologyData?.birthDetails?.name || "Nitin"}
+                value={astrologyData?.birthDetails?.name || ""}
                 onChange={(e) => handleLoadProfileByName(e.target.value)}
                 className={`text-[11px] sm:text-xs font-semibold rounded-lg px-2 py-1 sm:px-2.5 sm:py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-500 cursor-pointer border ${
                   isDark ? "bg-slate-900 border-indigo-500/10 text-amber-100" : isDating ? "bg-[#FFF0F2] border-[#FFE3E6] text-[#3E101B]" : "bg-neutral-50 border-neutral-200 text-neutral-800"
                 }`}
               >
-                <option value="Nitin">Nitin (Default)</option>
-                {cachedList.filter(r => r.name !== "Nitin").map(r => (
+                <option value="">Select Profile...</option>
+                {cachedList.map(r => (
                   <option key={r.id} value={r.name}>{r.name}</option>
                 ))}
               </select>

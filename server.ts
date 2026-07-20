@@ -525,6 +525,20 @@ app.post("/api/user-profile/index-table", async (req, res) => {
 // Endpoint to retrieve active user profile JSON from disk
 app.get("/api/user-profile/get", async (req, res) => {
   try {
+    const uid = req.query.uid as string;
+    
+    // If uid is provided, check if a profile exists for this uid in user_profiles.json
+    if (uid) {
+      const localFilePath = path.join(process.cwd(), "data", "user_profiles.json");
+      if (fs.existsSync(localFilePath)) {
+        const localContent = fs.readFileSync(localFilePath, "utf-8");
+        const localProfiles = JSON.parse(localContent);
+        if (localProfiles[uid]) {
+          return res.json(localProfiles[uid]);
+        }
+      }
+    }
+
     const filePath = path.join(process.cwd(), "Users", "userprofile.json");
     if (fs.existsSync(filePath)) {
       const content = fs.readFileSync(filePath, "utf-8");

@@ -57,24 +57,10 @@ export const RawDataPdfGenerator: React.FC<RawDataPdfGeneratorProps> = ({
       let targetData = astrologyData;
 
       if (!targetData) {
-        // Dynamically calculate the high-precision 1976-01-06 profile first if empty
-        const defaultRes = await fetch("/api/astrology/calculate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: "Nitin",
-            date: "1976-01-06",
-            time: "18:40:00",
-            place: "Dehradun, Uttarakhand, India",
-            latitude: 30.3165,
-            longitude: 78.0322,
-            timezone: 5.5
-          })
-        });
-        if (defaultRes.ok) {
-          targetData = await defaultRes.json();
-          setAstrologyData(targetData);
-        }
+        clearInterval(interval);
+        alert("Please cast and calculate your horoscope first using the form before generating the PDF.");
+        setCompiling(false);
+        return;
       }
 
       if (!targetData) {

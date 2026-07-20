@@ -1760,7 +1760,8 @@ export function MyPageView({
     }
 
     try {
-      const res = await fetch("/api/user-profile/get");
+      const url = activeUser?.uid ? `/api/user-profile/get?uid=${activeUser.uid}` : "/api/user-profile/get";
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         let parsedProfile = data;
@@ -1781,7 +1782,7 @@ export function MyPageView({
             User: {
               profile_name: activeUser.name || "Seeker",
               email: activeUser.email || "guest@jhora.ai",
-              SoulSynthesis: "Nitin's cosmic blueprint is that of a deeply wise, ancient guardian soul, characterized by a Cancer Ascendant in Pushya with Saturn in the first house, and an intuitive, transformative Shatabhisha Moon in the eighth house. Supported by the divine grace of Jupiter in its own sign of Pisces in the ninth house, his path is one of turning profound karmic responsibilities and psychological alchemy into pure spiritual leadership, impactful counseling, and enduring prosperity."
+              SoulSynthesis: `${activeUser.name || "Seeker"}'s cosmic blueprint is ready for computational analysis. Complete a custom horoscope calculation to populate the advanced synthesis report.`
             },
             Birth: {
               date: activeUser.birthDate,
@@ -1818,7 +1819,7 @@ export function MyPageView({
         }
       }
     } catch (err: any) {
-      console.error("Failed to load userprofile.json:", err);
+      console.error("Failed to load user profile:", err);
       if (!localStorage.getItem("jhora_raw_user_profile_cache")) {
         setErrorMsg("Failed to connect to backend profile service.");
       }
@@ -1911,7 +1912,7 @@ export function MyPageView({
 
   // Load the cached Soul Blueprint Synthesis from user profile json
   const soulSynthesisSummary = profile?.User?.SoulSynthesis || 
-    "Nitin's cosmic blueprint is that of a deeply wise, ancient guardian soul, characterized by a Cancer Ascendant in Pushya with Saturn in the first house, and an intuitive, transformative Shatabhisha Moon in the eighth house. Supported by the divine grace of Jupiter in its own sign of Pisces in the ninth house, his path is one of turning profound karmic responsibilities and psychological alchemy into pure spiritual leadership, impactful counseling, and enduring prosperity.";
+    `${profile?.User?.profile_name || activeUser?.name || "The Native"}'s cosmic blueprint is ready for computational analysis. Complete a custom horoscope calculation to populate the advanced synthesis report.`;
 
   const birthDetails = astrologyData?.birthDetails || profile?.Birth || {};
   const lagna = astrologyData?.lagna || profile?.Vedic?.ascendant || {};

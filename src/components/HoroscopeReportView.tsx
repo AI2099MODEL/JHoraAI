@@ -2315,23 +2315,17 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
             <div className="flex items-center gap-1.5">
               <select
                 value={
-                  birthDetails?.name === "Nitin"
-                    ? "Nitin"
-                    : profilesList.find(p => 
-                        p.name === birthDetails?.name && 
-                        p.date === birthDetails?.date && 
-                        p.time === birthDetails?.time
-                      )?.id || 
-                      profilesList.find(p => p.name === birthDetails?.name)?.id || 
-                      "Nitin"
+                  profilesList.find(p => 
+                    p.name === birthDetails?.name && 
+                    p.date === birthDetails?.date && 
+                    p.time === birthDetails?.time
+                  )?.id || 
+                  profilesList.find(p => p.name === birthDetails?.name)?.id || 
+                  ""
                 }
                 onChange={(e) => {
                   const val = e.target.value;
-                  if (val === "Nitin") {
-                    if (onLoadProfileByName) {
-                      onLoadProfileByName("Nitin");
-                    }
-                  } else {
+                  if (val) {
                     const selected = profilesList.find(p => p.id === val);
                     if (selected) {
                       if (onLoadProfile) {
@@ -2344,8 +2338,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                 }}
                 className="bg-slate-900/90 border border-slate-700 text-slate-100 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500/50 cursor-pointer font-medium font-sans"
               >
-                <option value="Nitin">Nitin (Default)</option>
-                {profilesList.filter(p => p.name !== "Nitin").map((p) => (
+                <option value="">Select Profile...</option>
+                {profilesList.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name} ({p.date})
                   </option>
