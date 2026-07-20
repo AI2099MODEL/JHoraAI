@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-20T13:04:18.240Z",
+    "lastUpdated": "2026-07-20T13:23:13.242Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-20T13:04:18.240Z",
-    "localTime": "2026-07-20T06:04:18-07:00",
+    "utcTime": "2026-07-20T13:23:13.242Z",
+    "localTime": "2026-07-20T06:23:13-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Virgo",
       "displayName": "Virgo",
-      "longitude": 175.11
+      "longitude": 175.28
     },
     "currentNakshatra": {
       "id": "Chitra",
@@ -34,9 +34,9 @@
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Saptami",
-      "illuminationPercentage": 45.2
+      "illuminationPercentage": 45.3
     },
-    "moonLongitude": 175.11,
+    "moonLongitude": 175.28,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 93.74,
+    "longitude": 93.76,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,18 +63,18 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 93.74,
+      "longitude": 93.76,
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
-      "subLord": "Rahu",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Virgo",
-      "longitude": 175.11,
+      "longitude": 175.28,
       "nakshatra": "Chitra",
       "pada": 1,
       "starLord": "Mars",
@@ -85,23 +85,23 @@
     },
     "mars": {
       "currentSign": "Virgo",
-      "longitude": 157.15,
-      "nakshatra": "Uttara Phalguni",
-      "pada": 4,
-      "starLord": "Sun",
-      "subLord": "Venus",
+      "longitude": 160.49,
+      "nakshatra": "Hasta",
+      "pada": 1,
+      "starLord": "Moon",
+      "subLord": "Sun",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 197.36,
+      "longitude": 197.43,
       "nakshatra": "Swati",
       "pada": 4,
       "starLord": "Rahu",
-      "subLord": "Mercury",
-      "retrograde": false,
+      "subLord": "Rahu",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 115.09,
+      "longitude": 115.13,
       "nakshatra": "Ashlesha",
       "pada": 3,
       "starLord": "Mercury",
-      "subLord": "Saturn",
+      "subLord": "Venus",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -285,7 +285,7 @@
       "name": "Sukla Saptami",
       "index": 7,
       "paksha": "Sukla",
-      "endDate": "2026-07-21T01:04:18.240Z"
+      "endDate": "2026-07-21T01:23:13.242Z"
     },
     "vara": {
       "name": "Monday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Chitra",
       "lord": "Mars",
-      "endDate": "2026-07-21T07:04:18.240Z"
+      "endDate": "2026-07-21T07:23:13.242Z"
     },
     "yoga": {
       "name": "Siddha",
       "lord": "Sun",
-      "endDate": "2026-07-21T03:04:18.240Z"
+      "endDate": "2026-07-21T03:23:13.242Z"
     },
     "karana": {
       "name": "Vanija",
       "lord": "Sun",
-      "endDate": "2026-07-20T19:04:18.240Z"
+      "endDate": "2026-07-20T19:23:13.242Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -391,8 +391,7 @@
       "Analytical precision"
     ],
     "negativeThemes": [
-      "Over-thinking",
-      "Restlessness"
+      "Communication hiccups"
     ],
     "emotionalTone": "The sky carries a highly reflective and analytical emotional tone governed by Moon in Virgo."
   },
@@ -440,8 +439,11 @@
   },
   "currentChallenges": {
     "delays": {
-      "active": false,
-      "affectedAreas": []
+      "active": true,
+      "affectedAreas": [
+        "Documentation workflows",
+        "Long distance transits"
+      ]
     },
     "stress": {
       "active": false,
