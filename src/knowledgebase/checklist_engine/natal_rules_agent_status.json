@@ -1,0 +1,74 @@
+{
+  "agentName": "NatalRulesEvaluatorAgent",
+  "status": "Healthy / Active",
+  "lastChecked": "2026-07-20T06:47:25.916Z",
+  "nextScheduledCheck": "2026-07-20T18:47:25.916Z",
+  "checkedProfile": "Nitin",
+  "checkedProfileFile": "userprofile.json",
+  "intervalMs": 43200000,
+  "results": [
+    {
+      "id": "KP_MAR_01",
+      "name": "Cuspal Sub Lord of 7th House for Marriage Timing",
+      "isMet": true,
+      "significator": "Ketu",
+      "starLord": "Venus",
+      "signifiedHouses": [
+        5,
+        4,
+        11
+      ],
+      "category": "Marriage",
+      "reasoning": "The 7th Cuspal Sub Lord (Ketu) is in the star of Venus, which signifies houses [5, 4, 11]. This is highly favorable as it connects directly with key relationship houses (2, 7, 11), confirming marriage promise."
+    },
+    {
+      "id": "KP_CAR_01",
+      "name": "10th Cuspal Sub Lord for Career and Profession Sector",
+      "isMet": true,
+      "significator": "Rahu",
+      "starLord": "Jupiter",
+      "signifiedHouses": [
+        9,
+        6
+      ],
+      "category": "Career",
+      "reasoning": "The 10th Cuspal Sub Lord (Rahu) is in the star of Jupiter, which signifies houses [9, 6]. Direct connection to professional houses [2, 6, 10, 11] triggers high status, stability, and career progress."
+    },
+    {
+      "id": "KP_FIN_01",
+      "name": "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
+      "isMet": true,
+      "significator": "Rahu",
+      "starLord": "Jupiter",
+      "signifiedHouses": [
+        9,
+        6
+      ],
+      "category": "Finance",
+      "reasoning": "The 2nd Cuspal Sub Lord (Rahu) resides in the star of Jupiter, signifying houses [9, 6]. Highly auspicious indicators for wealth accumulation and sound capital gains."
+    },
+    {
+      "id": "KP_HEA_01",
+      "name": "Health and Disease Propensity via 1st and 6th CSL",
+      "isMet": false,
+      "significator": "1st CSL: Mercury, 6th CSL: Rahu",
+      "starLord": "Jupiter",
+      "signifiedHouses": [
+        9,
+        6
+      ],
+      "category": "Health",
+      "reasoning": "The 6th Cuspal Sub Lord (Rahu) is in the star of Jupiter, signifying houses [9, 6]. Alert: Linkage with disease-prone houses (6, 8, 12) suggests keeping a healthy routine."
+    },
+    {
+      "id": "KP_DBA_01",
+      "name": "Dasha-Bhukti-Antara (DBA) Event Trigger Validation",
+      "isMet": true,
+      "significator": "Mercury - Saturn",
+      "starLord": "Various",
+      "signifiedHouses": [],
+      "category": "DBA",
+      "reasoning": "Current major active timeline lords are Mahadasha: Mercury and Bhukti: Saturn. These planetary nodes are ripe to trigger events in their designated houses."
+    }
+  ]
+}

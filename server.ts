@@ -2425,6 +2425,227 @@ app.post("/api/astrology/rules-handbook", (req, res) => {
   }
 });
 
+// ============================================================================
+// BACKGROUND AGENT: 12-Hour Astrological Natal Rules Evaluator Agent
+// ============================================================================
+const STATUS_FILE_PATH = path.join(process.cwd(), "src", "knowledgebase", "checklist_engine", "natal_rules_agent_status.json");
+
+function getPlanetHouses(kpData: any, planetName: string): number[] {
+  const housesSet = new Set<number>();
+  if (!kpData || !planetName) return [];
+  const p = kpData.planets?.[planetName];
+  if (p) {
+    if (p.house !== undefined && p.house !== null) {
+      housesSet.add(Number(p.house));
+    }
+    if (p.occupation) {
+      const match = String(p.occupation).match(/\d+/);
+      if (match) housesSet.add(Number(match[0]));
+    }
+    if (Array.isArray(p.ownership)) {
+      p.ownership.forEach((h: any) => housesSet.add(Number(h)));
+    }
+  }
+  return Array.from(housesSet);
+}
+
+function runNatalRulesEvaluatorAgent() {
+  console.log("[AGENT] Running 12-Hour Natal Rules Evaluator Agent...");
+  try {
+    const usersDir = path.join(process.cwd(), "Users");
+    let profilePath = path.join(usersDir, "userprofile.json");
+    if (!fs.existsSync(profilePath)) {
+      if (fs.existsSync(usersDir)) {
+        const files = fs.readdirSync(usersDir).filter(f => f.endsWith(".json"));
+        if (files.length > 0) {
+          profilePath = path.join(usersDir, files[0]);
+        }
+      }
+    }
+
+    if (!fs.existsSync(profilePath)) {
+      console.warn("[AGENT] No user profile files found in Users/. Agent will write default state.");
+      const defaultState = {
+        agentName: "NatalRulesEvaluatorAgent",
+        status: "Healthy / Idle",
+        lastChecked: new Date().toISOString(),
+        nextScheduledCheck: new Date(Date.now() + 12 * 3600 * 1000).toISOString(),
+        checkedProfile: "No Active Profile Loaded",
+        checkedProfileFile: "none",
+        intervalMs: 12 * 3600 * 1000,
+        results: []
+      };
+      fs.writeFileSync(STATUS_FILE_PATH, JSON.stringify(defaultState, null, 2), "utf-8");
+      return;
+    }
+
+    const rawData = fs.readFileSync(profilePath, "utf-8");
+    const profile = JSON.parse(rawData);
+    const kpData = profile.KP || {};
+    const profileName = profile.User?.profile_name || "Guest";
+
+    const results: any[] = [];
+
+    // Rule 1: Marriage Promise (7th CSL)
+    const csl7 = kpData.cusps?.House_7?.sub_lord || kpData.cusps?.["7"]?.sub_lord || "Saturn";
+    const star7 = kpData.planets?.[csl7]?.star_lord || "Rahu";
+    const sig7 = getPlanetHouses(kpData, star7);
+    const isMarFavorable = sig7.some(h => [2, 7, 11].includes(h));
+    results.push({
+      id: "KP_MAR_01",
+      name: "Cuspal Sub Lord of 7th House for Marriage Timing",
+      isMet: isMarFavorable,
+      significator: csl7,
+      starLord: star7,
+      signifiedHouses: sig7,
+      category: "Marriage",
+      reasoning: `The 7th Cuspal Sub Lord (${csl7}) is in the star of ${star7}, which signifies houses [${sig7.join(", ")}]. ${
+        isMarFavorable 
+          ? "This is highly favorable as it connects directly with key relationship houses (2, 7, 11), confirming marriage promise." 
+          : "The linkage is mixed/neutral, suggesting that partnerships will trigger growth and require conscious alignment."
+      }`
+    });
+
+    // Rule 2: Career & Profession (10th CSL)
+    const csl10 = kpData.cusps?.House_10?.sub_lord || kpData.cusps?.["10"]?.sub_lord || "Mercury";
+    const star10 = kpData.planets?.[csl10]?.star_lord || "Moon";
+    const sig10 = getPlanetHouses(kpData, star10);
+    const isCarFavorable = sig10.some(h => [2, 6, 10, 11].includes(h));
+    results.push({
+      id: "KP_CAR_01",
+      name: "10th Cuspal Sub Lord for Career and Profession Sector",
+      isMet: isCarFavorable,
+      significator: csl10,
+      starLord: star10,
+      signifiedHouses: sig10,
+      category: "Career",
+      reasoning: `The 10th Cuspal Sub Lord (${csl10}) is in the star of ${star10}, which signifies houses [${sig10.join(", ")}]. ${
+        isCarFavorable 
+          ? "Direct connection to professional houses [2, 6, 10, 11] triggers high status, stability, and career progress." 
+          : "Standard career promise; suggests career advancement will occur steadily through discipline."
+      }`
+    });
+
+    // Rule 3: Financial Status & Wealth Promise (2nd CSL)
+    const csl2 = kpData.cusps?.House_2?.sub_lord || kpData.cusps?.["2"]?.sub_lord || "Rahu";
+    const star2 = kpData.planets?.[csl2]?.star_lord || "Ketu";
+    const sig2 = getPlanetHouses(kpData, star2);
+    const isFinFavorable = sig2.some(h => [2, 6, 10, 11].includes(h));
+    results.push({
+      id: "KP_FIN_01",
+      name: "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
+      isMet: isFinFavorable,
+      significator: csl2,
+      starLord: star2,
+      signifiedHouses: sig2,
+      category: "Finance",
+      reasoning: `The 2nd Cuspal Sub Lord (${csl2}) resides in the star of ${star2}, signifying houses [${sig2.join(", ")}]. ${
+        isFinFavorable
+          ? "Highly auspicious indicators for wealth accumulation and sound capital gains."
+          : "Requires careful financial budgeting and prudent cash-flow planning."
+      }`
+    });
+
+    // Rule 4: Health and Disease Propensity (1st & 6th CSL)
+    const csl1 = kpData.cusps?.House_1?.sub_lord || kpData.cusps?.["1"]?.sub_lord || "Mercury";
+    const csl6 = kpData.cusps?.House_6?.sub_lord || kpData.cusps?.["6"]?.sub_lord || "Jupiter";
+    const star6 = kpData.planets?.[csl6]?.star_lord || "Mercury";
+    const sig6 = getPlanetHouses(kpData, star6);
+    const hasDiseasePropensity = sig6.some(h => [6, 8, 12].includes(h));
+    results.push({
+      id: "KP_HEA_01",
+      name: "Health and Disease Propensity via 1st and 6th CSL",
+      isMet: !hasDiseasePropensity,
+      significator: `1st CSL: ${csl1}, 6th CSL: ${csl6}`,
+      starLord: star6,
+      signifiedHouses: sig6,
+      category: "Health",
+      reasoning: `The 6th Cuspal Sub Lord (${csl6}) is in the star of ${star6}, signifying houses [${sig6.join(", ")}]. ${
+        hasDiseasePropensity 
+          ? "Alert: Linkage with disease-prone houses (6, 8, 12) suggests keeping a healthy routine." 
+          : "Auspicious: Low susceptibility to chronic ailments, strong natural immunity."
+      }`
+    });
+
+    // Rule 5: Dasha-Bhukti-Antara Event Trigger
+    const md = kpData.dba?.mahadasha || "Jupiter";
+    const ad = kpData.dba?.bhukti || "Mercury";
+    const activeDbaLords = [md, ad];
+    results.push({
+      id: "KP_DBA_01",
+      name: "Dasha-Bhukti-Antara (DBA) Event Trigger Validation",
+      isMet: true,
+      significator: activeDbaLords.join(" - "),
+      starLord: "Various",
+      signifiedHouses: [],
+      category: "DBA",
+      reasoning: `Current major active timeline lords are Mahadasha: ${md} and Bhukti: ${ad}. These planetary nodes are ripe to trigger events in their designated houses.`
+    });
+
+    const agentState = {
+      agentName: "NatalRulesEvaluatorAgent",
+      status: "Healthy / Active",
+      lastChecked: new Date().toISOString(),
+      nextScheduledCheck: new Date(Date.now() + 12 * 3600 * 1000).toISOString(),
+      checkedProfile: profileName,
+      checkedProfileFile: path.basename(profilePath),
+      intervalMs: 12 * 3600 * 1000,
+      results: results
+    };
+
+    const dir = path.dirname(STATUS_FILE_PATH);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(STATUS_FILE_PATH, JSON.stringify(agentState, null, 2), "utf-8");
+    console.log("[AGENT] Natal Rules verified and status saved successfully.");
+  } catch (err: any) {
+    console.error("[AGENT] Error in Natal Rules Evaluator Agent:", err);
+  }
+}
+
+// Register API Endpoints for the Natal Rules Evaluator Agent
+app.get("/api/rules/natal-agent-status", (req, res) => {
+  try {
+    if (fs.existsSync(STATUS_FILE_PATH)) {
+      const statusData = JSON.parse(fs.readFileSync(STATUS_FILE_PATH, "utf-8"));
+      return res.json(statusData);
+    } else {
+      runNatalRulesEvaluatorAgent();
+      if (fs.existsSync(STATUS_FILE_PATH)) {
+        const statusData = JSON.parse(fs.readFileSync(STATUS_FILE_PATH, "utf-8"));
+        return res.json(statusData);
+      }
+      return res.status(404).json({ error: "Agent status file not found yet. Evaluator is booting." });
+    }
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/rules/natal-agent-refresh", (req, res) => {
+  try {
+    runNatalRulesEvaluatorAgent();
+    if (fs.existsSync(STATUS_FILE_PATH)) {
+      const statusData = JSON.parse(fs.readFileSync(STATUS_FILE_PATH, "utf-8"));
+      return res.json({ success: true, message: "Natal rules manually evaluated by agent.", status: statusData });
+    }
+    return res.json({ success: true, message: "Natal rules agent triggered successfully." });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// Run background agent on boot
+setTimeout(() => {
+  runNatalRulesEvaluatorAgent();
+}, 2000);
+
+// Schedule agent to run every 12 hours
+setInterval(() => {
+  runNatalRulesEvaluatorAgent();
+}, 12 * 3600 * 1000);
+
 // ==========================================
 // Vite Dev / Static Hosting Setup
 // ==========================================

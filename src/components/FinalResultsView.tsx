@@ -27,6 +27,43 @@ export const FinalResultsView: React.FC<FinalResultsViewProps> = ({
   isDark
 }) => {
   const [activeTheme, setActiveTheme] = useState<"all" | "career" | "relationship">("all");
+  const [agentStatus, setAgentStatus] = useState<any>(null);
+  const [agentLoading, setAgentLoading] = useState<boolean>(false);
+  const [agentRefreshing, setAgentRefreshing] = useState<boolean>(false);
+
+  const fetchAgentStatus = async () => {
+    setAgentLoading(true);
+    try {
+      const res = await fetch("/api/rules/natal-agent-status");
+      if (res.ok) {
+        const data = await res.json();
+        setAgentStatus(data);
+      }
+    } catch (e) {
+      console.error("Error fetching agent status:", e);
+    } finally {
+      setAgentLoading(false);
+    }
+  };
+
+  const refreshAgent = async () => {
+    setAgentRefreshing(true);
+    try {
+      const res = await fetch("/api/rules/natal-agent-refresh", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setAgentStatus(data.status || data);
+      }
+    } catch (e) {
+      console.error("Error refreshing agent:", e);
+    } finally {
+      setAgentRefreshing(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchAgentStatus();
+  }, []);
 
   const birthDetails = useMemo(() => {
     if (!astrologyData) return null;
@@ -652,6 +689,63 @@ export const FinalResultsView: React.FC<FinalResultsViewProps> = ({
         <p className="text-xs text-slate-400 leading-relaxed">
           The following logic gates represent the core rules mapped directly from the **Astrological Rules Handbook** and the **KP Eventbook**. The synthesis scores above are derived deterministically through these active triggers:
         </p>
+
+        {/* ================= BACKGROUND AGENT MONITOR ================= */}
+        <div className="p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/5 space-y-3 font-sans">
+          <div className="flex flex-wrap justify-between items-center gap-3">
+            <div className="flex items-center gap-2">
+              <RefreshCw className={`w-4 h-4 text-indigo-400 ${agentRefreshing ? "animate-spin" : ""}`} />
+              <div>
+                <h4 className="text-xs font-bold text-slate-200">
+                  Natal Rules Evaluator Agent <span className="text-[10px] text-indigo-300 font-mono font-normal">(Scheduled 12h)</span>
+                </h4>
+                <p className="text-[10px] text-slate-400 font-mono">
+                  Autonomous background daemon verifying JHora natal specifications
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <span className={`text-[9px] font-mono px-2 py-0.5 rounded font-bold uppercase border ${
+                agentStatus?.status?.includes("Active") 
+                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25" 
+                  : "bg-slate-800 text-slate-400 border-slate-700"
+              }`}>
+                {agentStatus?.status || "Starting..."}
+              </span>
+              <button 
+                onClick={refreshAgent}
+                disabled={agentRefreshing || agentLoading}
+                className="text-[10px] bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold px-2.5 py-1 rounded transition-colors disabled:opacity-40"
+              >
+                {agentRefreshing ? "Refreshing..." : "Force Agent Scan"}
+              </button>
+            </div>
+          </div>
+
+          {agentStatus && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-indigo-500/10 pt-2.5 text-[10px] font-mono text-slate-400">
+              <div>
+                <span className="text-slate-500 block">LAST RUN</span>
+                <span className="text-slate-300 font-bold">
+                  {agentStatus.lastChecked ? new Date(agentStatus.lastChecked).toLocaleString() : "Never"}
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 block">NEXT SCHEDULED SCAN</span>
+                <span className="text-slate-300 font-bold">
+                  {agentStatus.nextScheduledCheck ? new Date(agentStatus.nextScheduledCheck).toLocaleString() : "In 12 Hours"}
+                </span>
+              </div>
+              <div>
+                <span className="text-slate-500 block">ACTIVE PROFILE</span>
+                <span className="text-indigo-300 font-bold">
+                  {agentStatus.checkedProfile || "None"} ({agentStatus.checkedProfileFile || "N/A"})
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           {synthesizedRules.map((rule, idx) => (
