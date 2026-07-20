@@ -5,7 +5,6 @@ import DashaTree from "./DashaTree";
 import TransitsTab from "./TransitsTab";
 import { AstroRawTablesView } from "./AstroRawTablesView";
 import { MasterArchitectureView } from "./MasterArchitectureView";
-import { VargaAnalysisView } from "./VargaAnalysisView";
 import currentSkyJson from "../knowledgebase/checklist_engine/current_sky.json";
 import {
   mapJHoraResponseToAstrologyData,
@@ -6841,7 +6840,17 @@ export function MyPageView({
         </div>
       ) : activeTab === "my_life_analysis" ? (
         <div className="space-y-6 animate-fade-in">
-          <VargaAnalysisView isDark={isDark} />
+          <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
+            <div className="p-3.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <Layers className="w-6 h-6 animate-pulse" />
+            </div>
+            <div className="space-y-1.5 max-w-sm">
+              <h4 className="text-base font-bold text-slate-200">My Life Analysis</h4>
+              <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                This section is reserved for your comprehensive life analysis. Custom charts, transit trends, and predictive matrices will reside here.
+              </p>
+            </div>
+          </div>
         </div>
       ) : activeTab === "future" ? (
         (() => {
