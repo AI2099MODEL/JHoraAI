@@ -104,6 +104,32 @@ import GithubOtaView from "./components/GithubOtaView";
 import { apiFetch as fetch } from "./lib/api";
 import RulesTerminal from "./components/RulesTerminal";
 
+const SETTINGS_SUBMENU_IDS = [
+  "rules_terminal",
+  "theme",
+  "google_drive",
+  "google_calendar",
+  "google_gmail",
+  "google_keep",
+  "google_contacts",
+  "github_ota",
+  "language",
+  "ayanamsa",
+  "chart_style",
+  "notification",
+  "github_updates",
+  "raw_json",
+  "api_inspector",
+  "request_log",
+  "response_log",
+  "dto_viewer",
+  "room_database_viewer",
+  "plugin_manager",
+  "performance",
+  "cache_manager",
+  "google_account"
+];
+
 // ==========================================================================
 // 1. EMBEDDED GLOBAL COMPONENT STYLES
 // ==========================================================================
@@ -1389,8 +1415,8 @@ export default function App() {
       }
       return p;
     }));
-    setActiveMenu("settings");
-    setActiveSubMenu(prev => ({ ...prev, settings: "plugin_manager" }));
+    setActiveMenu("astro");
+    setActiveSubMenu(prev => ({ ...prev, astro: "plugin_manager" }));
   };
 
   const isDark = theme !== "vedic-sandalwood";
@@ -1445,36 +1471,31 @@ export default function App() {
         { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "JH19: Lal Kitab Teva & Sleeping Status.", systemId: "astro", category: "LAL KITAB" },
 
         // Category 7: EVENTS
-        { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "astro", category: "EVENTS" }
-      ]
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: SettingsIcon,
-      submenus: [
-        { id: "rules_terminal", label: "Rules Terminal", description: "Review and edit core astrological logic gates." },
-        { id: "theme", label: "Theme", description: "Dark, Light, and custom styling." },
-        { id: "google_drive", label: "Google Drive Backup", description: "Save and load birth charts on Google Drive." },
-        { id: "google_calendar", label: "Google Calendar Sync", description: "Sync Vimshottari dasha events to calendar." },
-        { id: "google_gmail", label: "Google Gmail Dispatcher", description: "Send astrological reports via Gmail." },
-        { id: "google_keep", label: "Google Keep Notes", description: "Save and backup remedies and analysis notes." },
-        { id: "google_contacts", label: "Google Contacts", description: "Access connected Google Contacts list." },
-        { id: "github_ota", label: "GitHub OTA Updates", description: "Check for new releases." },
-        { id: "language", label: "Language", description: "Switch display languages." },
-        { id: "ayanamsa", label: "Ayanamsa", description: "Select precession correction systems." },
-        { id: "chart_style", label: "Chart Style", description: "Choose North vs South Indian charts." },
-        { id: "notification", label: "Notification", description: "Ingress alert options." },
-        { id: "github_updates", label: "GitHub Updates", description: "System version history." },
-        { id: "raw_json", label: "Raw JSON", description: "JHora API Response payload." },
-        { id: "api_inspector", label: "API Inspector", description: "Response headers and latencies." },
-        { id: "request_log", label: "Request Log", description: "Outgoing request archives." },
-        { id: "response_log", label: "Response Log", description: "Incoming payload bodies." },
-        { id: "dto_viewer", label: "DTO Viewer", description: "TypeScript interface schemas." },
-        { id: "room_database_viewer", label: "Room Database Viewer", description: "Review IndexedDB tables." },
-        { id: "plugin_manager", label: "Plugin Manager", description: "Load or configure hot-swap modules." },
-        { id: "performance", label: "Performance", description: "Renders benchmarks." },
-        { id: "cache_manager", label: "Cache Manager", description: "Manage database limits." }
+        { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "astro", category: "EVENTS" },
+
+        // Category 8: SETTINGS
+        { id: "rules_terminal", label: "Rules Terminal", description: "Review and edit core astrological logic gates.", systemId: "astro", category: "SETTINGS" },
+        { id: "theme", label: "Theme", description: "Dark, Light, and custom styling.", systemId: "astro", category: "SETTINGS" },
+        { id: "google_drive", label: "Google Drive Backup", description: "Save and load birth charts on Google Drive.", systemId: "astro", category: "SETTINGS" },
+        { id: "google_calendar", label: "Google Calendar Sync", description: "Sync Vimshottari dasha events to calendar.", systemId: "astro", category: "SETTINGS" },
+        { id: "google_gmail", label: "Google Gmail Dispatcher", description: "Send astrological reports via Gmail.", systemId: "astro", category: "SETTINGS" },
+        { id: "google_keep", label: "Google Keep Notes", description: "Save and backup remedies and analysis notes.", systemId: "astro", category: "SETTINGS" },
+        { id: "google_contacts", label: "Google Contacts", description: "Access connected Google Contacts list.", systemId: "astro", category: "SETTINGS" },
+        { id: "github_ota", label: "GitHub OTA Updates", description: "Check for new releases.", systemId: "astro", category: "SETTINGS" },
+        { id: "language", label: "Language", description: "Switch display languages.", systemId: "astro", category: "SETTINGS" },
+        { id: "ayanamsa", label: "Ayanamsa", description: "Select precession correction systems.", systemId: "astro", category: "SETTINGS" },
+        { id: "chart_style", label: "Chart Style", description: "Choose North vs South Indian charts.", systemId: "astro", category: "SETTINGS" },
+        { id: "notification", label: "Notification", description: "Ingress alert options.", systemId: "astro", category: "SETTINGS" },
+        { id: "github_updates", label: "GitHub Updates", description: "System version history.", systemId: "astro", category: "SETTINGS" },
+        { id: "raw_json", label: "Raw JSON", description: "JHora API Response payload.", systemId: "astro", category: "SETTINGS" },
+        { id: "api_inspector", label: "API Inspector", description: "Response headers and latencies.", systemId: "astro", category: "SETTINGS" },
+        { id: "request_log", label: "Request Log", description: "Outgoing request archives.", systemId: "astro", category: "SETTINGS" },
+        { id: "response_log", label: "Response Log", description: "Incoming payload bodies.", systemId: "astro", category: "SETTINGS" },
+        { id: "dto_viewer", label: "DTO Viewer", description: "TypeScript interface schemas.", systemId: "astro", category: "SETTINGS" },
+        { id: "room_database_viewer", label: "Room Database Viewer", description: "Review IndexedDB tables.", systemId: "astro", category: "SETTINGS" },
+        { id: "plugin_manager", label: "Plugin Manager", description: "Load or configure hot-swap modules.", systemId: "astro", category: "SETTINGS" },
+        { id: "performance", label: "Performance", description: "Renders benchmarks.", systemId: "astro", category: "SETTINGS" },
+        { id: "cache_manager", label: "Cache Manager", description: "Manage database limits.", systemId: "astro", category: "SETTINGS" }
       ]
     }
   ];
@@ -2844,7 +2865,168 @@ export default function App() {
                 exit={{ opacity: 0, y: -5 }}
                 className="space-y-6"
               >
-                {activeSubmenuId === "event_book" ? (
+                {SETTINGS_SUBMENU_IDS.includes(activeSubmenuId) ? (
+                  /* Interactive settings panel rendered inside Astro menu */
+                  [
+                    "raw_json",
+                    "api_inspector",
+                    "request_log",
+                    "response_log",
+                    "dto_viewer",
+                    "room_database_viewer",
+                    "plugin_manager",
+                    "performance",
+                    "cache_manager"
+                  ].includes(activeSubmenuId) ? (
+                    activeSubmenuId === "plugin_manager" ? (
+                      <PluginManager
+                        plugins={plugins}
+                        onTogglePlugin={handleTogglePlugin}
+                        onResetPlugins={handleResetPlugins}
+                        isDarkTheme={isDark}
+                      />
+                    ) : (
+                      <ApiAcceptanceDashboard 
+                        focusSection={
+                          activeSubmenuId === "raw_json" ? "raw_json" :
+                          activeSubmenuId === "api_inspector" ? "metrics" :
+                          activeSubmenuId === "room_database_viewer" ? "cache" :
+                          "audit"
+                        }
+                      />
+                    )
+                  ) : activeSubmenuId === "rules_terminal" ? (
+                    <RulesTerminal isDarkTheme={isDark} />
+                  ) : activeSubmenuId === "google_account" ? (
+                    <AuthScreen onAuthSuccess={(user) => setActiveUser(user)} activeUser={activeUser} />
+                  ) : [
+                    "google_drive",
+                    "google_calendar",
+                    "google_gmail",
+                    "google_keep",
+                    "google_contacts"
+                  ].includes(activeSubmenuId) ? (
+                    <WorkspaceTab astrologyData={astrologyData} activeSub={activeSubmenuId} />
+                  ) : activeSubmenuId === "github_ota" ? (
+                    <GithubOtaView isDarkTheme={isDark} />
+                  ) : (
+                    <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
+                      <div className="border-b border-indigo-500/10 pb-4">
+                        <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
+                          <SettingsIcon className="w-5 h-5 text-amber-500" />
+                          Platform Settings (Material 3)
+                        </h3>
+                        <p className="text-xs text-slate-400 mt-1">
+                          Configure planetary coordinates systems, precession formulas, and visual themes.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Ayanamsa (Precession Formula)</label>
+                            <select
+                              value={ayanamsa}
+                              onChange={(e) => setAyanamsa(e.target.value)}
+                              className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                                isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
+                              }`}
+                            >
+                              <option>Lahiri (Chitra Paksha) - JHora Default</option>
+                              <option>Raman (Suryasiddhanta)</option>
+                              <option>Krishnamurti (KP System)</option>
+                              <option>Fagan-Bradley (Western Sidereal)</option>
+                              <option>Yukteshwar</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Chart Drawing Style</label>
+                            <div className="flex gap-2">
+                              {["north", "south"].map((style) => (
+                                <button
+                                  key={style}
+                                  onClick={() => setChartStyle(style as any)}
+                                  className={`flex-1 py-2 rounded-lg border text-xs font-semibold capitalize transition-all cursor-pointer ${
+                                    chartStyle === style
+                                      ? "bg-amber-500/10 text-amber-500 border-amber-500/35"
+                                      : isDark
+                                        ? "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
+                                        : "bg-white border-neutral-300 text-neutral-600 hover:bg-neutral-100"
+                                  }`}
+                                >
+                                  {style} Indian
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Language Translator</label>
+                            <select
+                              value={selectedLanguage}
+                              onChange={(e) => setSelectedLanguage(e.target.value)}
+                              className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                                isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
+                              }`}
+                            >
+                              <option>English</option>
+                              <option>Hindi (हिन्दी)</option>
+                              <option>Sanskrit (संस्कृतम्)</option>
+                              <option>Tamil (தமிழ்)</option>
+                              <option>Telugu (తెలుగు)</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Ingress Notification Alerts</label>
+                            <div className="flex items-center justify-between p-2 rounded-lg border border-indigo-500/5 bg-slate-950/20">
+                              <span className="text-xs text-slate-400">Push notification on major ingress</span>
+                              <input
+                                type="checkbox"
+                                checked={notificationsActive}
+                                onChange={(e) => setNotificationsActive(e.target.checked)}
+                                className="w-4 h-4 cursor-pointer text-amber-500 focus:ring-amber-500"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-4 border-t border-indigo-500/10">
+                        <div>
+                          <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">
+                            ChatGPT / OpenAI API Key (Client-Side Key)
+                          </label>
+                          <div className="flex gap-2">
+                            <input
+                              type="password"
+                              placeholder="sk-proj-..."
+                              value={userOpenaiApiKey}
+                              onChange={(e) => handleOpenaiKeyChange(e.target.value)}
+                              className={`flex-1 border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono ${
+                                isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
+                              }`}
+                            />
+                            {userOpenaiApiKey && (
+                              <button
+                                onClick={() => handleOpenaiKeyChange("")}
+                                className="px-3 py-2 text-xs font-mono rounded-lg border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 transition-colors"
+                              >
+                                Clear Key
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
+                            Your key is stored securely in your browser's local storage and is sent directly in request headers. Setting a custom key here allows you to bypass server limits and use your personal ChatGPT directly.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                ) : activeSubmenuId === "event_book" ? (
                   <EventBookView 
                     astrologyData={astrologyData} 
                     isDark={isDark} 
@@ -3107,177 +3289,6 @@ export default function App() {
                   activeSubmenuId={activeSubmenuId}
                   astrologyData={astrologyData}
                 />
-              </motion.div>
-            </AnimatePresence>
-          ) : activeMenu === "settings" ? (
-            /* Interactive settings panel */
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeSubmenuId}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="space-y-6"
-              >
-                {[
-                  "raw_json",
-                  "api_inspector",
-                  "request_log",
-                  "response_log",
-                  "dto_viewer",
-                  "room_database_viewer",
-                  "plugin_manager",
-                  "performance",
-                  "cache_manager"
-                ].includes(activeSubmenuId) ? (
-                  activeSubmenuId === "plugin_manager" ? (
-                    <PluginManager
-                      plugins={plugins}
-                      onTogglePlugin={handleTogglePlugin}
-                      onResetPlugins={handleResetPlugins}
-                      isDarkTheme={isDark}
-                    />
-                  ) : (
-                    <ApiAcceptanceDashboard 
-                      focusSection={
-                        activeSubmenuId === "raw_json" ? "raw_json" :
-                        activeSubmenuId === "api_inspector" ? "metrics" :
-                        activeSubmenuId === "room_database_viewer" ? "cache" :
-                        "audit"
-                      }
-                    />
-                  )
-                ) : activeSubmenuId === "rules_terminal" ? (
-                  <RulesTerminal isDarkTheme={isDark} />
-                ) : activeSubmenuId === "google_account" ? (
-                  <AuthScreen onAuthSuccess={(user) => setActiveUser(user)} activeUser={activeUser} />
-                ) : [
-                  "google_drive",
-                  "google_calendar",
-                  "google_gmail",
-                  "google_keep",
-                  "google_contacts"
-                ].includes(activeSubmenuId) ? (
-                  <WorkspaceTab astrologyData={astrologyData} activeSub={activeSubmenuId} />
-                ) : activeSubmenuId === "github_ota" ? (
-                  <GithubOtaView isDarkTheme={isDark} />
-                ) : (
-                  <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                    <div className="border-b border-indigo-500/10 pb-4">
-                      <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                        <SettingsIcon className="w-5 h-5 text-amber-500" />
-                        Platform Settings (Material 3)
-                      </h3>
-                      <p className="text-xs text-slate-400 mt-1">
-                        Configure planetary coordinates systems, precession formulas, and visual themes.
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Ayanamsa (Precession Formula)</label>
-                          <select
-                            value={ayanamsa}
-                            onChange={(e) => setAyanamsa(e.target.value)}
-                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          >
-                            <option>Lahiri (Chitra Paksha) - JHora Default</option>
-                            <option>Raman (Suryasiddhanta)</option>
-                            <option>Krishnamurti (KP System)</option>
-                            <option>Fagan-Bradley (Western Sidereal)</option>
-                            <option>Yukteshwar</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Chart Drawing Style</label>
-                          <div className="flex gap-2">
-                            {["north", "south"].map((style) => (
-                              <button
-                                key={style}
-                                onClick={() => setChartStyle(style as any)}
-                                className={`flex-1 py-2 rounded-lg border text-xs font-semibold capitalize transition-all cursor-pointer ${
-                                  chartStyle === style
-                                    ? "bg-amber-500/10 text-amber-500 border-amber-500/35"
-                                    : isDark
-                                      ? "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
-                                      : "bg-white border-neutral-300 text-neutral-600 hover:bg-neutral-100"
-                                }`}
-                              >
-                                {style} Indian
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Language Translator</label>
-                          <select
-                            value={selectedLanguage}
-                            onChange={(e) => setSelectedLanguage(e.target.value)}
-                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          >
-                            <option>English</option>
-                            <option>Hindi (हिन्दी)</option>
-                            <option>Sanskrit (संस्कृतम्)</option>
-                            <option>Tamil (தமிழ்)</option>
-                            <option>Telugu (తెలుగు)</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">Ingress Notification Alerts</label>
-                          <div className="flex items-center justify-between p-2 rounded-lg border border-indigo-500/5 bg-slate-950/20">
-                            <span className="text-xs text-slate-400">Push notification on major ingress</span>
-                            <input
-                              type="checkbox"
-                              checked={notificationsActive}
-                              onChange={(e) => setNotificationsActive(e.target.checked)}
-                              className="w-4 h-4 cursor-pointer text-amber-500 focus:ring-amber-500"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pt-4 border-t border-indigo-500/10">
-                      <div>
-                        <label className="block text-[11px] text-slate-400 font-bold font-mono uppercase mb-1">
-                          ChatGPT / OpenAI API Key (Client-Side Key)
-                        </label>
-                        <div className="flex gap-2">
-                          <input
-                            type="password"
-                            placeholder="sk-proj-..."
-                            value={userOpenaiApiKey}
-                            onChange={(e) => handleOpenaiKeyChange(e.target.value)}
-                            className={`flex-1 border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          />
-                          {userOpenaiApiKey && (
-                            <button
-                              onClick={() => handleOpenaiKeyChange("")}
-                              className="px-3 py-2 text-xs font-mono rounded-lg border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 transition-colors"
-                            >
-                              Clear Key
-                            </button>
-                          )}
-                        </div>
-                        <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed">
-                          Your key is stored securely in your browser's local storage and is sent directly in request headers. Setting a custom key here allows you to bypass server limits and use your personal ChatGPT directly.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </motion.div>
             </AnimatePresence>
           ) : (
