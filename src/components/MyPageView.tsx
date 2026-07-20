@@ -1699,7 +1699,13 @@ function renderIndexedTable(tableId: string, data: any, profile?: any, astrology
 }
 
 const lifeTabs = [
-  { id: "daily", label: "Daily" }
+  { id: "daily", label: "Daily" },
+  { id: "current_dasha", label: "Current Dasha" },
+  { id: "current_yogas", label: "Yogas" },
+  { id: "current_doshas", label: "Doshas" },
+  { id: "house_activation", label: "House Activation" },
+  { id: "sensitive_points", label: "Sensitive Points" },
+  { id: "transit_summary", label: "Transit Summary" }
 ];
 
 const journeyTabs = [
@@ -5964,6 +5970,20 @@ export function MyPageView({
             </div>
           );
         })()
+      ) : ["current_dasha", "current_yogas", "current_doshas", "house_activation", "sensitive_points", "transit_summary"].includes(activeTab) ? (
+        <div className="space-y-6">
+          {astrologyData ? (
+            <TransitsTab
+              astrologyData={astrologyData}
+              profile={profile}
+              subTab={activeTab}
+            />
+          ) : (
+            <div className="text-center py-8 text-xs text-slate-500 font-mono">
+              ⚠️ Please cast a horoscope first to view real-time transits.
+            </div>
+          )}
+        </div>
       ) : activeTab === "predictions" ? (
         <div className="space-y-6 animate-fade-in">
           <MasterArchitectureView
