@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-20T13:36:03.367Z",
+    "lastUpdated": "2026-07-20T13:51:28.328Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-20T13:36:03.367Z",
-    "localTime": "2026-07-20T06:36:03-07:00",
+    "utcTime": "2026-07-20T13:51:28.328Z",
+    "localTime": "2026-07-20T06:51:28-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Virgo",
       "displayName": "Virgo",
-      "longitude": 175.4
+      "longitude": 175.54
     },
     "currentNakshatra": {
       "id": "Chitra",
@@ -28,15 +28,15 @@
       "displayName": "Mars"
     },
     "currentSubLord": {
-      "id": "Saturn",
-      "displayName": "Saturn"
+      "id": "Moon",
+      "displayName": "Moon"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Saptami",
       "illuminationPercentage": 45.4
     },
-    "moonLongitude": 175.4,
+    "moonLongitude": 175.54,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 93.77,
+    "longitude": 93.78,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,45 +63,45 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 93.77,
+      "longitude": 93.78,
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
-      "subLord": "Saturn",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Virgo",
-      "longitude": 175.4,
+      "longitude": 175.54,
       "nakshatra": "Chitra",
       "pada": 1,
       "starLord": "Mars",
-      "subLord": "Saturn",
+      "subLord": "Moon",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Virgo",
-      "longitude": 162.78,
+      "longitude": 165.42,
       "nakshatra": "Hasta",
-      "pada": 1,
+      "pada": 2,
       "starLord": "Moon",
-      "subLord": "Rahu",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 197.47,
+      "longitude": 197.53,
       "nakshatra": "Swati",
       "pada": 4,
       "starLord": "Rahu",
-      "subLord": "Venus",
-      "retrograde": true,
+      "subLord": "Jupiter",
+      "retrograde": false,
       "combust": false,
       "stationary": false
     },
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 115.15,
+      "longitude": 115.18,
       "nakshatra": "Ashlesha",
       "pada": 3,
       "starLord": "Mercury",
-      "subLord": "Moon",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Mercury",
     "moonStarLord": "Mars",
-    "moonSubLord": "Saturn"
+    "moonSubLord": "Moon"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Saptami",
       "index": 7,
       "paksha": "Sukla",
-      "endDate": "2026-07-21T01:36:03.367Z"
+      "endDate": "2026-07-21T01:51:28.328Z"
     },
     "vara": {
       "name": "Monday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Chitra",
       "lord": "Mars",
-      "endDate": "2026-07-21T07:36:03.367Z"
+      "endDate": "2026-07-21T07:51:28.328Z"
     },
     "yoga": {
       "name": "Siddha",
       "lord": "Sun",
-      "endDate": "2026-07-21T03:36:03.367Z"
+      "endDate": "2026-07-21T03:51:28.328Z"
     },
     "karana": {
       "name": "Vanija",
       "lord": "Sun",
-      "endDate": "2026-07-20T19:36:03.367Z"
+      "endDate": "2026-07-20T19:51:28.328Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -391,7 +391,8 @@
       "Analytical precision"
     ],
     "negativeThemes": [
-      "Communication hiccups"
+      "Over-thinking",
+      "Restlessness"
     ],
     "emotionalTone": "The sky carries a highly reflective and analytical emotional tone governed by Moon in Virgo."
   },
@@ -439,11 +440,8 @@
   },
   "currentChallenges": {
     "delays": {
-      "active": true,
-      "affectedAreas": [
-        "Documentation workflows",
-        "Long distance transits"
-      ]
+      "active": false,
+      "affectedAreas": []
     },
     "stress": {
       "active": false,

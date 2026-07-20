@@ -22917,74 +22917,74 @@
     "chara_dasha": [
       {
         "sign": "Cancer",
-        "start_date": "1976-01-01",
-        "end_date": "1981-01-01",
+        "start_date": "1976-01-06",
+        "end_date": "1981-01-06",
         "duration_years": 5
       },
       {
         "sign": "Gemini",
-        "start_date": "1981-01-01",
-        "end_date": "1988-01-01",
+        "start_date": "1981-01-06",
+        "end_date": "1988-01-06",
         "duration_years": 7
       },
       {
         "sign": "Taurus",
-        "start_date": "1988-01-01",
-        "end_date": "1994-01-01",
+        "start_date": "1988-01-06",
+        "end_date": "1994-01-06",
         "duration_years": 6
       },
       {
         "sign": "Aries",
-        "start_date": "1994-01-01",
-        "end_date": "1995-01-01",
+        "start_date": "1994-01-06",
+        "end_date": "1995-01-06",
         "duration_years": 1
       },
       {
         "sign": "Pisces",
-        "start_date": "1995-01-01",
-        "end_date": "2007-01-01",
+        "start_date": "1995-01-06",
+        "end_date": "2007-01-06",
         "duration_years": 12
       },
       {
         "sign": "Aquarius",
-        "start_date": "2007-01-01",
-        "end_date": "2012-01-01",
+        "start_date": "2007-01-06",
+        "end_date": "2012-01-06",
         "duration_years": 5
       },
       {
         "sign": "Capricorn",
-        "start_date": "2012-01-01",
-        "end_date": "2018-01-01",
+        "start_date": "2012-01-06",
+        "end_date": "2018-01-06",
         "duration_years": 6
       },
       {
         "sign": "Sagittarius",
-        "start_date": "2018-01-01",
-        "end_date": "2021-01-01",
+        "start_date": "2018-01-06",
+        "end_date": "2021-01-06",
         "duration_years": 3
       },
       {
         "sign": "Scorpio",
-        "start_date": "2021-01-01",
-        "end_date": "2027-01-01",
+        "start_date": "2021-01-06",
+        "end_date": "2027-01-06",
         "duration_years": 6
       },
       {
         "sign": "Libra",
-        "start_date": "2027-01-01",
-        "end_date": "2028-01-01",
+        "start_date": "2027-01-06",
+        "end_date": "2028-01-06",
         "duration_years": 1
       },
       {
         "sign": "Virgo",
-        "start_date": "2028-01-01",
-        "end_date": "2036-01-01",
+        "start_date": "2028-01-06",
+        "end_date": "2036-01-06",
         "duration_years": 8
       },
       {
         "sign": "Leo",
-        "start_date": "2036-01-01",
-        "end_date": "2040-01-01",
+        "start_date": "2036-01-06",
+        "end_date": "2040-01-06",
         "duration_years": 4
       }
     ]
