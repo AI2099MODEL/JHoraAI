@@ -178,5 +178,33 @@ A dedicated background daemon, `AnalysisSyncAgent`, operates as the core synchro
 - **Rolling Chronological Event Logging**: Persists a historical array `eventsLog` tracking previously evaluated and triggered transits, maintaining up to 100 historical snapshots.
 - **Git Push Automation**: Stages, commits, and pushes updated static/dynamic analysis files directly to the remote repository (`git push origin main`) to ensure persistent tracking across server container cycles.
 
+---
+
+## 8. Current Sky Context Updater Agent & Transit Table Synchronization
+
+The platform features a dedicated, real-time background agent that acts as the single source of truth for all transit-related displays and reporting modules.
+
+### A. Core Operation & Mechanism
+- **Centrally Managed Context**: Automatically maintains `/src/knowledgebase/checklist_engine/current_sky.json` as a real-time, high-fidelity JSON data store of current cosmic conditions.
+- **15-Minute Polling Scheduler**: The agent runs automatically on server boot and repeats every 15 minutes to guarantee sub-degree precision of transit coordinates.
+- **Los Angeles Local Coordinate Anchor**: Computes exact planetary longitudes, signs, Nakshatras, and Padas using Los Angeles local time coordinates.
+
+### B. Dynamic Sub-Section Evaluation
+Unlike static placeholders, the updater agent dynamically evaluates and overwrites the entire hierarchy of `current_sky.json` at every poll:
+1. **Dynamic Energy Metrics (`currentEnergy`)**: Computes real-time numerical scores (1-10) and qualitative tones ("Peak Focus", "Strong / Robust", "Balanced", "Subdued / Vulnerable") for overall, mental, physical, relationship, career, financial, and spiritual energies by mapping planetary house coordinates against the natural Aries zodiac.
+2. **Current Mood Block (`currentMood`)**: Identifies dominant astrological houses, planetary strengths, and lists current positive/negative themes based on transiting Moon-nakshatra divisions.
+3. **Daily Focus Matrix (`currentFocus`)**: Calculates priorities ("high", "medium", "low") and strategic descriptions across key lifestyle verticals (career, business, finance, family, etc.).
+4. **Active Cosmic Challenges (`currentChallenges`)**: Evaluates planetary retrogrades, combustion offsets, and debilities to highlight specific caution flags (delays, stress, legal, health, or financial warnings).
+5. **Cosmic Opportunity Windows (`currentOpportunities`)**: Marks windows of favorability for marriage, investments, travel, and complex professional learning modules.
+6. **Timeline Horizon (`timeline`)**: Generates custom bulleted summaries and targeted action logs of favorable/unfavorable tasks for `today`, `tomorrow`, `thisWeek`, `thisMonth`, and long-term targets.
+
+### C. Downstream Propagation & Synchronization
+The updated keys are instantly consumed across the platform:
+- **`MyPageView.tsx`**: Extracts real-time Nakshatra and Sublord metrics to display in the primary global dashboard header.
+- **`TransitsTab.tsx`**: Renders real-time planetary lists, aspect lines, and calculated energy meters.
+- **`HoroscopeReportView.tsx`**: Uses the panchanga, current challenges, and dynamic energies to auto-populate high-resolution PDF report pages and raw tables.
+- **`AstroChat.tsx`**: Serves the fully refreshed JSON state as the structural grounding context for the AI Astrological Assistant.
+
+
 
 

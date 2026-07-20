@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-20T10:24:14.520Z",
+    "lastUpdated": "2026-07-20T10:41:55.528Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-20T10:24:14.520Z",
-    "localTime": "2026-07-20T03:24:14-07:00",
+    "utcTime": "2026-07-20T10:41:55.528Z",
+    "localTime": "2026-07-20T03:41:55-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Virgo",
       "displayName": "Virgo",
-      "longitude": 173.64
+      "longitude": 173.8
     },
     "currentNakshatra": {
       "id": "Chitra",
@@ -28,15 +28,15 @@
       "displayName": "Mars"
     },
     "currentSubLord": {
-      "id": "Moon",
-      "displayName": "Moon"
+      "id": "Venus",
+      "displayName": "Venus"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Saptami",
-      "illuminationPercentage": 44.4
+      "illuminationPercentage": 44.5
     },
-    "moonLongitude": 173.64,
+    "moonLongitude": 173.8,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 93.63,
+    "longitude": 93.65,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,45 +63,45 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 93.63,
+      "longitude": 93.65,
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
-      "subLord": "Moon",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Virgo",
-      "longitude": 173.64,
+      "longitude": 173.8,
       "nakshatra": "Chitra",
       "pada": 1,
       "starLord": "Mars",
-      "subLord": "Moon",
-      "retrograde": true,
+      "subLord": "Venus",
+      "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Leo",
-      "longitude": 129.02,
+      "longitude": 132.01,
       "nakshatra": "Magha",
-      "pada": 3,
+      "pada": 4,
       "starLord": "Ketu",
-      "subLord": "Mars",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 196.8,
+      "longitude": 196.86,
       "nakshatra": "Swati",
       "pada": 4,
       "starLord": "Rahu",
-      "subLord": "Rahu",
-      "retrograde": true,
+      "subLord": "Moon",
+      "retrograde": false,
       "combust": false,
       "stationary": false
     },
@@ -111,18 +111,18 @@
       "nakshatra": "Uttara Ashadha",
       "pada": 1,
       "starLord": "Sun",
-      "subLord": "Sun",
+      "subLord": "Moon",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 114.8,
+      "longitude": 114.84,
       "nakshatra": "Ashlesha",
       "pada": 3,
       "starLord": "Mercury",
-      "subLord": "Rahu",
+      "subLord": "Mercury",
       "retrograde": true,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Mercury",
     "moonStarLord": "Mars",
-    "moonSubLord": "Moon"
+    "moonSubLord": "Venus"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Saptami",
       "index": 7,
       "paksha": "Sukla",
-      "endDate": "2026-07-20T22:24:14.520Z"
+      "endDate": "2026-07-20T22:41:55.528Z"
     },
     "vara": {
       "name": "Monday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Chitra",
       "lord": "Mars",
-      "endDate": "2026-07-21T04:24:14.520Z"
+      "endDate": "2026-07-21T04:41:55.528Z"
     },
     "yoga": {
       "name": "Siddha",
       "lord": "Sun",
-      "endDate": "2026-07-21T00:24:14.520Z"
+      "endDate": "2026-07-21T00:41:55.528Z"
     },
     "karana": {
       "name": "Vanija",
       "lord": "Sun",
-      "endDate": "2026-07-20T16:24:14.520Z"
+      "endDate": "2026-07-20T16:41:55.528Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",

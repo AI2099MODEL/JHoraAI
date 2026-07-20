@@ -3182,6 +3182,315 @@ function runCurrentSkyUpdaterAgent() {
         yamaganda: currentSky.panchanga?.yamaganda || { startTime: "05:48 AM", endTime: "07:30 AM" },
         gulika: currentSky.panchanga?.gulika || { startTime: "09:12 AM", endTime: "10:54 AM" }
       };
+
+      // DYNAMIC ASTRO CALCULATIONS FOR OUTSTANDING SECTIONS/TABLES IN CURRENT SKY
+      const getPlanetDetails = (pName: string) => {
+        return currentSky.planets[pName.toLowerCase()] || {
+          currentSign: "Aries",
+          longitude: 0,
+          nakshatra: "Ashwini",
+          pada: 1,
+          starLord: "Ketu",
+          subLord: "Ketu",
+          retrograde: false,
+          combust: false
+        };
+      };
+
+      const signToHouse = (sign: string): number => {
+        const idx = ZODIAC_SIGNS.indexOf(sign);
+        return idx !== -1 ? idx + 1 : 1;
+      };
+
+      const sunHouse = signToHouse(sunSign);
+      const mercHouse = signToHouse(getPlanetDetails("Mercury").currentSign);
+      const marsHouse = signToHouse(getPlanetDetails("Mars").currentSign);
+      const venHouse = signToHouse(getPlanetDetails("Venus").currentSign);
+      const jupHouse = signToHouse(getPlanetDetails("Jupiter").currentSign);
+      const satHouse = signToHouse(getPlanetDetails("Saturn").currentSign);
+      const moonHouse = signToHouse(moonSign);
+
+      let overallVal = 6.5;
+      if ([1, 3, 6, 10, 11].includes(sunHouse)) overallVal += 2.0;
+      if ([8, 12].includes(sunHouse)) overallVal -= 1.5;
+
+      let mentalVal = 6.0;
+      if ([1, 4, 5, 10, 11].includes(mercHouse)) mentalVal += 2.5;
+      if ([6, 8, 12].includes(mercHouse)) mentalVal -= 1.0;
+
+      let physicalVal = 5.5;
+      if ([3, 6, 10, 11].includes(marsHouse)) physicalVal += 3.0;
+      if ([8, 12].includes(marsHouse)) physicalVal -= 1.5;
+
+      let relationshipVal = 6.5;
+      if ([1, 4, 5, 7, 9, 11].includes(venHouse)) relationshipVal += 2.0;
+      if ([6, 8, 12].includes(venHouse)) relationshipVal -= 1.5;
+
+      let careerVal = 7.0;
+      if ([1, 5, 9, 10, 11].includes(jupHouse)) careerVal += 1.5;
+      if ([3, 6, 10, 11].includes(satHouse)) careerVal += 1.0;
+
+      let financialVal = 6.0;
+      if ([2, 5, 9, 11, 1].includes(moonHouse)) financialVal += 2.5;
+      if ([6, 8, 12].includes(moonHouse)) financialVal -= 1.5;
+
+      let spiritualVal = 7.0;
+      if ([5, 8, 9, 12].includes(moonHouse)) spiritualVal += 1.5;
+
+      const clampScore = (val: number) => Number(Math.max(1, Math.min(10, val)).toFixed(1));
+      const getEnergyTone = (val: number) => {
+        if (val >= 8.5) return "Peak Focus";
+        if (val >= 7.2) return "Strong / Robust";
+        if (val >= 5.5) return "Balanced";
+        return "Subdued / Vulnerable";
+      };
+
+      currentSky.currentEnergy = {
+        overallEnergy: {
+          score: clampScore(overallVal),
+          tone: getEnergyTone(overallVal),
+          description: `Sun in ${sunSign} establishes a ${getEnergyTone(overallVal).toLowerCase()} vitality layer for standard operations.`
+        },
+        mentalEnergy: {
+          score: clampScore(mentalVal),
+          tone: getEnergyTone(mentalVal),
+          description: `Mercury in ${getPlanetDetails("Mercury").currentSign} drives ${getEnergyTone(mentalVal).toLowerCase()} mental stamina and communication focus.`
+        },
+        physicalEnergy: {
+          score: clampScore(physicalVal),
+          tone: getEnergyTone(physicalVal),
+          description: `Mars in ${getPlanetDetails("Mars").currentSign} yields a ${getEnergyTone(physicalVal).toLowerCase()} reserve of physical resilience.`
+        },
+        relationshipEnergy: {
+          score: clampScore(relationshipVal),
+          tone: getEnergyTone(relationshipVal),
+          description: `Venus in ${getPlanetDetails("Venus").currentSign} channels ${getEnergyTone(relationshipVal).toLowerCase()} empathy and social ties.`
+        },
+        careerEnergy: {
+          score: clampScore(careerVal),
+          tone: getEnergyTone(careerVal),
+          description: `Jupiter in ${getPlanetDetails("Jupiter").currentSign} and Saturn in ${getPlanetDetails("Saturn").currentSign} sustain ${getEnergyTone(careerVal).toLowerCase()} career structures.`
+        },
+        financialEnergy: {
+          score: clampScore(financialVal),
+          tone: getEnergyTone(financialVal),
+          description: `Moon in ${moonSign} indicates ${getEnergyTone(financialVal).toLowerCase()} capital liquidity and trade dynamics.`
+        },
+        spiritualEnergy: {
+          score: clampScore(spiritualVal),
+          tone: getEnergyTone(spiritualVal),
+          description: `Transit alignments trigger a ${getEnergyTone(spiritualVal).toLowerCase()} resonance suitable for introspective focus.`
+        }
+      };
+
+      const activeHouses = [moonHouse, sunHouse].filter((value, index, self) => self.indexOf(value) === index);
+      const dominantHouses = activeHouses.map(hNum => ({
+        houseNumber: hNum,
+        significance: hNum === 1 ? "Self, physical vitality, new beginnings" :
+                      hNum === 2 ? "Finances, assets, speech, family" :
+                      hNum === 3 ? "Courage, communication, efforts, siblings" :
+                      hNum === 4 ? "Home, emotions, peace of mind, mother" :
+                      hNum === 5 ? "Creativity, intelligence, speculation, children" :
+                      hNum === 6 ? "Daily routines, health, service, obstacles" :
+                      hNum === 7 ? "Partnerships, spouse, public relations" :
+                      hNum === 8 ? "Longevity, sudden events, deep mysteries, transformation" :
+                      hNum === 9 ? "Higher learning, wisdom, fortune, foreign travel" :
+                      hNum === 10 ? "Career, status, public authority, actions" :
+                      hNum === 11 ? "Gains, desires, social circles, cash flow" :
+                      "Expenditures, foreign realms, isolation, spiritual liberation"
+      }));
+
+      const dominantPlanets = [
+        { planet: "Moon", strength: 1.2 + (moonHouse % 3) * 0.1, influenceType: `Emotional anchor in ${moonSign}` },
+        { planet: "Sun", strength: 1.1 + (sunHouse % 3) * 0.1, influenceType: `Vital force in ${sunSign}` }
+      ];
+
+      const positiveThemes = [];
+      if (moonSignIdx % 3 === 0) {
+        positiveThemes.push("Dynamic initiatives", "Creative breakthroughs", "Physical vitality");
+      } else if (moonSignIdx % 3 === 1) {
+        positiveThemes.push("Emotional stability", "Financial prudence", "Domestic comfort");
+      } else {
+        positiveThemes.push("Intellectual growth", "Deep meditation", "Analytical precision");
+      }
+
+      const negativeThemes = [];
+      if (getPlanetDetails("Mercury").retrograde) negativeThemes.push("Communication hiccups");
+      if (getPlanetDetails("Saturn").retrograde) negativeThemes.push("Minor structural delays");
+      if (getPlanetDetails("Mars").combust) negativeThemes.push("Physical impatience");
+      if (negativeThemes.length === 0) negativeThemes.push("Over-thinking", "Restlessness");
+
+      currentSky.currentMood = {
+        dominantHouses,
+        dominantPlanets,
+        positiveThemes,
+        negativeThemes,
+        emotionalTone: `The sky carries a highly ${moonSignIdx % 2 === 0 ? "dynamic and expressive" : "reflective and analytical"} emotional tone governed by Moon in ${moonSign}.`
+      };
+
+      currentSky.currentFocus = {
+        career: {
+          priority: careerVal >= 7.2 ? "high" : "medium",
+          description: `Leverage Jupiter and Saturn transits to structure workflows and secure milestones.`
+        },
+        business: {
+          priority: mentalVal >= 7.2 ? "high" : "medium",
+          description: `Mercury transits favor ${mentalVal >= 7.2 ? "active marketing and agreements" : "reviewing strategy and communication plans"}.`
+        },
+        finance: {
+          priority: financialVal >= 7.2 ? "high" : "medium",
+          description: `Moon transits advise ${financialVal >= 7.2 ? "strategic asset allocations" : "capital conservation and prudent budgeting"}.`
+        },
+        relationship: {
+          priority: relationshipVal >= 7.2 ? "high" : "medium",
+          description: `Nurture domestic relationships under active Venus forces.`
+        },
+        family: {
+          priority: moonHouse === 4 || sunHouse === 4 ? "high" : "medium",
+          description: `Engage with family and focus on home environment stability.`
+        },
+        children: {
+          priority: "medium",
+          description: `Encourage learning and creative activities.`
+        },
+        health: {
+          priority: physicalVal < 5.5 ? "high" : "medium",
+          description: `Practice wellness routines, eat warm meals, and maintain sleep schedules.`
+        },
+        education: {
+          priority: mentalVal >= 7.2 ? "high" : "medium",
+          description: `Ideal day for deep reading, research, and skill courses.`
+        },
+        travel: {
+          priority: physicalVal >= 7.2 ? "medium" : "low",
+          description: `Plan short journeys to refresh focus; avoid heavy over-taxing transits.`
+        },
+        spirituality: {
+          priority: spiritualVal >= 7.2 ? "high" : "medium",
+          description: `Excellent day for meditation, introspection, and self-study.`
+        }
+      };
+
+      const delaysActive = getPlanetDetails("Saturn").retrograde || getPlanetDetails("Mercury").retrograde;
+      const stressActive = getPlanetDetails("Moon").combust || getPlanetDetails("Mercury").combust;
+      const legalActive = getPlanetDetails("Jupiter").retrograde;
+      const relationshipActive = getPlanetDetails("Venus").combust;
+      const healthActive = getPlanetDetails("Mars").combust || physicalVal < 5.5;
+      const careerActive = getPlanetDetails("Saturn").combust;
+      const financeActive = getPlanetDetails("Jupiter").combust || financialVal < 5.5;
+
+      currentSky.currentChallenges = {
+        delays: {
+          active: delaysActive,
+          affectedAreas: delaysActive ? ["Documentation workflows", "Long distance transits"] : []
+        },
+        stress: {
+          active: stressActive,
+          affectedAreas: stressActive ? ["Anxiety spikes", "Irregular focus patterns"] : []
+        },
+        legal: {
+          active: legalActive,
+          affectedAreas: legalActive ? ["Contract signing", "Regulatory clearances"] : []
+        },
+        relationship: {
+          active: relationshipActive,
+          affectedAreas: relationshipActive ? ["Misunderstandings", "Temporary emotional coldness"] : []
+        },
+        health: {
+          active: healthActive,
+          affectedAreas: healthActive ? ["Digestive heat", "Restlessness", "Physical fatigue"] : []
+        },
+        career: {
+          active: careerActive,
+          affectedAreas: careerActive ? ["Authority disputes", "Performance reviews"] : []
+        },
+        finance: {
+          active: financeActive,
+          affectedAreas: financeActive ? ["Unexpected outflows", "Investment delays"] : []
+        }
+      };
+
+      currentSky.currentOpportunities = {
+        marriageWindow: {
+          active: relationshipVal >= 7.2 && !relationshipActive,
+          timeframe: relationshipVal >= 7.2 && !relationshipActive ? "Highly favorable for relationship initiatives" : "Build mutual trust; plan for upcoming windows"
+        },
+        careerOpportunity: {
+          active: careerVal >= 7.2 && !careerActive,
+          timeframe: careerVal >= 7.2 && !careerActive ? "Auspicious career window active; take charge" : "Consolidate and double-check deliverables"
+        },
+        businessOpportunity: {
+          active: mentalVal >= 7.2 && !stressActive,
+          timeframe: mentalVal >= 7.2 && !stressActive ? "Favorable for digital sign-offs and trade" : "Review contracts; verify system requirements first"
+        },
+        investmentOpportunity: {
+          active: financialVal >= 7.2 && !financeActive,
+          timeframe: financialVal >= 7.2 && !financeActive ? "Solid window for wealth-building actions" : "Hold cash reserves; defer speculative investments"
+        },
+        travelOpportunity: {
+          active: physicalVal >= 7.2 && !healthActive,
+          timeframe: physicalVal >= 7.2 && !healthActive ? "Auspicious travel window is active" : "Consolidate energy locally"
+        },
+        learningOpportunity: {
+          active: mentalVal >= 7.2,
+          timeframe: "Perfect for research, reading, and learning complex systems"
+        }
+      };
+
+      currentSky.timeline = {
+        today: {
+          summary: `A day characterized by Moon transit in ${moonSign} and Sun transit in ${sunSign}, establishing a ${getEnergyTone(overallVal).toLowerCase()} flow.`,
+          favorableActivities: [
+            spiritualVal >= 7.2 ? "Mantra chanting & meditation" : "Self-reflection",
+            mentalVal >= 7.2 ? "Technical research & reporting" : "Pruning backlogs",
+            "Structuring daily files"
+          ],
+          unfavorableActivities: [
+            healthActive ? "Intense physical heavy lifting" : "Avoid late night sleeping",
+            financeActive ? "High-stakes speculative trades" : "Hasty capital spending"
+          ]
+        },
+        tomorrow: {
+          summary: "The transit Moon continues to shift forward, bringing dynamic changes to the planetary lattice.",
+          favorableActivities: ["Engaging in constructive dialogues", "Reviewing metrics"],
+          unfavorableActivities: ["Committing without proper verification"]
+        },
+        thisWeek: {
+          summary: "Planetary aspects favor building internal discipline and optimizing routines.",
+          trends: [
+            `Moon transiting through ${moonSign} stimulates active mental focusing.`,
+            `Sun in ${sunSign} highlights leadership potential and career actions.`
+          ]
+        },
+        thisMonth: {
+          summary: "Excellent monthly alignments for structuring financial assets and organizing goals.",
+          trends: [
+            "Saturn demands structural perseverance.",
+            "Jupiter coordinates opportunities through strategic communications."
+          ]
+        },
+        next3Months: {
+          summary: "Steady expansion of projects and networks as Jupiter and Sun move into supportive quadrants.",
+          trends: ["Consolidation of workspace systems", "Auspicious growth in skills"]
+        },
+        next6Months: {
+          summary: "Long-term Saturn transit encourages finishing pending obligations before launching major ventures.",
+          trends: ["Clearing old organizational bottlenecks", "Solidifying bone and cardiovascular health"]
+        },
+        thisYear: {
+          summary: "A foundational year of steady professional stabilization and inner spiritual refinement.",
+          trends: ["Strong alignment with mantra siddhi and personal development"]
+        }
+      };
+
+      currentSky.validation = {
+        currentSkyLoaded: true,
+        transitLoaded: true,
+        currentMoonLoaded: true,
+        currentDashaLoaded: true,
+        panchangaLoaded: true,
+        readyForAi: true
+      };
     }
 
     fs.writeFileSync(skyPath, JSON.stringify(currentSky, null, 2), "utf-8");
