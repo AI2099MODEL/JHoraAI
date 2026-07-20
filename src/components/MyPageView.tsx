@@ -5,6 +5,8 @@ import DashaTree from "./DashaTree";
 import TransitsTab from "./TransitsTab";
 import { AstroRawTablesView } from "./AstroRawTablesView";
 import { MasterArchitectureView } from "./MasterArchitectureView";
+import EventBookView from "./EventBookView";
+import { FinalResultsView } from "./FinalResultsView";
 import {
   mapJHoraResponseToAstrologyData,
   mapAstrologyDataToUserProfileJSON
@@ -1707,6 +1709,8 @@ const lifeTabs = [
 
 const journeyTabs = [
   { id: "overview", label: "My Soul" },
+  { id: "event_book", label: "Event Book" },
+  { id: "final_results", label: "Final Results" },
   { id: "predictions", label: "Predictions" },
   { id: "future", label: "Future" },
   { id: "my_life_analysis", label: "My Life Analysis" }
@@ -6165,6 +6169,20 @@ export function MyPageView({
               ⚠️ Please cast a horoscope first to view real-time transits.
             </div>
           )}
+        </div>
+      ) : activeTab === "event_book" ? (
+        <div className="space-y-6 animate-fade-in">
+          <EventBookView
+            astrologyData={astrologyData}
+            isDark={isDark}
+          />
+        </div>
+      ) : activeTab === "final_results" ? (
+        <div className="space-y-6 animate-fade-in">
+          <FinalResultsView
+            astrologyData={astrologyData}
+            isDark={isDark}
+          />
         </div>
       ) : activeTab === "predictions" ? (
         <div className="space-y-6 animate-fade-in">

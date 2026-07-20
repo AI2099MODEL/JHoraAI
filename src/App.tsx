@@ -87,7 +87,6 @@ import { UnifiedEvidenceView } from "./components/UnifiedEvidenceView";
 import { AIRelationshipExpert } from "./components/AIRelationshipExpert";
 import { RelationshipReportGenerator } from "./components/RelationshipReportGenerator";
 import { RawDataPdfGenerator } from "./components/RawDataPdfGenerator";
-import { HoroscopeReportView } from "./components/HoroscopeReportView";
 import { MasterArchitectureView } from "./components/MasterArchitectureView";
 import { RelationshipKnowledgeCenter } from "./components/RelationshipKnowledgeCenter";
 import { AstrologicalReasoningEngine } from "./components/AstrologicalReasoningEngine";
@@ -480,7 +479,7 @@ export default function App() {
   };
 
   // Active Navigation Coordinate Graph
-  const [activeMenu, setActiveMenu] = useState<string>("analysis");
+  const [activeMenu, setActiveMenu] = useState<string>("my_page");
   const [activeSubMenu, setActiveSubMenu] = useState<{ [key: string]: string }>({
     horoscope: "overview",
     charts: "d1_rasi",
@@ -1407,11 +1406,6 @@ export default function App() {
       id: "my_page",
       label: "My Page",
       icon: User
-    },
-    {
-      id: "analysis",
-      label: "Analysis",
-      icon: BarChart
     },
     {
       id: "astro",
@@ -2840,31 +2834,6 @@ export default function App() {
                   activeSubmenuId={activeSubmenuId}
                   onSubmenuSelect={handleSubmenuSelect}
                 />
-              </motion.div>
-            </AnimatePresence>
-          ) : activeMenu === "analysis" ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key="analysis"
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="space-y-6"
-              >
-                {/* Traditional Horoscope Report (Main Default Presentation) */}
-                <HoroscopeReportView
-                  astrologyData={astrologyData}
-                  activeUser={activeUser}
-                  mapAstrologyDataToUserProfileJSON={mapAstrologyDataToUserProfileJSON}
-                  setAstrologyData={setAstrologyData}
-                  onLoadProfile={handleLoadProfileDirect}
-                  onLoadProfileByName={handleLoadProfileByName}
-                  isDark={isDark}
-                  currentDateTime={currentDateTime}
-                  headerGps={headerGps}
-                  chartStyle={chartStyle}
-                />
-
               </motion.div>
             </AnimatePresence>
           ) : activeMenu === "reports" ? (
