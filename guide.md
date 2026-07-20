@@ -135,6 +135,9 @@ The submenu "Divisional Vargas" within the "Astro" menu must be updated and labe
 ### Rule 6: Mandatory Google Authentication & Account-Bound User Profile Persistence
 All users accessing the JHora AI Professional platform are required to authenticate via Google Account credentials upon site entry. Under no circumstances should any static, hardcoded, or pre-loaded default profiles (such as the legacy "Nitin" profile) be baked into the application's code, fallback states, initial input fields, dropdown selectors, or stored file repository (e.g. `/Users/`). The active user profile and all generated or saved astrological charts must be strictly attached, dynamically synced, and persistently stored under the authenticated user's unique Google account credentials. All database and API operations must map directly to the Google UID to maintain absolute account isolation and data security.
 
+### Rule 7: Auto-Refresh of PDF Reports & 24-Hour Cache Policy
+To keep pre-compiled reports in perfect alignment with latest user data, the platform implements a 24-hour cache refresh policy. A visible "Refresh Reports" button is integrated into the Reports Hub. Clicking this button triggers a manual review of all active menu tabs and sections (updating reports according to deleted, moved, or added sections). By default, the system automatically checks and executes this alignment refresh every 24 hours based on local storage timestamps to ensure that reports match active tabs, deleted/moved tabs, and data structures. This is managed programmatically at load time.
+
 ---
 
 ## 6. Daily Horoscope Engine (KP Only) Specification

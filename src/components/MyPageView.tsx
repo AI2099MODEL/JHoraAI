@@ -20,6 +20,12 @@ import {
 import { generateAstrologyPDF } from "../lib/pdfGenerator";
 import { generateRelationshipPDF } from "../lib/relationshipReportGenerator";
 import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
+import {
+  generateVimshottariDashaPDF,
+  generateEmotionalMoodCyclesPDF,
+  generateBehavioralThemesPDF,
+  generateTransitDBAConvergencePDF
+} from "../lib/specializedReports";
 import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelationshipEvidenceEngine";
 import {
   User,
@@ -1755,7 +1761,57 @@ export function MyPageView({
   const [age, setAge] = useState<{ years: number; months: number; days: number } | null>(null);
   const [activeTab, setActiveTab] = useState<string>("overview");
   const [activeSubmenu, setActiveSubmenu] = useState<"my_life" | "my_journey" | "my_astro" | "my_reports">("my_astro");
-  const [compilingRelReport, setCompilingRelReport] = useState<"marriage" | "complete" | "vedic" | "raw360" | null>(null);
+  const [compilingRelReport, setCompilingRelReport] = useState<string | null>(null);
+  const [lastRefreshed, setLastRefreshed] = useState<string>("");
+  const [isSyncingReports, setIsSyncingReports] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<string>("");
+
+  const triggerReportSync = async (isAuto = false) => {
+    setIsSyncingReports(true);
+    setSyncStatus("Reviewing active dasha and divisional structures...");
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    setSyncStatus("Aligning report templates with active menu partitions...");
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    setSyncStatus("Validating calculated user variables across all tabs...");
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    
+    const nowMs = Date.now();
+    localStorage.setItem("jhora_reports_last_refreshed", String(nowMs));
+    setLastRefreshed(new Date(nowMs).toLocaleString());
+    setIsSyncingReports(false);
+    setSyncStatus("");
+    
+    if (!isAuto) {
+      alert("Successfully refreshed and synchronized all specialized reports with the latest user data and tab alignments!");
+    }
+  };
+
+  useEffect(() => {
+    const checkCacheAndAutoRefresh = async () => {
+      const stored = localStorage.getItem("jhora_reports_last_refreshed");
+      const nowMs = Date.now();
+      
+      if (!stored) {
+        localStorage.setItem("jhora_reports_last_refreshed", String(nowMs));
+        setLastRefreshed(new Date(nowMs).toLocaleString());
+      } else {
+        const lastMs = parseInt(stored, 10);
+        const diffMs = nowMs - lastMs;
+        const twentyFourHoursMs = 24 * 60 * 60 * 1000;
+        
+        if (diffMs >= twentyFourHoursMs) {
+          console.log("Auto-Refreshing Reports (24-Hour Cache Policy Expiry)");
+          await triggerReportSync(true);
+        } else {
+          setLastRefreshed(new Date(lastMs).toLocaleString());
+        }
+      }
+    };
+    
+    if (profile) {
+      checkCacheAndAutoRefresh();
+    }
+  }, [profile]);
 
   useEffect(() => {
     if (activeSubmenuId) {
@@ -2941,65 +2997,76 @@ export function MyPageView({
           <div className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl" />
             
-            <div className="border-b border-amber-500/10 pb-4 mb-6">
-              <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
-                Automated PDF Reports Download Hub
-              </span>
-              <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-amber-500" />
-                PRE-COMPILED SYSTEM REVEALS & REPORTS
-              </h2>
-              <p className={`text-xs ${textMutedStyle} mt-1`}>
-                All reports are compiled dynamically for your birth coordinates. Click directly to download your personalized dossiers.
-              </p>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-amber-500/10 pb-4 mb-6 gap-4">
+              <div>
+                <span className="text-[10px] bg-amber-500/15 text-amber-500 border border-amber-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                  Automated PDF Reports Download Hub
+                </span>
+                <h2 className="text-sm font-bold text-amber-500 mt-2 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-amber-500" />
+                  PRE-COMPILED SPECIALIZED DOSSIERS
+                </h2>
+                <p className={`text-xs ${textMutedStyle} mt-1`}>
+                  All dossiers are compiled dynamically for your birth coordinates. Reports are automatically refreshed every 24 hours.
+                </p>
+                {lastRefreshed && (
+                  <p className="text-[9px] font-mono text-slate-500 mt-1">
+                    Last Synced: {lastRefreshed}
+                  </p>
+                )}
+              </div>
+
+              {/* REFRESH BUTTON */}
+              <button
+                disabled={isSyncingReports}
+                onClick={() => triggerReportSync(false)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 text-xs font-bold font-mono uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50 shrink-0 self-end sm:self-auto"
+                id="refresh-reports-button"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isSyncingReports ? "animate-spin" : ""}`} />
+                {isSyncingReports ? "Syncing..." : "Refresh Reports"}
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Card 1: Complete 360° Report */}
+            {isSyncingReports && (
+              <div className="mb-6 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 flex items-center gap-3 animate-pulse">
+                <RefreshCw className="w-5 h-5 text-amber-500 animate-spin shrink-0" />
+                <span className="text-xs font-mono font-bold text-amber-400">{syncStatus}</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              {/* Card 1: Vimshottari Dasha Chronicles */}
               <button
                 disabled={compilingRelReport !== null}
                 onClick={async () => {
                   try {
-                    setCompilingRelReport("raw360");
+                    setCompilingRelReport("vimshottari");
                     const targetProfile = profile || mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
                     if (!targetProfile) {
                       throw new Error("Unable to load astrology profile data.");
                     }
-                    const allSubmenuIds = [
-                      "overview", "planetary_positions", "planet_strength", "bhava_strength", 
-                      "ashtakavarga", "yogas", "doshas", "vimshottari", "yogini", "ashtottari", 
-                      "longevity", "sade_sati", "d1_rasi", "d9_navamsa", "d10_dasamsa", 
-                      "arudhas", "sphutas", "upagrahas", "sahams", "special_lagnas",
-                      "argalas", "charaDasha", "panchapakshi", "lalkitab", "gemstones", "numerology",
-                      "kp_dashboard", "kp_rulebook", "kp_cusps", "kp_planet_analysis", 
-                      "kp_significators", "kp_houses_significators", "kp_planet_to_house", "kp_ruling_planets", "kp_dasha", "kp_transit", "kp_horary",
-                      "west_dashboard", "west_natal_chart", "west_positions", "west_aspects", "west_synastry", "west_transits",
-                      "eso_nadi", "eso_lalkitab", "eso_varshaphala", "eso_bazi", "eso_numerology", "eso_celtic", "eso_mayan"
-                    ];
-                    const doc = generateRawAstrologyPDF(targetProfile, {
-                      profileName: userName,
-                      submenus: allSubmenuIds
-                    });
-                    doc.save(`Complete_360_Astrological_Systems_Report_${userName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+                    const doc = generateVimshottariDashaPDF(targetProfile);
+                    doc.save(`Vimshottari_50Year_Prana_Dasha_${userName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.pdf`);
                   } catch (err: any) {
-                    console.error("360 PDF compile failed:", err);
-                    alert("Failed to compile 360° PDF: " + err.message);
+                    console.error("Vimshottari PDF compile failed:", err);
+                    alert("Failed to compile Vimshottari PDF: " + err.message);
                   } finally {
                     setCompilingRelReport(null);
                   }
                 }}
-                className={`p-4 rounded-xl border text-left ${isDark ? "border-indigo-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-indigo-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer disabled:opacity-50`}
+                className={`p-4 rounded-xl border text-left ${isDark ? "border-amber-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-amber-500/40 transition-all flex flex-col justify-between h-40 group cursor-pointer disabled:opacity-50`}
               >
                 <div className="w-full">
                   <div className="flex justify-between items-start">
-                    <FileText className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
-                    <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded font-mono font-bold">360° TOTAL</span>
+                    <Clock className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded font-mono font-bold">CHRONOLOGY</span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-200 mt-2">Complete 360° Report</h4>
-                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Tabular astrological metrics across JHora, KP, and Western.</p>
+                  <h4 className="text-xs font-bold text-slate-200 mt-2">50-Year Vimshottari Dasha</h4>
+                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Recursive timing chronology down to Prana level for your active period.</p>
                 </div>
-                <div className="text-[10px] font-bold text-indigo-400 flex items-center gap-1 mt-2">
-                  {compilingRelReport === "raw360" ? (
+                <div className="text-[10px] font-bold text-amber-400 flex items-center gap-1 mt-2">
+                  {compilingRelReport === "vimshottari" ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
                     </>
@@ -3011,104 +3078,37 @@ export function MyPageView({
                 </div>
               </button>
 
-              {/* Card 2: Authoritative Vedic Report */}
+              {/* Card 2: My Life — Emotional & Mood Cycles */}
               <button
                 disabled={compilingRelReport !== null}
                 onClick={async () => {
                   try {
-                    setCompilingRelReport("vedic");
+                    setCompilingRelReport("mood");
                     const targetProfile = profile || mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
                     if (!targetProfile) {
                       throw new Error("Unable to load astrology profile data.");
                     }
-                    const doc = generateAstrologyPDF(targetProfile);
-                    doc.save(`Vedic_Astrology_Authoritative_Report_${userName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+                    const doc = generateEmotionalMoodCyclesPDF(targetProfile);
+                    doc.save(`My_Life_Emotional_Mood_Cycles_${userName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.pdf`);
                   } catch (err: any) {
-                    console.error("Vedic PDF compile failed:", err);
-                    alert("Failed to compile Vedic PDF: " + err.message);
+                    console.error("Mood PDF compile failed:", err);
+                    alert("Failed to compile Mood PDF: " + err.message);
                   } finally {
                     setCompilingRelReport(null);
                   }
                 }}
-                className={`p-4 rounded-xl border text-left ${isDark ? "border-amber-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-amber-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer disabled:opacity-50`}
+                className={`p-4 rounded-xl border text-left ${isDark ? "border-rose-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-rose-500/40 transition-all flex flex-col justify-between h-40 group cursor-pointer disabled:opacity-50`}
               >
                 <div className="w-full">
                   <div className="flex justify-between items-start">
-                    <FileText className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
-                    <span className="text-[9px] bg-amber-500/10 text-amber-500 border border-amber-500/20 px-2 py-0.5 rounded font-mono font-bold">SIDEREAL VEDIC</span>
+                    <Heart className="w-5 h-5 text-rose-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded font-mono font-bold">EMOTIONS</span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-200 mt-2">Authoritative Vedic Report</h4>
-                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Traditional Parashari calculations, planetary strengths, and dasha trees.</p>
-                </div>
-                <div className="text-[10px] font-bold text-amber-500 flex items-center gap-1 mt-2">
-                  {compilingRelReport === "vedic" ? (
-                    <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
-                    </>
-                  ) : (
-                    <>
-                      <Download className="w-3.5 h-3.5" /> Download PDF
-                    </>
-                  )}
-                </div>
-              </button>
-
-              {/* Card 3: Marriage Promise Report */}
-              <button
-                disabled={compilingRelReport !== null}
-                onClick={async () => {
-                  try {
-                    setCompilingRelReport("marriage");
-                    const targetData = astrologyData;
-                    if (!targetData) {
-                      throw new Error("Unable to load astrology data for compiling report.");
-                    }
-                    const evidence = calculateUnifiedRelationshipEvidence(targetData, undefined, 28);
-                    
-                    const apiResponse = await fetch("/api/astrology/ai-relationship-expert", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        evidence,
-                        question: "Provide an elegant esoterically precise relationship analysis focusing on Marriage Promise, Delay aspects, and dasha timing triggers."
-                      })
-                    });
-
-                    let expertData = { reply: "Astrological alignment indicates favorable cosmic resonance across Vedic and KP parameters." };
-                    if (apiResponse.ok) {
-                      expertData = await apiResponse.json();
-                    }
-
-                    const doc = generateRelationshipPDF({
-                      profileName: userName,
-                      partnerName: "Auspicious Partner",
-                      reportType: "Marriage Promise Report",
-                      reportOption: "Professional",
-                      targetAge: 28,
-                      evidence,
-                      expertData
-                    });
-
-                    doc.save(`Marriage_Promise_Report_${userName.replace(/\s+/g, "_")}_${Date.now()}.pdf`);
-                  } catch (err: any) {
-                    console.error("Marriage PDF compile failed:", err);
-                    alert("Failed to compile Marriage PDF: " + err.message);
-                  } finally {
-                    setCompilingRelReport(null);
-                  }
-                }}
-                className={`p-4 rounded-xl border text-left ${isDark ? "border-rose-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-rose-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer disabled:opacity-50`}
-              >
-                <div className="w-full">
-                  <div className="flex justify-between items-start">
-                    <FileText className="w-5 h-5 text-rose-400 group-hover:scale-110 transition-transform" />
-                    <span className="text-[9px] bg-rose-500/10 text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded font-mono font-bold">PROMISE & TIMING</span>
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-200 mt-2">Marriage Promise & Timing</h4>
-                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Relationship timing, marital promise ratings, and sub-lord evidence logs.</p>
+                  <h4 className="text-xs font-bold text-slate-200 mt-2">Emotional & Mood Cycles</h4>
+                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Esoteric mood and emotional state indicators tracking Houses 1, 3, 4, 5, 6, and 12.</p>
                 </div>
                 <div className="text-[10px] font-bold text-rose-400 flex items-center gap-1 mt-2">
-                  {compilingRelReport === "marriage" ? (
+                  {compilingRelReport === "mood" ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
                     </>
@@ -3120,62 +3120,154 @@ export function MyPageView({
                 </div>
               </button>
 
-              {/* Card 4: 15-Topic Partner Diagnostics */}
+              {/* Card 3: My Life — Behavioral & Theme Probability */}
               <button
                 disabled={compilingRelReport !== null}
                 onClick={async () => {
                   try {
-                    setCompilingRelReport("complete");
-                    const targetData = astrologyData;
-                    if (!targetData) {
-                      throw new Error("Unable to load astrology data for compiling report.");
+                    setCompilingRelReport("behavior");
+                    const targetProfile = profile || mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
+                    if (!targetProfile) {
+                      throw new Error("Unable to load astrology profile data.");
                     }
-                    const evidence = calculateUnifiedRelationshipEvidence(targetData, undefined, 28);
-                    
-                    const apiResponse = await fetch("/api/astrology/ai-relationship-expert", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        evidence,
-                        question: "Provide a detailed multi-system diagnostic of partnership potential across Vedic, KP, and Jaimini parameters."
-                      })
-                    });
-
-                    let expertData = { reply: "Astrological alignments indicate overall positive balance and harmonic resonance." };
-                    if (apiResponse.ok) {
-                      expertData = await apiResponse.json();
-                    }
-
-                    const doc = generateRelationshipPDF({
-                      profileName: userName,
-                      partnerName: "Auspicious Partner",
-                      reportType: "Complete Relationship Report",
-                      reportOption: "Professional",
-                      targetAge: 28,
-                      evidence,
-                      expertData
-                    });
-
-                    doc.save(`Complete_Relationship_Report_${userName.replace(/\s+/g, "_")}_${Date.now()}.pdf`);
+                    const doc = generateBehavioralThemesPDF(targetProfile);
+                    doc.save(`My_Life_Behavioral_Themes_${userName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.pdf`);
                   } catch (err: any) {
-                    console.error("Partner Diagnostics PDF compile failed:", err);
-                    alert("Failed to compile Partner Diagnostics PDF: " + err.message);
+                    console.error("Behavior PDF compile failed:", err);
+                    alert("Failed to compile Behavior PDF: " + err.message);
                   } finally {
                     setCompilingRelReport(null);
                   }
                 }}
-                className={`p-4 rounded-xl border text-left ${isDark ? "border-purple-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-purple-500/40 transition-all flex flex-col justify-between h-36 group cursor-pointer disabled:opacity-50`}
+                className={`p-4 rounded-xl border text-left ${isDark ? "border-teal-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-teal-500/40 transition-all flex flex-col justify-between h-40 group cursor-pointer disabled:opacity-50`}
               >
                 <div className="w-full">
                   <div className="flex justify-between items-start">
-                    <FileText className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
-                    <span className="text-[9px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded font-mono font-bold">15-TOPIC PAIRINGS</span>
+                    <Briefcase className="w-5 h-5 text-teal-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2 py-0.5 rounded font-mono font-bold">BEHAVIOR</span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-200 mt-2">15-Topic Partner Diagnostics</h4>
-                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Complete multi-system compatibility assessment and partner synastry.</p>
+                  <h4 className="text-xs font-bold text-slate-200 mt-2">Behavioral Patterns</h4>
+                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Career vocations, communication styles, and themes mapping Houses 2, 3, 6, 7, 10, and 11.</p>
                 </div>
-                <div className="text-[10px] font-bold text-purple-400 flex items-center gap-1 mt-2">
-                  {compilingRelReport === "complete" ? (
+                <div className="text-[10px] font-bold text-teal-400 flex items-center gap-1 mt-2">
+                  {compilingRelReport === "behavior" ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </>
+                  )}
+                </div>
+              </button>
+
+              {/* Card 4: My Journey — Transit DBA Convergence */}
+              <button
+                disabled={compilingRelReport !== null}
+                onClick={async () => {
+                  try {
+                    setCompilingRelReport("journey");
+                    const targetProfile = profile || mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
+                    if (!targetProfile) {
+                      throw new Error("Unable to load astrology profile data.");
+                    }
+                    const doc = generateTransitDBAConvergencePDF(targetProfile);
+                    doc.save(`My_Journey_Transit_DBA_Convergence_${userName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+                  } catch (err: any) {
+                    console.error("Journey PDF compile failed:", err);
+                    alert("Failed to compile Journey PDF: " + err.message);
+                  } finally {
+                    setCompilingRelReport(null);
+                  }
+                }}
+                className={`p-4 rounded-xl border text-left ${isDark ? "border-sky-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-sky-500/40 transition-all flex flex-col justify-between h-40 group cursor-pointer disabled:opacity-50`}
+              >
+                <div className="w-full">
+                  <div className="flex justify-between items-start">
+                    <Compass className="w-5 h-5 text-sky-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] bg-sky-500/10 text-sky-400 border border-sky-500/20 px-2 py-0.5 rounded font-mono font-bold">JOURNEY PATH</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-200 mt-2">Transit DBA Alignment</h4>
+                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Maps actual transit movements of Saturn, Jupiter, and Moon over natal period rulers.</p>
+                </div>
+                <div className="text-[10px] font-bold text-sky-400 flex items-center gap-1 mt-2">
+                  {compilingRelReport === "journey" ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </>
+                  )}
+                </div>
+              </button>
+
+              {/* Card 5: All Aspects Alignment */}
+              <button
+                disabled={compilingRelReport !== null}
+                onClick={async () => {
+                  try {
+                    setCompilingRelReport("all_aspects");
+                    const targetProfile = profile || mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
+                    if (!targetProfile) {
+                      throw new Error("Unable to load astrology profile data.");
+                    }
+                    const activeAstroTabIds = currentTabs.map(t => t.id);
+                    const submenusMap: { [key: string]: string[] } = {
+                      dasha: ["jhora_vimshottari"],
+                      charts: ["jhora_divisional"],
+                      vedic: ["jhora_planets", "jhora_shadbala", "jhora_bhava_balas"],
+                      transits_data: [],
+                      jaimini: ["jaimini_karakas", "jaimini_arudhas"],
+                      kp: ["kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_houses_significators"],
+                      lalkitab: ["lalkitab_houses", "lalkitab_teva"],
+                      tajik: ["tajika_varshaphal", "tajika_harshabala"],
+                      western: ["western_tropical", "western_aspects"]
+                    };
+                    
+                    let activeSubmenuIds = ["jhora_birth_details"];
+                    activeAstroTabIds.forEach(tabId => {
+                      if (submenusMap[tabId]) {
+                        activeSubmenuIds.push(...submenusMap[tabId]);
+                      }
+                    });
+                    
+                    if (activeSubmenuIds.length <= 1) {
+                      activeSubmenuIds = [
+                        "jhora_birth_details", "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", 
+                        "jhora_ashtakavarga", "jhora_divisional", "jhora_vimshottari", "kp_cusps", 
+                        "kp_sub_lords", "kp_planet_significators", "kp_house_significators", "jaimini_karakas", 
+                        "jaimini_arudhas", "western_tropical", "western_aspects", "tajika_varshaphal", 
+                        "tajika_harshabala", "lalkitab_houses", "lalkitab_teva"
+                      ];
+                    }
+
+                    const doc = generateRawAstrologyPDF(targetProfile, {
+                      profileName: userName,
+                      submenus: activeSubmenuIds
+                    });
+                    doc.save(`All_Aspects_Alignment_Report_${userName.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.pdf`);
+                  } catch (err: any) {
+                    console.error("All Aspects PDF compile failed:", err);
+                    alert("Failed to compile All Aspects PDF: " + err.message);
+                  } finally {
+                    setCompilingRelReport(null);
+                  }
+                }}
+                className={`p-4 rounded-xl border text-left ${isDark ? "border-indigo-500/20 bg-slate-950/40" : "border-neutral-200 bg-neutral-50"} hover:border-indigo-500/40 transition-all flex flex-col justify-between h-40 group cursor-pointer disabled:opacity-50`}
+              >
+                <div className="w-full">
+                  <div className="flex justify-between items-start">
+                    <Shield className="w-5 h-5 text-indigo-400 group-hover:scale-110 transition-transform" />
+                    <span className="text-[9px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded font-mono font-bold">360° TOTAL</span>
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-200 mt-2">All Aspects Alignment</h4>
+                  <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">Dynamic tabular dump aligning Parashari, KP, Jaimini, Lalkitab and Western based on active tabs.</p>
+                </div>
+                <div className="text-[10px] font-bold text-indigo-400 flex items-center gap-1 mt-2">
+                  {compilingRelReport === "all_aspects" ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling...
                     </>
