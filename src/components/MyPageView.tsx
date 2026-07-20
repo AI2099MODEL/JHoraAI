@@ -4735,7 +4735,7 @@ export function MyPageView({
                         return (
                           <div key={p.name} className="flex justify-between items-center py-1 border-b border-dashed border-slate-500/10">
                             <span className={textStyle}>{p.name} (House {lkHouse})</span>
-                            <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${status.includes("Asleep") ? "bg-red-500/10 text-red-500" : "bg-emerald-500/10 text-emerald-500"}`}>
+                            <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${(status || "").includes("Asleep") ? "bg-red-500/10 text-red-500" : "bg-emerald-500/10 text-emerald-500"}`}>
                               {status}
                             </span>
                           </div>

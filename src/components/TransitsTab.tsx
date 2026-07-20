@@ -2093,7 +2093,7 @@ export default function TransitsTab({
                           <td className="p-3 text-indigo-300">{m.time}</td>
                           <td className="p-3">
                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              m.auspiciousness.includes("Highly") || m.auspiciousness.includes("Good") || m.auspiciousness.includes("Beneficial")
+                              (m.auspiciousness || "").includes("Highly") || (m.auspiciousness || "").includes("Good") || (m.auspiciousness || "").includes("Beneficial")
                                 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                                 : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
                             }`}>
