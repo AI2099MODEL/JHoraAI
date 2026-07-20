@@ -97,6 +97,94 @@ function getGeminiClient(): GoogleGenAI {
   return aiClient;
 }
 
+// Helpers to read and write profile-tagged analysis from/to the analysis folder
+function getUserAnalysisContext(userName: string, userEmail: string, uid?: string): string {
+  try {
+    const analysisDir = path.join(process.cwd(), "analysis");
+    if (!fs.existsSync(analysisDir)) {
+      return "";
+    }
+    const files = fs.readdirSync(analysisDir);
+    let matchedContent = "";
+    
+    const normName = userName.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const normEmail = userEmail.toLowerCase().trim();
+    
+    for (const file of files) {
+      if (file === "README.md") continue;
+      const fileLower = file.toLowerCase();
+      let matches = false;
+      
+      // Match by normalized name
+      if (normName && normName.length >= 3 && fileLower.includes(normName)) {
+        matches = true;
+      }
+      // Match by email prefix
+      if (normEmail && normEmail.includes("@")) {
+        const emailPrefix = normEmail.split("@")[0];
+        if (emailPrefix && emailPrefix.length >= 3 && fileLower.includes(emailPrefix)) {
+          matches = true;
+        }
+      }
+      // Match by uid if available
+      if (uid && fileLower.includes(uid.toLowerCase())) {
+        matches = true;
+      }
+      
+      if (matches) {
+        const filePath = path.join(analysisDir, file);
+        const stats = fs.statSync(filePath);
+        if (stats.isFile()) {
+          const content = fs.readFileSync(filePath, "utf-8");
+          matchedContent += `\n\n--- FILE: ${file} ---\n${content}\n`;
+        }
+      }
+    }
+    return matchedContent;
+  } catch (err) {
+    console.error("Error reading user analysis context from analysis folder:", err);
+    return "";
+  }
+}
+
+function saveUserAnalysisToFolder(userName: string, analysisText: string, astrologyData: any) {
+  try {
+    const analysisDir = path.join(process.cwd(), "analysis");
+    if (!fs.existsSync(analysisDir)) {
+      fs.mkdirSync(analysisDir, { recursive: true });
+    }
+    
+    const normName = userName.toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (!normName) return;
+    
+    const analysisPath = path.join(analysisDir, `${normName}_analysis.md`);
+    const dataPath = path.join(analysisDir, `${normName}_data.json`);
+    
+    fs.writeFileSync(analysisPath, analysisText);
+    fs.writeFileSync(dataPath, JSON.stringify(astrologyData, null, 2));
+    
+    console.log(`[Analysis Save] Saved analysis for ${userName} to analysis/ folder.`);
+    
+    // Stage, commit and push to git asynchronously
+    exec(`git add analysis/${normName}_analysis.md analysis/${normName}_data.json && (git diff-index --quiet HEAD || git commit -m "feat(analysis): update stored analysis for ${userName}")`, (err, stdout, stderr) => {
+      if (err) {
+        console.warn("[Analysis Git Commit Warning]", err.message);
+      } else {
+        console.log("[Analysis Git Commit Success]");
+        exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
+          if (pushErr) {
+            console.error("[Analysis Git Push Warning]", pushErr.message);
+          } else {
+            console.log("[Analysis Git Push Success]", pushStdout);
+          }
+        });
+      }
+    });
+  } catch (err) {
+    console.error("Error saving user analysis to folder:", err);
+  }
+}
+
 // Helper to send real-time personalized astrology report via Email using Nodemailer
 async function triggerAstrologyEmail(profile: any) {
   const email = profile.email;
@@ -1502,7 +1590,11 @@ ${doshasDesc}
       temperature: 0.7,
     });
 
-    res.json({ analysis: response.choices[0]?.message?.content || "" });
+    const analysisText = response.choices[0]?.message?.content || "";
+    const userName = astrologyData.birthDetails?.name || "Seeker";
+    saveUserAnalysisToFolder(userName, analysisText, astrologyData);
+
+    res.json({ analysis: analysisText });
   } catch (apiErr: any) {
     let prependedNotice = "";
     if (apiErr.message?.includes("No OpenAI API key found")) {
@@ -1547,7 +1639,11 @@ To harmonize any planetary imbalances, consider the following traditional measur
 
 *Note: This report was generated using the local JHoraAI Vedic Synthesis engine as a robust fallback.*`;
     
-    res.json({ analysis: prependedNotice + analysisFallback });
+    const finalFallback = prependedNotice + analysisFallback;
+    const fallbackName = birthDetails.name || "Seeker";
+    saveUserAnalysisToFolder(fallbackName, finalFallback, astrologyData);
+
+    res.json({ analysis: finalFallback });
   }
 });
 
@@ -2068,6 +2164,7 @@ app.post("/api/astrology/master-ask", async (req, res) => {
     const systemInstruction = `You are JHoraAI's Master AI Astrologer, the unified intelligence core of the entire application.
 You are directly connected to all 7 relationship systems (Vedic, KP, Jaimini, Nadi, Lal Kitab, Tajik, Western), the Unified Evidence and Decision Engines, the Astrological Reasoning Engine, and the Knowledge Center.
 You have direct, full-read access to all of the user's dashboard pages, astrological systems, calculations, and tables.
+You are equipped with Google Search grounding to query current dates, real-time transits, active ephemeris states, and external planetary movements on the internet to verify and enrich your analysis.
 You are trained to read and synthesize ALL application page data:
 - **Vedic / JHora System Pages**: Including raw natal coords, Vimshottari/Ashtottari/Yogini dasha tables, Shadbala, Ashtakavarga, Bhava balas, divisional charts, etc.
 - **KP Stellar Dashboard**: Placidus cusps, cuspal sub-lords, planet sub-lords, planet significators, and house significators.
@@ -2080,6 +2177,8 @@ You have access to the complete **Astrological Rules Handbook** which indexes al
 
 When answering, always reference and cite specific tables (e.g. [JH1] for Birth details, [JH2] for KP planets, [JH4] for Vimshottari Dasha, [JH19] for Shadbala, etc.), specific rule IDs (e.g. [RULE_PAR_01]), and event codes (e.g. [REL001] for Marriage Promise, [CAR001] for Promotion) from the handbook to maintain complete transparency and precision. Make your counseling response elegant, reassuring, and professional. Return your response structured in a clean JSON format matching the schema.`;
 
+    const userAnalysisContext = getUserAnalysisContext(userName, userEmail, mergedProfile.uid);
+
     const userPrompt = `
 You are consulting for logged-in user: ${userName} (${userEmail}).
 Birth MOMENT details: Born on ${birthDate} at ${birthTime} in ${place}.
@@ -2091,6 +2190,11 @@ ${savedProfilesSummary || "No alternative profiles saved yet."}
 
 SOUL BLUEPRINT SYNTHESIS (Page Data):
 "${soulSynthesis}"
+
+==================================================
+PREVIOUS USER ANALYSIS & CORRESPONDING DATA (from analysis/ folder):
+==================================================
+${userAnalysisContext || "No previous analysis files found in the repository for this user."}
 
 ==================================================
 ASTROLOGICAL RULES HANDBOOK (System Rules & Table Index):
@@ -2136,6 +2240,8 @@ LAWS OF CELESTIAL ANALYSIS:
       contents: userPrompt,
       config: {
         systemInstruction,
+        tools: [{ googleSearch: {} }],
+        toolConfig: { includeServerSideToolInvocations: true },
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
