@@ -458,6 +458,44 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
             </div>
           </div>
 
+          {/* Dedicated Project Mismatch Diagnostic Card for auth/unauthorized-domain */}
+          {error.includes("auth/unauthorized-domain") && (
+            <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl text-xs space-y-3" id="project-mismatch-diagnostic">
+              <div className="flex items-center gap-2 font-semibold text-amber-300 text-sm">
+                <span>🔌</span>
+                <span>Connect Applet to Your Custom "JHoraAI Professional" Project</span>
+              </div>
+              <p className="text-slate-300 leading-relaxed text-[11px]">
+                You have authorized your preview domains under the custom Firebase project <strong className="text-amber-300 font-mono">jhoraai-professional</strong>, but this development applet is currently connected to the default sandbox project <strong className="text-amber-300 font-mono">{activeProjectId}</strong>.
+              </p>
+              <div className="space-y-2 text-[11px] text-slate-300 bg-slate-950/80 p-3 rounded-lg border border-slate-800">
+                <span className="font-semibold text-amber-400 block">👉 How to fix (Use your custom Firebase Project):</span>
+                <ol className="list-decimal list-inside space-y-1.5 text-slate-300">
+                  <li>
+                    Open the <strong className="text-white">Settings</strong> menu of AI Studio (click the gear icon <strong className="text-white">⚙️</strong> in the panel).
+                  </li>
+                  <li>
+                    Scroll to the <strong className="text-white">Environment Variables</strong> section.
+                  </li>
+                  <li>
+                    Add the following variables with your custom project's settings:
+                    <div className="mt-1.5 space-y-1 font-mono text-[10px] text-slate-400 bg-slate-900 p-2 rounded border border-slate-800 select-all">
+                      <div>VITE_FIREBASE_API_KEY = <span className="text-slate-500">&lt;Your Web API Key&gt;</span></div>
+                      <div className="text-amber-200/90">VITE_FIREBASE_AUTH_DOMAIN = "jhoraai-professional.firebaseapp.com"</div>
+                      <div className="text-amber-200/90">VITE_FIREBASE_PROJECT_ID = "jhoraai-professional"</div>
+                      <div className="text-amber-200/90">VITE_FIREBASE_STORAGE_BUCKET = "jhoraai-professional.appspot.com"</div>
+                      <div>VITE_FIREBASE_MESSAGING_SENDER_ID = <span className="text-slate-500">&lt;Your Sender ID&gt;</span></div>
+                      <div>VITE_FIREBASE_APP_ID = <span className="text-slate-500">&lt;Your Web App ID&gt;</span></div>
+                    </div>
+                  </li>
+                  <li className="text-slate-300">
+                    Once saved, the applet will automatically rebuild and connect to your custom project!
+                  </li>
+                </ol>
+              </div>
+            </div>
+          )}
+
           <div className="p-4 bg-slate-900/90 border border-amber-500/20 rounded-xl text-xs text-slate-300 space-y-3">
             <h4 className="font-mono text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[10px]">
               🛠️ Google Auth & Firebase Resolution Steps
