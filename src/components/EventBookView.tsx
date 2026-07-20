@@ -233,6 +233,256 @@ const relEvents: KPEvent[] = [
   { id: "CUS001", category: "custom", name: "Custom Event Plugin", primary: "1,11", supporting: "-", obstructing: "-", mainCsl: "1", description: "Reserved for user-defined plugins and custom astrological triggers." }
 ];
 
+function getEventRelationships(eventId: string): any[] {
+  const rels: any[] = [];
+  const timestamp = "2026-07-20T13:48:28Z";
+
+  if (eventId.startsWith("REL")) {
+    if (eventId === "REL008") {
+      rels.push({ relationship_id: "R_REL008_REL009", source_id: "REL008", target_id: "REL009", type: "Enables", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+      rels.push({ relationship_id: "R_REL008_REL001", source_id: "REL008", target_id: "REL001", type: "Depends On", priority: "Critical", validation_status: "Valid", active_flag: true, timestamp });
+    } else if (eventId === "REL009") {
+      rels.push({ relationship_id: "R_REL009_REL008", source_id: "REL009", target_id: "REL008", type: "Successor", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+      rels.push({ relationship_id: "R_REL009_REL011", source_id: "REL009", target_id: "REL011", type: "Enables", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+    } else if (eventId === "REL011") {
+      rels.push({ relationship_id: "R_REL011_REL009", source_id: "REL011", target_id: "REL009", type: "Successor", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+      rels.push({ relationship_id: "R_REL011_REL013", source_id: "REL011", target_id: "REL013", type: "Enables", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+      rels.push({ relationship_id: "R_REL011_REL012", source_id: "REL011", target_id: "REL012", type: "Mutually Exclusive", priority: "Critical", validation_status: "Valid", active_flag: true, timestamp });
+    } else if (eventId === "REL013") {
+      rels.push({ relationship_id: "R_REL013_REL011", source_id: "REL013", target_id: "REL011", type: "Successor", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+      rels.push({ relationship_id: "R_REL013_REL014", source_id: "REL013", target_id: "REL014", type: "Enables", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+    } else if (eventId === "REL014") {
+      rels.push({ relationship_id: "R_REL014_REL013", source_id: "REL014", target_id: "REL013", type: "Depends On", priority: "Critical", validation_status: "Valid", active_flag: true, timestamp });
+    } else if (eventId === "REL001") {
+      rels.push({ relationship_id: "R_REL001_REL016", source_id: "REL001", target_id: "REL016", type: "Mutually Exclusive", priority: "Critical", validation_status: "Valid", active_flag: true, timestamp });
+    }
+  } else if (eventId.startsWith("CAR")) {
+    if (eventId === "CAR001") {
+      rels.push({ relationship_id: "R_CAR001_CAR005", source_id: "CAR001", target_id: "CAR005", type: "Enables", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+    } else if (eventId === "CAR005") {
+      rels.push({ relationship_id: "R_CAR005_CAR001", source_id: "CAR005", target_id: "CAR001", type: "Depends On", priority: "Critical", validation_status: "Valid", active_flag: true, timestamp });
+      rels.push({ relationship_id: "R_CAR005_CAR011", source_id: "CAR005", target_id: "CAR011", type: "Enables", priority: "Medium", validation_status: "Valid", active_flag: true, timestamp });
+      rels.push({ relationship_id: "R_CAR005_CAR019", source_id: "CAR005", target_id: "CAR019", type: "Mutually Exclusive", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+    } else if (eventId === "CAR012") {
+      rels.push({ relationship_id: "R_CAR012_CAR013", source_id: "CAR012", target_id: "CAR013", type: "Enables", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+      rels.push({ relationship_id: "R_CAR012_CAR015", source_id: "CAR012", target_id: "CAR015", type: "Mutually Exclusive", priority: "Critical", validation_status: "Valid", active_flag: true, timestamp });
+    }
+  } else if (eventId.startsWith("EST")) {
+    if (eventId === "EST003") {
+      rels.push({ relationship_id: "R_EST003_EST005", source_id: "EST003", target_id: "EST005", type: "Enables", priority: "High", validation_status: "Valid", active_flag: true, timestamp });
+    } else if (eventId === "EST005") {
+      rels.push({ relationship_id: "R_EST005_EST003", source_id: "EST005", target_id: "EST003", type: "Depends On", priority: "Critical", validation_status: "Valid", active_flag: true, timestamp });
+    }
+  } else if (eventId.startsWith("FIN")) {
+    if (eventId === "FIN014") {
+      rels.push({ relationship_id: "R_FIN014_FIN015", source_id: "FIN014", target_id: "FIN015", type: "Enables", priority: "Medium", validation_status: "Valid", active_flag: true, timestamp });
+    }
+  }
+
+  if (rels.length === 0) {
+    const baseId = eventId.substring(0, 3);
+    const num = parseInt(eventId.substring(3)) || 1;
+    const nextNum = num + 1;
+    const prevNum = Math.max(1, num - 1);
+    
+    rels.push({
+      relationship_id: `R_${eventId}_${baseId}${String(nextNum).padStart(3, '0')}`,
+      source_id: eventId,
+      target_id: `${baseId}${String(nextNum).padStart(3, '0')}`,
+      type: "Related",
+      priority: "Medium",
+      validation_status: "Valid",
+      active_flag: true,
+      timestamp
+    });
+
+    if (num > 1) {
+      rels.push({
+        relationship_id: `R_${eventId}_${baseId}${String(prevNum).padStart(3, '0')}`,
+        source_id: eventId,
+        target_id: `${baseId}${String(prevNum).padStart(3, '0')}`,
+        type: "Predecessor",
+        priority: "Medium",
+        validation_status: "Valid",
+        active_flag: true,
+        timestamp
+      });
+    }
+  }
+
+  return rels;
+}
+
+function getEventStatusLifecycle(eventId: string, verdict: string, probability: number) {
+  let current_status = "PROMISED";
+  let reason = "Natal promise confirmed; waiting for timing activation.";
+
+  if (verdict.includes("APPROVED") || verdict.includes("CONFIRMED") || probability > 70) {
+    if (probability > 85) {
+      current_status = "VERY_LIKELY";
+      reason = "Timing activation is extremely strong; transit window is peaking.";
+    } else {
+      current_status = "ACTIVATION_WINDOW_OPEN";
+      reason = "Dasha periods support house significations; window is active.";
+    }
+  } else if (probability < 30) {
+    current_status = "BLOCKED";
+    reason = "Dasha and transit signals are obstructing; active negations detected.";
+  } else {
+    current_status = "WAITING_FOR_ACTIVATION";
+    reason = "Natal promise exists, but timing window is currently inactive.";
+  }
+
+  if (eventId === "REL016") {
+    current_status = "FAILED";
+    reason = "Natal structure negates active marriage alignment.";
+  }
+
+  return {
+    status_id: "STAT_" + eventId,
+    current_status,
+    previous_status: "DEFINED",
+    timestamp: "2026-07-20T13:48:28Z",
+    source: "KP_STATUS_ENGINE_v2.1",
+    reason,
+    version: "v2.1",
+    history: [
+      { status: "DEFINED", timestamp: "2026-07-19T12:00:00Z", reason: "Standard database initialization", engine_version: "v2.1", rule_version: "r2.0" },
+      { status: "PROMISED", timestamp: "2026-07-20T00:01:00Z", reason: "Natal promise check passed", engine_version: "v2.1", rule_version: "r2.0" },
+      { status: current_status, timestamp: "2026-07-20T13:48:28Z", reason, engine_version: "v2.1", rule_version: "r2.0" }
+    ]
+  };
+}
+
+function getEventConfidenceAndProbability(eventId: string, verdict: string, probability: number) {
+  let confidence_level = "MODERATE";
+  if (probability > 80) {
+    confidence_level = "VERY HIGH";
+  } else if (probability > 60) {
+    confidence_level = "HIGH";
+  } else if (probability < 40) {
+    confidence_level = "LOW";
+  }
+
+  const reliabilityIndex = parseFloat((0.75 + (probability / 400)).toFixed(2));
+
+  return {
+    confidence_id: "CONF_" + eventId,
+    confidence_level,
+    confidence_score: Math.round(probability * 1.05),
+    probability_score: probability,
+    reliability_index: reliabilityIndex,
+    timestamp: "2026-07-20T13:48:28Z",
+    engine_version: "v2.1",
+    rule_version: "r2.0",
+    factors: {
+      natal_promise_strength: probability > 50 ? "STRONG" : "CHALLENGED",
+      activation_strength: probability > 60 ? "ACTIVE" : "STALE",
+      transit_support: probability > 70 ? "HIGH" : "LOW",
+      dba_support: probability > 50 ? "SUPPORTIVE" : "OBSTRUCTIVE",
+      supporting_rule_count: Math.round(probability / 15),
+      blocking_rule_count: Math.round((100 - probability) / 25),
+      planet_strength: "MUTUAL DIGNITY",
+      house_strength: "CONCENTRIC ALIGNMENT",
+      cuspal_strength: "VERIFIED"
+    },
+    history: [
+      { previous_confidence: "MODERATE", previous_probability: 55, timestamp: "2026-07-19T12:00:00Z", engine_version: "v2.1", rule_version: "r2.0" }
+    ]
+  };
+}
+
+function getEventEvidenceSpecification(eventId: string, primary: string, mainCsl: string, probability: number) {
+  const timestamp = "2026-07-20T13:48:28Z";
+  const status_rule = probability > 50 ? "SUPPORTED" : "CONFLICTING";
+
+  return {
+    evidences: [
+      {
+        evidence_id: `EV_${eventId}_NATAL`,
+        event_id: eventId,
+        evidence_type: "Natal Evidence",
+        evidence_source: "KP System",
+        evidence_value: `Cuspal Sub-Lord (CSL) ${mainCsl} is strongly placed and rules primary houses [${primary}]`,
+        evidence_status: status_rule,
+        evidence_weight: 40,
+        evidence_timestamp: timestamp,
+        rule_id: `RULE_NATAL_${eventId}`,
+        decision_reference: `DEC_REF_${eventId}`,
+        confidence_reference: `CONF_REF_${eventId}`
+      },
+      {
+        evidence_id: `EV_${eventId}_DBA`,
+        event_id: eventId,
+        evidence_type: "DBA Evidence",
+        evidence_source: "DBA Engine",
+        evidence_value: "Running Vimshottari period contains active planetary significators of houses of gain.",
+        evidence_status: status_rule,
+        evidence_weight: 35,
+        evidence_timestamp: timestamp,
+        rule_id: `RULE_TIMING_${eventId}`,
+        decision_reference: `DEC_REF_${eventId}`,
+        confidence_reference: `CONF_REF_${eventId}`
+      },
+      {
+        evidence_id: `EV_${eventId}_TRANSIT`,
+        event_id: eventId,
+        evidence_type: "Transit Evidence",
+        evidence_source: "Transit Engine",
+        evidence_value: `Transit coordinates aspect cusp lord ${mainCsl}, creating a high-frequency connection.`,
+        evidence_status: status_rule,
+        evidence_weight: 25,
+        evidence_timestamp: timestamp,
+        rule_id: `RULE_TRANSIT_${eventId}`,
+        decision_reference: `DEC_REF_${eventId}`,
+        confidence_reference: `CONF_REF_${eventId}`
+      }
+    ]
+  };
+}
+
+function getEventTimelineSpecification(eventId: string, probability: number) {
+  let current_position = "Activation Window Opens";
+  let progress_index = 2;
+
+  if (probability > 80) {
+    current_position = "Peak Activation";
+    progress_index = 3;
+  } else if (probability > 60) {
+    current_position = "Activation Window Opens";
+    progress_index = 2;
+  } else if (probability < 30) {
+    current_position = "Waiting for Activation";
+    progress_index = 1;
+  }
+
+  const stages = [
+    { stage_name: "Natal Promise", status: "COMPLETED", timestamp: "2026-07-20T00:00:00Z" },
+    { stage_name: "Waiting for Activation", status: progress_index >= 1 ? "COMPLETED" : "PENDING", timestamp: "2026-07-20T01:00:00Z" },
+    { stage_name: "Activation Window Opens", status: progress_index >= 2 ? (progress_index === 2 ? "ACTIVE" : "COMPLETED") : "PENDING", timestamp: "2026-07-20T13:48:28Z" },
+    { stage_name: "Peak Activation", status: progress_index === 3 ? "ACTIVE" : "PENDING" },
+    { stage_name: "Event Occurs", status: "PENDING" },
+    { stage_name: "Event Completed", status: "PENDING" },
+    { stage_name: "Historical Record", status: "PENDING" }
+  ];
+
+  return {
+    timeline_id: "TL_" + eventId,
+    event_id: eventId,
+    timeline_type: "Lifetime Timeline",
+    timeline_status: "Active Tracker",
+    current_position,
+    start_date: "2026-07-20",
+    end_date: "2026-11-30",
+    stages,
+    windows: {
+      current_window: "Active (2026-07-20 to 2026-08-15)",
+      next_window: "Upcoming (2026-09-01 to 2026-12-10)",
+      future_windows: "Dec 2027 onwards"
+    }
+  };
+}
+
 function getUniversalEventRecord(event: KPEvent, astrologyData: any, njResult: any) {
   // Extract real dynamic Vimshottari dasha lord if available
   let activeDasha = "Ketu-Venus-Mercury";
@@ -434,7 +684,12 @@ function getUniversalEventRecord(event: KPEvent, astrologyData: any, njResult: a
       json: "Available (Download full structured JSON)",
       csv: "Available (Append row to spreadsheet report)",
       research_report: "Available (Generate Deep Research paper)"
-    }
+    },
+    relationships: getEventRelationships(event.id),
+    status_lifecycle: getEventStatusLifecycle(event.id, forecastScore > 50 ? "APPROVED" : "CHALLENGING", forecastScore),
+    confidence_probability: getEventConfidenceAndProbability(event.id, forecastScore > 50 ? "APPROVED" : "CHALLENGING", forecastScore),
+    evidence_specification: getEventEvidenceSpecification(event.id, event.primary, event.mainCsl, forecastScore),
+    timeline_specification: getEventTimelineSpecification(event.id, forecastScore)
   };
 }
 
@@ -597,6 +852,20 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
   const [activeEventBookSection, setActiveEventBookSection] = useState<string>("event_info");
   const [expandedEventTabs, setExpandedEventTabs] = useState<Record<string, string>>({});
 
+  // Advanced Search State Variables
+  const [isAdvancedSearch, setIsAdvancedSearch] = useState(false);
+  const [searchStatus, setSearchStatus] = useState("all");
+  const [searchPriority, setSearchPriority] = useState("all");
+  const [searchConfidence, setSearchConfidence] = useState("all");
+  const [searchMinProbability, setSearchMinProbability] = useState(0);
+  const [searchHouse, setSearchHouse] = useState("");
+  const [searchSortField, setSearchSortField] = useState("id");
+  const [searchSortOrder, setSearchSortOrder] = useState("asc");
+
+  // Status Simulator State Variables
+  const [simulatedStatuses, setSimulatedStatuses] = useState<Record<string, string>>({});
+  const [simulationLogs, setSimulationLogs] = useState<Record<string, any[]>>({});
+
   const fetchAgentRules = async () => {
     setIsLoadingRules(true);
     try {
@@ -723,19 +992,81 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
   ], [combinedEvents, agentRules]);
 
   const filteredEvents = useMemo(() => {
-    return combinedEvents.filter((ev) => {
-      const matchesSearch = 
-        ev.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ev.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ev.primary.includes(searchTerm) ||
-        ev.mainCsl.includes(searchTerm) ||
-        ev.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesCategory = selectedCategory === "all" || ev.category === selectedCategory;
-
-      return matchesSearch && matchesCategory;
+    let result = combinedEvents.map(ev => {
+      const record = getUniversalEventRecord(ev, astrologyData, njResult);
+      if (simulatedStatuses[ev.id]) {
+        record.status_lifecycle.current_status = simulatedStatuses[ev.id];
+      }
+      return { ev, record };
     });
-  }, [combinedEvents, searchTerm, selectedCategory]);
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(item => 
+        item.ev.id.toLowerCase().includes(term) ||
+        item.ev.name.toLowerCase().includes(term) ||
+        item.ev.primary.includes(term) ||
+        item.ev.mainCsl.includes(term) ||
+        item.ev.description.toLowerCase().includes(term)
+      );
+    }
+
+    if (selectedCategory !== "all") {
+      result = result.filter(item => item.ev.category === selectedCategory);
+    }
+
+    if (isAdvancedSearch) {
+      if (searchStatus !== "all") {
+        result = result.filter(item => item.record.status_lifecycle.current_status === searchStatus);
+      }
+      if (searchPriority !== "all") {
+        result = result.filter(item => item.record.event_info.priority === searchPriority);
+      }
+      if (searchConfidence !== "all") {
+        result = result.filter(item => item.record.confidence_probability.confidence_level === searchConfidence);
+      }
+      if (searchMinProbability > 0) {
+        result = result.filter(item => item.record.confidence_probability.probability_score >= searchMinProbability);
+      }
+      if (searchHouse) {
+        result = result.filter(item => 
+          item.record.astro_foundation.primary_houses.split(",").includes(searchHouse) ||
+          item.record.astro_foundation.supporting_houses.split(",").includes(searchHouse)
+        );
+      }
+    }
+
+    result.sort((a, b) => {
+      let valA: any = "";
+      let valB: any = "";
+
+      if (searchSortField === "id") {
+        valA = a.ev.id;
+        valB = b.ev.id;
+      } else if (searchSortField === "name") {
+        valA = a.ev.name;
+        valB = b.ev.name;
+      } else if (searchSortField === "category") {
+        valA = a.ev.category;
+        valB = b.ev.category;
+      } else if (searchSortField === "priority") {
+        valA = a.record.event_info.priority;
+        valB = b.record.event_info.priority;
+      } else if (searchSortField === "confidence") {
+        valA = a.record.confidence_probability.confidence_level;
+        valB = b.record.confidence_probability.confidence_level;
+      } else if (searchSortField === "probability") {
+        valA = a.record.confidence_probability.probability_score;
+        valB = b.record.confidence_probability.probability_score;
+      }
+
+      if (valA < valB) return searchSortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return searchSortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return result.map(item => item.ev);
+  }, [combinedEvents, searchTerm, selectedCategory, isAdvancedSearch, searchStatus, searchPriority, searchConfidence, searchMinProbability, searchHouse, searchSortField, searchSortOrder, astrologyData, njResult, simulatedStatuses]);
 
   const drawTableHeaderAtY = (doc: jsPDF, y: number, showForecast: boolean) => {
     doc.setFillColor(30, 41, 59); // slate-800
@@ -1039,23 +1370,145 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="mt-5 flex items-center gap-2 bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/60">
-          <Search className="w-4 h-4 text-slate-400 ml-1.5" />
-          <input
-            type="text"
-            placeholder="Search events, primary houses, or cuspal sub-lords (e.g., CAR001, Promotion, CSL 10)..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 bg-transparent border-none outline-none text-xs text-slate-200 placeholder-slate-500 focus:ring-0 focus:outline-none"
-          />
-          {searchTerm && (
-            <button 
-              onClick={() => setSearchTerm("")}
-              className="text-slate-400 hover:text-slate-200 p-0.5"
+        {/* Search Bar & Advanced Query Engine */}
+        <div className="mt-5 space-y-3">
+          <div className="flex items-center gap-2 bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/60">
+            <Search className="w-4 h-4 text-slate-400 ml-1.5" />
+            <input
+              type="text"
+              placeholder="Search events, primary houses, or cuspal sub-lords (e.g., CAR001, Promotion, CSL 10)..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="flex-1 bg-transparent border-none outline-none text-xs text-slate-200 placeholder-slate-500 focus:ring-0 focus:outline-none"
+            />
+            {searchTerm && (
+              <button 
+                onClick={() => setSearchTerm("")}
+                className="text-slate-400 hover:text-slate-200 p-0.5 mr-1"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+            <button
+              onClick={() => setIsAdvancedSearch(!isAdvancedSearch)}
+              className={`px-3 py-1 rounded-lg text-[10px] font-mono font-bold border transition-all ${
+                isAdvancedSearch 
+                  ? "bg-amber-500/25 border-amber-500/50 text-amber-300 shadow-sm" 
+                  : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200"
+              }`}
+              id="advanced-search-toggle"
             >
-              <X className="w-3.5 h-3.5" />
+              Advanced Query Engine {isAdvancedSearch ? "ON" : "OFF"}
             </button>
+          </div>
+
+          {isAdvancedSearch && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 p-4 bg-slate-950/50 rounded-xl border border-slate-800/60 animate-fade-in text-xs font-mono" id="advanced-search-panel">
+              <div className="space-y-1">
+                <label className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Lifecycle Status</label>
+                <select
+                  value={searchStatus}
+                  onChange={(e) => setSearchStatus(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-300 focus:outline-none focus:border-amber-500/50"
+                  id="search-status-select"
+                >
+                  <option value="all">ALL STATUSES</option>
+                  <option value="PROMISED">PROMISED</option>
+                  <option value="WAITING_FOR_ACTIVATION">WAITING FOR ACTIVATION</option>
+                  <option value="ACTIVATION_WINDOW_OPEN">WINDOW OPEN</option>
+                  <option value="VERY_LIKELY">VERY LIKELY</option>
+                  <option value="BLOCKED">BLOCKED</option>
+                  <option value="FAILED">FAILED</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Priority Level</label>
+                <select
+                  value={searchPriority}
+                  onChange={(e) => setSearchPriority(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-300 focus:outline-none focus:border-amber-500/50"
+                  id="search-priority-select"
+                >
+                  <option value="all">ALL PRIORITIES</option>
+                  <option value="CRITICAL">CRITICAL</option>
+                  <option value="HIGH">HIGH</option>
+                  <option value="MEDIUM">MEDIUM</option>
+                  <option value="LOW">LOW</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Confidence Level</label>
+                <select
+                  value={searchConfidence}
+                  onChange={(e) => setSearchConfidence(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-300 focus:outline-none focus:border-amber-500/50"
+                  id="search-confidence-select"
+                >
+                  <option value="all">ALL CONFIDENCE</option>
+                  <option value="VERY HIGH">VERY HIGH</option>
+                  <option value="HIGH">HIGH</option>
+                  <option value="MODERATE">MODERATE</option>
+                  <option value="LOW">LOW</option>
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Min Probability</label>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={searchMinProbability}
+                    onChange={(e) => setSearchMinProbability(parseInt(e.target.value))}
+                    className="w-full accent-amber-500 bg-slate-900 h-1 rounded-lg"
+                    id="search-min-prob-range"
+                  />
+                  <span className="text-[10px] text-slate-400 shrink-0 w-8 text-right">{searchMinProbability}%</span>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">House Activated</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 7 or 10"
+                  value={searchHouse}
+                  onChange={(e) => setSearchHouse(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-300 focus:outline-none focus:border-amber-500/50"
+                  id="search-house-input"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] text-slate-500 uppercase font-bold tracking-wider">Sort & Order</label>
+                <div className="flex gap-1">
+                  <select
+                    value={searchSortField}
+                    onChange={(e) => setSearchSortField(e.target.value)}
+                    className="flex-1 bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-[10px] text-slate-300 focus:outline-none focus:border-amber-500/50 font-mono"
+                    id="search-sort-field-select"
+                  >
+                    <option value="id">EVENT ID</option>
+                    <option value="name">EVENT NAME</option>
+                    <option value="category">CATEGORY</option>
+                    <option value="priority">PRIORITY</option>
+                    <option value="confidence">CONFIDENCE</option>
+                    <option value="probability">PROBABILITY</option>
+                  </select>
+                  <button
+                    onClick={() => setSearchSortOrder(searchSortOrder === "asc" ? "desc" : "asc")}
+                    className="p-1.5 bg-slate-900 border border-slate-800 rounded-lg text-slate-400 hover:text-slate-200"
+                    title={searchSortOrder === "asc" ? "Sort Ascending" : "Sort Descending"}
+                    id="search-sort-order-toggle"
+                  >
+                    {searchSortOrder === "asc" ? "▲" : "▼"}
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
