@@ -79,7 +79,7 @@ const IconMap: { [key: string]: React.ComponentType<any> } = {
   award: Award,
 };
 
-function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, astrologyData: any }) {
+function CharaDashaInteractiveTable({ profile, astrologyData, isDark }: { profile: any, astrologyData: any, isDark?: boolean }) {
   const [expandedMajor, setExpandedMajor] = useState<number | null>(null);
   const [expandedSub, setExpandedSub] = useState<number | null>(null);
 
@@ -238,12 +238,21 @@ function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, 
 
   const currentYear = new Date().getFullYear();
 
+  const tableBg = isDark ? "bg-slate-950/40 border-slate-800/60" : "bg-white border-neutral-200";
+  const headerBg = isDark ? "bg-slate-900 border-b border-slate-800 text-slate-400" : "bg-neutral-100 border-b border-neutral-200 text-neutral-600";
+  const textPrimary = isDark ? "text-slate-200" : "text-neutral-800";
+  const textSecondary = isDark ? "text-slate-300" : "text-neutral-700";
+  const textMuted = isDark ? "text-slate-400" : "text-neutral-500";
+  const textMutedLight = isDark ? "text-slate-500" : "text-neutral-400";
+  const borderCol = isDark ? "divide-slate-800/30" : "divide-neutral-200/50";
+  const btnBg = isDark ? "bg-slate-800 hover:bg-slate-700 border-slate-700 text-amber-400" : "bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-amber-600";
+
   return (
     <div className="space-y-4 text-xs font-mono">
-      <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
+      <div className={`overflow-x-auto rounded-lg border ${tableBg} mt-2`}>
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="bg-slate-900 border-b border-slate-800 text-slate-400 font-sans text-[10px] uppercase font-bold tracking-wider">
+            <tr className={`${headerBg} font-sans text-[10px] uppercase font-bold tracking-wider`}>
               <th className="py-2.5 px-3">Level / Sign</th>
               <th className="py-2.5 px-3">Duration</th>
               <th className="py-2.5 px-3">Start Date</th>
@@ -252,7 +261,7 @@ function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, 
               <th className="py-2.5 px-3 text-right">Drilldown</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/30 text-slate-300">
+          <tbody className={`divide-y ${borderCol} ${textSecondary}`}>
             {finalDashas.map((dasha: any, idx: number) => {
               const startYr = parseInt(dasha.start_date.split("-")[0]);
               const endYr = parseInt(dasha.end_date.split("-")[0]);
@@ -265,8 +274,8 @@ function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, 
               return (
                 <React.Fragment key={`major-${idx}`}>
                   {/* Major Dasha Row */}
-                  <tr className={`hover:bg-slate-900/40 ${isActive ? "bg-amber-500/5 font-bold text-amber-300" : ""}`}>
-                    <td className="py-2.5 px-3 font-bold font-sans text-slate-200">
+                  <tr className={`hover:bg-amber-500/5 ${isActive ? "bg-amber-500/5 font-bold text-amber-400" : ""}`}>
+                    <td className={`py-2.5 px-3 font-bold font-sans ${isActive ? "text-amber-400" : textPrimary}`}>
                       🔶 {dasha.sign} (MD)
                     </td>
                     <td className="py-2.5 px-3">{dasha.duration_years} Years</td>
@@ -274,13 +283,13 @@ function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, 
                     <td className="py-2.5 px-3">{dasha.end_date}</td>
                     <td className="py-2.5 px-3">
                       {isActive ? (
-                        <span className="px-2 py-0.5 text-[9px] bg-amber-500/15 border border-amber-500/40 text-amber-400 rounded font-bold uppercase tracking-wider animate-pulse">
+                        <span className="px-2 py-0.5 text-[9px] bg-amber-500/15 border border-amber-500/40 text-amber-500 rounded font-bold uppercase tracking-wider animate-pulse">
                           Active MD
                         </span>
                       ) : isPast ? (
-                        <span className="text-slate-500">Completed</span>
+                        <span className={textMuted}>Completed</span>
                       ) : (
-                        <span className="text-indigo-400/70">Future</span>
+                        <span className="text-indigo-500/70">Future</span>
                       )}
                     </td>
                     <td className="py-2.5 px-3 text-right">
@@ -289,7 +298,7 @@ function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, 
                           setExpandedMajor(isExpanded ? null : idx);
                           setExpandedSub(null);
                         }}
-                        className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 cursor-pointer text-[10px] font-bold font-sans uppercase"
+                        className={`p-1.5 rounded cursor-pointer text-[10px] font-bold font-sans uppercase border ${btnBg}`}
                       >
                         {isExpanded ? "Collapse" : "Explore AD"}
                       </button>
@@ -309,28 +318,28 @@ function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, 
 
                     return (
                       <React.Fragment key={`sub-${idx}-${sIdx}`}>
-                        <tr className={`bg-slate-900/30 border-l-4 border-amber-500/40 hover:bg-slate-900/50 ${isSubActive ? "bg-amber-500/10 font-bold text-amber-200" : ""}`}>
-                          <td className="py-2 px-3 pl-8 text-slate-300 font-sans">
+                        <tr className={`border-l-4 border-amber-500/40 hover:bg-amber-500/5 ${isDark ? "bg-slate-900/30" : "bg-neutral-50/50"} ${isSubActive ? "bg-amber-500/10 font-bold text-amber-500" : ""}`}>
+                          <td className={`py-2 px-3 pl-8 font-sans ${isSubActive ? "text-amber-500 font-bold" : textSecondary}`}>
                             🔹 {sub.sign} (AD)
                           </td>
                           <td className="py-2 px-3">{sub.duration_months} Months</td>
-                          <td className="py-2 px-3 text-slate-400">{sub.start_date}</td>
-                          <td className="py-2 px-3 text-slate-400">{sub.end_date}</td>
+                          <td className={`py-2 px-3 ${textMuted}`}>{sub.start_date}</td>
+                          <td className={`py-2 px-3 ${textMuted}`}>{sub.end_date}</td>
                           <td className="py-2 px-3">
                             {isSubActive ? (
-                              <span className="px-1.5 py-0.5 text-[9px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded uppercase font-bold tracking-wider">
+                              <span className="px-1.5 py-0.5 text-[9px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 rounded uppercase font-bold tracking-wider">
                                 Active AD
                               </span>
                             ) : isSubPast ? (
-                              <span className="text-slate-600">Completed</span>
+                              <span className={textMutedLight}>Completed</span>
                             ) : (
-                              <span className="text-slate-500/60">Future</span>
+                              <span className={textMutedLight}>Future</span>
                             )}
                           </td>
                           <td className="py-2 px-3 text-right">
                             <button
                               onClick={() => setExpandedSub(isSubExpanded ? null : sIdx)}
-                              className="p-1 px-2 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 cursor-pointer text-[9px] font-bold font-sans uppercase"
+                              className={`p-1 px-2 rounded cursor-pointer text-[9px] font-bold font-sans uppercase border ${isDark ? "bg-slate-800 hover:bg-slate-700 border-slate-700 text-cyan-400" : "bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-cyan-600"}`}
                             >
                               {isSubExpanded ? "Collapse" : "Explore PD"}
                             </button>
@@ -346,22 +355,22 @@ function CharaDashaInteractiveTable({ profile, astrologyData }: { profile: any, 
                           const isSsubPast = now >= ssubEnd;
 
                           return (
-                            <tr key={`ssub-${idx}-${sIdx}-${ssIdx}`} className={`bg-slate-950/60 border-l-8 border-cyan-500/40 hover:bg-slate-950/80 ${isSsubActive ? "bg-cyan-500/10 font-bold text-cyan-200" : ""}`}>
-                              <td className="py-1.5 px-3 pl-14 text-slate-400 font-sans">
+                            <tr key={`ssub-${idx}-${sIdx}-${ssIdx}`} className={`border-l-8 border-cyan-500/40 hover:bg-cyan-500/5 ${isDark ? "bg-slate-950/60" : "bg-neutral-100/30"} ${isSsubActive ? "bg-cyan-500/10 font-bold text-cyan-500" : ""}`}>
+                              <td className={`py-1.5 px-3 pl-14 font-sans ${isSsubActive ? "text-cyan-500 font-bold" : textMuted}`}>
                                 ▫️ {ssub.sign} (PD)
                               </td>
-                              <td className="py-1.5 px-3 text-slate-500">{ssub.duration_days} Days</td>
-                              <td className="py-1.5 px-3 text-slate-500">{ssub.start_date}</td>
-                              <td className="py-1.5 px-3 text-slate-500">{ssub.end_date}</td>
+                              <td className={`py-1.5 px-3 ${textMutedLight}`}>{ssub.duration_days} Days</td>
+                              <td className={`py-1.5 px-3 ${textMutedLight}`}>{ssub.start_date}</td>
+                              <td className={`py-1.5 px-3 ${textMutedLight}`}>{ssub.end_date}</td>
                               <td className="py-1.5 px-3" colSpan={2}>
                                 {isSsubActive ? (
-                                  <span className="px-1.5 py-0.5 text-[8px] bg-cyan-500/20 border border-cyan-500/40 text-cyan-400 rounded uppercase font-bold tracking-wider animate-pulse">
+                                  <span className="px-1.5 py-0.5 text-[8px] bg-cyan-500/20 border border-cyan-500/40 text-cyan-500 rounded uppercase font-bold tracking-wider animate-pulse">
                                     Active PD
                                   </span>
                                 ) : isSsubPast ? (
-                                  <span className="text-slate-600/50">Completed</span>
+                                  <span className={textMutedLight}>Completed</span>
                                 ) : (
-                                  <span className="text-slate-600/40">Future</span>
+                                  <span className={textMutedLight}>Future</span>
                                 )}
                               </td>
                             </tr>
@@ -4593,6 +4602,26 @@ export function MyPageView({
                 activeUser={activeUser}
                 hideHeaders={true}
               />
+            </div>
+          </div>
+
+          {/* Table JH23: Jaimini Chara Dasha (Interactive Table) */}
+          <div className="space-y-3 mt-6">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                  Table JH23
+                </span>
+                <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                  JH23: Jaimini Chara Dasha Timeline (User JSON Based)
+                </h3>
+              </div>
+              <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-wider font-bold">
+                🟢 Live Astrological Engine
+              </span>
+            </div>
+            <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <CharaDashaInteractiveTable profile={profile} astrologyData={astrologyData} isDark={isDark} />
             </div>
           </div>
         </div>
