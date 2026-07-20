@@ -1553,8 +1553,7 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-[360px]">
-          {/* Sidebar Tabs */}
-          <div className="lg:col-span-4 flex flex-col gap-1 overflow-y-auto max-h-[380px] pr-2 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+          <div className="lg:col-span-4 flex flex-col gap-1 overflow-y-auto max-h-[500px] pr-2 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
             <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 py-1 block">Architecture Modules</span>
             
             <button
@@ -1583,6 +1582,33 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
               { id: "timeline", label: "S11: TIMELINE" },
               { id: "history", label: "S12: HISTORY" },
               { id: "export", label: "S13: EXPORT" }
+            ].map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveEventBookSection(section.id)}
+                className={`flex items-center justify-between px-3 py-2 text-[11px] font-mono rounded-lg transition-all text-left ${
+                  activeEventBookSection === section.id
+                    ? "bg-amber-500/10 text-amber-400 border-l-2 border-amber-500 pl-4 font-bold"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/30"
+                }`}
+              >
+                <span>{section.label}</span>
+                <ChevronRight className="w-3.5 h-3.5 opacity-60" />
+              </button>
+            ))}
+
+            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider px-2 py-1 mt-3 block">Master Framework Specs</span>
+            
+            {[
+              { id: "api_spec", label: "EVENT API SPECIFICATION" },
+              { id: "db_schema", label: "DATABASE SCHEMA" },
+              { id: "supporting_specs", label: "SUPPORTING SPECS" },
+              { id: "rule_library", label: "MASTER RULE LIBRARY" },
+              { id: "astro_kb", label: "ASTRO KNOWLEDGE BASE" },
+              { id: "authoring_standard", label: "RULE AUTHORING STANDARD" },
+              { id: "decision_matrix", label: "DECISION MATRIX" },
+              { id: "calculation_pipeline", label: "CALCULATION PIPELINE" },
+              { id: "validation_qa", label: "VALIDATION & QA" }
             ].map((section) => (
               <button
                 key={section.id}
@@ -1870,6 +1896,473 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
                     <span className="p-2 bg-slate-900 border border-slate-800 rounded text-blue-400">JSON Payload</span>
                     <span className="p-2 bg-slate-900 border border-slate-800 rounded text-purple-400">CSV Sheet</span>
                     <span className="p-2 bg-slate-900 border border-slate-800 rounded text-pink-400">Research Doc</span>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "api_spec" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> KP Master Event Book - API Specification
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Status: MANDATORY STANDARD FOR ALL PLATFORMS</p>
+                  </div>
+                  
+                  <div className="space-y-3 text-[11px] leading-relaxed">
+                    <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                      <span className="text-amber-300 font-mono font-bold block mb-1">SECTION 1: PURPOSE</span>
+                      Provide a standardized interface for accessing Event Book data. Supports Android, Web, Desktop, AI, Plugins, REST, and future APIs.
+                    </div>
+
+                    <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                      <span className="text-amber-300 font-mono font-bold block mb-1">SECTION 2: API OBJECT</span>
+                      Contains metadata properties: <code className="text-slate-200 font-bold font-mono">API Version</code>, <code className="text-slate-200 font-bold font-mono">Engine Version</code>, <code className="text-slate-200 font-bold font-mono">Rule Version</code>, <code className="text-slate-200 font-bold font-mono">Request ID</code>, <code className="text-slate-200 font-bold font-mono">Response ID</code>, and <code className="text-slate-200 font-bold font-mono">Timestamp</code>.
+                    </div>
+
+                    <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                      <span className="text-amber-300 font-mono font-bold block mb-1">SECTION 3: EVENT ENDPOINTS</span>
+                      <div className="grid grid-cols-2 gap-1 font-mono text-[10px] text-slate-400">
+                        <div>• Get Event / Get Events</div>
+                        <div>• Search Events / Filter Events</div>
+                        <div>• Timeline / Categories</div>
+                        <div>• History / Statistics</div>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                      <span className="text-amber-300 font-mono font-bold block mb-1">SECTION 4: EVENT REQUEST</span>
+                      Request structure fields: <code className="text-slate-200 font-mono font-bold">EventID</code>, <code className="text-slate-200 font-mono font-bold">Category</code>, <code className="text-slate-200 font-mono font-bold">Filters</code>, <code className="text-slate-200 font-mono font-bold">Timeline</code>, <code className="text-slate-200 font-mono font-bold">Status</code>, <code className="text-slate-200 font-mono font-bold">Priority</code>, <code className="text-slate-200 font-mono font-bold">Confidence</code>, and <code className="text-slate-200 font-mono font-bold">Probability</code>.
+                    </div>
+
+                    <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                      <span className="text-amber-300 font-mono font-bold block mb-1">SECTION 5: EVENT RESPONSE</span>
+                      Full envelope: Event Information, Astrological Foundation, Rule References, Natal Result, Activation Result, Daily Result, Evidence, Decision, Confidence, Explanation, Timeline, History.
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-[10px] font-mono text-slate-400">
+                      <div className="p-2 bg-slate-900/40 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 6: SEARCH API</span>
+                        By Event ID, Category, Planet, House, Rule ID, Timeline, DBA, Transit, Confidence, Status.
+                      </div>
+                      <div className="p-2 bg-slate-900/40 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 7: TIMELINE API</span>
+                        Exposes Current, Upcoming, Today's, Weekly, Monthly, and Historical Events.
+                      </div>
+                      <div className="p-2 bg-slate-900/40 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 8: ANALYTICS API</span>
+                        Exposes category stats, event frequencies, rule usages, confidence and timeline distributions.
+                      </div>
+                      <div className="p-2 bg-slate-900/40 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 9: EXPORT API</span>
+                        Produces PDF, JSON, CSV, Research Reports, and Timeline Exports.
+                      </div>
+                      <div className="p-2 bg-slate-900/40 rounded border border-slate-800 col-span-2">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 10: PLUGIN API</span>
+                        SDK hooks: Read Event, Search Event, Read Timeline, Read History, Read Evidence, Read Rules, Read Confidence.
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 space-y-1">
+                      <span className="text-amber-300 font-mono font-bold block mb-1">SECTION 11-13: SECURITY, ERRORS, & VERSIONING</span>
+                      <div>• <strong className="text-slate-300">Security:</strong> Read-only architecture, token authentication, ACL, rate limiting, audit logging.</div>
+                      <div>• <strong className="text-slate-300">Errors:</strong> Invalid Event/Request, Missing Data, Permission Denied, Unsupported Version.</div>
+                      <div>• <strong className="text-slate-300">Versioning:</strong> API, Engine, Rule, Database, and Plugin versions explicitly validated on each lifecycle call.</div>
+                    </div>
+
+                    <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                      <span className="text-amber-400 font-mono font-bold block mb-1">SECTION 14: ENGINE PRINCIPLES</span>
+                      The API never executes astrology. The API never modifies Event Book records. The API only returns validated and versioned Event Book data. Every response must be deterministic and auditable.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "db_schema" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Master Event Book - Canonical Database Schema
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Implementation-independent and database-neutral</p>
+                  </div>
+
+                  <div className="space-y-3 text-[11px] font-mono text-slate-300">
+                    <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                      <span className="text-amber-300 font-bold block mb-1">SECTION 1: DATABASE PRINCIPLES</span>
+                      Single Source of Truth • Immutable Audit History • Version Controlled • Deterministic • Fully Traceable • Plugin Ready • Future Expandable.
+                    </div>
+
+                    <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+                      <span className="text-amber-300 font-bold block mb-1">SECTION 2 & 3: CORE ENTITIES & RELATIONSHIPS</span>
+                      <p className="text-[10px] text-slate-400 leading-normal mb-2">
+                        Native → BirthChart → Events → Rule References → Rule Execution → Evidence → Decision → Confidence → Explanation → Timeline → History
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-400">
+                      <div className="p-2.5 bg-slate-900/40 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 4: EVENT ENTITY</span>
+                        EventID, Category, SubCategory, EventName, Description, Priority, Stage, Status, SystemsUsed, CreatedAt, UpdatedAt, Version.
+                      </div>
+                      <div className="p-2.5 bg-slate-900/40 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 5 & 6: RULES REFERENCE & EXECUTION</span>
+                        RuleReferenceID, EventID, RuleID, RuleSystem, Enabled, ExecutionID, ExecutionStatus, Duration, ValidationStatus.
+                      </div>
+                      <div className="p-2.5 bg-slate-900/40 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 7-9: NATAL, ACTIVATION & DAILY ANALYSIS</span>
+                        NatalID, Promise, Strength, Supporting, Blocking, Verdict; ActivationID, DBA, Transit, Window, Verdict; DailyID, Today, Tomorrow, Week, Month.
+                      </div>
+                      <div className="p-2.5 bg-slate-900/40 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 10-13: EVIDENCE, DECISION, CONFIDENCE, EXPLANATION</span>
+                        EvidenceID, Source, Status, Weight; DecisionID, Verdict, Reason; ConfidenceID, ConfidenceLevel, Probability; ExplanationID, Human & Technical.
+                      </div>
+                      <div className="p-2.5 bg-slate-900/40 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 14-16: TIMELINE, STATUS, HISTORY</span>
+                        TimelineID, TimelineType, Windows; StatusID, Current/Prev Status, Reason; HistoryID, Prev Decisions, Prev Evidence.
+                      </div>
+                      <div className="p-2.5 bg-slate-900/40 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SECTION 17-20: INDEX, EXPORT, PLUGIN, AUDIT</span>
+                        SearchID, Keywords, Categories; ExportID, PDF, JSON; PluginID, Name, Version; AuditID, Operation, OldValue, NewValue, User, Timestamp.
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded bg-slate-900/60 border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">SECTION 21-22: INDEXES & VERSIONING</span>
+                      Primary Keys, Foreign Keys, Unique constraints, Search indexes, Timeline/Rule/Confidence/Status indexes. Fully versioned engines and schemas.
+                    </div>
+
+                    <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300">
+                      <span className="text-amber-400 font-bold block mb-1">ENGINE PRINCIPLES</span>
+                      The database schema is the canonical data model. Every entity is versioned, auditable, and searchable. Supports future extensions without schema redesign. No duplicate data.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "supporting_specs" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Five Supporting Framework Specifications
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Change control, SDKs, reports, and contributor standards</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1">
+                      <span className="text-amber-300 font-mono font-bold block uppercase">Part 1: Event Versioning & Change Management</span>
+                      <p className="text-slate-300">Maintains complete version history of every Event Record. Tracks modifications to events, rule references, evidence, decisions, and databases. Stores Version Numbers, Previous Versions, Change Type, Author, and Rollback parameters.</p>
+                      <span className="text-[10px] font-mono text-slate-500 block">Principles: Immutable history • Complete audit trail • Rollback support</span>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1">
+                      <span className="text-amber-300 font-mono font-bold block uppercase">Part 2: Event Analytics & Statistics</span>
+                      <p className="text-slate-300">Provides statistical and research analysis. Tracks Category statistics, Career, Finance, Health, rule usage metrics, planet/house activations, confidence distributions, and prediction accuracy.</p>
+                      <span className="text-[10px] font-mono text-slate-500 block">Principles: Read Only • Deterministic • No Rule Execution • Research Ready</span>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1">
+                      <span className="text-amber-300 font-mono font-bold block uppercase">Part 3: Event Plugin SDK</span>
+                      <p className="text-slate-300">Allows external modules to safely extend categories, events, rules, reports, timelines, and export configurations. Strictly forbids modifying core rules, decisions, or core evidence directly.</p>
+                      <span className="text-[10px] font-mono text-slate-500 block">Principles: Sandboxed • Versioned • Audited • Future Expandable</span>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1">
+                      <span className="text-amber-300 font-mono font-bold block uppercase">Part 4: Event Report Generator</span>
+                      <p className="text-slate-300">Generates polished user and developer reports: Relationship, Career, Property, Health, Education, Spiritual, etc. Supports exports to PDF, HTML, JSON, CSV, and Markdown.</p>
+                      <span className="text-[10px] font-mono text-slate-500 block">Principles: Reports never execute astrology; they consume validated records only.</span>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1">
+                      <span className="text-amber-300 font-mono font-bold block uppercase">Part 5: Event Book Developer Guide</span>
+                      <p className="text-slate-300">Establishes folders, naming conventions, unit/regression test patterns, contribution workflows, review processes, and database migration guidelines.</p>
+                      <span className="text-[10px] font-mono text-slate-500 block">Principles: Consistency • Deterministic Naming • Backward Compatibility</span>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/70 rounded-lg border border-slate-800 space-y-1.5 font-mono text-[10px] text-slate-400">
+                      <span className="text-slate-200 font-bold block uppercase">IMPLEMENTATION ROADMAP</span>
+                      <div className="flex flex-wrap gap-1">
+                        {["REL (Relationship)", "CAR (Career)", "FIN (Finance)", "EST (Property)", "HEA (Health)", "EDU (Education)", "CHI (Children)", "TRA (Travel)", "LIT (Litigation)", "SPI (Spiritual)", "DAY (Daily)"].map((phase, idx) => (
+                          <span key={idx} className="bg-slate-900 px-2 py-0.5 rounded text-[9px] border border-slate-800">Phase {idx + 1}: {phase}</span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                      <span className="text-amber-400 font-mono font-bold block">FINAL RULE</span>
+                      The KP SYSTEM MASTER EVENT BOOK is the single source of truth for JHora AI. The Rule Engine computes. The Decision Engine decides. The Event Book stores.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "rule_library" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Master Rule Library (MRL) Repository
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Centralized repository of every astrological rule</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                      <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">RULE HIERARCHY</span>
+                        System → Category → Event → Rule Group → Rule
+                      </div>
+                      <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">SYSTEMS COVERED</span>
+                        KP, Parashari, Jaimini, Transit, DBA, Daily, Validation, Conflict Resolution, Plugins.
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1">
+                      <span className="text-amber-300 font-mono font-bold block uppercase">RULE TYPES & CATEGORIES</span>
+                      Promise Rules, Strength Rules, Affliction Rules, Timing Rules, Activation Rules, Transit Rules, Daily Rules, Validation Rules, Conflict Rules, Evidence/Explanation Rules.
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1.5">
+                      <span className="text-amber-300 font-mono font-bold block uppercase">RULE OBJECT STRUCTURAL PROPERTIES</span>
+                      <p className="text-[10px] text-slate-400 leading-normal font-mono grid grid-cols-2 gap-1.5">
+                        <span>• Rule ID / Rule Name</span>
+                        <span>• Related Event ID</span>
+                        <span>• System & Category</span>
+                        <span>• Purpose & Inputs</span>
+                        <span>• Supporting Houses/Planets</span>
+                        <span>• Blocking Houses/Planets</span>
+                        <span>• Evaluation Logic / Operator</span>
+                        <span>• Generated Evidence / Decision</span>
+                        <span>• Confidence & Priority</span>
+                        <span>• Enabled / Version Details</span>
+                      </p>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1 font-mono text-[10px]">
+                      <span className="text-slate-200 font-bold block uppercase">EXECUTION PIPELINE</span>
+                      Load Rule → Validate Inputs → Execute Rule → Generate Evidence → Return Result. Rules can be ACTIVE, DISABLED, DEPRECATED, EXPERIMENTAL, or PLUGIN.
+                    </div>
+
+                    <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300">
+                      <span className="text-amber-400 font-mono font-bold block">ENGINE PRINCIPLES</span>
+                      Rules never know about UI, PDF, or reports. Rules only compute astrological logic. The Event Book references Rule IDs, the Rule Engine executes them, and the Decision Engine evaluates them.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "astro_kb" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Master Astrological Knowledge Base (AKB)
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Read-only canonical definitions and reference library</p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">SECTION 1: HOUSE KNOWLEDGE</span>
+                      House number, Primary/Secondary meanings, KP, Parashari, Jaimini meanings, Positive & Negative significations, Related events, Planets, and Yogas.
+                    </div>
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">SECTION 2: PLANET KNOWLEDGE</span>
+                      Planet, Nature, Gender, Karakatwa, Friendships, Exaltation, Own signs, KP significations, Natural & directional strengths.
+                    </div>
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">SECTION 3: SIGN KNOWLEDGE</span>
+                      Sign, Element, Mode, Gender, Lord, Nature, Body parts, Professions, Behavior, Strengths & Weaknesses.
+                    </div>
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">SECTION 4: NAKSHATRA KNOWLEDGE</span>
+                      Nakshatra, Lord, Deity, Symbol, Nature, Motivation, Guna, Yoni, Element, Profession, KP Usage.
+                    </div>
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">SECTION 5-7: LORDS KNOWLEDGE</span>
+                      Star Lord, Sub Lord & SSL significations, relationships, strengths, weaknesses, and decision behavior.
+                    </div>
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-slate-200 font-bold block mb-1">SECTION 8 & 9: YOGAS & DOSHAS</span>
+                      Yoga and Dosha ID, Names, formations, meanings, severities, affected events, and cancellation parameters.
+                    </div>
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800 col-span-2">
+                      <span className="text-slate-200 font-bold block mb-1">SECTION 10-14: ASPECTS, TIMING & GLOSSARY</span>
+                      Aspect strengths, KP & Parashari aspects, Mahadasha/Bhukti event tendencies, Transit rules, Divisional chart relevance, and central Astrological Glossary.
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300">
+                    <span className="text-amber-400 font-mono font-bold block">AKB PRINCIPLES</span>
+                    The AKB is strictly read-only. Rules consume AKB definitions. Reports, events, plugins, and AI reference the AKB. No duplicate definitions are allowed outside of this canonical encyclopedia.
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "authoring_standard" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Master Rule Authoring Standard (MRAS)
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Mandatory format and specifications for all rules</p>
+                  </div>
+
+                  <div className="space-y-2.5 font-mono text-[10px]">
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-amber-300 font-bold block mb-1">SECTION 1: RULE ID STANDARD</span>
+                      Format: <code className="text-slate-200 bg-slate-950 px-1 py-0.5 rounded font-bold">&lt;System&gt;_&lt;Category&gt;_&lt;Number&gt;</code><br />
+                      Examples: <code className="text-slate-300">KP_REL_001</code>, <code className="text-slate-300">KP_CAR_001</code>, <code className="text-slate-300">PAR_REL_001</code>, <code className="text-slate-300">TR_REL_001</code>.
+                    </div>
+
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-amber-300 font-bold block mb-1">SECTION 2 & 3: RULE OBJECT & INPUTS</span>
+                      Structure includes ID, System, Category, Event ID, Evaluation Logic, Outputs. Consumes: Planet, House, Sign, Nakshatra, Star Lord, Sub Lord, SSL, CSL, Transit, DBA, Divisional Charts, Yogas, and Doshas.
+                    </div>
+
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-amber-300 font-bold block mb-1">SECTION 4: RULE OUTPUT TYPES</span>
+                      Outputs are strictly normalized to: <code className="text-emerald-400 font-bold">PASS</code>, <code className="text-rose-400 font-bold">FAIL</code>, <code className="text-amber-400 font-bold">PARTIAL</code>, <code className="text-slate-400 font-bold">BLOCKED</code>, or <code className="text-slate-500 font-bold">NOT_APPLICABLE</code>, generating an Evidence Object, Decision Contribution, and Explanation Reference.
+                    </div>
+
+                    <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                      <span className="text-amber-300 font-bold block mb-1">SECTION 5-10: DEPENDENCIES, LIFECYCLE & TESTING</span>
+                      Required/Optional rules, positive/negative test boundary cases, versions, documentation requirements, validation gates, and lifecycle stages (Draft → Review → Approved → Active → Deprecated → Archived).
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300">
+                    <span className="text-amber-400 font-mono font-bold block">MRAS PRINCIPLES</span>
+                    Every rule must be deterministic, independently testable, reusable, and produce fully traceable evidence. All rules must integrate perfectly with the central Rule Engine and Event Book.
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "decision_matrix" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Master Decision Matrix Specification (MDM)
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Universal aggregated decision framework</p>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                      <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">INPUT SOURCES</span>
+                        KP, Parashari, Jaimini, Transit, DBA, Daily, Validation, and Conflict rules.
+                      </div>
+                      <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">DECISION LEVELS</span>
+                        NOT PROMISED, WEAK, MODERATE, STRONG, VERY STRONG, CONTRADICTORY, INCONCLUSIVE.
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1">
+                      <span className="text-amber-300 font-mono font-bold block uppercase">CONFLICT RESOLUTION & PRIORITY</span>
+                      System priority defaults to: <code className="text-amber-400 font-bold">KP</code> → <code className="text-slate-300">Parashari</code> → <code className="text-slate-300">Jaimini</code> → <code className="text-slate-300">Transit</code> → <code className="text-slate-300">DBA</code> → <code className="text-slate-300">Daily</code>. Employs weighted evidence, limiting constraints, and validation override criteria.
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 font-mono text-[10px] space-y-1">
+                      <span className="text-slate-200 font-bold block uppercase">DECISION PIPELINE</span>
+                      Load Results → Validate → Resolve Dependencies → Resolve Conflicts → Aggregate Evidence → Calculate Confidence → Generate Decision → Store Decision.
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300 font-mono text-[10px]">
+                    <span className="text-amber-400 font-bold block">MDM PRINCIPLES</span>
+                    Rules generate evidence, validation verifies it, the Decision Matrix resolves conflicts, the Decision Engine calculates the final verdict, and the Event Book stores the complete auditable trace-data.
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "calculation_pipeline" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Master Calculation Pipeline Orchestration
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">End-to-end execution flow of the JHora AI Engine</p>
+                  </div>
+
+                  <div className="space-y-2.5 font-mono text-[10px]">
+                    <div className="relative border-l border-amber-500/30 pl-4 ml-2 space-y-3">
+                      <div className="relative font-mono text-[10px]">
+                        <span className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        <strong className="text-slate-200 block">PHASE 1 & 2: INPUTS & ASTRONOMICAL CALCULATIONS</strong>
+                        Receive birth details, validate and normalize, calculate planet/house positions, Lagna, speed, retrogrades, Ayanamsa, and planetary strengths.
+                      </div>
+                      <div className="relative font-mono text-[10px]">
+                        <span className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        <strong className="text-slate-200 block">PHASE 3 & 4: CHARTS & KNOWLEDGE LOAD</strong>
+                        Generate Rasi, Bhava, KP Cusps, Divisional Charts, and Karakas. Load AKB planet, house, sign, nakshatra, and yoga definitions.
+                      </div>
+                      <div className="relative font-mono text-[10px]">
+                        <span className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        <strong className="text-slate-200 block">PHASE 5 & 6: RULE LOADER & EXECUTION</strong>
+                        Load KP, Parashari, Jaimini, transit, and DBA rules. Sequentially execute Natal, Activation, Transit, Daily, and Validation rules.
+                      </div>
+                      <div className="relative font-mono text-[10px]">
+                        <span className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        <strong className="text-slate-200 block">PHASE 7 & 8: DECISIONS & EVENT BOOK PROCESSING</strong>
+                        Collect and validate evidence, resolve conflicts, apply decision matrix, update Event Book timelines, status lifecycle, and confidence scores.
+                      </div>
+                      <div className="relative font-mono text-[10px]">
+                        <span className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                        <strong className="text-slate-200 block">PHASE 9 & 10: REPORTS & DIGITAL EXPORTS</strong>
+                        Generate Career, Relationship, Property, and Health reports. Expose data via Web, Android, API, PDF, JSON, CSV, and Plugins.
+                      </div>
+                    </div>
+
+                    <div className="p-2 bg-slate-900/40 rounded border border-slate-800">
+                      • <strong className="text-slate-300">Caching & Performance:</strong> Integrates multi-layer chart, rule, decision, and report caching with parallel execution and lazy loading optimizations.
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300">
+                    <span className="text-amber-400 font-mono font-bold block">PIPELINE PRINCIPLES</span>
+                    Every horoscope follows exactly the same pipeline. Every phase is deterministic, independently testable, versioned, and auditable. The pipeline orchestrates all engines without hardcoding interpretations.
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "validation_qa" && (
+                <div className="space-y-3.5 max-h-[460px] overflow-y-auto pr-1 text-[11px] leading-relaxed text-slate-300">
+                  <div className="border-b border-slate-800 pb-2">
+                    <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5 font-bold">
+                      <span>★</span> Master Validation & Quality Assurance Framework
+                    </h5>
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">Deterministic QA standards for the JHora AI Platform</p>
+                  </div>
+
+                  <div className="space-y-2.5 text-[10px] font-mono">
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">VALIDATION SCOPE</span>
+                        Inputs, Astronomical calculations, Charts, Rules, Evidence, Decisions, Timeline, Event Book, PDF, API, and Plugins.
+                      </div>
+                      <div className="p-2.5 bg-slate-900/50 rounded border border-slate-800">
+                        <span className="text-slate-200 font-bold block mb-1">VALIDATION LEVELS</span>
+                        Syntax, Structural, Logical, Computational, Rule, Evidence, Decision, Timeline, Report, and Export Validation.
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1">
+                      <span className="text-amber-300 font-bold block uppercase">VALIDATION STATUS & SEVERITY</span>
+                      <div>• Statuses: <code className="text-emerald-400">PASSED</code>, <code className="text-rose-400">FAILED</code>, <code className="text-amber-400">WARNING</code>, <code className="text-slate-400">SKIPPED</code>, <code className="text-slate-500">INCOMPLETE</code>.</div>
+                      <div>• Severity Levels: <strong className="text-rose-500">Critical</strong>, <strong className="text-amber-500">Major</strong>, <strong className="text-yellow-500">Minor</strong>, <strong className="text-slate-400">Information</strong>.</div>
+                    </div>
+
+                    <div className="p-3 bg-slate-900/50 rounded-lg border border-slate-800/80 space-y-1">
+                      <span className="text-amber-300 font-bold block uppercase">TESTING SUITE & DATA INTEGRITY</span>
+                      Continuous automated Unit, Integration, Regression, Historical Horoscopes, and Performance tests. Strict duplicate detection, missing reference tracing, and version conflict resolution.
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-slate-300 font-mono text-[10px]">
+                    <span className="text-amber-400 font-bold block">QA PRINCIPLES</span>
+                    Validation never executes astrology or modifies Event Book data. It strictly verifies correctness, consistency, completeness, and end-to-end traceability of the system.
                   </div>
                 </div>
               )}
