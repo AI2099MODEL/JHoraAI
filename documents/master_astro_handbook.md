@@ -1815,6 +1815,252 @@ ENGINE PRINCIPLES
 • No UI operations occur during execution.
 
 ###############################################################
+
+###############################################################
+RULE VALIDATION ENGINE
+Validation and Consistency Framework
+###############################################################
+
+PURPOSE
+
+The Rule Validation Engine verifies that all executed rule results
+are logically consistent, astrologically valid, and complete before
+they are accepted by the Decision Engine.
+
+The Validation Engine never creates rules.
+
+The Validation Engine never modifies rules.
+
+The Validation Engine only validates execution results.
+
+###############################################################
+
+INPUT
+
+Rule Execution Results
+
+↓
+
+Evidence Objects
+
+↓
+
+Dependency Status
+
+↓
+
+Chart Data
+
+↓
+
+Event Context
+
+###############################################################
+
+VALIDATION PROCESS
+
+Load Rule Results
+
+↓
+
+Verify Input Completeness
+
+↓
+
+Verify Rule Dependencies
+
+↓
+
+Verify Astrological Consistency
+
+↓
+
+Verify Duplicate Results
+
+↓
+
+Verify Blocking Rules
+
+↓
+
+Verify Supporting Rules
+
+↓
+
+Generate Validation Status
+
+###############################################################
+
+VALIDATION CHECKS
+
+Input Validation
+
+Dependency Validation
+
+Rule Integrity
+
+Evidence Integrity
+
+Duplicate Detection
+
+Conflict Detection
+
+Stage Validation
+
+System Validation
+
+###############################################################
+
+DEPENDENCY VALIDATION
+
+Required Rule
+
+↓
+
+Exists
+
+↓
+
+PASS
+
+Otherwise
+
+↓
+
+FAIL VALIDATION
+
+###############################################################
+
+DUPLICATE VALIDATION
+
+Same RuleID
+
+↓
+
+Same Event
+
+↓
+
+Ignore Duplicate
+
+###############################################################
+
+CONFLICT VALIDATION
+
+Supporting Rule
+
+PASS
+
+↓
+
+Blocking Rule
+
+PASS
+
+↓
+
+Mark
+
+CONFLICT
+
+↓
+
+Forward to Rule Decision Engine
+
+###############################################################
+
+SYSTEM VALIDATION
+
+KP Rules
+
+Validated Independently
+
+↓
+
+Parashari Rules
+
+Validated Independently
+
+↓
+
+Jaimini Rules
+
+Validated Independently
+
+↓
+
+Daily Rules
+
+Validated Independently
+
+###############################################################
+
+VALIDATION STATUS
+
+VALID
+
+INVALID
+
+INCOMPLETE
+
+CONFLICT
+
+SKIPPED
+
+###############################################################
+
+VALIDATION OBJECT
+
+ValidationID
+
+EventID
+
+Validated Rules
+
+Failed Rules
+
+Conflict Rules
+
+Dependency Status
+
+Validation Status
+
+Timestamp
+
+###############################################################
+
+OUTPUT
+
+Validated Rule Results
+
+↓
+
+Rule Decision Engine
+
+###############################################################
+
+REFERENCE
+
+Previous Module
+
+Rule Execution Engine
+
+Next Module
+
+Rule Decision Engine
+
+###############################################################
+
+ENGINE PRINCIPLES
+
+• Validation never executes rules.
+• Validation never changes chart data.
+• Validation never changes rule definitions.
+• Validation only verifies correctness.
+• Invalid rule results are rejected before decision making.
+• All validation actions are deterministic and repeatable.
+
+###############################################################
 ```
 
 

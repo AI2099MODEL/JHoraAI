@@ -1607,6 +1607,252 @@ ENGINE PRINCIPLES
 • No Event Book operations occur during execution.
 • No UI operations occur during execution.
 
+###############################################################
+
+###############################################################
+RULE VALIDATION ENGINE
+Validation and Consistency Framework
+###############################################################
+
+PURPOSE
+
+The Rule Validation Engine verifies that all executed rule results
+are logically consistent, astrologically valid, and complete before
+they are accepted by the Decision Engine.
+
+The Validation Engine never creates rules.
+
+The Validation Engine never modifies rules.
+
+The Validation Engine only validates execution results.
+
+###############################################################
+
+INPUT
+
+Rule Execution Results
+
+↓
+
+Evidence Objects
+
+↓
+
+Dependency Status
+
+↓
+
+Chart Data
+
+↓
+
+Event Context
+
+###############################################################
+
+VALIDATION PROCESS
+
+Load Rule Results
+
+↓
+
+Verify Input Completeness
+
+↓
+
+Verify Rule Dependencies
+
+↓
+
+Verify Astrological Consistency
+
+↓
+
+Verify Duplicate Results
+
+↓
+
+Verify Blocking Rules
+
+↓
+
+Verify Supporting Rules
+
+↓
+
+Generate Validation Status
+
+###############################################################
+
+VALIDATION CHECKS
+
+Input Validation
+
+Dependency Validation
+
+Rule Integrity
+
+Evidence Integrity
+
+Duplicate Detection
+
+Conflict Detection
+
+Stage Validation
+
+System Validation
+
+###############################################################
+
+DEPENDENCY VALIDATION
+
+Required Rule
+
+↓
+
+Exists
+
+↓
+
+PASS
+
+Otherwise
+
+↓
+
+FAIL VALIDATION
+
+###############################################################
+
+DUPLICATE VALIDATION
+
+Same RuleID
+
+↓
+
+Same Event
+
+↓
+
+Ignore Duplicate
+
+###############################################################
+
+CONFLICT VALIDATION
+
+Supporting Rule
+
+PASS
+
+↓
+
+Blocking Rule
+
+PASS
+
+↓
+
+Mark
+
+CONFLICT
+
+↓
+
+Forward to Rule Decision Engine
+
+###############################################################
+
+SYSTEM VALIDATION
+
+KP Rules
+
+Validated Independently
+
+↓
+
+Parashari Rules
+
+Validated Independently
+
+↓
+
+Jaimini Rules
+
+Validated Independently
+
+↓
+
+Daily Rules
+
+Validated Independently
+
+###############################################################
+
+VALIDATION STATUS
+
+VALID
+
+INVALID
+
+INCOMPLETE
+
+CONFLICT
+
+SKIPPED
+
+###############################################################
+
+VALIDATION OBJECT
+
+ValidationID
+
+EventID
+
+Validated Rules
+
+Failed Rules
+
+Conflict Rules
+
+Dependency Status
+
+Validation Status
+
+Timestamp
+
+###############################################################
+
+OUTPUT
+
+Validated Rule Results
+
+↓
+
+Rule Decision Engine
+
+###############################################################
+
+REFERENCE
+
+Previous Module
+
+Rule Execution Engine
+
+Next Module
+
+Rule Decision Engine
+
+###############################################################
+
+ENGINE PRINCIPLES
+
+• Validation never executes rules.
+• Validation never changes chart data.
+• Validation never changes rule definitions.
+• Validation only verifies correctness.
+• Invalid rule results are rejected before decision making.
+• All validation actions are deterministic and repeatable.
+
 ###############################################################`;
 
   const copyToClipboard = () => {
@@ -1817,6 +2063,8 @@ ENGINE PRINCIPLES
               { name: "NatalEngine", desc: "Decides birth promises (IF) by compiling KP, Parashari, and Jaimini rules into direct PASS, FAIL, WEAK, or STRONG flags." },
               { name: "ActivationEngine", desc: "Finds active timing periods (WHEN) by processing current DBA (Maha, Antar, Antara, Sookshma, Prana) and major transits." },
               { name: "DailyEngine", desc: "Computes daily trends (TODAY) using transiting Moon parameters, house significator frequencies, and fast planetary alignments." },
+              { name: "RuleExecutionEngine", desc: "Executes compiled astrological rules in a deterministic sequence, supporting dependencies and caching." },
+              { name: "RuleValidationEngine", desc: "Verifies execution results for logical consistency, dependency integrity, and system-level correctness." },
               { name: "RuleCompiler", desc: "Ingests raw markdown guidelines from the Master Handbook, validates syntax, identifies conflicts, and builds compiled JSON rulebooks." },
               { name: "RuleCache", desc: "In-memory database storing compiled rules for fast retrieval, supporting hot reloading without server downtime." },
               { name: "DecisionEngine", desc: "Resolves conflicting multi-system rulesets into a unified final promise evaluation: STRONG, MODERATE, WEAK, or CONTRADICTORY." },
