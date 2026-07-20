@@ -445,8 +445,28 @@ export default function AuthScreen({ onAuthSuccess, activeUser }: AuthScreenProp
               <li>
                 <strong>Authorize Preview Domains:</strong> If you see an <code>auth/unauthorized-domain</code> error, you must add these preview URLs to your <strong>Firebase Console → Authentication → Settings → Authorized Domains</strong>:
                 <div className="mt-1.5 p-2 bg-slate-950 rounded border border-slate-800 font-mono text-[10px] space-y-1 select-all break-all text-slate-400">
-                  <div>ais-dev-6ic57h7v4jqiekwc7gbmxh-368964429506.asia-east1.run.app</div>
-                  <div>ais-pre-6ic57h7v4jqiekwc7gbmxh-368964429506.asia-east1.run.app</div>
+                  {typeof window !== "undefined" ? (
+                    <>
+                      <div>{window.location.hostname}</div>
+                      {window.location.hostname.includes("-dev-") && (
+                        <div>{window.location.hostname.replace("-dev-", "-pre-")}</div>
+                      )}
+                      {window.location.hostname.includes("-pre-") && (
+                        <div>{window.location.hostname.replace("-pre-", "-dev-")}</div>
+                      )}
+                      {!window.location.hostname.includes("-dev-") && !window.location.hostname.includes("-pre-") && (
+                        <>
+                          <div>ais-dev-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app</div>
+                          <div>ais-pre-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app</div>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div>ais-dev-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app</div>
+                      <div>ais-pre-hqixtkxxrplcdrfbw5q33r-443356580754.asia-east1.run.app</div>
+                    </>
+                  )}
                 </div>
               </li>
               <li>
