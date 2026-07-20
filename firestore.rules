@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Entity validation helper to enforce strict structure and types
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'name', 'email', 'createdDate', 'lastLogin']) 
+        && data.keys().size() <= 11
+        && data.uid is string && data.uid.size() <= 128 && data.uid == request.auth.uid
+        && data.name is string && data.name.size() <= 256
+        && data.email is string && data.email.size() <= 256
+        && (!data.keys().hasAny(['phoneNumber']) || (data.phoneNumber is string && data.phoneNumber.size() <= 32))
+        && (!data.keys().hasAny(['photoURL']) || (data.photoURL is string && data.photoURL.size() <= 2048))
+        && data.createdDate is string && data.createdDate.size() <= 64
+        && data.lastLogin is string && data.lastLogin.size() <= 64;
+    }
+
+    // Match rules for the users collection
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow delete: if isOwner(userId) && isValidId(userId);
+      allow list: if isOwner(userId);
+
+      allow create: if isOwner(userId) 
+                    && isValidId(userId)
+                    && isVerifiedUser()
+                    && isValidUser(incoming());
+
+      allow update: if isOwner(userId)
+                    && isValidId(userId)
+                    && isVerifiedUser()
+                    && isValidUser(incoming())
+                    && incoming().uid == existing().uid
+                    && incoming().createdDate == existing().createdDate;
+    }
+  }
+}

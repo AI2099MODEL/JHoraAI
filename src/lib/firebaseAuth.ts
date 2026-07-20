@@ -29,18 +29,58 @@ import {
   where, 
   getDocs, 
   deleteDoc,
+  getDocFromServer,
   Firestore
 } from "firebase/firestore";
+import firebaseConfig from "../../firebase-applet-config.json";
 
-// Safe, embedded fallback configuration from firebase-applet-config.json or environment variables
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyB3TnU9HFn22A7jYUY8t86HXMtBQ8c1nV8",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "gen-lang-client-0193743078.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "gen-lang-client-0193743078",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "gen-lang-client-0193743078.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "79558992702",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:79558992702:web:dbe18c64b5ed44fa77c26f"
-};
+// Operation types for error reporting conforming to guidelines
+export enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+export interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId?: string | null;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    isAnonymous?: boolean | null;
+    tenantId?: string | null;
+    providerInfo?: {
+      providerId?: string | null;
+      email?: string | null;
+    }[];
+  }
+}
+
+export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth?.currentUser?.uid,
+      email: auth?.currentUser?.email,
+      emailVerified: auth?.currentUser?.emailVerified,
+      isAnonymous: auth?.currentUser?.isAnonymous,
+      tenantId: auth?.currentUser?.tenantId,
+      providerInfo: auth?.currentUser?.providerData?.map(provider => ({
+        providerId: provider.providerId,
+        email: provider.email,
+      })) || []
+    },
+    operationType,
+    path
+  };
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
+}
 
 let app;
 let auth: Auth;
@@ -53,14 +93,19 @@ try {
     app = getApp();
   }
   auth = getAuth(app);
+  db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
   
-  // If user-defined custom Firebase environment variables are provided, initialize with the default database.
-  // Otherwise, use the custom AI Studio database ID to avoid breaking the fallback database connection.
-  if (import.meta.env.VITE_FIREBASE_PROJECT_ID) {
-    db = getFirestore(app);
-  } else {
-    db = getFirestore(app, "ai-studio-jhoraai-b515adab-0d0d-4cd6-aed5-99cdb77486ac");
-  }
+  // Test connection on boot using getDocFromServer
+  const testConnection = async () => {
+    try {
+      await getDocFromServer(doc(db, 'test', 'connection'));
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('the client is offline')) {
+        console.error("Please check your Firebase configuration.");
+      }
+    }
+  };
+  testConnection();
 } catch (error) {
   console.error("Failed to initialize Firebase:", error);
 }
@@ -92,6 +137,7 @@ export interface UserProfile {
 export const UserProfileRepository = {
   async getProfile(uid: string): Promise<UserProfile | null> {
     if (!db) return null;
+    const path = `users/${uid}`;
     try {
       const docRef = doc(db, "users", uid);
       const docSnap = await getDoc(docRef);
@@ -99,38 +145,41 @@ export const UserProfileRepository = {
         return docSnap.data() as UserProfile;
       }
     } catch (err) {
-      console.error("Error reading profile:", err);
+      handleFirestoreError(err, OperationType.GET, path);
     }
     return null;
   },
 
   async saveProfile(profile: UserProfile): Promise<void> {
     if (!db) return;
+    const path = `users/${profile.uid}`;
     try {
       const docRef = doc(db, "users", profile.uid);
       await setDoc(docRef, profile, { merge: true });
     } catch (err) {
-      console.error("Error saving profile:", err);
+      handleFirestoreError(err, OperationType.WRITE, path);
     }
   },
 
   async updateSettings(uid: string, settings: Partial<UserProfile["settings"]>): Promise<void> {
     if (!db) return;
+    const path = `users/${uid}`;
     try {
       const docRef = doc(db, "users", uid);
       await updateDoc(docRef, { settings });
     } catch (err) {
-      console.error("Error updating settings:", err);
+      handleFirestoreError(err, OperationType.UPDATE, path);
     }
   },
 
   async updateSavedProfiles(uid: string, savedProfiles: any[]): Promise<void> {
     if (!db) return;
+    const path = `users/${uid}`;
     try {
       const docRef = doc(db, "users", uid);
       await updateDoc(docRef, { savedProfiles });
     } catch (err) {
-      console.error("Error updating profiles:", err);
+      handleFirestoreError(err, OperationType.UPDATE, path);
     }
   }
 };
@@ -423,13 +472,14 @@ export const AuthManager = {
   async deleteAccount(): Promise<void> {
     if (!auth || !auth.currentUser) return;
     const user = auth.currentUser;
+    const path = `users/${user.uid}`;
     // Attempt delete doc
     try {
       if (db) {
         await deleteDoc(doc(db, "users", user.uid));
       }
     } catch (e) {
-      console.warn("Could not delete user profile document from Firestore, proceeding to delete auth profile", e);
+      handleFirestoreError(e, OperationType.DELETE, path);
     }
     await deleteUser(user);
     SessionManager.clearSession();

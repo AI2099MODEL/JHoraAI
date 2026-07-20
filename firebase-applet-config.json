@@ -1,11 +1,12 @@
 {
-  "projectId": "esoteric-node-vt3g1",
-  "appId": "1:581105736042:web:16c6811256205a3e496d13",
-  "apiKey": "AIzaSyCeuv_XBCK4KS_DHRhxYeA1LhlmHHy4qN8",
-  "authDomain": "esoteric-node-vt3g1.firebaseapp.com",
-  "storageBucket": "esoteric-node-vt3g1.firebasestorage.app",
-  "messagingSenderId": "581105736042",
+  "projectId": "gen-lang-client-0193743078",
+  "appId": "1:79558992702:web:dbe18c64b5ed44fa77c26f",
+  "apiKey": "AIzaSyB3TnU9HFn22A7jYUY8t86HXMtBQ8c1nV8",
+  "authDomain": "gen-lang-client-0193743078.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-jhoraai-b515adab-0d0d-4cd6-aed5-99cdb77486ac",
+  "storageBucket": "gen-lang-client-0193743078.firebasestorage.app",
+  "messagingSenderId": "79558992702",
   "measurementId": "",
-  "oAuthClientId": "581105736042-8vj790m10ee02g4jmer7k2qmkjhh63bv.apps.googleusercontent.com",
+  "oAuthClientId": "79558992702-hpsvtiprjdsulpnm4ie2faub62kfparr.apps.googleusercontent.com",
   "recaptchaSiteKey": ""
 }
