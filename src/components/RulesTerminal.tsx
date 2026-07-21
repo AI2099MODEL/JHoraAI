@@ -45,6 +45,7 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"board" | "registry" | "matcher">("board");
 
   // Edit states
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
@@ -463,226 +464,516 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
         )}
       </div>
 
-      {/* Rules Board */}
-      <div className="space-y-8">
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-20 space-y-3">
-            <RefreshCw className="w-8 h-8 text-indigo-500 animate-spin" />
-            <span className={`text-xs font-mono ${textMuted}`}>Parsing Rules Handbook File...</span>
-          </div>
-        ) : filteredSections.length === 0 ? (
-          <div className={`p-10 rounded-2xl border text-center ${containerStyle}`}>
-            <HelpCircle className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-            <h4 className={`text-sm font-bold ${textHeading}`}>No matching astrological rules found</h4>
-            <p className={`text-xs ${textMuted} mt-1`}>Try refining your query search term.</p>
-          </div>
-        ) : (
-          filteredSections.map((section, secIdx) => (
-            <div key={section.id} className="space-y-4">
-              {/* Section Header */}
-              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-                <h4 className={`text-base font-sans font-bold flex items-center gap-2 ${textHeading}`}>
-                  {section.number && <span className="font-mono text-indigo-400">{section.number}</span>}
-                  {section.title}
-                </h4>
-                <button
-                  onClick={() => startAdd(section.id)}
-                  className="flex items-center gap-1 text-[11px] font-bold text-amber-500 hover:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg transition-all"
-                >
-                  <Plus className="w-3 h-3" />
-                  Add Rule
-                </button>
-              </div>
+      {/* Tab Navigation */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 gap-2">
+        <button
+          onClick={() => setActiveTab("board")}
+          className={`pb-3 px-4 font-mono text-xs font-bold transition-all border-b-2 flex items-center gap-2 cursor-pointer ${
+            activeTab === "board"
+              ? "border-amber-500 text-amber-500 dark:text-amber-400 font-bold"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <span>❖</span> LIVE RULES BOARD
+        </button>
+        <button
+          onClick={() => setActiveTab("registry")}
+          className={`pb-3 px-4 font-mono text-xs font-bold transition-all border-b-2 flex items-center gap-2 cursor-pointer ${
+            activeTab === "registry"
+              ? "border-indigo-500 text-indigo-500 dark:text-indigo-400 font-bold"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <span>✦</span> KP RULE REGISTRY SPEC
+        </button>
+        <button
+          onClick={() => setActiveTab("matcher")}
+          className={`pb-3 px-4 font-mono text-xs font-bold transition-all border-b-2 flex items-center gap-2 cursor-pointer ${
+            activeTab === "matcher"
+              ? "border-emerald-500 text-emerald-500 dark:text-emerald-400 font-bold"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <span>✺</span> KP RULE MATCHER SPEC
+        </button>
+      </div>
 
-              {/* Rules Table */}
-              <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-                <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left">
-                  <thead className="bg-slate-50 dark:bg-slate-900/80">
-                    <tr>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/6">
-                        System
-                      </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/8">
-                        Type
-                      </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-5/12">
-                        Logical Condition / Trigger Gate
-                      </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/6">
-                        Target Output Status
-                      </th>
-                      <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center w-1/12">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-950/40">
-                    {section.rules.map((rule) => {
-                      const isEditing = editingRuleId === rule.id;
-                      const isTransitRule = rule.condition.toLowerCase().includes("transit") || rule.condition.toLowerCase().includes("gochara");
-                      const ruleTypeLabel = isTransitRule ? "Transit" : "Natal";
+      {activeTab === "board" ? (
+        /* Rules Board */
+        <div className="space-y-8">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20 space-y-3">
+              <RefreshCw className="w-8 h-8 text-indigo-500 animate-spin" />
+              <span className={`text-xs font-mono ${textMuted}`}>Parsing Rules Handbook File...</span>
+            </div>
+          ) : filteredSections.length === 0 ? (
+            <div className={`p-10 rounded-2xl border text-center ${containerStyle}`}>
+              <HelpCircle className="w-8 h-8 text-slate-500 mx-auto mb-2" />
+              <h4 className={`text-sm font-bold ${textHeading}`}>No matching astrological rules found</h4>
+              <p className={`text-xs ${textMuted} mt-1`}>Try refining your query search term.</p>
+            </div>
+          ) : (
+            filteredSections.map((section, secIdx) => (
+              <div key={section.id} className="space-y-4">
+                {/* Section Header */}
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+                  <h4 className={`text-base font-sans font-bold flex items-center gap-2 ${textHeading}`}>
+                    {section.number && <span className="font-mono text-indigo-400">{section.number}</span>}
+                    {section.title}
+                  </h4>
+                  <button
+                    onClick={() => startAdd(section.id)}
+                    className="flex items-center gap-1 text-[11px] font-bold text-amber-500 hover:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg transition-all"
+                  >
+                    <Plus className="w-3 h-3" />
+                    Add Rule
+                  </button>
+                </div>
 
-                      return (
-                        <tr 
-                          key={rule.id}
-                          className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors"
-                        >
-                          {/* System column */}
-                          <td className="px-4 py-3">
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={editSystem}
-                                onChange={(e) => setEditSystem(e.target.value)}
-                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-bold"
-                              />
-                            ) : (
-                              <span className={`text-xs font-bold ${textHeading}`}>
-                                {rule.system}
+                {/* Rules Table */}
+                <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                  <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800 text-left">
+                    <thead className="bg-slate-50 dark:bg-slate-900/80">
+                      <tr>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/6">
+                          System
+                        </th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/8">
+                          Type
+                        </th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-5/12">
+                          Logical Condition / Trigger Gate
+                        </th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-1/6">
+                          Target Output Status
+                        </th>
+                        <th className="px-4 py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-center w-1/12">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-slate-950/40">
+                      {section.rules.map((rule) => {
+                        const isEditing = editingRuleId === rule.id;
+                        const isTransitRule = rule.condition.toLowerCase().includes("transit") || rule.condition.toLowerCase().includes("gochara");
+                        const ruleTypeLabel = isTransitRule ? "Transit" : "Natal";
+
+                        return (
+                          <tr 
+                            key={rule.id}
+                            className="hover:bg-slate-50/50 dark:hover:bg-slate-900/20 transition-colors"
+                          >
+                            {/* System column */}
+                            <td className="px-4 py-3">
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={editSystem}
+                                  onChange={(e) => setEditSystem(e.target.value)}
+                                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-bold"
+                                />
+                              ) : (
+                                <span className={`text-xs font-bold ${textHeading}`}>
+                                  {rule.system}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Type column */}
+                            <td className="px-4 py-3">
+                              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase tracking-wider border ${
+                                isTransitRule 
+                                  ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" 
+                                  : "bg-teal-500/10 text-teal-400 border-teal-500/20"
+                              }`}>
+                                {ruleTypeLabel}
                               </span>
-                            )}
-                          </td>
+                            </td>
 
-                          {/* Type column */}
+                            {/* Logical Condition column */}
+                            <td className="px-4 py-3">
+                              {isEditing ? (
+                                <textarea
+                                  value={editCondition}
+                                  onChange={(e) => setEditCondition(e.target.value)}
+                                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-mono resize-y"
+                                  rows={2}
+                                />
+                              ) : (
+                                renderConditionText(rule.condition)
+                              )}
+                            </td>
+
+                            {/* Target Output Status column */}
+                            <td className="px-4 py-3">
+                              {isEditing ? (
+                                <input
+                                  type="text"
+                                  value={editStatus}
+                                  onChange={(e) => setEditStatus(e.target.value)}
+                                  className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-mono"
+                                />
+                              ) : (
+                                <span className="inline-block bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 text-slate-700 dark:text-slate-300 font-mono text-[11px] font-semibold px-2 py-0.5 rounded uppercase tracking-wider">
+                                  {rule.status}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Actions column */}
+                            <td className="px-4 py-3 text-center">
+                              {isEditing ? (
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <button
+                                    onClick={() => saveEdit(section.id, rule.id)}
+                                    className="text-emerald-500 hover:text-emerald-400 p-1 bg-emerald-500/10 rounded"
+                                    title="Save Changes"
+                                  >
+                                    <Check className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={cancelEdit}
+                                    className="text-slate-400 hover:text-slate-300 p-1 bg-slate-500/10 rounded"
+                                    title="Cancel"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
+                                  <button
+                                    onClick={() => startEdit(rule)}
+                                    className="text-slate-400 hover:text-indigo-400 p-1 bg-slate-500/10 rounded hover:bg-indigo-500/10 transition-colors"
+                                    title="Edit Rule"
+                                  >
+                                    <Edit2 className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => deleteRule(section.id, rule.id)}
+                                    className="text-slate-400 hover:text-red-400 p-1 bg-slate-500/10 rounded hover:bg-red-500/10 transition-colors"
+                                    title="Delete Rule"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+
+                      {/* Inline adding row form */}
+                      {addingToSectionId === section.id && (
+                        <tr className="bg-amber-500/5 border-t-2 border-dashed border-amber-500/20">
                           <td className="px-4 py-3">
-                            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded uppercase tracking-wider border ${
-                              isTransitRule 
-                                ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" 
-                                : "bg-teal-500/10 text-teal-400 border-teal-500/20"
-                            }`}>
-                              {ruleTypeLabel}
-                            </span>
+                            <input
+                              type="text"
+                              value={newSystem}
+                              onChange={(e) => setNewSystem(e.target.value)}
+                              placeholder="System (e.g. KP System)"
+                              className="w-full bg-slate-100 dark:bg-slate-900 border border-amber-500/30 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 font-bold"
+                            />
                           </td>
-
-                          {/* Logical Condition column */}
                           <td className="px-4 py-3">
-                            {isEditing ? (
-                              <textarea
-                                value={editCondition}
-                                onChange={(e) => setEditCondition(e.target.value)}
-                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-mono resize-y"
-                                rows={2}
-                              />
-                            ) : (
-                              renderConditionText(rule.condition)
-                            )}
+                            <textarea
+                              value={newCondition}
+                              onChange={(e) => setNewCondition(e.target.value)}
+                              placeholder="Type condition... Use backticks for highlight (e.g. `cusp_12.sub_lord` signifies houses `[3, 9, 12]`)"
+                              className="w-full bg-slate-100 dark:bg-slate-900 border border-amber-500/30 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 font-mono resize-y"
+                              rows={2}
+                            />
                           </td>
-
-                          {/* Target Output Status column */}
                           <td className="px-4 py-3">
-                            {isEditing ? (
-                              <input
-                                type="text"
-                                value={editStatus}
-                                onChange={(e) => setEditStatus(e.target.value)}
-                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 font-mono"
-                              />
-                            ) : (
-                              <span className="inline-block bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 text-slate-700 dark:text-slate-300 font-mono text-[11px] font-semibold px-2 py-0.5 rounded uppercase tracking-wider">
-                                {rule.status}
-                              </span>
-                            )}
+                            <input
+                              type="text"
+                              value={newStatus}
+                              onChange={(e) => setNewStatus(e.target.value)}
+                              placeholder="Target Output (e.g. VISA_TRAVEL_APPROVAL)"
+                              className="w-full bg-slate-100 dark:bg-slate-900 border border-amber-500/30 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 font-mono"
+                            />
                           </td>
-
-                          {/* Actions column */}
                           <td className="px-4 py-3 text-center">
-                            {isEditing ? (
-                              <div className="flex items-center justify-center gap-1.5">
-                                <button
-                                  onClick={() => saveEdit(section.id, rule.id)}
-                                  className="text-emerald-500 hover:text-emerald-400 p-1 bg-emerald-500/10 rounded"
-                                  title="Save Changes"
-                                >
-                                  <Check className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  onClick={cancelEdit}
-                                  className="text-slate-400 hover:text-slate-300 p-1 bg-slate-500/10 rounded"
-                                  title="Cancel"
-                                >
-                                  <X className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            ) : (
-                              <div className="flex items-center justify-center gap-1.5 opacity-60 hover:opacity-100 transition-opacity">
-                                <button
-                                  onClick={() => startEdit(rule)}
-                                  className="text-slate-400 hover:text-indigo-400 p-1 bg-slate-500/10 rounded hover:bg-indigo-500/10 transition-colors"
-                                  title="Edit Rule"
-                                >
-                                  <Edit2 className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  onClick={() => deleteRule(section.id, rule.id)}
-                                  className="text-slate-400 hover:text-red-400 p-1 bg-slate-500/10 rounded hover:bg-red-500/10 transition-colors"
-                                  title="Delete Rule"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            )}
+                            <div className="flex items-center justify-center gap-1.5">
+                              <button
+                                onClick={() => saveNewRule(section.id)}
+                                className="text-amber-500 hover:text-amber-400 p-1 bg-amber-500/10 rounded"
+                                title="Add Rule to List"
+                              >
+                                <Check className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={cancelAdd}
+                                className="text-slate-400 hover:text-slate-300 p-1 bg-slate-500/10 rounded"
+                                title="Cancel"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
-                      );
-                    })}
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      ) : activeTab === "registry" ? (
+        /* KP Rule Registry Spec */
+        <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-indigo-500/10 pb-4">
+            <div>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wider">
+                Module Spec v1.0
+              </span>
+              <h4 className={`text-lg font-sans font-bold ${textHeading} mt-1.5`}>
+                KP RULE REGISTRY SPECIFICATION
+              </h4>
+              <p className={`text-xs ${textMuted} mt-0.5`}>
+                Central management layer for loading, organizing, and exposing all classical KP Rulebook entries.
+              </p>
+            </div>
+            <span className="text-2xl">📁</span>
+          </div>
 
-                    {/* Inline adding row form */}
-                    {addingToSectionId === section.id && (
-                      <tr className="bg-amber-500/5 border-t-2 border-dashed border-amber-500/20">
-                        <td className="px-4 py-3">
-                          <input
-                            type="text"
-                            value={newSystem}
-                            onChange={(e) => setNewSystem(e.target.value)}
-                            placeholder="System (e.g. KP System)"
-                            className="w-full bg-slate-100 dark:bg-slate-900 border border-amber-500/30 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 font-bold"
-                          />
-                        </td>
-                        <td className="px-4 py-3">
-                          <textarea
-                            value={newCondition}
-                            onChange={(e) => setNewCondition(e.target.value)}
-                            placeholder="Type condition... Use backticks for highlight (e.g. `cusp_12.sub_lord` signifies houses `[3, 9, 12]`)"
-                            className="w-full bg-slate-100 dark:bg-slate-900 border border-amber-500/30 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 font-mono resize-y"
-                            rows={2}
-                          />
-                        </td>
-                        <td className="px-4 py-3">
-                          <input
-                            type="text"
-                            value={newStatus}
-                            onChange={(e) => setNewStatus(e.target.value)}
-                            placeholder="Target Output (e.g. VISA_TRAVEL_APPROVAL)"
-                            className="w-full bg-slate-100 dark:bg-slate-900 border border-amber-500/30 rounded px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 font-mono"
-                          />
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <button
-                              onClick={() => saveNewRule(section.id)}
-                              className="text-amber-500 hover:text-amber-400 p-1 bg-amber-500/10 rounded"
-                              title="Add Rule to List"
-                            >
-                              <Check className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={cancelAdd}
-                              className="text-slate-400 hover:text-slate-300 p-1 bg-slate-500/10 rounded"
-                              title="Cancel"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+          {/* Objective & Flow */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800 space-y-2">
+              <span className="text-[10px] font-mono text-amber-500 font-bold uppercase tracking-wider block">OBJECTIVE</span>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Implement a central <strong>KP Rule Registry</strong>. The registry is responsible for organizing and exposing all KP rules. 
+                It is <em>NOT</em> another Rule Engine and performs <em>NO calculations</em>. It simply manages the complete KP Rulebook and provides high-performance, efficient access to rules required by the main execution engine.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800 space-y-3 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-mono text-indigo-400 font-bold uppercase tracking-wider block">ARCHITECTURE PIPELINE FLOW</span>
+                <p className="text-xs text-slate-400 leading-relaxed mb-2">Deterministic linear downstream propagation:</p>
+              </div>
+              <div className="flex items-center justify-around font-mono text-[9px] text-slate-300 bg-slate-950 p-2 rounded border border-slate-800/60 overflow-x-auto gap-2">
+                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 font-bold">Rulebook</span>
+                <span>➔</span>
+                <span className="px-1.5 py-0.5 rounded bg-indigo-950 border border-indigo-800 font-bold text-indigo-300">Registry</span>
+                <span>➔</span>
+                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800">Rule Engine</span>
+                <span>➔</span>
+                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800">Evidence</span>
+                <span>➔</span>
+                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800">Decision</span>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          </div>
+
+          {/* Code & Functions */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span className="text-[10px] font-mono text-amber-400 font-bold">core/kp/rules/KPRuleRegistry.kt</span>
+                  <span className="text-[9px] font-mono text-slate-500">Kotlin Object Signature</span>
+                </div>
+                <pre className="text-emerald-400 leading-relaxed font-mono text-[11px] overflow-x-auto pt-2">
+{`object KPRuleRegistry {
+    val version: String = "1.0"
+    val rules: List<KPRule>
+    
+    fun getAllRules(): List<KPRule>
+    fun getRule(id: String): KPRule?
+    fun getRules(category: RuleCategory): List<KPRule>
+    fun getEnabledRules(): List<KPRule>
+    fun getRuleCount(): Int
+    fun getVersion(): String
+}`}
+                </pre>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-900/20 border border-slate-800 space-y-2 text-xs">
+                <span className="text-[10px] font-mono text-slate-400 font-bold block">STARTUP & RUNTIME SEQUENCE</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1 font-mono text-[10px] text-slate-300">
+                  <div className="space-y-1 bg-slate-950/60 p-2.5 rounded border border-slate-800/80">
+                    <span className="text-amber-500 font-bold block mb-1">🚀 STARTUP SEEDING</span>
+                    <ol className="list-decimal pl-4 space-y-1">
+                      <li>Application Starts Up</li>
+                      <li>Load Master Rulebook</li>
+                      <li>Validate definitions</li>
+                      <li>Build Map index trees</li>
+                      <li>Registry Ready</li>
+                    </ol>
+                  </div>
+                  <div className="space-y-1 bg-slate-950/60 p-2.5 rounded border border-slate-800/80">
+                    <span className="text-indigo-400 font-bold block mb-1">⏱ RUNTIME EVALUATION</span>
+                    <ol className="list-decimal pl-4 space-y-1">
+                      <li>Prediction Request made</li>
+                      <li>Rule Engine queries Registry</li>
+                      <li>Registry returns Immutable List</li>
+                      <li>Rule Engine executes and matches</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800 space-y-2">
+                <span className="text-[10px] font-mono text-indigo-400 font-bold uppercase tracking-wider block">CATEGORY INDEX</span>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {["Marriage", "Career", "Business", "Finance", "Property", "Vehicle", "Education", "Children", "Travel", "Foreign Settlement", "Health", "Litigation", "Spiritual", "Longevity", "General"].map(cat => (
+                    <span key={cat} className="text-[10px] font-mono bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-slate-300">
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800 space-y-2">
+                <span className="text-[10px] font-mono text-rose-400 font-bold uppercase tracking-wider block">RULE VALIDATION CHECKS</span>
+                <ul className="list-disc pl-4 text-[11px] text-slate-300 space-y-1 pt-1 font-mono">
+                  <li><strong>Duplicate IDs</strong> - Validates rule uniqueness</li>
+                  <li><strong>Missing IDs</strong> - Checks required index keys</li>
+                  <li><strong>Disabled Rules</strong> - Gracefully filters on boot</li>
+                  <li><strong>Invalid Categories</strong> - Catches unknown folders</li>
+                  <li><strong>Null References</strong> - Blocks incomplete structures</li>
+                  <li className="text-slate-400"><strong>Duplicate Names</strong> - Warning log only</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Design Principles */}
+          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800">
+            <span className="text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider block mb-2">DESIGN PRINCIPLES</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-center font-mono text-[9px] text-slate-300">
+              <div className="p-2 rounded bg-slate-900/60 border border-slate-800/80">Immutable</div>
+              <div className="p-2 rounded bg-slate-900/60 border border-slate-800/80">Read-only</div>
+              <div className="p-2 rounded bg-slate-900/60 border border-slate-800/80">Thread-safe</div>
+              <div className="p-2 rounded bg-slate-900/60 border border-slate-800/80">Fast Lookup</div>
+              <div className="p-2 rounded bg-slate-900/60 border border-slate-800/80">No Calculations</div>
+              <div className="p-2 rounded bg-slate-900/60 border border-slate-800/80">No Astrology</div>
+              <div className="p-2 rounded bg-slate-900/60 border border-slate-800/80">No Side Effects</div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* KP Rule Matcher Spec */
+        <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-emerald-500/10 pb-4">
+            <div>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">
+                Module Spec v1.0
+              </span>
+              <h4 className={`text-lg font-sans font-bold ${textHeading} mt-1.5`}>
+                KP RULE MATCHER SPECIFICATION
+              </h4>
+              <p className={`text-xs ${textMuted} mt-0.5`}>
+                Stateless evaluation component matching individual KP rules against active DBA timelines and transit snapshots.
+              </p>
+            </div>
+            <span className="text-2xl">⚙️</span>
+          </div>
+
+          {/* Objective & Flow */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800 space-y-2">
+              <span className="text-[10px] font-mono text-amber-500 font-bold uppercase tracking-wider block">OBJECTIVE</span>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Implement the pure <strong>KP Rule Matcher</strong>. The Rule Matcher is responsible for matching a single rule against the current KP Knowledge Book and Runtime Context.
+                It does <em>NOT</em> make predictions, does <em>NOT</em> generate events, and simply determines whether a rule is satisfied and returns highly structured evidence.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800 space-y-3 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider block">EVALUATION PROPAGATION FLOW</span>
+                <p className="text-xs text-slate-400 leading-relaxed mb-2">Deterministic stateless evaluations:</p>
+              </div>
+              <div className="flex items-center justify-around font-mono text-[9px] text-slate-300 bg-slate-950 p-2 rounded border border-slate-800/60 overflow-x-auto gap-2">
+                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 font-bold">KP Rule</span>
+                <span>➔</span>
+                <span className="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 font-bold text-emerald-300">KP Rule Matcher</span>
+                <span>➔</span>
+                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800">Match Result</span>
+                <span>➔</span>
+                <span className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800">Evidence Engine</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Class Specs */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                  <span className="text-[10px] font-mono text-emerald-400 font-bold">core/kp/rules/RuleMatchResult.kt</span>
+                  <span className="text-[9px] font-mono text-slate-500">Kotlin Data Class</span>
+                </div>
+                <pre className="text-emerald-400 leading-relaxed font-mono text-[10.5px] overflow-x-auto pt-2">
+{`data class RuleMatchResult(
+    val ruleId: String,
+    val matched: Boolean,
+    val score: Int,
+    val supportingHouses: List<Int>,
+    val missingHouses: List<Int>,
+    val supportingPlanets: List<String>,
+    val blockingPlanets: List<String>,
+    val evidence: List<String>
+)`}
+                </pre>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-900/20 border border-slate-800 space-y-2 text-xs">
+                <span className="text-[10px] font-mono text-slate-400 font-bold block">EVALUATION SEQUENCE</span>
+                <div className="space-y-1.5 bg-slate-950 p-3 rounded border border-slate-800/80 font-mono text-[10px] text-slate-300">
+                  <p>1. Ingest <code className="text-amber-400">KPRule</code> and <code className="text-indigo-400">KPRuleExecutionContext</code>.</p>
+                  <p>2. Query the <code className="text-indigo-300">KP Knowledge Book</code> references.</p>
+                  <p>3. Extract the active natal <code className="text-emerald-400">Vimshottari Dasha, Bhukti, and Antara (DBA)</code> lords.</p>
+                  <p>4. Extract the active transiting coordinate snapshots.</p>
+                  <p>5. Run targeted rules checks across required, supporting, and blocking structures.</p>
+                  <p>6. Build and return the <code className="text-teal-400">RuleMatchResult</code> wrapper object.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800 space-y-2">
+                <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider block">CORE MATCH CHECKS</span>
+                <ul className="list-disc pl-4 text-[11px] text-slate-300 space-y-1.5 pt-1 font-mono">
+                  <li><strong>Check Required Houses</strong> - Confirms critical cusps</li>
+                  <li><strong>Check Supporting Houses</strong> - Secondary houses</li>
+                  <li><strong>Check Blocking Houses</strong> - Dusthanas / Obstructive houses</li>
+                  <li><strong>Check Required Significators</strong> - Planetary links</li>
+                  <li><strong>Check Natal Promise</strong> - Base chart alignments</li>
+                  <li><strong>Check DBA Activation</strong> - Dynamic period lords</li>
+                  <li><strong>Check Transit Activation</strong> - Realtime gochara</li>
+                </ul>
+              </div>
+
+              <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800 space-y-2">
+                <span className="text-[10px] font-mono text-teal-400 font-bold uppercase tracking-wider block">EVIDENCE & SCORES</span>
+                <div className="space-y-2 text-[11px] text-slate-300 leading-normal pt-1">
+                  <p>
+                    <strong>Deterministic Scores:</strong> Normalized to range from <code>0</code> (No Match) up to <code>100</code> (Complete Match), with intermediate levels for partial configurations.
+                  </p>
+                  <p>
+                    <strong>Granular Evidence logs:</strong> Fully documents exact triggers (which aspects supported, which dusthanas obstructed, which planets blocked).
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bound Exclusion */}
+          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/80 text-xs">
+            <span className="text-[10px] font-mono text-rose-400 font-bold uppercase tracking-wider block mb-1">STRICT OUT-OF-SCOPE BOUNDARIES</span>
+            <p className="text-[11px] text-slate-400 font-mono leading-relaxed">
+              The Matcher must <strong>NEVER</strong> commit to the Event Book, calculate confidence, resolve rule conflicts, generate events, or alter rule priority levels. These tasks are strictly handled downstream.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Helpful Info Section */}
       <div className={`p-4 rounded-xl border ${cardStyle} flex items-start gap-2.5 text-xs ${textMuted}`}>

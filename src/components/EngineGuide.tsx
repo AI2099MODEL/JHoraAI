@@ -2797,7 +2797,9 @@ All processing is deterministic, traceable, auditable, and repeatable.
       { name: "ConfidenceEngine", desc: "Measures the reliability of the Decision Engine verdict (PASS, FAIL, STRONG, WEAK, NOT PROMISED) without altering the outcome." },
       { name: "EvidenceEngine", desc: "Generates clear natural-language human and technical explanations by summarizing matched, failed, supporting, and obstructing house rules." },
       { name: "ExplanationEngine", desc: "Produces beautifully parsed human-readable and technical explanations from validated evidence, syncing with the Event Book." },
-      { name: "EventBook", desc: "Maintains a secure, persistent historical chronological log of all rules parsed and events triggered, enabling full audits." }
+      { name: "EventBook", desc: "Maintains a secure, persistent historical chronological log of all rules parsed and events triggered, enabling full audits." },
+      { name: "KPRuleRegistry", desc: "Central manager for loading, indexing, and validating all classical KP Rulebook entries securely on startup." },
+      { name: "KPRuleMatcher", desc: "Stateless evaluation engine assessing KP rule conditions against active DBA parameters and transit snapshots to output exact evidence." }
     ];
 
     let modY = 95;
