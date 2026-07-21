@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin_06011976_0640pm_dehradun",
-    "lastUpdated": "2026-07-21T05:08:15.913Z",
+    "lastUpdated": "2026-07-21T05:16:59.998Z",
     "evaluationDate": "2026-07-21",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-21T05:07:26.655Z",
-      "localTime": "2026-07-20T22:07:26-07:00",
+      "utcTime": "2026-07-21T05:16:34.152Z",
+      "localTime": "2026-07-20T22:16:34-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Libra",
         "displayName": "Libra",
-        "longitude": 183.92
+        "longitude": 184
       },
       "currentNakshatra": {
         "id": "Chitra",
@@ -30,15 +30,15 @@
         "displayName": "Mars"
       },
       "currentSubLord": {
-        "id": "Rahu",
-        "displayName": "Rahu"
+        "id": "Mars",
+        "displayName": "Mars"
       },
       "moonPhase": {
         "type": "Waxing Gibbous",
         "displayName": "Sukla Ashtami",
-        "illuminationPercentage": 49.7
+        "illuminationPercentage": 49.8
       },
-      "moonLongitude": 183.92,
+      "moonLongitude": 184,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -52,7 +52,7 @@
         "id": "Cancer",
         "displayName": "Cancer"
       },
-      "longitude": 94.4,
+      "longitude": 94.41,
       "nakshatra": {
         "id": "Pushya",
         "displayName": "Pushya"
@@ -65,7 +65,7 @@
     "planets": {
       "sun": {
         "currentSign": "Cancer",
-        "longitude": 94.4,
+        "longitude": 94.41,
         "nakshatra": "Pushya",
         "pada": 1,
         "starLord": "Saturn",
@@ -76,33 +76,33 @@
       },
       "moon": {
         "currentSign": "Libra",
-        "longitude": 183.92,
+        "longitude": 184,
         "nakshatra": "Chitra",
         "pada": 4,
         "starLord": "Mars",
-        "subLord": "Rahu",
+        "subLord": "Mars",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mars": {
         "currentSign": "Gemini",
-        "longitude": 74.49,
+        "longitude": 76.07,
         "nakshatra": "Ardra",
         "pada": 3,
         "starLord": "Rahu",
-        "subLord": "Rahu",
+        "subLord": "Sun",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mercury": {
         "currentSign": "Libra",
-        "longitude": 200.76,
+        "longitude": 200.79,
         "nakshatra": "Vishakha",
         "pada": 1,
         "starLord": "Jupiter",
-        "subLord": "Rahu",
+        "subLord": "Ketu",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -120,11 +120,11 @@
       },
       "venus": {
         "currentSign": "Cancer",
-        "longitude": 116.82,
+        "longitude": 116.84,
         "nakshatra": "Ashlesha",
         "pada": 4,
         "starLord": "Mercury",
-        "subLord": "Ketu",
+        "subLord": "Venus",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -245,6 +245,21 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-21T05:16:59.998Z",
+      "evaluationDate": "2026-07-21",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
+    },
     {
       "timestamp": "2026-07-21T05:08:15.913Z",
       "evaluationDate": "2026-07-21",
@@ -1717,21 +1732,6 @@
     },
     {
       "timestamp": "2026-07-20T11:57:04.538Z",
-      "evaluationDate": "2026-07-20",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Cuspal Sub Lord of 7th House for Marriage Timing",
-        "10th Cuspal Sub Lord for Career and Profession Sector",
-        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-20T11:57:04.350Z",
       "evaluationDate": "2026-07-20",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
