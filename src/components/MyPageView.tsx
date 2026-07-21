@@ -3535,6 +3535,74 @@ export function MyPageView({
                   )}
                 </div>
               </button>
+
+              {/* Card 6: My Report */}
+              <button
+                disabled={compilingRelReport !== null}
+                onClick={async () => {
+                  try {
+                    setCompilingRelReport("my_report");
+                    const targetProfile = profile || mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
+                    if (!targetProfile) {
+                      throw new Error("Unable to load astrology profile data.");
+                    }
+                    const activeSubmenuIds = [
+                      "jhora_birth_details", "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", 
+                      "jhora_ashtakavarga", "jhora_divisional", "jhora_vimshottari", "kp_cusps", 
+                      "kp_sub_lords", "kp_planet_significators", "kp_house_significators", "jaimini_karakas", 
+                      "jaimini_arudhas", "western_tropical", "western_aspects", "tajika_varshaphal", 
+                      "tajika_harshabala", "lalkitab_houses", "lalkitab_teva"
+                    ];
+
+                    const doc = generateRawAstrologyPDF(targetProfile, {
+                      profileName: userName,
+                      submenus: activeSubmenuIds
+                    });
+                    doc.save("My_Report.pdf");
+                  } catch (err: any) {
+                    console.error("My Report PDF compile failed:", err);
+                    alert("Failed to compile My Report PDF: " + err.message);
+                  } finally {
+                    setCompilingRelReport(null);
+                  }
+                }}
+                className={`p-5 rounded-2xl border text-left md:col-span-3 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
+                  isDark 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
+                    : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
+                }`}
+                id="download-my-report-button"
+              >
+                <div className="w-full">
+                  <div className="flex justify-between items-start">
+                    <Database className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+                    <span className={`text-[9px] border px-2 py-0.5 rounded font-mono font-bold ${
+                      isDark 
+                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20" 
+                        : "bg-amber-500/5 text-amber-600 border-amber-500/20"
+                    }`}>
+                      100% COMPLETE SYSTEMS DATA
+                    </span>
+                  </div>
+                  <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                    My Report
+                  </h4>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                    Comprehensive dossier compiling all user data across all sections, submenus, and all 19 raw tables (JH1 to JH19 consecutively).
+                  </p>
+                </div>
+                <div className="text-[11px] font-bold text-amber-500 flex items-center gap-1.5 mt-2">
+                  {compilingRelReport === "my_report" ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling My Report...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5" /> Download PDF Report (My_Report.pdf)
+                    </>
+                  )}
+                </div>
+              </button>
             </div>
 
             {/* Bottom Section: Active JSON Export */}
