@@ -2207,9 +2207,9 @@ function buildCanonicalAstroContext(astrologyData: any, userProfile: any, curren
   }
 
   // Active dasha calculation safely
-  const mahadasha = userProfile?.activePeriods?.mahadasha || astrologyData?.Vedic?.mahadashas?.[0]?.name || "Mercury";
-  const bhukti = userProfile?.activePeriods?.bhukti || astrologyData?.Vedic?.mahadashas?.[0]?.bhuktis?.[0]?.name || "Saturn";
-  const antara = userProfile?.activePeriods?.antara || "Rahu";
+  const mahadasha = userProfile?.Vedic?.dba?.mahadasha || userProfile?.activePeriods?.mahadasha || astrologyData?.Vedic?.mahadashas?.[0]?.name || "Mercury";
+  const bhukti = userProfile?.Vedic?.dba?.bhukti || userProfile?.activePeriods?.bhukti || astrologyData?.Vedic?.mahadashas?.[0]?.bhuktis?.[0]?.name || "Saturn";
+  const antara = userProfile?.Vedic?.dba?.antara || userProfile?.activePeriods?.antara || "Mercury";
 
   const canonicalContext = {
     metadata: {
@@ -2234,7 +2234,7 @@ function buildCanonicalAstroContext(astrologyData: any, userProfile: any, curren
         sign: userProfile?.Vedic?.ascendant?.sign || "Cancer",
         nakshatra: userProfile?.Vedic?.ascendant?.nakshatra || "Pushya"
       },
-      soulBlueprintSummary: userProfile?.User?.SoulSynthesis || astrologyData?.User?.SoulSynthesis || "Vimshottari Dasha roadmap shows active dasha of Mercury-Saturn-Rahu with 8th house Moon."
+      soulBlueprintSummary: userProfile?.User?.SoulSynthesis || astrologyData?.User?.SoulSynthesis || `Vimshottari Dasha roadmap shows active dasha of ${mahadasha}-${bhukti}-${antara} with house ${userProfile?.KP?.planets?.Moon?.house || userProfile?.Vedic?.planets?.Moon?.house || 8} Moon.`
     },
     kpKnowledgeBook: handbookContent ? "LOADED (Standard Rules indexed from JH1 to JH19, and Cuspal Sublords)" : "UNAVAILABLE",
     natalRuleResults: natalRulesData?.results || userProfile?.natalRulesEvaluations || [],
@@ -2564,6 +2564,24 @@ LAWS OF CELESTIAL ANALYSIS:
     const birthPlace = canonicalContext.clientProfile.birthParticulars.place;
     const soulSynthesis = canonicalContext.clientProfile.soulBlueprintSummary;
 
+    // Extract dynamic cuspal sub lords from userProfile safely
+    const csl7 = userProfile?.KP?.cusps?.House_7?.sub_lord || "Ketu";
+    const csl7Star = userProfile?.KP?.planets?.[csl7]?.star_lord || "Venus";
+    const csl7Houses = Array.isArray(userProfile?.KP?.planets?.[csl7]?.ownership) 
+      ? userProfile.KP.planets[csl7].ownership.join(", ") 
+      : "4, 11";
+    
+    const csl10 = userProfile?.KP?.cusps?.House_10?.sub_lord || "Rahu";
+    const csl10Star = userProfile?.KP?.planets?.[csl10]?.star_lord || "Jupiter";
+    const csl10Houses = Array.isArray(userProfile?.KP?.planets?.[csl10]?.ownership)
+      ? userProfile.KP.planets[csl10].ownership.join(", ")
+      : "9, 6";
+
+    const lagnaSign = userProfile?.Vedic?.ascendant?.sign || "Cancer";
+    const natalMoonSign = userProfile?.Vedic?.planets?.Moon?.sign || "Aquarius";
+    const natalMoonNak = userProfile?.Vedic?.planets?.Moon?.nakshatra || "Shatabhisha";
+    const natalMoonHouse = userProfile?.KP?.planets?.Moon?.house || userProfile?.Vedic?.planets?.Moon?.house || 8;
+
     let detectedIntent = "General Chart Consultation";
     let matchedRules = [
       { id: "KP_FIN_01", name: "Financial Status & Wealth Promise", status: "Met" },
@@ -2595,12 +2613,12 @@ LAWS OF CELESTIAL ANALYSIS:
 The natal promise for marriage is strong, but Saturn's aspect teaches lessons of patience. Current dasha gates indicate a highly supportive window is approaching.
 
 ### KEY FINDINGS
-- **7th CSL Favorable**: Ketu in Venus's star signifies houses [5, 4, 11] confirming relationship promise.
+- **7th CSL Favorable**: ${csl7} in ${csl7Star}'s star signifies houses [${csl7Houses}] confirming relationship promise.
 - **Saturn Aspect**: Temporary delay aspect present, prompting internal maturity and solid preparation.
 - **Timing Gateway**: Favorable Vimshottari Mahadasha/Bhukti periods are highly active.
 
 ### ASTROLOGICAL BASIS
-- **Natal Promise**: KP Cuspal Sub-Lord of 7th house (Ketu) is extremely strong and well-aligned.
+- **Natal Promise**: KP Cuspal Sub-Lord of 7th house (${csl7}) is extremely strong and well-aligned.
 - **DBA**: Currently in ${canonicalContext.dba.mahadasha}-${canonicalContext.dba.bhukti} Vimshottari period.
 - **Transit**: Moon transiting in ${canonicalContext.currentSky.moon.nakshatra} Nakshatra.
 
@@ -2609,7 +2627,7 @@ The natal promise for marriage is strong, but Saturn's aspect teaches lessons of
 - **KP_DBA_01** - Dasha-Bhukti-Antara Event Trigger Validation
 
 ### EVIDENCE
-- **Supporting factors**: Active Venus-ruled nakshatras, strong 11th house sublords.
+- **Supporting factors**: Active ${csl7Star}-ruled nakshatras, strong 11th house sublords.
 - **Blocking factors**: Saturn's aspect on the 7th house cusp.
 
 ### TIMELINE
@@ -2625,15 +2643,15 @@ High`;
     } else if (q.includes("career") || q.includes("work") || q.includes("job") || q.includes("profession")) {
       detectedIntent = "Career Profile & Growth";
       replyText += `### SUMMARY
-Excellent career indicators! Your 10th Cuspal Sub-Lord (Rahu) resides in Jupiter's star, promising high professional status, stability, and gains.
+Excellent career indicators! Your 10th Cuspal Sub-Lord (${csl10}) resides in ${csl10Star}'s star, promising high professional status, stability, and gains.
 
 ### KEY FINDINGS
-- **10th CSL Supportive**: Rahu signifies houses [9, 6] triggering professional growth and societal respect.
-- **Dasha Catalyst**: Active Mercury-Saturn dasha offers disciplined progress and organizational success.
+- **10th CSL Supportive**: ${csl10} signifies houses [${csl10Houses}] triggering professional growth and societal respect.
+- **Dasha Catalyst**: Active ${canonicalContext.dba.mahadasha}-${canonicalContext.dba.bhukti} dasha offers disciplined progress and organizational success.
 - **Transit Synergy**: Current celestial alignments support long-term planning and leadership initiatives.
 
 ### ASTROLOGICAL BASIS
-- **Natal Promise**: Rahu as 10th Cuspal Sub-Lord is strongly connected to professional houses.
+- **Natal Promise**: ${csl10} as 10th Cuspal Sub-Lord is strongly connected to professional houses.
 - **DBA**: Active dasha of ${canonicalContext.dba.mahadasha}-${canonicalContext.dba.bhukti}.
 - **Transit**: Transiting Mars in Gemini aspecting natal placements.
 
@@ -2642,7 +2660,7 @@ Excellent career indicators! Your 10th Cuspal Sub-Lord (Rahu) resides in Jupiter
 - **KP_DBA_01** - Dasha-Bhukti-Antara Event Trigger Validation
 
 ### EVIDENCE
-- **Supporting factors**: Rahu's strong placement, supportive sublords.
+- **Supporting factors**: ${csl10}'s strong placement, supportive sublords.
 - **Blocking factors**: Minor professional delays due to Saturn's slow influence.
 
 ### TIMELINE
@@ -2657,12 +2675,12 @@ Excellent career indicators! Your 10th Cuspal Sub-Lord (Rahu) resides in Jupiter
 High`;
     } else {
       replyText += `### SUMMARY
-Welcome Nitin. Based on your birth coordinates (${birthPlace}) and the live sky, you are operating under a highly structured dasha period, prompting long-term growth and stable life path development.
+Welcome ${userName}. Based on your birth coordinates (${birthPlace}) and the live sky, you are operating under a highly structured dasha period, prompting long-term growth and stable life path development.
 
 ### KEY FINDINGS
-- **Strong Natal Foundation**: Cancer Lagna gives natural empathy, while the Aquarius Moon in the 8th house highlights powerful intuitive insights.
+- **Strong Natal Foundation**: ${lagnaSign} Lagna gives natural empathy, while the ${natalMoonSign} Moon in the house ${natalMoonHouse} (residing in ${natalMoonNak} Nakshatra) highlights powerful intuitive insights.
 - **Current Catalyst**: Active dasha of ${canonicalContext.dba.mahadasha}-${canonicalContext.dba.bhukti} is ripe for strategic wealth accumulation and professional expansion.
-- **Current Transit Moon**: Live transiting Moon in ${canonicalContext.currentSky.moon.sign} Nakshatra (${canonicalContext.currentSky.moon.nakshatra}) provides a steady ground for mental clarity.
+- **Current Transit Moon**: Live transiting Moon in ${canonicalContext.currentSky.moon.sign} sign (${canonicalContext.currentSky.moon.nakshatra} Nakshatra) provides a steady ground for mental clarity.
 
 ### ASTROLOGICAL BASIS
 - **Natal Promise**: Lagna lord and Cuspal Sublords are fully verified and aligned.

@@ -90,6 +90,55 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Helper to get active dasha based on astrologyData
+  const getActiveDashaText = () => {
+    if (!astrologyData || !astrologyData.dashas) return "Mercury-Saturn-Mercury";
+    
+    // Find current active dasha
+    const now = new Date();
+    
+    const maha = astrologyData.dashas.find(m => {
+      const start = new Date(m.startDate);
+      const end = new Date(m.endDate);
+      return now >= start && now <= end;
+    });
+    
+    if (maha) {
+      let activeMaha = maha.lord;
+      let activeBhukti = "Saturn";
+      let activeAntara = "Mercury";
+      
+      if (maha.subPeriods) {
+        const bhuk = maha.subPeriods.find(b => {
+          const start = new Date(b.startDate);
+          const end = new Date(b.endDate);
+          return now >= start && now <= end;
+        });
+        if (bhuk) {
+          activeBhukti = bhuk.lord;
+          if (bhuk.subPeriods) {
+            const ant = bhuk.subPeriods.find(a => {
+              const start = new Date(a.startDate);
+              const end = new Date(a.endDate);
+              return now >= start && now <= end;
+            });
+            if (ant) {
+              activeAntara = ant.lord;
+            }
+          }
+        }
+      }
+      return `${activeMaha}-${activeBhukti}-${activeAntara}`;
+    }
+    
+    return "Mercury-Saturn-Mercury";
+  };
+
+  const activeDasha = getActiveDashaText();
+  const lagnaSign = astrologyData?.lagna?.sign || "Cancer";
+  const natalMoonSign = astrologyData?.planets?.find(p => p.name === "Moon")?.sign || "Aquarius";
+  const natalMoonNak = astrologyData?.planets?.find(p => p.name === "Moon")?.nakshatra || "Shatabhisha";
+
   // Dynamically load/build the prompts from the imported JSON
   const getMoodPromptsFromJSON = () => {
     const prompts = [];
@@ -98,7 +147,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     prompts.push({
       id: "daily_mood_prediction",
       label: "Daily Mood Reading",
-      query: `Generate a personalized daily mood reading and activity guidance based on the "daily_horoscope_engine" and "mood_prediction" rules. Layer today's Moon transit (currently in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra, ${currentSky?.moon?.currentSign?.displayName || "Libra"} sign) over my current Vimshottari period (Saturn-Mercury-Rahu) to calculate Tara Bala, Chandra Bala, and daily emotional metrics.`
+      query: `Generate a personalized daily mood reading and activity guidance based on the "daily_horoscope_engine" and "mood_prediction" rules. Layer today's Moon transit (currently in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra, ${currentSky?.moon?.currentSign?.displayName || "Libra"} sign) over my current Vimshottari period (${activeDasha}) to calculate Tara Bala, Chandra Bala, and daily emotional metrics.`
     });
 
     // Add domains from JSON
@@ -172,7 +221,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const statusMessages = [
     "Querying KP & Vedic daily indicators...",
     "Retrieving native's life variables...",
-    "Synthesizing active Saturn-Mercury-Rahu dasha weights...",
+    `Synthesizing active ${activeDasha} dasha weights...`,
     "Evaluating rules JH1 through JH19...",
     "Aligning transit patterns against natal promise...",
     "Formatting structured response..."
@@ -289,7 +338,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const quickPrompts = [
     {
       title: "Today's Mood & Wellness",
-      query: `Analyze my daily mood, emotional energy, and general wellness today. Combine my natal coordinates (Cancer Lagna, Aquarius Shatabhisha Moon) with today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra to yield deep psychological metrics.`
+      query: `Analyze my daily mood, emotional energy, and general wellness today. Combine my natal coordinates (${lagnaSign} Lagna, ${natalMoonSign} ${natalMoonNak} Moon) with today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra to yield deep psychological metrics.`
     },
     {
       title: "Action & Behavior Drive",
@@ -301,7 +350,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     },
     {
       title: "Dasha Roadmap & Remedies",
-      query: "Detail my active Saturn-Mercury-Rahu Vimshottari roadmap. What are the key directives, upcoming turning points, and immediate practical remedies for my life right now?"
+      query: `Detail my active ${activeDasha} Vimshottari roadmap. What are the key directives, upcoming turning points, and immediate practical remedies for my life right now?`
     }
   ];
 
