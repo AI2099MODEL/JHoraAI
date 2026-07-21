@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin06011976dehradun0640PM",
-    "lastUpdated": "2026-07-21T15:03:01.714Z",
+    "lastUpdated": "2026-07-21T15:08:01.715Z",
     "evaluationDate": "2026-07-21",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-21T15:03:01.683Z",
-      "localTime": "2026-07-21T08:03:01-07:00",
+      "utcTime": "2026-07-21T15:08:01.683Z",
+      "localTime": "2026-07-21T08:08:01-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Libra",
         "displayName": "Libra",
-        "longitude": 189.37
+        "longitude": 189.42
       },
       "currentNakshatra": {
         "id": "Swati",
@@ -30,15 +30,15 @@
         "displayName": "Rahu"
       },
       "currentSubLord": {
-        "id": "Ketu",
-        "displayName": "Ketu"
+        "id": "Rahu",
+        "displayName": "Rahu"
       },
       "moonPhase": {
         "type": "Waxing Gibbous",
         "displayName": "Sukla Ashtami",
-        "illuminationPercentage": 52.5
+        "illuminationPercentage": 52.6
       },
-      "moonLongitude": 189.37,
+      "moonLongitude": 189.42,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -76,33 +76,33 @@
       },
       "moon": {
         "currentSign": "Libra",
-        "longitude": 189.37,
+        "longitude": 189.42,
         "nakshatra": "Swati",
         "pada": 1,
         "starLord": "Rahu",
-        "subLord": "Ketu",
+        "subLord": "Rahu",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mars": {
-        "currentSign": "Virgo",
-        "longitude": 179.29,
+        "currentSign": "Libra",
+        "longitude": 180.17,
         "nakshatra": "Chitra",
-        "pada": 2,
+        "pada": 3,
         "starLord": "Mars",
-        "subLord": "Venus",
-        "retrograde": true,
+        "subLord": "Saturn",
+        "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mercury": {
         "currentSign": "Libra",
-        "longitude": 202.86,
+        "longitude": 202.88,
         "nakshatra": "Vishakha",
         "pada": 1,
         "starLord": "Jupiter",
-        "subLord": "Mercury",
+        "subLord": "Venus",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -120,11 +120,11 @@
       },
       "venus": {
         "currentSign": "Cancer",
-        "longitude": 117.89,
+        "longitude": 117.9,
         "nakshatra": "Ashlesha",
         "pada": 4,
         "starLord": "Mercury",
-        "subLord": "Mercury",
+        "subLord": "Ketu",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -245,6 +245,21 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-21T15:08:01.715Z",
+      "evaluationDate": "2026-07-21",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
+    },
     {
       "timestamp": "2026-07-21T15:03:01.714Z",
       "evaluationDate": "2026-07-21",
@@ -1717,21 +1732,6 @@
     },
     {
       "timestamp": "2026-07-20T10:41:05.848Z",
-      "evaluationDate": "2026-07-20",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Cuspal Sub Lord of 7th House for Marriage Timing",
-        "10th Cuspal Sub Lord for Career and Profession Sector",
-        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-20T10:26:07.900Z",
       "evaluationDate": "2026-07-20",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
