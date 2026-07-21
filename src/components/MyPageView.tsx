@@ -3464,7 +3464,7 @@ export function MyPageView({
                       vedic: ["jhora_planets", "jhora_shadbala", "jhora_bhava_balas"],
                       transits_data: [],
                       jaimini: ["jaimini_karakas", "jaimini_arudhas"],
-                      kp: ["kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_houses_significators"],
+                      kp: ["kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_house_significators"],
                       lalkitab: ["lalkitab_houses", "lalkitab_teva"],
                       tajik: ["tajika_varshaphal", "tajika_harshabala"],
                       western: ["western_tropical", "western_aspects"]

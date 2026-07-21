@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-21T05:00:30.108Z",
+    "lastUpdated": "2026-07-21T05:14:17.356Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-21T05:00:30.108Z",
-    "localTime": "2026-07-20T22:00:30-07:00",
+    "utcTime": "2026-07-21T05:14:17.356Z",
+    "localTime": "2026-07-20T22:14:17-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Libra",
       "displayName": "Libra",
-      "longitude": 183.86
+      "longitude": 183.98
     },
     "currentNakshatra": {
       "id": "Chitra",
@@ -28,15 +28,15 @@
       "displayName": "Mars"
     },
     "currentSubLord": {
-      "id": "Saturn",
-      "displayName": "Saturn"
+      "id": "Sun",
+      "displayName": "Sun"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Ashtami",
-      "illuminationPercentage": 49.7
+      "illuminationPercentage": 49.8
     },
-    "moonLongitude": 183.86,
+    "moonLongitude": 183.98,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 94.4,
+    "longitude": 94.41,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,44 +63,44 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 94.4,
+      "longitude": 94.41,
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
-      "subLord": "Saturn",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Libra",
-      "longitude": 183.86,
+      "longitude": 183.98,
       "nakshatra": "Chitra",
       "pada": 4,
       "starLord": "Mars",
-      "subLord": "Saturn",
+      "subLord": "Sun",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Gemini",
-      "longitude": 73.26,
+      "longitude": 75.72,
       "nakshatra": "Ardra",
-      "pada": 2,
+      "pada": 3,
       "starLord": "Rahu",
-      "subLord": "Mercury",
+      "subLord": "Sun",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 200.73,
+      "longitude": 200.78,
       "nakshatra": "Vishakha",
       "pada": 1,
       "starLord": "Jupiter",
-      "subLord": "Moon",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 116.81,
+      "longitude": 116.84,
       "nakshatra": "Ashlesha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Mercury",
+      "subLord": "Venus",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Venus",
     "moonStarLord": "Mars",
-    "moonSubLord": "Saturn"
+    "moonSubLord": "Sun"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Ashtami",
       "index": 8,
       "paksha": "Sukla",
-      "endDate": "2026-07-21T17:00:30.108Z"
+      "endDate": "2026-07-21T17:14:17.356Z"
     },
     "vara": {
       "name": "Monday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Chitra",
       "lord": "Mars",
-      "endDate": "2026-07-21T23:00:30.108Z"
+      "endDate": "2026-07-21T23:14:17.356Z"
     },
     "yoga": {
       "name": "Siddha",
       "lord": "Sun",
-      "endDate": "2026-07-21T19:00:30.108Z"
+      "endDate": "2026-07-21T19:14:17.356Z"
     },
     "karana": {
       "name": "Vishti",
       "lord": "Sun",
-      "endDate": "2026-07-21T11:00:30.108Z"
+      "endDate": "2026-07-21T11:14:17.356Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
