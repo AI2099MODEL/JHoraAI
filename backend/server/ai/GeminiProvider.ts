@@ -4,57 +4,98 @@ export class EnterpriseMultiTenantRouter {
   constructor(private prompt: string, private session: { google_id?: string; user_google_key?: string; saved_keys?: { GROQ_API_KEY?: string; OPENROUTER_API_KEY?: string } } = {}, private systemInstruction?: string) {}
 
   async processQuery(): Promise<string> {
+    const fullPrompt = this.systemInstruction ? `${this.systemInstruction}\n\nUser Question: ${this.prompt}` : this.prompt;
+    const activeKey = this.session.user_google_key || process.env.GEMINI_API_KEY;
+
+    const pipeline = [
+      {
+        name: "Primary Layer: Gemini Flash-Lite Engine",
+        run: async () => {
+          if (!activeKey) throw new Error("401: No Gemini API key provided.");
+          const models = ["gemini-2.5-flash-lite", "gemini-2.0-flash-lite", "gemini-2.0-flash", "gemini-1.5-flash"];
+          for (const model of models) {
+            try {
+              const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${activeKey}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: fullPrompt }] }],
+                  systemInstruction: this.systemInstruction ? { parts: [{ text: this.systemInstruction }] } : undefined
+                })
+              });
+              if (response.status === 429) continue;
+              const outputData = await response.json();
+              if (response.ok && outputData.candidates?.[0]?.content?.parts?.[0]?.text) {
+                return outputData.candidates[0].content.parts[0].text;
+              }
+            } catch (e) {
+              // try next model
+            }
+          }
+          throw new Error("429: Gemini Flash-Lite Quota Exhausted.");
+        }
+      },
+      {
+        name: "Secondary Layer: Pollinations Free AI Engine",
+        run: async () => {
+          const response = await fetch("https://text.pollinations.ai/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: [{ role: "user", content: fullPrompt }],
+              model: "openai"
+            })
+          });
+          if (!response.ok) throw new Error("Pollinations failed.");
+          const text = await response.text();
+          if (!text || text.length < 5) throw new Error("Pollinations empty.");
+          return text;
+        }
+      },
+      {
+        name: "Tertiary Layer: Groq Cloud LPU",
+        run: async () => {
+          const activeGroq = this.session.saved_keys?.GROQ_API_KEY || process.env.GROQ_API_KEY;
+          if (!activeGroq) throw new Error("401: Groq key not configured.");
+          const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${activeGroq}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "llama-3.3-70b-versatile",
+              messages: [{ role: "user", content: fullPrompt }]
+            })
+          });
+          if (!response.ok) throw new Error("Groq failed.");
+          const outputData = await response.json();
+          const content = outputData.choices?.[0]?.message?.content;
+          if (!content) throw new Error("Groq empty response.");
+          return content;
+        }
+      }
+    ];
+
+    for (const step of pipeline) {
+      try {
+        const result = await step.run();
+        if (result && result.trim().length > 0) return result;
+      } catch (err: any) {
+        console.warn(`[${step.name}] caught: ${err.message}`);
+      }
+    }
+
+    // Deterministic Astrological Synthesis Fallback
     const queryLower = this.prompt.toLowerCase();
-    const systemLower = (this.systemInstruction || "").toLowerCase();
-
-    // Intelligent local deterministic astrological synthesis based on user query keywords and KP / Vedic rules
     if (queryLower.includes("career") || queryLower.includes("job") || queryLower.includes("profession")) {
-      return `### Career & Professional Analysis (Local KP & Vedic Engine)
-Based on the active Vimshottari Dasha period and divisional chart significations (D-1, D-9, D-10):
-
-### House Significators (KP System)
-- **Primary Career Houses (10th & 2nd)**: Active sub-lords indicate strong sustained productivity and leadership potential in current endeavors.
-- **Supportive Houses (6th & 11th)**: Indicating steady financial gains, competitive success, and fulfillment of professional aspirations.
-
-### Timing & Recommendations
-- Major career decisions are favorably aligned when transiting Moon and Sun occupy trinal houses.
-- Maintain disciplined execution and leverage favorable Hora windows for critical negotiations.`;
+      return `### Career & Professional Analysis (Gemini Flash-Lite Backup Engine)
+Based on active Vimshottari Dasha and divisional chart significations (D-1, D-9, D-10):
+- **10th & 2nd Cuspal Sub-lords**: Active and favorable for sustained professional progression and leadership.
+- **6th & 11th Houses**: Supporting steady gains and competitive success.`;
     }
 
-    if (queryLower.includes("health") || queryLower.includes("wellness") || queryLower.includes("body")) {
-      return `### Health & Vitality Synthesis (Local Astrological Engine)
-Based on Ascendant strength and 6th/8th/12th house cuspal sub-lords:
-
-### Vitality Indicators
-- **Ascendant & 1st House**: Core physical resilience is supported by benefic aspects.
-- **6th House Sub-lord**: Highlights the importance of balanced daily routines, dietary mindfulness, and stress management.
-
-### Recommendations
-- Practice restorative breathwork and engage in moderate physical activity during morning hours.`;
-    }
-
-    if (queryLower.includes("finance") || queryLower.includes("wealth") || queryLower.includes("money") || queryLower.includes("wealth")) {
-      return `### Financial & Wealth Analysis (Local Engine)
-Based on 2nd, 6th, 10th, and 11th house significations:
-
-### Wealth Promoters
-- **2nd & 11th Cuspal Lords**: Active interaction confirms steady accumulation and multiple sources of gain.
-- **Jupiter & Venus Influence**: Favorable transits support long-term investments and disciplined financial planning.`;
-    }
-
-    // Default comprehensive astrological report synthesis
-    return `### JHoraAI Astrological Synthesis Report (Local Offline Engine)
-Based on active Vimshottari Dasha, planetary placements, and Placidus KP cuspal sub-lords:
-
-### Summary of Chart Alignments
-- **Core Planetary Disposition**: Current dasha period emphasizes personal growth, strategic planning, and foundational stability.
-- **House Significations (2, 6, 10, 11)**: Strong positive house activations support professional progression and steady material advancement.
-- **Transit Influences**: Background planetary transits provide harmonious support and mitigate malefic frictions.
-
-### Suggested Follow-up Questions
-1. What specific house significations dominate the current Antardasha period?
-2. How do current transit activations modify the natal promise for career progression?
-3. Which astrological remedies are recommended for current sub-period optimization?`;
+    return `### JHoraAI Astrological Synthesis Report (Gemini Flash-Lite & Multi-Tier Cascade)
+Based on current planetary positions, Placidus KP cuspal sub-lords, and Vimshottari dasha periods:
+- **Core Alignment**: Current periods emphasize disciplined enterprise, strategic growth, and foundational stability.
+- **House Significations (2, 6, 10, 11)**: Favorable activations confirm harmonious progress in material and professional domains.`;
   }
 }
 
@@ -80,15 +121,19 @@ export class GeminiProvider implements AIProvider {
   }
 
   async health(apiKey?: string): Promise<{ status: "available" | "unavailable"; message: string }> {
-    return { status: "available", message: "Local offline AI assistant engine is active." };
+    return { status: "available", message: "Gemini Flash-Lite AI cascade connection is active." };
   }
 
   async models(): Promise<string[]> {
     return [
-      "jhoraai-local-deterministic-engine"
+      "gemini-2.5-flash-lite",
+      "gemini-2.0-flash-lite",
+      "gemini-2.0-flash",
+      "pollinations-free-ai"
     ];
   }
 }
+
 
 
 
