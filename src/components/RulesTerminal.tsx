@@ -385,7 +385,7 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
           <div>
             <h3 className={`text-xl font-sans font-semibold flex items-center gap-2 ${textHeading}`}>
               <FileText className="w-5 h-5 text-indigo-400" />
-              Astrological Logic Gates & Rules Compiler
+              KP Book — Astrological Logic Gates & Rules Compiler
             </h3>
             <p className={`text-xs ${textMuted} mt-1`}>
               Configure absolute systems, logical trigger conditions, and target output gates across Parashari, KP, and Jaimini systems.
