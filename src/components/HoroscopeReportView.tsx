@@ -245,6 +245,8 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
     partner?: string;
   }>({});
   const [compilingStatus, setCompilingStatus] = useState<"idle" | "compiling" | "ready" | "error">("idle");
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string>("");
+  const [showRawJson, setShowRawJson] = useState<boolean>(false);
 
   const [selectedMahaIdx, setSelectedMahaIdx] = useState<number | null>(null);
   const [selectedAntarIdx, setSelectedAntarIdx] = useState<number | null>(null);
@@ -2457,6 +2459,16 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
           }`}
         >
           Transit
+        </button>
+        <button
+          onClick={() => setMajorTab("reports")}
+          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border-b-2 transition-all shrink-0 ${
+            majorTab === "reports"
+              ? "border-emerald-500 text-emerald-400 font-extrabold bg-emerald-500/10"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          My Reports
         </button>
       </div>
 
@@ -8536,6 +8548,279 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {majorTab === "reports" && (
+        <div className="space-y-6 animate-fade-in mt-6">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl border border-slate-800 bg-slate-900/20">
+            <div>
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <FileText className="w-5 h-5 text-emerald-400" />
+                My Astrological Reports Center
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">
+                Access and download high-resolution PDF exports and raw system telemetry payloads for <strong className="text-emerald-400">{birthDetails.name || "Vedic Native"}</strong>.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-[10px] font-mono text-slate-500">ENGINE STATUS:</span>
+              {compilingStatus === "compiling" ? (
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-mono bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center gap-1.5 animate-pulse">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  BACKGROUND COMPILING...
+                </span>
+              ) : compilingStatus === "ready" ? (
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-mono bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  ALL SYSTEMS READY
+                </span>
+              ) : (
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-mono bg-slate-500/10 border border-slate-500/30 text-slate-400 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  STANDBY
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* PDF Report Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Complete 360 Card */}
+            <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/30 hover:border-emerald-500/20 transition-all flex flex-col justify-between space-y-4">
+              <div className="space-y-2">
+                <span className="text-[9px] font-mono text-emerald-400 uppercase tracking-wider block">Comprehensive Export</span>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-emerald-400" />
+                  360° Astrological Systems Report
+                </h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  A complete, deep-dive document indexing all 19 system tables (JH1–JH19), detailed planetary coordinates, divisional charts (D1, D9, D10), KP significators, tropical transits, and esoteric calculations.
+                </p>
+              </div>
+              <div className="flex gap-2 pt-2">
+                {generatedPdfs.complete360 ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        const a = document.createElement("a");
+                        a.href = generatedPdfs.complete360!;
+                        a.download = `360_Astrological_Systems_Report_${birthDetails.name || "Nitin"}.pdf`;
+                        a.click();
+                      }}
+                      className="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </button>
+                    <button
+                      onClick={() => setPdfPreviewUrl(generatedPdfs.complete360 || "")}
+                      className="py-2 px-3 border border-slate-700 hover:border-slate-500 text-slate-300 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+                    >
+                      Preview
+                    </button>
+                  </>
+                ) : (
+                  <div className="text-slate-500 text-xs italic font-mono flex items-center gap-2">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-600" /> Preparing compiler...
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Authoritative Vedic Card */}
+            <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/30 hover:border-emerald-500/20 transition-all flex flex-col justify-between space-y-4">
+              <div className="space-y-2">
+                <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-wider block">Traditional Sastra</span>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Award className="w-4 h-4 text-indigo-400" />
+                  Authoritative Traditional Vedic Report
+                </h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Focuses on classical Vedic metrics, planetary strengths (Shadbala, Ishtaphala), Ashtakavarga charts, primary yogas, traditional doshas, and active dasha cycles (Vimshottari/Yogini).
+                </p>
+              </div>
+              <div className="flex gap-2 pt-2">
+                {generatedPdfs.vedic ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        const a = document.createElement("a");
+                        a.href = generatedPdfs.vedic!;
+                        a.download = `Traditional_Horoscope_Report_${birthDetails.name || "Nitin"}.pdf`;
+                        a.click();
+                      }}
+                      className="flex-1 py-2 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </button>
+                    <button
+                      onClick={() => setPdfPreviewUrl(generatedPdfs.vedic || "")}
+                      className="py-2 px-3 border border-slate-700 hover:border-slate-500 text-slate-300 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+                    >
+                      Preview
+                    </button>
+                  </>
+                ) : (
+                  <div className="text-slate-500 text-xs italic font-mono flex items-center gap-2">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-600" /> Preparing compiler...
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Marriage Promise Card */}
+            <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/30 hover:border-emerald-500/20 transition-all flex flex-col justify-between space-y-4">
+              <div className="space-y-2">
+                <span className="text-[9px] font-mono text-pink-400 uppercase tracking-wider block">Relationship Diagnostics</span>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-pink-400" />
+                  Vedic Marriage Promise Report
+                </h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Evaluates marital suitability, timing promise for marriage, separation indices, and compatibility matching using planetary alignments and divisional dynamics.
+                </p>
+              </div>
+              <div className="flex gap-2 pt-2">
+                {generatedPdfs.marriage ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        const a = document.createElement("a");
+                        a.href = generatedPdfs.marriage!;
+                        a.download = `Vedic_Marriage_Promise_Report_${birthDetails.name || "Nitin"}.pdf`;
+                        a.click();
+                      }}
+                      className="flex-1 py-2 px-3 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </button>
+                    <button
+                      onClick={() => setPdfPreviewUrl(generatedPdfs.marriage || "")}
+                      className="py-2 px-3 border border-slate-700 hover:border-slate-500 text-slate-300 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+                    >
+                      Preview
+                    </button>
+                  </>
+                ) : (
+                  <div className="text-slate-500 text-xs italic font-mono flex items-center gap-2">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-600" /> Preparing compiler...
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Partner Diagnostic Card */}
+            <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/30 hover:border-emerald-500/20 transition-all flex flex-col justify-between space-y-4">
+              <div className="space-y-2">
+                <span className="text-[9px] font-mono text-cyan-400 uppercase tracking-wider block">Synastry & Harmony</span>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-cyan-400" />
+                  Complete Partner Compatibility
+                </h3>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Interactive multi-system evaluation including composite charts, aspect alignments, house triggers, and overall relational health scores.
+                </p>
+              </div>
+              <div className="flex gap-2 pt-2">
+                {generatedPdfs.partner ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        const a = document.createElement("a");
+                        a.href = generatedPdfs.partner!;
+                        a.download = `Complete_Partner_Compatibility_${birthDetails.name || "Nitin"}.pdf`;
+                        a.click();
+                      }}
+                      className="flex-1 py-2 px-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Download PDF
+                    </button>
+                    <button
+                      onClick={() => setPdfPreviewUrl(generatedPdfs.partner || "")}
+                      className="py-2 px-3 border border-slate-700 hover:border-slate-500 text-slate-300 rounded-lg text-xs font-semibold transition-all cursor-pointer"
+                    >
+                      Preview
+                    </button>
+                  </>
+                ) : (
+                  <div className="text-slate-500 text-xs italic font-mono flex items-center gap-2">
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-slate-600" /> Preparing compiler...
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* PDF Previewer Pane */}
+          {pdfPreviewUrl && (
+            <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/30 space-y-4 animate-fade-in">
+              <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 className="text-xs font-mono text-emerald-400 uppercase tracking-wider font-extrabold flex items-center gap-2">
+                  <FileText className="w-4 h-4" /> Live PDF Report Previewer
+                </h3>
+                <button
+                  onClick={() => setPdfPreviewUrl("")}
+                  className="text-[11px] font-mono text-rose-400 hover:text-rose-300 hover:underline cursor-pointer"
+                >
+                  Close Preview
+                </button>
+              </div>
+              <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-950/40">
+                <iframe
+                  src={pdfPreviewUrl}
+                  className="w-full h-[650px] bg-slate-950/20"
+                  title="PDF Preview"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Raw JSON Inspect & Download Hub */}
+          <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/30 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-3">
+              <div>
+                <h3 className="text-xs font-mono text-slate-300 uppercase tracking-wider font-extrabold flex items-center gap-2">
+                  <Cpu className="w-4 h-4 text-cyan-400" /> Complete Raw JSON Payload Inspect & Download Hub
+                </h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Inspect and download the underlying raw JSON payload conforming to the Astro systems registry schema.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  const payload = profileJson || astrologyData;
+                  const jsonStr = JSON.stringify(payload, null, 2);
+                  const blob = new Blob([jsonStr], { type: "application/json" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `Vedic_Native_Profile_Raw_${Date.now()}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="py-1.5 px-3 border border-slate-700 hover:border-slate-500 text-slate-300 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 font-mono shrink-0 cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" /> Download JSON Payload
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-[10px] font-mono text-slate-400">RAW ACTIVE PROFILE PAYLOAD (JH1-JH19 MAPPED)</span>
+                <button
+                  onClick={() => setShowRawJson(!showRawJson)}
+                  className="text-[10px] font-mono text-amber-500 hover:text-amber-400 hover:underline cursor-pointer"
+                >
+                  {showRawJson ? "Collapse Viewer" : "Expand Payload Viewer"}
+                </button>
+              </div>
+              {showRawJson && (
+                <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/60 font-mono text-[10px] text-emerald-400 overflow-auto max-h-[400px]">
+                  <pre>{JSON.stringify(profileJson || astrologyData, null, 2)}</pre>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
