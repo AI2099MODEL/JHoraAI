@@ -56,6 +56,51 @@ const ZODIAC_SIGNS = [
   "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
 ];
 
+// Sequential Git Command Queue to serialize all Git writes, commits and pushes and handle lock concurrency
+interface GitQueueItem {
+  cmd: string;
+  callback?: (err: Error | null, stdout: string, stderr: string) => void;
+}
+const gitQueue: GitQueueItem[] = [];
+let gitQueueProcessing = false;
+
+function processGitQueue() {
+  if (gitQueueProcessing || gitQueue.length === 0) return;
+  gitQueueProcessing = true;
+  
+  const item = gitQueue.shift()!;
+  
+  const attemptRun = (retriesLeft: number) => {
+    exec(item.cmd, (err, stdout, stderr) => {
+      if (err) {
+        const errMsg = err.message || "";
+        const isLockError = errMsg.includes("lock") || errMsg.includes("index.lock") || errMsg.includes("Resource temporarily unavailable");
+        if (isLockError && retriesLeft > 0) {
+          console.log(`[Git Queue] Detected lock error for command "${item.cmd}", retrying in 1000ms. Retries left: ${retriesLeft}`);
+          setTimeout(() => attemptRun(retriesLeft - 1), 1000);
+          return;
+        }
+        
+        console.warn(`[Git Queue Error] Command failed: "${item.cmd}". Error: ${err.message}`);
+        if (item.callback) item.callback(err, stdout || "", stderr || "");
+      } else {
+        if (item.callback) item.callback(null, stdout || "", stderr || "");
+      }
+      
+      // Process next item in queue
+      gitQueueProcessing = false;
+      setTimeout(processGitQueue, 100);
+    });
+  };
+  
+  attemptRun(5); // retry up to 5 times for any locked index situations
+}
+
+function enqueueGitCommand(cmd: string, callback?: (err: Error | null, stdout: string, stderr: string) => void) {
+  gitQueue.push({ cmd, callback });
+  processGitQueue();
+}
+
 // Lazy-initialize OpenAI API client to avoid startup crashes if key is missing
 let openaiClient: OpenAI | null = null;
 function getOpenAIClient(req?: any): OpenAI {
@@ -196,12 +241,12 @@ function saveUserAnalysisToFolder(userName: string, analysisText: string, astrol
     console.log(`[Analysis Save] Saved analysis for ${userName} to analysis/ folder.`);
     
     // Stage, commit and push to git asynchronously
-    exec(`git add analysis/${normName}_analysis.md analysis/${normName}_data.json && (git diff-index --quiet HEAD || git commit -m "feat(analysis): update stored analysis for ${userName}")`, (err, stdout, stderr) => {
+    enqueueGitCommand(`git add analysis/${normName}_analysis.md analysis/${normName}_data.json && (git diff-index --quiet HEAD || git commit -m "feat(analysis): update stored analysis for ${userName}")`, (err, stdout, stderr) => {
       if (err) {
         console.warn("[Analysis Git Commit Warning]", err.message);
       } else {
         console.log("[Analysis Git Commit Success]");
-        exec("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
+        enqueueGitCommand("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
           if (pushErr) {
             console.error("[Analysis Git Push Warning]", pushErr.message);
           } else {
@@ -439,13 +484,13 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
       fs.writeFileSync(dynamicFilePath, JSON.stringify(profileData, null, 2));
       console.log(`[Git Sync] Written Users/userprofile.json and Users/${dynamicName} for profile: ${profileName}`);
 
-      exec(`git add Users/userprofile.json Users/${dynamicName} && (git diff-index --quiet HEAD || git commit -m "feat: activate user profile ${profileName}")`, (err, stdout, stderr) => {
+      enqueueGitCommand(`git add Users/userprofile.json Users/${dynamicName} && (git diff-index --quiet HEAD || git commit -m "feat: activate user profile ${profileName}")`, (err, stdout, stderr) => {
         if (err) {
           console.warn("[Git Sync Add Local Warning - could not commit locally]", err.message);
         } else {
           console.log("[Git Sync Add Local Success] Profile committed locally.");
           // Attempt push as a separate, fully graceful operation
-          exec("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
+          enqueueGitCommand("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
             if (pushErr) {
               console.info("[Git Sync Push Notice] Git push skipped/unauthenticated. Profile is securely saved locally and committed to Git.");
             } else {
@@ -503,13 +548,13 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
 
         if (deletedAny && filesToGitRm.length > 0) {
           const filesStr = filesToGitRm.join(" ");
-          exec(`git rm ${filesStr} && (git diff-index --quiet HEAD || git commit -m "feat: deactivate user profile ${profileName}")`, (err, stdout, stderr) => {
+          enqueueGitCommand(`git rm ${filesStr} && (git diff-index --quiet HEAD || git commit -m "feat: deactivate user profile ${profileName}")`, (err, stdout, stderr) => {
             if (err) {
               console.warn("[Git Sync Delete Local Warning]", err.message);
             } else {
               console.log("[Git Sync Delete Local Success] Deactivation committed locally.");
               // Attempt push as a separate, fully graceful operation
-              exec("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
+              enqueueGitCommand("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
                 if (pushErr) {
                   console.info("[Git Sync Push Notice] Git push skipped/unauthenticated. Deactivation is securely saved locally and committed to Git.");
                 } else {
@@ -625,13 +670,13 @@ app.post("/api/user-profile/index-table", async (req, res) => {
     }
 
     // Git Operations: commit and push
-    exec(`git add Users/userprofile.json Users/${dynamicName} documents/master_astro_handbook.md && (git diff-index --quiet HEAD || git commit -m "feat: index ${tableId} for profile ${fallbackName}")`, (err, stdout, stderr) => {
+    enqueueGitCommand(`git add Users/userprofile.json Users/${dynamicName} documents/master_astro_handbook.md && (git diff-index --quiet HEAD || git commit -m "feat: index ${tableId} for profile ${fallbackName}")`, (err, stdout, stderr) => {
       if (err) {
         console.warn("[Table Index Git Commit Warning]", err.message);
       } else {
         console.log("[Table Index Git Commit Success]");
         // Push HEAD to origin
-        exec("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
+        enqueueGitCommand("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
           if (pushErr) {
             console.error("[Table Index Git Push Warning]", pushErr.message);
           } else {
@@ -3069,12 +3114,12 @@ function runAnalysisSyncAgentForProfile(profile: any, filename?: string) {
     console.log(`[Analysis Sync Agent] Saved dynamic_data.json for profile ${profileName}`);
 
     // Commit and push asynchronously to keep Git repository perfectly up-to-date
-    exec(`git add analysis/${profileFolder}/static_data.json analysis/${profileFolder}/dynamic_data.json && (git diff-index --quiet HEAD || git commit -m "feat(analysis): update static and dynamic logs for ${profileName}")`, (err) => {
+    enqueueGitCommand(`git add analysis/${profileFolder}/static_data.json analysis/${profileFolder}/dynamic_data.json && (git diff-index --quiet HEAD || git commit -m "feat(analysis): update static and dynamic logs for ${profileName}")`, (err, stdout, stderr) => {
       if (err) {
         console.warn("[Analysis Git Warning]", err.message);
       } else {
         console.log(`[Analysis Git Success] Committed static/dynamic analysis files for ${profileName}.`);
-        exec("git push origin HEAD", (pushErr) => {
+        enqueueGitCommand("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
           if (pushErr) {
             console.warn("[Analysis Push Warning] push skipped/unauthenticated.");
           } else {
