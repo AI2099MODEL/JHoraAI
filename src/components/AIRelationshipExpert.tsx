@@ -27,7 +27,8 @@ import {
   Smile,
   ShieldCheck,
   BrainCircuit,
-  CornerDownRight
+  CornerDownRight,
+  Scale
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { calculateUnifiedRelationshipEvidence, UnifiedEvidenceObject } from "../lib/rules/unifiedRelationshipEvidenceEngine";
@@ -253,6 +254,7 @@ You can ask me follow-up questions, or use the quick command shortcuts below (e.
     { id: "Arranged Marriage", label: "Arranged Marriage", icon: Compass },
     { id: "Marriage Delay", label: "Delay Analysis", icon: Calendar },
     { id: "Divorce", label: "Divorce Analysis", icon: Ban },
+    { id: "Divorce Litigation", label: "Divorce Litigation", icon: Scale },
     { id: "Remarriage", label: "Remarriage Analysis", icon: Sparkles },
     { id: "Spouse Nature", label: "Spouse Analysis", icon: Smile },
     { id: "Marriage Happiness", label: "Relationship Happiness", icon: Sparkles },

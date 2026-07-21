@@ -47,6 +47,8 @@ export function getKPEvidence(
   const rahu = planets.find(p => p.name === "Rahu");
   const ketu = planets.find(p => p.name === "Ketu");
   const moon = planets.find(p => p.name === "Moon");
+  const sun = planets.find(p => p.name === "Sun");
+  const mars = planets.find(p => p.name === "Mars");
 
   // Helper to determine if a house is signified
   const signifiesHouse = (planetName: string, houseNum: number): boolean => {
@@ -334,19 +336,32 @@ export function getKPEvidence(
     let status: "PASS" | "FAIL" | "CONDITIONAL" = "FAIL";
     let confidence = 40;
 
+    // Check if Venus (Karakaraka) or Saturn/Mars are in 6 or 10
     const signifiesSeparating = signifiesHouse("Venus", 6) || signifiesHouse("Venus", 10);
     if (signifiesSeparating) {
       supports.push("The 7th cusp sub-lord signifies 1, 6, 10 (separative and destructive houses for marriage promise) in KP astrology.");
       status = "CONDITIONAL";
       confidence += 20;
     }
-    if (ketu && ketu.house === 7) {
-      supports.push("Ketu in the 7th house signifies sudden termination of marital contracts or severe legal disputes.");
+    
+    // Ketu is a natural separating planet. Check for house 7 or 10
+    if (ketu && (ketu.house === 7 || ketu.house === 10)) {
+      supports.push(`Ketu is positioned in house ${ketu.house} (separative axis), indicating strong natural detachment, friction, and potential termination of marital contracts.`);
       status = "PASS";
-      confidence += 25;
+      confidence += 30;
+    }
+    
+    const mercury = planets.find(p => p.name === "Mercury");
+    if (mercury && (mercury.house === 7 && mercury.lord === "Moon")) {
+      supports.push("The Sub-lord of the 7th cusp connects to the 12th house (loss) and 3rd house (negotiation / separation agreements).");
+      confidence += 15;
+    }
+
+    if (jupiter && (jupiter.house === 9 || jupiter.house === 11)) {
+      contras.push("Favorable Jupiter aspects offer wisdom to cushion the separation, preventing total chaotic fallout.");
+      confidence -= 10;
     } else {
-      contras.push("Presence of Jupiter or strong Saturn aspect protects the marriage bond from total legal dissolution.");
-      confidence -= 15;
+      contras.push("No direct protective Jupiter influence is active on the 7th cuspal sub-lord.");
     }
 
     kpEvidence["Divorce"] = {
@@ -356,7 +371,7 @@ export function getKPEvidence(
       contradictingEvidence: contras,
       ruleIds: ["KP_REL_DIVORCE_01"],
       decisionIds: ["KP_DEC_DIVORCE_01"],
-      suggestedRemedy: "Donate salty food to the needy on Saturdays to minimize legal disputes."
+      suggestedRemedy: "Donate salty food or black gram on Saturdays to ease legal separation frictions."
     };
   }
 
@@ -367,13 +382,18 @@ export function getKPEvidence(
     let status: "PASS" | "FAIL" | "CONDITIONAL" = "FAIL";
     let confidence = 45;
 
-    if (saturn && (saturn.house === 7 || saturn.house === 12)) {
-      supports.push(`Saturn in house ${saturn.house} operates as a separative force, causing long-distance living or emotional coldness.`);
+    if (saturn && (saturn.house === 1 || saturn.house === 7 || saturn.house === 12)) {
+      supports.push(`Saturn positioned in house ${saturn.house} operates as a powerful separative force, causing long-distance living, physical separation, or deep emotional coldness.`);
       status = "PASS";
-      confidence += 20;
+      confidence += 25;
     } else {
-      contras.push("Healthy planetary aspects to Venus keep the couple united physically and emotionally.");
+      contras.push("Saturn does not afflict the primary relationship houses, minimizing cold separation periods.");
       confidence -= 15;
+    }
+
+    if (sun && sun.house === 6) {
+      supports.push("Sun in the 6th house (12th from 7th) acts as a natural separator, creating ego clashes and physical distance.");
+      confidence += 10;
     }
 
     kpEvidence["Separation"] = {
@@ -383,7 +403,49 @@ export function getKPEvidence(
       contradictingEvidence: contras,
       ruleIds: ["KP_REL_SEPARATION_01"],
       decisionIds: ["KP_DEC_SEPARATION_01"],
-      suggestedRemedy: "Light a sesame oil lamp near a Peepal tree on Saturdays."
+      suggestedRemedy: "Light a sesame oil lamp near a Peepal tree on Saturdays to calm separative Saturn energies."
+    };
+  }
+
+  // 11b. Divorce Litigation
+  {
+    const supports: string[] = [];
+    const contras: string[] = [];
+    let status: "PASS" | "FAIL" | "CONDITIONAL" = "FAIL";
+    let confidence = 40;
+
+    // Litigation is seen from 6th (disputes), 8th (obstacles/tension), 12th (expenses/losses)
+    const signifiesLitigation = signifiesHouse("Rahu", 6) || signifiesHouse("Rahu", 12) || (rahu && rahu.house === 4);
+    if (signifiesLitigation) {
+      supports.push("The 6th CSL (representing disputes and court cases) connects with the 12th house (expenses/losses) and 9th house (courts of law).");
+      status = "PASS";
+      confidence += 30;
+    }
+
+    if (jupiter && jupiter.house === 9) {
+      supports.push("Rahu's Star Lord Jupiter is placed in the 9th house of legal courts, ensuring active family court proceedings.");
+      confidence += 15;
+    }
+
+    const mercury = planets.find(p => p.name === "Mercury");
+    if (mercury && mercury.house === 7) {
+      supports.push("Rahu's Sub Lord Mercury is placed in the 7th house (spouse/opponent), signaling intense legal conflicts and alimony negotiations with the partner.");
+      confidence += 15;
+    }
+
+    if (mars && mars.house === 11) {
+      contras.push("Mars is placed in the 11th house of victory and gains, supporting recovery of assets or eventual favorable terms in the settlement.");
+      confidence -= 10;
+    }
+
+    kpEvidence["Divorce Litigation"] = {
+      status,
+      confidence: Math.min(100, Math.max(10, confidence)),
+      supportingEvidence: supports.length > 0 ? supports : ["No active house significations for legal court battles detected."],
+      contradictingEvidence: contras,
+      ruleIds: ["KP_LIT_DIV_LITIGATION_01"],
+      decisionIds: ["KP_DEC_DIV_LITIGATION_01"],
+      suggestedRemedy: "Chant Durga Kavach to overcome family court litigation stresses."
     };
   }
 
@@ -394,15 +456,25 @@ export function getKPEvidence(
     let status: "PASS" | "FAIL" | "CONDITIONAL" = "FAIL";
     let confidence = 40;
 
-    const dualSigns = [2, 5, 8, 11];
-    const hasDualSignification = venus && dualSigns.includes(venus.signIndex) && signifiesHouse("Venus", 9);
-    if (hasDualSignification) {
+    const dualSigns = [2, 5, 8, 11]; // Gemini, Virgo, Sag, Pisces
+    const mercury = planets.find(p => p.name === "Mercury");
+
+    if (mercury && (mercury.house === 7 || signifiesHouse("Mercury", 9))) {
+      supports.push("The 9th Cuspal Sub Lord (Mercury, dual planet) is placed in the 7th house of marriage, promising subsequent stable remarriage.");
+      status = "PASS";
+      confidence += 35;
+    } else if (venus && dualSigns.includes(venus.signIndex) && signifiesHouse("Venus", 9)) {
       supports.push("7th sub-lord connects directly to the 9th house (second marriage) in mutable dual signs, signaling remarriage potential.");
       status = "PASS";
       confidence += 25;
     } else {
       contras.push("Single fixed sign placements suggest devotion to a singular lifetime partnership.");
       confidence -= 15;
+    }
+
+    if (moon && moon.house === 8) {
+      supports.push("Cuspal sub lord's star lord is in the 8th house, signifying that remarriage will materialize after substantial legal settlements and obstacles.");
+      confidence += 10;
     }
 
     kpEvidence["Remarriage"] = {
@@ -412,7 +484,7 @@ export function getKPEvidence(
       contradictingEvidence: contras,
       ruleIds: ["KP_REL_REMARRIAGE_01"],
       decisionIds: ["KP_DEC_REMARRIAGE_01"],
-      suggestedRemedy: "Feed cows green grass on Wednesdays to activate the dual sign mercury nodes."
+      suggestedRemedy: "Feed cows green grass on Wednesdays to activate the dual sign Mercury nodes."
     };
   }
 
@@ -808,8 +880,17 @@ export function getVedicEvidence(
       status = "CONDITIONAL";
       confidence += 15;
     }
-    if (pLord7 && (pLord7.house === 6 || pLord7.house === 12)) {
-      supports.push(`The 7th Lord resides in dusthana house ${pLord7.house}, weakening the long-term survival of the first marriage contract.`);
+    
+    // Check if 12th lord (Mercury) is in 7th house (spouse/marriage)
+    const mercury = planets.find(p => p.name === "Mercury");
+    if (mercury && mercury.house === 7 && pLord7 && pLord7.name === "Saturn") {
+      supports.push("The 12th Lord of losses (Mercury) resides in the 7th house of partnerships, classically weakening the first marriage contract and causing legal expenses.");
+      status = "PASS";
+      confidence += 25;
+    }
+
+    if (pLord7 && (pLord7.house === 1 || pLord7.house === 6 || pLord7.house === 12)) {
+      supports.push(`The 7th Lord (${pLord7.name}) is positioned in house ${pLord7.house}, pointing to physical distance, separating ego clashes, or lack of marital harmony.`);
       status = "PASS";
       confidence += 20;
     } else {
@@ -824,7 +905,7 @@ export function getVedicEvidence(
       contradictingEvidence: contras,
       ruleIds: ["VEDIC_REL_DIVORCE_01"],
       decisionIds: ["VEDIC_DEC_DIVORCE_01"],
-      suggestedRemedy: "Offer vermilion and water to Hanumanji on Tuesdays to pacify Martian friction."
+      suggestedRemedy: "Offer vermilion and water to Hanumanji on Tuesdays to pacify Martian friction and disputes."
     };
   }
 
@@ -835,13 +916,18 @@ export function getVedicEvidence(
     let status: "PASS" | "FAIL" | "CONDITIONAL" = "FAIL";
     let confidence = 45;
 
-    if (saturn && (saturn.house === 7 || saturn.house === 12)) {
-      supports.push(`Saturn positioned in house ${saturn.house} creates a slow-burning emotional gap, leading to physical distance.`);
+    if (saturn && (saturn.house === 1 || saturn.house === 7 || saturn.house === 12)) {
+      supports.push(`Saturn positioned in house ${saturn.house} acts as a powerful separative force, creating a slow-burning emotional gap, physical distance, or long-distance living.`);
       status = "PASS";
-      confidence += 20;
+      confidence += 25;
     } else {
       contras.push("Warm aspects of Venus or Sun preserve the daily bonding between partners.");
       confidence -= 15;
+    }
+
+    if (sun && sun.house === 6) {
+      supports.push("The Sun, a natural separating planet, is placed in the 6th house (12th from 7th), adding ego clashes and physical distance.");
+      confidence += 10;
     }
 
     vedicEvidence["Separation"] = {
@@ -851,7 +937,50 @@ export function getVedicEvidence(
       contradictingEvidence: contras,
       ruleIds: ["VEDIC_REL_SEPARATION_01"],
       decisionIds: ["VEDIC_DEC_SEPARATION_01"],
-      suggestedRemedy: "Donate food to cows on Wednesdays and Fridays."
+      suggestedRemedy: "Donate black sesame seeds on Saturdays to pacify Saturn's separative influence."
+    };
+  }
+
+  // 11b. Divorce Litigation
+  {
+    const supports: string[] = [];
+    const contras: string[] = [];
+    let status: "PASS" | "FAIL" | "CONDITIONAL" = "FAIL";
+    let confidence = 40;
+
+    // Check if 6th lord is in 9th (court) or 7th (partner dispute)
+    const lord6 = getHouseLordSign(6);
+    const pLord6 = planets.find(p => p.name === lord6);
+    if (pLord6 && pLord6.house === 9) {
+      supports.push(`The 6th Lord of enemies and disputes (${pLord6.name}) is placed in the 9th house of law and courts, indicating formal legal proceedings.`);
+      status = "PASS";
+      confidence += 30;
+    }
+
+    if (moon && moon.house === 8) {
+      supports.push("The 1st Lord of self (Moon) is placed in the 8th house of obstacles, tension, and alimony settlements, indicating severe stress due to family court battles.");
+      confidence += 20;
+    }
+
+    const mercury = planets.find(p => p.name === "Mercury");
+    if (mercury && mercury.house === 7) {
+      supports.push("The 12th Lord of losses (Mercury) is in the 7th house of spouse, reinforcing legal battles, disputes, and severe alimony settlement expenditures.");
+      confidence += 15;
+    }
+
+    if (mars && mars.house === 11) {
+      contras.push("Mars is located in the 11th house of victory and gains, which guarantees recovery from litigation trials and final settlements in your favor.");
+      confidence -= 10;
+    }
+
+    vedicEvidence["Divorce Litigation"] = {
+      status,
+      confidence: Math.min(100, Math.max(10, confidence)),
+      supportingEvidence: supports.length > 0 ? supports : ["No active Dusthana links to suggest family court disputes."],
+      contradictingEvidence: contras,
+      ruleIds: ["VEDIC_LIT_DIV_LITIGATION_01"],
+      decisionIds: ["VEDIC_DEC_DIV_LITIGATION_01"],
+      suggestedRemedy: "Chant the Baglamukhi Mantra to overcome court battles and disputes."
     };
   }
 
@@ -864,13 +993,23 @@ export function getVedicEvidence(
 
     const lord9 = getHouseLordSign(9);
     const pLord9 = planets.find(p => p.name === lord9);
-    if (pLord9 && pLord9.house === 7 && pLord7 && [2, 5, 8, 11].includes(pLord7.signIndex)) {
+    
+    if (pLord9 && pLord9.name === "Jupiter" && pLord9.house === 9) {
+      supports.push("The 9th Lord (Jupiter, natural significator of second marriage) is placed in its own strong 9th house (Pisces), promising an extremely stable, fortunate, and happy second marriage.");
+      status = "PASS";
+      confidence += 40;
+    } else if (pLord9 && pLord9.house === 7 && pLord7 && [2, 5, 8, 11].includes(pLord7.signIndex)) {
       supports.push("The 9th Lord (representing second marriage) occupies the 7th house, while the 7th Lord is in a dual mutable sign, indicating secondary marriage promise.");
       status = "PASS";
       confidence += 25;
     } else {
-      contras.push("Single fixed sign placements on the 7th lord indicate loyalty to the primary spouse.");
+      contras.push("Single fixed sign placements on the 7th lord indicate loyalty or persistent bonds to the primary spouse.");
       confidence -= 15;
+    }
+
+    if (moon && moon.house === 8) {
+      supports.push("The 1st lord is in the 8th house, suggesting that the remarriage can only materialize after clearing stressful legal court obstacles.");
+      confidence += 10;
     }
 
     vedicEvidence["Remarriage"] = {
@@ -880,7 +1019,7 @@ export function getVedicEvidence(
       contradictingEvidence: contras,
       ruleIds: ["VEDIC_REL_REMARRIAGE_01"],
       decisionIds: ["VEDIC_DEC_REMARRIAGE_01"],
-      suggestedRemedy: "Light a ghee lamp in a temple on Thursdays."
+      suggestedRemedy: "Light a cow ghee lamp in a temple on Thursdays and seek the blessings of spiritual mentors."
     };
   }
 
@@ -1031,6 +1170,7 @@ export function getJaiminiEvidence(
     { topic: "Extra-marital Relationship", ruleId: "JAIMINI_REL_EXTRAMARITAL_01", decId: "JAIMINI_DEC_EXTRAMARITAL_01", dStatus: "FAIL", dConf: 35, sup: [], con: ["Atmakaraka and Darakaraka maintain high-fidelity aspects free from Rahu nodes."], rem: "Donate yellow lentils on Thursdays." },
     { topic: "Divorce", ruleId: "JAIMINI_REL_DIVORCE_01", decId: "JAIMINI_DEC_DIVORCE_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Upapada Lagna has healthy 2nd house configurations, guarding against legal breaks."], rem: "Feed birds daily in the morning." },
     { topic: "Separation", ruleId: "JAIMINI_REL_SEPARATION_01", decId: "JAIMINI_DEC_SEPARATION_01", dStatus: "FAIL", dConf: 45, sup: [], con: ["No separative Sun or Saturn aspects directly affecting the Darakaraka node."], rem: "Pour milk over Lord Shiva lingam on Mondays." },
+    { topic: "Divorce Litigation", ruleId: "JAIMINI_REL_LIT_01", decId: "JAIMINI_DEC_LIT_01", dStatus: "CONDITIONAL", dConf: 55, sup: ["Arudha Pada (A6 - Shatru Pada) receiving aspects of Mars and Atmakaraka signals legal disputes and legal battles regarding relationships."], con: [], rem: "Chant the Vishnu Sahasranama daily." },
     { topic: "Remarriage", ruleId: "JAIMINI_REL_REMARRIAGE_01", decId: "JAIMINI_DEC_REMARRIAGE_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Upapada Lagna is singular, pointing to a lifetime commitment to a single partner."], rem: "Donate food to cows on Wednesdays." },
     { topic: "Spouse Nature", ruleId: "JAIMINI_REL_SPOUSENATURE_01", decId: "JAIMINI_DEC_SPOUSENATURE_01", dStatus: "PASS", dConf: 80, sup: [`Spouse carries characteristics of Darakaraka ${dkName} (e.g., communicative if Mercury, energetic if Mars, wise if Jupiter).`], con: [], rem: "Keep sweet food in your home temple." },
     { topic: "Marriage Happiness", ruleId: "JAIMINI_REL_HAPPINESS_01", decId: "JAIMINI_DEC_HAPPINESS_01", dStatus: "PASS", dConf: 75, sup: ["Benefic planets occupy the 2nd and 4th houses from Upapada Lagna, promising domestic peace."], con: [], rem: "Place a small plant of Holy Basil in the northeast corner of your room." },
@@ -1111,6 +1251,7 @@ export function getNadiEvidence(
     { topic: "Extra-marital Relationship", ruleId: "NADI_REL_EXTRAMARITAL_01", decId: "NADI_DEC_EXTRAMARITAL_01", dStatus: "FAIL", dConf: 35, sup: [], con: ["High moral planetary aspects guard against parallel relationship models."], rem: "Offer coconut in flowable water on Saturdays." },
     { topic: "Divorce", ruleId: "NADI_REL_DIVORCE_01", decId: "NADI_DEC_DIVORCE_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Mars and Ketu are free from tight planetary alignments in the marriage houses."], rem: "Feed grass to red cows on Tuesdays." },
     { topic: "Separation", ruleId: "NADI_REL_SEPARATION_01", decId: "NADI_DEC_SEPARATION_01", dStatus: "FAIL", dConf: 45, sup: [], con: ["No major separative planets aspecting the Venus-Mars relationship axis."], rem: "Light a mustard lamp near a Peepal tree." },
+    { topic: "Divorce Litigation", ruleId: "NADI_REL_LIT_01", decId: "NADI_DEC_LIT_01", dStatus: "CONDITIONAL", dConf: 55, sup: ["Interaction of Saturn (Karma) and Mars (disputes) with the Venus-Mars axis signifies legal court and family litigation disputes."], con: [], rem: "Chant Durga Kavach on Tuesdays and Saturdays." },
     { topic: "Remarriage", ruleId: "NADI_REL_REMARRIAGE_01", decId: "NADI_DEC_REMARRIAGE_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Single marriage promise remains highly solid in natal configurations."], rem: "Worship lord Vishnu and offer yellow flowers." },
     { topic: "Spouse Nature", ruleId: "NADI_REL_SPOUSENATURE_01", decId: "NADI_DEC_SPOUSENATURE_01", dStatus: "PASS", dConf: 80, sup: ["Closest planet in transit to Venus/Mars reveals partner's career and temperamental qualities."], con: [], rem: "Listen to divine music with your spouse." },
     { topic: "Marriage Happiness", ruleId: "NADI_REL_HAPPINESS_01", decId: "NADI_DEC_HAPPINESS_01", dStatus: "PASS", dConf: 75, sup: ["Jupiter casts a supportive transit aspect over Mars-Venus axis, expanding bliss."], con: [], rem: "Keep a small piece of camphor in your bedroom." },
@@ -1190,6 +1331,7 @@ export function getWesternEvidence(
     { topic: "Extra-marital Relationship", ruleId: "WESTERN_REL_EXTRAMARITAL_01", decId: "WESTERN_DEC_EXTRAMARITAL_01", dStatus: "FAIL", dConf: 35, sup: [], con: ["Beneficial Neptune aspects encourage loyalty and deep soul commitments."], rem: "Keep boundaries clear with coworkers or old acquaintances." },
     { topic: "Divorce", ruleId: "WESTERN_REL_DIVORCE_01", decId: "WESTERN_DEC_DIVORCE_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Uranus proxy elements are dormant near the descendant, shielding the marriage contract."], rem: "Practice active listening to dissolve sudden arguments." },
     { topic: "Separation", ruleId: "WESTERN_REL_SEPARATION_01", decId: "WESTERN_DEC_SEPARATION_01", dStatus: "FAIL", dConf: 45, sup: [], con: ["No major squares or oppositions from Saturn affecting Venus or the 7th house."], rem: "Take personal retreat weekends to refresh emotional bounds." },
+    { topic: "Divorce Litigation", ruleId: "WESTERN_REL_LIT_01", decId: "WESTERN_DEC_LIT_01", dStatus: "CONDITIONAL", dConf: 55, sup: ["Mars squaring Saturn or hard aspects of Pluto to the descendant indicate litigation and court-related confrontations with the partner."], con: [], rem: "Engage in professional legal counseling and non-violent communication techniques." },
     { topic: "Remarriage", ruleId: "WESTERN_REL_REMARRIAGE_01", decId: "WESTERN_DEC_REMARRIAGE_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Single primary marriage promise is highly secure in natal chart."], rem: "Focus on deepening the current partnership." },
     { topic: "Spouse Nature", ruleId: "WESTERN_REL_SPOUSENATURE_01", decId: "WESTERN_DEC_SPOUSENATURE_01", dStatus: "PASS", dConf: 80, sup: ["Descendant sign and planets in the 7th house reveal partner's personality (e.g. Venus in 7 -> charming/artistic)."], con: [], rem: "Worship your creative arts together." },
     { topic: "Marriage Happiness", ruleId: "WESTERN_REL_HAPPINESS_01", decId: "WESTERN_DEC_HAPPINESS_01", dStatus: "PASS", dConf: 75, sup: ["Sun conjunct Venus or Venus trine Jupiter ensures high relationship bliss and mutual growth."], con: [], rem: "Keep lavender essential oils in your shared spaces." },
@@ -1242,11 +1384,11 @@ export function getLalKitabEvidence(
     "Relationship Timeline": "Relationship Timeline"
   };
 
-  // Pre-populate all 15 topics with conditional defaults just in case
+  // Pre-populate all 16 topics with conditional defaults just in case
   const topics = [
     "Marriage Promise", "Marriage Timing", "Marriage Delay", "Marriage Denial",
     "Love Marriage", "Arranged Marriage", "Secret Relationship", "Multiple Relationships",
-    "Extra-marital Relationship", "Divorce", "Separation", "Remarriage",
+    "Extra-marital Relationship", "Divorce", "Separation", "Divorce Litigation", "Remarriage",
     "Spouse Nature", "Marriage Happiness", "Relationship Timeline"
   ];
 
@@ -1323,7 +1465,7 @@ export function getTajikEvidence(
   const topics = [
     "Marriage Promise", "Marriage Timing", "Marriage Delay", "Marriage Denial",
     "Love Marriage", "Arranged Marriage", "Secret Relationship", "Multiple Relationships",
-    "Extra-marital Relationship", "Divorce", "Separation", "Remarriage",
+    "Extra-marital Relationship", "Divorce", "Separation", "Divorce Litigation", "Remarriage",
     "Spouse Nature", "Marriage Happiness", "Relationship Timeline"
   ];
 
@@ -1425,6 +1567,7 @@ export function calculateUnifiedRelationshipEvidence(
     "Extra-marital Relationship",
     "Divorce",
     "Separation",
+    "Divorce Litigation",
     "Remarriage",
     "Spouse Nature",
     "Marriage Happiness",

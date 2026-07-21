@@ -30,7 +30,8 @@ import {
   XCircle,
   Gem,
   Flame,
-  Sun
+  Sun,
+  Scale
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { calculateUnifiedRelationshipEvidence, UnifiedEvidenceItem } from "../lib/rules/unifiedRelationshipEvidenceEngine";
@@ -91,6 +92,7 @@ export const RelationshipKnowledgeCenter: React.FC<RelationshipKnowledgeCenterPr
     { id: "Extra-marital Relationship", label: "Extra-marital Relationship", icon: AlertCircle, desc: "Temptations and parallel bond indicators." },
     { id: "Divorce", label: "Divorce", icon: ShieldAlert, desc: "Destructive house groupings (1, 6, 10) leading to legal breaks." },
     { id: "Separation", label: "Separation", icon: Activity, desc: "Separative aspects causing emotional or geographical distance." },
+    { id: "Divorce Litigation", label: "Divorce Litigation", icon: Scale, desc: "Legal battles, disputes, and family court proceedings (6th, 8th, 12th houses)." },
     { id: "Remarriage", label: "Remarriage", icon: Sparkles, desc: "Secondary marriage promise (9th house connections)." },
     { id: "Spouse Nature", label: "Spouse Nature", icon: Smile, desc: "Temperament, career, and physical qualities of the partner." },
     { id: "Marriage Happiness", label: "Marriage Happiness", icon: Sparkles, desc: "Mutual harmony and domestic peace in shared spaces." },
