@@ -15,9 +15,13 @@ import {
   Check, 
   FileText, 
   AlertCircle,
-  HelpCircle
+  HelpCircle,
+  FileDown,
+  BookOpen,
+  Activity
 } from "lucide-react";
 import { apiFetch as fetch } from "../lib/api";
+import { exportMasterReferenceBookPDF } from "../utils/referenceBookExporter";
 
 interface Rule {
   id: string;
@@ -46,6 +50,12 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"board" | "registry" | "matcher">("board");
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  const handleExportSystemBooksPDF = async () => {
+    await exportMasterReferenceBookPDF(setIsExporting, setExportError);
+  };
 
   // Edit states
   const [editingRuleId, setEditingRuleId] = useState<string | null>(null);
@@ -395,6 +405,24 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
 
           <div className="flex items-center gap-3">
             <button
+              onClick={handleExportSystemBooksPDF}
+              disabled={isExporting}
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 disabled:opacity-50 cursor-pointer"
+            >
+              {isExporting ? (
+                <>
+                  <Activity className="w-3.5 h-3.5 animate-spin text-slate-950" />
+                  <span>Generating...</span>
+                </>
+              ) : (
+                <>
+                  <FileDown className="w-3.5 h-3.5" />
+                  <span>Export Reference Book (PDF)</span>
+                </>
+              )}
+            </button>
+
+            <button
               onClick={fetchHandbook}
               disabled={isLoading || isSaving}
               className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 disabled:opacity-50 transition-colors cursor-pointer"
@@ -459,6 +487,15 @@ export default function RulesTerminal({ isDarkTheme }: RulesTerminalProps) {
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <div>
               <span className="font-bold">Validation Error:</span> {error}
+            </div>
+          </div>
+        )}
+
+        {exportError && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-start gap-2.5 text-xs text-red-600 dark:text-red-400">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold">Export Error:</span> {exportError}
             </div>
           </div>
         )}

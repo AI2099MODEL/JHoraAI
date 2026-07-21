@@ -17,6 +17,9 @@ import {
   FileDown
 } from "lucide-react";
 import { jsPDF } from "jspdf";
+import { relEvents } from "./EventBookView";
+import { apiFetch } from "../lib/api";
+import { exportMasterReferenceBookPDF } from "../utils/referenceBookExporter";
 
 interface EngineGuideProps {
   isDark: boolean;
@@ -25,6 +28,12 @@ interface EngineGuideProps {
 export default function EngineGuide({ isDark }: EngineGuideProps) {
   const [activeTab, setActiveTab] = useState<"spec" | "modules" | "stages" | "interactive">("spec");
   const [copied, setCopied] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+
+  const handleExportSystemBooksPDF = async () => {
+    await exportMasterReferenceBookPDF(setIsExporting, setExportError);
+  };
 
   const rawSpec = `###########################################################
 # JHORA AI PROFESSIONAL - ASTROLOGICAL RULE ENGINE
@@ -555,14 +564,35 @@ Dynamic Context Data (Prediction Query)
             </button>
           </div>
 
-          <button
-            onClick={handleExportPDF}
-            className="px-3 py-1.5 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
-            title="Download the complete handbook and specification as PDF"
-          >
-            <FileDown className="w-3.5 h-3.5" />
-            Export PDF
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={handleExportPDF}
+              className="px-3 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 rounded-xl shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+              title="Download the technical architecture specification as PDF"
+            >
+              <FileDown className="w-3.5 h-3.5" />
+              Export Spec
+            </button>
+
+            <button
+              onClick={handleExportSystemBooksPDF}
+              disabled={isExporting}
+              className="px-3 py-1.5 text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              title="Download entire Master Event Book and KP Rulebook as PDF"
+            >
+              {isExporting ? (
+                <>
+                  <Activity className="w-3.5 h-3.5 animate-spin text-slate-950" />
+                  Generating Reference Book...
+                </>
+              ) : (
+                <>
+                  <BookOpen className="w-3.5 h-3.5" />
+                  Export Event Book & KP Book (PDF)
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -593,11 +623,21 @@ Dynamic Context Data (Prediction Query)
             </h4>
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
-                onClick={handleExportPDF}
-                className="px-2.5 py-1.5 text-[11px] font-semibold bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all flex items-center gap-1 cursor-pointer w-full sm:w-auto justify-center"
+                onClick={handleExportSystemBooksPDF}
+                disabled={isExporting}
+                className="px-2.5 py-1.5 text-[11px] font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer w-full sm:w-auto justify-center disabled:opacity-50"
               >
-                <FileDown className="w-3.5 h-3.5" />
-                Export Complete PDF
+                {isExporting ? (
+                  <>
+                    <Activity className="w-3.5 h-3.5 animate-spin text-slate-950" />
+                    Generating Reference Book...
+                  </>
+                ) : (
+                  <>
+                    <BookOpen className="w-3.5 h-3.5" />
+                    Export Reference Book (PDF)
+                  </>
+                )}
               </button>
               <button
                 onClick={copyToClipboard}

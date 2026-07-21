@@ -24,13 +24,15 @@ import {
   HelpCircle,
   FileText,
   RefreshCw,
-  Compass
+  Compass,
+  FileDown
 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { runNJEngine, NJEngineResult } from "../lib/njEngine";
 import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
+import { exportMasterReferenceBookPDF } from "../utils/referenceBookExporter";
 
-interface KPEvent {
+export interface KPEvent {
   id: string;
   category: "relationship" | "career" | "finance" | "property" | "health" | "education" | "children" | "travel" | "litigation" | "spiritual" | "daily" | "custom" | "agent_rules";
   name: string;
@@ -41,7 +43,7 @@ interface KPEvent {
   description: string;
 }
 
-const relEvents: KPEvent[] = [
+export const relEvents: KPEvent[] = [
   // 1. RELATIONSHIP (REL001 - REL036)
   { id: "REL001", category: "relationship", name: "Marriage Promise", primary: "2,7,11", supporting: "5,9", obstructing: "1,6,10", mainCsl: "7", description: "Evaluates the overall foundational promise of marriage in the natal chart." },
   { id: "REL002", category: "relationship", name: "Love Marriage", primary: "5,7,11", supporting: "2,9", obstructing: "1,6,10", mainCsl: "5,7", description: "Self-chosen relationship translating to legal marriage, driven by affection." },
@@ -836,6 +838,12 @@ interface EventBookViewProps {
 
 export default function EventBookView({ astrologyData, isDark }: EventBookViewProps) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isExportingSystem, setIsExportingSystem] = useState(false);
+  const [systemExportError, setSystemExportError] = useState<string | null>(null);
+
+  const handleExportSystemBooksPDF = async () => {
+    await exportMasterReferenceBookPDF(setIsExportingSystem, systemExportError => setSystemExportError(systemExportError));
+  };
   const [selectedCategory, setSelectedCategory] = useState<"all" | "relationship" | "career" | "finance" | "property" | "health" | "education" | "children" | "travel" | "litigation" | "spiritual" | "daily" | "custom" | "agent_rules">("all");
   const [showLiveForecast, setShowLiveForecast] = useState(true);
 
@@ -1725,6 +1733,23 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportSystemBooksPDF}
+              disabled={isExportingSystem}
+              className="px-2.5 py-1 text-[10px] font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
+            >
+              {isExportingSystem ? (
+                <>
+                  <Activity className="w-3 h-3 animate-spin text-slate-950" />
+                  Generating Reference Book...
+                </>
+              ) : (
+                <>
+                  <FileDown className="w-3.5 h-3.5" />
+                  Export Reference Book (PDF)
+                </>
+              )}
+            </button>
             <span className="px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase">
               Engine Standard v2.1
             </span>
@@ -1733,6 +1758,13 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
             </span>
           </div>
         </div>
+
+        {systemExportError && (
+          <div className="p-3 bg-red-950/20 border border-red-500/20 rounded-xl text-red-400 text-xs flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 shrink-0" />
+            <span>{systemExportError}</span>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-[360px]">
           <div className="lg:col-span-4 flex flex-col gap-1 overflow-y-auto max-h-[500px] pr-2 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
