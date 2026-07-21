@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin06011976dehradun0640PM",
-    "lastUpdated": "2026-07-21T13:04:37.793Z",
+    "lastUpdated": "2026-07-21T13:05:59.240Z",
     "evaluationDate": "2026-07-21",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-21T13:04:37.585Z",
-      "localTime": "2026-07-21T06:04:37-07:00",
+      "utcTime": "2026-07-21T13:05:59.173Z",
+      "localTime": "2026-07-21T06:05:59-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Libra",
         "displayName": "Libra",
-        "longitude": 188.29
+        "longitude": 188.3
       },
       "currentNakshatra": {
         "id": "Swati",
@@ -30,15 +30,15 @@
         "displayName": "Rahu"
       },
       "currentSubLord": {
-        "id": "Ketu",
-        "displayName": "Ketu"
+        "id": "Venus",
+        "displayName": "Venus"
       },
       "moonPhase": {
         "type": "Waxing Gibbous",
         "displayName": "Sukla Ashtami",
         "illuminationPercentage": 52
       },
-      "moonLongitude": 188.29,
+      "moonLongitude": 188.3,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -69,25 +69,25 @@
         "nakshatra": "Pushya",
         "pada": 1,
         "starLord": "Saturn",
-        "subLord": "Mars",
+        "subLord": "Rahu",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "moon": {
         "currentSign": "Libra",
-        "longitude": 188.29,
+        "longitude": 188.3,
         "nakshatra": "Swati",
         "pada": 1,
         "starLord": "Rahu",
-        "subLord": "Ketu",
+        "subLord": "Venus",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mars": {
         "currentSign": "Virgo",
-        "longitude": 158.37,
+        "longitude": 158.54,
         "nakshatra": "Uttara Phalguni",
         "pada": 4,
         "starLord": "Sun",
@@ -98,7 +98,7 @@
       },
       "mercury": {
         "currentSign": "Libra",
-        "longitude": 202.44,
+        "longitude": 202.45,
         "nakshatra": "Vishakha",
         "pada": 1,
         "starLord": "Jupiter",
@@ -245,6 +245,21 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-21T13:05:59.240Z",
+      "evaluationDate": "2026-07-21",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
+    },
     {
       "timestamp": "2026-07-21T13:04:37.792Z",
       "evaluationDate": "2026-07-21",
