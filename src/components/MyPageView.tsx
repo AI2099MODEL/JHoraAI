@@ -6592,12 +6592,35 @@ export function MyPageView({
             
             const signIdx = Math.floor(siderealLon / 30);
             const nakIdx = Math.floor(siderealLon / 13.333333);
+            const nakshatraLord = LOCAL_NAKSHATRA_LORDS[nakIdx];
+
+            // Compute Sub Lord using standard KP divisions
+            const degreeInNakshatra = siderealLon % 13.333333;
+            const ratio = degreeInNakshatra / 13.333333;
+            const dashaOrder = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+            const dashaYears: Record<string, number> = {
+              Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
+            };
+            const startIndex = dashaOrder.indexOf(nakshatraLord);
+            let accumulatedRatio = 0;
+            let subLord = nakshatraLord;
+            for (let i = 0; i < 9; i++) {
+              const currentLord = dashaOrder[(startIndex + i) % 9];
+              const lordShare = dashaYears[currentLord] / 120;
+              accumulatedRatio += lordShare;
+              if (ratio <= accumulatedRatio) {
+                subLord = currentLord;
+                break;
+              }
+            }
+
             return {
               longitude: siderealLon,
               signName: LOCAL_SIGN_NAMES[signIdx],
               signLord: LOCAL_SIGN_LORDS[signIdx],
               nakshatraName: LOCAL_NAKSHATRAS[nakIdx],
-              nakshatraLord: LOCAL_NAKSHATRA_LORDS[nakIdx]
+              nakshatraLord,
+              subLord
             };
           };
 
@@ -6698,12 +6721,12 @@ export function MyPageView({
           if (Object.keys(pSigs).length === 0) {
             pSigs = {
               "Sun": { level1: [12], level2: [12], level3: [1], level4: [12], level5: [2], level6: [12] },
-              "Moon": { level1: [9], level2: [9], level3: [12], level4: [9], level5: [12], level6: [9] },
+              "Moon": { level1: [1], level2: [4], level3: [5], level4: [8], level5: [11], level6: [1, 4, 5, 8, 11] },
               "Mars": { level1: [1], level2: [1], level3: [1], level4: [1], level5: [12], level6: [1] },
-              "Mercury": { level1: [12], level2: [12], level3: [9], level4: [12], level5: [5], level6: [12] },
-              "Jupiter": { level1: [2], level2: [2], level3: [5], level4: [2], level5: [12], level6: [2] },
+              "Mercury": { level1: [1], level2: [4], level3: [7], level4: [8], level5: [12], level6: [1, 4, 7, 8, 12] },
+              "Jupiter": { level1: [1], level2: [4], level3: [6], level4: [7], level5: [8], level6: [9, 10, 12] },
               "Venus": { level1: [11], level2: [11], level3: [11], level4: [11], level5: [9], level6: [11] },
-              "Saturn": { level1: [5], level2: [5], level3: [2], level4: [5], level5: [12], level6: [5] },
+              "Saturn": { level1: [4], level2: [7], level3: [8], level4: [9], level5: [12], level6: [4, 7, 8, 9, 12] },
               "Rahu": { level1: [12], level2: [12], level3: [12], level4: [12], level5: [5], level6: [12] },
               "Ketu": { level1: [6], level2: [6], level3: [5], level4: [6], level5: [5], level6: [6] }
             };
@@ -6732,73 +6755,123 @@ export function MyPageView({
 
           const currentSelDate = datesList[selectedDateOffset] || today;
 
-          // RUN MOOD ENGINE v1.0
+          // RUN MOOD ENGINE v2.0 (8-Layer Compliance Model)
           const activeLords = getLocalDashaLords(astrologyData?.dashas || [], currentSelDate);
           const transitMoon = getLocalMoonPosition(currentSelDate);
 
+          const getPlanetStrength = (planetName: string): number => {
+            const shadbala = profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || astrologyData?.strengths?.shadbala || {};
+            const plData = shadbala[planetName];
+            if (plData) {
+              if (typeof plData.strength_ratio === "number") return plData.strength_ratio;
+              if (typeof plData.strength_percentage === "number") return plData.strength_percentage / 100;
+              if (typeof plData.total_score === "number") return plData.total_score / 350;
+              if (typeof plData === "number") return plData;
+            }
+            return 1.0; // standard fallback
+          };
+
           const layers = [
-            { id: "Mahadasha", name: "Mahadasha Lord", planet: activeLords.maha },
-            { id: "Antardasha", name: "Antardasha Lord", planet: activeLords.antar },
-            { id: "Pratyantardasha", name: "Pratyantardasha Lord", planet: activeLords.pratyantar },
-            { id: "Sookshma", name: "Sookshma Lord", planet: activeLords.sookshma },
-            { id: "Prana", name: "Prana Lord", planet: activeLords.prana },
-            { id: "MoonNakLord", name: "Moon Nakshatra Lord", planet: transitMoon.nakshatraLord },
-            { id: "MoonSignLord", name: "Moon Sign Lord", planet: transitMoon.signLord }
+            { id: "Mahadasha", name: "Mahadasha Lord", planet: activeLords.maha, weight: 30 },
+            { id: "Antardasha", name: "Antardasha Lord", planet: activeLords.antar, weight: 22 },
+            { id: "Pratyantardasha", name: "Pratyantardasha Lord", planet: activeLords.pratyantar, weight: 16 },
+            { id: "Sookshma", name: "Sookshma Lord", planet: activeLords.sookshma, weight: 12 },
+            { id: "Prana", name: "Prana Lord", planet: activeLords.prana, weight: 8 },
+            { id: "MoonNakLord", name: "Moon Nakshatra Lord", planet: transitMoon.nakshatraLord, weight: 7 },
+            { id: "MoonSubLord", name: "Moon Sub Lord", planet: transitMoon.subLord, weight: 5 },
+            { id: "MoonSignLord", name: "Moon Sign Lord", planet: transitMoon.signLord, weight: 3 }
           ];
 
-          // Step 3 & 4: Merge House Sets
+          // Merge House Sets & Calculate Planet Strengths
           const layerHouseMaps = layers.map(l => {
             const hSet = getPlanetHousesUnion(l.planet);
-            return { ...l, houses: hSet };
+            const strength = getPlanetStrength(l.planet);
+            return { ...l, houses: hSet, strength };
           });
 
-          // Step 5: Count Frequency
+          // Compute House significators mapping, frequencies, and weighted scores
           const frequencyMap: Record<number, number> = {};
+          const scoreMap: Record<number, number> = {};
           for (let h = 1; h <= 12; h++) {
             frequencyMap[h] = 0;
+            scoreMap[h] = 0;
           }
 
           layerHouseMaps.forEach(lm => {
             lm.houses.forEach(h => {
               if (frequencyMap[h] !== undefined) {
                 frequencyMap[h]++;
+                scoreMap[h] += lm.weight * lm.strength;
               }
             });
           });
 
-          // Step 6 & 7: Sort and build Tiers
-          const frequencyPairs = Object.entries(frequencyMap)
-            .map(([house, count]) => ({ house: Number(house), count }))
-            .sort((a, b) => b.count - a.count || b.house - a.house);
+          // Build dynamic lists of houses categorized by the Convergence Engine
+          const primaryThemeHouses: number[] = [];
+          const secondaryThemeHouses: number[] = [];
+          const backgroundOverlayHouses: number[] = [];
 
-          // Get unique counts descending
-          const uniqueCounts = Array.from(new Set(frequencyPairs.map(p => p.count)))
-            .filter(c => c > 0)
-            .sort((a, b) => b - a);
+          for (let h = 1; h <= 12; h++) {
+            const freq = frequencyMap[h];
+            if (freq >= 5) {
+              primaryThemeHouses.push(h);
+            } else if (freq >= 3) {
+              secondaryThemeHouses.push(h);
+            } else if (freq > 0) {
+              backgroundOverlayHouses.push(h);
+            }
+          }
 
-          const getHousesInTier = (tierIndex: number): number[] => {
-            if (tierIndex >= uniqueCounts.length) return [];
-            const targetCount = uniqueCounts[tierIndex];
-            return frequencyPairs.filter(p => p.count === targetCount).map(p => p.house);
-          };
+          // Sort each category by weight descending
+          primaryThemeHouses.sort((a, b) => scoreMap[b] - scoreMap[a]);
+          secondaryThemeHouses.sort((a, b) => scoreMap[b] - scoreMap[a]);
+          backgroundOverlayHouses.sort((a, b) => scoreMap[b] - scoreMap[a]);
 
-          const tier1 = getHousesInTier(0);
-          const tier2 = getHousesInTier(1);
-          const tier3 = getHousesInTier(2);
-          const tier4 = getHousesInTier(3);
-          const tier5 = getHousesInTier(4);
+          // Extract dominant theme combinations
+          const strongestCombo = primaryThemeHouses.length > 0 
+            ? primaryThemeHouses.slice(0, 4).join(" + ") 
+            : secondaryThemeHouses.slice(0, 3).join(" + ") || "Low-intensity Baseline";
 
-          // Build dynamic mood summaries
-          const formatTierInterpretation = (houses: number[]) => {
-            if (houses.length === 0) return "Quiet subconscious currents with gentle, low-intensity mental rhythms.";
-            return houses.map(h => {
+          const primaryVibe = primaryThemeHouses.length > 0 
+            ? LOCAL_HOUSE_MOOD_MAP[primaryThemeHouses[0]]?.vibe || "Introspective Focus" 
+            : "Contemplative";
+          const secondaryVibe = secondaryThemeHouses.length > 0 
+            ? LOCAL_HOUSE_MOOD_MAP[secondaryThemeHouses[0]]?.vibe || "Grounded" 
+            : "Reflective";
+
+          // Calculate unique Moon overlays (present in Moon layers but not in primary dasha layers)
+          const dashaHouses = new Set<number>();
+          layerHouseMaps
+            .filter(l => ["Mahadasha", "Antardasha", "Pratyantardasha"].includes(l.id))
+            .forEach(lm => lm.houses.forEach(h => dashaHouses.add(h)));
+
+          const moonHouses = new Set<number>();
+          layerHouseMaps
+            .filter(l => ["Prana", "MoonNakLord", "MoonSubLord", "MoonSignLord"].includes(l.id))
+            .forEach(lm => lm.houses.forEach(h => moonHouses.add(h)));
+
+          const uniqueMoonOverlays = Array.from(moonHouses).filter(h => !dashaHouses.has(h));
+
+          // Narrative generation
+          const getPrimaryNarrative = () => {
+            if (primaryThemeHouses.length === 0) {
+              return `Your psychological state is currently in a steady baseline state without highly concentrated triggers. General focus is balanced across several background areas.`;
+            }
+            const listStr = primaryThemeHouses.map(h => {
               const m = LOCAL_HOUSE_MOOD_MAP[h];
-              return m ? `${m.vibe} focus (${m.title})` : `House ${h} issues`;
-            }).join(" blended with ") + ".";
+              return `House ${h} (${m ? m.title : "Area"})`;
+            }).join(", ");
+            return `Today's psychological landscape is anchored heavily by the primary convergence of ${listStr}. Multiple active dasha periods and key celestial transits align to place your mental and emotional focus in these sectors.`;
           };
 
-          const primaryVibe = tier1.length > 0 ? LOCAL_HOUSE_MOOD_MAP[tier1[0]]?.vibe || "Grounded" : "Peaceful";
-          const secondaryVibe = tier2.length > 0 ? LOCAL_HOUSE_MOOD_MAP[tier2[0]]?.vibe || "Stable" : "Reflective";
+          const getMoonNarrative = () => {
+            if (uniqueMoonOverlays.length === 0) {
+              return `The transiting Moon's coordinates closely echo your primary dasha cycles, reinforcing your core focus without introducing divergent emotional overlays.`;
+            }
+            const moonLords = `Prana (${activeLords.prana}), Nakshatra Lord (${transitMoon.nakshatraLord}), Sub Lord (${transitMoon.subLord}), and Sign Ruler (${transitMoon.signLord})`;
+            const overlaysStr = uniqueMoonOverlays.map(h => `House ${h} (${LOCAL_HOUSE_MOOD_MAP[h]?.title || "Focus"})`).join(", ");
+            return `The transiting Moon (acting through ${moonLords}) introduces unique overlays in ${overlaysStr}. Rather than disrupting the dominant dasha theme, it tints your day with a subtle emotional coloring, sparking temporary waves of ${uniqueMoonOverlays.map(h => LOCAL_HOUSE_MOOD_MAP[h]?.vibe || "sentiment").join(" and ")}.`;
+          };
 
           return (
             <div className="space-y-6 animate-fadeIn" id="daily-analysis-tab">
@@ -6807,10 +6880,10 @@ export function MyPageView({
                 <div>
                   <h3 className="text-lg font-sans font-medium text-amber-100 flex items-center gap-2">
                     <Activity className="w-5 h-5 text-indigo-400" />
-                    KP Stellar Daily Mood Engine
+                    KP Stellar Daily Mood Engine v2.0
                   </h3>
                   <p className={`text-xs ${textMuted} mt-1`}>
-                    Mapping the 7 active stellar layers of time to identify daily focus and mental alignments.
+                    Mapping the 8 active stellar layers of time to identify daily focus and mental alignments.
                   </p>
                 </div>
                 {/* Date switcher tabs */}
@@ -6856,91 +6929,124 @@ export function MyPageView({
                         Daily Mental State
                       </span>
                       <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
-                        Moon in {transitMoon.nakshatraName} ({transitMoon.nakshatraLord})
+                        <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                        Moon in {transitMoon.nakshatraName}
                       </span>
                     </div>
 
                     <div className="space-y-4">
                       <div>
-                        <span className="text-xs text-indigo-300">Dominant Psychological State</span>
+                        <span className="text-xs text-indigo-300 font-mono">DOMINANT COGNITIVE CONVERGENCE</span>
                         <h4 className="text-2xl font-bold text-white mt-1">
-                          {primaryVibe} & {secondaryVibe}
+                          Houses: {strongestCombo}
                         </h4>
+                        <div className="text-xs text-amber-200 font-medium mt-1">
+                          Primary Vibe: {primaryVibe} & {secondaryVibe}
+                        </div>
                       </div>
 
-                      <p className="text-sm text-slate-300 leading-relaxed bg-slate-950/30 border border-slate-900 p-4 rounded-xl">
-                        Today's cosmic flow is anchored by the dual alignments of <strong>{transitMoon.nakshatraName}</strong> nakshatra and your active Vimshottari period (<strong>{activeLords.maha}—{activeLords.antar}—{activeLords.pratyantar}</strong>). 
-                        You will experience high mental focus on the house groupings {tier1.join(", ")} and {tier2.join(", ")}. 
-                        This suggests {formatTierInterpretation(tier1)}
-                      </p>
+                      <div className="space-y-3 text-sm text-slate-300 leading-relaxed bg-slate-950/50 border border-slate-900 p-5 rounded-xl">
+                        <p>
+                          {getPrimaryNarrative()}
+                        </p>
+                        <p className="border-t border-slate-800/60 pt-2 text-xs text-indigo-200">
+                          <strong>Transit Color Overlay:</strong> {getMoonNarrative()}
+                        </p>
+                      </div>
 
                       {/* Recommend Action Points */}
                       <div className="space-y-3 pt-2">
                         <h5 className="text-xs font-semibold text-amber-200 uppercase tracking-wide">
-                          Recommended Alignments For Today
+                          Primary Theme Significations
                         </h5>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {tier1.slice(0, 4).map((h) => {
+                          {primaryThemeHouses.slice(0, 4).map((h) => {
                             const m = LOCAL_HOUSE_MOOD_MAP[h];
                             if (!m) return null;
                             return (
                               <div key={h} className="bg-slate-950/50 border border-slate-900 p-3 rounded-lg flex items-start gap-2.5">
-                                <span className="font-mono text-xs font-bold text-indigo-400 bg-indigo-500/10 w-5 h-5 flex items-center justify-center rounded">
+                                <span className="font-mono text-xs font-bold text-indigo-400 bg-indigo-500/10 w-5 h-5 flex items-center justify-center rounded border border-indigo-500/10">
                                   {h}
                                 </span>
                                 <div>
                                   <strong className="block text-xs text-white">{m.title}</strong>
                                   <span className="text-[11px] text-slate-400 leading-normal block mt-0.5 font-sans">
-                                    {m.desc.split("Focus on ")[1] || m.desc}
+                                    {m.desc}
                                   </span>
                                 </div>
                               </div>
                             );
                           })}
+                          {primaryThemeHouses.length === 0 && (
+                            <div className="col-span-2 text-center text-xs text-slate-500 py-4 font-mono">
+                              No primary theme houses (&ge; 5 layers) triggered for this date.
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Frequency Spectrum representation */}
-                  <div className={`p-6 rounded-2xl border ${cardStyle} space-y-4`}>
+                  {/* TABULAR PRESENTATION: Weighted House Activation Matrix */}
+                  <div className={`p-6 rounded-2xl border ${cardStyle} space-y-4 overflow-x-auto`}>
                     <div>
                       <h4 className={`text-sm font-bold ${textStyle} font-sans`}>
-                        Cuspal House Significance Spectrum
+                        Weighted House Activation Matrix (JH1 to JH12)
                       </h4>
                       <p className={`text-xs ${textMuted} mt-0.5`}>
-                        Visualizing how intensely each house is triggered across all 7 cosmic layers.
+                        Consecutively indexed matrix displaying trigger frequency, raw weighted scores, and active tiers.
                       </p>
                     </div>
 
-                    <div className="space-y-3">
-                      {frequencyPairs.map(({ house, count }) => {
-                        const m = LOCAL_HOUSE_MOOD_MAP[house];
-                        const pct = (count / 7) * 100;
-                        return (
-                          <div key={house} className="flex items-center gap-3">
-                            <span className="w-6 font-mono text-[11px] font-bold text-slate-400 text-right">
-                              H{house}
-                            </span>
-                            <div className="flex-1 h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-900 flex items-center relative">
-                              <div 
-                                className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 rounded-full"
-                                style={{ width: `${pct}%` }}
-                              ></div>
-                              {count > 0 && (
-                                <span className="absolute right-2 font-mono text-[9px] font-bold text-indigo-300">
-                                  {count}/7 Layers
+                    <table className="w-full text-left text-xs text-slate-300 font-mono">
+                      <thead>
+                        <tr className="border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
+                          <th className="py-2.5">Index</th>
+                          <th className="py-2.5">Theme / Area</th>
+                          <th className="py-2.5 text-center">Frequency</th>
+                          <th className="py-2.5 text-right">Weighted Score</th>
+                          <th className="py-2.5 text-center">Classification</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/40">
+                        {Array.from({ length: 12 }).map((_, idx) => {
+                          const house = idx + 1;
+                          const count = frequencyMap[house] || 0;
+                          const score = scoreMap[house] || 0;
+                          const m = LOCAL_HOUSE_MOOD_MAP[house];
+                          
+                          let tier = "Inactive";
+                          let badgeClass = "text-slate-500 bg-slate-900/30";
+                          if (count >= 5) {
+                            tier = "Primary Theme";
+                            badgeClass = "text-amber-300 bg-amber-500/10 border border-amber-500/20";
+                          } else if (count >= 3) {
+                            tier = "Secondary Theme";
+                            badgeClass = "text-indigo-300 bg-indigo-500/10 border border-indigo-500/20";
+                          } else if (count > 0) {
+                            tier = "Background Overlay";
+                            badgeClass = "text-slate-400 bg-slate-800/30";
+                          }
+
+                          return (
+                            <tr key={house} className="hover:bg-slate-900/20 transition-colors">
+                              <td className="py-2.5 font-bold text-indigo-400">JH{house}</td>
+                              <td className="py-2.5 font-sans">
+                                <div className="font-semibold text-white text-[11px]">{m?.title || `House ${house}`}</div>
+                                <div className="text-[10px] text-slate-400 line-clamp-1">{m?.desc || "No custom significations."}</div>
+                              </td>
+                              <td className="py-2.5 text-center text-slate-200 font-bold">{count} / 8</td>
+                              <td className="py-2.5 text-right text-indigo-300 font-bold">{score.toFixed(2)}</td>
+                              <td className="py-2.5 text-center">
+                                <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold ${badgeClass}`}>
+                                  {tier}
                                 </span>
-                              )}
-                            </div>
-                            <span className={`w-28 text-[11px] ${m?.text || "text-slate-500"} font-medium truncate font-sans`}>
-                              {m?.title || `House ${house}`}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
 
                 </div>
@@ -6948,107 +7054,107 @@ export function MyPageView({
                 {/* Right Side: Active Layers & Technical Breakdowns */}
                 <div className="lg:col-span-5 space-y-6">
                   
-                  {/* Active Layers Box */}
+                  {/* TABULAR PRESENTATION: Daily Activation Stack */}
                   <div className={`p-5 rounded-2xl border ${cardStyle} space-y-4 shadow-sm`}>
                     <div>
                       <h4 className={`text-sm font-bold ${textStyle} font-sans`}>
-                        The 7 Active Layers of Time
+                        The 8 Active Layers of Time
                       </h4>
                       <p className={`text-[11px] ${textMuted} mt-0.5`}>
-                        Planets currently acting as rulers of your mind and timeline for this date.
+                        The complete planetary time cycles driving your dasha periods and transiting Moon's coordinates.
                       </p>
                     </div>
 
-                    <div className="space-y-2.5">
-                      {layerHouseMaps.map(layer => {
-                        return (
-                          <div key={layer.id} className="flex items-center justify-between p-2.5 bg-slate-950/40 rounded-xl border border-slate-900">
-                            <div>
-                              <span className="text-[10px] font-mono text-slate-400 block uppercase tracking-wider">
-                                {layer.name}
-                              </span>
-                              <span className={`text-xs font-bold ${textStyle} mt-0.5 inline-block`}>
-                                {layer.planet}
-                              </span>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-[10px] font-mono text-slate-400 block uppercase">
-                                Houses
-                              </span>
-                              <div className="flex gap-1 mt-0.5 justify-end">
-                                {layer.houses.map(h => (
-                                  <span key={h} className="text-[9px] font-mono font-bold px-1 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/5">
-                                    {h}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs text-slate-300 font-mono">
+                        <thead>
+                          <tr className="border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
+                            <th className="py-2">Layer</th>
+                            <th className="py-2">Ruler</th>
+                            <th className="py-2 text-right">Weight</th>
+                            <th className="py-2 text-right">Strength</th>
+                            <th className="py-2 text-right">Activated</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/40">
+                          {layerHouseMaps.map(layer => {
+                            return (
+                              <tr key={layer.id} className="hover:bg-slate-900/20 transition-colors">
+                                <td className="py-2 text-[10px] text-slate-400 uppercase tracking-wider font-sans">{layer.name.replace(" Lord", "")}</td>
+                                <td className="py-2 text-white font-bold">{layer.planet}</td>
+                                <td className="py-2 text-right text-slate-300">{layer.weight}</td>
+                                <td className="py-2 text-right text-emerald-400">{layer.strength.toFixed(2)}x</td>
+                                <td className="py-2 text-right">
+                                  <div className="flex gap-1 justify-end flex-wrap">
+                                    {layer.houses.map(h => (
+                                      <span key={h} className="text-[9px] font-mono font-bold px-1 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/5">
+                                        {h}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
 
-                  {/* Frequency Tiers Summary */}
+                  {/* Dynamic Convergence Tiers Info Card */}
                   <div className={`p-5 rounded-2xl border ${cardStyle} space-y-4`}>
                     <div>
                       <h4 className={`text-sm font-bold ${textStyle} font-sans`}>
-                        Calculated Frequency Tiers
+                        Convergence Tier Definitions
                       </h4>
                       <p className={`text-[11px] ${textMuted} mt-0.5`}>
-                        Grouping houses into psychological and environmental influence zones.
+                        Understanding how the frequency layers determine environmental and mental emphasis.
                       </p>
                     </div>
 
-                    <div className="space-y-3 text-xs">
-                      <div className="border-l-2 border-indigo-500 pl-3 py-1">
-                        <strong className="block text-indigo-300">Tier 1: Primary Focus (Frequency: {uniqueCounts[0] || 0})</strong>
-                        <div className="flex gap-1 mt-1">
-                          {tier1.map(h => (
-                            <span key={h} className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/5 font-mono text-[10px] font-bold">
+                    <div className="space-y-3.5 text-xs">
+                      <div className="border-l-2 border-amber-400 pl-3 py-1">
+                        <strong className="block text-amber-200 text-[11px]">Primary Themes (&ge; 5 Layers)</strong>
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {primaryThemeHouses.map(h => (
+                            <span key={h} className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 font-mono text-[10px] font-bold">
                               H{h}
                             </span>
                           ))}
+                          {primaryThemeHouses.length === 0 && <span className="text-[10px] text-slate-500 italic">None active</span>}
                         </div>
-                        <p className={`text-[11px] ${textMuted} mt-1 leading-normal`}>
-                          {formatTierInterpretation(tier1)}
+                        <p className={`text-[11px] ${textMuted} mt-1.5 leading-normal font-sans`}>
+                          Represents highly recurring mental states, environmental opportunities, and major focus vectors.
                         </p>
                       </div>
 
-                      <div className="border-l-2 border-indigo-500/60 pl-3 py-1">
-                        <strong className="block text-indigo-300">Tier 2: Secondary Focus (Frequency: {uniqueCounts[1] || 0})</strong>
-                        <div className="flex gap-1 mt-1">
-                          {tier2.map(h => (
-                            <span key={h} className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/5 font-mono text-[10px] font-bold">
+                      <div className="border-l-2 border-indigo-400 pl-3 py-1">
+                        <strong className="block text-indigo-200 text-[11px]">Secondary Themes (3 to 4 Layers)</strong>
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {secondaryThemeHouses.map(h => (
+                            <span key={h} className="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-mono text-[10px] font-bold">
                               H{h}
                             </span>
                           ))}
+                          {secondaryThemeHouses.length === 0 && <span className="text-[10px] text-slate-500 italic">None active</span>}
                         </div>
-                        <p className={`text-[11px] ${textMuted} mt-1 leading-normal`}>
-                          {formatTierInterpretation(tier2)}
+                        <p className={`text-[11px] ${textMuted} mt-1.5 leading-normal font-sans`}>
+                          Reflects secondary, supporting emotional impulses or daily objectives that play a solid part in your day.
                         </p>
                       </div>
 
-                      <div className="border-l-2 border-indigo-500/30 pl-3 py-1">
-                        <strong className="block text-slate-400">Tier 3: Supporting (Frequency: {uniqueCounts[2] || 0})</strong>
-                        <div className="flex gap-1 mt-1">
-                          {tier3.map(h => (
-                            <span key={h} className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700/50 font-mono text-[10px] font-bold">
+                      <div className="border-l-2 border-slate-600 pl-3 py-1">
+                        <strong className="block text-slate-400 text-[11px]">Background Overlays (1 to 2 Layers)</strong>
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {backgroundOverlayHouses.map(h => (
+                            <span key={h} className="px-2 py-0.5 rounded bg-slate-900/60 text-slate-400 border border-slate-800 font-mono text-[10px]">
                               H{h}
                             </span>
                           ))}
                         </div>
-                      </div>
-
-                      <div className="border-l-2 border-indigo-500/10 pl-3 py-1">
-                        <strong className="block text-slate-500">Tier 4 & 5: Background Focus</strong>
-                        <div className="flex gap-1 mt-1">
-                          {[...tier4, ...tier5].map(h => (
-                            <span key={h} className="px-2 py-0.5 rounded bg-slate-900/60 text-slate-500 border border-slate-950 font-mono text-[10px]">
-                              H{h}
-                            </span>
-                          ))}
-                        </div>
+                        <p className={`text-[11px] ${textMuted} mt-1.5 leading-normal font-sans`}>
+                          Flickering thoughts, minor tasks, or transient environmental factors with low-level daily importance.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -7157,12 +7263,35 @@ export function MyPageView({
             
             const signIdx = Math.floor(siderealLon / 30);
             const nakIdx = Math.floor(siderealLon / 13.333333);
+            const nakshatraLord = LOCAL_NAKSHATRA_LORDS[nakIdx];
+
+            // Compute Sub Lord using standard KP divisions
+            const degreeInNakshatra = siderealLon % 13.333333;
+            const ratio = degreeInNakshatra / 13.333333;
+            const dashaOrder = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+            const dashaYears: Record<string, number> = {
+              Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
+            };
+            const startIndex = dashaOrder.indexOf(nakshatraLord);
+            let accumulatedRatio = 0;
+            let subLord = nakshatraLord;
+            for (let i = 0; i < 9; i++) {
+              const currentLord = dashaOrder[(startIndex + i) % 9];
+              const lordShare = dashaYears[currentLord] / 120;
+              accumulatedRatio += lordShare;
+              if (ratio <= accumulatedRatio) {
+                subLord = currentLord;
+                break;
+              }
+            }
+
             return {
               longitude: siderealLon,
               signName: LOCAL_SIGN_NAMES[signIdx],
               signLord: LOCAL_SIGN_LORDS[signIdx],
               nakshatraName: LOCAL_NAKSHATRAS[nakIdx],
-              nakshatraLord: LOCAL_NAKSHATRA_LORDS[nakIdx]
+              nakshatraLord,
+              subLord
             };
           };
 
@@ -7290,31 +7419,54 @@ export function MyPageView({
             const transitMoon = getLocalMoonPosition(date);
 
             const layers = [
-              activeLords.maha,
-              activeLords.antar,
-              activeLords.pratyantar,
-              activeLords.sookshma,
-              activeLords.prana,
-              transitMoon.nakshatraLord,
-              transitMoon.signLord
+              { id: "Mahadasha", planet: activeLords.maha, weight: 30 },
+              { id: "Antardasha", planet: activeLords.antar, weight: 22 },
+              { id: "Pratyantardasha", planet: activeLords.pratyantar, weight: 16 },
+              { id: "Sookshma", planet: activeLords.sookshma, weight: 12 },
+              { id: "Prana", planet: activeLords.prana, weight: 8 },
+              { id: "MoonNakLord", planet: transitMoon.nakshatraLord, weight: 7 },
+              { id: "MoonSubLord", planet: transitMoon.subLord, weight: 5 },
+              { id: "MoonSignLord", planet: transitMoon.signLord, weight: 3 }
             ];
 
-            const frequencyMap: Record<number, number> = {};
-            for (let h = 1; h <= 12; h++) frequencyMap[h] = 0;
+            const getPlanetStrength = (planetName: string): number => {
+              const shadbala = profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || astrologyData?.strengths?.shadbala || {};
+              const plData = shadbala[planetName];
+              if (plData) {
+                if (typeof plData.strength_ratio === "number") return plData.strength_ratio;
+                if (typeof plData.strength_percentage === "number") return plData.strength_percentage / 100;
+                if (typeof plData.total_score === "number") return plData.total_score / 350;
+                if (typeof plData === "number") return plData;
+              }
+              return 1.0;
+            };
 
-            layers.forEach(p => {
-              getPlanetHousesUnion(p).forEach(h => {
-                if (frequencyMap[h] !== undefined) frequencyMap[h]++;
+            const scoreMap: Record<number, number> = {};
+            const frequencyMap: Record<number, number> = {};
+            for (let h = 1; h <= 12; h++) {
+              scoreMap[h] = 0;
+              frequencyMap[h] = 0;
+            }
+
+            layers.forEach(l => {
+              const hSet = getPlanetHousesUnion(l.planet);
+              const strength = getPlanetStrength(l.planet);
+              hSet.forEach(h => {
+                if (scoreMap[h] !== undefined) {
+                  frequencyMap[h]++;
+                  scoreMap[h] += l.weight * strength;
+                }
               });
             });
 
-            const topHouse = Object.entries(frequencyMap)
-              .map(([house, count]) => ({ house: Number(house), count }))
-              .sort((a, b) => b.count - a.count || b.house - a.house)[0];
+            const topHouse = Object.entries(scoreMap)
+              .map(([house, score]) => ({ house: Number(house), score, count: frequencyMap[Number(house)] }))
+              .sort((a, b) => b.score - a.score || b.count - a.count || b.house - a.house)[0];
 
             return {
               house: topHouse?.house || 1,
               count: topHouse?.count || 1,
+              score: topHouse?.score || 0,
               moonNak: transitMoon.nakshatraName,
               moonSign: transitMoon.signName
             };
