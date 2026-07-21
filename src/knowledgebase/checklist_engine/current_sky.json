@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-21T16:44:43.361Z",
+    "lastUpdated": "2026-07-21T16:46:34.739Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-21T16:44:43.361Z",
-    "localTime": "2026-07-21T09:44:43-07:00",
+    "utcTime": "2026-07-21T16:46:34.739Z",
+    "localTime": "2026-07-21T09:46:34-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Libra",
       "displayName": "Libra",
-      "longitude": 190.3
+      "longitude": 190.32
     },
     "currentNakshatra": {
       "id": "Swati",
@@ -28,15 +28,15 @@
       "displayName": "Rahu"
     },
     "currentSubLord": {
-      "id": "Mars",
-      "displayName": "Mars"
+      "id": "Rahu",
+      "displayName": "Rahu"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Ashtami",
       "illuminationPercentage": 53
     },
-    "moonLongitude": 190.3,
+    "moonLongitude": 190.32,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -74,23 +74,23 @@
     },
     "moon": {
       "currentSign": "Libra",
-      "longitude": 190.3,
+      "longitude": 190.32,
       "nakshatra": "Swati",
       "pada": 2,
       "starLord": "Rahu",
-      "subLord": "Mars",
+      "subLord": "Rahu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Libra",
-      "longitude": 197.05,
+      "longitude": 197.4,
       "nakshatra": "Swati",
       "pada": 4,
       "starLord": "Rahu",
-      "subLord": "Mars",
-      "retrograde": false,
+      "subLord": "Moon",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
@@ -100,7 +100,7 @@
       "nakshatra": "Vishakha",
       "pada": 1,
       "starLord": "Jupiter",
-      "subLord": "Mercury",
+      "subLord": "Ketu",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Venus",
     "moonStarLord": "Rahu",
-    "moonSubLord": "Mars"
+    "moonSubLord": "Rahu"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Ashtami",
       "index": 8,
       "paksha": "Sukla",
-      "endDate": "2026-07-22T04:44:43.361Z"
+      "endDate": "2026-07-22T04:46:34.739Z"
     },
     "vara": {
       "name": "Tuesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Swati",
       "lord": "Rahu",
-      "endDate": "2026-07-22T10:44:43.361Z"
+      "endDate": "2026-07-22T10:46:34.739Z"
     },
     "yoga": {
       "name": "Sadhya",
       "lord": "Moon",
-      "endDate": "2026-07-22T06:44:43.361Z"
+      "endDate": "2026-07-22T06:46:34.739Z"
     },
     "karana": {
       "name": "Bava",
       "lord": "Sun",
-      "endDate": "2026-07-21T22:44:43.361Z"
+      "endDate": "2026-07-21T22:46:34.739Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
