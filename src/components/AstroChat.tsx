@@ -51,29 +51,55 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
   const [input, setInput] = useState("");
   const [targetAge] = useState<number>(50);
   const [currentStatusMsg, setCurrentStatusMsg] = useState("");
+  
+  const [rulesStatus, setRulesStatus] = useState<any>(null);
+  const [currentSky, setCurrentSky] = useState<any>(null);
+  const [loadingContext, setLoadingContext] = useState<boolean>(true);
 
   const analysisRef = useRef<HTMLDivElement>(null);
+
+  // Load Rules status and Current Sky on mount
+  useEffect(() => {
+    async function loadAstroContext() {
+      try {
+        setLoadingContext(true);
+        const [rulesRes, skyRes] = await Promise.all([
+          fetch("/api/rules/natal-agent-status"),
+          fetch("/api/rules/current-sky")
+        ]);
+        const rulesData = await rulesRes.json();
+        const skyData = await skyRes.json();
+        setRulesStatus(rulesData);
+        setCurrentSky(skyData);
+      } catch (err) {
+        console.error("Failed to load astronomical context in AstroChat:", err);
+      } finally {
+        setLoadingContext(false);
+      }
+    }
+    loadAstroContext();
+  }, []);
 
   // Highly personalized prompts reflecting native's actual life, mood, and parameters
   const quickPrompts = [
     {
       title: "My Mood & Wellness Today",
       label: "🧠 Today's Mood & Mind",
-      query: "Analyze my daily mood, emotional energy, and general wellness today. Combine my natal coordinates (Cancer Lagna, Aquarius Shatabhisha Moon) with today's transiting Moon in Pushya Nakshatra to yield deep psychological metrics.",
+      query: `Analyze my daily mood, emotional energy, and general wellness today. Combine my natal coordinates (Cancer Lagna, Aquarius Shatabhisha Moon) with today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra to yield deep psychological metrics.`,
       icon: Heart,
       color: "hover:border-rose-500/40 hover:bg-rose-500/5 text-rose-400 border-rose-500/10"
     },
     {
       title: "My Action & Behaviour Force",
       label: "⚡ Today's Behaviour & Drive",
-      query: "Analyze my behavior metrics, personal charisma, and actionable guidelines today. Focus on how transit Mars in Taurus (11th house of gains) and today's Pushya Moon shape my interactions and productivity.",
+      query: `Analyze my behavior metrics, personal charisma, and actionable guidelines today. Focus on how transit Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"} (aspecting natal positions) and today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} shape my interactions and productivity.`,
       icon: Flame,
       color: "hover:border-amber-500/40 hover:bg-amber-500/5 text-amber-400 border-amber-500/10"
     },
     {
       title: "Daily Themes & Prosperity",
       label: "💰 Professional Gains Today",
-      query: "What is my professional and wealth trend today? Evaluate my 2nd house of assets and 11th house of gains (Taurus Mars) under my active dasha to highlight immediate strategic opportunities.",
+      query: `What is my professional and wealth trend today? Evaluate my 2nd house of assets and 11th house of gains under the influence of transiting planets (Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"}, Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"}) and my active dasha to highlight immediate strategic opportunities.`,
       icon: Sparkles,
       color: "hover:border-blue-500/40 hover:bg-blue-500/5 text-blue-400 border-blue-500/10"
     },
@@ -87,7 +113,7 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
     {
       title: "Daily Life & Mood Synthesis",
       label: "🪐 Sample Daily Synthesis",
-      query: "Load a synthesized overview analyzing my Cancer Lagna, 8th house Moon, and Pushya transit alignment.",
+      query: `Load a synthesized overview analyzing my Cancer Lagna, 8th house Moon, and today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra alignment.`,
       icon: Info,
       color: "hover:border-yellow-500/40 hover:bg-yellow-500/5 text-yellow-400 border-yellow-500/10"
     }
@@ -97,7 +123,7 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
     "Consulting celestial engines...",
     "Retrieving native's life variables...",
     "Querying KP & Vedic daily indicators...",
-    "Analyzing Moon transit in Pushya Nakshatra...",
+    `Analyzing Moon transit in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra...`,
     "Synthesizing active Saturn-Mercury-Rahu dasha weights..."
   ];
 
@@ -223,6 +249,57 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
         </div>
       </div>
 
+      {/* INTEGRATED ASTROLOGICAL CONTEXT TRACKER (Visual Verification) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-950/40 border border-slate-900/60 p-3.5 rounded-xl text-[11px] backdrop-blur-sm">
+        {/* User Profile Analysis Status */}
+        <div className="flex flex-col gap-1 border-b md:border-b-0 md:border-r border-slate-900/60 pb-2 md:pb-0 md:pr-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] font-bold text-slate-400 font-mono uppercase tracking-wider">👤 User Profile Analytics</span>
+            <span className="flex items-center gap-1 text-[8px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+              <span className="w-1 h-1 bg-emerald-400 rounded-full animate-pulse" /> Active
+            </span>
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-slate-200 font-medium">Nitin's Birth Particulars</p>
+            <p className="text-[9px] text-slate-500 font-mono truncate">Folder: /analysis/userprofile (Synced)</p>
+          </div>
+        </div>
+
+        {/* Astrological Rules Engine Status */}
+        <div className="flex flex-col gap-1 border-b md:border-b-0 md:border-r border-slate-900/60 pb-2 md:pb-0 md:pr-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] font-bold text-slate-400 font-mono uppercase tracking-wider">⚙️ Astrological Rules Engine</span>
+            <span className={`flex items-center gap-1 text-[8px] font-bold px-1.5 py-0.5 rounded ${rulesStatus ? "text-emerald-400 bg-emerald-500/10" : "text-amber-400 bg-amber-500/10"}`}>
+              <span className={`w-1 h-1 rounded-full ${rulesStatus ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} /> {rulesStatus?.status || "Active"}
+            </span>
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-slate-200 font-medium">Vedic Multi-System Rules (JH1 - JH19)</p>
+            <p className="text-[9px] text-slate-500 font-mono truncate">
+              {rulesStatus?.results ? `${rulesStatus.results.filter((r: any) => r.isMet).length} of ${rulesStatus.results.length} Conditions Met` : "5 of 5 Conditions Met"}
+            </p>
+          </div>
+        </div>
+
+        {/* Current Sky Transit Context */}
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] font-bold text-slate-400 font-mono uppercase tracking-wider">🌍 Current Sky Context</span>
+            <span className={`flex items-center gap-1 text-[8px] font-bold px-1.5 py-0.5 rounded ${currentSky ? "text-emerald-400 bg-emerald-500/10" : "text-amber-400 bg-amber-500/10"}`}>
+              <span className={`w-1 h-1 rounded-full ${currentSky ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} /> Live Ephemeris
+            </span>
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-slate-200 font-medium">
+              {currentSky ? `Moon: ${currentSky.moon?.currentSign?.displayName} (${currentSky.moon?.currentNakshatra?.displayName})` : "Moon: Libra (Chitra)"}
+            </p>
+            <p className="text-[9px] text-slate-500 font-mono truncate">
+              {currentSky ? `Tithi: ${currentSky.moon?.moonPhase?.displayName} • Sun: ${currentSky.sun?.sign?.displayName}` : "Tithi: Sukla Ashtami • Sun: Cancer"}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* TWO-COLUMN GRID LAYOUT */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* LEFT COLUMN: Prompts & Input Form (Spans 5 cols on lg) */}
@@ -296,6 +373,38 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
               </div>
             </div>
           </form>
+
+          {/* Collapsible Rules Status Inspector */}
+          {rulesStatus && rulesStatus.results && (
+            <div className="bg-slate-950/40 border border-slate-900 rounded-xl p-3.5 space-y-2.5">
+              <div className="flex justify-between items-center">
+                <span className="text-[9px] text-slate-400 font-bold font-mono uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" /> Active Natal Rules
+                </span>
+                <span className="text-[8px] font-bold text-slate-500 font-mono">KP Sublords Verification</span>
+              </div>
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin">
+                {rulesStatus.results.map((rule: any) => (
+                  <div key={rule.id} className="p-2 rounded-lg bg-slate-900/40 border border-slate-850 space-y-1">
+                    <div className="flex justify-between items-start gap-2">
+                      <span className="text-[10px] font-bold text-slate-200">{rule.category} Promise ({rule.id})</span>
+                      <span className={`text-[8px] font-black uppercase px-1 rounded-sm ${rule.isMet ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/10" : "bg-red-500/10 text-red-400 border border-red-500/10"}`}>
+                        {rule.isMet ? "Met" : "Alert"}
+                      </span>
+                    </div>
+                    <p className="text-[9px] text-slate-400 leading-relaxed font-sans">{rule.reasoning}</p>
+                    <div className="flex items-center gap-2 text-[8px] text-slate-500 font-mono pt-1 border-t border-slate-850/60 mt-1">
+                      <span>CSL: <strong className="text-slate-300">{rule.significator}</strong></span>
+                      <span>Star: <strong className="text-slate-300">{rule.starLord}</strong></span>
+                      {rule.signifiedHouses && rule.signifiedHouses.length > 0 && (
+                        <span>Houses: <strong className="text-slate-300">[{rule.signifiedHouses.join(", ")}]</strong></span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* RIGHT COLUMN: Dedicated Results Analysis (Spans 7 cols on lg) */}

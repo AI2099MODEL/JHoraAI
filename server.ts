@@ -2984,6 +2984,25 @@ app.get("/api/rules/natal-agent-status", (req, res) => {
   }
 });
 
+app.get("/api/rules/current-sky", (req, res) => {
+  try {
+    const skyPath = path.join(process.cwd(), "src", "knowledgebase", "checklist_engine", "current_sky.json");
+    if (fs.existsSync(skyPath)) {
+      const skyData = JSON.parse(fs.readFileSync(skyPath, "utf-8"));
+      return res.json(skyData);
+    } else {
+      runCurrentSkyUpdaterAgent();
+      if (fs.existsSync(skyPath)) {
+        const skyData = JSON.parse(fs.readFileSync(skyPath, "utf-8"));
+        return res.json(skyData);
+      }
+      return res.status(404).json({ error: "Current sky data not found." });
+    }
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 app.post("/api/rules/natal-agent-refresh", (req, res) => {
   try {
     runNatalRulesEvaluatorAgent();
