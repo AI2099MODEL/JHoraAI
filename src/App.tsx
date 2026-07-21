@@ -1998,10 +1998,16 @@ export default function App() {
 
   const isChatMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mode") === "chat";
 
-  if (isChatMode) {
+  if (isChatMode || activeMenu === "ai_assistant") {
     return (
-      <div className="w-screen h-screen bg-white">
-        <AstroChat astrologyData={astrologyData} isStandalone={true} />
+      <div className="w-screen h-screen bg-white" id="standalone-chat-container">
+        <AstroChat 
+          astrologyData={astrologyData} 
+          isStandalone={true} 
+          onCloseStandalone={() => {
+            setActiveMenu("dashboard");
+          }}
+        />
       </div>
     );
   }
@@ -2194,10 +2200,6 @@ export default function App() {
                 <button
                   key={node.id}
                   onClick={() => {
-                    if (node.id === "ai_assistant") {
-                      window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
-                      return;
-                    }
                     handleMenuSelect(node.id);
                     if (node.submenus && node.submenus.length > 0) {
                       setIsMobileMenuOpen(true);
@@ -3533,10 +3535,6 @@ export default function App() {
             <button
               key={node.id}
               onClick={() => {
-                if (node.id === "ai_assistant") {
-                  window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
-                  return;
-                }
                 handleMenuSelect(node.id);
                 if (node.submenus && node.submenus.length > 0) {
                   setIsMobileMenuOpen(true);

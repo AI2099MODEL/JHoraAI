@@ -49,6 +49,7 @@ import { apiFetch as fetch } from "../lib/api";
 interface AstroChatProps {
   astrologyData: AstrologyData | null;
   isStandalone?: boolean;
+  onCloseStandalone?: () => void;
 }
 
 interface Message {
@@ -59,7 +60,7 @@ interface Message {
   debugInfo?: any;
 }
 
-export default function AstroChat({ astrologyData, isStandalone }: AstroChatProps) {
+export default function AstroChat({ astrologyData, isStandalone, onCloseStandalone }: AstroChatProps) {
   // Sidebar open/close state on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -341,26 +342,6 @@ export default function AstroChat({ astrologyData, isStandalone }: AstroChatProp
             ))}
           </div>
 
-          {/* Quick Suggested Prompts Section - on the Left-Hand Side as requested */}
-          <div className="space-y-1.5 pt-1 border-t border-neutral-200/40">
-            <div className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Flame className="w-3 h-3 text-amber-500" />
-              <span>Suggested Prompts</span>
-            </div>
-            <div className="space-y-1 px-1">
-              {quickPrompts.map((p, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => runAnalysis(p.query)}
-                  className="w-full text-left p-2.5 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-100 hover:border-neutral-350 transition-all text-xs cursor-pointer group shadow-xs"
-                >
-                  <span className="font-semibold text-neutral-800 block leading-tight mb-0.5 group-hover:text-[#5c4df2]">{p.title}</span>
-                  <span className="text-neutral-400 text-[10px] block truncate leading-normal">{p.query}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Chats / Pinned Folders Section */}
           <div className="space-y-1 pt-1 border-t border-neutral-200/40">
             <div className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Pinned Chats</div>
@@ -509,6 +490,28 @@ export default function AstroChat({ astrologyData, isStandalone }: AstroChatProp
               ))}
             </div>
 
+            {onCloseStandalone && (
+              <button
+                onClick={onCloseStandalone}
+                className="flex items-center gap-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border border-neutral-200"
+                title="Return to JHora Astrology Dashboard"
+              >
+                <ChevronRight className="w-3.5 h-3.5 rotate-180" />
+                <span>Return to Dashboard</span>
+              </button>
+            )}
+
+            <button 
+              onClick={() => {
+                window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
+              }}
+              className="flex items-center gap-1.5 border border-neutral-200 px-3 py-1.5 rounded-full text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition-all cursor-pointer bg-white group"
+              title="Open full page in a new window. Note: If you get a 403 error in the preview sandbox, please use the 'Open in new tab' button at the top-right of AI Studio."
+            >
+              <ExternalLink className="w-3.5 h-3.5 group-hover:scale-105 transition-transform text-[#5c4df2]" />
+              <span className="hidden sm:inline">Open in New Window</span>
+            </button>
+
             <button 
               onClick={() => {
                 alert("Share Link: Astrological conversation state serialized securely. Ready to share with your personal circle!");
@@ -540,11 +543,45 @@ export default function AstroChat({ astrologyData, isStandalone }: AstroChatProp
           <div className="max-w-2xl mx-auto space-y-6">
             
             {messages.length === 0 ? (
-              /* CLEAN ELEGANT CHATGPT WELCOME STATE - PURE BLANK LOOK */
-              <div className="flex flex-col items-center justify-center text-center py-20 min-h-[45vh] select-none">
-                <h1 className="text-2xl font-medium text-neutral-800 font-sans tracking-tight">
-                  Ready when you are.
+              /* GORGEOUS PREMIUM CHATGPT-STYLE START SCREEN WITH SUGGESTED PROMPTS GRID */
+              <div className="flex flex-col items-center justify-center text-center py-10 min-h-[50vh]">
+                <div className="bg-gradient-to-tr from-[#5c4df2] to-amber-500 p-3.5 rounded-2xl shadow-md mb-6 animate-pulse select-none">
+                  <Sparkles className="w-7 h-7 text-white" />
+                </div>
+                <h1 className="text-2xl md:text-3xl font-sans font-semibold text-neutral-800 tracking-tight mb-3">
+                  How can JHora Astro AI assist you today?
                 </h1>
+                <p className="text-neutral-400 text-[10px] font-mono max-w-md uppercase tracking-widest mb-8 select-none">
+                  Vedic, KP Stellar & Western Astrological Computational Companion
+                </p>
+
+                {/* Elegant 2x2 Grid for Suggested Prompts - Moving them to the Right-Hand Workspace */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl mt-4 px-4">
+                  {quickPrompts.map((p, idx) => {
+                    // Assign a specific icon and color scheme for each block
+                    const Icon = idx === 0 ? Heart : idx === 1 ? Flame : idx === 2 ? Briefcase : Compass;
+                    const iconColor = idx === 0 ? "text-emerald-500" : idx === 1 ? "text-orange-500" : idx === 2 ? "text-amber-500" : "text-[#5c4df2]";
+                    const bgColor = idx === 0 ? "bg-emerald-50" : idx === 1 ? "bg-orange-50" : idx === 2 ? "bg-amber-50" : "bg-indigo-50";
+
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => runAnalysis(p.query)}
+                        className="w-full text-left p-4 rounded-2xl border border-neutral-200 bg-white hover:bg-neutral-50 hover:border-neutral-350 transition-all cursor-pointer group shadow-xs hover:shadow-sm"
+                      >
+                        <div className="flex items-center gap-2.5 mb-2 select-none">
+                          <div className={`p-1.5 rounded-lg ${bgColor}`}>
+                            <Icon className={`w-4 h-4 ${iconColor}`} />
+                          </div>
+                          <span className="font-semibold text-neutral-800 text-sm group-hover:text-[#5c4df2] transition-colors">{p.title}</span>
+                        </div>
+                        <p className="text-neutral-500 text-xs leading-relaxed line-clamp-3">
+                          {p.query}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             ) : (
               messages.map((msg) => (
