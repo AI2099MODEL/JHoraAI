@@ -110,6 +110,29 @@ function getUserAnalysisContext(userName: string, userEmail: string, uid?: strin
     const normName = userName.toLowerCase().replace(/[^a-z0-9]/g, "");
     const normEmail = userEmail.toLowerCase().trim();
     
+    // Helper to read all files in a folder recursively
+    const readDirRec = (dirPath: string, parentName: string): string => {
+      let contentAcc = "";
+      try {
+        const items = fs.readdirSync(dirPath);
+        for (const item of items) {
+          const fullItemPath = path.join(dirPath, item);
+          const itemStats = fs.statSync(fullItemPath);
+          if (itemStats.isFile()) {
+            if (item.endsWith(".json") || item.endsWith(".md") || item.endsWith(".txt")) {
+              const fileContent = fs.readFileSync(fullItemPath, "utf-8");
+              contentAcc += `\n\n--- FILE: ${parentName}/${item} ---\n${fileContent}\n`;
+            }
+          } else if (itemStats.isDirectory()) {
+            contentAcc += readDirRec(fullItemPath, `${parentName}/${item}`);
+          }
+        }
+      } catch (dirErr) {
+        console.error(`Error reading sub-directory ${dirPath}:`, dirErr);
+      }
+      return contentAcc;
+    };
+    
     for (const file of files) {
       if (file === "README.md") continue;
       const fileLower = file.toLowerCase();
@@ -131,12 +154,19 @@ function getUserAnalysisContext(userName: string, userEmail: string, uid?: strin
         matches = true;
       }
       
+      // Also match generic folder fallback for testing/demo
+      if (fileLower === "userprofile") {
+        matches = true;
+      }
+      
       if (matches) {
         const filePath = path.join(analysisDir, file);
         const stats = fs.statSync(filePath);
         if (stats.isFile()) {
           const content = fs.readFileSync(filePath, "utf-8");
           matchedContent += `\n\n--- FILE: ${file} ---\n${content}\n`;
+        } else if (stats.isDirectory()) {
+          matchedContent += readDirRec(filePath, file);
         }
       }
     }
@@ -2156,6 +2186,27 @@ app.post("/api/astrology/master-ask", async (req, res) => {
       }
     }
 
+    // Load rules engine evaluations dynamically
+    const rulesStatusPath = path.join(process.cwd(), "src", "knowledgebase", "checklist_engine", "natal_rules_agent_status.json");
+    let rulesStatusContent = "";
+    if (fs.existsSync(rulesStatusPath)) {
+      try {
+        rulesStatusContent = fs.readFileSync(rulesStatusPath, "utf-8");
+      } catch (err) {
+        console.error("Failed to read natal_rules_agent_status.json in master-ask:", err);
+      }
+    }
+
+    const currentSkyPath = path.join(process.cwd(), "src", "knowledgebase", "checklist_engine", "current_sky.json");
+    let currentSkyContent = "";
+    if (fs.existsSync(currentSkyPath)) {
+      try {
+        currentSkyContent = fs.readFileSync(currentSkyPath, "utf-8");
+      } catch (err) {
+        console.error("Failed to read current_sky.json in master-ask:", err);
+      }
+    }
+
     // Workspace profiles summary
     let savedProfilesSummary = "";
     try {
@@ -2212,6 +2263,16 @@ ${userAnalysisContext || "No previous analysis files found in the repository for
 ASTROLOGICAL RULES HANDBOOK (System Rules & Table Index):
 ==================================================
 ${handbookContent || "No handbook found on disk."}
+
+==================================================
+ASTROLOGICAL RULES ENGINE EVALUATION STATUS (Natal Rules):
+==================================================
+${rulesStatusContent || "No rules evaluation found on disk."}
+
+==================================================
+GLOBAL CURRENT SKY TRANSIT COORDINATES (Live Sky Context):
+==================================================
+${currentSkyContent || "No live sky coordinates found on disk."}
 
 ==================================================
 COMPLETE ACTIVE PAGES & MULTI-SYSTEM DATASET:
