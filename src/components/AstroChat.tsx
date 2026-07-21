@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
+import { ConversationService } from "../features/ask/services/ConversationService";
 import moodRules from "../knowledgebase/checklist_engine/mood_analysis_rules.json";
 
 interface AstroChatProps {
@@ -255,6 +256,9 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     setAnalysisLoading(true);
 
     try {
+      const preferences = ConversationService.getPreferences();
+      const geminiApiKey = preferences?.geminiApiKey;
+
       const response = await fetch("/api/astrology/master-ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -263,7 +267,8 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           question: queryText,
           targetAge: 50,
           mode: responseMode,
-          history: messages.slice(-6).map(m => ({ sender: m.sender, text: m.text }))
+          history: messages.slice(-6).map(m => ({ sender: m.sender, text: m.text })),
+          geminiApiKey
         })
       });
 

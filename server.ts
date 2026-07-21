@@ -123,23 +123,19 @@ function getOpenAIClient(req?: any): OpenAI {
 }
 
 // Lazy-initialize Gemini API client to avoid startup crashes if key is missing
-let aiClient: GoogleGenAI | null = null;
-function getGeminiClient(): GoogleGenAI {
-  if (!aiClient) {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key) {
-      throw new Error("GEMINI_API_KEY environment variable is required. Please set it in Settings > Secrets.");
-    }
-    aiClient = new GoogleGenAI({
-      apiKey: key,
-      httpOptions: {
-        headers: {
-          "User-Agent": "aistudio-build",
-        },
-      },
-    });
+function getGeminiClient(customKey?: string): GoogleGenAI {
+  const key = customKey || process.env.GEMINI_API_KEY;
+  if (!key) {
+    throw new Error("GEMINI_API_KEY environment variable is required. Please set it in Settings > Secrets.");
   }
-  return aiClient;
+  return new GoogleGenAI({
+    apiKey: key,
+    httpOptions: {
+      headers: {
+        "User-Agent": "aistudio-build",
+      },
+    },
+  });
 }
 
 // Helpers to read and write profile-tagged analysis from/to the analysis folder
@@ -1737,8 +1733,9 @@ To harmonize any planetary imbalances, consider the following traditional measur
 // Endpoint to generate sectioned personalized My Page reading using server-side Gemini API
 app.post("/api/user-profile/generate-summary", async (req, res) => {
   try {
-    const ai = getGeminiClient();
-    let profileData = req.body.profile;
+    const { profile, geminiApiKey } = req.body;
+    let profileData = profile;
+    const ai = getGeminiClient(geminiApiKey);
 
     if (!profileData) {
       // Fallback: Read from Users/userprofile.json
@@ -1861,75 +1858,12 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
     const result = JSON.parse(response.text.trim());
     res.json(result);
   } catch (err: any) {
-    if (err.status === 429 || err.message?.includes("quota") || err.message?.includes("limit")) {
-      console.warn("Gemini API rate limit or quota exceeded in generate-summary. Activating high-fidelity local fallback.");
-    } else {
-      console.warn("Gemini API error in generate-summary. Fallback active:", err.message || err);
+    console.error("Gemini API error in generate-summary:", err);
+    let errMsg = err.message || "Failed to generate reading.";
+    if (err.status === 429 || errMsg.toLowerCase().includes("quota") || errMsg.toLowerCase().includes("limit") || errMsg.toLowerCase().includes("429")) {
+      errMsg = "Gemini API Quota Exceeded. Please configure your personal GEMINI_API_KEY in the Settings panel (top-right corner ⚙️) to ensure unlimited, ultra-fast personal AI readings.";
     }
-
-    // High-fidelity local fallback if Gemini is rate-limited or API key is missing
-    try {
-      let profileData = req.body.profile;
-      if (!profileData) {
-        const filePath = path.join(process.cwd(), "Users", "userprofile.json");
-        if (fs.existsSync(filePath)) {
-          const content = fs.readFileSync(filePath, "utf-8");
-          profileData = JSON.parse(content);
-        }
-      }
-
-      const userName = profileData?.User?.profile_name || "Seeker";
-      const birthDate = profileData?.Birth?.date || "Nitin's Birth Coordinates";
-      const birthPlace = profileData?.Birth?.place || "Calculated Profile";
-      const ascendantSign = profileData?.Vedic?.ascendant?.sign || "Cancer";
-      const ascendantNakshatra = profileData?.Vedic?.ascendant?.nakshatra || "Pushya";
-      const moonPhase = profileData?.Astronomical?.moon_phase || "Waxing Gibbous";
-
-      const fallbackSummary = `Offline Soul Blueprint Synthesis for ${userName}. Your ${ascendantSign} Lagna provides deep emotional sensitivity and intuitive insight, while your planetary alignments guide your karmic evolution towards professional and spiritual mastery.`;
-      const fallbackSections = [
-        {
-          title: "Core Soul Archetype & Personality",
-          content: `As a ${ascendantSign} Ascendant residing in ${ascendantNakshatra} Nakshatra, you possess a highly developed intuitive center and empathetic disposition. The ${moonPhase} phase of your birth represents the specific celestial canvas guiding your emotional responses, offering a natural gift for understanding subtle atmospheres and human feelings.`,
-          remedy: "Spend 5-10 minutes each morning in silent contemplation or focusing on your breath to ground your powerful energy field.",
-          icon: "user"
-        },
-        {
-          title: "Karmic Cycles & Life Path",
-          content: `Your planetary placements indicate active karmic learning through relational and vocational spheres. Major transitions are designed to refine your personal boundaries and build a more resilient and self-authoritative lifestyle.`,
-          remedy: "Engage in acts of selfless service on Saturdays to channel Saturn's slow and disciplining lessons productively.",
-          icon: "zap"
-        },
-        {
-          title: "Prosperity & Life Purpose",
-          content: "With strong indicators in your 2nd and 10th houses, your life purpose is aligned with organizational mastery, counseling, technical fields, or consulting. Financial accrual is promised to materialize through disciplined, consistent effort.",
-          remedy: "Keep a daily gratitude journal listing at least three small achievements or blessings to amplify your 11th house gains.",
-          icon: "briefcase"
-        },
-        {
-          title: "Spiritual Practices & Remedies",
-          content: "Your alignment path favors spiritual and introspective practices that integrate your analytical capabilities with intuitive, high-frequency focus.",
-          remedy: "Incorporate regular pranayama (breath regulation) and mindfulness to soothe your active nervous system and align your core.",
-          icon: "compass"
-        }
-      ];
-
-      res.json({
-        summary: fallbackSummary,
-        sections: fallbackSections
-      });
-    } catch (fallbackErr) {
-      res.status(200).json({
-        summary: "Soul Blueprint Synthesis. Your alignments guide your karmic evolution towards professional and spiritual mastery.",
-        sections: [
-          {
-            title: "Core Soul Archetype",
-            content: "You possess a highly developed intuitive center and empathetic disposition, offering a natural gift for understanding subtle atmospheres and human feelings.",
-            remedy: "Spend 5-10 minutes each morning in silent contemplation.",
-            icon: "user"
-          }
-        ]
-      });
-    }
+    res.status(500).json({ error: errMsg });
   }
 });
 
@@ -2325,7 +2259,7 @@ function buildCanonicalAstroContext(astrologyData: any, userProfile: any, curren
 
 // Endpoint for Master AI Astrologer (Phase 20) with Intent Detection & Knowledge Acquisition
 app.post("/api/astrology/master-ask", async (req, res) => {
-  const { astrologyData, question, history, targetAge, mode = "professional" } = req.body;
+  const { astrologyData, question, history, targetAge, mode = "professional", geminiApiKey } = req.body;
   const startTime = Date.now();
   let promptSize = 0;
 
@@ -2483,7 +2417,7 @@ LAWS OF CELESTIAL ANALYSIS:
 
     promptSize = Buffer.byteLength(userPrompt, "utf-8");
 
-    const ai = getGeminiClient();
+    const ai = getGeminiClient(geminiApiKey);
     let response;
     let modelUsed = "gemini-3.6-flash";
     try {
@@ -2700,195 +2634,43 @@ LAWS OF CELESTIAL ANALYSIS:
 
     res.json(output);
   } catch (apiErr: any) {
-    if (apiErr.status === 429 || apiErr.message?.includes("quota") || apiErr.message?.includes("limit") || apiErr.message?.includes("429")) {
-      console.warn("Gemini API rate limit or quota exceeded during Master Ask. Activating offline fallback.");
-    } else {
-      console.warn("Gemini API error during Master Ask. Fallback active:", apiErr.message || apiErr);
-    }
+    console.error("Gemini API error during Master Ask:", apiErr);
     
-    // High-fidelity local fallback using the active user profile data to make it extremely personalized and responsive
-    const q = (question || "").toLowerCase();
-    const userName = canonicalContext.clientProfile.name;
-    const birthDate = canonicalContext.clientProfile.birthParticulars.date;
-    const birthPlace = canonicalContext.clientProfile.birthParticulars.place;
-    const soulSynthesis = canonicalContext.clientProfile.soulBlueprintSummary;
-
-    // Extract dynamic cuspal sub lords from userProfile safely
-    const csl7 = userProfile?.KP?.cusps?.House_7?.sub_lord || "Ketu";
-    const csl7Star = userProfile?.KP?.planets?.[csl7]?.star_lord || "Venus";
-    const csl7Houses = Array.isArray(userProfile?.KP?.planets?.[csl7]?.ownership) 
-      ? userProfile.KP.planets[csl7].ownership.join(", ") 
-      : "4, 11";
+    let warningMsg = apiErr.message || "Celestial consultation temporarily unavailable.";
+    const isQuotaError = apiErr.status === 429 || warningMsg.toLowerCase().includes("quota") || warningMsg.toLowerCase().includes("limit") || warningMsg.toLowerCase().includes("429") || warningMsg.toLowerCase().includes("resource");
     
-    const csl10 = userProfile?.KP?.cusps?.House_10?.sub_lord || "Rahu";
-    const csl10Star = userProfile?.KP?.planets?.[csl10]?.star_lord || "Jupiter";
-    const csl10Houses = Array.isArray(userProfile?.KP?.planets?.[csl10]?.ownership)
-      ? userProfile.KP.planets[csl10].ownership.join(", ")
-      : "9, 6";
-
-    const lagnaSign = userProfile?.Vedic?.ascendant?.sign || "Cancer";
-    const natalMoonSign = userProfile?.Vedic?.planets?.Moon?.sign || "Aquarius";
-    const natalMoonNak = userProfile?.Vedic?.planets?.Moon?.nakshatra || "Shatabhisha";
-    const natalMoonHouse = userProfile?.KP?.planets?.Moon?.house || userProfile?.Vedic?.planets?.Moon?.house || 8;
-
-    let detectedIntent = "General Chart Consultation";
-    let matchedRules = [
-      { id: "KP_FIN_01", name: "Financial Status & Wealth Promise", status: "Met" },
-      { id: "KP_CAR_01", name: "10th Cuspal Sub Lord for Career", status: "Met" },
-      { id: "KP_DBA_01", name: "Dasha-Bhukti-Antara Trigger", status: "Met" }
-    ];
-    let failedRules = [
-      { id: "KP_HEA_01", name: "Health and Disease Propensity" }
-    ];
-    let replyText = "";
-
-    if (apiErr.status === 429 || apiErr.message?.includes("quota") || apiErr.message?.includes("limit") || apiErr.message?.includes("429")) {
-      replyText += `⚠️ **Gemini API Quota Exceeded**: The shared Gemini API quota has been temporarily exhausted. Please configure your own \`GEMINI_API_KEY\` in the app Settings panel (top-right corner ⚙️) for unlimited, ultra-fast personal AI consultations. Here is your high-fidelity offline synthesis from your calculated profile:\n\n`;
-    } else if (apiErr.message?.includes("GEMINI_API_KEY environment variable is required") || apiErr.message?.includes("API key")) {
-      replyText += `⚠️ **Gemini API Key Notice**: Please set your personal \`GEMINI_API_KEY\` in the Settings panel (top-right corner ⚙️) to activate full real-time conversations. In the meantime, here is your high-fidelity offline synthesis from your calculated profile:\n\n`;
+    if (isQuotaError) {
+      warningMsg = "⚠️ **Gemini API Quota Exceeded**: The shared Gemini API quota has been temporarily exhausted. Please configure your own `GEMINI_API_KEY` in the app Settings panel (top-right corner ⚙️) for unlimited, ultra-fast personal AI consultations.";
+    } else if (warningMsg.includes("GEMINI_API_KEY environment variable is required") || warningMsg.includes("API key")) {
+      warningMsg = "⚠️ **Gemini API Key Notice**: Please set your personal `GEMINI_API_KEY` in the Settings panel (top-right corner ⚙️) to activate full real-time conversations.";
     } else {
-      replyText += `⚠️ **Celestial Session Interrupted** (using offline local synthesis fallback):\n\n`;
+      warningMsg = `⚠️ **Celestial Session Interrupted**: ${warningMsg}`;
     }
 
-    if (soulSynthesis) {
-      replyText += `### Active Soul Blueprint Synthesis\n*"${soulSynthesis}"*\n\n`;
-    }
-
-    if (q.includes("delay") || q.includes("when") || q.includes("time") || q.includes("marri")) {
-      detectedIntent = "Marriage Delay & Timings";
-      matchedRules.push({ id: "KP_MAR_01", name: "7th Cuspal Sub Lord for Marriage", status: "Met" });
-      
-      replyText += `### SUMMARY
-The natal promise for marriage is strong, but Saturn's aspect teaches lessons of patience. Current dasha gates indicate a highly supportive window is approaching.
-
-### KEY FINDINGS
-- **7th CSL Favorable**: ${csl7} in ${csl7Star}'s star signifies houses [${csl7Houses}] confirming relationship promise.
-- **Saturn Aspect**: Temporary delay aspect present, prompting internal maturity and solid preparation.
-- **Timing Gateway**: Favorable Vimshottari Mahadasha/Bhukti periods are highly active.
-
-### ASTROLOGICAL BASIS
-- **Natal Promise**: KP Cuspal Sub-Lord of 7th house (${csl7}) is extremely strong and well-aligned.
-- **DBA**: Currently in ${canonicalContext.dba.mahadasha}-${canonicalContext.dba.bhukti} Vimshottari period.
-- **Transit**: Moon transiting in ${canonicalContext.currentSky.moon.nakshatra} Nakshatra.
-
-### MATCHED RULES
-- **KP_MAR_01** - Cuspal Sub Lord of 7th House for Marriage Timing
-- **KP_DBA_01** - Dasha-Bhukti-Antara Event Trigger Validation
-
-### EVIDENCE
-- **Supporting factors**: Active ${csl7Star}-ruled nakshatras, strong 11th house sublords.
-- **Blocking factors**: Saturn's aspect on the 7th house cusp.
-
-### TIMELINE
-- **Current**: Introspective phase, stabilizing personal foundations.
-- **Near Future**: Progressive dasha transition opening new connection gates.
-- **Long Term**: Deeply rewarding and stable relationship alignment.
-
-### RECOMMENDATION
-- Chant 'Om Shukraya Namah' on Fridays to clear temporary relationship delays and promote harmony.
-
-### CONFIDENCE
-High`;
-    } else if (q.includes("career") || q.includes("work") || q.includes("job") || q.includes("profession")) {
-      detectedIntent = "Career Profile & Growth";
-      replyText += `### SUMMARY
-Excellent career indicators! Your 10th Cuspal Sub-Lord (${csl10}) resides in ${csl10Star}'s star, promising high professional status, stability, and gains.
-
-### KEY FINDINGS
-- **10th CSL Supportive**: ${csl10} signifies houses [${csl10Houses}] triggering professional growth and societal respect.
-- **Dasha Catalyst**: Active ${canonicalContext.dba.mahadasha}-${canonicalContext.dba.bhukti} dasha offers disciplined progress and organizational success.
-- **Transit Synergy**: Current celestial alignments support long-term planning and leadership initiatives.
-
-### ASTROLOGICAL BASIS
-- **Natal Promise**: ${csl10} as 10th Cuspal Sub-Lord is strongly connected to professional houses.
-- **DBA**: Active dasha of ${canonicalContext.dba.mahadasha}-${canonicalContext.dba.bhukti}.
-- **Transit**: Transiting Mars in Gemini aspecting natal placements.
-
-### MATCHED RULES
-- **KP_CAR_01** - 10th Cuspal Sub Lord for Career and Profession Sector
-- **KP_DBA_01** - Dasha-Bhukti-Antara Event Trigger Validation
-
-### EVIDENCE
-- **Supporting factors**: ${csl10}'s strong placement, supportive sublords.
-- **Blocking factors**: Minor professional delays due to Saturn's slow influence.
-
-### TIMELINE
-- **Current**: Consolidating professional authority, taking on serious responsibilities.
-- **Near Future**: Excellent window for leadership expansion and strategic career choices.
-- **Long Term**: Highly secure, high-status leadership position.
-
-### RECOMMENDATION
-- Engage in daily morning meditation and focus on disciplined execution of organizational goals.
-
-### CONFIDENCE
-High`;
-    } else {
-      replyText += `### SUMMARY
-Welcome ${userName}. Based on your birth coordinates (${birthPlace}) and the live sky, you are operating under a highly structured dasha period, prompting long-term growth and stable life path development.
-
-### KEY FINDINGS
-- **Strong Natal Foundation**: ${lagnaSign} Lagna gives natural empathy, while the ${natalMoonSign} Moon in the house ${natalMoonHouse} (residing in ${natalMoonNak} Nakshatra) highlights powerful intuitive insights.
-- **Current Catalyst**: Active dasha of ${canonicalContext.dba.mahadasha}-${canonicalContext.dba.bhukti} is ripe for strategic wealth accumulation and professional expansion.
-- **Current Transit Moon**: Live transiting Moon in ${canonicalContext.currentSky.moon.sign} sign (${canonicalContext.currentSky.moon.nakshatra} Nakshatra) provides a steady ground for mental clarity.
-
-### ASTROLOGICAL BASIS
-- **Natal Promise**: Lagna lord and Cuspal Sublords are fully verified and aligned.
-- **DBA**: Current Vimshottari period: ${canonicalContext.dba.mahadasha}-${canonicalContext.dba.bhukti}-${canonicalContext.dba.antara}.
-- **Transit**: Live transit Moon in ${canonicalContext.currentSky.moon.nakshatra} Nakshatra.
-
-### MATCHED RULES
-- **KP_CAR_01** - 10th Cuspal Sub Lord for Career and Profession Sector
-- **KP_FIN_01** - Financial Status & Wealth Promise via 2nd Cuspal Sub Lord
-- **KP_DBA_01** - Dasha-Bhukti-Antara Event Trigger Validation
-
-### EVIDENCE
-- **Supporting factors**: Active dasha lords are friendly to Lagna, live Moon is in a stable constellation.
-- **Blocking factors**: Saturn's discipline phase advises focus and clear planning.
-
-### TIMELINE
-- **Current**: Progressive daily routine, mental clarity, and gradual dasha gains.
-- **Near Future**: Favorable dasha and transit alignments opening doors in career and finance.
-- **Long Term**: Fully established professional mastery and secure financial foundations.
-
-### RECOMMENDATION
-- Maintain a structured daily routine, practice mindful meditation, and make decisions based on deterministic indicators.
-
-### CONFIDENCE
-High`;
-    }
-
-    const fallbackOutput = {
-      reply: replyText,
+    const errorOutput = {
+      reply: warningMsg,
       debugInfo: {
         knowledgeBookVersion: canonicalContext.metadata.knowledgeBookVersion,
-        matchedRules,
-        failedRules,
-        evidence: [
-          "Natal 10th Cuspal Sub-lord Rahu well placed",
-          "Active Mercury-Saturn Vimshottari major period",
-          "Live transit Moon in supportive constellation"
-        ],
-        decision: canonicalContext.decision.promiseEvaluation,
-        timeline: [
-          "Current: Stable dasha progression",
-          "Next 3 Months: High professional synergy",
-          "Long-Term: Secured leadership"
-        ],
-        eventIds: ["CAR001", "FIN001", "TR_GEN_01"],
-        currentSkySnapshot: `Moon: ${canonicalContext.currentSky.moon.sign} (${canonicalContext.currentSky.moon.nakshatra}) • Sun: Cancer`,
+        matchedRules: [],
+        failedRules: [],
+        evidence: [],
+        decision: `Error: ${apiErr.message || "API call failed"}`,
+        timeline: [],
+        eventIds: [],
+        currentSkySnapshot: "",
         promptSize: `${(promptSize / 1024).toFixed(2)} KB`,
         responseTime: `${Date.now() - startTime} ms`,
-        modelUsed: "offline-fallback-engine",
-        contextSourcesLoaded: ["KP Knowledge Book", "User Profile Analysis", "Natal Rule Results", "DBA", "Current Sky", "Event Book"]
+        modelUsed: "none",
+        contextSourcesLoaded: []
       },
       intentDetected: {
-        intent: detectedIntent,
-        confidence: 90
+        intent: "Error",
+        confidence: 0
       },
       candidateKnowledge: null
     };
 
-    res.json(fallbackOutput);
+    res.json(errorOutput);
   }
 });
 

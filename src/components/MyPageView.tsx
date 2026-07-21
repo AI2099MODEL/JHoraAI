@@ -28,6 +28,7 @@ import {
   generateTransitDBAConvergencePDF
 } from "../lib/specializedReports";
 import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelationshipEvidenceEngine";
+import { ConversationService } from "../features/ask/services/ConversationService";
 import {
   User,
   Calendar,
@@ -2011,10 +2012,13 @@ export function MyPageView({
     setGenerationLoading(true);
     setErrorMsg(null);
     try {
+      const preferences = ConversationService.getPreferences();
+      const geminiApiKey = preferences?.geminiApiKey;
+
       const response = await fetch("/api/user-profile/generate-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile }),
+        body: JSON.stringify({ profile, geminiApiKey }),
       });
 
       if (!response.ok) {
