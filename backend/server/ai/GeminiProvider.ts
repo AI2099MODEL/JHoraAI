@@ -4,29 +4,39 @@ export class EnterpriseMultiTenantRouter {
   constructor(private prompt: string, private session: { google_id?: string; user_google_key?: string; saved_keys?: { GROQ_API_KEY?: string; OPENROUTER_API_KEY?: string } } = {}, private systemInstruction?: string) {}
 
   async processQuery(): Promise<string> {
-    const fullPrompt = this.systemInstruction ? `System Instructions: ${this.systemInstruction}\n\nUser Query: ${this.prompt}` : this.prompt;
+    const fullPrompt = this.systemInstruction ? `${this.systemInstruction}\n\nUser Question: ${this.prompt}` : this.prompt;
+    const encodedPrompt = encodeURIComponent(fullPrompt);
 
     const pipeline = [
       {
-        name: "Primary Layer: Pollinations 100% Free Public AI Engine (No Key Required)",
+        name: "Primary Layer: Pollinations AI Free Text API (GET)",
+        run: async () => {
+          const response = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=openai`);
+          if (!response.ok) throw new Error("Pollinations GET failed.");
+          const text = await response.text();
+          if (!text || text.length < 5 || text.includes("error")) throw new Error("Pollinations invalid text.");
+          return text;
+        }
+      },
+      {
+        name: "Secondary Layer: Pollinations AI Free Text API (POST)",
         run: async () => {
           const response = await fetch("https://text.pollinations.ai/", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               messages: [{ role: "user", content: fullPrompt }],
-              model: "openai",
-              jsonMode: false
+              model: "openai"
             })
           });
-          if (!response.ok) throw new Error("Pollinations API failed.");
+          if (!response.ok) throw new Error("Pollinations POST failed.");
           const text = await response.text();
           if (!text || text.length < 5) throw new Error("Pollinations empty response.");
           return text;
         }
       },
       {
-        name: "Secondary Layer: Groq Cloud LPU Speed Node",
+        name: "Tertiary Layer: Groq Cloud LPU Speed Node",
         run: async () => {
           const activeKey = this.session.saved_keys?.GROQ_API_KEY || process.env.GROQ_API_KEY;
           if (!activeKey) throw new Error("401: Groq API key not configured.");
@@ -48,7 +58,7 @@ export class EnterpriseMultiTenantRouter {
         }
       },
       {
-        name: "Tertiary Layer: OpenRouter Free Tier Cluster",
+        name: "Quaternary Layer: OpenRouter Free Tier Cluster",
         run: async () => {
           const activeKey = this.session.saved_keys?.OPENROUTER_API_KEY || process.env.OPENROUTER_API_KEY;
           if (!activeKey) throw new Error("401: OpenRouter API key not configured.");
@@ -74,32 +84,25 @@ export class EnterpriseMultiTenantRouter {
         }
       },
       {
-        name: "Quaternary Layer: Gemini Free Tier (If Configured & Quota Available)",
+        name: "Quinary Layer: Gemini Free Tier",
         run: async () => {
           const activeKey = this.session.user_google_key || process.env.GEMINI_API_KEY;
           if (!activeKey) throw new Error("401: No Gemini configuration key.");
           
-          const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash-lite"];
-          for (const model of models) {
-            try {
-              const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${activeKey}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  contents: [{ parts: [{ text: fullPrompt }] }],
-                  systemInstruction: this.systemInstruction ? { parts: [{ text: this.systemInstruction }] } : undefined
-                })
-              });
-              if (response.status === 429) continue;
-              const outputData = await response.json();
-              if (response.ok && outputData.candidates?.[0]?.content?.parts?.[0]?.text) {
-                return outputData.candidates[0].content.parts[0].text;
-              }
-            } catch (e) {
-              // try next model
-            }
+          const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${activeKey}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: fullPrompt }] }],
+              systemInstruction: this.systemInstruction ? { parts: [{ text: this.systemInstruction }] } : undefined
+            })
+          });
+          if (response.status === 429) throw new Error("429: Gemini Quota Exhausted.");
+          const outputData = await response.json();
+          if (response.ok && outputData.candidates?.[0]?.content?.parts?.[0]?.text) {
+            return outputData.candidates[0].content.parts[0].text;
           }
-          throw new Error("429: Gemini Quota Exhausted.");
+          throw new Error("Gemini failed.");
         }
       }
     ];
@@ -107,7 +110,7 @@ export class EnterpriseMultiTenantRouter {
     for (const step of pipeline) {
       try {
         const result = await step.run();
-        if (result) return result;
+        if (result && result.trim().length > 0) return result;
       } catch (err: any) {
         console.warn(`[${step.name}] caught: ${err.message}`);
       }
