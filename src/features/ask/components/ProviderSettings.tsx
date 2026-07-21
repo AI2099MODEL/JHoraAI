@@ -21,7 +21,7 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ preferences,
   const [claudeModels, setClaudeModels] = useState<string[]>([]);
 
   const [selectedOpenaiModel, setSelectedOpenaiModel] = useState(preferences.preferredModels.openai || "gpt-4o-mini");
-  const [selectedGeminiModel, setSelectedGeminiModel] = useState(preferences.preferredModels.gemini || "gemini-3.5-flash");
+  const [selectedGeminiModel, setSelectedGeminiModel] = useState(preferences.preferredModels.gemini || "gemini-3.6-flash");
   const [selectedClaudeModel, setSelectedClaudeModel] = useState(preferences.preferredModels.claude || "claude-3-5-sonnet-latest");
 
   const [testStatus, setTestStatus] = useState<{ [key: string]: "idle" | "loading" | "success" | "error" }>({

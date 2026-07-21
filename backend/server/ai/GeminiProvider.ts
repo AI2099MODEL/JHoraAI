@@ -24,15 +24,40 @@ export class GeminiProvider implements AIProvider {
       parts: [{ text: m.content }],
     }));
 
-    const response = await ai.models.generateContent({
-      model: options.model || "gemini-3.5-flash",
-      contents: contents,
-      config: {
-        systemInstruction: options.systemInstruction || "You are JHoraAI, a premium AI workspace assistant for professional astrologers. You reason over astrological calculations but never perform them yourself. Always respond clearly.",
-      },
-    });
+    const requestedModel = options.model || "gemini-3.6-flash";
 
-    return { text: response.text || "" };
+    try {
+      const response = await ai.models.generateContent({
+        model: requestedModel,
+        contents: contents,
+        config: {
+          systemInstruction: options.systemInstruction || "You are JHoraAI, a premium AI workspace assistant for professional astrologers. You reason over astrological calculations but never perform them yourself. Always respond clearly.",
+        },
+      });
+
+      return { text: response.text || "" };
+    } catch (e: any) {
+      const errMsg = (e.message || "").toLowerCase();
+      const isQuotaError = e.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
+      
+      if (isQuotaError && requestedModel !== "gemini-3.1-flash-lite") {
+        console.warn(`Gemini quota exceeded for model ${requestedModel}. Falling back to gemini-3.1-flash-lite...`);
+        try {
+          const response = await ai.models.generateContent({
+            model: "gemini-3.1-flash-lite",
+            contents: contents,
+            config: {
+              systemInstruction: options.systemInstruction || "You are JHoraAI, a premium AI workspace assistant for professional astrologers. You reason over astrological calculations but never perform them yourself. Always respond clearly.",
+            },
+          });
+          return { text: response.text || "" };
+        } catch (fallbackErr: any) {
+          console.error("Gemini fallback to gemini-3.1-flash-lite failed:", fallbackErr);
+          throw fallbackErr;
+        }
+      }
+      throw e;
+    }
   }
 
   async stream(options: ChatOptions, onChunk: (text: string) => void): Promise<void> {
@@ -42,27 +67,56 @@ export class GeminiProvider implements AIProvider {
       parts: [{ text: m.content }],
     }));
 
-    const responseStream = await ai.models.generateContentStream({
-      model: options.model || "gemini-3.5-flash",
-      contents: contents,
-      config: {
-        systemInstruction: options.systemInstruction || "You are JHoraAI, a premium AI workspace assistant for professional astrologers. You reason over astrological calculations but never perform them yourself. Always respond clearly.",
-      },
-    });
+    const requestedModel = options.model || "gemini-3.6-flash";
 
-    for await (const chunk of responseStream) {
-      if (chunk.text) {
-        onChunk(chunk.text);
+    try {
+      const responseStream = await ai.models.generateContentStream({
+        model: requestedModel,
+        contents: contents,
+        config: {
+          systemInstruction: options.systemInstruction || "You are JHoraAI, a premium AI workspace assistant for professional astrologers. You reason over astrological calculations but never perform them yourself. Always respond clearly.",
+        },
+      });
+
+      for await (const chunk of responseStream) {
+        if (chunk.text) {
+          onChunk(chunk.text);
+        }
       }
+    } catch (e: any) {
+      const errMsg = (e.message || "").toLowerCase();
+      const isQuotaError = e.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
+      
+      if (isQuotaError && requestedModel !== "gemini-3.1-flash-lite") {
+        console.warn(`Gemini quota exceeded for stream with ${requestedModel}. Falling back to gemini-3.1-flash-lite stream...`);
+        try {
+          const responseStream = await ai.models.generateContentStream({
+            model: "gemini-3.1-flash-lite",
+            contents: contents,
+            config: {
+              systemInstruction: options.systemInstruction || "You are JHoraAI, a premium AI workspace assistant for professional astrologers. You reason over astrological calculations but never perform them yourself. Always respond clearly.",
+            },
+          });
+          for await (const chunk of responseStream) {
+            if (chunk.text) {
+              onChunk(chunk.text);
+            }
+          }
+          return;
+        } catch (fallbackErr: any) {
+          console.error("Gemini stream fallback to gemini-3.1-flash-lite failed:", fallbackErr);
+          throw fallbackErr;
+        }
+      }
+      throw e;
     }
   }
 
   async health(apiKey?: string): Promise<{ status: "available" | "unavailable"; message: string }> {
     try {
       const ai = this.getClient(apiKey);
-      // Simple ping call
       const res = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-3.6-flash",
         contents: "ping",
         config: {
           maxOutputTokens: 5,
@@ -73,13 +127,28 @@ export class GeminiProvider implements AIProvider {
       }
       return { status: "unavailable", message: "Empty response from Gemini." };
     } catch (e: any) {
+      try {
+        const ai = this.getClient(apiKey);
+        const res = await ai.models.generateContent({
+          model: "gemini-3.1-flash-lite",
+          contents: "ping",
+          config: {
+            maxOutputTokens: 5,
+          },
+        });
+        if (res.text) {
+          return { status: "available", message: "Gemini connection is active (via Lite fallback)." };
+        }
+      } catch (innerE) {
+        // Ignored
+      }
       return { status: "unavailable", message: e.message || "Failed to connect to Gemini." };
     }
   }
 
   async models(apiKey?: string): Promise<string[]> {
     return [
-      "gemini-3.5-flash",
+      "gemini-3.6-flash",
       "gemini-3.1-pro-preview",
       "gemini-3.1-flash-lite"
     ];

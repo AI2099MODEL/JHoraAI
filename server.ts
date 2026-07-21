@@ -1782,36 +1782,77 @@ Synthesize these configurations into 4 distinct, meaningful, and comprehensive s
 Use the requested JSON schema. Choose appropriate icons for each section from: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'.
     `;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            summary: {
-              type: Type.STRING,
-              description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
-            },
-            sections: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
-                  content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
-                  remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
-                  icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
-                },
-                required: ["title", "content", "remedy", "icon"]
+    let response;
+    try {
+      response = await ai.models.generateContent({
+        model: "gemini-3.6-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              summary: {
+                type: Type.STRING,
+                description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
+              },
+              sections: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
+                    content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
+                    remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
+                    icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
+                  },
+                  required: ["title", "content", "remedy", "icon"]
+                }
               }
-            }
-          },
-          required: ["summary", "sections"]
+            },
+            required: ["summary", "sections"]
+          }
         }
+      });
+    } catch (apiErr: any) {
+      const errMsg = (apiErr.message || "").toLowerCase();
+      const isQuotaError = apiErr.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
+      if (isQuotaError) {
+        console.warn("Gemini 3.6-flash quota exceeded in generate-summary. Trying gemini-3.1-flash-lite...");
+        response = await ai.models.generateContent({
+          model: "gemini-3.1-flash-lite",
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                summary: {
+                  type: Type.STRING,
+                  description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
+                },
+                sections: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
+                      content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
+                      remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
+                      icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
+                    },
+                    required: ["title", "content", "remedy", "icon"]
+                  }
+                }
+              },
+              required: ["summary", "sections"]
+            }
+          }
+        });
+      } else {
+        throw apiErr;
       }
-    });
+    }
 
     if (!response.text) {
       throw new Error("Empty response from Gemini API.");
@@ -2443,101 +2484,209 @@ LAWS OF CELESTIAL ANALYSIS:
     promptSize = Buffer.byteLength(userPrompt, "utf-8");
 
     const ai = getGeminiClient();
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: userPrompt,
-      config: {
-        systemInstruction,
-        tools: [{ googleSearch: {} }],
-        toolConfig: { includeServerSideToolInvocations: true },
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            reply: {
-              type: Type.STRING,
-              description: "The main conversational response to the user's question, styled elegantly with clean markdown."
-            },
-            debugInfo: {
-              type: Type.OBJECT,
-              properties: {
-                knowledgeBookVersion: { type: Type.STRING },
-                matchedRules: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      id: { type: Type.STRING },
-                      name: { type: Type.STRING },
-                      status: { type: Type.STRING }
-                    },
-                    required: ["id", "name", "status"]
+    let response;
+    let modelUsed = "gemini-3.6-flash";
+    try {
+      response = await ai.models.generateContent({
+        model: "gemini-3.6-flash",
+        contents: userPrompt,
+        config: {
+          systemInstruction,
+          tools: [{ googleSearch: {} }],
+          toolConfig: { includeServerSideToolInvocations: true },
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              reply: {
+                type: Type.STRING,
+                description: "The main conversational response to the user's question, styled elegantly with clean markdown."
+              },
+              debugInfo: {
+                type: Type.OBJECT,
+                properties: {
+                  knowledgeBookVersion: { type: Type.STRING },
+                  matchedRules: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        id: { type: Type.STRING },
+                        name: { type: Type.STRING },
+                        status: { type: Type.STRING }
+                      },
+                      required: ["id", "name", "status"]
+                    }
+                  },
+                  failedRules: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        id: { type: Type.STRING },
+                        name: { type: Type.STRING }
+                      },
+                      required: ["id", "name"]
+                    }
+                  },
+                  evidence: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  },
+                  decision: { type: Type.STRING },
+                  timeline: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  },
+                  eventIds: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
+                  },
+                  currentSkySnapshot: { type: Type.STRING },
+                  contextSourcesLoaded: {
+                    type: Type.ARRAY,
+                    items: { type: Type.STRING }
                   }
                 },
-                failedRules: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      id: { type: Type.STRING },
-                      name: { type: Type.STRING }
-                    },
-                    required: ["id", "name"]
-                  }
+                required: [
+                  "knowledgeBookVersion",
+                  "matchedRules",
+                  "failedRules",
+                  "evidence",
+                  "decision",
+                  "timeline",
+                  "eventIds",
+                  "currentSkySnapshot",
+                  "contextSourcesLoaded"
+                ]
+              },
+              intentDetected: {
+                type: Type.OBJECT,
+                properties: {
+                  intent: { type: Type.STRING },
+                  confidence: { type: Type.INTEGER }
                 },
-                evidence: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
-                },
-                decision: { type: Type.STRING },
-                timeline: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
-                },
-                eventIds: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
-                },
-                currentSkySnapshot: { type: Type.STRING },
-                contextSourcesLoaded: {
-                  type: Type.ARRAY,
-                  items: { type: Type.STRING }
+                required: ["intent", "confidence"]
+              },
+              candidateKnowledge: {
+                type: Type.OBJECT,
+                properties: {
+                  classification: { type: Type.STRING },
+                  source: { type: Type.STRING },
+                  category: { type: Type.STRING },
+                  confidence: { type: Type.INTEGER }
                 }
-              },
-              required: [
-                "knowledgeBookVersion",
-                "matchedRules",
-                "failedRules",
-                "evidence",
-                "decision",
-                "timeline",
-                "eventIds",
-                "currentSkySnapshot",
-                "contextSourcesLoaded"
-              ]
-            },
-            intentDetected: {
-              type: Type.OBJECT,
-              properties: {
-                intent: { type: Type.STRING },
-                confidence: { type: Type.INTEGER }
-              },
-              required: ["intent", "confidence"]
-            },
-            candidateKnowledge: {
-              type: Type.OBJECT,
-              properties: {
-                classification: { type: Type.STRING },
-                source: { type: Type.STRING },
-                category: { type: Type.STRING },
-                confidence: { type: Type.INTEGER }
               }
-            }
-          },
-          required: ["reply", "debugInfo", "intentDetected"]
+            },
+            required: ["reply", "debugInfo", "intentDetected"]
+          }
         }
+      });
+    } catch (apiErr: any) {
+      const errMsg = (apiErr.message || "").toLowerCase();
+      const isQuotaError = apiErr.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
+      if (isQuotaError) {
+        console.warn("Gemini 3.6-flash quota exceeded in Master Ask. Trying gemini-3.1-flash-lite...");
+        modelUsed = "gemini-3.1-flash-lite";
+        response = await ai.models.generateContent({
+          model: "gemini-3.1-flash-lite",
+          contents: userPrompt,
+          config: {
+            systemInstruction,
+            tools: [{ googleSearch: {} }],
+            toolConfig: { includeServerSideToolInvocations: true },
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                reply: {
+                  type: Type.STRING,
+                  description: "The main conversational response to the user's question, styled elegantly with clean markdown."
+                },
+                debugInfo: {
+                  type: Type.OBJECT,
+                  properties: {
+                    knowledgeBookVersion: { type: Type.STRING },
+                    matchedRules: {
+                      type: Type.ARRAY,
+                      items: {
+                        type: Type.OBJECT,
+                        properties: {
+                          id: { type: Type.STRING },
+                          name: { type: Type.STRING },
+                          status: { type: Type.STRING }
+                        },
+                        required: ["id", "name", "status"]
+                      }
+                    },
+                    failedRules: {
+                      type: Type.ARRAY,
+                      items: {
+                        type: Type.OBJECT,
+                        properties: {
+                          id: { type: Type.STRING },
+                          name: { type: Type.STRING }
+                        },
+                        required: ["id", "name"]
+                      }
+                    },
+                    evidence: {
+                      type: Type.ARRAY,
+                      items: { type: Type.STRING }
+                    },
+                    decision: { type: Type.STRING },
+                    timeline: {
+                      type: Type.ARRAY,
+                      items: { type: Type.STRING }
+                    },
+                    eventIds: {
+                      type: Type.ARRAY,
+                      items: { type: Type.STRING }
+                    },
+                    currentSkySnapshot: { type: Type.STRING },
+                    contextSourcesLoaded: {
+                      type: Type.ARRAY,
+                      items: { type: Type.STRING }
+                    }
+                  },
+                  required: [
+                    "knowledgeBookVersion",
+                    "matchedRules",
+                    "failedRules",
+                    "evidence",
+                    "decision",
+                    "timeline",
+                    "eventIds",
+                    "currentSkySnapshot",
+                    "contextSourcesLoaded"
+                  ]
+                },
+                intentDetected: {
+                  type: Type.OBJECT,
+                  properties: {
+                    intent: { type: Type.STRING },
+                    confidence: { type: Type.INTEGER }
+                },
+                required: ["intent", "confidence"]
+              },
+              candidateKnowledge: {
+                type: Type.OBJECT,
+                properties: {
+                  classification: { type: Type.STRING },
+                  source: { type: Type.STRING },
+                  category: { type: Type.STRING },
+                  confidence: { type: Type.INTEGER }
+                }
+              }
+            },
+            required: ["reply", "debugInfo", "intentDetected"]
+          }
+        }
+      });
+      } else {
+        throw apiErr;
       }
-    });
+    }
 
     const text = response.text || "{}";
     const output = JSON.parse(text);
@@ -2546,7 +2695,7 @@ LAWS OF CELESTIAL ANALYSIS:
     if (output && output.debugInfo) {
       output.debugInfo.promptSize = `${(promptSize / 1024).toFixed(2)} KB`;
       output.debugInfo.responseTime = `${Date.now() - startTime} ms`;
-      output.debugInfo.modelUsed = "gemini-3.5-flash";
+      output.debugInfo.modelUsed = modelUsed;
     }
 
     res.json(output);
