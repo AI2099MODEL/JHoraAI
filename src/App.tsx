@@ -104,9 +104,11 @@ import { UpdateManager, UpdateManifest } from "./lib/androidOta";
 import GithubOtaView from "./components/GithubOtaView";
 import { apiFetch as fetch } from "./lib/api";
 import EngineGuide from "./components/EngineGuide";
+import KpDocumentationView from "./components/KpDocumentationView";
 
 const SETTINGS_SUBMENU_IDS = [
   "theme",
+  "kp_documentation",
   "google_drive",
   "google_calendar",
   "google_gmail",
@@ -1526,6 +1528,7 @@ export default function App() {
 
         // Category 9: SETTINGS
         { id: "theme", label: "Theme", description: "Dark, Light, and custom styling.", systemId: "astro", category: "SETTINGS" },
+        { id: "kp_documentation", label: "KP Documentation", description: "KP Knowledge Book, Rulebook & Context Specifications.", systemId: "astro", category: "SETTINGS" },
         { id: "google_drive", label: "Google Drive Backup", description: "Save and load birth charts on Google Drive.", systemId: "astro", category: "SETTINGS" },
         { id: "google_calendar", label: "Google Calendar Sync", description: "Sync Vimshottari dasha events to calendar.", systemId: "astro", category: "SETTINGS" },
         { id: "google_gmail", label: "Google Gmail Dispatcher", description: "Send astrological reports via Gmail.", systemId: "astro", category: "SETTINGS" },
@@ -2957,6 +2960,8 @@ export default function App() {
                     <WorkspaceTab astrologyData={astrologyData} activeSub={activeSubmenuId} />
                   ) : activeSubmenuId === "github_ota" ? (
                     <GithubOtaView isDarkTheme={isDark} />
+                  ) : activeSubmenuId === "kp_documentation" ? (
+                    <KpDocumentationView isDark={isDark} />
                   ) : (
                     <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
                       <div className="border-b border-indigo-500/10 pb-4">

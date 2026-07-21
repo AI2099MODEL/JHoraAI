@@ -1798,6 +1798,9 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
               { id: "implementation_phase", label: "IMPLEMENTATION PHASE" },
               { id: "mdrs", label: "DET. RULE SPEC (MDRS)" },
               { id: "kp_foundation_pack_001", label: "KP FOUNDATION PACK 001" },
+              { id: "kp_knowledge_book_specs", label: "KP KNOWLEDGE BOOK SPECS" },
+              { id: "kp_rulebook_specs", label: "KP RULEBOOK SPECS" },
+              { id: "kp_rule_execution_context_specs", label: "KP EXECUTION CONTEXT" },
               { id: "crer_ceo_pipeline", label: "CRER & CEO PIPELINE" },
               { id: "simulator_v2", label: "SIMULATOR V2 (MULTI-EVENT)" }
             ].map((section) => (
@@ -3519,6 +3522,122 @@ if (fertileCount === 0 && barrenCount >= 3) {
                   </div>
                 );
               })()}
+
+              {activeEventBookSection === "kp_knowledge_book_specs" && (
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                  <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                    <span>★</span> MODULE: KP KNOWLEDGE BOOK (SPECIFICATION v1.0)
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    The <strong>KP Knowledge Book</strong> is the permanent deterministic KP repository for each user profile. It stores all static KP calculations (planets, houses, cusps, significators, event profiles, strengths) and is generated <strong>only once</strong> when a new profile is created, birth details change, or recalculation is requested. Prediction and event matching runs strictly load this cached object.
+                  </p>
+                  
+                  <div className="p-3 rounded bg-slate-900/60 border border-slate-800 space-y-1.5 font-mono text-[10px] text-slate-400">
+                    <span className="text-slate-200 font-bold block mb-1">CANONICAL KNOWLEDGE BOOK SCHEMA (JSON representation)</span>
+                    <pre className="text-amber-500/90 leading-normal font-mono text-[9.5px] overflow-x-auto">
+{`{
+  "version": "1.0",
+  "chartId": "CHART_NITIN_1983",
+  "generatedOn": 1782294103000,
+  "ayanamsa": "Lahiri",
+  "birthDetails": { "name": "Nitin", "dob": "1983-10-23", "tob": "18:40:00" },
+  "planets": [
+    { "name": "Sun", "longitude": 186.23, "starLord": "Rahu", "subLord": "Saturn", "subSubLord": "Venus" }
+  ],
+  "houses": [
+    { "house": 1, "longitude": 34.52, "starLord": "Mars", "subLord": "Ketu", "subSubLord": "Jupiter" }
+  ],
+  "significators": [
+    { "planet": "Sun", "primaryHouses": [2, 7], "secondaryHouses": [11], "strength": 8.5 }
+  ],
+  "eventProfiles": [
+    { "event": "Marriage", "promise": true, "primaryHouses": [2, 7, 11], "confidenceBase": 85.0 }
+  ]
+}`}
+                    </pre>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[10px] font-mono text-slate-400">
+                    <div className="p-3 bg-slate-900/40 rounded border border-slate-800/80">
+                      <span className="text-slate-200 font-bold block mb-1">PLANET CHARACTERISTICS</span>
+                      Tracks coordinate degree, retro/combust state, ownership, natural significations, nakshatra, and SSL (Sub Sub Lord) levels.
+                    </div>
+                    <div className="p-3 bg-slate-900/40 rounded border border-slate-800/80">
+                      <span className="text-slate-200 font-bold block mb-1">EVENT PROFILE ARCHIVE</span>
+                      Stores pre-calculated natal promise verdicts across 14 events with confidence base scores to bypass repetitive calculations.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "kp_rulebook_specs" && (
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                  <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                    <span>★</span> MODULE: KP RULEBOOK (SPECIFICATION v1.0)
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    The <strong>KP Rulebook</strong> is a static, deterministic repository of all astrological condition rules. It is loaded once during system startup and contains no dynamic evaluation logic. Rules are strictly immutable, deterministic, and mapped directly to permanent rule IDs (e.g., <code className="text-amber-400">KP_MAR_0001</code>).
+                  </p>
+
+                  <div className="p-3 rounded bg-slate-900/60 border border-slate-800 space-y-1.5 font-mono text-[10px] text-slate-400">
+                    <span className="text-slate-200 font-bold block mb-1">STATIC RULE DATA SCHEME</span>
+                    <pre className="text-indigo-400 leading-normal font-mono text-[9.5px] overflow-x-auto">
+{`{
+  "id": "KP_MAR_0001",
+  "name": "7th Cuspal Sub-Lord Primary Significator",
+  "category": "Marriage",
+  "description": "Evaluates if 7th CSL connects to 2nd, 7th, or 11th house without blocking aspects.",
+  "requiredHouses": [2, 7, 11],
+  "supportingHouses": [5, 9],
+  "blockingHouses": [1, 6, 10],
+  "weight": 10,
+  "priority": 1,
+  "enabled": true
+}`}
+                    </pre>
+                  </div>
+
+                  <div className="p-3 bg-amber-500/10 rounded-lg border border-amber-500/20 text-[10px] text-slate-300 font-mono">
+                    <strong>IMMUTABILITY PRINCIPLE:</strong> Under no circumstances can rules contain dynamic state or execution calculations. They are purely diagnostic blueprints that define target house nodes and planet signifiers for the execution context to match against.
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "kp_rule_execution_context_specs" && (
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                  <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                    <span>★</span> MODULE: KP RULE EXECUTION CONTEXT (SPECIFICATION v1.0)
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    The <strong>KPRuleExecutionContext</strong> represents the immutable runtime state built dynamically for a single prediction query. It compiles the static <strong>KP Knowledge Book</strong> data alongside the current dynamic Vimshottari Mahadasha/Bhukti/Antardasha (DBA) period, and Gochara transit positions, providing a self-contained snapshot for the Rule Engine.
+                  </p>
+
+                  <div className="p-3 rounded bg-slate-900/60 border border-slate-800 space-y-1.5 font-mono text-[10px] text-slate-400">
+                    <span className="text-slate-200 font-bold block mb-1">RUN-TIME SNAPSHOT STRUCTURE</span>
+                    <pre className="text-emerald-400 leading-normal font-mono text-[9.5px] overflow-x-auto">
+{`{
+  "chartId": "CHART_NITIN_1983",
+  "event": "Marriage Promise & Timing",
+  "generatedOn": 1782294156000,
+  "knowledgeBook": { /* KPKnowledgeBook reference */ },
+  "currentDBA": {
+    "mahadasha": "Ketu", "bhukti": "Venus", "antardasha": "Saturn",
+    "mahadashaSignifies": [2, 7], "bhuktiSignifies": [7, 11]
+  },
+  "currentTransit": {
+    "moonSign": "Taurus", "moonNakshatra": "Rohini",
+    "planetCoordinates": { "Venus": 45.2, "Jupiter": 210.8 }
+  },
+  "requestedDate": 1782294156000
+}`}
+                    </pre>
+                  </div>
+
+                  <div className="p-3 bg-indigo-500/10 rounded-lg border border-indigo-500/20 text-[10px] text-slate-300 font-mono">
+                    <strong>TRACEABILITY MATRIX:</strong> Stores permanent system parameters (such as the context UUID, loaded rulebook version, and generation timestamp) to allow tracing any predicted astrological output back to the underlying rule definition.
+                  </div>
+                </div>
+              )}
 
               {activeEventBookSection === "crer_ceo_pipeline" && (() => {
                 // Dynamically build the JSON objects for CRER and CEO based on Nitin's selected rule!

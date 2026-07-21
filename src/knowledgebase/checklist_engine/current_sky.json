@@ -3,46 +3,46 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-20T14:56:25.950Z",
+    "lastUpdated": "2026-07-21T02:59:30.438Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-20T14:56:25.950Z",
-    "localTime": "2026-07-20T07:56:25-07:00",
+    "utcTime": "2026-07-21T02:59:30.438Z",
+    "localTime": "2026-07-20T19:59:30-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
-      "id": "Virgo",
-      "displayName": "Virgo",
-      "longitude": 176.13
+      "id": "Libra",
+      "displayName": "Libra",
+      "longitude": 182.75
     },
     "currentNakshatra": {
       "id": "Chitra",
       "displayName": "Chitra",
       "lord": "Mars"
     },
-    "currentPada": 1,
+    "currentPada": 3,
     "currentStarLord": {
       "id": "Mars",
       "displayName": "Mars"
     },
     "currentSubLord": {
-      "id": "Ketu",
-      "displayName": "Ketu"
+      "id": "Mars",
+      "displayName": "Mars"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
-      "displayName": "Sukla Saptami",
-      "illuminationPercentage": 45.7
+      "displayName": "Sukla Ashtami",
+      "illuminationPercentage": 49.1
     },
-    "moonLongitude": 176.13,
+    "moonLongitude": 182.75,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
       "isVoidOfCourse": false,
       "aspectFreeUntil": null,
-      "nextSign": "Libra"
+      "nextSign": "Scorpio"
     }
   },
   "sun": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 93.82,
+    "longitude": 94.32,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,51 +63,51 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 93.82,
+      "longitude": 94.32,
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
+      "subLord": "Mercury",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "moon": {
+      "currentSign": "Libra",
+      "longitude": 182.75,
+      "nakshatra": "Chitra",
+      "pada": 3,
+      "starLord": "Mars",
       "subLord": "Mars",
       "retrograde": true,
       "combust": false,
       "stationary": false
     },
-    "moon": {
-      "currentSign": "Virgo",
-      "longitude": 176.13,
-      "nakshatra": "Chitra",
-      "pada": 1,
-      "starLord": "Mars",
-      "subLord": "Ketu",
-      "retrograde": false,
-      "combust": false,
-      "stationary": false
-    },
     "mars": {
-      "currentSign": "Virgo",
-      "longitude": 176.85,
-      "nakshatra": "Chitra",
-      "pada": 2,
-      "starLord": "Mars",
-      "subLord": "Mercury",
+      "currentSign": "Taurus",
+      "longitude": 51.98,
+      "nakshatra": "Rohini",
+      "pada": 4,
+      "starLord": "Moon",
+      "subLord": "Rahu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 197.76,
-      "nakshatra": "Swati",
-      "pada": 4,
-      "starLord": "Rahu",
-      "subLord": "Sun",
+      "longitude": 200.31,
+      "nakshatra": "Vishakha",
+      "pada": 1,
+      "starLord": "Jupiter",
+      "subLord": "Rahu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "jupiter": {
       "currentSign": "Sagittarius",
-      "longitude": 267.27,
+      "longitude": 267.35,
       "nakshatra": "Uttara Ashadha",
       "pada": 1,
       "starLord": "Sun",
@@ -118,44 +118,44 @@
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 115.29,
+      "longitude": 116.59,
       "nakshatra": "Ashlesha",
       "pada": 3,
       "starLord": "Mercury",
-      "subLord": "Ketu",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "saturn": {
       "currentSign": "Leo",
-      "longitude": 144.7,
+      "longitude": 144.74,
       "nakshatra": "Purva Phalguni",
       "pada": 4,
       "starLord": "Venus",
-      "subLord": "Saturn",
+      "subLord": "Venus",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "rahu": {
       "currentSign": "Leo",
-      "longitude": 131.87,
+      "longitude": 131.85,
       "nakshatra": "Magha",
       "pada": 4,
       "starLord": "Ketu",
-      "subLord": "Sun",
+      "subLord": "Mercury",
       "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "ketu": {
       "currentSign": "Aquarius",
-      "longitude": 311.87,
+      "longitude": 311.85,
       "nakshatra": "Shatabhisha",
       "pada": 2,
       "starLord": "Rahu",
-      "subLord": "Sun",
+      "subLord": "Mercury",
       "retrograde": true,
       "combust": false,
       "stationary": false
@@ -276,16 +276,16 @@
     "ascendantLord": "Mars",
     "ascendantStarLord": "Ketu",
     "ascendantSubLord": "Sun",
-    "moonSignLord": "Mercury",
+    "moonSignLord": "Venus",
     "moonStarLord": "Mars",
-    "moonSubLord": "Ketu"
+    "moonSubLord": "Mars"
   },
   "panchanga": {
     "tithi": {
-      "name": "Sukla Saptami",
-      "index": 7,
+      "name": "Sukla Ashtami",
+      "index": 8,
       "paksha": "Sukla",
-      "endDate": "2026-07-21T02:56:25.950Z"
+      "endDate": "2026-07-21T14:59:30.438Z"
     },
     "vara": {
       "name": "Monday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Chitra",
       "lord": "Mars",
-      "endDate": "2026-07-21T08:56:25.950Z"
+      "endDate": "2026-07-21T20:59:30.438Z"
     },
     "yoga": {
       "name": "Siddha",
       "lord": "Sun",
-      "endDate": "2026-07-21T04:56:25.950Z"
+      "endDate": "2026-07-21T16:59:30.438Z"
     },
     "karana": {
-      "name": "Vanija",
+      "name": "Vishti",
       "lord": "Sun",
-      "endDate": "2026-07-20T20:56:25.950Z"
+      "endDate": "2026-07-21T08:59:30.438Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -337,9 +337,9 @@
       "description": "Mercury in Libra drives balanced mental stamina and communication focus."
     },
     "physicalEnergy": {
-      "score": 8.5,
-      "tone": "Peak Focus",
-      "description": "Mars in Virgo yields a peak focus reserve of physical resilience."
+      "score": 5.5,
+      "tone": "Balanced",
+      "description": "Mars in Taurus yields a balanced reserve of physical resilience."
     },
     "relationshipEnergy": {
       "score": 8.5,
@@ -352,9 +352,9 @@
       "description": "Jupiter in Sagittarius and Saturn in Leo sustain peak focus career structures."
     },
     "financialEnergy": {
-      "score": 4.5,
-      "tone": "Subdued / Vulnerable",
-      "description": "Moon in Virgo indicates subdued / vulnerable capital liquidity and trade dynamics."
+      "score": 6,
+      "tone": "Balanced",
+      "description": "Moon in Libra indicates balanced capital liquidity and trade dynamics."
     },
     "spiritualEnergy": {
       "score": 7,
@@ -365,8 +365,8 @@
   "currentMood": {
     "dominantHouses": [
       {
-        "houseNumber": 6,
-        "significance": "Daily routines, health, service, obstacles"
+        "houseNumber": 7,
+        "significance": "Partnerships, spouse, public relations"
       },
       {
         "houseNumber": 4,
@@ -376,8 +376,8 @@
     "dominantPlanets": [
       {
         "planet": "Moon",
-        "strength": 1.2,
-        "influenceType": "Emotional anchor in Virgo"
+        "strength": 1.3,
+        "influenceType": "Emotional anchor in Libra"
       },
       {
         "planet": "Sun",
@@ -386,15 +386,15 @@
       }
     ],
     "positiveThemes": [
-      "Intellectual growth",
-      "Deep meditation",
-      "Analytical precision"
+      "Dynamic initiatives",
+      "Creative breakthroughs",
+      "Physical vitality"
     ],
     "negativeThemes": [
       "Over-thinking",
       "Restlessness"
     ],
-    "emotionalTone": "The sky carries a highly reflective and analytical emotional tone governed by Moon in Virgo."
+    "emotionalTone": "The sky carries a highly dynamic and expressive emotional tone governed by Moon in Libra."
   },
   "currentFocus": {
     "career": {
@@ -430,7 +430,7 @@
       "description": "Ideal day for deep reading, research, and skill courses."
     },
     "travel": {
-      "priority": "medium",
+      "priority": "low",
       "description": "Plan short journeys to refresh focus; avoid heavy over-taxing transits."
     },
     "spirituality": {
@@ -464,11 +464,8 @@
       "affectedAreas": []
     },
     "finance": {
-      "active": true,
-      "affectedAreas": [
-        "Unexpected outflows",
-        "Investment delays"
-      ]
+      "active": false,
+      "affectedAreas": []
     }
   },
   "currentOpportunities": {
@@ -489,8 +486,8 @@
       "timeframe": "Hold cash reserves; defer speculative investments"
     },
     "travelOpportunity": {
-      "active": true,
-      "timeframe": "Auspicious travel window is active"
+      "active": false,
+      "timeframe": "Consolidate energy locally"
     },
     "learningOpportunity": {
       "active": false,
@@ -499,7 +496,7 @@
   },
   "timeline": {
     "today": {
-      "summary": "A day characterized by Moon transit in Virgo and Sun transit in Cancer, establishing a balanced flow.",
+      "summary": "A day characterized by Moon transit in Libra and Sun transit in Cancer, establishing a balanced flow.",
       "favorableActivities": [
         "Self-reflection",
         "Pruning backlogs",
@@ -507,7 +504,7 @@
       ],
       "unfavorableActivities": [
         "Avoid late night sleeping",
-        "High-stakes speculative trades"
+        "Hasty capital spending"
       ]
     },
     "tomorrow": {
@@ -523,7 +520,7 @@
     "thisWeek": {
       "summary": "Planetary aspects favor building internal discipline and optimizing routines.",
       "trends": [
-        "Moon transiting through Virgo stimulates active mental focusing.",
+        "Moon transiting through Libra stimulates active mental focusing.",
         "Sun in Cancer highlights leadership potential and career actions."
       ]
     },
