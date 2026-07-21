@@ -186,7 +186,7 @@ The platform features a dedicated, real-time background agent that acts as the s
 
 ### A. Core Operation & Mechanism
 - **Centrally Managed Context**: Automatically maintains `/src/knowledgebase/checklist_engine/current_sky.json` as a real-time, high-fidelity JSON data store of current cosmic conditions.
-- **15-Minute Polling Scheduler**: The agent runs automatically on server boot and repeats every 15 minutes to guarantee sub-degree precision of transit coordinates.
+- **5-Minute Polling Scheduler with Differential Detection**: The agent runs automatically on server boot and repeats every 5 minutes to guarantee sub-degree precision of transit coordinates. To optimize computation and keep Git logs clean, it only triggers downstream user-profile re-evaluations (`AnalysisSyncAgent` and corresponding Git push updates) if a genuine, differential astronomical shift (e.g. planetary/moon longitude changes of >= 0.01°, Nakshatra transitions, or Sub Lord switches) is detected.
 - **Los Angeles Local Coordinate Anchor**: Computes exact planetary longitudes, signs, Nakshatras, and Padas using Los Angeles local time coordinates.
 
 ### B. Dynamic Sub-Section Evaluation

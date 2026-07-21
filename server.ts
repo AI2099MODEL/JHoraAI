@@ -3554,8 +3554,54 @@ function runCurrentSkyUpdaterAgent() {
       };
     }
 
+    let hasDifferentialChange = false;
+    if (!fs.existsSync(skyPath)) {
+      hasDifferentialChange = true;
+    } else {
+      try {
+        const oldSky = JSON.parse(fs.readFileSync(skyPath, "utf-8"));
+        
+        // 1. Compare Moon Nakshatra & Sub Lord
+        const moonNakChanged = oldSky?.moon?.currentNakshatra?.id !== currentSky.moon?.currentNakshatra?.id;
+        const moonSubChanged = oldSky?.moon?.currentSubLord?.id !== currentSky.moon?.currentSubLord?.id;
+        
+        // 2. Compare Moon and Sun Longitudes (0.01 degree change)
+        const moonLongChanged = Math.abs((oldSky?.moon?.moonLongitude || 0) - (currentSky.moon?.moonLongitude || 0)) >= 0.01;
+        const sunLongChanged = Math.abs((oldSky?.sun?.longitude || 0) - (currentSky.sun?.longitude || 0)) >= 0.01;
+
+        // 3. Compare other planets' longitudes
+        let planetsChanged = false;
+        if (oldSky?.planets && currentSky.planets) {
+          for (const key of Object.keys(currentSky.planets)) {
+            const oldP = oldSky.planets[key];
+            const newP = currentSky.planets[key];
+            if (!oldP || !newP || Math.abs((oldP.longitude || 0) - (newP.longitude || 0)) >= 0.01) {
+              planetsChanged = true;
+              break;
+            }
+          }
+        } else {
+          planetsChanged = true;
+        }
+
+        if (moonNakChanged || moonSubChanged || moonLongChanged || sunLongChanged || planetsChanged) {
+          hasDifferentialChange = true;
+        }
+      } catch (e) {
+        hasDifferentialChange = true;
+      }
+    }
+
     fs.writeFileSync(skyPath, JSON.stringify(currentSky, null, 2), "utf-8");
     console.log("[AGENT] Current Sky data updated successfully in current_sky.json.");
+
+    // Conditionally trigger sync agent if there was a true differential transit shift
+    if (hasDifferentialChange) {
+      console.log("[AGENT] Differential astrological shift detected. Re-evaluating dynamic user profiles...");
+      runAnalysisSyncAgent();
+    } else {
+      console.log("[AGENT] No major differential astrological change. Skipped dynamic profile re-sync.");
+    }
   } catch (err: any) {
     console.error("[AGENT] Error in Current Sky Updater Agent:", err);
   }
@@ -3583,11 +3629,10 @@ setTimeout(() => {
   runAnalysisSyncAgent();
 }, 2000);
 
-// Schedule agent to run every 15 minutes for real-time sky updates
+// Schedule agent to run every 5 minutes for real-time sky updates with differential evaluations
 setInterval(() => {
   runCurrentSkyUpdaterAgent();
-  runAnalysisSyncAgent();
-}, 15 * 60 * 1000);
+}, 5 * 60 * 1000);
 
 // Schedule agent to run every 12 hours for deep rules evaluations
 setInterval(() => {
