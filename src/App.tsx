@@ -1996,6 +1996,16 @@ export default function App() {
     );
   }
 
+  const isChatMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mode") === "chat";
+
+  if (isChatMode) {
+    return (
+      <div className="w-screen h-screen bg-white">
+        <AstroChat astrologyData={astrologyData} isStandalone={true} />
+      </div>
+    );
+  }
+
   return (
     <div 
       className={`min-h-screen flex flex-col transition-colors duration-300 ${
@@ -2184,6 +2194,10 @@ export default function App() {
                 <button
                   key={node.id}
                   onClick={() => {
+                    if (node.id === "ai_assistant") {
+                      window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
+                      return;
+                    }
                     handleMenuSelect(node.id);
                     if (node.submenus && node.submenus.length > 0) {
                       setIsMobileMenuOpen(true);
@@ -3519,6 +3533,10 @@ export default function App() {
             <button
               key={node.id}
               onClick={() => {
+                if (node.id === "ai_assistant") {
+                  window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
+                  return;
+                }
                 handleMenuSelect(node.id);
                 if (node.submenus && node.submenus.length > 0) {
                   setIsMobileMenuOpen(true);

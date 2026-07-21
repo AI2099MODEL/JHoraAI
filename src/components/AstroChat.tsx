@@ -48,6 +48,7 @@ import { apiFetch as fetch } from "../lib/api";
 
 interface AstroChatProps {
   astrologyData: AstrologyData | null;
+  isStandalone?: boolean;
 }
 
 interface Message {
@@ -58,7 +59,7 @@ interface Message {
   debugInfo?: any;
 }
 
-export default function AstroChat({ astrologyData }: AstroChatProps) {
+export default function AstroChat({ astrologyData, isStandalone }: AstroChatProps) {
   // Sidebar open/close state on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -254,24 +255,24 @@ export default function AstroChat({ astrologyData }: AstroChatProps) {
   const renderMarkdown = (text: string) => {
     return text.split("\n").map((line, idx) => {
       if (line.startsWith("### ")) {
-        return <h4 key={idx} className="text-xs font-bold text-indigo-600 mt-3 mb-1.5 uppercase font-mono tracking-wider">{line.replace("### ", "")}</h4>;
+        return <h4 key={idx} className="text-sm font-bold text-indigo-600 mt-3 mb-1.5 uppercase font-mono tracking-wider">{line.replace("### ", "")}</h4>;
       }
       if (line.startsWith("## ")) {
-        return <h3 key={idx} className="text-sm font-bold text-neutral-800 mt-4 mb-2 border-b border-neutral-100 pb-1 font-sans">{line.replace("## ", "")}</h3>;
+        return <h3 key={idx} className="text-base font-bold text-neutral-800 mt-4 mb-2 border-b border-neutral-100 pb-1 font-sans">{line.replace("## ", "")}</h3>;
       }
       if (line.startsWith("# ")) {
-        return <h2 key={idx} className="text-base font-bold text-neutral-900 mt-5 mb-2 font-sans tracking-tight">{line.replace("# ", "")}</h2>;
+        return <h2 key={idx} className="text-lg font-bold text-neutral-900 mt-5 mb-2 font-sans tracking-tight">{line.replace("# ", "")}</h2>;
       }
       if (line.startsWith("- ") || line.startsWith("* ")) {
         const cleanLine = line.replace(/^[-*]\s+/, "");
         const bolded = cleanLine.replace(/\*\*(.*?)\*\*/g, "<strong class='text-neutral-900 font-semibold'>$1</strong>");
         return (
-          <li key={idx} className="ml-4 list-disc text-neutral-700 text-xs mb-1 leading-relaxed" dangerouslySetInnerHTML={{ __html: bolded }} />
+          <li key={idx} className="ml-4 list-disc text-neutral-700 text-sm mb-1.5 leading-relaxed" dangerouslySetInnerHTML={{ __html: bolded }} />
         );
       }
       const bolded = line.replace(/\*\*(.*?)\*\*/g, "<strong class='text-neutral-900 font-semibold'>$1</strong>");
       return (
-        <p key={idx} className="mb-2 leading-relaxed text-neutral-700 text-xs" dangerouslySetInnerHTML={{ __html: bolded }} />
+        <p key={idx} className="mb-3 leading-relaxed text-neutral-700 text-sm" dangerouslySetInnerHTML={{ __html: bolded }} />
       );
     });
   };
@@ -279,7 +280,7 @@ export default function AstroChat({ astrologyData }: AstroChatProps) {
   const activeDebugInfo = selectedDebugMsg?.debugInfo || messages[messages.length - 1]?.debugInfo;
 
   return (
-    <div className="w-full h-[calc(100vh-140px)] min-h-[580px] bg-white text-neutral-800 flex overflow-hidden rounded-2xl border border-neutral-200 shadow-xl relative font-sans">
+    <div className={`w-full ${isStandalone ? "h-screen border-none rounded-none shadow-none" : "h-[calc(100vh-140px)] min-h-[580px] rounded-2xl border border-neutral-200 shadow-xl"} bg-white text-neutral-800 flex overflow-hidden relative font-sans`}>
       
       {/* 1. LEFT SIDEBAR (ChatGPT-style Premium Light Sidebar) */}
       <div className={`fixed lg:relative inset-y-0 left-0 w-[260px] bg-[#f9f9f9] border-r border-neutral-200 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
