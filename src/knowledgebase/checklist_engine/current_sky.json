@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-21T04:07:33.846Z",
+    "lastUpdated": "2026-07-21T04:17:50.456Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-21T04:07:33.846Z",
-    "localTime": "2026-07-20T21:07:33-07:00",
+    "utcTime": "2026-07-21T04:17:50.456Z",
+    "localTime": "2026-07-20T21:17:50-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Libra",
       "displayName": "Libra",
-      "longitude": 183.37
+      "longitude": 183.47
     },
     "currentNakshatra": {
       "id": "Chitra",
@@ -34,9 +34,9 @@
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Ashtami",
-      "illuminationPercentage": 49.4
+      "illuminationPercentage": 49.5
     },
-    "moonLongitude": 183.37,
+    "moonLongitude": 183.47,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 94.36,
+    "longitude": 94.37,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,7 +63,7 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 94.36,
+      "longitude": 94.37,
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
@@ -74,33 +74,33 @@
     },
     "moon": {
       "currentSign": "Libra",
-      "longitude": 183.37,
+      "longitude": 183.47,
       "nakshatra": "Chitra",
       "pada": 4,
       "starLord": "Mars",
       "subLord": "Mars",
-      "retrograde": false,
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Gemini",
-      "longitude": 63.94,
+      "longitude": 65.7,
       "nakshatra": "Mrigashira",
       "pada": 4,
       "starLord": "Mars",
-      "subLord": "Moon",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 200.55,
+      "longitude": 200.58,
       "nakshatra": "Vishakha",
       "pada": 1,
       "starLord": "Jupiter",
-      "subLord": "Sun",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 116.72,
+      "longitude": 116.73,
       "nakshatra": "Ashlesha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Saturn",
+      "subLord": "Ketu",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -285,7 +285,7 @@
       "name": "Sukla Ashtami",
       "index": 8,
       "paksha": "Sukla",
-      "endDate": "2026-07-21T16:07:33.846Z"
+      "endDate": "2026-07-21T16:17:50.456Z"
     },
     "vara": {
       "name": "Monday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Chitra",
       "lord": "Mars",
-      "endDate": "2026-07-21T22:07:33.846Z"
+      "endDate": "2026-07-21T22:17:50.456Z"
     },
     "yoga": {
       "name": "Siddha",
       "lord": "Sun",
-      "endDate": "2026-07-21T18:07:33.846Z"
+      "endDate": "2026-07-21T18:17:50.456Z"
     },
     "karana": {
       "name": "Vishti",
       "lord": "Sun",
-      "endDate": "2026-07-21T10:07:33.846Z"
+      "endDate": "2026-07-21T10:17:50.456Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",

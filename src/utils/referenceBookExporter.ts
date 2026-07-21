@@ -31,102 +31,225 @@ export async function exportMasterReferenceBookPDF(
     // Default Raw Specification (Part III Fallback/Content)
     const rawSpec = `###########################################################
 # JHORA AI PROFESSIONAL - ASTROLOGICAL RULE ENGINE
-# OFFICIAL SPECIFICATION HANDBOOK (V1.0)
+# CANONICAL BUSINESS PIPELINE SPECIFICATION (V2.0)
 ###########################################################
 
 ===========================================================
-1. MASTER WORKFLOW & ARCHITECTURE
+1. CANONICAL PIPELINE WORKFLOW
 ===========================================================
 
-The canonical workflow separating static natal potentials from dynamic timing and rule-based decision modeling:
+The platform utilizes a strictly linear, deterministic workflow separating
+static birth potential (natal) from dynamic time windows (activation) and 
+rule-based decision logic.
 
 USER PROFILE
       │
       ▼
-Astronomical Calculator (stateless coordinate extraction)
+Astronomical Calculator
       │
       ▼
-KP Calculation Engine (convert to significations)
+KP Calculation Engine
       │
       ▼
-KP Knowledge Book (static, deterministic)
+KP Knowledge Book
       │
       ▼
-Store inside User Profile
-
-───────────────────────────────────────────────────────────
-
 Prediction Request
       ↓
-KP Rulebook (permanent rules grouped by 15 domains)
+KP Rulebook
       ↓
-Rule Engine (rule evaluation and outcome matching)
+Rule Engine
       ↓
-Evidence Engine (collecting supporting/blocking proofs)
+Evidence Engine
       ↓
-Decision Engine (resolving verdicts)
+Decision Engine
       ↓
-Timeline Engine (calculating activation windows)
+Timeline Engine
       ↓
-Event Book (single source of truth for persistence)
+Event Book
       ↓
-Report Engine (rendering final dashboard, UI, and PDF)
+Report Engine
 
 ===========================================================
-2. SYSTEM ARCHITECTURE & MODULES
+2. MODULE RESPONSIBILITIES & SYSTEM BOUNDS
 ===========================================================
 
 [01] Astronomical Calculator
-- Responsibility: Stateless calculation of planetary longitudes, Placidus house cusps, and transits.
-- Input: Birth Date, Time, Latitude, Longitude, Elevation, and Ayanamsa Type.
-- Output: Exact 3D spatial coordinates of planets and cusps.
+-----------------------------------------------------------
+- Responsibility:
+  Stateless calculation of planetary longitudes, Placidus house cusps, 
+  and transit coordinates from ephemeris data.
+- Input:
+  Birth Date, Time, Latitude, Longitude, and Ayanamsa Standard (e.g. Lahiri).
+- Output:
+  Exact 3D spatial celestial coordinates.
+- Constraints:
+  Absolutely NO astrological interpretations, significations, or strengths occur.
 
 [02] KP Calculation Engine
-- Responsibility: Converts coordinates into deterministic KP data (Planets, Nakshatras, Cusps, Significators).
+-----------------------------------------------------------
+- Responsibility:
+  Converts astronomical coordinates into deterministic KP astrological structures.
+- Generates:
+  Planets, Houses, Placidus Cusps, Star Lords, Sub Lords, Significators 
+  (Levels A-D), Planet Strengths, House Strengths, and Natal Event Promise.
+- Output:
+  Populates the static, immutable KP Knowledge Book.
+- Constraints:
+  Only triggered during profile initialization, birth detail changes, or
+  ayanamsa changes. Never during predictions.
 
 [03] KP Knowledge Book
-- Responsibility: Permanent deterministic repository containing ONLY static natal KP information.
+-----------------------------------------------------------
+- Responsibility:
+  Permanent deterministic repository containing ONLY static natal KP information.
+- Structure:
+  - Planets & Cusps coordinate map
+  - KP Star Lords, Sub Lords, and Sub-Sub Lords (SSL)
+  - House Significators
+  - Planet & House Strengths
+  - Natal Event Promise (Renamed from "Event Profiles")
+  - KP Knowledge Book Version
+- Principles:
+  Stored once inside the User Profile. NEVER regenerated during dynamic predictions.
 
 [04] KP Rulebook
-- Responsibility: Permanent repository of KP rules grouped by 15 domains without calculation logic.
+-----------------------------------------------------------
+- Responsibility:
+  Permanent repository of classical KP rules. Grouped strictly by 15 domains.
+- Contains:
+  ONLY conditional logic rules. No execution, calculation, or prediction logic.
+- Grouped Domains:
+  1. Marriage        6. Vehicle         11. Health
+  2. Career          7. Education       12. Litigation
+  3. Finance         8. Children        13. Spiritual
+  4. Business        9. Travel          14. Longevity
+  5. Property        10. Foreign        15. General
 
 [05] Rule Engine
-- Responsibility: Executes rules and produces Rule Results. Does NOT evaluate evidence.
+-----------------------------------------------------------
+- Responsibility:
+  Executes rules from the KP Rulebook against the KP Knowledge Book + Dynamic Context.
+- Output:
+  Produces stateless Rule Results mapping conditions to true/false outcomes.
+- Constraints:
+  Must NOT generate evidence, create event records, calculate confidence, or
+  store results.
+- Subcomponents:
+  - Rule Validation Step: Internal syntax checks.
+  - Rule Compiler/Cache/Registry: Private internal execution helpers.
 
 [06] Evidence Engine
-- Responsibility: Collects supporting/blocking evidence and satisfied/failed rules.
+-----------------------------------------------------------
+- Responsibility:
+  Aggregates and organizes evidence from Rule Results.
+- Collects:
+  Supporting Rules, Blocking Rules, Matched Rules, Failed Rules, 
+  House Evidence, Planet Evidence, Transit Evidence, Dasha Evidence, and Rule Lineage.
+- Output:
+  Produces a stateless, structured Evidence Object.
+- Constraints:
+  Must NOT execute rules or write to the database.
 
 [07] Decision Engine
-- Responsibility: Evaluates Natal Promise + DBA + Transit + Evidence -> Final Verdict.
+-----------------------------------------------------------
+- Responsibility:
+  Dynamic mathematical evaluation of eventual feasibility.
+- Equation:
+  Natal Promise + Active DBA + Transit + Collected Evidence -> Final Decision
+- Verdicts:
+  STRONG | MODERATE | WEAK | NOT PROMISED
+- Constraints:
+  Stateless execution. No persistence or Event Book writes.
+- Subcomponents:
+  - Confidence Engine: Internal subcomponent calculating numerical weights.
 
 [08] Timeline Engine
-- Responsibility: Schedules the chronological period for promised events.
+-----------------------------------------------------------
+- Responsibility:
+  Schedules and determines precise chronologies for manifestation.
+- Computes:
+  - Activation Window (Start/End dates)
+  - Timing Range
+  - Activation Strength
+  - Priority Window
+- Constraints:
+  Must NOT create events. Terms like 'Delay' and 'Acceleration' are 
+  interpretations and must never be described as engine outputs.
 
 [09] Event Book
-- Responsibility: Single Source of Truth database. Persists Event ID, Decision, Evidence, Timeline, and History.
+-----------------------------------------------------------
+- Responsibility:
+  The SINGLE SOURCE OF TRUTH persistent database repository.
+- Workflow:
+  Decision Engine -> Event Candidate -> Event Book -> Persist
+- Stored Fields:
+  - Event ID
+  - Decision / Verdict
+  - Evidence Package
+  - Timeline Windows
+  - Confidence Base & Final Scores
+  - Rule Lineage
+  - History & Audit Trail
+- Constraints:
+  Does NOT decide events, execute rules, or evaluate astrology. Purely a storage vault.
 
 [10] Report Engine
-- Responsibility: Renders PDF, UI, and Dashboard representation. Performs NO astrology calculations.
+-----------------------------------------------------------
+- Responsibility:
+  Compiles verified event records into interactive or printable formats.
+- Outputs:
+  Dashboard Views, Interactive UI Cards, PDF Exports, API Responses.
+- Constraints:
+  Reads ONLY from the Event Book. Absolutely NO astrology calculations or 
+  rule evaluations occur in this module.
+- Subcomponents:
+  - Explanation Engine: Translates technical evidence packages into human-readable text.
 
 ===========================================================
-3. TRIPLE-STAGE SEPARATION
+3. DATA DIVISION & RECONCILIATION
 ===========================================================
 
-- STAGE 1: NATAL ENGINE (Decides IF)
-- STAGE 2: ACTIVATION ENGINE (Decides WHEN)
-- STAGE 3: DAILY ENGINE (Decides TODAY)
+-----------------------------------------------------------
+A. Static Natal Data (KP Knowledge Book)
+-----------------------------------------------------------
+• Planets
+• Houses
+• Cusps
+• Star Lords
+• Sub Lords
+• Significators
+• Planet Strengths
+• House Strengths
+• Natal Event Promise
+• KP Knowledge Book Version
 
-These stages operate sequentially and never override one another.
+-----------------------------------------------------------
+B. Dynamic Context Data (Prediction Query)
+-----------------------------------------------------------
+• Current DBA (Dasha-Bhukti-Antara)
+• Current Transit Snapshot
+• Current Date
+• Current Time
+• User Event History (optional)
+• User Notes (optional)
 
 ===========================================================
-4. ZERO DUPLICATION RULES
+4. ZERO DUPLICATION LAWS
 ===========================================================
 - Rule Engine does NOT generate evidence.
 - Evidence Engine does NOT execute rules.
 - Decision Engine does NOT store events.
 - Timeline Engine does NOT create events.
 - Event Book does NOT evaluate astrology.
-- Report Engine does NOT calculate astrology.`;
+- Report Engine does NOT calculate astrology.
+- All auxiliary components (Rule Validation, Confidence, Explanation, 
+  Compiler, Matcher) are implemented strictly as internal subcomponents 
+  or helper classes of their parent engines.
+
+###########################################################
+# END OF SPECIFICATION
+###########################################################`;
 
     // Initialize jsPDF
     const doc = new jsPDF({
