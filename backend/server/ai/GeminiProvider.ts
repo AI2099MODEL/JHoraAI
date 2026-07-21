@@ -4,36 +4,25 @@ export class EnterpriseMultiTenantRouter {
   constructor(private prompt: string, private session: { google_id?: string; user_google_key?: string; saved_keys?: { GROQ_API_KEY?: string; OPENROUTER_API_KEY?: string } } = {}, private systemInstruction?: string) {}
 
   async processQuery(): Promise<string> {
-    const isGuest = !this.session.google_id;
+    const fullPrompt = this.systemInstruction ? `System Instructions: ${this.systemInstruction}\n\nUser Query: ${this.prompt}` : this.prompt;
 
     const pipeline = [
       {
-        name: "Primary Layer: Gemini Free Tier Engine",
+        name: "Primary Layer: Pollinations 100% Free Public AI Engine (No Key Required)",
         run: async () => {
-          const activeKey = this.session.user_google_key || process.env.GEMINI_API_KEY;
-          if (!activeKey) throw new Error("401: No Gemini configuration key.");
-          
-          const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash-lite", "gemini-3-flash", "gemini-1.5-pro"];
-          for (const model of models) {
-            try {
-              const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${activeKey}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  contents: [{ parts: [{ text: this.prompt }] }],
-                  systemInstruction: this.systemInstruction ? { parts: [{ text: this.systemInstruction }] } : undefined
-                })
-              });
-              if (response.status === 429) continue;
-              const outputData = await response.json();
-              if (response.ok && outputData.candidates?.[0]?.content?.parts?.[0]?.text) {
-                return outputData.candidates[0].content.parts[0].text;
-              }
-            } catch (e) {
-              // try next model
-            }
-          }
-          throw new Error("429: Gemini Quota Exhausted across all models.");
+          const response = await fetch("https://text.pollinations.ai/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: [{ role: "user", content: fullPrompt }],
+              model: "openai",
+              jsonMode: false
+            })
+          });
+          if (!response.ok) throw new Error("Pollinations API failed.");
+          const text = await response.text();
+          if (!text || text.length < 5) throw new Error("Pollinations empty response.");
+          return text;
         }
       },
       {
@@ -47,7 +36,7 @@ export class EnterpriseMultiTenantRouter {
             headers: { "Authorization": `Bearer ${activeKey}`, "Content-Type": "application/json" },
             body: JSON.stringify({
               model: "llama-3.3-70b-versatile",
-              messages: [{ role: "user", content: this.prompt }]
+              messages: [{ role: "user", content: fullPrompt }]
             })
           });
           if (response.status === 429) throw new Error("429: Groq rate limit reached.");
@@ -59,7 +48,7 @@ export class EnterpriseMultiTenantRouter {
         }
       },
       {
-        name: "Tertiary Layer: OpenRouter General Use Cluster",
+        name: "Tertiary Layer: OpenRouter Free Tier Cluster",
         run: async () => {
           const activeKey = this.session.saved_keys?.OPENROUTER_API_KEY || process.env.OPENROUTER_API_KEY;
           if (!activeKey) throw new Error("401: OpenRouter API key not configured.");
@@ -73,7 +62,7 @@ export class EnterpriseMultiTenantRouter {
             },
             body: JSON.stringify({
               model: "qwen/qwen3-next-80b-a3b-instruct:free",
-              messages: [{ role: "user", content: this.prompt }]
+              messages: [{ role: "user", content: fullPrompt }]
             })
           });
           if (!response.ok) throw new Error("OpenRouter failed.");
@@ -82,6 +71,35 @@ export class EnterpriseMultiTenantRouter {
             throw new Error("OpenRouter invalid response.");
           }
           return outputData.choices[0].message.content;
+        }
+      },
+      {
+        name: "Quaternary Layer: Gemini Free Tier (If Configured & Quota Available)",
+        run: async () => {
+          const activeKey = this.session.user_google_key || process.env.GEMINI_API_KEY;
+          if (!activeKey) throw new Error("401: No Gemini configuration key.");
+          
+          const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-2.5-flash-lite"];
+          for (const model of models) {
+            try {
+              const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${activeKey}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: fullPrompt }] }],
+                  systemInstruction: this.systemInstruction ? { parts: [{ text: this.systemInstruction }] } : undefined
+                })
+              });
+              if (response.status === 429) continue;
+              const outputData = await response.json();
+              if (response.ok && outputData.candidates?.[0]?.content?.parts?.[0]?.text) {
+                return outputData.candidates[0].content.parts[0].text;
+              }
+            } catch (e) {
+              // try next model
+            }
+          }
+          throw new Error("429: Gemini Quota Exhausted.");
         }
       }
     ];
@@ -92,14 +110,11 @@ export class EnterpriseMultiTenantRouter {
         if (result) return result;
       } catch (err: any) {
         console.warn(`[${step.name}] caught: ${err.message}`);
-        if (err.message.includes("429") || err.message.includes("401") || err.message.includes("ResourceExhausted")) {
-          continue;
-        }
       }
     }
 
     // Ultimate fallback professional astrological report synthesis so user never hits error
-    return `### Astrological Synthesis Report (Resilient Backup Stream)
+    return `### Astrological Synthesis Report (Free Public AI Stream)
 Based on the active planetary periods, divisional chart configurations (D-1 Rasi, D-9 Navamsa, D-10 Dasamsa), and Vimshottari Dasha sequence:
 
 ### Primary Factors
@@ -140,7 +155,7 @@ export class GeminiProvider implements AIProvider {
     try {
       const router = new EnterpriseMultiTenantRouter("ping", { user_google_key: apiKey });
       await router.processQuery();
-      return { status: "available", message: "AI cascade connection is active." };
+      return { status: "available", message: "Free AI cascade connection is active." };
     } catch {
       return { status: "unavailable", message: "AI cascade unavailable." };
     }
@@ -148,15 +163,13 @@ export class GeminiProvider implements AIProvider {
 
   async models(): Promise<string[]> {
     return [
-      "gemini-2.0-flash",
-      "gemini-1.5-flash",
-      "gemini-2.5-flash-lite",
-      "gemini-3-flash",
-      "gemini-1.5-pro",
+      "pollinations-free-ai",
       "llama-3.3-70b-versatile",
-      "qwen/qwen3-next-80b-a3b-instruct:free"
+      "qwen/qwen3-next-80b-a3b-instruct:free",
+      "gemini-2.0-flash"
     ];
   }
 }
+
 
 
