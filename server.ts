@@ -201,7 +201,7 @@ function saveUserAnalysisToFolder(userName: string, analysisText: string, astrol
         console.warn("[Analysis Git Commit Warning]", err.message);
       } else {
         console.log("[Analysis Git Commit Success]");
-        exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
+        exec("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
           if (pushErr) {
             console.error("[Analysis Git Push Warning]", pushErr.message);
           } else {
@@ -445,7 +445,7 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
         } else {
           console.log("[Git Sync Add Local Success] Profile committed locally.");
           // Attempt push as a separate, fully graceful operation
-          exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
+          exec("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
             if (pushErr) {
               console.info("[Git Sync Push Notice] Git push skipped/unauthenticated. Profile is securely saved locally and committed to Git.");
             } else {
@@ -509,7 +509,7 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
             } else {
               console.log("[Git Sync Delete Local Success] Deactivation committed locally.");
               // Attempt push as a separate, fully graceful operation
-              exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
+              exec("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
                 if (pushErr) {
                   console.info("[Git Sync Push Notice] Git push skipped/unauthenticated. Deactivation is securely saved locally and committed to Git.");
                 } else {
@@ -630,8 +630,8 @@ app.post("/api/user-profile/index-table", async (req, res) => {
         console.warn("[Table Index Git Commit Warning]", err.message);
       } else {
         console.log("[Table Index Git Commit Success]");
-        // Push main to origin
-        exec("git push origin main", (pushErr, pushStdout, pushStderr) => {
+        // Push HEAD to origin
+        exec("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
           if (pushErr) {
             console.error("[Table Index Git Push Warning]", pushErr.message);
           } else {
@@ -3074,7 +3074,7 @@ function runAnalysisSyncAgentForProfile(profile: any, filename?: string) {
         console.warn("[Analysis Git Warning]", err.message);
       } else {
         console.log(`[Analysis Git Success] Committed static/dynamic analysis files for ${profileName}.`);
-        exec("git push origin main", (pushErr) => {
+        exec("git push origin HEAD", (pushErr) => {
           if (pushErr) {
             console.warn("[Analysis Push Warning] push skipped/unauthenticated.");
           } else {
@@ -3726,8 +3726,54 @@ function runCurrentSkyUpdaterAgent() {
       };
     }
 
+    let hasDifferentialChange = false;
+    if (!fs.existsSync(skyPath)) {
+      hasDifferentialChange = true;
+    } else {
+      try {
+        const oldSky = JSON.parse(fs.readFileSync(skyPath, "utf-8"));
+        
+        // 1. Compare Moon Nakshatra & Sub Lord
+        const moonNakChanged = oldSky?.moon?.currentNakshatra?.id !== currentSky.moon?.currentNakshatra?.id;
+        const moonSubChanged = oldSky?.moon?.currentSubLord?.id !== currentSky.moon?.currentSubLord?.id;
+        
+        // 2. Compare Moon and Sun Longitudes (0.01 degree change)
+        const moonLongChanged = Math.abs((oldSky?.moon?.moonLongitude || 0) - (currentSky.moon?.moonLongitude || 0)) >= 0.01;
+        const sunLongChanged = Math.abs((oldSky?.sun?.longitude || 0) - (currentSky.sun?.longitude || 0)) >= 0.01;
+
+        // 3. Compare other planets' longitudes
+        let planetsChanged = false;
+        if (oldSky?.planets && currentSky.planets) {
+          for (const key of Object.keys(currentSky.planets)) {
+            const oldP = oldSky.planets[key];
+            const newP = currentSky.planets[key];
+            if (!oldP || !newP || Math.abs((oldP.longitude || 0) - (newP.longitude || 0)) >= 0.01) {
+              planetsChanged = true;
+              break;
+            }
+          }
+        } else {
+          planetsChanged = true;
+        }
+
+        if (moonNakChanged || moonSubChanged || moonLongChanged || sunLongChanged || planetsChanged) {
+          hasDifferentialChange = true;
+        }
+      } catch (e) {
+        hasDifferentialChange = true;
+      }
+    }
+
     fs.writeFileSync(skyPath, JSON.stringify(currentSky, null, 2), "utf-8");
     console.log("[AGENT] Current Sky data updated successfully in current_sky.json.");
+
+    // Conditionally trigger sync agent if there was a true differential transit shift
+    if (hasDifferentialChange) {
+      console.log("[AGENT] Differential astrological shift detected. Re-evaluating dynamic user profiles...");
+      runAnalysisSyncAgent();
+    } else {
+      console.log("[AGENT] No major differential astrological change. Skipped dynamic profile re-sync.");
+    }
   } catch (err: any) {
     console.error("[AGENT] Error in Current Sky Updater Agent:", err);
   }
@@ -3755,11 +3801,10 @@ setTimeout(() => {
   runAnalysisSyncAgent();
 }, 2000);
 
-// Schedule agent to run every 15 minutes for real-time sky updates
+// Schedule agent to run every 5 minutes for real-time sky updates with differential evaluations
 setInterval(() => {
   runCurrentSkyUpdaterAgent();
-  runAnalysisSyncAgent();
-}, 15 * 60 * 1000);
+}, 5 * 60 * 1000);
 
 // Schedule agent to run every 12 hours for deep rules evaluations
 setInterval(() => {

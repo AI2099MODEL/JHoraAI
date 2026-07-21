@@ -36,6 +36,20 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
     "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
   ];
 
+  const getPlanetSignIndex = (p: any): number => {
+    if (!p) return 0;
+    let idx = 0;
+    if (typeof p.signIndex === "number" && !isNaN(p.signIndex)) {
+      idx = p.signIndex;
+    } else if (typeof p.sign_index === "number" && !isNaN(p.sign_index)) {
+      idx = p.sign_index;
+    } else if (p.sign) {
+      const foundIdx = zodiacSigns.findIndex(s => s.toLowerCase() === p.sign.toLowerCase() || p.sign.toLowerCase().includes(s.toLowerCase()));
+      if (foundIdx !== -1) idx = foundIdx;
+    }
+    return (idx % 12 + 12) % 12;
+  };
+
   // Color scheme (Cool Tech/Slate look for raw data representation)
   const primaryColor = [15, 23, 42];   // Slate 900
   const secondaryColor = [51, 65, 85]; // Slate 600
@@ -730,7 +744,7 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
       ]);
 
       pList.forEach((p: any) => {
-        const progressedSignIdx = (p.signIndex + targetAge) % 12;
+        const progressedSignIdx = (getPlanetSignIndex(p) + targetAge) % 12;
         const progressedSign = zodiacSigns[progressedSignIdx];
         const progressedHouse = (p.house + targetAge - 1) % 12 + 1;
         rows.push([
@@ -794,19 +808,19 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
       const lkbHouses: { [house: number]: string[] } = {};
       for (let h = 1; h <= 12; h++) lkbHouses[h] = [];
       pList.forEach((p: any) => {
-        const lkHouse = p.signIndex + 1;
+        const lkHouse = getPlanetSignIndex(p) + 1;
         lkbHouses[lkHouse].push(p.name);
       });
 
       const rows = pList.map((p: any) => {
-        const lkHouse = p.signIndex + 1;
+        const lkHouse = getPlanetSignIndex(p) + 1;
         const companions = lkbHouses[lkHouse].filter((name: string) => name !== p.name);
         const lords = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
         return [
           p.name || "—",
           p.sign || "—",
           `House ${lkHouse}`,
-          lords[p.signIndex] || "—",
+          lords[getPlanetSignIndex(p)] || "—",
           companions.join(", ") || "Alone"
         ];
       });
@@ -827,12 +841,12 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
       const lkbHouses: { [house: number]: string[] } = {};
       for (let h = 1; h <= 12; h++) lkbHouses[h] = [];
       pList.forEach((p: any) => {
-        const lkHouse = p.signIndex + 1;
+        const lkHouse = getPlanetSignIndex(p) + 1;
         lkbHouses[lkHouse].push(p.name);
       });
 
       const rows = pList.map((p: any) => {
-        const lkHouse = p.signIndex + 1;
+        const lkHouse = getPlanetSignIndex(p) + 1;
         let sleepStatus = "Active";
         if (lkHouse === 1 && lkbHouses[7].length === 0) {
           sleepStatus = "Sleeping - H7 Empty";

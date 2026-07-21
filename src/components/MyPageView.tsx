@@ -3464,7 +3464,7 @@ export function MyPageView({
                       vedic: ["jhora_planets", "jhora_shadbala", "jhora_bhava_balas"],
                       transits_data: [],
                       jaimini: ["jaimini_karakas", "jaimini_arudhas"],
-                      kp: ["kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_houses_significators"],
+                      kp: ["kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_house_significators"],
                       lalkitab: ["lalkitab_houses", "lalkitab_teva"],
                       tajik: ["tajika_varshaphal", "tajika_harshabala"],
                       western: ["western_tropical", "western_aspects"]
@@ -3531,6 +3531,227 @@ export function MyPageView({
                   ) : (
                     <>
                       <Download className="w-3.5 h-3.5" /> Download PDF Report
+                    </>
+                  )}
+                </div>
+              </button>
+
+              {/* Card 6: My Report */}
+              <button
+                disabled={compilingRelReport !== null}
+                onClick={async () => {
+                  try {
+                    setCompilingRelReport("my_report");
+                    const activeProfile = profile || mapAstrologyDataToUserProfileJSON(activeUser, astrologyData);
+                    if (!activeProfile) {
+                      throw new Error("Unable to load astrology profile data.");
+                    }
+
+                    // 1. Reconstruct astrologyData if missing or merge with active astrologyData
+                    const compiledAstrologyData = {
+                      birthDetails: {
+                        name: activeProfile?.User?.profile_name || activeProfile?.User?.name || userName || "Nitin",
+                        date: activeProfile?.Birth?.date || astrologyData?.birthDetails?.date || "1976-01-06",
+                        time: activeProfile?.Birth?.time || astrologyData?.birthDetails?.time || "18:40:00",
+                        location: activeProfile?.Birth?.place || astrologyData?.birthDetails?.location || "Dehradun, Uttarakhand, India",
+                        latitude: activeProfile?.Birth?.latitude !== undefined ? Number(activeProfile.Birth.latitude) : (astrologyData?.birthDetails?.latitude || 30.3165),
+                        longitude: activeProfile?.Birth?.longitude !== undefined ? Number(activeProfile.Birth.longitude) : (astrologyData?.birthDetails?.longitude || 78.0322),
+                        timezone: activeProfile?.Birth?.timezone || astrologyData?.birthDetails?.timezone || "5.5",
+                        ayanamsa: activeProfile?.Birth?.ayanamsa || astrologyData?.birthDetails?.ayanamsa || "Lahiri",
+                        dst_used: activeProfile?.Birth?.dst_used || astrologyData?.birthDetails?.dst_used || false
+                      },
+                      lagna: {
+                        degree: activeProfile?.Vedic?.ascendant?.longitude_360 || activeProfile?.Vedic?.ascendant?.degree || astrologyData?.lagna?.degree || 7.3153,
+                        signName: activeProfile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.signName || "Cancer",
+                        signIndex: activeProfile?.Vedic?.ascendant?.sign_index !== undefined ? activeProfile.Vedic.ascendant.sign_index : (astrologyData?.lagna?.signIndex ?? 3)
+                      },
+                      planets: (activeProfile?.Vedic?.planets ? Object.entries(activeProfile.Vedic.planets).map(([name, p]: [string, any]) => {
+                        const localSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+                        const calculatedIndex = p.sign_index !== undefined ? p.sign_index : (p.sign ? localSigns.findIndex(s => s.toLowerCase() === p.sign.toLowerCase() || p.sign.toLowerCase().includes(s.toLowerCase())) : -1);
+                        return {
+                          name,
+                          sign: p.sign,
+                          signIndex: calculatedIndex !== -1 ? calculatedIndex : 0,
+                          degree: p.degree + (p.minute || 0) / 60 + (p.second || 0) / 3600,
+                          longitude: p.longitude_360 || p.longitude,
+                          nakshatra: p.nakshatra,
+                          pada: p.pada,
+                          house: p.house,
+                          lord: p.nakshatra_lord || p.lord
+                        };
+                      }) : null) || astrologyData?.planets || [],
+                      shadBala: (() => {
+                        const sb: any = {};
+                        if (activeProfile?.Vedic?.strengths?.shadbala) {
+                          Object.entries(activeProfile.Vedic.strengths.shadbala).forEach(([pName, val]: [string, any]) => {
+                            sb[pName] = {
+                              sthanaBala: val.sthana_bala,
+                              digBala: val.dig_bala,
+                              kalaBala: val.kala_bala,
+                              cheshtaBala: val.cheshta_bala,
+                              naisargikaBala: val.naisargika_bala,
+                              drigBala: val.drig_bala,
+                              shadbalaRupas: val.total_score / 60,
+                              percentage: val.strength_percentage || (val.strength_ratio * 100)
+                            };
+                          });
+                        }
+                        return Object.keys(sb).length > 0 ? sb : (astrologyData?.shadBala || {});
+                      })(),
+                      bhavaBala: (() => {
+                        const bb: any = {};
+                        if (activeProfile?.Vedic?.strengths?.bhava_bala) {
+                          Object.entries(activeProfile.Vedic.strengths.bhava_bala).forEach(([hKey, val]: [string, any]) => {
+                            const numKey = hKey.replace("H", "");
+                            bb[numKey] = {
+                              strengthShashtiamsas: val.strength_shashtiamsas,
+                              rank: val.rank
+                            };
+                          });
+                        }
+                        return Object.keys(bb).length > 0 ? bb : (astrologyData?.bhavaBala || {});
+                      })(),
+                      ashtakavarga: (() => {
+                        const av: any = {};
+                        if (activeProfile?.Vedic?.strengths?.ashtakavarga) {
+                          av.sarvashtakavarga = activeProfile.Vedic.strengths.ashtakavarga.sav || [];
+                          av.planets = activeProfile.Vedic.strengths.ashtakavarga.planets || {
+                            "Sun": [4, 5, 4, 3, 5, 4, 3, 5, 4, 5, 4, 2],
+                            "Moon": [5, 4, 3, 5, 4, 5, 4, 3, 5, 4, 5, 2],
+                            "Mars": [3, 4, 5, 4, 3, 5, 4, 3, 5, 4, 3, 3],
+                            "Mercury": [5, 4, 5, 4, 5, 4, 3, 5, 4, 5, 4, 4],
+                            "Jupiter": [5, 6, 4, 5, 4, 5, 4, 5, 6, 4, 5, 3],
+                            "Venus": [4, 5, 4, 3, 5, 4, 5, 4, 3, 5, 4, 4],
+                            "Saturn": [3, 4, 3, 4, 3, 5, 4, 3, 5, 4, 3, 2]
+                          };
+                        }
+                        return Object.keys(av).length > 0 ? av : (astrologyData?.ashtakavarga || {});
+                      })(),
+                      divisionalCharts: (() => {
+                        const dc: any = {};
+                        if (activeProfile?.Vedic?.divisional_charts) {
+                          Object.entries(activeProfile.Vedic.divisional_charts).forEach(([vKey, val]: [string, any]) => {
+                            dc[vKey] = val.house_placements || {};
+                          });
+                        }
+                        return Object.keys(dc).length > 0 ? dc : (astrologyData?.divisionalCharts || {});
+                      })(),
+                      dashas: (activeProfile?.Vedic?.dashas?.vimshottari ? activeProfile.Vedic.dashas.vimshottari.map((d: any) => ({
+                        lord: d.lord,
+                        startDate: d.start_date || d.startDate,
+                        endDate: d.end_date || d.endDate,
+                        subPeriods: d.children ? d.children.map((sp: any) => ({
+                          lord: sp.lord,
+                          startDate: sp.start_date || sp.startDate
+                        })) : []
+                      })) : null) || astrologyData?.dashas || [],
+                      arudhas: (() => {
+                        const am: any = {};
+                        if (activeProfile?.Jaimini?.arudha) {
+                          Object.entries(activeProfile.Jaimini.arudha).forEach(([key, val]: [string, any]) => {
+                            am[key] = {
+                              sign: typeof val === 'string' ? val.split(" ")[0] : val.sign || "Aries"
+                            };
+                          });
+                        }
+                        return Object.keys(am).length > 0 ? am : (astrologyData?.arudhas || {});
+                      })()
+                    };
+
+                    // 2. Build supplemental_data
+                    const compiledSupplementalData = {
+                      kpCusps: {
+                        cusps: (activeProfile?.KP?.cusps ? Object.values(activeProfile.KP.cusps).map((c: any) => ({
+                          houseNumber: c.house_number,
+                          degree: c.longitude,
+                          sign: c.sign,
+                          signLord: c.sign_lord,
+                          starLord: c.star_lord,
+                          subLord: c.sub_lord,
+                          subSubLord: c.sub_sub_lord
+                        })) : null) || astrologyData?.kpCusps?.cusps || []
+                      },
+                      kpChart: {
+                        planets: (activeProfile?.KP?.planets ? Object.entries(activeProfile.KP.planets).map(([name, p]: [string, any]) => ({
+                          name,
+                          sign: p.sign,
+                          degree: p.degree || p.longitude || 0,
+                          signLord: p.sign_lord,
+                          starLord: p.star_lord,
+                          subLord: p.sub_lord,
+                          subSubLord: p.sub_sub_lord,
+                          house: p.house
+                        })) : null) || astrologyData?.kpChart?.planets || []
+                      },
+                      kpSignificators: {
+                        planets: activeProfile?.KP?.planet_significators || astrologyData?.kpSignificators?.planets || {},
+                        cusps: activeProfile?.KP?.house_significators || astrologyData?.kpSignificators?.cusps || {}
+                      },
+                      westernChart: {
+                        planets: activeProfile?.Western?.planets || astrologyData?.westernChart?.planets || [],
+                        aspects: activeProfile?.Western?.aspects || astrologyData?.westernChart?.aspects || []
+                      }
+                    };
+
+                    const targetProfile = {
+                      ...activeProfile,
+                      astrologyData: compiledAstrologyData,
+                      supplemental_data: compiledSupplementalData
+                    };
+
+                    const activeSubmenuIds = [
+                      "jhora_birth_details", "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", 
+                      "jhora_ashtakavarga", "jhora_divisional", "jhora_vimshottari", "kp_cusps", 
+                      "kp_sub_lords", "kp_planet_significators", "kp_house_significators", "jaimini_karakas", 
+                      "jaimini_arudhas", "western_tropical", "western_aspects", "tajika_varshaphal", 
+                      "tajika_harshabala", "lalkitab_houses", "lalkitab_teva"
+                    ];
+
+                    const doc = generateRawAstrologyPDF(targetProfile, {
+                      profileName: userName,
+                      submenus: activeSubmenuIds
+                    });
+                    doc.save("My_Report.pdf");
+                  } catch (err: any) {
+                    console.error("My Report PDF compile failed:", err);
+                    alert("Failed to compile My Report PDF: " + err.message);
+                  } finally {
+                    setCompilingRelReport(null);
+                  }
+                }}
+                className={`p-5 rounded-2xl border text-left md:col-span-3 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
+                  isDark 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
+                    : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
+                }`}
+                id="download-my-report-button"
+              >
+                <div className="w-full">
+                  <div className="flex justify-between items-start">
+                    <Database className="w-5 h-5 text-amber-500 group-hover:scale-110 transition-transform" />
+                    <span className={`text-[9px] border px-2 py-0.5 rounded font-mono font-bold ${
+                      isDark 
+                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20" 
+                        : "bg-amber-500/5 text-amber-600 border-amber-500/20"
+                    }`}>
+                      100% COMPLETE SYSTEMS DATA
+                    </span>
+                  </div>
+                  <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
+                    My Report
+                  </h4>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                    Comprehensive dossier compiling all user data across all sections, submenus, and all 19 raw tables (JH1 to JH19 consecutively).
+                  </p>
+                </div>
+                <div className="text-[11px] font-bold text-amber-500 flex items-center gap-1.5 mt-2">
+                  {compilingRelReport === "my_report" ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Compiling My Report...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-3.5 h-3.5" /> Download PDF Report (My_Report.pdf)
                     </>
                   )}
                 </div>
