@@ -273,7 +273,13 @@ Guidelines:
     return res.end();
 
   } catch (error: any) {
-    console.error("AI consultation route error:", error);
+    const errMsg = (error.message || "").toLowerCase();
+    const isQuotaError = error.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
+    if (isQuotaError) {
+      console.warn("AI consultation route quota warning:", error.message || error);
+    } else {
+      console.error("AI consultation route error:", error);
+    }
     if (!res.headersSent) {
       return res.status(500).json({ error: error.message || "An error occurred during consultation generation." });
     } else {
@@ -319,7 +325,13 @@ router.post("/chat", async (req, res) => {
       return res.json({ text: result.text });
     }
   } catch (error: any) {
-    console.error("AI chat route error:", error);
+    const errMsg = (error.message || "").toLowerCase();
+    const isQuotaError = error.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
+    if (isQuotaError) {
+      console.warn("AI chat route quota warning:", error.message || error);
+    } else {
+      console.error("AI chat route error:", error);
+    }
     if (!res.headersSent) {
       return res.status(500).json({ error: error.message || "An error occurred during generation." });
     } else {

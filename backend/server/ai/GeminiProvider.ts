@@ -52,7 +52,7 @@ export class GeminiProvider implements AIProvider {
           });
           return { text: response.text || "" };
         } catch (fallbackErr: any) {
-          console.error("Gemini fallback to gemini-3.1-flash-lite failed:", fallbackErr);
+          console.warn("Gemini fallback to gemini-3.1-flash-lite failed:", fallbackErr.message || fallbackErr);
           throw fallbackErr;
         }
       }
@@ -104,7 +104,7 @@ export class GeminiProvider implements AIProvider {
           }
           return;
         } catch (fallbackErr: any) {
-          console.error("Gemini stream fallback to gemini-3.1-flash-lite failed:", fallbackErr);
+          console.warn("Gemini stream fallback to gemini-3.1-flash-lite failed:", fallbackErr.message || fallbackErr);
           throw fallbackErr;
         }
       }

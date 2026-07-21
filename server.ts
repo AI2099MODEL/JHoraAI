@@ -1858,12 +1858,18 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
     const result = JSON.parse(response.text.trim());
     res.json(result);
   } catch (err: any) {
-    console.error("Gemini API error in generate-summary:", err);
-    let errMsg = err.message || "Failed to generate reading.";
-    if (err.status === 429 || errMsg.toLowerCase().includes("quota") || errMsg.toLowerCase().includes("limit") || errMsg.toLowerCase().includes("429")) {
-      errMsg = "Gemini API Quota Exceeded. Please configure your personal GEMINI_API_KEY in the Settings panel (top-right corner ⚙️) to ensure unlimited, ultra-fast personal AI readings.";
+    const errMsg = (err.message || "").toLowerCase();
+    const isQuotaError = err.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
+    if (isQuotaError) {
+      console.warn("Gemini API Quota Exceeded in generate-summary:", err.message || err);
+    } else {
+      console.error("Gemini API error in generate-summary:", err);
     }
-    res.status(500).json({ error: errMsg });
+    let friendlyMsg = err.message || "Failed to generate reading.";
+    if (isQuotaError) {
+      friendlyMsg = "Gemini API Quota Exceeded. Please configure your personal GEMINI_API_KEY in the Settings panel (top-right corner ⚙️) to ensure unlimited, ultra-fast personal AI readings.";
+    }
+    res.status(500).json({ error: friendlyMsg });
   }
 });
 
@@ -2634,16 +2640,17 @@ LAWS OF CELESTIAL ANALYSIS:
 
     res.json(output);
   } catch (apiErr: any) {
-    console.error("Gemini API error during Master Ask:", apiErr);
-    
     let warningMsg = apiErr.message || "Celestial consultation temporarily unavailable.";
     const isQuotaError = apiErr.status === 429 || warningMsg.toLowerCase().includes("quota") || warningMsg.toLowerCase().includes("limit") || warningMsg.toLowerCase().includes("429") || warningMsg.toLowerCase().includes("resource");
     
     if (isQuotaError) {
+      console.warn("Gemini API Quota Exceeded during Master Ask:", apiErr.message || apiErr);
       warningMsg = "⚠️ **Gemini API Quota Exceeded**: The shared Gemini API quota has been temporarily exhausted. Please configure your own `GEMINI_API_KEY` in the app Settings panel (top-right corner ⚙️) for unlimited, ultra-fast personal AI consultations.";
     } else if (warningMsg.includes("GEMINI_API_KEY environment variable is required") || warningMsg.includes("API key")) {
+      console.warn("Gemini API key is missing or invalid during Master Ask.");
       warningMsg = "⚠️ **Gemini API Key Notice**: Please set your personal `GEMINI_API_KEY` in the Settings panel (top-right corner ⚙️) to activate full real-time conversations.";
     } else {
+      console.error("Gemini API error during Master Ask:", apiErr);
       warningMsg = `⚠️ **Celestial Session Interrupted**: ${warningMsg}`;
     }
 
