@@ -3,14 +3,14 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin06011976dehradun0640PM",
-    "lastUpdated": "2026-07-21T16:57:45.589Z",
+    "lastUpdated": "2026-07-21T16:57:57.609Z",
     "evaluationDate": "2026-07-21",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-21T16:57:45.437Z",
-      "localTime": "2026-07-21T09:57:45-07:00",
+      "utcTime": "2026-07-21T16:57:57.542Z",
+      "localTime": "2026-07-21T09:57:57-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
@@ -30,8 +30,8 @@
         "displayName": "Rahu"
       },
       "currentSubLord": {
-        "id": "Jupiter",
-        "displayName": "Jupiter"
+        "id": "Saturn",
+        "displayName": "Saturn"
       },
       "moonPhase": {
         "type": "Waxing Gibbous",
@@ -80,7 +80,7 @@
         "nakshatra": "Swati",
         "pada": 2,
         "starLord": "Rahu",
-        "subLord": "Jupiter",
+        "subLord": "Saturn",
         "retrograde": true,
         "combust": false,
         "stationary": false
@@ -245,6 +245,21 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-21T16:57:57.609Z",
+      "evaluationDate": "2026-07-21",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
+    },
     {
       "timestamp": "2026-07-21T16:57:45.589Z",
       "evaluationDate": "2026-07-21",
@@ -1717,21 +1732,6 @@
     },
     {
       "timestamp": "2026-07-21T13:04:37.638Z",
-      "evaluationDate": "2026-07-21",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Cuspal Sub Lord of 7th House for Marriage Timing",
-        "10th Cuspal Sub Lord for Career and Profession Sector",
-        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-21T12:58:42.504Z",
       "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
