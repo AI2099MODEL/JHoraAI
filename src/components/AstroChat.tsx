@@ -286,72 +286,121 @@ export default function AstroChat({ astrologyData }: AstroChatProps) {
         
         {/* Sidebar Header */}
         <div className="p-3.5 flex items-center justify-between border-b border-neutral-200/60">
+          {/* Logo and toggle controls */}
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-neutral-800 shrink-0" />
+            <span className="font-bold text-xs tracking-tight text-neutral-800 font-sans">JHora AI</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button className="p-1.5 hover:bg-neutral-200/60 rounded-lg text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer">
+              <Search className="w-3.5 h-3.5" />
+            </button>
+            <button className="p-1.5 hover:bg-neutral-200/60 rounded-lg text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer">
+              <Compass className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* New Chat Button */}
+        <div className="px-3.5 py-2.5">
           <button 
             onClick={() => {
               setMessages([]);
               setSelectedDebugMsg(null);
             }}
-            className="flex items-center gap-2 hover:bg-neutral-200/50 px-3 py-2 rounded-lg text-sm font-medium w-full text-left text-neutral-800 transition-colors group cursor-pointer"
+            className="flex items-center gap-2 bg-neutral-200/40 hover:bg-neutral-200/75 border border-neutral-300/20 px-3 py-2 rounded-xl text-xs font-semibold w-full text-left text-neutral-800 transition-colors group cursor-pointer"
           >
-            <Sparkles className="w-4 h-4 text-[#5c4df2] group-hover:rotate-12 transition-transform" />
-            <span className="font-semibold text-xs text-neutral-700">New Astrology Chat</span>
-            <Plus className="w-4 h-4 ml-auto text-neutral-400 group-hover:text-neutral-700" />
+            <MessageSquare className="w-4 h-4 text-neutral-500" />
+            <span>New chat</span>
+            <Plus className="w-3.5 h-3.5 ml-auto text-neutral-400 group-hover:text-neutral-700" />
           </button>
         </div>
 
-        {/* Search Input inside Sidebar */}
-        <div className="px-3.5 py-2">
-          <div className="flex items-center gap-2 bg-neutral-100/80 px-3 py-1.5 rounded-lg border border-neutral-200/80">
-            <Search className="w-3.5 h-3.5 text-neutral-400" />
-            <input 
-              type="text" 
-              placeholder="Search chat history..." 
-              className="bg-transparent text-[11px] placeholder-neutral-400 outline-none w-full text-neutral-800"
-            />
-          </div>
-        </div>
-
         {/* Sidebar Navigation Entries */}
-        <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto px-2 py-1 space-y-4 scrollbar-thin">
           
-          {/* Main List */}
+          {/* Main ChatGPT Menu items */}
           <div className="space-y-0.5">
             {[
-              { id: "nitin-life", label: "Nitin Life", type: "folder" },
-              { id: "ananya-life", label: "Ananya Life", type: "folder" },
-              { id: "market-help", label: "Indian Markets Trading Help", type: "chat" },
-              { id: "jh-api", label: "Jagannatha Hora API", type: "chat" }
-            ].map((item) => {
-              const isActive = activeConversationId === item.id;
-              return (
+              { id: "library", label: "Library", icon: BookOpen },
+              { id: "scheduled", label: "Scheduled", icon: Clock },
+              { id: "plugins", label: "Plugins", icon: Zap },
+              { id: "codex", label: "Codex", icon: Cpu }
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  alert(`${item.label} feature integration: Astrological analysis engines scheduled and managed.`);
+                }}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40 w-full text-left transition-colors cursor-pointer"
+              >
+                <item.icon className="w-4 h-4 text-neutral-400 shrink-0" />
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Quick Suggested Prompts Section - on the Left-Hand Side as requested */}
+          <div className="space-y-1.5 pt-1 border-t border-neutral-200/40">
+            <div className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
+              <Flame className="w-3 h-3 text-amber-500" />
+              <span>Suggested Prompts</span>
+            </div>
+            <div className="space-y-1 px-1">
+              {quickPrompts.map((p, idx) => (
                 <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveConversationId(item.id);
-                    if (item.id === "jh-api") {
-                      // Reset to empty screen
-                      setMessages([]);
-                      setSelectedDebugMsg(null);
-                    } else {
-                      setInput(`Analyzing ${item.label} astrology parameters...`);
-                    }
-                    setSidebarOpen(false);
-                  }}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium w-full text-left transition-colors cursor-pointer ${
-                    isActive 
-                      ? "bg-neutral-200/75 text-neutral-900 border border-neutral-300/30" 
-                      : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
-                  }`}
+                  key={idx}
+                  onClick={() => runAnalysis(p.query)}
+                  className="w-full text-left p-2.5 rounded-xl border border-neutral-200 bg-white hover:bg-neutral-100 hover:border-neutral-350 transition-all text-xs cursor-pointer group shadow-xs"
                 >
-                  {item.type === "folder" ? (
-                    <Folder className={`w-4 h-4 shrink-0 ${isActive ? "text-amber-500" : "text-neutral-400"}`} />
-                  ) : (
-                    <MessageSquare className={`w-4 h-4 shrink-0 ${isActive ? "text-[#5c4df2]" : "text-neutral-400"}`} />
-                  )}
-                  <span className="truncate">{item.label}</span>
+                  <span className="font-semibold text-neutral-800 block leading-tight mb-0.5 group-hover:text-[#5c4df2]">{p.title}</span>
+                  <span className="text-neutral-400 text-[10px] block truncate leading-normal">{p.query}</span>
                 </button>
-              );
-            })}
+              ))}
+            </div>
+          </div>
+
+          {/* Chats / Pinned Folders Section */}
+          <div className="space-y-1 pt-1 border-t border-neutral-200/40">
+            <div className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Pinned Chats</div>
+            <div className="space-y-0.5">
+              {[
+                { id: "nitin-life", label: "Nitin Life", type: "folder" },
+                { id: "ananya-life", label: "Ananya Life", type: "folder" },
+                { id: "market-help", label: "Indian Markets Trading Help", type: "chat" },
+                { id: "jh-api", label: "Jagannatha Hora API", type: "chat" }
+              ].map((item) => {
+                const isActive = activeConversationId === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveConversationId(item.id);
+                      if (item.id === "jh-api") {
+                        // Reset to empty screen
+                        setMessages([]);
+                        setSelectedDebugMsg(null);
+                      } else {
+                        setInput(`Analyzing ${item.label} astrology parameters...`);
+                      }
+                      setSidebarOpen(false);
+                    }}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium w-full text-left transition-colors cursor-pointer ${
+                      isActive 
+                        ? "bg-neutral-200/75 text-neutral-900 border border-neutral-300/30" 
+                        : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                    }`}
+                  >
+                    {item.type === "folder" ? (
+                      <Folder className={`w-4 h-4 shrink-0 ${isActive ? "text-amber-500" : "text-neutral-400"}`} />
+                    ) : (
+                      <MessageSquare className={`w-4 h-4 shrink-0 ${isActive ? "text-[#5c4df2]" : "text-neutral-400"}`} />
+                    )}
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Projects Section */}
@@ -373,30 +422,6 @@ export default function AstroChat({ astrologyData }: AstroChatProps) {
                   className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-500 hover:text-neutral-900 hover:bg-neutral-200/40 w-full text-left cursor-pointer"
                 >
                   <Folder className="w-4 h-4 text-neutral-400 shrink-0" />
-                  <span className="truncate">{item.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Chats Section */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Chats</div>
-            <div className="space-y-0.5">
-              {[
-                { id: "github-prs", label: "GitHub PRs and Issues" },
-                { id: "dasha-seq", label: "Dasha Sequence Interpretation" },
-                { id: "calc-req", label: "Total Calculation Request" }
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setInput(`Investigate query regarding: ${item.label}`);
-                    setSidebarOpen(false);
-                  }}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-500 hover:text-neutral-900 hover:bg-neutral-200/40 w-full text-left cursor-pointer"
-                >
-                  <MessageSquare className="w-4 h-4 text-neutral-400 shrink-0" />
                   <span className="truncate">{item.label}</span>
                 </button>
               ))}
@@ -514,33 +539,11 @@ export default function AstroChat({ astrologyData }: AstroChatProps) {
           <div className="max-w-2xl mx-auto space-y-6">
             
             {messages.length === 0 ? (
-              /* CLEAN ELEGANT CHATGPT WELCOME STATE */
-              <div className="flex flex-col items-center justify-center text-center py-12 md:py-20 max-w-lg mx-auto space-y-6">
-                <div className="w-12 h-12 rounded-full bg-[#5c4df2]/10 border border-[#5c4df2]/20 text-[#5c4df2] flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 animate-pulse" />
-                </div>
-                <div className="space-y-2">
-                  <h1 className="text-xl md:text-2xl font-bold text-neutral-800 tracking-tight font-sans">
-                    How can I assist your astrological exploration?
-                  </h1>
-                  <p className="text-xs text-neutral-500 max-w-sm mx-auto leading-relaxed">
-                    Ask JHora AI about career paths, planetary transits, relationships, or long-term Vimshottari milestones.
-                  </p>
-                </div>
-                
-                {/* 2x2 grid of suggested prompts inside the center screen */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full pt-4">
-                  {quickPrompts.map((p, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => runAnalysis(p.query)}
-                      className="text-left p-3.5 rounded-2xl border border-neutral-200/80 bg-neutral-50/50 hover:bg-neutral-50 hover:border-neutral-300 transition-all text-xs group cursor-pointer"
-                    >
-                      <span className="font-bold text-neutral-800 block mb-1 group-hover:text-black">{p.title}</span>
-                      <span className="text-neutral-500 line-clamp-2 leading-relaxed text-[10.5px]">{p.query}</span>
-                    </button>
-                  ))}
-                </div>
+              /* CLEAN ELEGANT CHATGPT WELCOME STATE - PURE BLANK LOOK */
+              <div className="flex flex-col items-center justify-center text-center py-20 min-h-[45vh] select-none">
+                <h1 className="text-2xl font-medium text-neutral-800 font-sans tracking-tight">
+                  Ready when you are.
+                </h1>
               </div>
             ) : (
               messages.map((msg) => (
@@ -722,7 +725,7 @@ export default function AstroChat({ astrologyData }: AstroChatProps) {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask JHora AI... (e.g., 'What is my career promise?' or 'Evaluate marriage timing')"
+                placeholder="Ask anything"
                 disabled={analysisLoading}
                 className="flex-1 bg-transparent border-none outline-none py-2 text-xs text-neutral-800 placeholder-neutral-400 font-sans"
               />
