@@ -4661,7 +4661,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
                         </thead>
                         <tbody className="divide-y divide-slate-800/20 text-slate-300">
                           {(() => {
-                            const charaDashas = astrologyData?.jaimini?.chara_dasha || astrologyData?.charaDasha || [];
+                            const charaDashas = jaiminiData?.chara_dasha || astrologyData?.jaimini?.chara_dasha || astrologyData?.charaDasha || [];
                             const birthDateStr = birthDetails.date || "1976-01-06";
                             const [bYr, bMon, bDay] = birthDateStr.split("-");
                             const birthYear = parseInt(bYr) || 1976;

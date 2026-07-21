@@ -4,6 +4,46 @@
  */
 
 import { IKpProvider, KPParams } from "./IKpProvider";
+import fs from "fs";
+import path from "path";
+
+function getProfileData(params?: KPParams): any {
+  try {
+    const profilePath = path.join(process.cwd(), "Users", "userprofile.json");
+    if (fs.existsSync(profilePath)) {
+      const content = fs.readFileSync(profilePath, "utf-8");
+      const data = JSON.parse(content);
+      
+      if (params && data.Birth) {
+        const pDate = params.date;
+        const bDate = data.Birth.date;
+        
+        const normalizeTime = (t: string) => {
+          if (!t) return "";
+          const parts = t.split(":");
+          return `${parts[0].padStart(2, "0")}:${parts[1].padStart(2, "0")}`;
+        };
+        
+        const pTime = normalizeTime(params.time);
+        const bTime = normalizeTime(data.Birth.time);
+        
+        const latDiff = Math.abs(Number(params.latitude) - Number(data.Birth.latitude));
+        const lonDiff = Math.abs(Number(params.longitude) - Number(data.Birth.longitude));
+        
+        const isMatch = pDate === bDate && pTime === bTime && latDiff < 0.1 && lonDiff < 0.1;
+        if (isMatch) {
+          return data;
+        }
+      } else {
+        return data;
+      }
+    }
+  } catch (err) {
+    console.error("Failed to load profile from userprofile.json in VedicAstroProvider:", err);
+  }
+  return null;
+}
+
 import { 
   KpChart, 
   KpCuspData, 
@@ -98,7 +138,7 @@ export class VedicAstroProvider implements IKpProvider {
       return KpMapper.toKpCuspData(raw);
     } catch (error) {
       console.info("KP Cusps: utilizing high-integrity local astronomical calculation");
-      return this.getLocalCusps();
+      return this.getLocalCusps(params);
     }
   }
 
@@ -443,8 +483,8 @@ export class VedicAstroProvider implements IKpProvider {
       return {
         number: params.horaryNumber || 108,
         question: params.question || "Will I succeed in my endeavor?",
-        cusps: this.getLocalCusps().cusps,
-        planets: this.getLocalPlanets(),
+        cusps: this.getLocalCusps(params).cusps,
+        planets: this.getLocalPlanets(params),
         rulingPlanets: {
           dayLord: "Mercury",
           moonSignLord: "Mercury",
@@ -466,7 +506,36 @@ export class VedicAstroProvider implements IKpProvider {
   }
 
   // Helper local database functions matching RAW_KP_RESPONSE and RAW_KP_CUSPS
-  private getLocalPlanets(): KpPlanetPosition[] {
+  private getLocalPlanets(params?: KPParams): KpPlanetPosition[] {
+    const profile = getProfileData(params);
+    if (profile && profile.KP?.planets && profile.Vedic?.planets) {
+      const planetsList: KpPlanetPosition[] = [];
+      const kpPlanets = profile.KP.planets;
+      const vedicPlanets = profile.Vedic.planets;
+      
+      const pNames = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+      for (const name of pNames) {
+        const kpP = kpPlanets[name];
+        const vP = vedicPlanets[name];
+        if (kpP && vP) {
+          const decDegree = vP.degree + (vP.minute || 0) / 60 + (vP.second || 0) / 3600;
+          planetsList.push({
+            name,
+            sign: kpP.sign || vP.sign || "Aries",
+            degree: decDegree,
+            house: Number(kpP.house || vP.house || 1),
+            starLord: kpP.star_lord || "Unknown",
+            subLord: kpP.sub_lord || "Unknown",
+            subSubLord: kpP.sub_sub_lord || "Unknown",
+            isRetrograde: !!(vP.retrograde || false)
+          });
+        }
+      }
+      if (planetsList.length > 0) {
+        return planetsList;
+      }
+    }
+
     return [
       { name: "Sun", sign: "Virgo", degree: 27.85, house: 12, starLord: "Mars", subLord: "Jupiter", subSubLord: "Saturn", isRetrograde: false },
       { name: "Moon", sign: "Gemini", degree: 12.45, house: 9, starLord: "Rahu", subLord: "Mercury", subSubLord: "Venus", isRetrograde: false },
@@ -481,17 +550,51 @@ export class VedicAstroProvider implements IKpProvider {
   }
 
   private getLocalChart(params: KPParams): KpChart {
+    const profile = getProfileData(params);
+    let ascendantDegree = 14.25;
+    let ascendantSign = "Libra";
+    
+    if (profile && profile.Vedic?.ascendant) {
+      const asc = profile.Vedic.ascendant;
+      ascendantDegree = asc.degree + (asc.minute || 0) / 60 + (asc.second || 0) / 3600;
+      ascendantSign = asc.sign || "Aries";
+    }
+
     return {
       birthDate: params.date,
       birthTime: params.time,
       location: params.place || "Query Location",
-      planets: this.getLocalPlanets(),
-      ascendantDegree: 14.25,
-      ascendantSign: "Libra"
+      planets: this.getLocalPlanets(params),
+      ascendantDegree,
+      ascendantSign
     };
   }
 
-  private getLocalCusps(): KpCuspData {
+  private getLocalCusps(params?: KPParams): KpCuspData {
+    const profile = getProfileData(params);
+    if (profile && profile.KP?.cusps) {
+      const cuspsList: KpCuspDetail[] = [];
+      const kpCusps = profile.KP.cusps;
+      for (let h = 1; h <= 12; h++) {
+        const key = `House_${h}`;
+        const c = kpCusps[key];
+        if (c) {
+          cuspsList.push({
+            houseNumber: h,
+            longitude: c.longitude || 0,
+            degree: (c.longitude || 0) % 30,
+            sign: c.sign || "Aries",
+            starLord: c.star_lord || "Unknown",
+            subLord: c.sub_lord || "Unknown",
+            subSubLord: c.sub_sub_lord || "Unknown"
+          });
+        }
+      }
+      if (cuspsList.length > 0) {
+        return { cusps: cuspsList };
+      }
+    }
+
     return {
       cusps: [
         { houseNumber: 1, longitude: 194.25, degree: 14.25, sign: "Libra", starLord: "Rahu", subLord: "Mercury", subSubLord: "Jupiter" },
