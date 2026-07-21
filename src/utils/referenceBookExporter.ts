@@ -247,6 +247,40 @@ B. Dynamic Context Data (Prediction Query)
   Compiler, Matcher) are implemented strictly as internal subcomponents 
   or helper classes of their parent engines.
 
+------------------------------------------------------------
+
+ARCHITECTURAL PRINCIPLES
+
+1. Every business module has exactly one responsibility.
+
+2. Static natal knowledge is calculated exactly once.
+
+3. Dynamic timing is calculated on demand.
+
+4. KP Knowledge Book is the permanent deterministic repository.
+
+5. KP Rulebook stores rules only.
+
+6. Rule Engine executes rules only.
+
+7. Evidence Engine aggregates evidence only.
+
+8. Decision Engine determines the verdict only.
+
+9. Timeline Engine determines timing only.
+
+10. Event Book stores results only.
+
+11. Report Engine renders results only.
+
+12. Internal helper classes are implementation details and must never appear as business architecture.
+
+13. No module may perform another module's responsibility.
+
+14. All processing must remain deterministic, immutable where appropriate, traceable, auditable, and maintainable.
+
+------------------------------------------------------------
+
 ###########################################################
 # END OF SPECIFICATION
 ###########################################################`;

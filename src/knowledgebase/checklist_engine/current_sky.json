@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-21T04:17:50.456Z",
+    "lastUpdated": "2026-07-21T04:26:52.132Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-21T04:17:50.456Z",
-    "localTime": "2026-07-20T21:17:50-07:00",
+    "utcTime": "2026-07-21T04:26:52.132Z",
+    "localTime": "2026-07-20T21:26:52-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Libra",
       "displayName": "Libra",
-      "longitude": 183.47
+      "longitude": 183.55
     },
     "currentNakshatra": {
       "id": "Chitra",
@@ -28,15 +28,15 @@
       "displayName": "Mars"
     },
     "currentSubLord": {
-      "id": "Mars",
-      "displayName": "Mars"
+      "id": "Moon",
+      "displayName": "Moon"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Ashtami",
       "illuminationPercentage": 49.5
     },
-    "moonLongitude": 183.47,
+    "moonLongitude": 183.55,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 94.37,
+    "longitude": 94.38,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,44 +63,44 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 94.37,
+      "longitude": 94.38,
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
-      "subLord": "Mars",
+      "subLord": "Rahu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Libra",
-      "longitude": 183.47,
+      "longitude": 183.55,
       "nakshatra": "Chitra",
       "pada": 4,
       "starLord": "Mars",
-      "subLord": "Mars",
-      "retrograde": true,
+      "subLord": "Moon",
+      "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Gemini",
-      "longitude": 65.7,
-      "nakshatra": "Mrigashira",
-      "pada": 4,
-      "starLord": "Mars",
-      "subLord": "Mercury",
-      "retrograde": false,
+      "longitude": 67.28,
+      "nakshatra": "Ardra",
+      "pada": 1,
+      "starLord": "Rahu",
+      "subLord": "Mars",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 200.58,
+      "longitude": 200.62,
       "nakshatra": "Vishakha",
       "pada": 1,
       "starLord": "Jupiter",
-      "subLord": "Jupiter",
+      "subLord": "Ketu",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 116.73,
+      "longitude": 116.75,
       "nakshatra": "Ashlesha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Ketu",
+      "subLord": "Venus",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Venus",
     "moonStarLord": "Mars",
-    "moonSubLord": "Mars"
+    "moonSubLord": "Moon"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Ashtami",
       "index": 8,
       "paksha": "Sukla",
-      "endDate": "2026-07-21T16:17:50.456Z"
+      "endDate": "2026-07-21T16:26:52.132Z"
     },
     "vara": {
       "name": "Monday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Chitra",
       "lord": "Mars",
-      "endDate": "2026-07-21T22:17:50.456Z"
+      "endDate": "2026-07-21T22:26:52.132Z"
     },
     "yoga": {
       "name": "Siddha",
       "lord": "Sun",
-      "endDate": "2026-07-21T18:17:50.456Z"
+      "endDate": "2026-07-21T18:26:52.132Z"
     },
     "karana": {
       "name": "Vishti",
       "lord": "Sun",
-      "endDate": "2026-07-21T10:17:50.456Z"
+      "endDate": "2026-07-21T10:26:52.132Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
