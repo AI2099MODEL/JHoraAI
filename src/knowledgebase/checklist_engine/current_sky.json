@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-21T03:43:41.973Z",
+    "lastUpdated": "2026-07-21T03:49:07.712Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-21T03:43:41.973Z",
-    "localTime": "2026-07-20T20:43:41-07:00",
+    "utcTime": "2026-07-21T03:49:07.712Z",
+    "localTime": "2026-07-20T20:49:07-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Libra",
       "displayName": "Libra",
-      "longitude": 183.15
+      "longitude": 183.2
     },
     "currentNakshatra": {
       "id": "Chitra",
@@ -28,15 +28,15 @@
       "displayName": "Mars"
     },
     "currentSubLord": {
-      "id": "Ketu",
-      "displayName": "Ketu"
+      "id": "Rahu",
+      "displayName": "Rahu"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Ashtami",
-      "illuminationPercentage": 49.3
+      "illuminationPercentage": 49.4
     },
-    "moonLongitude": 183.15,
+    "moonLongitude": 183.2,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -74,33 +74,33 @@
     },
     "moon": {
       "currentSign": "Libra",
-      "longitude": 183.15,
+      "longitude": 183.2,
       "nakshatra": "Chitra",
       "pada": 3,
       "starLord": "Mars",
-      "subLord": "Ketu",
+      "subLord": "Rahu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
-      "currentSign": "Taurus",
-      "longitude": 59.72,
+      "currentSign": "Gemini",
+      "longitude": 60.77,
       "nakshatra": "Mrigashira",
-      "pada": 2,
+      "pada": 3,
       "starLord": "Mars",
-      "subLord": "Mars",
+      "subLord": "Sun",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 200.46,
+      "longitude": 200.48,
       "nakshatra": "Vishakha",
       "pada": 1,
       "starLord": "Jupiter",
-      "subLord": "Moon",
+      "subLord": "Rahu",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 116.67,
+      "longitude": 116.68,
       "nakshatra": "Ashlesha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Moon",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -133,7 +133,7 @@
       "nakshatra": "Purva Phalguni",
       "pada": 4,
       "starLord": "Venus",
-      "subLord": "Venus",
+      "subLord": "Sun",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Venus",
     "moonStarLord": "Mars",
-    "moonSubLord": "Ketu"
+    "moonSubLord": "Rahu"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Ashtami",
       "index": 8,
       "paksha": "Sukla",
-      "endDate": "2026-07-21T15:43:41.973Z"
+      "endDate": "2026-07-21T15:49:07.712Z"
     },
     "vara": {
       "name": "Monday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Chitra",
       "lord": "Mars",
-      "endDate": "2026-07-21T21:43:41.973Z"
+      "endDate": "2026-07-21T21:49:07.712Z"
     },
     "yoga": {
       "name": "Siddha",
       "lord": "Sun",
-      "endDate": "2026-07-21T17:43:41.973Z"
+      "endDate": "2026-07-21T17:49:07.712Z"
     },
     "karana": {
       "name": "Vishti",
       "lord": "Sun",
-      "endDate": "2026-07-21T09:43:41.973Z"
+      "endDate": "2026-07-21T09:49:07.712Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -337,9 +337,9 @@
       "description": "Mercury in Libra drives balanced mental stamina and communication focus."
     },
     "physicalEnergy": {
-      "score": 5.5,
-      "tone": "Balanced",
-      "description": "Mars in Taurus yields a balanced reserve of physical resilience."
+      "score": 8.5,
+      "tone": "Peak Focus",
+      "description": "Mars in Gemini yields a peak focus reserve of physical resilience."
     },
     "relationshipEnergy": {
       "score": 8.5,
@@ -430,7 +430,7 @@
       "description": "Ideal day for deep reading, research, and skill courses."
     },
     "travel": {
-      "priority": "low",
+      "priority": "medium",
       "description": "Plan short journeys to refresh focus; avoid heavy over-taxing transits."
     },
     "spirituality": {
@@ -486,8 +486,8 @@
       "timeframe": "Hold cash reserves; defer speculative investments"
     },
     "travelOpportunity": {
-      "active": false,
-      "timeframe": "Consolidate energy locally"
+      "active": true,
+      "timeframe": "Auspicious travel window is active"
     },
     "learningOpportunity": {
       "active": false,
