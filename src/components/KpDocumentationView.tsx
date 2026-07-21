@@ -218,11 +218,11 @@ export default function KpDocumentationView({ isDark }: KpDocumentationViewProps
               </div>
             </div>
 
-            {/* Event Profile specs */}
+            {/* Natal Event Promise specs */}
             <div className={`p-4 rounded-xl border ${cardStyle} space-y-3`}>
-              <span className="text-[10px] font-bold text-slate-200 font-mono block border-b border-slate-800/50 pb-1.5 uppercase">NATAL EVENT PROFILES</span>
+              <span className="text-[10px] font-bold text-slate-200 font-mono block border-b border-slate-800/50 pb-1.5 uppercase">NATAL EVENT PROMISE</span>
               <p className="text-[11px] text-slate-400">
-                Generate one compact profile per category (Marriage, Career, Business, Finance, Property, Children, etc.) tracking strictly natal promise without any timing calculations:
+                Generate one compact promise evaluation per category (Marriage, Career, Business, Finance, Property, Children, etc.) tracking strictly natal promise without any timing calculations:
               </p>
               <div className="p-3 bg-slate-950/30 rounded-lg border border-slate-800/40 text-[10px] font-mono space-y-1.5 text-slate-300">
                 <p><strong>event:</strong> String identifier (e.g. "Marriage")</p>

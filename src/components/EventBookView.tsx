@@ -3531,7 +3531,7 @@ if (fertileCount === 0 && barrenCount >= 3) {
                     <span>★</span> MODULE: KP KNOWLEDGE BOOK (SPECIFICATION v1.0)
                   </h5>
                   <p className="text-[11px] text-slate-300 leading-relaxed">
-                    The <strong>KP Knowledge Book</strong> is the permanent deterministic KP repository for each user profile. It stores all static KP calculations (planets, houses, cusps, significators, event profiles, strengths) and is generated <strong>only once</strong> when a new profile is created, birth details change, or recalculation is requested. Prediction and event matching runs strictly load this cached object.
+                    The <strong>KP Knowledge Book</strong> is the permanent deterministic KP repository for each user profile. It stores all static KP calculations (planets, houses, cusps, significators, natal event promise, strengths) and is generated <strong>only once</strong> when a new profile is created, birth details change, or recalculation is requested. Prediction and event matching runs strictly load this cached object.
                   </p>
                   
                   <div className="p-3 rounded bg-slate-900/60 border border-slate-800 space-y-1.5 font-mono text-[10px] text-slate-400">
@@ -3552,7 +3552,7 @@ if (fertileCount === 0 && barrenCount >= 3) {
   "significators": [
     { "planet": "Sun", "primaryHouses": [2, 7], "secondaryHouses": [11], "strength": 8.5 }
   ],
-  "eventProfiles": [
+  "natalEventPromise": [
     { "event": "Marriage", "promise": true, "primaryHouses": [2, 7, 11], "confidenceBase": 85.0 }
   ]
 }`}
@@ -3565,8 +3565,8 @@ if (fertileCount === 0 && barrenCount >= 3) {
                       Tracks coordinate degree, retro/combust state, ownership, natural significations, nakshatra, and SSL (Sub Sub Lord) levels.
                     </div>
                     <div className="p-3 bg-slate-900/40 rounded border border-slate-800/80">
-                      <span className="text-slate-200 font-bold block mb-1">EVENT PROFILE ARCHIVE</span>
-                      Stores pre-calculated natal promise verdicts across 14 events with confidence base scores to bypass repetitive calculations.
+                      <span className="text-slate-200 font-bold block mb-1">NATAL EVENT PROMISE ARCHIVE</span>
+                      Stores pre-calculated natal promise verdicts across 15 event categories with confidence base scores to bypass repetitive calculations.
                     </div>
                   </div>
                 </div>
