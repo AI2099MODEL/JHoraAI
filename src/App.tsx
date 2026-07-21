@@ -105,6 +105,7 @@ import GithubOtaView from "./components/GithubOtaView";
 import { apiFetch as fetch } from "./lib/api";
 import EngineGuide from "./components/EngineGuide";
 import KpDocumentationView from "./components/KpDocumentationView";
+import RulesTerminal from "./components/RulesTerminal";
 
 const SETTINGS_SUBMENU_IDS = [
   "theme",
@@ -1522,6 +1523,7 @@ export default function App() {
         // Category 7: EVENTS
         { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "astro", category: "EVENTS" },
         { id: "engine_guide", label: "Astrological Rule Engine", description: "Master Astrological Rule Engine Specification v1.0.", systemId: "astro", category: "EVENTS" },
+        { id: "applications", label: "Applications Menu", description: "Interactive astrological rules terminal and validation panel.", systemId: "astro", category: "EVENTS" },
 
         // Category 8: DEPLOYMENT
         { id: "table_index", label: "Table Index", description: "JH1 to JH19 Master Tables Registry & Mapping.", systemId: "astro", category: "DEPLOYMENT" },
@@ -3175,6 +3177,10 @@ export default function App() {
                 ) : activeSubmenuId === "engine_guide" ? (
                   <EngineGuide 
                     isDark={isDark} 
+                  />
+                ) : activeSubmenuId === "applications" ? (
+                  <RulesTerminal 
+                    isDarkTheme={isDark} 
                   />
                 ) : (
                   <AstroRawTablesView 

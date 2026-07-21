@@ -2263,6 +2263,36 @@ PDF Export
 Plugin Requests
 
 ###############################################################
+PART 21B — KP RULE REGISTRY & MATCHER SPECIALIZATION
+###############################################################
+
+PURPOSE
+
+Establish a centralized, deterministic KP Rule Registry and 
+stateless KP Rule Matcher subsystem. The registry serves as the
+single source of truth for loading, validating, and grouping
+all KP rules, while the matcher evaluates rules against the 
+immutability-enforced KP Knowledge Book and runtime contexts.
+
+###############################################################
+
+KP RULE REGISTRY RESPONSIBILITIES
+
+1. Load all immutable KP rules from standard rulebooks.
+2. Group and partition rules by astronomical categories.
+3. Validate rules on startup for duplicate IDs, missing definitions,
+   disabled flags, and malformed categories.
+4. Provide O(1) lookup speeds by caching ID and Category indexes.
+
+KP RULE MATCHER RESPONSIBILITIES
+
+1. Receive rule specifications and execution contexts.
+2. Evaluate target house significations against natal and transit DBA.
+3. Analyze supporting and blocking planet aspects and degrees.
+4. Calculate a normalized compliance score (0 to 100).
+5. Generate deterministic, structured evidence logs.
+
+###############################################################
 PART 22 — PERFORMANCE & CACHE ENGINE
 ###############################################################
 

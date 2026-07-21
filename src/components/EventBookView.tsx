@@ -1801,6 +1801,8 @@ export default function EventBookView({ astrologyData, isDark }: EventBookViewPr
               { id: "kp_knowledge_book_specs", label: "KP KNOWLEDGE BOOK SPECS" },
               { id: "kp_rulebook_specs", label: "KP RULEBOOK SPECS" },
               { id: "kp_rule_execution_context_specs", label: "KP EXECUTION CONTEXT" },
+              { id: "kp_rule_registry_specs", label: "KP RULE REGISTRY" },
+              { id: "kp_rule_matcher_specs", label: "KP RULE MATCHER" },
               { id: "crer_ceo_pipeline", label: "CRER & CEO PIPELINE" },
               { id: "simulator_v2", label: "SIMULATOR V2 (MULTI-EVENT)" }
             ].map((section) => (
@@ -3635,6 +3637,81 @@ if (fertileCount === 0 && barrenCount >= 3) {
 
                   <div className="p-3 bg-indigo-500/10 rounded-lg border border-indigo-500/20 text-[10px] text-slate-300 font-mono">
                     <strong>TRACEABILITY MATRIX:</strong> Stores permanent system parameters (such as the context UUID, loaded rulebook version, and generation timestamp) to allow tracing any predicted astrological output back to the underlying rule definition.
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "kp_rule_registry_specs" && (
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                  <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                    <span>★</span> MODULE: KP RULE REGISTRY (SPECIFICATION v1.0)
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    The <strong>KPRuleRegistry</strong> is a central manager and index layer over the KP Rulebook. It organizes, validates, and provides high-performance access to rules required by the main execution engine.
+                  </p>
+
+                  <div className="p-3 rounded bg-slate-900/60 border border-slate-800 space-y-1.5 font-mono text-[10px] text-slate-400">
+                    <span className="text-slate-200 font-bold block mb-1">REGISTRY RESPONSIBILITIES</span>
+                    <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                      <li>Load all KP rules from static definitions.</li>
+                      <li>Group rules dynamically by astronomical category (Marriage, Career, Business, Finance, etc.).</li>
+                      <li>Return rules for a specific event or request category.</li>
+                      <li>Enforce strict startup validation checks (e.g. identify duplicate Rule IDs, invalid categories, null references, or disabled rules).</li>
+                    </ul>
+                  </div>
+
+                  <div className="p-3 rounded bg-slate-900/60 border border-slate-800 space-y-1.5 font-mono text-[10px] text-slate-400">
+                    <span className="text-slate-200 font-bold block mb-1">KOTLIN IMPLEMENTATION SIGNATURE</span>
+                    <pre className="text-amber-400 leading-normal font-mono text-[9.5px] overflow-x-auto">
+{`object KPRuleRegistry {
+    val version: String = "1.0"
+    val rules: List<KPRule>
+    
+    fun getAllRules(): List<KPRule>
+    fun getRule(id: String): KPRule?
+    fun getRules(category: RuleCategory): List<KPRule>
+    fun getEnabledRules(): List<KPRule>
+    fun getRuleCount(): Int
+    fun getVersion(): String
+}`}
+                    </pre>
+                  </div>
+                </div>
+              )}
+
+              {activeEventBookSection === "kp_rule_matcher_specs" && (
+                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                  <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                    <span>★</span> MODULE: KP RULE MATCHER & RESULT (SPECIFICATION v1.0)
+                  </h5>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    The <strong>KPRuleMatcher</strong> is a stateless, pure evaluation component. It determines whether a specific KP rule is satisfied under the current dynamic runtime context and returns a structured match score with granular supporting and blocking evidence.
+                  </p>
+
+                  <div className="p-3 rounded bg-slate-900/60 border border-slate-800 space-y-1.5 font-mono text-[10px] text-slate-400">
+                    <span className="text-slate-200 font-bold block mb-1">EVALUATION FLOW & CHECKS</span>
+                    <ul className="list-disc pl-4 space-y-1 text-slate-300">
+                      <li><strong>Check Required Houses:</strong> Confirms required cusps are activated by Mahadasha or Bhukti lords.</li>
+                      <li><strong>Check Supporting Houses:</strong> Collects secondary houses that amplify positive outcomes.</li>
+                      <li><strong>Check Blocking Houses:</strong> Checks if dusthana or obstructing houses (e.g., 6th/8th/12th) diminish strength.</li>
+                      <li><strong>Normalize Score:</strong> Returns a deterministic score from 0 (No Match) to 100 (Complete Match).</li>
+                    </ul>
+                  </div>
+
+                  <div className="p-3 rounded bg-slate-900/60 border border-slate-800 space-y-1.5 font-mono text-[10px] text-slate-400">
+                    <span className="text-slate-200 font-bold block mb-1">RULE MATCH RESULT STRUCTURE</span>
+                    <pre className="text-emerald-400 leading-normal font-mono text-[9.5px] overflow-x-auto">
+{`data class RuleMatchResult(
+    val ruleId: String,
+    val matched: Boolean,
+    val score: Int,
+    val supportingHouses: List<Int>,
+    val missingHouses: List<Int>,
+    val supportingPlanets: List<String>,
+    val blockingPlanets: List<String>,
+    val evidence: List<String>
+)`}
+                    </pre>
                   </div>
                 </div>
               )}
