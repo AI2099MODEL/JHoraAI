@@ -37,13 +37,17 @@ export function generateRawAstrologyPDF(profileData: any, options: RawPdfOptions
   ];
 
   const getPlanetSignIndex = (p: any): number => {
-    if (typeof p.signIndex === "number" && !isNaN(p.signIndex)) return p.signIndex;
-    if (typeof p.sign_index === "number" && !isNaN(p.sign_index)) return p.sign_index;
-    if (p.sign) {
-      const idx = zodiacSigns.findIndex(s => s.toLowerCase() === p.sign.toLowerCase() || p.sign.toLowerCase().includes(s.toLowerCase()));
-      if (idx !== -1) return idx;
+    if (!p) return 0;
+    let idx = 0;
+    if (typeof p.signIndex === "number" && !isNaN(p.signIndex)) {
+      idx = p.signIndex;
+    } else if (typeof p.sign_index === "number" && !isNaN(p.sign_index)) {
+      idx = p.sign_index;
+    } else if (p.sign) {
+      const foundIdx = zodiacSigns.findIndex(s => s.toLowerCase() === p.sign.toLowerCase() || p.sign.toLowerCase().includes(s.toLowerCase()));
+      if (foundIdx !== -1) idx = foundIdx;
     }
-    return 0;
+    return (idx % 12 + 12) % 12;
   };
 
   // Color scheme (Cool Tech/Slate look for raw data representation)
