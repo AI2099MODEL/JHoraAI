@@ -393,7 +393,7 @@ export function generateRelationshipPDF(params: ReportGenerationParams): jsPDF {
     doc.text("Consensus Code", 168, tableTop + 5);
 
     let rowY = tableTop + 8;
-    const coreTopics = ["Marriage Promise", "Marriage Timing", "Marriage Delay", "Marriage Denial", "Love Marriage", "Arranged Marriage", "Spouse Nature", "Marriage Happiness", "Relationship Timeline"];
+    const coreTopics = ["Marriage Promise", "Marriage Timing", "Marriage Delay", "Marriage Denial", "Love Marriage", "Arranged Marriage", "Spouse Nature", "Marriage Happiness", "Relationship Timeline", "Divorce", "Remarriage", "Litigation"];
 
     coreTopics.forEach((topic, idx) => {
       if (idx % 2 === 1) {
@@ -471,7 +471,7 @@ export function generateRelationshipPDF(params: ReportGenerationParams): jsPDF {
     doc.text("Western Sayana", 158, tableTop + 5);
 
     let rowY = tableTop + 8;
-    const extraTopics = ["Marriage Promise", "Marriage Timing", "Marriage Delay", "Love Marriage", "Arranged Marriage", "Divorce", "Remarriage", "Spouse Nature", "Marriage Happiness"];
+    const extraTopics = ["Marriage Promise", "Marriage Timing", "Marriage Delay", "Love Marriage", "Arranged Marriage", "Divorce", "Remarriage", "Spouse Nature", "Marriage Happiness", "Litigation"];
 
     extraTopics.forEach((topic, idx) => {
       if (idx % 2 === 1) {
@@ -980,7 +980,7 @@ export async function generateRelationshipDOCX(params: ReportGenerationParams): 
                   new TableCell({ children: [new Paragraph({ children: [new TextRun({ text: "Western Status", bold: true, color: "FFFFFF" })] })], shading: { fill: "1F2937" } })
                 ]
               }),
-              ...["Marriage Promise", "Marriage Timing", "Marriage Delay", "Marriage Denial", "Love Marriage", "Arranged Marriage", "Spouse Nature", "Marriage Happiness", "Relationship Timeline"].map((topic) => {
+              ...["Marriage Promise", "Marriage Timing", "Marriage Delay", "Marriage Denial", "Love Marriage", "Arranged Marriage", "Spouse Nature", "Marriage Happiness", "Relationship Timeline", "Divorce", "Remarriage", "Litigation"].map((topic) => {
                 const vedicItem = evidence?.[topic]?.Vedic || { status: "CONDITIONAL", confidence: 50 };
                 const kpItem = evidence?.[topic]?.KP || { status: "CONDITIONAL", confidence: 50 };
                 const jaiminiItem = evidence?.[topic]?.Jaimini || { status: "CONDITIONAL", confidence: 50 };

@@ -86,6 +86,7 @@ export const AstrologicalReasoningEngine: React.FC<AstrologicalReasoningEnginePr
     "Divorce",
     "Separation",
     "Remarriage",
+    "Litigation",
     "Spouse Nature",
     "Marriage Happiness",
     "Relationship Timeline"

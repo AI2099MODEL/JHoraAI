@@ -498,6 +498,40 @@ export function getKPEvidence(
     };
   }
 
+  // 16. Litigation
+  {
+    const supports: string[] = [];
+    const contras: string[] = [];
+    let status: "PASS" | "FAIL" | "CONDITIONAL" = "FAIL";
+    let confidence = 40;
+
+    const hasLitigationHouses = signifiesHouse("Mars", 6) || signifiesHouse("Mars", 8) || signifiesHouse("Mars", 12);
+    if (hasLitigationHouses) {
+      supports.push("Mars (disputes) signifies litigation-prone houses (6, 8, 12), indicating risk of legal disputes or court battles.");
+      status = "CONDITIONAL";
+      confidence += 20;
+    }
+    const signifiesCourtCase = signifiesHouse("Saturn", 6) || signifiesHouse("Saturn", 8);
+    if (signifiesCourtCase) {
+      supports.push("Saturn (obstacles and legal delays) is positioned in or signifies houses 6 or 8, indicating formal court filings or prolonged legal trials.");
+      status = "PASS";
+      confidence += 25;
+    } else {
+      contras.push("Lords of 6th and 8th houses are free from Saturnian and Mars affliction, reducing litigation risks.");
+      confidence -= 15;
+    }
+
+    kpEvidence["Litigation"] = {
+      status,
+      confidence: Math.min(100, Math.max(10, confidence)),
+      supportingEvidence: supports.length > 0 ? supports : ["Benefic influences pacify legal or court-related disputes."],
+      contradictingEvidence: contras,
+      ruleIds: ["KP_REL_LITIGATION_01"],
+      decisionIds: ["KP_DEC_LITIGATION_01"],
+      suggestedRemedy: "Recite Durga Chalisa daily to conquer enemies and win legal cases."
+    };
+  }
+
   return kpEvidence;
 }
 
@@ -965,6 +999,42 @@ export function getVedicEvidence(
     };
   }
 
+  // 16. Litigation
+  {
+    const supports: string[] = [];
+    const contras: string[] = [];
+    let status: "PASS" | "FAIL" | "CONDITIONAL" = "FAIL";
+    let confidence = 40;
+
+    const lord6 = getHouseLordSign(6);
+    const pLord6 = planets.find(p => p.name === lord6);
+    if (pLord6 && (pLord6.house === 7 || pLord6.house === 8 || pLord6.house === 12)) {
+      supports.push(`6th Lord of disputes (${lord6}) is placed in house ${pLord6.house}, triggering high litigation risk with spouse or partners.`);
+      status = "CONDITIONAL";
+      confidence += 20;
+    }
+    const lord8 = getHouseLordSign(8);
+    const pLord8 = planets.find(p => p.name === lord8);
+    if (pLord8 && (pLord8.house === 6 || pLord8.house === 12)) {
+      supports.push(`8th Lord of sudden shocks and legal penalties (${lord8}) resides in house ${pLord8.house}, signaling deep legal disputes and court expenses.`);
+      status = "PASS";
+      confidence += 25;
+    } else {
+      contras.push("The dusthana lords of 6th and 8th are placed in auspicious houses, reducing legal vulnerability.");
+      confidence -= 15;
+    }
+
+    vedicEvidence["Litigation"] = {
+      status,
+      confidence: Math.min(100, Math.max(10, confidence)),
+      supportingEvidence: supports.length > 0 ? supports : ["Chart is blessed with clean legal transitions without court disputes."],
+      contradictingEvidence: contras,
+      ruleIds: ["VEDIC_REL_LITIGATION_01"],
+      decisionIds: ["VEDIC_DEC_LITIGATION_01"],
+      suggestedRemedy: "Light a mustard oil lamp on Saturdays near a Peepal tree and pray to Lord Hanuman."
+    };
+  }
+
   return vedicEvidence;
 }
 
@@ -1034,7 +1104,8 @@ export function getJaiminiEvidence(
     { topic: "Remarriage", ruleId: "JAIMINI_REL_REMARRIAGE_01", decId: "JAIMINI_DEC_REMARRIAGE_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Upapada Lagna is singular, pointing to a lifetime commitment to a single partner."], rem: "Donate food to cows on Wednesdays." },
     { topic: "Spouse Nature", ruleId: "JAIMINI_REL_SPOUSENATURE_01", decId: "JAIMINI_DEC_SPOUSENATURE_01", dStatus: "PASS", dConf: 80, sup: [`Spouse carries characteristics of Darakaraka ${dkName} (e.g., communicative if Mercury, energetic if Mars, wise if Jupiter).`], con: [], rem: "Keep sweet food in your home temple." },
     { topic: "Marriage Happiness", ruleId: "JAIMINI_REL_HAPPINESS_01", decId: "JAIMINI_DEC_HAPPINESS_01", dStatus: "PASS", dConf: 75, sup: ["Benefic planets occupy the 2nd and 4th houses from Upapada Lagna, promising domestic peace."], con: [], rem: "Place a small plant of Holy Basil in the northeast corner of your room." },
-    { topic: "Relationship Timeline", ruleId: "JAIMINI_REL_TIMELINE_01", decId: "JAIMINI_DEC_TIMELINE_01", dStatus: "PASS", dConf: 70, sup: ["Jaimini Chara Dasha sequences map key romantic upgrades during the dasha of the sign containing DK."], con: [], rem: "Offer prayers to Lord Vishnu on Thursdays." }
+    { topic: "Relationship Timeline", ruleId: "JAIMINI_REL_TIMELINE_01", decId: "JAIMINI_DEC_TIMELINE_01", dStatus: "PASS", dConf: 70, sup: ["Jaimini Chara Dasha sequences map key romantic upgrades during the dasha of the sign containing DK."], con: [], rem: "Offer prayers to Lord Vishnu on Thursdays." },
+    { topic: "Litigation", ruleId: "JAIMINI_REL_LITIGATION_01", decId: "JAIMINI_DEC_LITIGATION_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Gnati Karaka (GK) represents legal and obstacle markers but is currently well-aligned and non-afflicting."], rem: "Recite Shiva Kavacham daily." }
   ];
 
   otherTopics.forEach((t) => {
@@ -1114,7 +1185,8 @@ export function getNadiEvidence(
     { topic: "Remarriage", ruleId: "NADI_REL_REMARRIAGE_01", decId: "NADI_DEC_REMARRIAGE_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Single marriage promise remains highly solid in natal configurations."], rem: "Worship lord Vishnu and offer yellow flowers." },
     { topic: "Spouse Nature", ruleId: "NADI_REL_SPOUSENATURE_01", decId: "NADI_DEC_SPOUSENATURE_01", dStatus: "PASS", dConf: 80, sup: ["Closest planet in transit to Venus/Mars reveals partner's career and temperamental qualities."], con: [], rem: "Listen to divine music with your spouse." },
     { topic: "Marriage Happiness", ruleId: "NADI_REL_HAPPINESS_01", decId: "NADI_DEC_HAPPINESS_01", dStatus: "PASS", dConf: 75, sup: ["Jupiter casts a supportive transit aspect over Mars-Venus axis, expanding bliss."], con: [], rem: "Keep a small piece of camphor in your bedroom." },
-    { topic: "Relationship Timeline", ruleId: "NADI_REL_TIMELINE_01", decId: "NADI_DEC_TIMELINE_01", dStatus: "PASS", dConf: 70, sup: ["Nadi planetary transits map major relationship milestones according to Jupiter cycles."], con: [], rem: "Chant the Shiva Panchakshara mantra daily." }
+    { topic: "Relationship Timeline", ruleId: "NADI_REL_TIMELINE_01", decId: "NADI_DEC_TIMELINE_01", dStatus: "PASS", dConf: 70, sup: ["Nadi planetary transits map major relationship milestones according to Jupiter cycles."], con: [], rem: "Chant the Shiva Panchakshara mantra daily." },
+    { topic: "Litigation", ruleId: "NADI_REL_LITIGATION_01", decId: "NADI_DEC_LITIGATION_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Mars and Saturn are free from direct tight junctions with the Mercury/Venus axes, showing minimal legal stress."], rem: "Sponsor food for a poor child on Tuesdays." }
   ];
 
   otherTopics.forEach((t) => {
@@ -1193,7 +1265,8 @@ export function getWesternEvidence(
     { topic: "Remarriage", ruleId: "WESTERN_REL_REMARRIAGE_01", decId: "WESTERN_DEC_REMARRIAGE_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["Single primary marriage promise is highly secure in natal chart."], rem: "Focus on deepening the current partnership." },
     { topic: "Spouse Nature", ruleId: "WESTERN_REL_SPOUSENATURE_01", decId: "WESTERN_DEC_SPOUSENATURE_01", dStatus: "PASS", dConf: 80, sup: ["Descendant sign and planets in the 7th house reveal partner's personality (e.g. Venus in 7 -> charming/artistic)."], con: [], rem: "Worship your creative arts together." },
     { topic: "Marriage Happiness", ruleId: "WESTERN_REL_HAPPINESS_01", decId: "WESTERN_DEC_HAPPINESS_01", dStatus: "PASS", dConf: 75, sup: ["Sun conjunct Venus or Venus trine Jupiter ensures high relationship bliss and mutual growth."], con: [], rem: "Keep lavender essential oils in your shared spaces." },
-    { topic: "Relationship Timeline", ruleId: "WESTERN_REL_TIMELINE_01", decId: "WESTERN_DEC_TIMELINE_01", dStatus: "PASS", dConf: 70, sup: ["Outer planet transits to Venus and Descendant map the major relationship milestones."], con: [], rem: "Review natal charts together on anniversaries." }
+    { topic: "Relationship Timeline", ruleId: "WESTERN_REL_TIMELINE_01", decId: "WESTERN_DEC_TIMELINE_01", dStatus: "PASS", dConf: 70, sup: ["Outer planet transits to Venus and Descendant map the major relationship milestones."], con: [], rem: "Review natal charts together on anniversaries." },
+    { topic: "Litigation", ruleId: "WESTERN_REL_LITIGATION_01", decId: "WESTERN_DEC_LITIGATION_01", dStatus: "FAIL", dConf: 40, sup: [], con: ["No major squares or oppositions from Saturn or Pluto to the 7th house cusp are active."], rem: "Meditate during full moon phases to release emotional tension." }
   ];
 
   otherTopics.forEach((t) => {
@@ -1239,7 +1312,8 @@ export function getLalKitabEvidence(
     "Remarriage": "Remarriage",
     "Spouse Nature": "Spouse Nature",
     "Marriage Happiness": "Marriage Happiness",
-    "Relationship Timeline": "Relationship Timeline"
+    "Relationship Timeline": "Relationship Timeline",
+    "Litigation": "Litigation"
   };
 
   // Pre-populate all 15 topics with conditional defaults just in case
@@ -1247,7 +1321,7 @@ export function getLalKitabEvidence(
     "Marriage Promise", "Marriage Timing", "Marriage Delay", "Marriage Denial",
     "Love Marriage", "Arranged Marriage", "Secret Relationship", "Multiple Relationships",
     "Extra-marital Relationship", "Divorce", "Separation", "Remarriage",
-    "Spouse Nature", "Marriage Happiness", "Relationship Timeline"
+    "Spouse Nature", "Marriage Happiness", "Relationship Timeline", "Litigation"
   ];
 
   topics.forEach((topic) => {
@@ -1275,6 +1349,16 @@ export function getLalKitabEvidence(
           ruleIds: ["LK_REL_MULTIPLE_01"],
           decisionIds: ["LK_DEC_MULTIPLE_01"],
           suggestedRemedy: "Offer yellow gram to standard rivers."
+        };
+      } else if (topic === "Litigation") {
+        lkEvidence[topic] = {
+          status: "FAIL",
+          confidence: 50,
+          supportingEvidence: ["Lal Kitab alerts that malicious Rahu or Ketu in dispute houses can cause silent legal conflicts."],
+          contradictingEvidence: [],
+          ruleIds: ["LK_REL_LITIGATION_01"],
+          decisionIds: ["LK_DEC_LITIGATION_01"],
+          suggestedRemedy: "Feed sweet bread cooked in a clay tandoor to dogs."
         };
       } else {
         lkEvidence[topic] = {
@@ -1324,7 +1408,7 @@ export function getTajikEvidence(
     "Marriage Promise", "Marriage Timing", "Marriage Delay", "Marriage Denial",
     "Love Marriage", "Arranged Marriage", "Secret Relationship", "Multiple Relationships",
     "Extra-marital Relationship", "Divorce", "Separation", "Remarriage",
-    "Spouse Nature", "Marriage Happiness", "Relationship Timeline"
+    "Spouse Nature", "Marriage Happiness", "Relationship Timeline", "Litigation"
   ];
 
   topics.forEach((topic) => {
@@ -1428,7 +1512,8 @@ export function calculateUnifiedRelationshipEvidence(
     "Remarriage",
     "Spouse Nature",
     "Marriage Happiness",
-    "Relationship Timeline"
+    "Relationship Timeline",
+    "Litigation"
   ];
 
   const unifiedEvidence: UnifiedEvidenceObject = {};
