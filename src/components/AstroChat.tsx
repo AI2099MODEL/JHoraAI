@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
+import moodRules from "../knowledgebase/checklist_engine/mood_analysis_rules.json";
 
 interface AstroChatProps {
   astrologyData: AstrologyData | null;
@@ -85,8 +86,60 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const [likedMessages, setLikedMessages] = useState<Record<string, boolean>>({});
   const [dislikedMessages, setDislikedMessages] = useState<Record<string, boolean>>({});
   const [currentStatusMsg, setCurrentStatusMsg] = useState("");
+  const [moodAnalysisExpanded, setMoodAnalysisExpanded] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Dynamically load/build the prompts from the imported JSON
+  const getMoodPromptsFromJSON = () => {
+    const prompts = [];
+    
+    // Add Daily Horoscope / Mood prompt
+    prompts.push({
+      id: "daily_mood_prediction",
+      label: "Daily Mood Reading",
+      query: `Generate a personalized daily mood reading and activity guidance based on the "daily_horoscope_engine" and "mood_prediction" rules. Layer today's Moon transit (currently in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra, ${currentSky?.moon?.currentSign?.displayName || "Libra"} sign) over my current Vimshottari period (Saturn-Mercury-Rahu) to calculate Tara Bala, Chandra Bala, and daily emotional metrics.`
+    });
+
+    // Add domains from JSON
+    if (moodRules && moodRules.domains) {
+      Object.entries(moodRules.domains).forEach(([key, value]: [string, any]) => {
+        let label = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        // Custom beautified labels for specific keys
+        if (key === "marriage_first") label = "Marriage Promise Check";
+        else if (key === "marriage_love_vs_arranged") label = "Love vs Arranged Marriage";
+        else if (key === "marriage_delay_denial") label = "Marriage Delay & Denial";
+        else if (key === "separation_divorce") label = "Separation & Divorce Risk";
+        else if (key === "career_promotion") label = "Career & Promotion Timing";
+        else if (key === "finance_wealth") label = "Wealth & Assets Accrual";
+        else if (key === "health_disease") label = "Health & Disease Risk";
+        else if (key === "foreign_travel_settlement") label = "Foreign Relocation/Travel";
+        else if (key === "property_vehicle") label = "Property & Vehicle Purchase";
+
+        let ruleText = "";
+        if (value.kp_rule) ruleText += ` KP Rule: ${value.kp_rule}`;
+        if (value.delay_rule) ruleText += ` Delay Rule: ${value.delay_rule}`;
+        if (value.denial_rule) ruleText += ` Denial Rule: ${value.denial_rule}`;
+        if (value.parashari_cross_check) ruleText += ` Parashari Cross-Check: ${value.parashari_cross_check}`;
+        if (value.jaimini_cross_check) ruleText += ` Jaimini Cross-Check: ${value.jaimini_cross_check}`;
+
+        prompts.push({
+          id: key,
+          label: label,
+          query: `Assess my astrological promise for [${label}] by executing the rules in our Mood Analysis schema. Formulate a multi-system convergence score (out of 10) across Krishnamurti Paddhati (KP), Parashari, Jaimini, and Ashtakavarga systems, specifically checking: ${ruleText}`
+        });
+      });
+    }
+
+    // Add Future Predictions prompt
+    prompts.push({
+      id: "future_prediction_timeline",
+      label: "Future Forecast Timeline",
+      query: `Evaluate a medium to long-term future forecast timeline using the "future_prediction_engine" rules. Walk my forward Dasha sequences (Mahadasha, Antardasha, Pratyantardasha) against slower-resolution transits of Jupiter, Saturn, Rahu, and Ketu to trace peak activation windows and potential life-theme changes.`
+    });
+
+    return prompts;
+  };
 
   // Load Rules status and Current Sky on mount
   useEffect(() => {
@@ -322,9 +375,43 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
         <div className="flex-1 overflow-y-auto px-2 py-1 space-y-4 scrollbar-thin">
           
           {/* Main ChatGPT Menu items */}
-          <div className="space-y-0.5">
+          <div className="space-y-1">
+            {/* My Mood Analysis Expandable Item */}
+            <div className="space-y-0.5">
+              <button
+                onClick={() => setMoodAnalysisExpanded(!moodAnalysisExpanded)}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold w-full text-left transition-colors cursor-pointer ${
+                  moodAnalysisExpanded 
+                    ? "bg-neutral-100/90 text-[#5c4df2]" 
+                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                }`}
+              >
+                <Activity className={`w-4 h-4 shrink-0 ${moodAnalysisExpanded ? "text-[#5c4df2]" : "text-neutral-400"}`} />
+                <span>My Mood Analysis</span>
+                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-400 transition-transform duration-200 ${moodAnalysisExpanded ? "rotate-180" : ""}`} />
+              </button>
+
+              {moodAnalysisExpanded && (
+                <div className="mt-1 ml-3 pl-2.5 border-l border-neutral-200/80 space-y-1 py-1 max-h-[220px] overflow-y-auto scrollbar-thin">
+                  {getMoodPromptsFromJSON().map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        runAnalysis(p.query);
+                        setSidebarOpen(false);
+                      }}
+                      className="flex items-center gap-2 py-1.5 px-2 rounded-md text-[10px] font-medium text-neutral-500 hover:text-[#5c4df2] hover:bg-neutral-100/60 w-full text-left transition-all cursor-pointer group"
+                      title={p.label}
+                    >
+                      <Sparkles className="w-3 h-3 text-neutral-300 group-hover:text-[#5c4df2] shrink-0" />
+                      <span className="truncate">{p.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {[
-              { id: "library", label: "Library", icon: BookOpen },
               { id: "scheduled", label: "Scheduled", icon: Clock },
               { id: "plugins", label: "Plugins", icon: Zap },
               { id: "codex", label: "Codex", icon: Cpu }
