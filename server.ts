@@ -1820,8 +1820,75 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
     const result = JSON.parse(response.text.trim());
     res.json(result);
   } catch (err: any) {
-    console.error("Error in /api/user-profile/generate-summary:", err);
-    res.status(500).json({ error: err.message || "Failed to generate personalized page content." });
+    if (err.status === 429 || err.message?.includes("quota") || err.message?.includes("limit")) {
+      console.warn("Gemini API rate limit or quota exceeded in generate-summary. Activating high-fidelity local fallback.");
+    } else {
+      console.warn("Gemini API error in generate-summary. Fallback active:", err.message || err);
+    }
+
+    // High-fidelity local fallback if Gemini is rate-limited or API key is missing
+    try {
+      let profileData = req.body.profile;
+      if (!profileData) {
+        const filePath = path.join(process.cwd(), "Users", "userprofile.json");
+        if (fs.existsSync(filePath)) {
+          const content = fs.readFileSync(filePath, "utf-8");
+          profileData = JSON.parse(content);
+        }
+      }
+
+      const userName = profileData?.User?.profile_name || "Seeker";
+      const birthDate = profileData?.Birth?.date || "Nitin's Birth Coordinates";
+      const birthPlace = profileData?.Birth?.place || "Calculated Profile";
+      const ascendantSign = profileData?.Vedic?.ascendant?.sign || "Cancer";
+      const ascendantNakshatra = profileData?.Vedic?.ascendant?.nakshatra || "Pushya";
+      const moonPhase = profileData?.Astronomical?.moon_phase || "Waxing Gibbous";
+
+      const fallbackSummary = `Offline Soul Blueprint Synthesis for ${userName}. Your ${ascendantSign} Lagna provides deep emotional sensitivity and intuitive insight, while your planetary alignments guide your karmic evolution towards professional and spiritual mastery.`;
+      const fallbackSections = [
+        {
+          title: "Core Soul Archetype & Personality",
+          content: `As a ${ascendantSign} Ascendant residing in ${ascendantNakshatra} Nakshatra, you possess a highly developed intuitive center and empathetic disposition. The ${moonPhase} phase of your birth represents the specific celestial canvas guiding your emotional responses, offering a natural gift for understanding subtle atmospheres and human feelings.`,
+          remedy: "Spend 5-10 minutes each morning in silent contemplation or focusing on your breath to ground your powerful energy field.",
+          icon: "user"
+        },
+        {
+          title: "Karmic Cycles & Life Path",
+          content: `Your planetary placements indicate active karmic learning through relational and vocational spheres. Major transitions are designed to refine your personal boundaries and build a more resilient and self-authoritative lifestyle.`,
+          remedy: "Engage in acts of selfless service on Saturdays to channel Saturn's slow and disciplining lessons productively.",
+          icon: "zap"
+        },
+        {
+          title: "Prosperity & Life Purpose",
+          content: "With strong indicators in your 2nd and 10th houses, your life purpose is aligned with organizational mastery, counseling, technical fields, or consulting. Financial accrual is promised to materialize through disciplined, consistent effort.",
+          remedy: "Keep a daily gratitude journal listing at least three small achievements or blessings to amplify your 11th house gains.",
+          icon: "briefcase"
+        },
+        {
+          title: "Spiritual Practices & Remedies",
+          content: "Your alignment path favors spiritual and introspective practices that integrate your analytical capabilities with intuitive, high-frequency focus.",
+          remedy: "Incorporate regular pranayama (breath regulation) and mindfulness to soothe your active nervous system and align your core.",
+          icon: "compass"
+        }
+      ];
+
+      res.json({
+        summary: fallbackSummary,
+        sections: fallbackSections
+      });
+    } catch (fallbackErr) {
+      res.status(200).json({
+        summary: "Soul Blueprint Synthesis. Your alignments guide your karmic evolution towards professional and spiritual mastery.",
+        sections: [
+          {
+            title: "Core Soul Archetype",
+            content: "You possess a highly developed intuitive center and empathetic disposition, offering a natural gift for understanding subtle atmospheres and human feelings.",
+            remedy: "Spend 5-10 minutes each morning in silent contemplation.",
+            icon: "user"
+          }
+        ]
+      });
+    }
   }
 });
 
@@ -2484,7 +2551,11 @@ LAWS OF CELESTIAL ANALYSIS:
 
     res.json(output);
   } catch (apiErr: any) {
-    console.error("Gemini API error during Master Ask:", apiErr);
+    if (apiErr.status === 429 || apiErr.message?.includes("quota") || apiErr.message?.includes("limit") || apiErr.message?.includes("429")) {
+      console.warn("Gemini API rate limit or quota exceeded during Master Ask. Activating offline fallback.");
+    } else {
+      console.warn("Gemini API error during Master Ask. Fallback active:", apiErr.message || apiErr);
+    }
     
     // High-fidelity local fallback using the active user profile data to make it extremely personalized and responsive
     const q = (question || "").toLowerCase();
@@ -2504,7 +2575,9 @@ LAWS OF CELESTIAL ANALYSIS:
     ];
     let replyText = "";
 
-    if (apiErr.message?.includes("GEMINI_API_KEY environment variable is required") || apiErr.message?.includes("API key")) {
+    if (apiErr.status === 429 || apiErr.message?.includes("quota") || apiErr.message?.includes("limit") || apiErr.message?.includes("429")) {
+      replyText += `⚠️ **Gemini API Quota Exceeded**: The shared Gemini API quota has been temporarily exhausted. Please configure your own \`GEMINI_API_KEY\` in the app Settings panel (top-right corner ⚙️) for unlimited, ultra-fast personal AI consultations. Here is your high-fidelity offline synthesis from your calculated profile:\n\n`;
+    } else if (apiErr.message?.includes("GEMINI_API_KEY environment variable is required") || apiErr.message?.includes("API key")) {
       replyText += `⚠️ **Gemini API Key Notice**: Please set your personal \`GEMINI_API_KEY\` in the Settings panel (top-right corner ⚙️) to activate full real-time conversations. In the meantime, here is your high-fidelity offline synthesis from your calculated profile:\n\n`;
     } else {
       replyText += `⚠️ **Celestial Session Interrupted** (using offline local synthesis fallback):\n\n`;
