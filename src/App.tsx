@@ -1522,7 +1522,7 @@ export default function App() {
 
         // Category 7: EVENTS
         { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "astro", category: "EVENTS" },
-        { id: "engine_guide", label: "Astrological Rule Engine", description: "Master Astrological Rule Engine Specification v1.0.", systemId: "astro", category: "EVENTS" },
+        { id: "engine_guide", label: "Astrological Rule Engine", description: "Master Astrological Rule Engine Specification V2.0.", systemId: "astro", category: "EVENTS" },
         { id: "kp_book", label: "KP Book", description: "Interactive astrological rules terminal and validation panel.", systemId: "astro", category: "EVENTS" },
 
         // Category 8: DEPLOYMENT
