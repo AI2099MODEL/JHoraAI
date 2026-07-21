@@ -196,7 +196,7 @@ function saveUserAnalysisToFolder(userName: string, analysisText: string, astrol
     console.log(`[Analysis Save] Saved analysis for ${userName} to analysis/ folder.`);
     
     // Stage, commit and push to git asynchronously
-    exec(`git add analysis/${normName}_analysis.md analysis/${normName}_data.json && (git diff-index --quiet HEAD || git commit -m "feat(analysis): update stored analysis for ${userName}")`, (err, stdout, stderr) => {
+    exec(`git add analysis/${normName}_analysis.md analysis/${normName}_data.json && (git diff-index --quiet HEAD || git -c user.name="AI Studio Agent" -c user.email="agent@aistudio.google" commit -m "feat(analysis): update stored analysis for ${userName}")`, (err, stdout, stderr) => {
       if (err) {
         console.warn("[Analysis Git Commit Warning]", err.message);
       } else {
@@ -439,7 +439,7 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
       fs.writeFileSync(dynamicFilePath, JSON.stringify(profileData, null, 2));
       console.log(`[Git Sync] Written Users/userprofile.json and Users/${dynamicName} for profile: ${profileName}`);
 
-      exec(`git add Users/userprofile.json Users/${dynamicName} && (git diff-index --quiet HEAD || git commit -m "feat: activate user profile ${profileName}")`, (err, stdout, stderr) => {
+      exec(`git add Users/userprofile.json Users/${dynamicName} && (git diff-index --quiet HEAD || git -c user.name="AI Studio Agent" -c user.email="agent@aistudio.google" commit -m "feat: activate user profile ${profileName}")`, (err, stdout, stderr) => {
         if (err) {
           console.warn("[Git Sync Add Local Warning - could not commit locally]", err.message);
         } else {
@@ -503,7 +503,7 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
 
         if (deletedAny && filesToGitRm.length > 0) {
           const filesStr = filesToGitRm.join(" ");
-          exec(`git rm ${filesStr} && (git diff-index --quiet HEAD || git commit -m "feat: deactivate user profile ${profileName}")`, (err, stdout, stderr) => {
+          exec(`git rm ${filesStr} && (git diff-index --quiet HEAD || git -c user.name="AI Studio Agent" -c user.email="agent@aistudio.google" commit -m "feat: deactivate user profile ${profileName}")`, (err, stdout, stderr) => {
             if (err) {
               console.warn("[Git Sync Delete Local Warning]", err.message);
             } else {
@@ -625,7 +625,7 @@ app.post("/api/user-profile/index-table", async (req, res) => {
     }
 
     // Git Operations: commit and push
-    exec(`git add Users/userprofile.json Users/${dynamicName} documents/master_astro_handbook.md && (git diff-index --quiet HEAD || git commit -m "feat: index ${tableId} for profile ${fallbackName}")`, (err, stdout, stderr) => {
+    exec(`git add Users/userprofile.json Users/${dynamicName} documents/master_astro_handbook.md && (git diff-index --quiet HEAD || git -c user.name="AI Studio Agent" -c user.email="agent@aistudio.google" commit -m "feat: index ${tableId} for profile ${fallbackName}")`, (err, stdout, stderr) => {
       if (err) {
         console.warn("[Table Index Git Commit Warning]", err.message);
       } else {
@@ -2916,7 +2916,7 @@ function runAnalysisSyncAgentForProfile(profile: any, filename?: string) {
     console.log(`[Analysis Sync Agent] Saved dynamic_data.json for profile ${profileName}`);
 
     // Commit and push asynchronously to keep Git repository perfectly up-to-date
-    exec(`git add analysis/${profileFolder}/static_data.json analysis/${profileFolder}/dynamic_data.json && (git diff-index --quiet HEAD || git commit -m "feat(analysis): update static and dynamic logs for ${profileName}")`, (err) => {
+    exec(`git add analysis/${profileFolder}/static_data.json analysis/${profileFolder}/dynamic_data.json && (git diff-index --quiet HEAD || git -c user.name="AI Studio Agent" -c user.email="agent@aistudio.google" commit -m "feat(analysis): update static and dynamic logs for ${profileName}")`, (err) => {
       if (err) {
         console.warn("[Analysis Git Warning]", err.message);
       } else {
