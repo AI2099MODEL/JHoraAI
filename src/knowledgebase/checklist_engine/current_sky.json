@@ -3,40 +3,40 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-21T16:11:17.720Z",
+    "lastUpdated": "2026-07-21T16:17:41.966Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-21T16:11:17.720Z",
-    "localTime": "2026-07-21T09:11:17-07:00",
+    "utcTime": "2026-07-21T16:17:41.966Z",
+    "localTime": "2026-07-21T09:17:41-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Libra",
       "displayName": "Libra",
-      "longitude": 189.99
+      "longitude": 190.05
     },
     "currentNakshatra": {
       "id": "Swati",
       "displayName": "Swati",
       "lord": "Rahu"
     },
-    "currentPada": 1,
+    "currentPada": 2,
     "currentStarLord": {
       "id": "Rahu",
       "displayName": "Rahu"
     },
     "currentSubLord": {
-      "id": "Ketu",
-      "displayName": "Ketu"
+      "id": "Jupiter",
+      "displayName": "Jupiter"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Ashtami",
       "illuminationPercentage": 52.9
     },
-    "moonLongitude": 189.99,
+    "moonLongitude": 190.05,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -67,47 +67,47 @@
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
-      "subLord": "Mercury",
+      "subLord": "Ketu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Libra",
-      "longitude": 189.99,
+      "longitude": 190.05,
       "nakshatra": "Swati",
-      "pada": 1,
+      "pada": 2,
       "starLord": "Rahu",
-      "subLord": "Ketu",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Libra",
-      "longitude": 191.25,
+      "longitude": 192.3,
       "nakshatra": "Swati",
       "pada": 2,
       "starLord": "Rahu",
-      "subLord": "Mercury",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 203.1,
+      "longitude": 203.12,
       "nakshatra": "Vishakha",
       "pada": 1,
       "starLord": "Jupiter",
-      "subLord": "Rahu",
-      "retrograde": true,
+      "subLord": "Mercury",
+      "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "jupiter": {
       "currentSign": "Sagittarius",
-      "longitude": 267.44,
+      "longitude": 267.45,
       "nakshatra": "Uttara Ashadha",
       "pada": 1,
       "starLord": "Sun",
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 118.02,
+      "longitude": 118.03,
       "nakshatra": "Ashlesha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Sun",
+      "subLord": "Moon",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Venus",
     "moonStarLord": "Rahu",
-    "moonSubLord": "Ketu"
+    "moonSubLord": "Jupiter"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Ashtami",
       "index": 8,
       "paksha": "Sukla",
-      "endDate": "2026-07-22T04:11:17.720Z"
+      "endDate": "2026-07-22T04:17:41.966Z"
     },
     "vara": {
       "name": "Tuesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Swati",
       "lord": "Rahu",
-      "endDate": "2026-07-22T10:11:17.720Z"
+      "endDate": "2026-07-22T10:17:41.966Z"
     },
     "yoga": {
       "name": "Sadhya",
       "lord": "Moon",
-      "endDate": "2026-07-22T06:11:17.720Z"
+      "endDate": "2026-07-22T06:17:41.966Z"
     },
     "karana": {
       "name": "Bava",
       "lord": "Sun",
-      "endDate": "2026-07-21T22:11:17.720Z"
+      "endDate": "2026-07-21T22:17:41.966Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -391,7 +391,8 @@
       "Physical vitality"
     ],
     "negativeThemes": [
-      "Communication hiccups"
+      "Over-thinking",
+      "Restlessness"
     ],
     "emotionalTone": "The sky carries a highly dynamic and expressive emotional tone governed by Moon in Libra."
   },
@@ -439,11 +440,8 @@
   },
   "currentChallenges": {
     "delays": {
-      "active": true,
-      "affectedAreas": [
-        "Documentation workflows",
-        "Long distance transits"
-      ]
+      "active": false,
+      "affectedAreas": []
     },
     "stress": {
       "active": false,
