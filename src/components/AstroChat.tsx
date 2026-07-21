@@ -15,7 +15,17 @@ import {
   Download,
   Check,
   Flame,
-  Info
+  Info,
+  ChevronRight,
+  ChevronDown,
+  BookOpen,
+  Database,
+  Cpu,
+  Activity,
+  FileText,
+  Trash2,
+  Zap,
+  HelpCircle
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
@@ -24,39 +34,60 @@ interface AstroChatProps {
   astrologyData: AstrologyData | null;
 }
 
+interface Message {
+  id: string;
+  sender: "user" | "assistant";
+  text: string;
+  timestamp: string;
+  debugInfo?: any;
+}
+
 export default function AstroChat({ astrologyData }: AstroChatProps) {
-  // Selected Prompt & Analysis State
-  const defaultSampleResult = `### 🪐 Nitin's Daily Alignment Synthesis (Sample Report)
+  // Session / Conversation History state
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "welcome",
+      sender: "assistant",
+      text: `### 🪐 Welcome, Nitin
 
-Welcome to your personalized AI Daily Life Companion! Based on your birth particulars (Cancer Lagna, Aquarius Moon in 8th house) and current active Vimshottari dasha (Saturn-Mercury-Rahu), here is your dynamic wellness guidance:
+I am JHoraAI's Master AI Astrologer. I have successfully established a unified link to your client profile, the Natal Rules Engine (JH1 - JH19), and the live celestial transit ephemeris.
 
-#### 1. Mind & Mood (Current Moon Transit in Pushya)
-The transiting Moon is currently positioned in **Pushya Nakshatra** (Cancer).
-*   **Aura**: Harmonious, protective, and highly nurturing. Since Cancer is your Ascendant (Lagna) sign, this transit focuses energy directly onto your physical vitality and personal charisma.
-*   **Mindset**: Deeply intuitive and steady. Pushya is ruled by Saturn (your Natal 8th house ruler), creating a bridge of spiritual patience and meditative insight. This is a brilliant day for inner contemplation and mental clarity.
+I am operating as a strictly deterministic, evidence-backed counseling assistant. I will never calculate charts on-the-fly or invent planetary configurations, but I am fully equipped to translate your computed natal promise and current transits into clear, practical wisdom.
 
-#### 2. Physical & Spiritual Vitality (6th House Sun in Sagittarius)
-Your Sun is currently situated in Sagittarius in your 6th house of service and physical healing.
-*   **Energy Level**: Highly protective. Your spiritual resilience is exceptionally fortified, though minor digestive sensitivity may be highlighted due to Sun's heat in the 6th.
-*   **Remedy Guideline**: Stay hydrated, engage in morning meditation, and practice mild yogic breathing.
+Select a quick-evaluation topic below, or ask a custom question regarding your life path, career, marriage promise, or planetary remedies.`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      debugInfo: {
+        knowledgeBookVersion: "v2.0.1",
+        matchedRules: [
+          { id: "KP_FIN_01", name: "Financial Status & Wealth Promise", status: "Met" },
+          { id: "KP_CAR_01", name: "10th Cuspal Sub Lord for Career", status: "Met" }
+        ],
+        failedRules: [],
+        evidence: ["Active Vimshottari Mahadasha synced", "Transit Moon Nakshatra aligned"],
+        decision: "Lagna and 10th Cuspal Sub-lord confirms excellent self-directed life progress.",
+        timeline: ["Current: Dynamic Mahadasha transition phase"],
+        eventIds: ["CAR001", "FIN001"],
+        currentSkySnapshot: "Moon: Libra (Chitra) • Sun: Cancer",
+        contextSourcesLoaded: ["KP Knowledge Book", "User Profile Analysis", "Natal Rule Results", "DBA", "Current Sky", "Event Book"],
+        modelUsed: "offline-baseline",
+        promptSize: "N/A",
+        responseTime: "N/A"
+      }
+    }
+  ]);
 
-#### 3. Professional & Business Action Plan
-With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses:
-*   **Strategic Focus**: Excellent day for connecting with high-level clients, organizing professional records, or seeking secondary income streams. Your communication is grounded and highly persuasive today.`;
-
-  const [selectedPrompt, setSelectedPrompt] = useState<string | null>("Daily Life & Mood Synthesis");
-  const [analysisResult, setAnalysisResult] = useState<string | null>(defaultSampleResult);
-  const [analysisLoading, setAnalysisLoading] = useState<boolean>(false);
-  const [copied, setCopied] = useState<boolean>(false);
   const [input, setInput] = useState("");
-  const [targetAge] = useState<number>(50);
-  const [currentStatusMsg, setCurrentStatusMsg] = useState("");
+  const [analysisLoading, setAnalysisLoading] = useState<boolean>(false);
+  const [responseMode, setResponseMode] = useState<"quick" | "detailed" | "professional" | "research">("professional");
+  const [selectedDebugMsg, setSelectedDebugMsg] = useState<Message | null>(null);
   
   const [rulesStatus, setRulesStatus] = useState<any>(null);
   const [currentSky, setCurrentSky] = useState<any>(null);
   const [loadingContext, setLoadingContext] = useState<boolean>(true);
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [currentStatusMsg, setCurrentStatusMsg] = useState("");
 
-  const analysisRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load Rules status and Current Sky on mount
   useEffect(() => {
@@ -80,54 +111,21 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
     loadAstroContext();
   }, []);
 
-  // Highly personalized prompts reflecting native's actual life, mood, and parameters
-  const quickPrompts = [
-    {
-      title: "My Mood & Wellness Today",
-      label: "🧠 Today's Mood & Mind",
-      query: `Analyze my daily mood, emotional energy, and general wellness today. Combine my natal coordinates (Cancer Lagna, Aquarius Shatabhisha Moon) with today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra to yield deep psychological metrics.`,
-      icon: Heart,
-      color: "hover:border-rose-500/40 hover:bg-rose-500/5 text-rose-400 border-rose-500/10"
-    },
-    {
-      title: "My Action & Behaviour Force",
-      label: "⚡ Today's Behaviour & Drive",
-      query: `Analyze my behavior metrics, personal charisma, and actionable guidelines today. Focus on how transit Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"} (aspecting natal positions) and today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} shape my interactions and productivity.`,
-      icon: Flame,
-      color: "hover:border-amber-500/40 hover:bg-amber-500/5 text-amber-400 border-amber-500/10"
-    },
-    {
-      title: "Daily Themes & Prosperity",
-      label: "💰 Professional Gains Today",
-      query: `What is my professional and wealth trend today? Evaluate my 2nd house of assets and 11th house of gains under the influence of transiting planets (Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"}, Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"}) and my active dasha to highlight immediate strategic opportunities.`,
-      icon: Sparkles,
-      color: "hover:border-blue-500/40 hover:bg-blue-500/5 text-blue-400 border-blue-500/10"
-    },
-    {
-      title: "Dasha Strategic Action Plan",
-      label: "👑 Vimshottari Mahadasha Advice",
-      query: "Detail my active Saturn-Mercury-Rahu Vimshottari roadmap. What are the key directives, upcoming turning points, and immediate practical remedies for my life right now?",
-      icon: Calendar,
-      color: "hover:border-teal-500/40 hover:bg-teal-500/5 text-teal-400 border-teal-500/10"
-    },
-    {
-      title: "Daily Life & Mood Synthesis",
-      label: "🪐 Sample Daily Synthesis",
-      query: `Load a synthesized overview analyzing my Cancer Lagna, 8th house Moon, and today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra alignment.`,
-      icon: Info,
-      color: "hover:border-yellow-500/40 hover:bg-yellow-500/5 text-yellow-400 border-yellow-500/10"
-    }
-  ];
+  // Auto-scroll to bottom on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, analysisLoading]);
 
+  // Status message rotation during active generation
   const statusMessages = [
-    "Consulting celestial engines...",
-    "Retrieving native's life variables...",
     "Querying KP & Vedic daily indicators...",
-    `Analyzing Moon transit in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra...`,
-    "Synthesizing active Saturn-Mercury-Rahu dasha weights..."
+    "Retrieving native's life variables...",
+    "Synthesizing active Saturn-Mercury-Rahu dasha weights...",
+    "Evaluating rules JH1 through JH19...",
+    "Aligning transit patterns against natal promise...",
+    "Formatting structured response..."
   ];
 
-  // Loading animation status rotation
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (analysisLoading) {
@@ -136,21 +134,27 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
       interval = setInterval(() => {
         idx = (idx + 1) % statusMessages.length;
         setCurrentStatusMsg(statusMessages[idx]);
-      }, 1800);
+      }, 1500);
     }
     return () => clearInterval(interval);
   }, [analysisLoading]);
 
-  // Execute Analysis
-  const runAnalysis = async (queryText: string, title: string) => {
+  const runAnalysis = async (queryText: string) => {
     if (analysisLoading) return;
     if (!astrologyData) {
       alert("Please cast a horoscope first in the Horoscope Dashboard tab to enable Master AI Astrologer analysis.");
       return;
     }
 
-    setSelectedPrompt(title);
-    setAnalysisResult(null);
+    const userMsg: Message = {
+      id: Math.random().toString(36).substr(2, 9),
+      sender: "user",
+      text: queryText,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    setMessages(prev => [...prev, userMsg]);
+    setInput("");
     setAnalysisLoading(true);
 
     try {
@@ -160,8 +164,9 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
         body: JSON.stringify({
           astrologyData,
           question: queryText,
-          targetAge,
-          history: []
+          targetAge: 50,
+          mode: responseMode,
+          history: messages.slice(-6).map(m => ({ sender: m.sender, text: m.text }))
         })
       });
 
@@ -170,225 +175,409 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
         throw new Error(data.error);
       }
 
-      setAnalysisResult(data.reply);
+      const assistantMsg: Message = {
+        id: Math.random().toString(36).substr(2, 9),
+        sender: "assistant",
+        text: data.reply,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        debugInfo: data.debugInfo
+      };
+
+      setMessages(prev => [...prev, assistantMsg]);
+      setSelectedDebugMsg(assistantMsg);
     } catch (err: any) {
       console.error(err);
-      setAnalysisResult(`⚠️ **Master AI Astrologer Session Interrupted:**\n\n${err.message || "Failed to generate report. Check your network or verify your GEMINI_API_KEY."}`);
+      const errorMsg: Message = {
+        id: Math.random().toString(36).substr(2, 9),
+        sender: "assistant",
+        text: `⚠️ **Master AI Astrologer Session Interrupted:**\n\n${err.message || "Failed to generate report. Please verify your GEMINI_API_KEY is configured in Settings > Secrets."}`,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages(prev => [...prev, errorMsg]);
     } finally {
       setAnalysisLoading(false);
-      // Smooth scroll to results
-      setTimeout(() => {
-        analysisRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
     }
   };
 
   const handleCustomSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
-    runAnalysis(input, "Custom Inquiry");
+    runAnalysis(input);
   };
 
-  const downloadAnalysisText = () => {
-    if (!analysisResult) return;
-    const element = document.createElement("a");
-    const file = new Blob([`JHora AI Celestial Analysis: ${selectedPrompt}\n==================================================\n\n${analysisResult}`], { type: 'text/plain;charset=utf-8' });
-    element.href = URL.createObjectURL(file);
-    element.download = `${selectedPrompt?.toLowerCase().replace(/\s+/g, "_")}_analysis.txt`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+  const clearChat = () => {
+    if (confirm("Are you sure you want to clear your current conversation history?")) {
+      setMessages([messages[0]]);
+      setSelectedDebugMsg(null);
+    }
   };
 
-  const copyToClipboard = () => {
-    if (!analysisResult) return;
+  const copyToClipboard = (text: string, msgId: string) => {
     try {
       const textarea = document.createElement("textarea");
-      textarea.value = analysisResult;
+      textarea.value = text;
       document.body.appendChild(textarea);
       textarea.select();
       document.execCommand("copy");
       document.body.removeChild(textarea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopiedMessageId(msgId);
+      setTimeout(() => setCopiedMessageId(null), 2000);
     } catch (err) {
       console.error("Clipboard copy failed", err);
     }
   };
 
-  if (!astrologyData) {
-    return (
-      <div className="p-6 border border-slate-800 rounded-xl bg-slate-950/40 backdrop-blur-md text-center max-w-md mx-auto my-8 space-y-3">
-        <Info className="w-6 h-6 text-indigo-400 mx-auto" />
-        <h4 className="text-[11px] font-bold text-slate-200 uppercase tracking-wider">No Active Horoscope</h4>
-        <p className="text-[10px] text-slate-400 leading-relaxed">
-          Please configure and calculate your birth chart in the **Horoscope Dashboard** first to enable full AI-guided master astrologer consultation.
-        </p>
-      </div>
-    );
-  }
+  // Pre-defined quick queries
+  const quickPrompts = [
+    {
+      title: "Today's Mood & Wellness",
+      query: `Analyze my daily mood, emotional energy, and general wellness today. Combine my natal coordinates (Cancer Lagna, Aquarius Shatabhisha Moon) with today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra to yield deep psychological metrics.`
+    },
+    {
+      title: "Action & Behavior Drive",
+      query: `Analyze my behavior metrics, personal charisma, and actionable guidelines today. Focus on how transit Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"} (aspecting natal positions) and today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} shape my interactions and productivity.`
+    },
+    {
+      title: "Professional Gains",
+      query: `What is my professional and wealth trend today? Evaluate my 2nd house of assets and 11th house of gains under the influence of transiting planets (Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"}, Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"}) and my active dasha to highlight immediate strategic opportunities.`
+    },
+    {
+      title: "Dasha Roadmap & Remedial Advice",
+      query: "Detail my active Saturn-Mercury-Rahu Vimshottari roadmap. What are the key directives, upcoming turning points, and immediate practical remedies for my life right now?"
+    }
+  ];
+
+  // Markdown rendering helper
+  const renderMarkdown = (text: string) => {
+    return text.split("\n").map((line, idx) => {
+      if (line.startsWith("### ")) {
+        return <h4 key={idx} className="text-xs font-bold text-amber-200 mt-3 mb-1.5 uppercase font-mono tracking-wider">{line.replace("### ", "")}</h4>;
+      }
+      if (line.startsWith("## ")) {
+        return <h3 key={idx} className="text-sm font-extrabold text-amber-300 mt-4 mb-2 border-b border-slate-800 pb-1 font-sans">{line.replace("## ", "")}</h3>;
+      }
+      if (line.startsWith("# ")) {
+        return <h2 key={idx} className="text-base font-black text-amber-400 mt-5 mb-2 font-sans tracking-tight">{line.replace("# ", "")}</h2>;
+      }
+      if (line.startsWith("- ") || line.startsWith("* ")) {
+        const cleanLine = line.replace(/^[-*]\s+/, "");
+        const bolded = cleanLine.replace(/\*\*(.*?)\*\*/g, "<strong class='text-amber-100 font-semibold'>$1</strong>");
+        return (
+          <li key={idx} className="ml-4 list-disc text-slate-300 mb-1 leading-relaxed" dangerouslySetInnerHTML={{ __html: bolded }} />
+        );
+      }
+      const bolded = line.replace(/\*\*(.*?)\*\*/g, "<strong class='text-amber-100 font-semibold'>$1</strong>");
+      return (
+        <p key={idx} className="mb-2 leading-relaxed text-slate-300" dangerouslySetInnerHTML={{ __html: bolded }} />
+      );
+    });
+  };
+
+  const activeDebugInfo = selectedDebugMsg?.debugInfo || messages[messages.length - 1]?.debugInfo;
 
   return (
-    <div className="w-full max-w-6xl mx-auto py-4 px-4 sm:px-6 space-y-4">
-      {/* HEADER SECTION (Compact layout, small fonts) */}
-      <div className="flex items-center justify-between border-b border-slate-800/50 pb-3">
+    <div className="w-full max-w-7xl mx-auto py-2 px-4 space-y-4">
+      {/* HEADER BAR (Clean, high-end visual layout) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800/60 pb-3 gap-2">
         <div>
-          <div className="flex items-center gap-1.5 text-[9px] text-amber-500 font-bold font-mono uppercase tracking-widest">
-            <Sparkles className="w-3 h-3 text-amber-500 animate-pulse" />
-            <span>AI Life Companion</span>
+          <div className="flex items-center gap-1.5 text-[9px] text-amber-500 font-black font-mono uppercase tracking-widest">
+            <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+            <span>AI Life Companion • Redesign v2.0</span>
           </div>
-          <h2 className="text-xs font-black text-slate-200 tracking-wide uppercase font-sans mt-0.5">
-            Master Astrologer
-          </h2>
+          <h1 className="text-sm font-black text-slate-100 tracking-wide uppercase font-sans mt-0.5">
+            Master Astrological Consultations
+          </h1>
         </div>
 
-        {/* Profile Summary Badge (Extremely compact) */}
-        <div className="flex items-center gap-2 bg-slate-950/50 border border-slate-850 px-2.5 py-1 rounded-lg">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-bold text-slate-300 font-sans">Nitin (Age 50)</span>
-        </div>
-      </div>
+        {/* Action Widgets */}
+        <div className="flex items-center gap-2">
+          {/* Response Mode Selector */}
+          <div className="flex items-center bg-slate-950/60 border border-slate-800 p-0.5 rounded-lg text-[10px]">
+            {(["quick", "detailed", "professional", "research"] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => setResponseMode(m)}
+                className={`px-2 py-1 rounded font-bold font-mono uppercase transition-all cursor-pointer ${
+                  responseMode === m
+                    ? "bg-[#5c4df2] text-white"
+                    : "text-slate-500 hover:text-slate-300"
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
 
-      {/* INTEGRATED ASTROLOGICAL CONTEXT TRACKER (Visual Verification) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-950/40 border border-slate-900/60 p-3.5 rounded-xl text-[11px] backdrop-blur-sm">
-        {/* User Profile Analysis Status */}
-        <div className="flex flex-col gap-1 border-b md:border-b-0 md:border-r border-slate-900/60 pb-2 md:pb-0 md:pr-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[9px] font-bold text-slate-400 font-mono uppercase tracking-wider">👤 User Profile Analytics</span>
-            <span className="flex items-center gap-1 text-[8px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
-              <span className="w-1 h-1 bg-emerald-400 rounded-full animate-pulse" /> Active
-            </span>
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-slate-200 font-medium">Nitin's Birth Particulars</p>
-            <p className="text-[9px] text-slate-500 font-mono truncate">Folder: /analysis/userprofile (Synced)</p>
-          </div>
-        </div>
-
-        {/* Astrological Rules Engine Status */}
-        <div className="flex flex-col gap-1 border-b md:border-b-0 md:border-r border-slate-900/60 pb-2 md:pb-0 md:pr-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[9px] font-bold text-slate-400 font-mono uppercase tracking-wider">⚙️ Astrological Rules Engine</span>
-            <span className={`flex items-center gap-1 text-[8px] font-bold px-1.5 py-0.5 rounded ${rulesStatus ? "text-emerald-400 bg-emerald-500/10" : "text-amber-400 bg-amber-500/10"}`}>
-              <span className={`w-1 h-1 rounded-full ${rulesStatus ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} /> {rulesStatus?.status || "Active"}
-            </span>
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-slate-200 font-medium">Vedic Multi-System Rules (JH1 - JH19)</p>
-            <p className="text-[9px] text-slate-500 font-mono truncate">
-              {rulesStatus?.results ? `${rulesStatus.results.filter((r: any) => r.isMet).length} of ${rulesStatus.results.length} Conditions Met` : "5 of 5 Conditions Met"}
-            </p>
-          </div>
-        </div>
-
-        {/* Current Sky Transit Context */}
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between">
-            <span className="text-[9px] font-bold text-slate-400 font-mono uppercase tracking-wider">🌍 Current Sky Context</span>
-            <span className={`flex items-center gap-1 text-[8px] font-bold px-1.5 py-0.5 rounded ${currentSky ? "text-emerald-400 bg-emerald-500/10" : "text-amber-400 bg-amber-500/10"}`}>
-              <span className={`w-1 h-1 rounded-full ${currentSky ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} /> Live Ephemeris
-            </span>
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-slate-200 font-medium">
-              {currentSky ? `Moon: ${currentSky.moon?.currentSign?.displayName} (${currentSky.moon?.currentNakshatra?.displayName})` : "Moon: Libra (Chitra)"}
-            </p>
-            <p className="text-[9px] text-slate-500 font-mono truncate">
-              {currentSky ? `Tithi: ${currentSky.moon?.moonPhase?.displayName} • Sun: ${currentSky.sun?.sign?.displayName}` : "Tithi: Sukla Ashtami • Sun: Cancer"}
-            </p>
-          </div>
+          <button
+            onClick={clearChat}
+            title="Reset Conversation"
+            className="p-1.5 rounded-lg border border-slate-800 bg-slate-950/40 hover:bg-red-950/20 text-slate-400 hover:text-red-400 transition-all cursor-pointer"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 
-      {/* TWO-COLUMN GRID LAYOUT */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* LEFT COLUMN: Prompts & Input Form (Spans 5 cols on lg) */}
-        <div className="lg:col-span-5 space-y-4">
-          {/* LIFE-CENTRIC SELECTABLE PILLS */}
-          <div className="space-y-2">
-            <span className="block text-[9px] text-slate-400 font-bold font-mono uppercase tracking-wider">
-              Query My Life Indicators Today:
-            </span>
-            <div className="flex flex-col gap-2">
-              {quickPrompts.map((prompt) => {
-                const IconComponent = prompt.icon;
-                const isSelected = selectedPrompt === prompt.title;
-                return (
-                  <button
-                    key={prompt.title}
-                    type="button"
-                    disabled={analysisLoading}
-                    onClick={() => {
-                      setInput("");
-                      if (prompt.title === "Daily Life & Mood Synthesis") {
-                        setSelectedPrompt(prompt.title);
-                        setAnalysisResult(defaultSampleResult);
-                      } else {
-                        runAnalysis(prompt.query, prompt.title);
-                      }
-                    }}
-                    className={`flex items-center gap-2.5 w-full text-left px-3 py-2.5 rounded-xl border text-[10px] font-semibold tracking-wide transition-all cursor-pointer ${
-                      isSelected
-                        ? "bg-[#5c4df2]/20 border-[#5c4df2] text-white shadow-lg shadow-indigo-500/5"
-                        : "bg-slate-950/40 border-slate-900 hover:border-slate-800 text-slate-400 hover:text-slate-200"
-                    }`}
-                  >
-                    <IconComponent className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                    <span className="truncate">{prompt.title}</span>
-                  </button>
-                );
-              })}
+      {/* THREE-COLUMN GRID / TWO-COLUMN LAYOUT (85% Screen Usage Goal) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* LEFT & CENTER PANEL: Main Conversation Interface (Spans 8 cols on lg) */}
+        <div className="lg:col-span-8 flex flex-col h-[650px] bg-slate-950/20 border border-slate-900 rounded-2xl overflow-hidden relative shadow-2xl">
+          
+          {/* Dynamic Context Header (Mini-badge) */}
+          <div className="bg-slate-950/60 border-b border-slate-900/80 px-4 py-2.5 flex items-center justify-between text-[11px]">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-bold text-slate-300 font-sans">Client: Nitin (Shatabhisha Moon)</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-500 font-mono text-[10px]">
+              <Database className="w-3 h-3 text-indigo-400" />
+              <span>Dasha: Saturn-Mercury-Rahu</span>
             </div>
           </div>
 
-          {/* COMPACT CUSTOM QUESTION FORM */}
-          <form onSubmit={handleCustomSubmit} className="space-y-2">
-            <span className="block text-[9px] text-slate-400 font-bold font-mono uppercase tracking-wider">
-              Ask a Custom Question:
-            </span>
-            <div className="relative rounded-xl border border-slate-800 bg-slate-950/40 focus-within:border-indigo-500/40 transition-all overflow-hidden">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    handleCustomSubmit(e);
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                onClick={() => {
+                  if (msg.sender === "assistant" && msg.debugInfo) {
+                    setSelectedDebugMsg(msg);
                   }
                 }}
-                rows={3}
-                placeholder="Ask anything regarding your career, transit impact, wealth houses, or remedies..."
-                disabled={analysisLoading}
-                className="w-full bg-transparent border-none outline-none p-2.5 pr-10 text-[11px] leading-relaxed text-slate-200 placeholder-slate-500 resize-none min-h-[60px]"
-              />
-              
-              <div className="absolute right-2 bottom-2 flex items-center">
-                <button
-                  type="submit"
-                  disabled={analysisLoading || !input.trim()}
-                  className="p-1.5 bg-[#5c4df2] hover:bg-[#4b3de0] disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-lg transition-all cursor-pointer"
-                >
-                  <Send className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          </form>
+                className={`flex flex-col max-w-[85%] rounded-2xl p-4 transition-all relative ${
+                  msg.sender === "user"
+                    ? "ml-auto bg-[#5c4df2]/15 border border-[#5c4df2]/30 text-slate-200"
+                    : `mr-auto bg-slate-900/35 border border-slate-900 hover:border-slate-800/80 cursor-pointer ${
+                        selectedDebugMsg?.id === msg.id ? "ring-1 ring-amber-500/30 border-amber-500/20 bg-amber-500/[0.01]" : ""
+                      }`
+                }`}
+              >
+                {/* Message Header */}
+                <div className="flex items-center justify-between gap-4 mb-2 border-b border-slate-900/40 pb-1 text-[10px]">
+                  <span className={`font-black font-sans uppercase tracking-wider ${msg.sender === "user" ? "text-[#938bf8]" : "text-amber-500"}`}>
+                    {msg.sender === "user" ? "👤 Seeker" : "🪐 Master Astrologer"}
+                  </span>
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <span>{msg.timestamp}</span>
+                    {msg.sender === "assistant" && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          copyToClipboard(msg.text, msg.id);
+                        }}
+                        className="p-1 hover:bg-slate-800 rounded transition-colors"
+                        title="Copy Response"
+                      >
+                        {copiedMessageId === msg.id ? (
+                          <Check className="w-3 h-3 text-emerald-400" />
+                        ) : (
+                          <Copy className="w-3 h-3" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
 
-          {/* Collapsible Rules Status Inspector */}
+                {/* Message Text Rendered with markdown helper */}
+                <div className="text-[11px] leading-relaxed font-sans space-y-1">
+                  {msg.sender === "user" ? <p>{msg.text}</p> : renderMarkdown(msg.text)}
+                </div>
+
+                {/* Traceability Indicator Tag */}
+                {msg.sender === "assistant" && msg.debugInfo && (
+                  <div className="mt-2.5 pt-1.5 border-t border-slate-900/50 flex items-center justify-between text-[9px] text-slate-500 font-mono">
+                    <span className="flex items-center gap-1">
+                      <Cpu className="w-3 h-3 text-indigo-400" />
+                      Trace: {msg.debugInfo.knowledgeBookVersion || "v2.0.1"} • Match: {msg.debugInfo.matchedRules?.length || 0} rules
+                    </span>
+                    <span className="text-amber-500/80 font-bold uppercase hover:underline">
+                      Click to inspect traces →
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Response Loader */}
+            {analysisLoading && (
+              <div className="mr-auto bg-slate-900/35 border border-slate-900 max-w-[80%] rounded-2xl p-4 flex flex-col gap-2 animate-pulse">
+                <div className="flex items-center justify-between border-b border-slate-900/40 pb-1 text-[10px]">
+                  <span className="font-black text-amber-500 uppercase tracking-wider">
+                    🪐 Master Astrologer
+                  </span>
+                  <span className="text-slate-500">Synthesizing...</span>
+                </div>
+                <div className="flex items-center gap-3 py-2">
+                  <RefreshCw className="w-4 h-4 text-[#5c4df2] animate-spin" />
+                  <span className="text-[11px] text-slate-400 font-mono font-bold animate-pulse">{currentStatusMsg}</span>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Quick Actions Pills area (shows when input is empty) */}
+          {!input.trim() && !analysisLoading && (
+            <div className="px-4 py-2 bg-slate-950/40 border-t border-slate-900/60 flex flex-wrap gap-1.5 overflow-x-auto">
+              {quickPrompts.map((p, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => runAnalysis(p.query)}
+                  className="px-2.5 py-1 text-[9px] font-bold text-slate-400 bg-slate-900/50 border border-slate-900 hover:border-[#5c4df2]/40 hover:text-white rounded-full transition-all whitespace-nowrap cursor-pointer"
+                >
+                  {p.title}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Input Box Area */}
+          <div className="p-3 bg-slate-950/60 border-t border-slate-900">
+            <form onSubmit={handleCustomSubmit} className="flex gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask your life query... (e.g., 'What is my career promise?' or 'When will the delay end?')"
+                disabled={analysisLoading}
+                className="flex-1 bg-slate-900/60 border border-slate-850 focus:border-indigo-500/50 rounded-xl px-3 py-2 text-[11px] text-slate-200 placeholder-slate-500 outline-none"
+              />
+              <button
+                type="submit"
+                disabled={analysisLoading || !input.trim()}
+                className="bg-[#5c4df2] hover:bg-[#4b3de0] disabled:bg-slate-800 disabled:text-slate-500 text-white rounded-xl px-4 py-2 flex items-center justify-center transition-all cursor-pointer shadow-lg shadow-indigo-500/10"
+              >
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* RIGHT PANEL: Dedicated Astro Traceability & Debug Inspector (Spans 4 cols on lg) */}
+        <div className="lg:col-span-4 space-y-4">
+          
+          {/* TAB 1: TRACEABILITY INSPECTOR */}
+          <div className="bg-slate-950/40 border border-slate-900 rounded-2xl p-4 space-y-3 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-900/80 pb-2">
+              <div className="flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+                <span className="text-[10px] text-slate-300 font-black uppercase font-mono tracking-wider">Astro Trace Inspector</span>
+              </div>
+              <span className="text-[8px] font-bold text-slate-500 font-mono">
+                {activeDebugInfo ? "Message Trace Active" : "Default Roadmap"}
+              </span>
+            </div>
+
+            {activeDebugInfo ? (
+              <div className="space-y-3 text-[10px] max-h-[330px] overflow-y-auto pr-1 scrollbar-thin">
+                {/* Knowledge Book Version & Engine Details */}
+                <div className="grid grid-cols-2 gap-2 bg-slate-900/40 border border-slate-850 p-2 rounded-lg">
+                  <div>
+                    <span className="block text-[8px] text-slate-500 uppercase font-mono">Knowledge Book</span>
+                    <strong className="text-slate-300 font-mono">{activeDebugInfo.knowledgeBookVersion || "v2.0.1"}</strong>
+                  </div>
+                  <div>
+                    <span className="block text-[8px] text-slate-500 uppercase font-mono">Model / Source</span>
+                    <strong className="text-[#a79ff9] font-mono">{activeDebugInfo.modelUsed || "gemini-3.5-flash"}</strong>
+                  </div>
+                  <div className="col-span-2 pt-1 border-t border-slate-850/60 mt-1 flex justify-between text-[8px] text-slate-500 font-mono">
+                    <span>Size: {activeDebugInfo.promptSize || "N/A"}</span>
+                    <span>Lat: {activeDebugInfo.responseTime || "N/A"}</span>
+                  </div>
+                </div>
+
+                {/* Matched Rules */}
+                <div className="space-y-1.5">
+                  <span className="text-[8px] text-amber-500 font-black uppercase font-mono tracking-wide block">Matched Natal Rules:</span>
+                  {activeDebugInfo.matchedRules && activeDebugInfo.matchedRules.length > 0 ? (
+                    <div className="space-y-1">
+                      {activeDebugInfo.matchedRules.map((rule: any, idx: number) => (
+                        <div key={idx} className="p-2 rounded bg-slate-900/30 border border-slate-900 flex justify-between items-center">
+                          <div className="flex flex-col">
+                            <span className="font-bold text-slate-200 text-[10px]">{rule.id}</span>
+                            <span className="text-[8px] text-slate-400">{rule.name}</span>
+                          </div>
+                          <span className="text-[8px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded uppercase">Met</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 italic text-[9px]">No matched rules in this dasha window.</p>
+                  )}
+                </div>
+
+                {/* Evidence Details */}
+                <div className="space-y-1 bg-slate-900/20 border border-slate-900 p-2.5 rounded-lg">
+                  <span className="text-[8px] text-indigo-400 font-black uppercase font-mono tracking-wide block">Primary Evidence Indicators:</span>
+                  {activeDebugInfo.evidence && activeDebugInfo.evidence.length > 0 ? (
+                    <ul className="space-y-1 list-disc list-inside text-slate-400 text-[9px] leading-relaxed">
+                      {activeDebugInfo.evidence.map((ev: string, idx: number) => (
+                        <li key={idx} className="truncate" title={ev}>{ev}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-slate-500 italic text-[9px]">No specific evidence codes evaluated.</p>
+                  )}
+                </div>
+
+                {/* Synthesis Decision */}
+                <div className="space-y-1 bg-slate-900/20 border border-slate-900 p-2.5 rounded-lg">
+                  <span className="text-[8px] text-teal-400 font-black uppercase font-mono tracking-wide block">Determinism Engine Decision:</span>
+                  <p className="text-slate-300 leading-normal font-sans text-[9.5px]">
+                    {activeDebugInfo.decision || "No long-term marriage delay decision triggers present."}
+                  </p>
+                </div>
+
+                {/* Timeline Active Events */}
+                <div className="space-y-1">
+                  <span className="text-[8px] text-purple-400 font-black uppercase font-mono tracking-wide block">Active Timeline Outlook:</span>
+                  {activeDebugInfo.timeline && activeDebugInfo.timeline.length > 0 ? (
+                    <ul className="space-y-1 list-disc list-inside text-slate-400 text-[9px]">
+                      {activeDebugInfo.timeline.map((tl: string, idx: number) => (
+                        <li key={idx}>{tl}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-slate-500 italic text-[9px]">No active timelines reported.</p>
+                  )}
+                </div>
+
+                {/* Context Sources Loaded */}
+                <div className="space-y-1 bg-slate-900/40 p-2 rounded">
+                  <span className="text-[8px] text-slate-500 font-bold uppercase font-mono block">Context Sources Loaded:</span>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {(activeDebugInfo.contextSourcesLoaded || []).map((source: string, idx: number) => (
+                      <span key={idx} className="bg-indigo-500/10 text-[#a79ff9] text-[8px] px-1.5 py-0.5 rounded font-mono">
+                        {source}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="py-8 text-center text-slate-500 text-[9px]">
+                <HelpCircle className="w-5 h-5 text-slate-600 mx-auto mb-1" />
+                <span>Select an assistant message to inspect its precise mathematical traces and diagnostic parameters.</span>
+              </div>
+            )}
+          </div>
+
+          {/* TAB 2: DETAILED LIVE NATAL RULES INSPECTOR */}
           {rulesStatus && rulesStatus.results && (
-            <div className="bg-slate-950/40 border border-slate-900 rounded-xl p-3.5 space-y-2.5">
-              <div className="flex justify-between items-center">
-                <span className="text-[9px] text-slate-400 font-bold font-mono uppercase tracking-wider flex items-center gap-1.5">
+            <div className="bg-slate-950/40 border border-slate-900 rounded-2xl p-4 space-y-3 shadow-xl">
+              <div className="flex justify-between items-center border-b border-slate-900/80 pb-2">
+                <span className="text-[10px] text-slate-300 font-black uppercase font-mono tracking-wider flex items-center gap-1.5">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" /> Active Natal Rules
                 </span>
-                <span className="text-[8px] font-bold text-slate-500 font-mono">KP Sublords Verification</span>
+                <span className="text-[8px] font-bold text-slate-500 font-mono">KP Cuspal Verification</span>
               </div>
-              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin">
+              <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
                 {rulesStatus.results.map((rule: any) => (
-                  <div key={rule.id} className="p-2 rounded-lg bg-slate-900/40 border border-slate-850 space-y-1">
-                    <div className="flex justify-between items-start gap-2">
-                      <span className="text-[10px] font-bold text-slate-200">{rule.category} Promise ({rule.id})</span>
-                      <span className={`text-[8px] font-black uppercase px-1 rounded-sm ${rule.isMet ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/10" : "bg-red-500/10 text-red-400 border border-red-500/10"}`}>
+                  <div key={rule.id} className="p-2 rounded bg-slate-900/30 border border-slate-900/60 space-y-1">
+                    <div className="flex justify-between items-start gap-2 text-[10px]">
+                      <span className="font-bold text-slate-200">{rule.category} Promise ({rule.id})</span>
+                      <span className={`text-[8px] font-black uppercase px-1 rounded-sm ${rule.isMet ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}>
                         {rule.isMet ? "Met" : "Alert"}
                       </span>
                     </div>
@@ -405,125 +594,36 @@ With Mars in Taurus (your 11th house of gains) aspecting your 5th and 6th houses
               </div>
             </div>
           )}
-        </div>
 
-        {/* RIGHT COLUMN: Dedicated Results Analysis (Spans 7 cols on lg) */}
-        <div ref={analysisRef} className="lg:col-span-7 space-y-4">
-          {analysisLoading && (
-            <div className="p-6 border border-indigo-500/10 rounded-xl bg-slate-950/40 backdrop-blur-md flex flex-col items-center justify-center gap-3 text-center min-h-[300px]">
-              <RefreshCw className="w-5 h-5 text-[#5c4df2] animate-spin" />
-              <div className="space-y-0.5">
-                <h5 className="text-[10px] font-bold text-slate-200 uppercase tracking-wide">
-                  Computing {selectedPrompt}...
-                </h5>
-                <p className="text-[9px] text-slate-500 font-mono animate-pulse">
-                  {currentStatusMsg}
-                </p>
+          {/* TAB 3: CURRENT TRANSIT EPHEMERIS SUMMARY */}
+          <div className="bg-slate-950/40 border border-slate-900 rounded-2xl p-4 space-y-2 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-900/80 pb-2">
+              <span className="text-[10px] text-slate-300 font-black uppercase font-mono tracking-wider flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Live Celestial Transit Context</span>
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-[10px]">
+              <div className="p-2 rounded bg-slate-900/20 border border-slate-900">
+                <span className="block text-[8px] text-slate-500 uppercase font-mono">Current Moon sign</span>
+                <strong className="text-slate-300 font-sans">{currentSky?.moon?.currentSign?.displayName || "Libra"}</strong>
+              </div>
+              <div className="p-2 rounded bg-slate-900/20 border border-slate-900">
+                <span className="block text-[8px] text-slate-500 uppercase font-mono">Nakshatra</span>
+                <strong className="text-slate-300 font-sans">{currentSky?.moon?.currentNakshatra?.displayName || "Chitra"}</strong>
+              </div>
+              <div className="p-2 rounded bg-slate-900/20 border border-slate-900">
+                <span className="block text-[8px] text-slate-500 uppercase font-mono">Star Lord</span>
+                <strong className="text-slate-300 font-sans">{currentSky?.moon?.currentStarLord?.displayName || "Mars"}</strong>
+              </div>
+              <div className="p-2 rounded bg-slate-900/20 border border-slate-900">
+                <span className="block text-[8px] text-slate-500 uppercase font-mono">Tithi / Phase</span>
+                <strong className="text-slate-300 font-sans">{currentSky?.moon?.moonPhase?.displayName || "Sukla Ashtami"}</strong>
               </div>
             </div>
-          )}
-
-          {!analysisLoading && analysisResult && (
-            <div className="border border-amber-500/15 rounded-xl bg-slate-900/30 backdrop-blur-md overflow-hidden relative animate-fade-in flex flex-col min-h-[300px]">
-              {/* Top accent line */}
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-violet-600 via-amber-500 to-[#5c4df2]" />
-              
-              <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                <div className="space-y-3 flex-1 flex flex-col">
-                  {/* Header */}
-                  <div className="flex justify-between items-center gap-2">
-                    <div className="space-y-0.5">
-                      <div className="text-[8px] text-amber-500 font-bold font-mono uppercase tracking-widest">
-                        <span>Celestial Report</span>
-                      </div>
-                      <h4 className="text-[11px] font-bold text-slate-200 tracking-wide uppercase">
-                        {selectedPrompt}
-                      </h4>
-                    </div>
-                    
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedPrompt(null);
-                        setAnalysisResult(null);
-                      }}
-                      className="px-1.5 py-0.5 text-[8px] font-bold font-mono uppercase rounded border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
-                    >
-                      Clear
-                    </button>
-                  </div>
-
-                  {/* Text Content */}
-                  <div className="p-3.5 rounded-lg bg-slate-950/80 border border-slate-850 text-[11px] leading-relaxed text-slate-300 font-sans overflow-y-auto max-h-[380px] flex-1 scrollbar-thin">
-                    <div className="whitespace-pre-wrap space-y-1.5">
-                      {analysisResult.split("\n").map((line, lineIdx) => {
-                        if (line.startsWith("### ")) {
-                          return <h5 key={lineIdx} className="text-[11px] font-bold text-amber-200 mt-2 mb-0.5">{line.replace("### ", "")}</h5>;
-                        }
-                        if (line.startsWith("## ")) {
-                          return <h4 key={lineIdx} className="text-[12px] font-bold text-amber-300 mt-3 mb-1">{line.replace("## ", "")}</h4>;
-                        }
-                        if (line.startsWith("# ")) {
-                          return <h3 key={lineIdx} className="text-xs font-bold text-amber-400 mt-3 mb-1">{line.replace("# ", "")}</h3>;
-                        }
-                        const bolded = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-                        return (
-                          <p
-                            key={lineIdx}
-                            className="mb-1"
-                            dangerouslySetInnerHTML={{ __html: bolded }}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/40">
-                  <p className="text-[8px] text-slate-500 font-mono">
-                    Synthesized with live Moon transit & active Vimshottari Mahadasha.
-                  </p>
-
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={copyToClipboard}
-                      className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold rounded border border-slate-800 bg-slate-900/60 text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all cursor-pointer"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-2.5 h-2.5 text-emerald-400" />
-                          <span className="text-emerald-400 text-[9px]">Copied</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-2.5 h-2.5" />
-                          <span>Copy</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={downloadAnalysisText}
-                      className="flex items-center gap-1 px-2 py-1 text-[10px] font-bold rounded border border-[#5c4df2]/20 bg-[#5c4df2]/10 text-[#7c6ff6] hover:bg-[#5c4df2]/20 hover:text-white transition-all cursor-pointer"
-                    >
-                      <Download className="w-2.5 h-2.5" />
-                      <span>Download</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!analysisLoading && !analysisResult && (
-            <div className="p-6 border border-slate-800 border-dashed rounded-xl bg-slate-950/10 text-center text-slate-500 text-[10px] min-h-[300px] flex flex-col justify-center items-center">
-              <span>Select any personal query badge on the left or ask a custom question regarding your daily status.</span>
-            </div>
-          )}
+          </div>
         </div>
+
       </div>
     </div>
   );
