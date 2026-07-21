@@ -3,40 +3,40 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-21T05:34:59.497Z",
+    "lastUpdated": "2026-07-21T12:45:58.320Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-21T05:34:59.497Z",
-    "localTime": "2026-07-20T22:34:59-07:00",
+    "utcTime": "2026-07-21T12:45:58.320Z",
+    "localTime": "2026-07-21T05:45:58-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Libra",
       "displayName": "Libra",
-      "longitude": 184.17
+      "longitude": 188.12
     },
     "currentNakshatra": {
-      "id": "Chitra",
-      "displayName": "Chitra",
-      "lord": "Mars"
+      "id": "Swati",
+      "displayName": "Swati",
+      "lord": "Rahu"
     },
-    "currentPada": 4,
+    "currentPada": 1,
     "currentStarLord": {
-      "id": "Mars",
-      "displayName": "Mars"
+      "id": "Rahu",
+      "displayName": "Rahu"
     },
     "currentSubLord": {
-      "id": "Moon",
-      "displayName": "Moon"
+      "id": "Venus",
+      "displayName": "Venus"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Ashtami",
-      "illuminationPercentage": 49.9
+      "illuminationPercentage": 51.9
     },
-    "moonLongitude": 184.17,
+    "moonLongitude": 188.12,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 94.42,
+    "longitude": 94.72,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,99 +63,99 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 94.42,
+      "longitude": 94.72,
       "nakshatra": "Pushya",
       "pada": 1,
       "starLord": "Saturn",
-      "subLord": "Venus",
+      "subLord": "Moon",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Libra",
-      "longitude": 184.17,
-      "nakshatra": "Chitra",
-      "pada": 4,
-      "starLord": "Mars",
-      "subLord": "Moon",
-      "retrograde": true,
+      "longitude": 188.12,
+      "nakshatra": "Swati",
+      "pada": 1,
+      "starLord": "Rahu",
+      "subLord": "Venus",
+      "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
-      "currentSign": "Gemini",
-      "longitude": 79.24,
-      "nakshatra": "Ardra",
-      "pada": 4,
-      "starLord": "Rahu",
-      "subLord": "Moon",
+      "currentSign": "Virgo",
+      "longitude": 155.02,
+      "nakshatra": "Uttara Phalguni",
+      "pada": 3,
+      "starLord": "Sun",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Libra",
-      "longitude": 200.86,
+      "longitude": 202.38,
       "nakshatra": "Vishakha",
       "pada": 1,
       "starLord": "Jupiter",
-      "subLord": "Jupiter",
-      "retrograde": false,
+      "subLord": "Rahu",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "jupiter": {
       "currentSign": "Sagittarius",
-      "longitude": 267.37,
+      "longitude": 267.42,
       "nakshatra": "Uttara Ashadha",
       "pada": 1,
       "starLord": "Sun",
-      "subLord": "Saturn",
-      "retrograde": false,
+      "subLord": "Moon",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "venus": {
       "currentSign": "Cancer",
-      "longitude": 116.87,
+      "longitude": 117.65,
       "nakshatra": "Ashlesha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Rahu",
-      "retrograde": false,
+      "subLord": "Venus",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "saturn": {
       "currentSign": "Leo",
-      "longitude": 144.74,
+      "longitude": 144.76,
       "nakshatra": "Purva Phalguni",
       "pada": 4,
       "starLord": "Venus",
-      "subLord": "Sun",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "rahu": {
       "currentSign": "Leo",
-      "longitude": 131.84,
+      "longitude": 131.82,
       "nakshatra": "Magha",
       "pada": 4,
       "starLord": "Ketu",
-      "subLord": "Mercury",
+      "subLord": "Jupiter",
       "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "ketu": {
       "currentSign": "Aquarius",
-      "longitude": 311.84,
+      "longitude": 311.82,
       "nakshatra": "Shatabhisha",
       "pada": 2,
       "starLord": "Rahu",
-      "subLord": "Mercury",
+      "subLord": "Jupiter",
       "retrograde": true,
       "combust": false,
       "stationary": false
@@ -272,39 +272,39 @@
     ]
   },
   "rulingPlanets": {
-    "dayLord": "Monday",
+    "dayLord": "Tuesday",
     "ascendantLord": "Mars",
     "ascendantStarLord": "Ketu",
     "ascendantSubLord": "Sun",
     "moonSignLord": "Venus",
-    "moonStarLord": "Mars",
-    "moonSubLord": "Moon"
+    "moonStarLord": "Rahu",
+    "moonSubLord": "Venus"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Ashtami",
       "index": 8,
       "paksha": "Sukla",
-      "endDate": "2026-07-21T17:34:59.497Z"
+      "endDate": "2026-07-22T00:45:58.320Z"
     },
     "vara": {
-      "name": "Monday",
-      "lord": "Moon"
+      "name": "Tuesday",
+      "lord": "Mars"
     },
     "nakshatra": {
-      "name": "Chitra",
-      "lord": "Mars",
-      "endDate": "2026-07-21T23:34:59.497Z"
+      "name": "Swati",
+      "lord": "Rahu",
+      "endDate": "2026-07-22T06:45:58.320Z"
     },
     "yoga": {
-      "name": "Siddha",
-      "lord": "Sun",
-      "endDate": "2026-07-21T19:34:59.497Z"
+      "name": "Sadhya",
+      "lord": "Moon",
+      "endDate": "2026-07-22T02:45:58.320Z"
     },
     "karana": {
-      "name": "Vishti",
+      "name": "Bava",
       "lord": "Sun",
-      "endDate": "2026-07-21T11:34:59.497Z"
+      "endDate": "2026-07-21T18:45:58.320Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -339,7 +339,7 @@
     "physicalEnergy": {
       "score": 8.5,
       "tone": "Peak Focus",
-      "description": "Mars in Gemini yields a peak focus reserve of physical resilience."
+      "description": "Mars in Virgo yields a peak focus reserve of physical resilience."
     },
     "relationshipEnergy": {
       "score": 8.5,
@@ -391,8 +391,7 @@
       "Physical vitality"
     ],
     "negativeThemes": [
-      "Over-thinking",
-      "Restlessness"
+      "Communication hiccups"
     ],
     "emotionalTone": "The sky carries a highly dynamic and expressive emotional tone governed by Moon in Libra."
   },
@@ -440,16 +439,22 @@
   },
   "currentChallenges": {
     "delays": {
-      "active": false,
-      "affectedAreas": []
+      "active": true,
+      "affectedAreas": [
+        "Documentation workflows",
+        "Long distance transits"
+      ]
     },
     "stress": {
       "active": false,
       "affectedAreas": []
     },
     "legal": {
-      "active": false,
-      "affectedAreas": []
+      "active": true,
+      "affectedAreas": [
+        "Contract signing",
+        "Regulatory clearances"
+      ]
     },
     "relationship": {
       "active": false,
