@@ -115,11 +115,11 @@ export class GeminiProvider implements AIProvider {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ provider: this.providerName, apiKey }),
       });
-      if (!response.ok) return ["gemini-3.6-flash", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite"];
+      if (!response.ok) return ["gemini-3-flash", "gemini-2.5-flash-lite"];
       const data = await response.json();
       return data.models || [];
     } catch {
-      return ["gemini-3.6-flash", "gemini-3.1-pro-preview", "gemini-3.1-flash-lite"];
+      return ["gemini-3-flash", "gemini-2.5-flash-lite"];
     }
   }
 }

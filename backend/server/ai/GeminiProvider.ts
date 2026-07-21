@@ -24,7 +24,7 @@ export class GeminiProvider implements AIProvider {
       parts: [{ text: m.content }],
     }));
 
-    const requestedModel = options.model || "gemini-3.6-flash";
+    const requestedModel = options.model || "gemini-3-flash";
 
     try {
       const response = await ai.models.generateContent({
@@ -40,11 +40,11 @@ export class GeminiProvider implements AIProvider {
       const errMsg = (e.message || "").toLowerCase();
       const isQuotaError = e.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
       
-      if (isQuotaError && requestedModel !== "gemini-3.1-flash-lite") {
-        console.warn(`Gemini quota exceeded for model ${requestedModel}. Falling back to gemini-3.1-flash-lite...`);
+      if (isQuotaError && requestedModel !== "gemini-2.5-flash-lite") {
+        console.warn(`Gemini quota exceeded for model ${requestedModel}. Falling back to gemini-2.5-flash-lite...`);
         try {
           const response = await ai.models.generateContent({
-            model: "gemini-3.1-flash-lite",
+            model: "gemini-2.5-flash-lite",
             contents: contents,
             config: {
               systemInstruction: options.systemInstruction || "You are JHoraAI, a premium AI workspace assistant for professional astrologers. You reason over astrological calculations but never perform them yourself. Always respond clearly.",
@@ -52,7 +52,7 @@ export class GeminiProvider implements AIProvider {
           });
           return { text: response.text || "" };
         } catch (fallbackErr: any) {
-          console.warn("Gemini fallback to gemini-3.1-flash-lite failed:", fallbackErr.message || fallbackErr);
+          console.warn("Gemini fallback to gemini-2.5-flash-lite failed:", fallbackErr.message || fallbackErr);
           throw fallbackErr;
         }
       }
@@ -67,7 +67,7 @@ export class GeminiProvider implements AIProvider {
       parts: [{ text: m.content }],
     }));
 
-    const requestedModel = options.model || "gemini-3.6-flash";
+    const requestedModel = options.model || "gemini-3-flash";
 
     try {
       const responseStream = await ai.models.generateContentStream({
@@ -87,11 +87,11 @@ export class GeminiProvider implements AIProvider {
       const errMsg = (e.message || "").toLowerCase();
       const isQuotaError = e.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
       
-      if (isQuotaError && requestedModel !== "gemini-3.1-flash-lite") {
-        console.warn(`Gemini quota exceeded for stream with ${requestedModel}. Falling back to gemini-3.1-flash-lite stream...`);
+      if (isQuotaError && requestedModel !== "gemini-2.5-flash-lite") {
+        console.warn(`Gemini quota exceeded for stream with ${requestedModel}. Falling back to gemini-2.5-flash-lite stream...`);
         try {
           const responseStream = await ai.models.generateContentStream({
-            model: "gemini-3.1-flash-lite",
+            model: "gemini-2.5-flash-lite",
             contents: contents,
             config: {
               systemInstruction: options.systemInstruction || "You are JHoraAI, a premium AI workspace assistant for professional astrologers. You reason over astrological calculations but never perform them yourself. Always respond clearly.",
@@ -104,7 +104,7 @@ export class GeminiProvider implements AIProvider {
           }
           return;
         } catch (fallbackErr: any) {
-          console.warn("Gemini stream fallback to gemini-3.1-flash-lite failed:", fallbackErr.message || fallbackErr);
+          console.warn("Gemini stream fallback to gemini-2.5-flash-lite failed:", fallbackErr.message || fallbackErr);
           throw fallbackErr;
         }
       }
@@ -116,7 +116,7 @@ export class GeminiProvider implements AIProvider {
     try {
       const ai = this.getClient(apiKey);
       const res = await ai.models.generateContent({
-        model: "gemini-3.6-flash",
+        model: "gemini-3-flash",
         contents: "ping",
         config: {
           maxOutputTokens: 5,
@@ -130,7 +130,7 @@ export class GeminiProvider implements AIProvider {
       try {
         const ai = this.getClient(apiKey);
         const res = await ai.models.generateContent({
-          model: "gemini-3.1-flash-lite",
+          model: "gemini-2.5-flash-lite",
           contents: "ping",
           config: {
             maxOutputTokens: 5,
@@ -148,9 +148,8 @@ export class GeminiProvider implements AIProvider {
 
   async models(apiKey?: string): Promise<string[]> {
     return [
-      "gemini-3.6-flash",
-      "gemini-3.1-pro-preview",
-      "gemini-3.1-flash-lite"
+      "gemini-3-flash",
+      "gemini-2.5-flash-lite"
     ];
   }
 }
