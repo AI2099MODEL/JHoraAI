@@ -3565,16 +3565,21 @@ export function MyPageView({
                         signName: activeProfile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.signName || "Cancer",
                         signIndex: activeProfile?.Vedic?.ascendant?.sign_index !== undefined ? activeProfile.Vedic.ascendant.sign_index : (astrologyData?.lagna?.signIndex ?? 3)
                       },
-                      planets: (activeProfile?.Vedic?.planets ? Object.entries(activeProfile.Vedic.planets).map(([name, p]: [string, any]) => ({
-                        name,
-                        sign: p.sign,
-                        degree: p.degree + (p.minute || 0) / 60 + (p.second || 0) / 3600,
-                        longitude: p.longitude_360 || p.longitude,
-                        nakshatra: p.nakshatra,
-                        pada: p.pada,
-                        house: p.house,
-                        lord: p.nakshatra_lord || p.lord
-                      })) : null) || astrologyData?.planets || [],
+                      planets: (activeProfile?.Vedic?.planets ? Object.entries(activeProfile.Vedic.planets).map(([name, p]: [string, any]) => {
+                        const localSigns = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+                        const calculatedIndex = p.sign_index !== undefined ? p.sign_index : (p.sign ? localSigns.findIndex(s => s.toLowerCase() === p.sign.toLowerCase() || p.sign.toLowerCase().includes(s.toLowerCase())) : -1);
+                        return {
+                          name,
+                          sign: p.sign,
+                          signIndex: calculatedIndex !== -1 ? calculatedIndex : 0,
+                          degree: p.degree + (p.minute || 0) / 60 + (p.second || 0) / 3600,
+                          longitude: p.longitude_360 || p.longitude,
+                          nakshatra: p.nakshatra,
+                          pada: p.pada,
+                          house: p.house,
+                          lord: p.nakshatra_lord || p.lord
+                        };
+                      }) : null) || astrologyData?.planets || [],
                       shadBala: (() => {
                         const sb: any = {};
                         if (activeProfile?.Vedic?.strengths?.shadbala) {
