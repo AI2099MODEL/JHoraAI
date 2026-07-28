@@ -1764,7 +1764,6 @@ const journeyTabs = [
 ];
 
 const astroTabs = [
-  { id: "dasha", label: "Vimshottari" },
   { id: "charts", label: "Charts" },
   { id: "vedic", label: "My Astro Details" },
   { id: "transits_data", label: "Transits" },
@@ -4779,10 +4778,40 @@ export function MyPageView({
           </div>
 
           {/* Table JH7: Vimshottari & Yogini Dashas */}
-          <div className="space-y-3">
-            
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_vimshottari" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
+          <div className="space-y-3" id="table-jh7-container">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-2xs">
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950">JH7</span>
+                  Vimshottari Dasha Timeline (To Prana)
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Interactive multi-level Vimshottari dasha cycle down to Prana level.
+                </p>
+              </div>
+              <button
+                onClick={downloadDashaCSV}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-600 transition-all text-xs font-bold shadow-xs cursor-pointer animate-fade-in"
+              >
+                <FileDown className="w-3.5 h-3.5" />
+                <span>Download 50-Year Prana Dasha (CSV)</span>
+              </button>
+            </div>
+
+            <div className="p-1 rounded-xl">
+              {(() => {
+                const rawDashas = astrologyData?.dashas || profile?.Vedic?.dashas?.vimshottari || [];
+                if (rawDashas.length === 0) {
+                  return (
+                    <div className="p-4 bg-white border border-slate-200 rounded-xl text-center text-xs text-slate-500 font-mono">
+                      ⚠️ No Vimshottari dasha data available. Please generate or load user particulars.
+                    </div>
+                  );
+                }
+                return (
+                  <DashaTree dashas={rawDashas} isDark={false} />
+                );
+              })()}
             </div>
           </div>
 
