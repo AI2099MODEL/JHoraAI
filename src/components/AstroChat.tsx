@@ -44,7 +44,10 @@ import {
   ArrowUp,
   ArrowLeft,
   Compass,
-  Briefcase
+  Briefcase,
+  Moon,
+  Sun,
+  Orbit
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
@@ -193,8 +196,16 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const antaraLord = dashaParts[2] || "Jupiter";
   const pranaLord = "Venus";
 
-  const transitMoonNak = currentSky?.moon?.currentNakshatra?.displayName || currentSky?.moon?.currentNakshatra || "Uttara Ashadha";
-  const transitMoonSub = currentSky?.moon?.currentSubLord?.displayName || currentSky?.moon?.currentSubLord || "Sun";
+  const transitMoonSign = currentSky?.moon?.currentSign?.displayName || currentSky?.moon?.currentSign || currentSky?.planets?.moon?.currentSign || "Capricorn";
+  const transitMoonNak = currentSky?.moon?.currentNakshatra?.displayName || currentSky?.moon?.currentNakshatra || currentSky?.planets?.moon?.nakshatra || "Uttara Ashadha";
+  const transitMoonStarLord = currentSky?.moon?.currentStarLord?.displayName || currentSky?.moon?.currentStarLord || currentSky?.moon?.currentNakshatra?.lord || currentSky?.planets?.moon?.starLord || "Sun";
+  const transitMoonSubLord = currentSky?.moon?.currentSubLord?.displayName || currentSky?.moon?.currentSubLord || currentSky?.planets?.moon?.subLord || "Jupiter";
+
+  const transitSunSign = currentSky?.sun?.sign?.displayName || currentSky?.planets?.sun?.currentSign || "Cancer";
+  const transitSunNak = currentSky?.sun?.nakshatra?.displayName || currentSky?.planets?.sun?.nakshatra || "Pushya";
+  const transitJupSign = currentSky?.planets?.jupiter?.currentSign || "Sagittarius";
+  const transitSatSign = currentSky?.planets?.saturn?.currentSign || "Leo";
+  const transitMarSign = currentSky?.planets?.mars?.currentSign || "Cancer";
 
   // Dynamically load/build the prompts from the imported JSON
   const getMoodPromptsFromJSON = () => {
@@ -466,10 +477,41 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
               </span>
             </div>
           ) : (
-            <div className="flex items-center gap-2.5 shrink-0">
-              <span className="text-sm font-bold text-neutral-800 tracking-tight">
-                JHora AI
-              </span>
+            <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] font-sans scrollbar-none py-1 min-w-0">
+              {/* Transit Moon Nakshatra & Lord/Sublord Pill */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50/90 border border-indigo-200/80 text-indigo-900 font-medium shrink-0 shadow-2xs">
+                <Moon className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                <span className="font-bold">{transitMoonSign}</span>
+                <span className="text-indigo-300">·</span>
+                <span className="font-semibold">{transitMoonNak}</span>
+                <span className="text-indigo-300">|</span>
+                <span className="font-mono text-[10px] text-indigo-700 flex items-center gap-1">
+                  <strong className="text-indigo-950 font-bold">Lord:</strong> {transitMoonStarLord}
+                  <span className="text-indigo-300">|</span>
+                  <strong className="text-indigo-950 font-bold">Sub:</strong> {transitMoonSubLord}
+                </span>
+              </div>
+
+              {/* Major Planets Transit Summary Pill */}
+              <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-50/80 border border-amber-200/80 text-amber-900 text-[10px] font-mono shrink-0 shadow-2xs">
+                <Orbit className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                <span className="flex items-center gap-1">
+                  <Sun className="w-3 h-3 text-amber-600 shrink-0" />
+                  <strong className="text-amber-950 font-bold">{transitSunSign}</strong> ({transitSunNak})
+                </span>
+                <span className="text-amber-300">|</span>
+                <span>
+                  <strong className="text-purple-900 font-bold">Jup:</strong> {transitJupSign}
+                </span>
+                <span className="text-amber-300">|</span>
+                <span>
+                  <strong className="text-slate-900 font-bold">Sat:</strong> {transitSatSign}
+                </span>
+                <span className="text-amber-300">|</span>
+                <span>
+                  <strong className="text-rose-900 font-bold">Mar:</strong> {transitMarSign}
+                </span>
+              </div>
             </div>
           )}
         </div>
