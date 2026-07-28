@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin_06011976_0640pm_dehradun",
-    "lastUpdated": "2026-07-28T12:00:31.774Z",
+    "lastUpdated": "2026-07-28T12:05:24.002Z",
     "evaluationDate": "2026-07-28",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-28T12:00:30.836Z",
-      "localTime": "2026-07-28T05:00:30-07:00",
+      "utcTime": "2026-07-28T12:05:23.905Z",
+      "localTime": "2026-07-28T05:05:23-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Capricorn",
         "displayName": "Capricorn",
-        "longitude": 279.94
+        "longitude": 279.98
       },
       "currentNakshatra": {
         "id": "Uttara Ashadha",
@@ -30,15 +30,15 @@
         "displayName": "Sun"
       },
       "currentSubLord": {
-        "id": "Moon",
-        "displayName": "Moon"
+        "id": "Mercury",
+        "displayName": "Mercury"
       },
       "moonPhase": {
         "type": "Waxing Gibbous",
         "displayName": "Sukla Purnima",
         "illuminationPercentage": 99.1
       },
-      "moonLongitude": 279.94,
+      "moonLongitude": 279.98,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -76,33 +76,33 @@
       },
       "moon": {
         "currentSign": "Capricorn",
-        "longitude": 279.94,
+        "longitude": 279.98,
         "nakshatra": "Uttara Ashadha",
         "pada": 4,
-        "starLord": "Sun",
-        "subLord": "Moon",
-        "retrograde": false,
-        "combust": false,
-        "stationary": false
-      },
-      "mars": {
-        "currentSign": "Virgo",
-        "longitude": 155.61,
-        "nakshatra": "Uttara Phalguni",
-        "pada": 3,
         "starLord": "Sun",
         "subLord": "Mercury",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
+      "mars": {
+        "currentSign": "Virgo",
+        "longitude": 156.49,
+        "nakshatra": "Uttara Phalguni",
+        "pada": 3,
+        "starLord": "Sun",
+        "subLord": "Jupiter",
+        "retrograde": false,
+        "combust": false,
+        "stationary": false
+      },
       "mercury": {
         "currentSign": "Scorpio",
-        "longitude": 237.76,
+        "longitude": 237.78,
         "nakshatra": "Jyeshtha",
         "pada": 4,
         "starLord": "Mercury",
-        "subLord": "Saturn",
+        "subLord": "Mercury",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -120,11 +120,11 @@
       },
       "venus": {
         "currentSign": "Leo",
-        "longitude": 135.68,
+        "longitude": 135.69,
         "nakshatra": "Purva Phalguni",
         "pada": 1,
         "starLord": "Venus",
-        "subLord": "Mars",
+        "subLord": "Rahu",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -142,7 +142,7 @@
       },
       "rahu": {
         "currentSign": "Leo",
-        "longitude": 131.46,
+        "longitude": 131.45,
         "nakshatra": "Magha",
         "pada": 4,
         "starLord": "Ketu",
@@ -153,7 +153,7 @@
       },
       "ketu": {
         "currentSign": "Aquarius",
-        "longitude": 311.46,
+        "longitude": 311.45,
         "nakshatra": "Shatabhisha",
         "pada": 2,
         "starLord": "Rahu",
@@ -232,6 +232,19 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-28T12:05:24.002Z",
+      "evaluationDate": "2026-07-28",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Health and Disease Propensity via 1st and 6th CSL",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+    },
     {
       "timestamp": "2026-07-28T12:00:31.774Z",
       "evaluationDate": "2026-07-28",
@@ -1508,19 +1521,6 @@
     },
     {
       "timestamp": "2026-07-28T07:58:27.765Z",
-      "evaluationDate": "2026-07-28",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-28T07:58:26.982Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
