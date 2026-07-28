@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-28T08:14:05.183Z",
+    "lastUpdated": "2026-07-28T08:34:24.548Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-28T08:14:05.183Z",
-    "localTime": "2026-07-28T01:14:05-07:00",
+    "utcTime": "2026-07-28T08:34:24.548Z",
+    "localTime": "2026-07-28T01:34:24-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 277.86
+      "longitude": 278.05
     },
     "currentNakshatra": {
       "id": "Uttara Ashadha",
@@ -28,15 +28,15 @@
       "displayName": "Sun"
     },
     "currentSubLord": {
-      "id": "Moon",
-      "displayName": "Moon"
+      "id": "Mars",
+      "displayName": "Mars"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Purnima",
-      "illuminationPercentage": 98
+      "illuminationPercentage": 98.1
     },
-    "moonLongitude": 277.86,
+    "moonLongitude": 278.05,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 101.43,
+    "longitude": 101.44,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,44 +63,44 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 101.43,
+      "longitude": 101.44,
       "nakshatra": "Pushya",
       "pada": 3,
       "starLord": "Saturn",
-      "subLord": "Ketu",
+      "subLord": "Venus",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 277.86,
+      "longitude": 278.05,
       "nakshatra": "Uttara Ashadha",
       "pada": 4,
       "starLord": "Sun",
-      "subLord": "Moon",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Cancer",
-      "longitude": 115.87,
+      "longitude": 119.39,
       "nakshatra": "Ashlesha",
-      "pada": 3,
+      "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Moon",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Scorpio",
-      "longitude": 236.96,
+      "longitude": 237.03,
       "nakshatra": "Jyeshtha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Mercury",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Leo",
-      "longitude": 135.27,
+      "longitude": 135.31,
       "nakshatra": "Purva Phalguni",
       "pada": 1,
       "starLord": "Venus",
-      "subLord": "Ketu",
+      "subLord": "Moon",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Sun",
-    "moonSubLord": "Moon"
+    "moonSubLord": "Mars"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Purnima",
       "index": 15,
       "paksha": "Sukla",
-      "endDate": "2026-07-28T20:14:05.183Z"
+      "endDate": "2026-07-28T20:34:24.548Z"
     },
     "vara": {
       "name": "Tuesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Uttara Ashadha",
       "lord": "Sun",
-      "endDate": "2026-07-29T02:14:05.183Z"
+      "endDate": "2026-07-29T02:34:24.548Z"
     },
     "yoga": {
       "name": "Preeti",
       "lord": "Venus",
-      "endDate": "2026-07-28T22:14:05.183Z"
+      "endDate": "2026-07-28T22:34:24.548Z"
     },
     "karana": {
       "name": "Bava",
       "lord": "Sun",
-      "endDate": "2026-07-28T14:14:05.183Z"
+      "endDate": "2026-07-28T14:34:24.548Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
