@@ -9,6 +9,7 @@ import {
   Send,
   Sparkles,
   Clock,
+  MapPin,
   Heart,
   RefreshCw,
   Calendar,
@@ -92,6 +93,42 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const [moodAnalysisExpanded, setMoodAnalysisExpanded] = useState(true);
   const [myPageExpanded, setMyPageExpanded] = useState(true);
   const [activeSubmenuPanel, setActiveSubmenuPanel] = useState<string | null>(null);
+
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [locationName, setLocationName] = useState<string>("Gurugram, India");
+  const [locationLoading, setLocationLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      setLocationLoading(true);
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const res = await fetch(`/api/jhora/location/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}`);
+            const data = await res.json();
+            if (data.address) {
+              const city = data.address.city || data.address.town || data.address.village || data.address.county || "Gurugram";
+              const country = data.address.country || "India";
+              setLocationName(`${city}, ${country}`);
+            }
+          } catch (e) {
+            // fallback stays Gurugram, India
+          } finally {
+            setLocationLoading(false);
+          }
+        },
+        () => {
+          setLocationLoading(false);
+        }
+      );
+    }
+
+    return () => clearInterval(timer);
+  }, []);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -672,21 +709,25 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
           <div className="flex items-center gap-2">
             {!activeSubmenuPanel && (
-              /* Response Mode Quick Switch */
-              <div className="hidden sm:flex items-center bg-neutral-100 border border-neutral-200 p-0.5 rounded-lg text-[10px]">
-                {(["quick", "detailed", "professional", "research"] as const).map((m) => (
-                  <button
-                    key={m}
-                    onClick={() => setResponseMode(m)}
-                    className={`px-2 py-1 rounded font-bold font-mono uppercase transition-all cursor-pointer ${
-                      responseMode === m
-                        ? "bg-[#5c4df2] text-white shadow-sm"
-                        : "text-neutral-500 hover:text-neutral-800"
-                    }`}
-                  >
-                    {m}
-                  </button>
-                ))}
+              /* Current Date, Live Time & Location details pill */
+              <div className="flex items-center gap-2 bg-neutral-50 border border-neutral-200/80 px-3 py-1.5 rounded-full text-xs font-medium text-neutral-700 shadow-2xs">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                  <span className="font-semibold text-neutral-800">
+                    {currentDateTime.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  </span>
+                  <span className="text-neutral-300">|</span>
+                  <span className="font-mono text-indigo-600 font-bold text-[11px] tracking-wide">
+                    {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                  </span>
+                </div>
+                <span className="text-neutral-300">|</span>
+                <div className="flex items-center gap-1.5 text-neutral-700">
+                  <MapPin className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                  <span className="font-medium text-neutral-800">
+                    {locationLoading ? "Locating..." : locationName}
+                  </span>
+                </div>
               </div>
             )}
 
