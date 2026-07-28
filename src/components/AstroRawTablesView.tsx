@@ -55,6 +55,32 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
   const [showRawJson, setShowRawJson] = useState<boolean>(false);
 
   const [targetAge, setTargetAge] = useState<number>(30); // Default Tajik Varshaphala age
+  const [charaPage, setCharaPage] = useState<number>(0);
+  const [charaFilter, setCharaFilter] = useState<string>("All");
+
+  const downloadCharaCSV = () => {
+    const charaList = astrologyData?.raw?.rasi_dashas?.chara || [];
+    if (charaList.length === 0) {
+      alert("No Chara Dasha data available to download.");
+      return;
+    }
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += "Index,Major Period,Sub Period,Start Date & Time\n";
+    charaList.forEach((item: any, idx: number) => {
+      const [path, dateStr] = item;
+      const parts = path.split("-");
+      const major = parts[0] || "";
+      const minor = parts[1] || "";
+      csvContent += `${idx + 1},"${major}","${minor}","${dateStr}"\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `jaimini_chara_dasha_${astrologyData?.birthDetails?.name || "native"}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Helper to compile all 19 raw system tables into a high-fidelity PDF document
   const handleExportPDF = async () => {
@@ -1680,60 +1706,495 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             );
 
 
-          case "jhora_jaimini_argalas":
+          case "jhora_jaimini_argalas": {
+            const argalas = astrologyData?.argalas || {};
+            const hasArgalas = Object.keys(argalas).length > 0;
             return (
               <div className="space-y-4 animate-fade-in" id="table-jaimini-argalas">
-                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH20: Jaimini Argalas</h3></div>
-                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+                  <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
+                    <Workflow className="w-4 h-4" />
+                    JH20: Jaimini Argalas & Virodhas (Obstructions)
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className={tableHeaderStyle}>
+                        <th className="py-3 px-4 font-semibold w-1/5">Target House</th>
+                        <th className="py-3 px-4 font-semibold w-1/5">Argala House (Type)</th>
+                        <th className="py-3 px-4 font-semibold w-1/5">Argala Planets</th>
+                        <th className="py-3 px-4 font-semibold w-1/5">Virodha House (Obstruction)</th>
+                        <th className="py-3 px-4 font-semibold w-1/5">Virodha Planets</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Status / Verdict</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {hasArgalas ? (
+                        Object.entries(argalas).flatMap(([houseNum, list]: [string, any]) => {
+                          if (!list || list.length === 0) return [];
+                          return list.map((item: any, idx: number) => (
+                            <tr key={`${houseNum}-${idx}`} className={tableRowStyle}>
+                              {idx === 0 ? (
+                                <td rowSpan={list.length} className="py-2.5 px-4 font-bold text-black border-r border-slate-100 align-top">
+                                  House {houseNum}
+                                </td>
+                              ) : null}
+                              <td className="py-2.5 px-4 font-medium">
+                                House {item.argalaHouse} <span className="text-[9px] text-slate-500">({item.type})</span>
+                              </td>
+                              <td className="py-2.5 px-4 font-mono text-indigo-700 font-semibold">
+                                {item.argalaPlanets?.join(", ") || "—"}
+                              </td>
+                              <td className="py-2.5 px-4 text-slate-600">
+                                House {item.virodhaHouse}
+                              </td>
+                              <td className="py-2.5 px-4 font-mono text-slate-500">
+                                {item.virodhaPlanets?.join(", ") || "—"}
+                              </td>
+                              <td className="py-2.5 px-4">
+                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                                  item.isObstructed 
+                                    ? "bg-red-50 text-red-700 border border-red-200" 
+                                    : "bg-green-50 text-green-700 border border-green-200"
+                                }`}>
+                                  {item.verdict}
+                                </span>
+                              </td>
+                            </tr>
+                          ));
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="py-8 text-center text-slate-700">No Jaimini Argalas computed.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             );
-          case "jhora_jaimini_sphutas":
+          }
+          case "jhora_jaimini_sphutas": {
+            const sphutas = astrologyData?.sphutas || {};
+            const hasSphutas = Object.keys(sphutas).length > 0;
             return (
               <div className="space-y-4 animate-fade-in" id="table-jaimini-sphutas">
-                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH21: Jaimini Sphutas</h3></div>
-                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+                  <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
+                    <Activity className="w-4 h-4" />
+                    JH21: Jaimini Sphutas (Special Astrological Degrees)
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className={tableHeaderStyle}>
+                        <th className="py-3 px-4 font-semibold">Sphuta Point (Formula Name)</th>
+                        <th className="py-3 px-4 font-semibold">Zodiac Sign Placement</th>
+                        <th className="py-3 px-4 font-semibold">Sign Degree</th>
+                        <th className="py-3 px-4 font-semibold">Absolute Longitude</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Description / Significance</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {hasSphutas ? (
+                        Object.entries(sphutas).map(([key, value]: [string, any]) => {
+                          let significance = "Sensitive degree representing specific karmic focal points.";
+                          if (key.includes("Tri")) significance = "Combined strength of Ascendant, Moon, and Yamaghantaka.";
+                          else if (key.includes("Chatur")) significance = "Represents general fortunes, four-fold auspiciousness.";
+                          else if (key.includes("Pancha")) significance = "Signifies five element balance and vital energy flow.";
+                          else if (key.includes("Prana")) significance = "Inhaled life-breath and personal physical vitality.";
+                          else if (key.includes("Deha")) significance = "Represents physical constitution, bodily health, and stamina.";
+                          else if (key.includes("Mrityu")) significance = "Points to points of physical vulnerability or transitions.";
+                          else if (key.includes("Beeja")) significance = "Male fertility potential and progeny seed strength.";
+                          else if (key.includes("Kshetra")) significance = "Female fertility potential and nurturing field strength.";
+                          else if (key.includes("Yogi")) significance = "Extremely auspicious degree attracting prosperity and fortune.";
+                          else if (key.includes("Avayogi")) significance = "Points of obstacle or lessons to be learned.";
+
+                          return (
+                            <tr key={key} className={tableRowStyle}>
+                              <td className="py-2.5 px-4 font-bold text-black">{key}</td>
+                              <td className="py-2.5 px-4 font-semibold text-amber-700">{value.sign}</td>
+                              <td className="py-2.5 px-4 font-mono">{formatDegree(value.degree)}</td>
+                              <td className="py-2.5 px-4 font-mono text-slate-500">{value.longitude?.toFixed(2)}°</td>
+                              <td className="py-2.5 px-4 text-slate-600 italic">{significance}</td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-slate-700">No special Jaimini Sphutas found in this profile.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             );
-          case "jhora_jaimini_sahams":
+          }
+          case "jhora_jaimini_sahams": {
+            const sahams = astrologyData?.sahams || {};
+            const hasSahams = Object.keys(sahams).length > 0;
             return (
               <div className="space-y-4 animate-fade-in" id="table-jaimini-sahams">
-                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH22: Jaimini Sahams</h3></div>
-                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+                  <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
+                    <Sparkles className="w-4 h-4" />
+                    JH22: JHora & Tajik Sahams (Sensitive Arabic Points)
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[450px] overflow-y-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="sticky top-0 bg-white z-10">
+                      <tr className={tableHeaderStyle}>
+                        <th className="py-3 px-4 font-semibold">Saham Name</th>
+                        <th className="py-3 px-4 font-semibold">Zodiac Sign</th>
+                        <th className="py-3 px-4 font-semibold">Degree Placement</th>
+                        <th className="py-3 px-4 font-semibold">Absolute Longitude</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Core Indication / Meaning</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {hasSahams ? (
+                        Object.entries(sahams).map(([key, value]: [string, any]) => {
+                          let indication = "Sensitive points indicating dynamic fields of life experience.";
+                          if (key.includes("Punya")) indication = "Fortunes, overall merit, prosperity, and spiritual grace.";
+                          else if (key.includes("Vidya")) indication = "Higher knowledge, learning capacity, and academic pursuits.";
+                          else if (key.includes("Yasas")) indication = "Fame, reputation, recognition, and social standing.";
+                          else if (key.includes("Mitra")) indication = "Friendships, social alliances, and companions.";
+                          else if (key.includes("Mahatmya")) indication = "Greatness, honor, magnanimity, and higher purpose.";
+                          else if (key.includes("Asha")) indication = "Wishes, desires, hopes, and expectations.";
+                          else if (key.includes("Samartha")) indication = "Capability, professional competence, and executive power.";
+                          else if (key.includes("Bhratri")) indication = "Siblings, close peer groups, and support structures.";
+                          else if (key.includes("Gaurava")) indication = "Dignity, self-respect, and self-esteem.";
+                          else if (key.includes("Pithri") || key.includes("Pitri")) indication = "Father, paternal lineage, and ancestral traits.";
+                          else if (key.includes("Guru")) indication = "Teachers, advisors, wisdom, and spiritual preceptors.";
+                          else if (key.includes("Karma")) indication = "Profession, action, career drive, and deeds.";
+                          else if (key.includes("Kalatra")) indication = "Spouse, partnership, marriage, and alliances.";
+                          else if (key.includes("Putra")) indication = "Children, progeny, creativity, and investments.";
+                          else if (key.includes("Roga")) indication = "Ailments, physical vulnerabilities, and recovery paths.";
+                          else if (key.includes("Kali")) indication = "Quarrels, active conflicts, and competitive hurdles.";
+
+                          return (
+                            <tr key={key} className={tableRowStyle}>
+                              <td className="py-2.5 px-4 font-bold text-black">{key}</td>
+                              <td className="py-2.5 px-4 font-semibold text-indigo-700">{value.sign}</td>
+                              <td className="py-2.5 px-4 font-mono">{formatDegree(value.degree)}</td>
+                              <td className="py-2.5 px-4 font-mono text-slate-500">{value.longitude?.toFixed(2)}°</td>
+                              <td className="py-2.5 px-4 text-slate-600 italic">{indication}</td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-slate-700">No Saham placements computed.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             );
-          case "jhora_vedic_upgrahas":
+          }
+          case "jhora_vedic_upgrahas": {
+            const upgrahas = astrologyData?.upagrahas || {};
+            const hasUpgrahas = Object.keys(upgrahas).length > 0;
             return (
               <div className="space-y-4 animate-fade-in" id="table-vedic-upgrahas">
-                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH23: Vedic Upgrahas</h3></div>
-                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+                  <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
+                    <Shield className="w-4 h-4" />
+                    JH23: Vedic Upgrahas (Non-Luminous Shadow Planets)
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className={tableHeaderStyle}>
+                        <th className="py-3 px-4 font-semibold">Upgraha (Shadow Node)</th>
+                        <th className="py-3 px-4 font-semibold">Zodiac Sign Placement</th>
+                        <th className="py-3 px-4 font-semibold">Sign Degree</th>
+                        <th className="py-3 px-4 font-semibold">Absolute Longitude</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Nature & Significance</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {hasUpgrahas ? (
+                        Object.entries(upgrahas).map(([key, value]: [string, any]) => {
+                          let desc = "Non-luminous sensitive secondary node.";
+                          const kLower = key.toLowerCase();
+                          if (kLower.includes("dhuma")) desc = "Associated with heat, smoke, and obscured visual sight; fiery nature.";
+                          else if (kLower.includes("vyatipaata")) desc = "Extremely hostile, relates to sudden energetic reversals.";
+                          else if (kLower.includes("parivesha")) desc = "Represents halos, concentric circles, and protective barriers.";
+                          else if (kLower.includes("indrachaapa")) desc = "Indra's bow (Rainbow); brings diverse colorations and fortunes.";
+                          else if (kLower.includes("upaketu")) desc = "Cometary tail; relates to sudden bursts or localized flashes.";
+                          else if (kLower.includes("kaala")) desc = "Time-spirit node under Sun's domain; karmic timekeeper.";
+                          else if (kLower.includes("mrityu")) desc = "Points to transience, mortal limits, and physical hazards.";
+                          else if (kLower.includes("artha")) desc = "Relates to resource gathering, wealth pursuit, and security.";
+                          else if (kLower.includes("yama")) desc = "Yama Ghantaka; related to Jupiter's secondary protective wave.";
+                          else if (kLower.includes("gulika")) desc = "Most active malefic shadow node under Saturn; physical manifestation of delay.";
+                          else if (kLower.includes("maandi")) desc = "Son of Saturn; highly active karmic catalyst and focal point of physical duty.";
+
+                          return (
+                            <tr key={key} className={tableRowStyle}>
+                              <td className="py-2.5 px-4 font-bold text-black capitalize">{key.replace("_", " ")}</td>
+                              <td className="py-2.5 px-4 font-semibold text-indigo-700">{value.sign}</td>
+                              <td className="py-2.5 px-4 font-mono">{formatDegree(value.degree)}</td>
+                              <td className="py-2.5 px-4 font-mono text-slate-500">{value.longitude?.toFixed(2)}°</td>
+                              <td className="py-2.5 px-4 text-slate-600 italic">{desc}</td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-slate-700">No Vedic Upgrahas found in this profile.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             );
-          case "jhora_ishtaphala":
+          }
+          case "jhora_ishtaphala": {
+            const ishta = astrologyData?.raw?.other_bala?.ishta_phala || {};
+            const kashta = astrologyData?.raw?.other_bala?.kashta_phala || {};
+            const planetsList = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+            const hasData = Object.keys(ishta).length > 0;
             return (
               <div className="space-y-4 animate-fade-in" id="table-ishtaphala">
-                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH24: Ishtaphala & Kashtaphala</h3></div>
-                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+                  <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
+                    <Award className="w-4 h-4" />
+                    JH24: Ishtaphala & Kashtaphala Strengths (Benefactor vs Afflictor)
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className={tableHeaderStyle}>
+                        <th className="py-3 px-4 font-semibold">Planet</th>
+                        <th className="py-3 px-4 font-semibold text-green-700">Ishta Phala (Auspicious Force, max 60)</th>
+                        <th className="py-3 px-4 font-semibold text-red-700">Kashta Phala (Inauspicious Force, max 60)</th>
+                        <th className="py-3 px-4 font-semibold text-center">Net Phala Balance</th>
+                        <th className="py-3 px-4 font-semibold">Relative Dominance Vector</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {hasData ? (
+                        planetsList.map((p) => {
+                          const iVal = ishta[p] !== undefined ? ishta[p] : 30;
+                          const kVal = kashta[p] !== undefined ? kashta[p] : 30;
+                          const balance = iVal - kVal;
+                          const total = (iVal + kVal) || 1;
+                          const ratio = (iVal / total) * 100;
+                          
+                          return (
+                            <tr key={p} className={tableRowStyle}>
+                              <td className="py-2.5 px-4 font-bold text-black">{p}</td>
+                              <td className="py-2.5 px-4 font-mono font-bold text-green-700">{iVal} / 60</td>
+                              <td className="py-2.5 px-4 font-mono font-bold text-red-700">{kVal} / 60</td>
+                              <td className={`py-2.5 px-4 font-mono font-bold text-center ${
+                                balance > 0 ? "text-green-700" : balance < 0 ? "text-red-700" : "text-slate-500"
+                              }`}>
+                                {balance > 0 ? `+${balance}` : balance}
+                              </td>
+                              <td className="py-2.5 px-4">
+                                <div className="flex items-center gap-2 w-full max-w-xs">
+                                  <span className="text-[9px] font-semibold text-red-600">Kashta</span>
+                                  <div className="h-2 flex-1 rounded-full bg-red-100 overflow-hidden flex">
+                                    <div className="h-full bg-green-500 rounded-full transition-all duration-300" style={{ width: `${ratio}%` }}></div>
+                                  </div>
+                                  <span className="text-[9px] font-semibold text-green-600">Ishta</span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-slate-700">No Ishta/Kashta Phala balances detected.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             );
-          case "jhora_jaimini_chara_dasha":
+          }
+          case "jhora_jaimini_chara_dasha": {
+            const charaList = astrologyData?.raw?.rasi_dashas?.chara || [];
+            const hasChara = charaList.length > 0;
+            
+            // Get unique major signs for filtering
+            const majorSigns = ["All", ...Array.from(new Set(charaList.map((item: any) => item[0].split("-")[0])))];
+            
+            // Filter list based on selected major sign
+            const filteredChara = charaFilter === "All" 
+              ? charaList 
+              : charaList.filter((item: any) => item[0].startsWith(charaFilter + "-"));
+            
+            const totalItems = filteredChara.length;
+            const itemsPerPage = 12;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const currentPage = Math.min(charaPage, Math.max(0, totalPages - 1));
+            
+            const paginatedChara = filteredChara.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+
             return (
               <div className="space-y-4 animate-fade-in" id="table-jaimini-chara">
-                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center">
-                  <h3 className="text-sm font-semibold text-black">JH25: Jaimini Chara Dasha</h3>
-                  <button 
-                    onClick={() => {
-                        // Logic to be implemented. For now, trigger similar dasha download
-                        alert("CSV Download for Jaimini Chara Dasha (50 Years) trigger");
-                    }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold hover:bg-amber-600"
-                  >
-                    <Download className="w-3 h-3" />
-                    Download 50-Year CSV
-                  </button>
+                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2 flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
+                      <Clock className="w-4 h-4" />
+                      JH25: Jaimini Chara Dasha Sub-periods (Vedic Rasi Timelines)
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={downloadCharaCSV}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold hover:bg-amber-600 shadow-sm"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      Export Complete 288-Period CSV
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+
+                <div className="flex justify-between items-center gap-4 bg-slate-50 p-3 rounded-lg flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-slate-700">Filter Major Sign:</span>
+                    <select 
+                      value={charaFilter} 
+                      onChange={(e) => {
+                        setCharaFilter(e.target.value);
+                        setCharaPage(0);
+                      }}
+                      className="text-[10px] border border-slate-200 rounded px-2 py-1 bg-white text-black font-semibold"
+                    >
+                      {majorSigns.map(sign => (
+                        <option key={sign} value={sign}>{sign}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="text-[10px] text-slate-600 font-mono">
+                    Showing {totalItems === 0 ? 0 : currentPage * itemsPerPage + 1} - {Math.min((currentPage + 1) * itemsPerPage, totalItems)} of {totalItems} periods
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className={tableHeaderStyle}>
+                        <th className="py-3 px-4 font-semibold w-12">Index</th>
+                        <th className="py-3 px-4 font-semibold">Major Dasha Sign</th>
+                        <th className="py-3 px-4 font-semibold">Sub-Antardasha Sign</th>
+                        <th className="py-3 px-4 font-semibold">Trigger Date & Time</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Dynamic Significance</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {hasChara && paginatedChara.length > 0 ? (
+                        paginatedChara.map((item: any, idx: number) => {
+                          const originalIdx = charaList.indexOf(item);
+                          const [path, dateStr] = item;
+                          const parts = path.split("-");
+                          const major = parts[0] || "";
+                          const minor = parts[1] || "";
+                          
+                          let focusText = `Active transition of consciousness from ${major} fields to ${minor} themes.`;
+                          if (major === minor) focusText = `Peak alignment of self-awareness within the ${major} house of destiny.`;
+
+                          return (
+                            <tr key={`${path}-${idx}`} className={tableRowStyle}>
+                              <td className="py-2.5 px-4 font-mono font-bold text-slate-500">{originalIdx + 1}</td>
+                              <td className="py-2.5 px-4 font-bold text-black">{major}</td>
+                              <td className="py-2.5 px-4 font-semibold text-indigo-700">{minor}</td>
+                              <td className="py-2.5 px-4 font-mono text-amber-800 font-semibold">{dateStr}</td>
+                              <td className="py-2.5 px-4 text-slate-600 italic">{focusText}</td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-slate-700">No Jaimini Chara Dasha periods found matching the filter.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {totalPages > 1 && (
+                  <div className="flex justify-between items-center mt-3 p-1 bg-white border border-slate-200 rounded-lg">
+                    <button
+                      disabled={currentPage === 0}
+                      onClick={() => setCharaPage(prev => Math.max(0, prev - 1))}
+                      className="px-3 py-1.5 rounded bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-[10px] font-bold text-slate-700 transition"
+                    >
+                      ← Previous
+                    </button>
+                    <span className="text-[10px] font-bold text-slate-600 font-mono">
+                      Page {currentPage + 1} of {totalPages}
+                    </span>
+                    <button
+                      disabled={currentPage >= totalPages - 1}
+                      onClick={() => setCharaPage(prev => Math.min(totalPages - 1, prev + 1))}
+                      className="px-3 py-1.5 rounded bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-[10px] font-bold text-slate-700 transition"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                )}
               </div>
             );
+          }
 
           case "table_index":
             return (

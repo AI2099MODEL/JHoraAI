@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-28T11:18:14.901Z",
+    "lastUpdated": "2026-07-28T11:29:51.955Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-28T11:18:14.901Z",
-    "localTime": "2026-07-28T04:18:14-07:00",
+    "utcTime": "2026-07-28T11:29:51.955Z",
+    "localTime": "2026-07-28T04:29:51-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 279.55
+      "longitude": 279.66
     },
     "currentNakshatra": {
       "id": "Uttara Ashadha",
@@ -28,15 +28,15 @@
       "displayName": "Sun"
     },
     "currentSubLord": {
-      "id": "Ketu",
-      "displayName": "Ketu"
+      "id": "Sun",
+      "displayName": "Sun"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Purnima",
       "illuminationPercentage": 98.9
     },
-    "moonLongitude": 279.55,
+    "moonLongitude": 279.66,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -67,47 +67,47 @@
       "nakshatra": "Pushya",
       "pada": 3,
       "starLord": "Saturn",
-      "subLord": "Moon",
+      "subLord": "Mars",
       "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 279.55,
+      "longitude": 279.66,
       "nakshatra": "Uttara Ashadha",
       "pada": 4,
       "starLord": "Sun",
-      "subLord": "Ketu",
+      "subLord": "Sun",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
-      "currentSign": "Leo",
-      "longitude": 148.22,
+      "currentSign": "Virgo",
+      "longitude": 150.16,
       "nakshatra": "Uttara Phalguni",
-      "pada": 1,
+      "pada": 2,
       "starLord": "Sun",
-      "subLord": "Mercury",
+      "subLord": "Moon",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Scorpio",
-      "longitude": 237.61,
+      "longitude": 237.65,
       "nakshatra": "Jyeshtha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Venus",
+      "subLord": "Rahu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "jupiter": {
       "currentSign": "Sagittarius",
-      "longitude": 268.57,
+      "longitude": 268.58,
       "nakshatra": "Uttara Ashadha",
       "pada": 1,
       "starLord": "Sun",
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Leo",
-      "longitude": 135.6,
+      "longitude": 135.62,
       "nakshatra": "Purva Phalguni",
       "pada": 1,
       "starLord": "Venus",
-      "subLord": "Jupiter",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Sun",
-    "moonSubLord": "Ketu"
+    "moonSubLord": "Sun"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Purnima",
       "index": 15,
       "paksha": "Sukla",
-      "endDate": "2026-07-28T23:18:14.901Z"
+      "endDate": "2026-07-28T23:29:51.955Z"
     },
     "vara": {
       "name": "Tuesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Uttara Ashadha",
       "lord": "Sun",
-      "endDate": "2026-07-29T05:18:14.901Z"
+      "endDate": "2026-07-29T05:29:51.955Z"
     },
     "yoga": {
       "name": "Preeti",
       "lord": "Venus",
-      "endDate": "2026-07-29T01:18:14.901Z"
+      "endDate": "2026-07-29T01:29:51.955Z"
     },
     "karana": {
       "name": "Bava",
       "lord": "Sun",
-      "endDate": "2026-07-28T17:18:14.901Z"
+      "endDate": "2026-07-28T17:29:51.955Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -337,9 +337,9 @@
       "description": "Mercury in Scorpio drives subdued / vulnerable mental stamina and communication focus."
     },
     "physicalEnergy": {
-      "score": 5.5,
-      "tone": "Balanced",
-      "description": "Mars in Leo yields a balanced reserve of physical resilience."
+      "score": 8.5,
+      "tone": "Peak Focus",
+      "description": "Mars in Virgo yields a peak focus reserve of physical resilience."
     },
     "relationshipEnergy": {
       "score": 8.5,
@@ -430,7 +430,7 @@
       "description": "Ideal day for deep reading, research, and skill courses."
     },
     "travel": {
-      "priority": "low",
+      "priority": "medium",
       "description": "Plan short journeys to refresh focus; avoid heavy over-taxing transits."
     },
     "spirituality": {
@@ -486,8 +486,8 @@
       "timeframe": "Hold cash reserves; defer speculative investments"
     },
     "travelOpportunity": {
-      "active": false,
-      "timeframe": "Consolidate energy locally"
+      "active": true,
+      "timeframe": "Auspicious travel window is active"
     },
     "learningOpportunity": {
       "active": false,

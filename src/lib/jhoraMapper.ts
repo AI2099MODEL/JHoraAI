@@ -768,7 +768,8 @@ export function mapJHoraResponseToAstrologyData(d: any): AstrologyData {
     sphutas,
     upagrahas,
     sahams,
-    argalas
+    argalas,
+    raw: h
   };
 }
 
