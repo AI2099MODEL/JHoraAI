@@ -727,10 +727,32 @@ app.get("/api/user-profile/get", async (req, res) => {
 
     const filePath = path.join(process.cwd(), "Users", "userprofile.json");
     if (fs.existsSync(filePath)) {
-      const content = fs.readFileSync(filePath, "utf-8");
-      const parsed = JSON.parse(content);
-      setTimeout(() => runAnalysisSyncAgentForProfile(parsed), 10);
-      return res.json(parsed);
+      try {
+        const content = fs.readFileSync(filePath, "utf-8");
+        const parsed = JSON.parse(content);
+        setTimeout(() => runAnalysisSyncAgentForProfile(parsed), 10);
+        return res.json(parsed);
+      } catch (e) {
+        console.warn("Users/userprofile.json is corrupted, falling back to other sources.", e);
+      }
+    }
+    
+    // Fallback: Check other valid JSON files in the Users directory
+    const usersDir = path.join(process.cwd(), "Users");
+    if (fs.existsSync(usersDir)) {
+      const files = fs.readdirSync(usersDir).filter(f => f.endsWith(".json") && f !== "userprofile.json");
+      for (const file of files) {
+        try {
+          const content = fs.readFileSync(path.join(usersDir, file), "utf-8");
+          const parsed = JSON.parse(content);
+          if (parsed && typeof parsed === 'object') {
+             setTimeout(() => runAnalysisSyncAgentForProfile(parsed), 10);
+             return res.json(parsed);
+          }
+        } catch (e) {
+          // ignore
+        }
+      }
     }
     // Fallback to local data dir if git file isn't created yet
     const localFilePath = path.join(process.cwd(), "data", "user_profiles.json");
@@ -1786,8 +1808,13 @@ app.post("/api/user-profile/generate-summary", async (req, res) => {
       // Fallback: Read from Users/userprofile.json
       const filePath = path.join(process.cwd(), "Users", "userprofile.json");
       if (fs.existsSync(filePath)) {
-        const content = fs.readFileSync(filePath, "utf-8");
-        profileData = JSON.parse(content);
+        try {
+          const content = fs.readFileSync(filePath, "utf-8");
+          profileData = JSON.parse(content);
+        } catch (e) {
+          console.warn("Failed to parse Users/userprofile.json in chart-analysis", e);
+          return res.status(400).json({ error: "Profile data is corrupted or invalid." });
+        }
       } else {
         return res.status(400).json({ error: "Profile data is required or must be synchronized first." });
       }
