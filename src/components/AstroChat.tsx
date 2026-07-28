@@ -42,6 +42,7 @@ import {
   Paperclip,
   Settings,
   ArrowUp,
+  ArrowLeft,
   Compass,
   Briefcase
 } from "lucide-react";
@@ -527,11 +528,10 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           {onCloseStandalone && (
             <button
               onClick={onCloseStandalone}
-              className="hidden sm:flex items-center gap-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border border-neutral-200 shrink-0"
-              title="Return to JHora Astrology Dashboard"
+              className="p-1.5 sm:p-2 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer shrink-0"
+              title="Return to Dashboard"
             >
-              <ChevronRight className="w-3.5 h-3.5 rotate-180" />
-              <span>Return to Dashboard</span>
+              <ArrowLeft className="w-4 h-4" />
             </button>
           )}
 
@@ -539,30 +539,28 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
             onClick={() => {
               window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
             }}
-            className="flex items-center gap-1.5 border border-neutral-200 p-1.5 sm:px-2.5 sm:py-1.5 rounded-full text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition-all cursor-pointer bg-white group shrink-0"
-            title="Open full page in a new window"
+            className="p-1.5 sm:p-2 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer shrink-0"
+            title="Open in New Window"
           >
-            <ExternalLink className="w-3.5 h-3.5 group-hover:scale-105 transition-transform text-[#5c4df2]" />
-            <span className="hidden md:inline">New Window</span>
+            <ExternalLink className="w-4 h-4 text-[#5c4df2]" />
           </button>
 
           <button 
             onClick={() => {
               alert("Share Link: Astrological conversation state serialized securely.");
             }}
-            className="flex items-center gap-1.5 border border-neutral-200 p-1.5 sm:px-2.5 sm:py-1.5 rounded-full text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition-all cursor-pointer bg-white shrink-0"
+            className="p-1.5 sm:p-2 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer shrink-0"
             title="Share conversation"
           >
-            <Share2 className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Share</span>
+            <Share2 className="w-4 h-4 text-neutral-600" />
           </button>
 
           <button
             onClick={clearChat}
             title="Reset Conversation"
-            className="p-1.5 rounded-full border border-neutral-200 bg-transparent hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer shrink-0"
+            className="p-1.5 sm:p-2 rounded-full border border-neutral-200 bg-white hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer shrink-0"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </div>
