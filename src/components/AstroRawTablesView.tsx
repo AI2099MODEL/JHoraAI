@@ -756,7 +756,20 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH7: Vimshottari Mahadasha Timelines
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">120-Year Lunar Cycle</span>
-                                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => {
+                        const csvContent = "data:text/csv;charset=utf-8," + "Lord,Start Date,End Date\n" + (astrologyData.dashas || []).map((d: any) => `${d.lord},${d.startDate},${d.endDate}`).join("\n");
+                        const encodedUri = encodeURI(csvContent);
+                        const link = document.createElement("a");
+                        link.setAttribute("href", encodedUri);
+                        link.setAttribute("download", "vimshottari_dasha_50years.csv");
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold hover:bg-amber-600" title="Download 50-Year CSV">
+                      <Download className="w-3 h-3" />
+                      Download 50-Year CSV
+                    </button>
                     <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
                       <Save className="w-4 h-4" />
                     </button>
