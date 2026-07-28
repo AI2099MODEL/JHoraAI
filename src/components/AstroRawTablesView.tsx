@@ -121,23 +121,15 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  const containerStyle = isDark 
-    ? "bg-slate-900/60 border border-slate-800 text-slate-200" 
-    : "bg-white border border-neutral-200 text-neutral-800";
+  const containerStyle = "bg-white border border-slate-200 text-black";
   
-  const cardStyle = isDark 
-    ? "bg-slate-950/40 border border-slate-900/60" 
-    : "bg-neutral-50/50 border border-neutral-200";
+  const cardStyle = "bg-white border border-slate-200 shadow-sm";
 
-  const tableHeaderStyle = isDark 
-    ? "bg-slate-950/80 border-b border-slate-800 text-slate-400" 
-    : "bg-neutral-100 border-b border-neutral-200 text-neutral-500";
+  const tableHeaderStyle = "bg-slate-50/80 border-b border-slate-200 text-slate-700 text-[10px] font-bold uppercase tracking-wider";
 
-  const tableRowStyle = isDark 
-    ? "border-b border-slate-950/50 hover:bg-slate-900/20 text-slate-300" 
-    : "border-b border-neutral-150 hover:bg-neutral-50/50 text-neutral-700";
+  const tableRowStyle = "border-b border-slate-100 hover:bg-slate-50 text-black text-[10px]";
 
-  const textMuted = isDark ? "text-slate-400" : "text-neutral-500";
+  const textMuted = "text-slate-500";
 
   // Helper to format degree to deg-min-sec
   const formatDegree = (deg: number) => {
@@ -212,9 +204,9 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
   if (!astrologyData) {
     return (
       <div className={`p-8 rounded-2xl ${containerStyle} text-center`}>
-        <Info className="w-8 h-8 text-amber-500 mx-auto mb-3 animate-pulse" />
+        <Info className="w-8 h-8 text-amber-800 mx-auto mb-3 animate-pulse" />
         <h3 className="text-sm font-semibold">No Active Astrology Profile Loaded</h3>
-        <p className="text-xs text-slate-400 mt-1">Please cast or import a birth profile first.</p>
+        <p className=" text-slate-600 mt-1">Please cast or import a birth profile first.</p>
       </div>
     );
   }
@@ -234,24 +226,24 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div className="space-y-1 max-w-xl">
               <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-500">
+                <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-800">
                   <TableIcon className="w-5 h-5" />
                 </span>
                 <h2 className="text-lg font-bold">Raw Astro Systems Registry</h2>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className=" text-slate-600">
                 Phase 10.0 Certified Raw Astrological Databases. Free of calculations, transit forecasts, or predictions.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-              <div className="flex items-center gap-2 text-[10px] font-mono bg-slate-950/45 px-2.5 py-1.5 rounded-lg border border-slate-800/80 mr-1">
+              <div className="flex items-center gap-2 text-[10px] font-mono bg-slate-950/45 px-2.5 py-1.5 rounded-lg border border-slate-200 mr-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-slate-400">Binds to userprofile.json</span>
+                <span className="text-slate-600">Binds to userprofile.json</span>
               </div>
               
               <button
                 onClick={handleDownloadJSON}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 text-xs font-bold cursor-pointer transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-700 border border-indigo-500/20  font-bold cursor-pointer transition-all"
                 title="Download JHora/KP raw JSON payload"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -261,7 +253,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
               <button
                 onClick={handleExportPDF}
                 disabled={pdfCompiling}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold disabled:opacity-50 cursor-pointer transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950  font-bold disabled:opacity-50 cursor-pointer transition-all"
                 title="Compile all raw systems into a PDF report"
               >
                 {pdfCompiling ? (
@@ -274,10 +266,10 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
 
               <button
                 onClick={() => setShowRawJson(!showRawJson)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-bold cursor-pointer transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border  font-bold cursor-pointer transition-all ${
                   showRawJson 
-                    ? "bg-slate-700/50 border-slate-600 text-slate-200" 
-                    : "bg-slate-800/20 border-slate-800 text-slate-400 hover:bg-slate-800/50"
+                    ? "bg-slate-700/50 border-slate-600 text-slate-900" 
+                    : "bg-slate-800/20 border-slate-800 text-slate-600 hover:bg-slate-800/50"
                 }`}
                 title="Toggle raw interactive JSON viewer"
               >
@@ -292,10 +284,10 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
       {!hideHeaders && showRawJson && (
         <div className={`p-4 rounded-xl border font-mono text-[11px] leading-relaxed relative ${cardStyle}`}>
           <div className="flex justify-between items-center mb-3 pb-2 border-b border-indigo-500/10">
-            <span className="text-indigo-400 font-bold uppercase tracking-wide">Raw JHora/KP/Western Combined Payload (.json)</span>
-            <span className="text-[10px] text-slate-500">Live memory state</span>
+            <span className="text-indigo-700 font-bold uppercase tracking-wide">Raw JHora/KP/Western Combined Payload (.json)</span>
+            <span className="text-[10px] text-slate-700">Live memory state</span>
           </div>
-          <pre className="overflow-x-auto max-h-[400px] text-slate-300 bg-slate-950/85 p-4 rounded-lg select-text">
+          <pre className="overflow-x-auto max-h-[400px] text-slate-800 bg-slate-50 p-4 rounded-lg select-text">
             {JSON.stringify({
               User: {
                 google_user_id: activeUser?.uid || "guest_user",
@@ -317,7 +309,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
       )}
 
       {error && (
-        <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400 text-xs flex items-center gap-2">
+        <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400  flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
           <span>Error loading raw system fields: {error}</span>
         </div>
@@ -325,8 +317,8 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
 
       {loading && (
         <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
-          <RefreshCw className="w-6 h-6 animate-spin text-amber-500" />
-          <span className="text-xs text-slate-400 font-mono">Retrieving remote database tables...</span>
+          <RefreshCw className="w-6 h-6 animate-spin text-amber-800" />
+          <span className=" text-slate-600 font-mono">Retrieving remote database tables...</span>
         </div>
       )}
 
@@ -339,15 +331,15 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-1-birth-details">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <User className="w-4 h-4" />
                     JH1: Birth Details & Astronomical Metrics
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Parashari Baseline</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Parashari Baseline</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-2.5 px-4 font-semibold">Parameter Key</th>
@@ -358,64 +350,64 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     </thead>
                     <tbody>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.name</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.name</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.name</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.name</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.birthDetails.name}</td>
-                        <td className="py-2.5 px-4 text-slate-400">Authenticated birth record profile name.</td>
+                        <td className="py-2.5 px-4 text-slate-600">Authenticated birth record profile name.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.date</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.date</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.date</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.date</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.birthDetails.date}</td>
-                        <td className="py-2.5 px-4 text-slate-400">Standard Gregorian Date representation (YYYY-MM-DD).</td>
+                        <td className="py-2.5 px-4 text-slate-600">Standard Gregorian Date representation (YYYY-MM-DD).</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.time</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.time</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.time</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.time</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.birthDetails.time}</td>
-                        <td className="py-2.5 px-4 text-slate-400">Local Standard Time of birth (HH:MM).</td>
+                        <td className="py-2.5 px-4 text-slate-600">Local Standard Time of birth (HH:MM).</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.location</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.location</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.location</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.location</td>
                         <td className="py-2.5 px-4">{astrologyData.birthDetails.location}</td>
-                        <td className="py-2.5 px-4 text-slate-400">Resolved city name coordinates database index.</td>
+                        <td className="py-2.5 px-4 text-slate-600">Resolved city name coordinates database index.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.latitude</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.latitude</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.latitude</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.latitude</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.birthDetails.latitude.toFixed(4)}°</td>
-                        <td className="py-2.5 px-4 text-slate-400">Geographical latitude of casting coordinates.</td>
+                        <td className="py-2.5 px-4 text-slate-600">Geographical latitude of casting coordinates.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.longitude</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.longitude</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.longitude</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.longitude</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.birthDetails.longitude.toFixed(4)}°</td>
-                        <td className="py-2.5 px-4 text-slate-400">Geographical longitude of casting coordinates.</td>
+                        <td className="py-2.5 px-4 text-slate-600">Geographical longitude of casting coordinates.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.timezone</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.timezone</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.timezone</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.timezone</td>
                         <td className="py-2.5 px-4 font-mono">GMT {astrologyData.birthDetails.timezone >= 0 ? "+" : ""}{astrologyData.birthDetails.timezone}</td>
-                        <td className="py-2.5 px-4 text-slate-400">Timezone offset hours relative to Greenwich Mean Time.</td>
+                        <td className="py-2.5 px-4 text-slate-600">Timezone offset hours relative to Greenwich Mean Time.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-white">lagna.sign</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-400">.lagna.sign</td>
-                        <td className="py-2.5 px-4 font-semibold text-amber-400">{astrologyData.lagna.sign}</td>
-                        <td className="py-2.5 px-4 text-slate-400">Rasi Ascendant sign at coordinates time boundary.</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-black">lagna.sign</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-700">.lagna.sign</td>
+                        <td className="py-2.5 px-4 font-semibold text-amber-700">{astrologyData.lagna.sign}</td>
+                        <td className="py-2.5 px-4 text-slate-600">Rasi Ascendant sign at coordinates time boundary.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-white">lagna.longitude</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-400">.lagna.longitude</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-black">lagna.longitude</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-700">.lagna.longitude</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.lagna.longitude.toFixed(4)}°</td>
-                        <td className="py-2.5 px-4 text-slate-400">Ascendant degree projected on the 360° celestial belt.</td>
+                        <td className="py-2.5 px-4 text-slate-600">Ascendant degree projected on the 360° celestial belt.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-white">lagna.degree</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-400">.lagna.degree</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-black">lagna.degree</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-700">.lagna.degree</td>
                         <td className="py-2.5 px-4 font-mono">{formatDegree(astrologyData.lagna.degree)}</td>
-                        <td className="py-2.5 px-4 text-slate-400">Exact degree offset inside the {astrologyData.lagna.sign} sign.</td>
+                        <td className="py-2.5 px-4 text-slate-600">Exact degree offset inside the {astrologyData.lagna.sign} sign.</td>
                       </tr>
                     </tbody>
                   </table>
@@ -427,15 +419,15 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-2-natal-planets">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Compass className="w-4 h-4" />
                     JH2: Natal Planets Longitudes & Rasi Placements
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Sidereal Placements</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Sidereal Placements</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
@@ -451,14 +443,14 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     <tbody>
                       {(astrologyData.planets || []).map((p: any) => (
                         <tr key={p.name} className={tableRowStyle}>
-                          <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
-                          <td className="py-2.5 px-4 font-mono text-amber-400">{p.sign}</td>
+                          <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
+                          <td className="py-2.5 px-4 font-mono text-amber-700">{p.sign}</td>
                           <td className="py-2.5 px-4 font-mono">{formatDegree(p.degree)}</td>
-                          <td className="py-2.5 px-4 font-mono text-slate-400">{p.longitude.toFixed(2)}°</td>
-                          <td className="py-2.5 px-4 font-medium text-indigo-400">{p.nakshatra}</td>
+                          <td className="py-2.5 px-4 font-mono text-slate-600">{p.longitude.toFixed(2)}°</td>
+                          <td className="py-2.5 px-4 font-medium text-indigo-700">{p.nakshatra}</td>
                           <td className="py-2.5 px-4 font-mono">{p.pada}</td>
                           <td className="py-2.5 px-4 font-semibold">House {p.house}</td>
-                          <td className="py-2.5 px-4 font-mono text-slate-400">{p.lord || "—"}</td>
+                          <td className="py-2.5 px-4 font-mono text-slate-600">{p.lord || "—"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -471,15 +463,15 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-3-shadbala">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Activity className="w-4 h-4" />
                     JH3: Shadbala Planet Strength Matrix (Shashtiamsas)
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Six-Fold Strength Model</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Six-Fold Strength Model</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
@@ -489,30 +481,30 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         <th className="py-3 px-4 font-semibold">Cheshta (Motional)</th>
                         <th className="py-3 px-4 font-semibold">Naisargika (Natural)</th>
                         <th className="py-3 px-4 font-semibold">Drig (Aspectual)</th>
-                        <th className="py-3 px-4 font-semibold text-amber-500">Total</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Total</th>
                         <th className="py-3 px-4 font-semibold">Required</th>
-                        <th className="py-3 px-4 font-semibold text-emerald-400">Ratio (%)</th>
+                        <th className="py-3 px-4 font-semibold text-emerald-700">Ratio (%)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {astrologyData.shadBala ? (
                         Object.entries(astrologyData.shadBala).map(([planet, b]: [string, any]) => (
                           <tr key={planet} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-bold text-white">{planet}</td>
+                            <td className="py-2.5 px-4 font-bold text-black">{planet}</td>
                             <td className="py-2.5 px-4 font-mono">{b.sthanaBala?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.digBala?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.kalaBala?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.cheshtaBala?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.naisargikaBala?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.drigBala?.toFixed(1) || "0.0"}</td>
-                            <td className="py-2.5 px-4 font-mono font-semibold text-amber-400">{b.total?.toFixed(1) || "0.0"}</td>
+                            <td className="py-2.5 px-4 font-mono font-semibold text-amber-700">{b.total?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.required || "300"}</td>
-                            <td className="py-2.5 px-4 font-mono font-bold text-emerald-400">{(b.strengthRatio * 100)?.toFixed(1)}%</td>
+                            <td className="py-2.5 px-4 font-mono font-bold text-emerald-700">{(b.strengthRatio * 100)?.toFixed(1)}%</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={10} className="py-8 text-center text-slate-500">No raw Shadbala entries found in this profile profile.</td>
+                          <td colSpan={10} className="py-8 text-center text-slate-700">No raw Shadbala entries found in this profile profile.</td>
                         </tr>
                       )}
                     </tbody>
@@ -525,19 +517,19 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-4-bhava-balas">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Award className="w-4 h-4" />
                     JH4: Bhava Balas (House Strengths)
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">House Boundaries</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">House Boundaries</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">House Cusp</th>
-                        <th className="py-3 px-4 font-semibold text-amber-500">Strength (Shashtiamsas)</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Strength (Shashtiamsas)</th>
                         <th className="py-3 px-4 font-semibold">Rank</th>
                         <th className="py-3 px-4 font-semibold">Core Significance Description</th>
                       </tr>
@@ -561,16 +553,16 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                           };
                           return (
                             <tr key={house} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-mono font-bold text-white">House {house}</td>
-                              <td className="py-2.5 px-4 font-mono text-amber-400 font-semibold">{b.strengthShashtiamsas?.toFixed(1) || "340.0"}</td>
+                              <td className="py-2.5 px-4 font-mono font-bold text-black">House {house}</td>
+                              <td className="py-2.5 px-4 font-mono text-amber-700 font-semibold">{b.strengthShashtiamsas?.toFixed(1) || "340.0"}</td>
                               <td className="py-2.5 px-4 font-mono">#{b.rank || house}</td>
-                              <td className="py-2.5 px-4 text-slate-400">{sigMap[house] || "Astrological house significations."}</td>
+                              <td className="py-2.5 px-4 text-slate-600">{sigMap[house] || "Astrological house significations."}</td>
                             </tr>
                           );
                         })
                       ) : (
                         <tr>
-                          <td colSpan={4} className="py-8 text-center text-slate-500">No raw Bhava Bala strengths found in this profile.</td>
+                          <td colSpan={4} className="py-8 text-center text-slate-700">No raw Bhava Bala strengths found in this profile.</td>
                         </tr>
                       )}
                     </tbody>
@@ -583,24 +575,24 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-5-ashtakavarga">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Hash className="w-4 h-4" />
                     JH5: Samudhaya Ashtakavarga Points (SAV)
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Binnashtakavarga Matrix</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Binnashtakavarga Matrix</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Zodiac Sign</th>
                         {Array.from({ length: 12 }).map((_, idx) => (
-                          <th key={idx} className="py-3 px-2 font-mono text-center font-semibold text-indigo-400">
+                          <th key={idx} className="py-3 px-2 font-mono text-center font-semibold text-indigo-700">
                             H{idx + 1}
                           </th>
                         ))}
-                        <th className="py-3 px-4 font-semibold text-center text-amber-500">Total SAV</th>
+                        <th className="py-3 px-4 font-semibold text-center text-amber-800">Total SAV</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -608,28 +600,28 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         <>
                           {Object.entries(astrologyData.ashtakavarga.planets || {}).map(([planet, pts]: [string, any]) => (
                             <tr key={planet} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-white">{planet}</td>
+                              <td className="py-2.5 px-4 font-bold text-black">{planet}</td>
                               {pts.map((pt: number, idx: number) => (
-                                <td key={idx} className="py-2.5 px-2 font-mono text-center text-slate-400">{pt}</td>
+                                <td key={idx} className="py-2.5 px-2 font-mono text-center text-slate-600">{pt}</td>
                               ))}
-                              <td className="py-2.5 px-4 font-mono text-center font-bold text-slate-500">
+                              <td className="py-2.5 px-4 font-mono text-center font-bold text-slate-700">
                                 {pts.reduce((a: number, b: number) => a + b, 0)}
                               </td>
                             </tr>
                           ))}
                           <tr className="bg-amber-500/5 font-bold border-t border-slate-700/50">
-                            <td className="py-3 px-4 text-amber-400">Samudhaya (SAV)</td>
+                            <td className="py-3 px-4 text-amber-700">Samudhaya (SAV)</td>
                             {(astrologyData.ashtakavarga.sarvashtakavarga || []).map((pt: number, idx: number) => (
-                              <td key={idx} className="py-3 px-2 font-mono text-center text-amber-400 font-bold">{pt}</td>
+                              <td key={idx} className="py-3 px-2 font-mono text-center text-amber-700 font-bold">{pt}</td>
                             ))}
-                            <td className="py-3 px-4 font-mono text-center text-amber-400 font-extrabold">
+                            <td className="py-3 px-4 font-mono text-center text-amber-700 font-extrabold">
                               {(astrologyData.ashtakavarga.sarvashtakavarga || []).reduce((a: number, b: number) => a + b, 0)}
                             </td>
                           </tr>
                         </>
                       ) : (
                         <tr>
-                          <td colSpan={14} className="py-8 text-center text-slate-500">No raw Ashtakavarga charts detected.</td>
+                          <td colSpan={14} className="py-8 text-center text-slate-700">No raw Ashtakavarga charts detected.</td>
                         </tr>
                       )}
                     </tbody>
@@ -681,22 +673,22 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
               <div className="space-y-4 animate-fade-in" id="table-6-divisional-vargas">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-indigo-500/10 pb-3">
                   <div className="space-y-1">
-                    <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                    <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                       <Map className="w-4 h-4" />
                       JH6: Divisional Vargas (D1 to D60) Planetary House Distributions
                     </h3>
-                    <p className="text-[10px] text-slate-500 font-mono">
+                    <p className="text-[10px] text-slate-700 font-mono">
                       Harmonics System • Selecting and displaying active divisional chart
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <label className="text-[10px] uppercase tracking-wider font-mono font-bold text-slate-400">Select Varga:</label>
+                    <label className="text-[10px] uppercase tracking-wider font-mono font-bold text-slate-600">Select Varga:</label>
                     <select
                       value={selectedVarga}
                       onChange={(e) => setSelectedVarga(e.target.value)}
-                      className={`text-xs px-3 py-1.5 rounded-xl border font-mono ${
+                      className={` px-3 py-1.5 rounded-xl border font-mono ${
                         isDark 
-                          ? "bg-slate-950 border-slate-800 text-slate-300 focus:border-amber-500/50" 
+                          ? "bg-slate-950 border-slate-800 text-slate-800 focus:border-amber-500/50" 
                           : "bg-white border-neutral-300 text-neutral-800 focus:border-amber-500"
                       } outline-none cursor-pointer`}
                     >
@@ -713,23 +705,23 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                   </div>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-medium">House Number</th>
-                        <th className="py-3 px-4 font-medium text-amber-500">Zodiac Sign</th>
-                        <th className="py-3 px-4 font-medium text-slate-200">Occupying Planets</th>
+                        <th className="py-3 px-4 font-medium text-amber-800">Zodiac Sign</th>
+                        <th className="py-3 px-4 font-medium text-slate-900">Occupying Planets</th>
                       </tr>
                     </thead>
                     <tbody>
                       {astrologyData.divisionalCharts && vargaChart ? (
                         rows.map((row) => (
                           <tr key={row.houseNum} className={tableRowStyle}>
-                            <td className="py-3 px-4 font-mono font-bold text-slate-200">
+                            <td className="py-3 px-4 font-mono font-bold text-slate-900">
                               House {row.houseNum} {row.houseNum === 1 ? "(Lagna)" : ""}
                             </td>
-                            <td className="py-3 px-4 font-mono font-bold text-amber-400">
+                            <td className="py-3 px-4 font-mono font-bold text-amber-700">
                               {row.signName}
                             </td>
                             <td className="py-3 px-4 font-semibold text-slate-100 font-mono">
@@ -739,7 +731,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={3} className="py-8 text-center text-slate-500">
+                          <td colSpan={3} className="py-8 text-center text-slate-700">
                             No divisional chart data available.
                           </td>
                         </tr>
@@ -755,15 +747,15 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-7-vimshottari">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Clock className="w-4 h-4" />
                     JH7: Vimshottari Mahadasha Timelines
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">120-Year Lunar Cycle</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">120-Year Lunar Cycle</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Major Lord</th>
@@ -775,10 +767,10 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     <tbody>
                       {(astrologyData.dashas || []).map((d: any, idx: number) => (
                         <tr key={idx} className={tableRowStyle}>
-                          <td className="py-3 px-4 font-bold text-white text-xs">{d.lord} Major Cycle</td>
-                          <td className="py-3 px-4 font-mono text-amber-400">{d.startDate}</td>
-                          <td className="py-3 px-4 font-mono text-amber-400">{d.endDate}</td>
-                          <td className="py-3 px-4 text-slate-400">
+                          <td className="py-3 px-4 font-bold text-black ">{d.lord} Major Cycle</td>
+                          <td className="py-3 px-4 font-mono text-amber-700">{d.startDate}</td>
+                          <td className="py-3 px-4 font-mono text-amber-700">{d.endDate}</td>
+                          <td className="py-3 px-4 text-slate-600">
                             {d.subPeriods ? d.subPeriods.map((sp: any) => `${sp.lord} (${sp.startDate} to ${sp.endDate})`).slice(0, 3).join(", ") + "..." : "—"}
                           </td>
                         </tr>
@@ -795,44 +787,44 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-8-placidus-cusps">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Shield className="w-4 h-4" />
                     JH8: Placidus House Cusp Coordinates & Lords
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">1-12 House Boundaries</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">1-12 House Boundaries</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-medium">Cusp</th>
                         <th className="py-3 px-4 font-medium">Sign (Zodiac)</th>
                         <th className="py-3 px-4 font-medium">Sign Degree</th>
                         <th className="py-3 px-4 font-medium">Absolute Longitude</th>
-                        <th className="py-3 px-4 font-medium text-amber-500">Sign Lord</th>
-                        <th className="py-3 px-4 font-medium text-indigo-400">Star Lord (Nakshatra)</th>
-                        <th className="py-3 px-4 font-medium text-emerald-400">Sub Lord</th>
-                        <th className="py-3 px-4 font-medium text-slate-400">Sub-Sub Lord</th>
+                        <th className="py-3 px-4 font-medium text-amber-800">Sign Lord</th>
+                        <th className="py-3 px-4 font-medium text-indigo-700">Star Lord (Nakshatra)</th>
+                        <th className="py-3 px-4 font-medium text-emerald-700">Sub Lord</th>
+                        <th className="py-3 px-4 font-medium text-slate-600">Sub-Sub Lord</th>
                       </tr>
                     </thead>
                     <tbody>
                       {kpCusps && kpCusps.cusps ? (
                         kpCusps.cusps.map((c: any) => (
                           <tr key={c.houseNumber} className={tableRowStyle}>
-                            <td className="py-3 px-4 font-mono font-bold text-slate-200">Cusp {c.houseNumber}</td>
-                            <td className="py-3 px-4 font-mono font-bold text-amber-400">{c.sign}</td>
+                            <td className="py-3 px-4 font-mono font-bold text-slate-900">Cusp {c.houseNumber}</td>
+                            <td className="py-3 px-4 font-mono font-bold text-amber-700">{c.sign}</td>
                             <td className="py-3 px-4 font-mono">{formatDegree(c.degree)}</td>
-                            <td className="py-3 px-4 font-mono text-slate-500">{c.longitude.toFixed(2)}°</td>
-                            <td className="py-3 px-4 font-mono text-amber-400/90">{c.signLord || "—"}</td>
-                            <td className="py-3 px-4 font-mono text-indigo-400">{c.starLord}</td>
-                            <td className="py-3 px-4 font-mono text-emerald-400 font-semibold">{c.subLord}</td>
-                            <td className="py-3 px-4 font-mono text-slate-500">{c.subSubLord || "Saturn"}</td>
+                            <td className="py-3 px-4 font-mono text-slate-700">{c.longitude.toFixed(2)}°</td>
+                            <td className="py-3 px-4 font-mono text-amber-700/90">{c.signLord || "—"}</td>
+                            <td className="py-3 px-4 font-mono text-indigo-700">{c.starLord}</td>
+                            <td className="py-3 px-4 font-mono text-emerald-700 font-semibold">{c.subLord}</td>
+                            <td className="py-3 px-4 font-mono text-slate-700">{c.subSubLord || "Saturn"}</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={8} className="py-8 text-center text-slate-500">Fetching raw Placidus cusp coordinates...</td>
+                          <td colSpan={8} className="py-8 text-center text-slate-700">Fetching raw Placidus cusp coordinates...</td>
                         </tr>
                       )}
                     </tbody>
@@ -845,24 +837,24 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-9-kp-sublords">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Workflow className="w-4 h-4" />
                     JH9: KP Planetary Sub-Lords & Coordinates
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Vedic Stella Ratios</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Vedic Stella Ratios</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-medium">Planet</th>
                         <th className="py-3 px-4 font-medium">Sign (Zodiac)</th>
                         <th className="py-3 px-4 font-medium">Degree</th>
                         <th className="py-3 px-4 font-medium">Occupied House</th>
-                        <th className="py-3 px-4 font-medium text-amber-500">Sign Lord</th>
-                        <th className="py-3 px-4 font-medium text-indigo-400">Star Lord (Nakshatra)</th>
-                        <th className="py-3 px-4 font-medium text-emerald-400">Sub Lord</th>
+                        <th className="py-3 px-4 font-medium text-amber-800">Sign Lord</th>
+                        <th className="py-3 px-4 font-medium text-indigo-700">Star Lord (Nakshatra)</th>
+                        <th className="py-3 px-4 font-medium text-emerald-700">Sub Lord</th>
                         <th className="py-3 px-4 font-medium">Motion Status</th>
                       </tr>
                     </thead>
@@ -870,25 +862,25 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                       {kpChart && kpChart.planets ? (
                         kpChart.planets.map((p: any) => (
                           <tr key={p.name} className={tableRowStyle}>
-                            <td className="py-3 px-4 font-bold text-white">{p.name}</td>
-                            <td className="py-3 px-4 font-mono text-amber-400">{p.sign}</td>
+                            <td className="py-3 px-4 font-bold text-black">{p.name}</td>
+                            <td className="py-3 px-4 font-mono text-amber-700">{p.sign}</td>
                             <td className="py-3 px-4 font-mono">{formatDegree(p.degree)}</td>
-                            <td className="py-3 px-4 font-mono text-slate-300">House {p.house}</td>
-                            <td className="py-3 px-4 font-mono text-amber-400/90">{p.signLord || "—"}</td>
-                            <td className="py-3 px-4 font-mono text-indigo-400">{p.starLord}</td>
-                            <td className="py-3 px-4 font-mono text-emerald-400 font-semibold">{p.subLord}</td>
+                            <td className="py-3 px-4 font-mono text-slate-800">House {p.house}</td>
+                            <td className="py-3 px-4 font-mono text-amber-700/90">{p.signLord || "—"}</td>
+                            <td className="py-3 px-4 font-mono text-indigo-700">{p.starLord}</td>
+                            <td className="py-3 px-4 font-mono text-emerald-700 font-semibold">{p.subLord}</td>
                             <td className="py-3 px-4 font-mono">
                               {p.isRetrograde ? (
-                                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[10px] font-bold">RETROGRADE</span>
+                                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-800 text-[10px] font-bold">RETROGRADE</span>
                               ) : (
-                                <span className="text-slate-500 text-[10px]">DIRECT</span>
+                                <span className="text-slate-700 text-[10px]">DIRECT</span>
                               )}
                             </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={8} className="py-8 text-center text-slate-500">Fetching planetary sub-lords and sidereal degrees...</td>
+                          <td colSpan={8} className="py-8 text-center text-slate-700">Fetching planetary sub-lords and sidereal degrees...</td>
                         </tr>
                       )}
                     </tbody>
@@ -901,38 +893,38 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-10-planet-significators">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Activity className="w-4 h-4" />
                     JH10: KP Planet-Level Significators
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Stellar Strength Levels</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Stellar Strength Levels</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
-                        <th className="py-3 px-4 font-semibold text-amber-500">Level A (Strongest)</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-400">Level B (Medium)</th>
-                        <th className="py-3 px-4 font-semibold text-emerald-400">Level C (Mild)</th>
-                        <th className="py-3 px-4 font-semibold text-slate-400">Level D (Supporting)</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Level A (Strongest)</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-700">Level B (Medium)</th>
+                        <th className="py-3 px-4 font-semibold text-emerald-700">Level C (Mild)</th>
+                        <th className="py-3 px-4 font-semibold text-slate-600">Level D (Supporting)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {kpSignificators && kpSignificators.planets ? (
                         Object.entries(kpSignificators.planets).map(([planet, sigs]: [string, any]) => (
                           <tr key={planet} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-bold text-white">{planet}</td>
-                            <td className="py-2.5 px-4 font-mono font-bold text-amber-400">{(sigs.levelA || []).join(", ") || "—"}</td>
-                            <td className="py-2.5 px-4 font-mono text-indigo-400">{(sigs.levelB || []).join(", ") || "—"}</td>
-                            <td className="py-2.5 px-4 font-mono text-emerald-400">{(sigs.levelC || []).join(", ") || "—"}</td>
-                            <td className="py-2.5 px-4 font-mono text-slate-500">{(sigs.levelD || []).join(", ") || "—"}</td>
+                            <td className="py-2.5 px-4 font-bold text-black">{planet}</td>
+                            <td className="py-2.5 px-4 font-mono font-bold text-amber-700">{(sigs.levelA || []).join(", ") || "—"}</td>
+                            <td className="py-2.5 px-4 font-mono text-indigo-700">{(sigs.levelB || []).join(", ") || "—"}</td>
+                            <td className="py-2.5 px-4 font-mono text-emerald-700">{(sigs.levelC || []).join(", ") || "—"}</td>
+                            <td className="py-2.5 px-4 font-mono text-slate-700">{(sigs.levelD || []).join(", ") || "—"}</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-500">Retrieving planet stellar significations matrix...</td>
+                          <td colSpan={5} className="py-8 text-center text-slate-700">Retrieving planet stellar significations matrix...</td>
                         </tr>
                       )}
                     </tbody>
@@ -945,32 +937,32 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-11-house-significators">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Shield className="w-4 h-4" />
                     JH11: KP House-Level Significators
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Placidus Boundary Mapping</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Placidus Boundary Mapping</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">House Cusp</th>
-                        <th className="py-3 px-4 font-semibold text-amber-500 font-mono">Signifying Planets</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800 font-mono">Signifying Planets</th>
                       </tr>
                     </thead>
                     <tbody>
                       {kpSignificators && kpSignificators.cusps ? (
                         Object.entries(kpSignificators.cusps).map(([house, planets]: [string, any]) => (
                           <tr key={house} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-mono font-bold text-white">Cusp {house}</td>
-                            <td className="py-2.5 px-4 font-mono font-semibold text-amber-400">{(planets || []).join(", ") || "None"}</td>
+                            <td className="py-2.5 px-4 font-mono font-bold text-black">Cusp {house}</td>
+                            <td className="py-2.5 px-4 font-mono font-semibold text-amber-700">{(planets || []).join(", ") || "None"}</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={2} className="py-8 text-center text-slate-500">Retrieving house boundary significators...</td>
+                          <td colSpan={2} className="py-8 text-center text-slate-700">Retrieving house boundary significators...</td>
                         </tr>
                       )}
                     </tbody>
@@ -985,20 +977,20 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-12-jaimini-karakas">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Award className="w-4 h-4" />
                     JH12: Jaimini Chara Karakas
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Seven-Fold Status</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Seven-Fold Status</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet Name</th>
-                        <th className="py-3 px-4 font-semibold text-amber-500">Degree within Sign</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-400">Jaimini Chara Karaka</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Degree within Sign</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-700">Jaimini Chara Karaka</th>
                         <th className="py-3 px-4 font-semibold">Significance</th>
                       </tr>
                     </thead>
@@ -1033,10 +1025,10 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                           const karaka = karakaNames[idx] || "—";
                           return (
                             <tr key={p.name} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
-                              <td className="py-2.5 px-4 font-mono text-amber-400">{formatDegree(p.degree)}</td>
-                              <td className="py-2.5 px-4 font-semibold text-indigo-400">{karaka}</td>
-                              <td className="py-2.5 px-4 text-slate-400">{descMap[karaka] || "—"}</td>
+                              <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
+                              <td className="py-2.5 px-4 font-mono text-amber-700">{formatDegree(p.degree)}</td>
+                              <td className="py-2.5 px-4 font-semibold text-indigo-700">{karaka}</td>
+                              <td className="py-2.5 px-4 text-slate-600">{descMap[karaka] || "—"}</td>
                             </tr>
                           );
                         });
@@ -1051,20 +1043,20 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-13-arudhas-padas">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Compass className="w-4 h-4" />
                     JH13: Jaimini Arudhas & Padas
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Zodiac Reflective Points</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Zodiac Reflective Points</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Reference House</th>
-                        <th className="py-3 px-4 font-semibold text-amber-500">Arudha Pada Label</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-400">Placed Sign</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Arudha Pada Label</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-700">Placed Sign</th>
                         <th className="py-3 px-4 font-semibold">Significance</th>
                       </tr>
                     </thead>
@@ -1087,16 +1079,16 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                           };
                           return (
                             <tr key={key} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-mono font-bold text-white">House {key.replace("A", "") || "1"}</td>
-                              <td className="py-2.5 px-4 font-mono font-semibold text-amber-400">{key}</td>
-                              <td className="py-2.5 px-4 font-mono text-indigo-400">{a.sign}</td>
-                              <td className="py-2.5 px-4 text-slate-400">{sigMap[key] || "Arudha reflection."}</td>
+                              <td className="py-2.5 px-4 font-mono font-bold text-black">House {key.replace("A", "") || "1"}</td>
+                              <td className="py-2.5 px-4 font-mono font-semibold text-amber-700">{key}</td>
+                              <td className="py-2.5 px-4 font-mono text-indigo-700">{a.sign}</td>
+                              <td className="py-2.5 px-4 text-slate-600">{sigMap[key] || "Arudha reflection."}</td>
                             </tr>
                           );
                         })
                       ) : (
                         <tr>
-                          <td colSpan={4} className="py-8 text-center text-slate-500">No raw Arudha padas found in this profile.</td>
+                          <td colSpan={4} className="py-8 text-center text-slate-700">No raw Arudha padas found in this profile.</td>
                         </tr>
                       )}
                     </tbody>
@@ -1111,21 +1103,21 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-14-western-tropical">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Compass className="w-4 h-4" />
                     JH14: Tropical Planetary Placements
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Western Tropical Zodiac</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Western Tropical Zodiac</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-medium">Planet</th>
-                        <th className="py-3 px-4 font-medium text-amber-500">Sign (Tropical)</th>
+                        <th className="py-3 px-4 font-medium text-amber-800">Sign (Tropical)</th>
                         <th className="py-3 px-4 font-medium">Degree</th>
-                        <th className="py-3 px-4 font-medium text-indigo-400">House Placed</th>
+                        <th className="py-3 px-4 font-medium text-indigo-700">House Placed</th>
                         <th className="py-3 px-4 font-medium">Element</th>
                         <th className="py-3 px-4 font-medium">Modality</th>
                         <th className="py-3 px-4 font-medium">Motion</th>
@@ -1135,24 +1127,24 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                       {westernChart && westernChart.planets ? (
                         westernChart.planets.map((p: any) => (
                           <tr key={p.name} className={tableRowStyle}>
-                            <td className="py-3 px-4 font-bold text-white">{p.name}</td>
-                            <td className="py-3 px-4 font-mono font-bold text-amber-400">{p.sign}</td>
+                            <td className="py-3 px-4 font-bold text-black">{p.name}</td>
+                            <td className="py-3 px-4 font-mono font-bold text-amber-700">{p.sign}</td>
                             <td className="py-3 px-4 font-mono">{formatDegree(p.degree)}</td>
-                            <td className="py-3 px-4 font-mono text-indigo-400">House {p.house}</td>
+                            <td className="py-3 px-4 font-mono text-indigo-700">House {p.house}</td>
                             <td className="py-3 px-4 font-medium">{p.element || "Fire"}</td>
                             <td className="py-3 px-4 font-medium">{p.modality || "Cardinal"}</td>
-                            <td className="py-3 px-4 font-mono text-xs">
+                            <td className="py-3 px-4 font-mono ">
                               {p.isRetrograde ? (
-                                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[10px] font-bold">RETROGRADE</span>
+                                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-800 text-[10px] font-bold">RETROGRADE</span>
                               ) : (
-                                <span className="text-slate-500 text-[10px]">DIRECT</span>
+                                <span className="text-slate-700 text-[10px]">DIRECT</span>
                               )}
                             </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={7} className="py-8 text-center text-slate-500">Retrieving raw Western tropical chart coordinates...</td>
+                          <td colSpan={7} className="py-8 text-center text-slate-700">Retrieving raw Western tropical chart coordinates...</td>
                         </tr>
                       )}
                     </tbody>
@@ -1165,38 +1157,38 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-15-western-aspects">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Workflow className="w-4 h-4" />
                     JH15: Tropical Planetary Aspects Matrix
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Exact Orbs</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Exact Orbs</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Primary Planet</th>
-                        <th className="py-3 px-4 font-semibold text-amber-500">Aspect Type</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-400">Target Planet</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Aspect Type</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-700">Target Planet</th>
                         <th className="py-3 px-4 font-semibold">Aspect Angle (°)</th>
-                        <th className="py-3 px-4 font-semibold text-emerald-400">Orb Offset Angle</th>
+                        <th className="py-3 px-4 font-semibold text-emerald-700">Orb Offset Angle</th>
                       </tr>
                     </thead>
                     <tbody>
                       {westernChart && westernChart.aspects ? (
                         westernChart.aspects.map((asp: any, idx: number) => (
                           <tr key={idx} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-bold text-white">{asp.planet1}</td>
-                            <td className="py-2.5 px-4 font-semibold text-amber-400 font-mono">{asp.type}</td>
-                            <td className="py-2.5 px-4 font-bold text-indigo-400">{asp.planet2}</td>
+                            <td className="py-2.5 px-4 font-bold text-black">{asp.planet1}</td>
+                            <td className="py-2.5 px-4 font-semibold text-amber-700 font-mono">{asp.type}</td>
+                            <td className="py-2.5 px-4 font-bold text-indigo-700">{asp.planet2}</td>
                             <td className="py-2.5 px-4 font-mono">{asp.angle || "0"}°</td>
-                            <td className="py-2.5 px-4 font-mono text-emerald-400">{asp.orb?.toFixed(2)}°</td>
+                            <td className="py-2.5 px-4 font-mono text-emerald-700">{asp.orb?.toFixed(2)}°</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-500">Retrieving raw Western aspect grids...</td>
+                          <td colSpan={5} className="py-8 text-center text-slate-700">Retrieving raw Western aspect grids...</td>
                         </tr>
                       )}
                     </tbody>
@@ -1211,29 +1203,29 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-16-tajik-varshaphal">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Compass className="w-4 h-4" />
                     JH16: Tajik Varshaphal Planetary Coordinates
                   </h3>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono text-slate-400">Target Age:</span>
+                    <span className="text-[10px] font-mono text-slate-600">Target Age:</span>
                     <input 
                       type="number" 
                       value={targetAge} 
                       onChange={(e) => setTargetAge(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="w-12 bg-slate-950 border border-slate-800 rounded px-1 text-xs text-center font-mono text-amber-500 focus:outline-none"
+                      className="w-12 bg-slate-950 border border-slate-800 rounded px-1  text-center font-mono text-amber-800 focus:outline-none"
                     />
                   </div>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet / sensitive Point</th>
-                        <th className="py-3 px-4 font-semibold text-amber-500">Varsha Sign</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Varsha Sign</th>
                         <th className="py-3 px-4 font-semibold">Progressed Degree</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-400">Varsha House</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-700">Varsha House</th>
                         <th className="py-3 px-4 font-semibold">Sanskrit Designation</th>
                       </tr>
                     </thead>
@@ -1245,7 +1237,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         const munthaSignName = zodiacSigns[munthaSignIdx];
                         const munthaHouseNumber = (munthaSignIdx - natalAscIdx + 12) % 12 + 1;
                         return (
-                          <tr className="bg-amber-500/5 font-semibold text-amber-400">
+                          <tr className="bg-amber-500/5 font-semibold text-amber-700">
                             <td className="py-2.5 px-4 font-bold">The Muntha Point</td>
                             <td className="py-2.5 px-4 font-mono font-bold">{munthaSignName}</td>
                             <td className="py-2.5 px-4 font-mono">{formatDegree(astrologyData.lagna.degree)}</td>
@@ -1262,11 +1254,11 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         const progressedHouse = (p.house + targetAge - 1) % 12 + 1;
                         return (
                           <tr key={p.name} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
-                            <td className="py-2.5 px-4 font-mono text-amber-500">{progressedSign}</td>
+                            <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
+                            <td className="py-2.5 px-4 font-mono text-amber-800">{progressedSign}</td>
                             <td className="py-2.5 px-4 font-mono">{formatDegree(p.degree)}</td>
-                            <td className="py-2.5 px-4 font-mono text-indigo-400">House {progressedHouse}</td>
-                            <td className="py-2.5 px-4 text-slate-500">{p.name} Progressed</td>
+                            <td className="py-2.5 px-4 font-mono text-indigo-700">House {progressedHouse}</td>
+                            <td className="py-2.5 px-4 text-slate-700">{p.name} Progressed</td>
                           </tr>
                         );
                       })}
@@ -1280,15 +1272,15 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-17-tajik-harshabala">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Activity className="w-4 h-4" />
                     JH17: Tajik Harsha Balas (4-Fold Strength)
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Persian Delight-Point System</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Persian Delight-Point System</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
@@ -1296,7 +1288,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         <th className="py-3 px-4 font-semibold">Second Strength (Temporal Delight)</th>
                         <th className="py-3 px-4 font-semibold">Third Strength (Gender Delight)</th>
                         <th className="py-3 px-4 font-semibold">Fourth Strength (Aspect Delight)</th>
-                        <th className="py-3 px-4 font-semibold text-center text-amber-500">Total Harsha Score</th>
+                        <th className="py-3 px-4 font-semibold text-center text-amber-800">Total Harsha Score</th>
                         <th className="py-3 px-4 font-semibold">Strength Ratio (%)</th>
                       </tr>
                     </thead>
@@ -1315,13 +1307,13 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         const total = scores.reduce((a, b) => a + b, 0);
                         return (
                           <tr key={p.name} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
+                            <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
                             <td className="py-2.5 px-4 font-mono">{scores[0] === 1 ? "Present (+1)" : "Absent (0)"}</td>
                             <td className="py-2.5 px-4 font-mono">{scores[1] === 1 ? "Present (+1)" : "Absent (0)"}</td>
                             <td className="py-2.5 px-4 font-mono">{scores[2] === 1 ? "Present (+1)" : "Absent (0)"}</td>
                             <td className="py-2.5 px-4 font-mono">{scores[3] === 1 ? "Present (+1)" : "Absent (0)"}</td>
-                            <td className="py-2.5 px-4 font-mono text-center font-bold text-amber-400">{total} / 4</td>
-                            <td className="py-2.5 px-4 font-mono font-semibold text-emerald-400">{(total / 4 * 100).toFixed(0)}%</td>
+                            <td className="py-2.5 px-4 font-mono text-center font-bold text-amber-700">{total} / 4</td>
+                            <td className="py-2.5 px-4 font-mono font-semibold text-emerald-700">{(total / 4 * 100).toFixed(0)}%</td>
                           </tr>
                         );
                       })}
@@ -1337,20 +1329,20 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-18-lalkitab-houses">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Compass className="w-4 h-4" />
                     JH18: Lal Kitab Planetary Houses & Placements
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Aries Fixed Ascendant (1)</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Aries Fixed Ascendant (1)</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
-                        <th className="py-3 px-4 font-semibold text-amber-500">Sign Placement (Sidereal)</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-400">Lal Kitab House Placed</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Sign Placement (Sidereal)</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-700">Lal Kitab House Placed</th>
                         <th className="py-3 px-4 font-semibold">House Lord</th>
                         <th className="py-3 px-4 font-semibold">Companion Planets in Same LKB House</th>
                       </tr>
@@ -1371,11 +1363,11 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                           const lords = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
                           return (
                             <tr key={p.name} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
-                              <td className="py-2.5 px-4 font-mono text-slate-400">{p.sign}</td>
-                              <td className="py-2.5 px-4 font-mono font-bold text-amber-400">House {lkHouse}</td>
-                              <td className="py-2.5 px-4 font-mono text-indigo-400">{lords[p.signIndex]}</td>
-                              <td className="py-2.5 px-4 text-slate-400">{companions.join(", ") || "Alone in House"}</td>
+                              <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
+                              <td className="py-2.5 px-4 font-mono text-slate-600">{p.sign}</td>
+                              <td className="py-2.5 px-4 font-mono font-bold text-amber-700">House {lkHouse}</td>
+                              <td className="py-2.5 px-4 font-mono text-indigo-700">{lords[p.signIndex]}</td>
+                              <td className="py-2.5 px-4 text-slate-600">{companions.join(", ") || "Alone in House"}</td>
                             </tr>
                           );
                         });
@@ -1390,20 +1382,20 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-19-lalkitab-teva">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
                     <Shield className="w-4 h-4" />
                     JH19: Lal Kitab Teva & Sleeping Planet Status
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-500 font-medium">Dormancy Status (Soye Grah)</span>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Dormancy Status (Soye Grah)</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
-                  <table className="w-full text-left border-collapse text-xs">
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
-                        <th className="py-3 px-4 font-semibold text-amber-500">LKB House</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-400">Sleeping Status (Soye Grah)</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">LKB House</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-700">Sleeping Status (Soye Grah)</th>
                         <th className="py-3 px-4 font-semibold">Teva Category (Horoscope Class)</th>
                         <th className="py-3 px-4 font-semibold">Planetary Nature Baseline</th>
                       </tr>
@@ -1455,13 +1447,13 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
 
                           return (
                             <tr key={p.name} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
+                              <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
                               <td className="py-2.5 px-4 font-mono">House {lkHouse}</td>
-                              <td className={`py-2.5 px-4 font-semibold ${sleepStatus.startsWith("Sleeping") ? "text-amber-500/90" : "text-emerald-400"}`}>
+                              <td className={`py-2.5 px-4 font-semibold ${sleepStatus.startsWith("Sleeping") ? "text-amber-800/90" : "text-emerald-700"}`}>
                                 {sleepStatus}
                               </td>
-                              <td className="py-2.5 px-4 font-mono font-medium text-indigo-400">{tevaCat}</td>
-                              <td className="py-2.5 px-4 text-slate-400">{natures[p.name] || "Dual (Nek/Manda)"}</td>
+                              <td className="py-2.5 px-4 font-mono font-medium text-indigo-700">{tevaCat}</td>
+                              <td className="py-2.5 px-4 text-slate-600">{natures[p.name] || "Dual (Nek/Manda)"}</td>
                             </tr>
                           );
                         });
@@ -1485,7 +1477,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
 
           default:
             return (
-              <div className="p-8 text-center text-slate-500">
+              <div className="p-8 text-center text-slate-700">
                 Unknown raw table system selected.
               </div>
             );

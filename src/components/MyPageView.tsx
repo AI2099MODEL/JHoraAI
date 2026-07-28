@@ -433,9 +433,9 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 
   if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_7", "table_8", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18", "table_20", "table_21", "table_22", "table_23"].includes(tableId)) return null;
   
-  const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
-  const thStyle = "py-2.5 px-3.5 bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white font-mono text-[10.5px] uppercase font-bold tracking-wider border-b border-indigo-900";
-  const tdStyle = "py-2 px-3.5 border-b border-indigo-100/80 text-neutral-900 font-sans font-semibold text-xs";
+  const baseTableStyle = "w-full text-left border-collapse mt-2";
+  const thStyle = "py-2 px-3.5 bg-slate-50 text-slate-800 font-bold font-mono text-[10px] uppercase tracking-wider border-b border-slate-200";
+  const tdStyle = "py-2 px-3.5 border-b border-slate-100 text-black font-sans text-[10px]";
 
   switch (tableId) {
     case "table_1":
@@ -4728,346 +4728,236 @@ export function MyPageView({
         </div>
       ) : activeTab === "vedic" ? (
         <div className="space-y-6">
-          {/* Master Table Index View (JH1 - JH19 Registry) */}
-          <div className={`p-6 rounded-2xl border ${cardStyle} shadow-sm space-y-4`}>
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-indigo-500/10 pb-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-500">
-                    <Sparkles className="w-5 h-5" />
-                  </span>
-                  <h2 className="text-lg font-extrabold text-amber-950 dark:text-amber-200">
-                    My Astro Details (Raw Systems Registry JH1 - JH19)
-                  </h2>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  All 19 raw astrological tables, planetary coordinates, sublords, and divisional systems consolidated into a single master registry.
-                </p>
-              </div>
-            </div>
-
-            <TableIndexView
-              astrologyData={astrologyData}
-              activeUser={activeUser}
-              isDark={isDark}
-            />
-          </div>
+          
 
           {/* Table JH1: Birth Details */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table JH1</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH1: Birth Details & Astronomical Metrics</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_birth_details" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH2: Natal Planets & Longitudes */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table JH2</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH2: Natal Planets & Longitudes Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_planets" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH3: Shadbala Strengths */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table JH3</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH3: Shadbala Strengths Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_shadbala" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH4: Bhava Balas */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table JH4</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH4: Bhava Balas & House Strengths Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_bhava_balas" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH5: Ashtakavarga Bindus */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table JH5</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH5: Ashtakavarga Bindus Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_ashtakavarga" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH6: Divisional Vargas */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table JH6</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH6: Divisional Vargas & Planetary Dignities Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_divisional" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH7: Vimshottari & Yogini Dashas */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table JH7</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH7: Vimshottari & Yogini Dashas Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_vimshottari" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH8: KP Cusps */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">Table JH8</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH8: KP Placidus Cusps & Longitudes Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_cusps" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH9: KP Sublords */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">Table JH9</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH9: KP Planetary Sublords Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_sub_lords" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH10: KP Planet Significators */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">Table JH10</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH10: KP Planet Significators Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_planet_significators" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH11: KP House Significators */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">Table JH11</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH11: KP House Significators Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_house_significators" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH12: Jaimini Chara Karakas */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-purple-400 font-bold uppercase tracking-wider block">Table JH12</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH12: Jaimini Chara Karakas (Raw Registry)</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jaimini_karakas" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH13: Jaimini Arudhas & Chara Dashas */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-purple-400 font-bold uppercase tracking-wider block">Table JH13</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH13: Jaimini Arudhas & Chara Dashas (Raw Registry)</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jaimini_arudhas" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH14: Western Tropical Placidus Coordinates */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-sky-400 font-bold uppercase tracking-wider block">Table JH14</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH14: Western Tropical Placidus Coordinates Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="western_tropical" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH15: Western Planetary Aspects & Harps */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-sky-400 font-bold uppercase tracking-wider block">Table JH15</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH15: Western Planetary Aspects & Harps Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="western_aspects" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH16: Tajik Varshaphal Sahams */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-fuchsia-400 font-bold uppercase tracking-wider block">Table JH16</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH16: Tajik Varshaphal Sahams Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="tajika_varshaphal" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH17: Tajik Varshaphal Harshabala */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-fuchsia-400 font-bold uppercase tracking-wider block">Table JH17</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH17: Tajik Varshaphal Harshabala Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="tajika_harshabala" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH18: Lalkitab Houses & Planetary Placements */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-rose-400 font-bold uppercase tracking-wider block">Table JH18</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH18: Lalkitab Houses & Planetary Placements Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="lalkitab_houses" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH19: Lalkitab Teva Kundli Coordinates */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
-              <span className="font-mono text-[10px] text-rose-400 font-bold uppercase tracking-wider block">Table JH19</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH19: Lalkitab Teva Kundli Coordinates Registry</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="lalkitab_teva" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table 10: Argalas */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table 10</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>Jaimini Planetary Argalas & Obstructions</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_10", null, profile, astrologyData)}
             </div>
           </div>
 
           {/* Table 14: Arudhas */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table 14</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>Jaimini Arudha Padas</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_14", null, profile, astrologyData)}
             </div>
           </div>
 
           {/* Table 15: Sphutas */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table 15</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>Jaimini Sphutas & Special Lagnas</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_15", null, profile, astrologyData)}
             </div>
           </div>
 
           {/* Table 16: Shadbala */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table 16</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>Vedic Shadbala Strengths</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_16", null, profile, astrologyData)}
             </div>
           </div>
 
           {/* Table 17: Sahams */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table 17</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>Jaimini Sahams</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_17", null, profile, astrologyData)}
             </div>
           </div>
 
           {/* Table 18: Vedic Upgrahas */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table 18</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>Vedic Upgrahas (Secondary Shadow Planets)</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_18", null, profile, astrologyData)}
             </div>
           </div>
 
           {/* Table 20: Ashtakavarga Bindus */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table 20</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>Ashtakavarga Bindu Points (SAV / BAV)</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_20", null, profile, astrologyData)}
             </div>
           </div>
 
           {/* Table 21: Bhava Bala */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table 21</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>Bhava Bala (House Strength Analysis)</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_21", null, profile, astrologyData)}
             </div>
           </div>
 
           {/* Table 22: Ishtaphala & Kashtaphala */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table 22</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>Ishtaphala & Kashtaphala (Auspiciousness Index)</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_22", null, profile, astrologyData)}
             </div>
           </div>
 
           {/* Table 23: Jaimini Chara Dasha */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
-              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">Table 23</span>
-              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>JH23: Jaimini Chara Dasha Timeline (User JSON Based)</h3>
-            </div>
-            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <CharaDashaInteractiveTable profile={profile} astrologyData={astrologyData} isDark={isDark} />
             </div>
           </div>
