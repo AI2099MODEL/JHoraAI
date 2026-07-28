@@ -338,6 +338,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH1: Birth Details & Astronomical Metrics
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Parashari Baseline</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -426,6 +437,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH2: Natal Planets Longitudes & Rasi Placements
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Sidereal Placements</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -470,6 +492,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH3: Shadbala Planet Strength Matrix (Shashtiamsas)
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Six-Fold Strength Model</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -524,6 +557,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH4: Bhava Balas (House Strengths)
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">House Boundaries</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -582,6 +626,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH5: Samudhaya Ashtakavarga Points (SAV)
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Binnashtakavarga Matrix</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -701,6 +756,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH7: Vimshottari Mahadasha Timelines
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">120-Year Lunar Cycle</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -741,6 +807,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH8: Placidus House Cusp Coordinates & Lords
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">1-12 House Boundaries</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -791,6 +868,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH9: KP Planetary Sub-Lords & Coordinates
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Vedic Stella Ratios</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -847,6 +935,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH10: KP Planet-Level Significators
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Stellar Strength Levels</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -891,6 +990,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH11: KP House-Level Significators
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Placidus Boundary Mapping</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -931,6 +1041,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH12: Jaimini Chara Karakas
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Seven-Fold Status</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -997,6 +1118,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH13: Jaimini Arudhas & Padas
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Zodiac Reflective Points</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -1057,6 +1189,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH14: Tropical Planetary Placements
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Western Tropical Zodiac</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -1111,6 +1254,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH15: Tropical Planetary Aspects Matrix
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Exact Orbs</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -1164,7 +1318,18 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                       onChange={(e) => setTargetAge(Math.max(1, parseInt(e.target.value) || 1))}
                       className="w-12 bg-slate-950 border border-slate-800 rounded px-1  text-center font-mono text-amber-800 focus:outline-none"
                     />
+                                    <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
                   </div>
+                </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -1226,6 +1391,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH17: Tajik Harsha Balas (4-Fold Strength)
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Persian Delight-Point System</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -1283,6 +1459,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH18: Lal Kitab Planetary Houses & Placements
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Aries Fixed Ascendant (1)</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -1336,6 +1523,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     JH19: Lal Kitab Teva & Sleeping Planet Status
                   </h3>
                   <span className="text-[10px] font-mono text-slate-700 font-medium">Dormancy Status (Soye Grah)</span>
+                                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
@@ -1417,7 +1615,18 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
           case "jhora_personal_details":
             return (
               <div className="space-y-4 animate-fade-in" id="table-26-personal">
-                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH26: Personal & Birth Details</h3></div>
+                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH26: Personal & Birth Details</h3>                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
                 <table className="w-full text-left border-collapse text-black text-[10px]"><tbody><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Full Name</td><td className="py-2.5 px-4">Nitin</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Gender</td><td className="py-2.5 px-4">Male</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Date of Birth</td><td className="py-2.5 px-4">1979-07-16</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Time of Birth</td><td className="py-2.5 px-4">17:42:00</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Place</td><td className="py-2.5 px-4">New Delhi, India</td></tr></tbody></table>
               </div>
             );
