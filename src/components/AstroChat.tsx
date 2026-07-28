@@ -48,7 +48,8 @@ import {
   Moon,
   Sun,
   Orbit,
-  X
+  X,
+  LayoutDashboard
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
@@ -665,6 +666,23 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           
           {/* Main ChatGPT Menu items */}
           <div className="space-y-2">
+            {/* Dashboard Menu Item */}
+            <button
+              onClick={() => {
+                setActiveSubmenuPanel("dashboard");
+                onNavigateMenu?.("ai_assistant", "dashboard");
+                setSidebarOpen(false);
+              }}
+              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
+                activeSubmenuPanel === "dashboard"
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border border-indigo-700 shadow-sm"
+                  : "bg-neutral-50/80 hover:bg-indigo-50/60 text-neutral-800 hover:text-indigo-900 border border-neutral-200/70"
+              }`}
+            >
+              <LayoutDashboard className={`w-4 h-4 shrink-0 ${activeSubmenuPanel === "dashboard" ? "text-white" : "text-indigo-500"}`} />
+              <span className="font-sans tracking-tight">Dashboard</span>
+            </button>
+
             {/* 1. My Journey (Renamed from My Mood Analysis) */}
             <div className="space-y-0.5">
               <button
