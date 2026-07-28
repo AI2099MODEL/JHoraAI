@@ -55,6 +55,8 @@ import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
 import { ConversationService } from "../features/ask/services/ConversationService";
 import moodRules from "../knowledgebase/checklist_engine/mood_analysis_rules.json";
+import HoroscopeDashboard from "./HoroscopeDashboard";
+import { AstroRawTablesView } from "./AstroRawTablesView";
 
 interface AstroChatProps {
   astrologyData: AstrologyData | null;
@@ -101,6 +103,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const [myJourneyExpanded, setMyJourneyExpanded] = useState(false);
   const [myReportsExpanded, setMyReportsExpanded] = useState(false);
   const [activeSubmenuPanel, setActiveSubmenuPanel] = useState<string | null>(null);
+  const [dashboardTab, setDashboardTab] = useState<"tables" | "dashboard">("tables");
 
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [locationName, setLocationName] = useState<string>("Gurugram, India");
@@ -670,7 +673,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
             <button
               onClick={() => {
                 setActiveSubmenuPanel("dashboard");
-                onNavigateMenu?.("dashboard", "jhora_birth_details");
                 setSidebarOpen(false);
               }}
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
@@ -908,19 +910,72 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                 <div className="flex items-center justify-between bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 px-4 py-2.5 rounded-xl border border-indigo-200/80 shadow-2xs">
                   <span className="text-xs font-extrabold text-indigo-950 capitalize tracking-tight flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                    {activeSubmenuPanel === "vedic" ? "My Astro Details" : activeSubmenuPanel.replace(/_/g, " ")}
+                    {activeSubmenuPanel === "vedic" ? "My Astro Details" : activeSubmenuPanel === "dashboard" ? "Astrological Dashboard & Tables" : activeSubmenuPanel.replace(/_/g, " ")}
                   </span>
+                  <div className="flex items-center gap-2">
+                    {activeSubmenuPanel === "dashboard" && (
+                      <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-indigo-200 text-xs">
+                        <button
+                          onClick={() => setDashboardTab("tables")}
+                          className={`px-2.5 py-1 rounded-md font-bold transition-all cursor-pointer ${dashboardTab === "tables" ? "bg-indigo-600 text-white shadow-xs" : "text-neutral-600 hover:text-indigo-600"}`}
+                        >
+                          Raw Tables (JH1-JH19)
+                        </button>
+                        <button
+                          onClick={() => setDashboardTab("dashboard")}
+                          className={`px-2.5 py-1 rounded-md font-bold transition-all cursor-pointer ${dashboardTab === "dashboard" ? "bg-indigo-600 text-white shadow-xs" : "text-neutral-600 hover:text-indigo-600"}`}
+                        >
+                          Charts Dashboard
+                        </button>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => setActiveSubmenuPanel(null)}
+                      className="px-2.5 py-1 text-xs font-bold text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-100 rounded-lg border border-neutral-300 transition-colors shadow-2xs cursor-pointer flex items-center gap-1"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                      Close Panel
+                    </button>
+                  </div>
                 </div>
-                <MyPageView
-                  astrologyData={astrologyData}
-                  activeUser={null}
-                  isDark={false}
-                  containerStyle="bg-white border-neutral-200"
-                  cardStyle="bg-neutral-50 border-neutral-200"
-                  textMuted="text-neutral-500"
-                  activeSubmenuId={activeSubmenuPanel}
-                  onSubmenuSelect={(id) => setActiveSubmenuPanel(id)}
-                />
+                {activeSubmenuPanel === "dashboard" ? (
+                  dashboardTab === "tables" ? (
+                    <AstroRawTablesView
+                      astrologyData={astrologyData}
+                      activeSubmenuId="jhora_birth_details"
+                      isDark={false}
+                      hideHeaders={false}
+                    />
+                  ) : astrologyData ? (
+                    <HoroscopeDashboard
+                      astrologyData={astrologyData}
+                      activeSubTab="dashboard"
+                      setActiveSubTab={() => {}}
+                      selectedVarga="D1"
+                      setSelectedVarga={() => {}}
+                      selectedBavPlanet="Jupiter"
+                      setSelectedBavPlanet={() => {}}
+                      activeDashaSystem="vimshottari"
+                      setActiveDashaSystem={() => {}}
+                      chartStyle="north"
+                    />
+                  ) : (
+                    <div className="p-8 text-center text-sm text-neutral-500 bg-neutral-50 rounded-xl border border-neutral-200">
+                      No chart data available. Please generate or load astrology data.
+                    </div>
+                  )
+                ) : (
+                  <MyPageView
+                    astrologyData={astrologyData}
+                    activeUser={null}
+                    isDark={false}
+                    containerStyle="bg-white border-neutral-200"
+                    cardStyle="bg-neutral-50 border-neutral-200"
+                    textMuted="text-neutral-500"
+                    activeSubmenuId={activeSubmenuPanel}
+                    onSubmenuSelect={(id) => setActiveSubmenuPanel(id)}
+                  />
+                )}
               </div>
             ) : (
               <div className="max-w-2xl mx-auto space-y-6 w-full">

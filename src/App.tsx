@@ -556,7 +556,7 @@ export default function App() {
   };
 
   // Active Navigation Coordinate Graph
-  const [activeMenu, setActiveMenu] = useState<string>("dashboard");
+  const [activeMenu, setActiveMenu] = useState<string>("ai_assistant");
   const [activeSubMenu, setActiveSubMenu] = useState<{ [key: string]: string }>({
     horoscope: "overview",
     charts: "d1_rasi",
@@ -1473,7 +1473,6 @@ export default function App() {
 
   // Navigation configuration representing Phase 10 spec
   const MAIN_MENU_STRUCTURE: MainMenuNode[] = [
-    { id: "dashboard", label: "Dashboard", icon: Compass },
     {
       id: "ai_assistant",
       label: "AI Assistant",
