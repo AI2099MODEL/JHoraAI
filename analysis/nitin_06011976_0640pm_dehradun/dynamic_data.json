@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin_06011976_0640pm_dehradun",
-    "lastUpdated": "2026-07-28T14:18:35.253Z",
+    "lastUpdated": "2026-07-28T14:21:16.883Z",
     "evaluationDate": "2026-07-28",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-28T14:17:03.516Z",
-      "localTime": "2026-07-28T07:17:03-07:00",
+      "utcTime": "2026-07-28T14:21:16.398Z",
+      "localTime": "2026-07-28T07:21:16-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Capricorn",
         "displayName": "Capricorn",
-        "longitude": 281.19
+        "longitude": 281.22
       },
       "currentNakshatra": {
         "id": "Shravana",
@@ -30,15 +30,15 @@
         "displayName": "Moon"
       },
       "currentSubLord": {
-        "id": "Sun",
-        "displayName": "Sun"
+        "id": "Jupiter",
+        "displayName": "Jupiter"
       },
       "moonPhase": {
         "type": "Waxing Gibbous",
         "displayName": "Sukla Purnima",
         "illuminationPercentage": 99.7
       },
-      "moonLongitude": 281.19,
+      "moonLongitude": 281.22,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -69,40 +69,40 @@
         "nakshatra": "Pushya",
         "pada": 3,
         "starLord": "Saturn",
-        "subLord": "Jupiter",
+        "subLord": "Saturn",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "moon": {
         "currentSign": "Capricorn",
-        "longitude": 281.19,
+        "longitude": 281.22,
         "nakshatra": "Shravana",
         "pada": 1,
         "starLord": "Moon",
-        "subLord": "Sun",
+        "subLord": "Jupiter",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mars": {
-        "currentSign": "Virgo",
-        "longitude": 179.7,
+        "currentSign": "Libra",
+        "longitude": 180.4,
         "nakshatra": "Chitra",
-        "pada": 2,
+        "pada": 3,
         "starLord": "Mars",
-        "subLord": "Rahu",
+        "subLord": "Mars",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mercury": {
         "currentSign": "Scorpio",
-        "longitude": 238.24,
+        "longitude": 238.26,
         "nakshatra": "Jyeshtha",
         "pada": 4,
         "starLord": "Mercury",
-        "subLord": "Venus",
+        "subLord": "Sun",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -120,11 +120,11 @@
       },
       "venus": {
         "currentSign": "Leo",
-        "longitude": 135.92,
+        "longitude": 135.93,
         "nakshatra": "Purva Phalguni",
         "pada": 1,
         "starLord": "Venus",
-        "subLord": "Sun",
+        "subLord": "Moon",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -146,7 +146,7 @@
         "nakshatra": "Magha",
         "pada": 4,
         "starLord": "Ketu",
-        "subLord": "Rahu",
+        "subLord": "Mars",
         "retrograde": true,
         "combust": false,
         "stationary": false
@@ -157,7 +157,7 @@
         "nakshatra": "Shatabhisha",
         "pada": 2,
         "starLord": "Rahu",
-        "subLord": "Rahu",
+        "subLord": "Mars",
         "retrograde": true,
         "combust": false,
         "stationary": false
@@ -165,73 +165,60 @@
     }
   },
   "activePeriods": {
-    "mahadasha": "Mercury",
-    "bhukti": "Saturn",
-    "description": "Active period governed by Vimshottari lords: Mercury and Saturn."
+    "mahadasha": "Jupiter",
+    "bhukti": "Mercury",
+    "description": "Active period governed by Vimshottari lords: Jupiter and Mercury."
   },
   "natalRulesEvaluations": [
     {
       "id": "KP_MAR_01",
       "name": "Cuspal Sub Lord of 7th House for Marriage Timing",
-      "isMet": true,
-      "significator": "Ketu",
-      "starLord": "Venus",
-      "signifiedHouses": [
-        5,
-        4,
-        11
-      ],
+      "isMet": false,
+      "significator": "Saturn",
+      "starLord": "Rahu",
+      "signifiedHouses": [],
       "category": "Marriage",
-      "reasoning": "The 7th Cuspal Sub Lord (Ketu) is in the star of Venus, which signifies houses [5, 4, 11]. This is highly favorable as it connects directly with key relationship houses (2, 7, 11), confirming marriage promise."
+      "reasoning": "The 7th Cuspal Sub Lord (Saturn) is in the star of Rahu, which signifies houses []. The linkage is mixed/neutral, suggesting that partnerships will trigger growth and require conscious alignment."
     },
     {
       "id": "KP_CAR_01",
       "name": "10th Cuspal Sub Lord for Career and Profession Sector",
-      "isMet": true,
-      "significator": "Rahu",
-      "starLord": "Jupiter",
-      "signifiedHouses": [
-        9,
-        6
-      ],
+      "isMet": false,
+      "significator": "Mercury",
+      "starLord": "Moon",
+      "signifiedHouses": [],
       "category": "Career",
-      "reasoning": "The 10th Cuspal Sub Lord (Rahu) is in the star of Jupiter, which signifies houses [9, 6]. Direct connection to professional houses [2, 6, 10, 11] triggers high status, stability, and career progress."
+      "reasoning": "The 10th Cuspal Sub Lord (Mercury) is in the star of Moon, which signifies houses []. Standard career promise; suggests career advancement will occur steadily through discipline."
     },
     {
       "id": "KP_FIN_01",
       "name": "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
-      "isMet": true,
+      "isMet": false,
       "significator": "Rahu",
-      "starLord": "Jupiter",
-      "signifiedHouses": [
-        9,
-        6
-      ],
+      "starLord": "Ketu",
+      "signifiedHouses": [],
       "category": "Finance",
-      "reasoning": "The 2nd Cuspal Sub Lord (Rahu) resides in the star of Jupiter, signifying houses [9, 6]. Highly auspicious indicators for wealth accumulation and sound capital gains."
+      "reasoning": "The 2nd Cuspal Sub Lord (Rahu) resides in the star of Ketu, signifying houses []. Requires careful financial budgeting and prudent cash-flow planning."
     },
     {
       "id": "KP_HEA_01",
       "name": "Health and Disease Propensity via 1st and 6th CSL",
-      "isMet": false,
-      "significator": "1st CSL: Mercury, 6th CSL: Rahu",
-      "starLord": "Jupiter",
-      "signifiedHouses": [
-        9,
-        6
-      ],
+      "isMet": true,
+      "significator": "1st CSL: Mercury, 6th CSL: Jupiter",
+      "starLord": "Mercury",
+      "signifiedHouses": [],
       "category": "Health",
-      "reasoning": "The 6th Cuspal Sub Lord (Rahu) is in the star of Jupiter, signifying houses [9, 6]. Alert: Linkage with disease-prone houses (6, 8, 12) suggests keeping a healthy routine."
+      "reasoning": "The 6th Cuspal Sub Lord (Jupiter) is in the star of Mercury, signifying houses []. Auspicious: Low susceptibility to chronic ailments, strong natural immunity."
     },
     {
       "id": "KP_DBA_01",
       "name": "Dasha-Bhukti-Antara (DBA) Event Trigger Validation",
       "isMet": true,
-      "significator": "Mercury - Saturn",
+      "significator": "Jupiter - Mercury",
       "starLord": "Various",
       "signifiedHouses": [],
       "category": "DBA",
-      "reasoning": "Current major active timeline lords are Mahadasha: Mercury and Bhukti: Saturn. These planetary nodes are ripe to trigger events in their designated houses."
+      "reasoning": "Current major active timeline lords are Mahadasha: Jupiter and Bhukti: Mercury. These planetary nodes are ripe to trigger events in their designated houses."
     }
   ],
   "triggeredTransitEvents": [
@@ -241,10 +228,36 @@
       "trigger": "Transit Moon Phase Sukla Purnima",
       "status": "Active",
       "category": "Muhurta",
-      "description": "Daily alignment evaluated successfully under the active planetary energies of Mahadasha lord: Mercury and Bhukti lord: Saturn."
+      "description": "Daily alignment evaluated successfully under the active planetary energies of Mahadasha lord: Jupiter and Bhukti lord: Mercury."
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-28T14:21:16.883Z",
+      "evaluationDate": "2026-07-28",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Health and Disease Propensity via 1st and 6th CSL",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+    },
+    {
+      "timestamp": "2026-07-28T14:21:16.679Z",
+      "evaluationDate": "2026-07-28",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Health and Disease Propensity via 1st and 6th CSL",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+    },
     {
       "timestamp": "2026-07-28T14:18:35.253Z",
       "evaluationDate": "2026-07-28",
@@ -1516,32 +1529,6 @@
     },
     {
       "timestamp": "2026-07-28T10:06:04.992Z",
-      "evaluationDate": "2026-07-28",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-28T10:06:04.264Z",
-      "evaluationDate": "2026-07-28",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-28T10:04:19.979Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
