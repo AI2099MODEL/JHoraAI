@@ -686,6 +686,9 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                   <div className="space-y-1">
                     {[
                       { id: "daily", label: "Daily", theme: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-500 hover:text-white" },
+                      { id: "weekly", label: "Weekly", theme: "bg-orange-50 text-orange-950 border-orange-200 hover:bg-orange-600 hover:text-white" },
+                      { id: "monthly", label: "Monthly", theme: "bg-blue-50 text-blue-950 border-blue-200 hover:bg-blue-600 hover:text-white" },
+                      { id: "long_term", label: "Long Term", theme: "bg-purple-50 text-purple-950 border-purple-200 hover:bg-purple-600 hover:text-white" },
                       { id: "current_dasha", label: "Current Dasha", theme: "bg-emerald-50 text-emerald-950 border-emerald-200 hover:bg-emerald-600 hover:text-white" },
                       { id: "predictions", label: "Predictions", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
                       { id: "future", label: "Future", theme: "bg-cyan-50 text-cyan-950 border-cyan-200 hover:bg-cyan-600 hover:text-white" },
@@ -696,7 +699,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                         key={sub.id}
                         onClick={() => {
                           setActiveSubmenuPanel(sub.id);
-                          onNavigateMenu?.("my_page", sub.id);
+                          onNavigateMenu?.("ai_assistant", sub.id);
                           setSidebarOpen(false);
                         }}
                         className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
@@ -761,7 +764,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                         key={sub.id}
                         onClick={() => {
                           setActiveSubmenuPanel(sub.id);
-                          onNavigateMenu?.("my_page", sub.id);
+                          onNavigateMenu?.("ai_assistant", sub.id);
                           setSidebarOpen(false);
                         }}
                         className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
@@ -787,7 +790,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                         key={sub.id}
                         onClick={() => {
                           setActiveSubmenuPanel(sub.id);
-                          onNavigateMenu?.("my_page", sub.id);
+                          onNavigateMenu?.("ai_assistant", sub.id);
                           setSidebarOpen(false);
                         }}
                         className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
@@ -833,7 +836,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                       key={sub.id}
                       onClick={() => {
                         setActiveSubmenuPanel(sub.id);
-                        onNavigateMenu?.("my_page", sub.id);
+                        onNavigateMenu?.("ai_assistant", sub.id);
                         setSidebarOpen(false);
                       }}
                       className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${

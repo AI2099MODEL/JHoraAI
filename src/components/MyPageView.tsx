@@ -1836,6 +1836,9 @@ const lifeTabs = [
 
 const journeyTabs = [
   { id: "daily", label: "Daily" },
+  { id: "weekly", label: "Weekly" },
+  { id: "monthly", label: "Monthly" },
+  { id: "long_term", label: "Long Term" },
   { id: "current_dasha", label: "Current Dasha" },
   { id: "predictions", label: "Predictions" },
   { id: "future", label: "Future" },
@@ -7389,6 +7392,48 @@ export function MyPageView({
               <h4 className="text-base font-bold text-slate-900">My Life Analysis</h4>
               <p className="text-xs text-slate-600 leading-relaxed font-sans">
                 This section is reserved for your comprehensive life analysis. Custom charts, transit trends, and predictive matrices will reside here.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : activeTab === "weekly" ? (
+        <div className="space-y-6 animate-fade-in">
+          <div className="bg-slate-900/40 border border-slate-200 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
+            <div className="p-3.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">
+              <Calendar className="w-6 h-6" />
+            </div>
+            <div className="space-y-1.5 max-w-sm">
+              <h4 className="text-base font-bold text-slate-900">Weekly Journey</h4>
+              <p className="text-xs text-slate-600 leading-relaxed font-sans">
+                Weekly transit forecasts and focus areas will appear here.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : activeTab === "monthly" ? (
+        <div className="space-y-6 animate-fade-in">
+          <div className="bg-slate-900/40 border border-slate-200 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
+            <div className="p-3.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <Calendar className="w-6 h-6" />
+            </div>
+            <div className="space-y-1.5 max-w-sm">
+              <h4 className="text-base font-bold text-slate-900">Monthly Journey</h4>
+              <p className="text-xs text-slate-600 leading-relaxed font-sans">
+                Monthly astrological transit reports and planetary shifts will appear here.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : activeTab === "long_term" ? (
+        <div className="space-y-6 animate-fade-in">
+          <div className="bg-slate-900/40 border border-slate-200 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
+            <div className="p-3.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
+              <Compass className="w-6 h-6" />
+            </div>
+            <div className="space-y-1.5 max-w-sm">
+              <h4 className="text-base font-bold text-slate-900">Long Term Journey</h4>
+              <p className="text-xs text-slate-600 leading-relaxed font-sans">
+                Long term predictive trends, major dasha shifts, and life milestones will appear here.
               </p>
             </div>
           </div>
