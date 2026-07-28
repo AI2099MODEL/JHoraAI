@@ -441,42 +441,151 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const activeDebugInfo = selectedDebugMsg?.debugInfo || messages[messages.length - 1]?.debugInfo;
 
   return (
-    <div className={`w-full ${isStandalone ? "h-screen border-none rounded-none shadow-none" : "h-[calc(100vh-140px)] min-h-[580px] rounded-2xl border border-neutral-200 shadow-xl"} bg-white text-neutral-800 flex overflow-hidden relative font-sans`}>
+    <div className={`w-full ${isStandalone ? "h-screen border-none rounded-none shadow-none" : "h-[calc(100vh-140px)] min-h-[580px] rounded-2xl border border-neutral-200 shadow-xl"} bg-white text-neutral-800 flex flex-col overflow-hidden relative font-sans`}>
       
-      {/* 1. LEFT SIDEBAR (ChatGPT-style Premium Light Sidebar) */}
-      <div className={`fixed lg:relative inset-y-0 left-0 w-[260px] bg-white border-r border-neutral-200 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
-        
-        {/* Sidebar Header */}
-        <div className="p-3.5 flex items-center justify-between border-b border-neutral-200/60">
-          {/* Logo and toggle controls */}
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-neutral-800 shrink-0" />
+      {/* UNIFIED TOP COMPACT HEADER (Full width across entire app window) */}
+      <div className="h-14 border-b border-neutral-200/80 px-4 flex items-center justify-between bg-white text-neutral-800 shrink-0 z-30">
+        <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
+          {/* Sidebar toggle button (Mobile only) */}
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-1.5 rounded-lg hover:bg-neutral-100 lg:hidden text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer shrink-0"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <Sparkles className="w-5 h-5 text-indigo-600 shrink-0" />
             <span className="font-bold text-xs tracking-tight text-neutral-800 font-sans">JHora AI</span>
           </div>
-          <div className="flex items-center gap-1">
-            <button className="p-1.5 hover:bg-neutral-200/60 rounded-lg text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer">
+
+          <div className="flex items-center gap-0.5 shrink-0">
+            <button className="p-1 hover:bg-neutral-200/60 rounded-lg text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer">
               <Search className="w-3.5 h-3.5" />
             </button>
-            <button className="p-1.5 hover:bg-neutral-200/60 rounded-lg text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer">
+            <button className="p-1 hover:bg-neutral-200/60 rounded-lg text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer">
               <Compass className="w-3.5 h-3.5" />
             </button>
           </div>
+
+          <span className="text-neutral-300 shrink-0">|</span>
+
+          {activeSubmenuPanel ? (
+            <div className="flex items-center gap-2.5 shrink-0">
+              <span className="text-sm font-bold text-neutral-800 capitalize tracking-tight">
+                {activeSubmenuPanel.replace(/_/g, " ")} Module
+              </span>
+            </div>
+          ) : (
+            /* Profile details merged seamlessly as one line without column split */
+            <div className="flex items-center gap-2 overflow-x-auto text-[11px] font-sans text-neutral-600 whitespace-nowrap scrollbar-none py-1 min-w-0">
+              <span className="font-bold text-neutral-800 flex items-center gap-1.5 shrink-0">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block shrink-0"></span>
+                {profileName}
+              </span>
+              <span className="text-neutral-300 shrink-0">|</span>
+              <span className="shrink-0"><strong className="font-semibold text-neutral-500">DOB:</strong> {profileDob} @ {profileTob}</span>
+              <span className="text-neutral-300 shrink-0">|</span>
+              <span className="shrink-0"><strong className="font-semibold text-neutral-500">Place:</strong> {profilePob}</span>
+              <span className="text-neutral-300 shrink-0">|</span>
+              <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-mono text-[10px] font-medium shrink-0">
+                <strong>ANTARA:</strong> {antaraLord} <span className="opacity-40">|</span> <strong>PRANA:</strong> {pranaLord}
+              </span>
+              <span className="text-neutral-300 shrink-0">|</span>
+              <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200/60 font-mono text-[10px] font-medium shrink-0">
+                <strong>TRANSIT MOON NAKSHATRA:</strong> {transitMoonNak} <span className="opacity-40">|</span> <strong>SUB:</strong> {transitMoonSub}
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* New Chat Button */}
-        <div className="px-3.5 py-2.5">
+        <div className="flex items-center gap-2 shrink-0 ml-2">
+          {!activeSubmenuPanel && (
+            /* Current Date, Live Time & Location details pill */
+            <div className="hidden lg:flex items-center gap-2 bg-neutral-50 border border-neutral-200/80 px-3 py-1.5 rounded-full text-xs font-medium text-neutral-700 shadow-2xs">
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                <span className="font-semibold text-neutral-800">
+                  {currentDateTime.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                </span>
+                <span className="text-neutral-300">|</span>
+                <span className="font-mono text-indigo-600 font-bold text-[11px] tracking-wide">
+                  {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                </span>
+              </div>
+              <span className="text-neutral-300">|</span>
+              <div className="flex items-center gap-1.5 text-neutral-700">
+                <MapPin className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                <span className="font-medium text-neutral-800 truncate max-w-[120px]">
+                  {locationLoading ? "Locating..." : locationName}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {onCloseStandalone && (
+            <button
+              onClick={onCloseStandalone}
+              className="hidden sm:flex items-center gap-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border border-neutral-200 shrink-0"
+              title="Return to JHora Astrology Dashboard"
+            >
+              <ChevronRight className="w-3.5 h-3.5 rotate-180" />
+              <span>Return to Dashboard</span>
+            </button>
+          )}
+
           <button 
             onClick={() => {
-              setMessages([]);
-              setSelectedDebugMsg(null);
+              window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
             }}
-            className="flex items-center gap-2 bg-neutral-200/40 hover:bg-neutral-200/75 border border-neutral-300/20 px-3 py-2 rounded-xl text-xs font-semibold w-full text-left text-neutral-800 transition-colors group cursor-pointer"
+            className="flex items-center gap-1.5 border border-neutral-200 p-1.5 sm:px-2.5 sm:py-1.5 rounded-full text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition-all cursor-pointer bg-white group shrink-0"
+            title="Open full page in a new window"
           >
-            <MessageSquare className="w-4 h-4 text-neutral-500" />
-            <span>New chat</span>
-            <Plus className="w-3.5 h-3.5 ml-auto text-neutral-400 group-hover:text-neutral-700" />
+            <ExternalLink className="w-3.5 h-3.5 group-hover:scale-105 transition-transform text-[#5c4df2]" />
+            <span className="hidden md:inline">New Window</span>
+          </button>
+
+          <button 
+            onClick={() => {
+              alert("Share Link: Astrological conversation state serialized securely.");
+            }}
+            className="flex items-center gap-1.5 border border-neutral-200 p-1.5 sm:px-2.5 sm:py-1.5 rounded-full text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition-all cursor-pointer bg-white shrink-0"
+            title="Share conversation"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Share</span>
+          </button>
+
+          <button
+            onClick={clearChat}
+            title="Reset Conversation"
+            className="p-1.5 rounded-full border border-neutral-200 bg-transparent hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer shrink-0"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
+      </div>
+
+      {/* MAIN CONTAINER (Sidebar + Center Workspace) */}
+      <div className="flex-1 flex overflow-hidden relative">
+        
+        {/* 1. LEFT SIDEBAR */}
+        <div className={`fixed lg:relative inset-y-0 left-0 w-[260px] bg-white border-r border-neutral-200 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+          
+          {/* New Chat Button */}
+          <div className="px-3.5 py-2.5">
+            <button 
+              onClick={() => {
+                setMessages([]);
+                setSelectedDebugMsg(null);
+              }}
+              className="flex items-center gap-2 bg-neutral-200/40 hover:bg-neutral-200/75 border border-neutral-300/20 px-3 py-2 rounded-xl text-xs font-semibold w-full text-left text-neutral-800 transition-colors group cursor-pointer"
+            >
+              <MessageSquare className="w-4 h-4 text-neutral-500" />
+              <span>New chat</span>
+              <Plus className="w-3.5 h-3.5 ml-auto text-neutral-400 group-hover:text-neutral-700" />
+            </button>
+          </div>
 
         {/* Sidebar Navigation Entries */}
         <div className="flex-1 overflow-y-auto px-2 py-1 space-y-4 scrollbar-thin">
@@ -676,116 +785,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
       {/* 2. CENTER WORKSPACE (ChatGPT main screen - Pure White Background) */}
       <div className="flex-1 flex flex-col h-full overflow-hidden bg-white">
-        
-        {/* TOP COMPACT HEADER */}
-        <div className="h-14 border-b border-neutral-200/80 px-4 flex items-center justify-between bg-white text-neutral-800">
-          <div className="flex items-center gap-3">
-            {/* Sidebar toggle button (Mobile only) */}
-            <button 
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-1.5 rounded-lg hover:bg-neutral-100 lg:hidden text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-
-            {activeSubmenuPanel ? (
-              <div className="flex items-center gap-2.5">
-                <span className="text-sm font-bold text-neutral-800 capitalize tracking-tight">
-                  {activeSubmenuPanel.replace(/_/g, " ")} Module
-                </span>
-              </div>
-            ) : (
-              /* Profile details in one line in top menu header */
-              <div className="flex items-center gap-2 overflow-x-auto text-[11px] font-sans text-neutral-600 whitespace-nowrap scrollbar-none py-1 max-w-[calc(100vw-360px)]">
-                <span className="font-bold text-neutral-800 flex items-center gap-1.5 shrink-0">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block shrink-0"></span>
-                  {profileName}
-                </span>
-                <span className="text-neutral-300 shrink-0">|</span>
-                <span className="shrink-0"><strong className="font-semibold text-neutral-500">DOB:</strong> {profileDob} @ {profileTob}</span>
-                <span className="text-neutral-300 shrink-0">|</span>
-                <span className="shrink-0"><strong className="font-semibold text-neutral-500">Place:</strong> {profilePob}</span>
-                <span className="text-neutral-300 shrink-0">|</span>
-                <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-mono text-[10px] font-medium shrink-0">
-                  <strong>ANTARA:</strong> {antaraLord} <span className="opacity-40">|</span> <strong>PRANA:</strong> {pranaLord}
-                </span>
-                <span className="text-neutral-300 shrink-0">|</span>
-                <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200/60 font-mono text-[10px] font-medium shrink-0">
-                  <strong>TRANSIT MOON NAKSHATRA:</strong> {transitMoonNak} <span className="opacity-40">|</span> <strong>SUB:</strong> {transitMoonSub}
-                </span>
-              </div>
-            )}
-
-
-          </div>
-
-          <div className="flex items-center gap-2">
-            {!activeSubmenuPanel && (
-              /* Current Date, Live Time & Location details pill */
-              <div className="flex items-center gap-2 bg-neutral-50 border border-neutral-200/80 px-3 py-1.5 rounded-full text-xs font-medium text-neutral-700 shadow-2xs">
-                <div className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                  <span className="font-semibold text-neutral-800">
-                    {currentDateTime.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                  </span>
-                  <span className="text-neutral-300">|</span>
-                  <span className="font-mono text-indigo-600 font-bold text-[11px] tracking-wide">
-                    {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit", second: "2-digit" })}
-                  </span>
-                </div>
-                <span className="text-neutral-300">|</span>
-                <div className="flex items-center gap-1.5 text-neutral-700">
-                  <MapPin className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                  <span className="font-medium text-neutral-800">
-                    {locationLoading ? "Locating..." : locationName}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {onCloseStandalone && (
-              <button
-                onClick={onCloseStandalone}
-                className="flex items-center gap-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border border-neutral-200"
-                title="Return to JHora Astrology Dashboard"
-              >
-                <ChevronRight className="w-3.5 h-3.5 rotate-180" />
-                <span>Return to Dashboard</span>
-              </button>
-            )}
-
-            <button 
-              onClick={() => {
-                window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
-              }}
-              className="flex items-center gap-1.5 border border-neutral-200 px-3 py-1.5 rounded-full text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition-all cursor-pointer bg-white group"
-              title="Open full page in a new window. Note: If you get a 403 error in the preview sandbox, please use the 'Open in new tab' button at the top-right of AI Studio."
-            >
-              <ExternalLink className="w-3.5 h-3.5 group-hover:scale-105 transition-transform text-[#5c4df2]" />
-              <span className="hidden sm:inline">Open in New Window</span>
-            </button>
-
-            <button 
-              onClick={() => {
-                alert("Share Link: Astrological conversation state serialized securely. Ready to share with your personal circle!");
-              }}
-              className="flex items-center gap-1.5 border border-neutral-200 px-3 py-1.5 rounded-full text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition-all cursor-pointer bg-white"
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Share</span>
-            </button>
-
-            <button
-              onClick={clearChat}
-              title="Reset Conversation"
-              className="p-2 rounded-full border border-neutral-200 bg-transparent hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
-
 
         {/* CONVERSATION AREA OR SUBMENU DETAILS PANEL */}
         <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8 space-y-6 scrollbar-thin">
@@ -1016,9 +1015,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           </div>
         </div>
       </div>
-
-
-
     </div>
-  );
+  </div>
+);
 }
