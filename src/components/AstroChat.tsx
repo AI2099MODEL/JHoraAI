@@ -1011,30 +1011,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
               </button>
             </form>
 
-            {/* ChatGPT Disclaimer */}
-            <div className="text-center text-[10px] text-neutral-400 font-sans">
-              JHora AI can make mistakes. Verify important astrological information.
-            </div>
 
-            {/* Profile details below chat window in one line */}
-            <div className="pt-2 border-t border-neutral-100 flex items-center justify-center gap-2 overflow-x-auto text-[11px] font-sans text-neutral-600 whitespace-nowrap scrollbar-none">
-              <span className="font-bold text-neutral-800 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block shrink-0"></span>
-                {profileName}
-              </span>
-              <span className="text-neutral-300">|</span>
-              <span><strong className="font-semibold text-neutral-500">DOB:</strong> {profileDob} @ {profileTob}</span>
-              <span className="text-neutral-300">|</span>
-              <span><strong className="font-semibold text-neutral-500">Place:</strong> {profilePob}</span>
-              <span className="text-neutral-300">|</span>
-              <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-mono text-[10px] font-medium shrink-0">
-                <strong>ANTARA:</strong> {antaraLord} <span className="opacity-40">|</span> <strong>PRANA:</strong> {pranaLord}
-              </span>
-              <span className="text-neutral-300">|</span>
-              <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200/60 font-mono text-[10px] font-medium shrink-0">
-                <strong>TRANSIT MOON NAKSHATRA:</strong> {transitMoonNak} <span className="opacity-40">|</span> <strong>SUB:</strong> {transitMoonSub}
-              </span>
-            </div>
 
           </div>
         </div>
