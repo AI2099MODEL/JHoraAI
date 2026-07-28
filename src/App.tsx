@@ -1477,28 +1477,28 @@ export default function App() {
         { id: "vedic", label: "My Astro Details", description: "Vedic chart details.", systemId: "ai_assistant", category: "JOURNEY" },
 
         // Category 1: JHORA
-        { id: "jhora_birth_details", label: "Birth Details", description: "JH1: Birth Details & Astronomical Metrics.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_planets", label: "Planets Placements", description: "JH2: Natal Planets Longitudes & Rasi Placements.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_dignity", label: "Dignity Registry", description: "JH32: Planet Dignity Registry.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_shadbala", label: "Shadbala Matrix", description: "JH3: Shadbala Planet Strength Matrix.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_bhava_balas", label: "Bhava Strengths", description: "JH4: Bhava Balas (House Strengths).", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_ashtakavarga", label: "SAV Ashtakavarga", description: "JH5: Samudhaya Ashtakavarga Points.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_divisional", label: "Charts", description: "JH6: Divisional Vargas D1 to D60.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_vimshottari", label: "Vimshottari Dasha", description: "JH7: Vimshottari Mahadasha Timelines.", systemId: "ai_assistant", category: "JHORA" },
+        { id: "jhora_birth_details", label: "Birth Details", description: "JH1: Birth Details & Astronomical Metrics.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "jhora_planets", label: "Planets Placements", description: "JH2: Natal Planets Longitudes & Rasi Placements.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "jhora_dignity", label: "Dignity Registry", description: "JH32: Planet Dignity Registry.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "jhora_shadbala", label: "Shadbala Matrix", description: "JH3: Shadbala Planet Strength Matrix.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "jhora_bhava_balas", label: "Bhava Strengths", description: "JH4: Bhava Balas (House Strengths).", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "jhora_ashtakavarga", label: "SAV Ashtakavarga", description: "JH5: Samudhaya Ashtakavarga Points.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "jhora_divisional", label: "Charts", description: "JH6: Divisional Vargas D1 to D60.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "jhora_vimshottari", label: "Vimshottari Dasha", description: "JH7: Vimshottari Mahadasha Timelines.", systemId: "ai_assistant", category: "SETTINGS" },
 
         // Category 2: KP STELLAR
-        { id: "kp_cusps", label: "Placidus Cusps", description: "JH8: Placidus House Cusp Coordinates.", systemId: "ai_assistant", category: "KP STELLAR" },
-        { id: "kp_sub_lords", label: "Planetary Sub-Lords", description: "JH9: KP Planetary Sub-Lords.", systemId: "ai_assistant", category: "KP STELLAR" },
-        { id: "kp_planet_significators", label: "Planet Significators", description: "JH10: KP Planet-Level Significators.", systemId: "ai_assistant", category: "KP STELLAR" },
-        { id: "kp_house_significators", label: "House Significators", description: "JH11: KP House-Level Significators.", systemId: "ai_assistant", category: "KP STELLAR" },
+        { id: "kp_cusps", label: "Placidus Cusps", description: "JH8: Placidus House Cusp Coordinates.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "kp_sub_lords", label: "Planetary Sub-Lords", description: "JH9: KP Planetary Sub-Lords.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "kp_planet_significators", label: "Planet Significators", description: "JH10: KP Planet-Level Significators.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "kp_house_significators", label: "House Significators", description: "JH11: KP House-Level Significators.", systemId: "ai_assistant", category: "SETTINGS" },
 
         // Category 5: TAJIKA
-        { id: "tajika_varshaphal", label: "Varshaphal Coordinates", description: "JH16: Varshaphal Planetary Coordinates.", systemId: "ai_assistant", category: "TAJIKA" },
-        { id: "tajika_harshabala", label: "Harsha Balas", description: "JH17: Tajik Harsha Balas.", systemId: "ai_assistant", category: "TAJIKA" },
+        { id: "tajika_varshaphal", label: "Varshaphal Coordinates", description: "JH16: Varshaphal Planetary Coordinates.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "tajika_harshabala", label: "Harsha Balas", description: "JH17: Tajik Harsha Balas.", systemId: "ai_assistant", category: "SETTINGS" },
 
         // Category 6: LAL KITAB
-        { id: "lalkitab_houses", label: "LKB Houses", description: "JH18: Lal Kitab Planetary Houses.", systemId: "ai_assistant", category: "LAL KITAB" },
-        { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "JH19: Lal Kitab Teva & Sleeping Status.", systemId: "ai_assistant", category: "LAL KITAB" },
+        { id: "lalkitab_houses", label: "LKB Houses", description: "JH18: Lal Kitab Planetary Houses.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "JH19: Lal Kitab Teva & Sleeping Status.", systemId: "ai_assistant", category: "SETTINGS" },
 
         // Category 7: EVENTS
         { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "ai_assistant", category: "SETTINGS" },
@@ -1506,7 +1506,7 @@ export default function App() {
         { id: "kp_book", label: "KP Book", description: "Interactive astrological rules terminal and validation panel.", systemId: "ai_assistant", category: "SETTINGS" },
 
         // Category 8: DEPLOYMENT
-        { id: "table_index", label: "Table Index", description: "JH1 to JH19 Master Tables Registry & Mapping.", systemId: "ai_assistant", category: "DEPLOYMENT" },
+        { id: "table_index", label: "Table Index", description: "JH1 to JH19 Master Tables Registry & Mapping.", systemId: "ai_assistant", category: "SETTINGS" },
 
         // Category 9: SETTINGS
         { id: "theme", label: "Theme", description: "Dark, Light, and custom styling.", systemId: "ai_assistant", category: "SETTINGS" },
@@ -2828,6 +2828,7 @@ export default function App() {
                   <AstroChat 
                     astrologyData={astrologyData} 
                     birthSettingsContent={birthSettingsNode} 
+                    activeSubmenuId={activeSubmenuId}
                     onNavigateMenu={(menu, submenu) => {
                       setActiveMenu(menu);
                       if (submenu) {

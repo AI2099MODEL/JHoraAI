@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-28T16:42:12.530Z",
+    "lastUpdated": "2026-07-28T16:57:08.657Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-28T16:42:12.530Z",
-    "localTime": "2026-07-28T09:42:12-07:00",
+    "utcTime": "2026-07-28T16:57:08.657Z",
+    "localTime": "2026-07-28T09:57:08-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 282.51
+      "longitude": 282.65
     },
     "currentNakshatra": {
       "id": "Shravana",
@@ -28,15 +28,15 @@
       "displayName": "Moon"
     },
     "currentSubLord": {
-      "id": "Ketu",
-      "displayName": "Ketu"
+      "id": "Rahu",
+      "displayName": "Rahu"
     },
     "moonPhase": {
       "type": "Waning Gibbous",
       "displayName": "Krishna Prathama",
-      "illuminationPercentage": 99.6
+      "illuminationPercentage": 99.5
     },
-    "moonLongitude": 282.51,
+    "moonLongitude": 282.65,
     "waxing": false,
     "waning": true,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 101.78,
+    "longitude": 101.79,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,45 +63,45 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 101.78,
+      "longitude": 101.79,
       "nakshatra": "Pushya",
       "pada": 3,
       "starLord": "Saturn",
-      "subLord": "Saturn",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 282.51,
+      "longitude": 282.65,
       "nakshatra": "Shravana",
       "pada": 1,
       "starLord": "Moon",
-      "subLord": "Ketu",
+      "subLord": "Rahu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Libra",
-      "longitude": 205.2,
+      "longitude": 207.83,
       "nakshatra": "Vishakha",
-      "pada": 2,
+      "pada": 3,
       "starLord": "Jupiter",
-      "subLord": "Mercury",
-      "retrograde": true,
+      "subLord": "Sun",
+      "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Scorpio",
-      "longitude": 238.75,
+      "longitude": 238.81,
       "nakshatra": "Jyeshtha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Saturn",
-      "retrograde": true,
+      "subLord": "Moon",
+      "retrograde": false,
       "combust": false,
       "stationary": false
     },
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Leo",
-      "longitude": 136.19,
+      "longitude": 136.21,
       "nakshatra": "Purva Phalguni",
       "pada": 1,
       "starLord": "Venus",
-      "subLord": "Venus",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Moon",
-    "moonSubLord": "Ketu"
+    "moonSubLord": "Rahu"
   },
   "panchanga": {
     "tithi": {
       "name": "Krishna Prathama",
       "index": 16,
       "paksha": "Krishna",
-      "endDate": "2026-07-29T04:42:12.530Z"
+      "endDate": "2026-07-29T04:57:08.657Z"
     },
     "vara": {
       "name": "Tuesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Shravana",
       "lord": "Moon",
-      "endDate": "2026-07-29T10:42:12.530Z"
+      "endDate": "2026-07-29T10:57:08.657Z"
     },
     "yoga": {
       "name": "Preeti",
       "lord": "Venus",
-      "endDate": "2026-07-29T06:42:12.530Z"
+      "endDate": "2026-07-29T06:57:08.657Z"
     },
     "karana": {
       "name": "Balava",
       "lord": "Sun",
-      "endDate": "2026-07-28T22:42:12.530Z"
+      "endDate": "2026-07-28T22:57:08.657Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -391,7 +391,8 @@
       "Physical vitality"
     ],
     "negativeThemes": [
-      "Communication hiccups"
+      "Over-thinking",
+      "Restlessness"
     ],
     "emotionalTone": "The sky carries a highly reflective and analytical emotional tone governed by Moon in Capricorn."
   },
@@ -439,11 +440,8 @@
   },
   "currentChallenges": {
     "delays": {
-      "active": true,
-      "affectedAreas": [
-        "Documentation workflows",
-        "Long distance transits"
-      ]
+      "active": false,
+      "affectedAreas": []
     },
     "stress": {
       "active": false,
