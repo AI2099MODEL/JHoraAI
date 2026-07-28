@@ -372,7 +372,7 @@ export function TableIndexView({
                 Deployment Node
               </span>
               <span className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider font-mono">
-                JH1-JH32 Registry
+                JH1-JH22 Registry
               </span>
             </div>
             <h2 className={`text-xl font-sans font-bold flex items-center gap-2 ${textStyle}`}>
@@ -416,7 +416,7 @@ export function TableIndexView({
             />
           </div>
           <span className="text-[10px] font-mono text-slate-400">
-            Showing {filteredTables.length} of 32 Tables
+            Showing {filteredTables.length} of 22 Tables
           </span>
         </div>
       </div>
