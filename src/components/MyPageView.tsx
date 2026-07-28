@@ -3005,28 +3005,6 @@ export function MyPageView({
         </div>
       )}
 
-      {/* Submenu Astrological Tabs */}
-      {currentTabs.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5 pb-2 pt-1 border-b border-slate-500/10">
-          {currentTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                onSubmenuSelect?.(tab.id);
-              }}
-              className={`px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold tracking-wider uppercase border transition-all cursor-pointer select-none ${
-                activeTab === tab.id
-                  ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm shadow-amber-500/10"
-                  : "bg-slate-500/5 text-slate-400 border-slate-500/10 hover:bg-slate-500/10 hover:text-slate-300"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      )}
-
       {activeSubmenu === "my_reports" ? (
         <div className="space-y-6 animate-fade-in">
           <div className={`p-6 sm:p-8 rounded-2xl border ${cardStyle} bg-gradient-to-b ${isDark ? "from-slate-950/60 to-slate-950/40" : "from-white to-neutral-50/50"} border-amber-500/15 relative overflow-hidden`}>
