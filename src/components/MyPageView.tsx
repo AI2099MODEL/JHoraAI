@@ -261,12 +261,12 @@ function CharaDashaInteractiveTable({ profile, astrologyData, isDark }: { profil
 
   const currentYear = new Date().getFullYear();
 
-  const tableBg = isDark ? "bg-slate-950/40 border-slate-800/60" : "bg-white border-neutral-200";
-  const headerBg = isDark ? "bg-slate-900 border-b border-slate-800 text-slate-400" : "bg-neutral-100 border-b border-neutral-200 text-neutral-600";
-  const textPrimary = isDark ? "text-slate-200" : "text-neutral-800";
-  const textSecondary = isDark ? "text-slate-300" : "text-neutral-700";
-  const textMuted = isDark ? "text-slate-400" : "text-neutral-500";
-  const textMutedLight = isDark ? "text-slate-500" : "text-neutral-400";
+  const tableBg = isDark ? "bg-white border-slate-200" : "bg-white border-neutral-200";
+  const headerBg = isDark ? "bg-slate-900 border-b border-slate-200 text-slate-600" : "bg-neutral-100 border-b border-neutral-200 text-neutral-600";
+  const textPrimary = isDark ? "text-slate-900" : "text-neutral-800";
+  const textSecondary = isDark ? "text-slate-800" : "text-neutral-700";
+  const textMuted = isDark ? "text-slate-600" : "text-neutral-500";
+  const textMutedLight = isDark ? "text-slate-700" : "text-neutral-400";
   const borderCol = isDark ? "divide-slate-800/30" : "divide-neutral-200/50";
   const btnBg = isDark ? "bg-slate-800 hover:bg-slate-700 border-slate-700 text-amber-400" : "bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-amber-600";
 
@@ -553,8 +553,8 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
     case "table_12":
     default:
       return (
-        <div className="p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 text-xs font-mono max-h-[300px] overflow-y-auto">
-          <pre className="text-[10px] text-slate-300 leading-relaxed overflow-x-auto whitespace-pre-wrap">
+        <div className="p-3 bg-white rounded-lg border border-slate-200 text-xs font-mono max-h-[300px] overflow-y-auto">
+          <pre className="text-[10px] text-slate-800 leading-relaxed overflow-x-auto whitespace-pre-wrap">
             {JSON.stringify(data, null, 2)}
           </pre>
         </div>
@@ -771,14 +771,14 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 
       return (
         <div className="space-y-6 text-xs animate-fade-in">
-          <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
-            <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider border-b border-slate-800 pb-1.5">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+            <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider border-b border-slate-200 pb-1.5">
               I. KP House Cusps (Placidus Stellar Division) [Table: KP_CUSPS]
             </h5>
             <div className="overflow-x-auto">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
+                  <tr className="bg-slate-900/60 text-slate-600 border-b border-slate-200 text-[10px] uppercase font-bold tracking-wider font-mono">
                     <th className="py-2.5 px-3">CuspNo</th>
                     <th className="py-2.5 px-3">AbsoluteLongitude</th>
                     <th className="py-2.5 px-3">ZodiacSign</th>
@@ -792,15 +792,15 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 <tbody className="divide-y divide-slate-800/20 font-mono">
                   {kpCuspsList.map((c: any, idx: number) => {
                     return (
-                      <tr key={idx} className="hover:bg-slate-900/30">
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300 font-bold">Cusp {c.CuspNo}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{typeof c.AbsoluteLongitude === "number" ? c.AbsoluteLongitude.toFixed(4) : c.AbsoluteLongitude}°</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-200 font-sans font-semibold">{c.ZodiacSign}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{typeof c.DegreeInSign === "number" ? c.DegreeInSign.toFixed(4) : c.DegreeInSign}°</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-semibold">{c.SignLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-yellow-400/90 font-medium">{c.StarLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400 font-bold">{c.SubLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400/80">{c.SubSubLord || "Saturn"}</td>
+                      <tr key={idx} className="hover:bg-slate-50">
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-800 font-bold">Cusp {c.CuspNo}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-600">{typeof c.AbsoluteLongitude === "number" ? c.AbsoluteLongitude.toFixed(4) : c.AbsoluteLongitude}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-900 font-sans font-semibold">{c.ZodiacSign}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-800">{typeof c.DegreeInSign === "number" ? c.DegreeInSign.toFixed(4) : c.DegreeInSign}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-amber-500 font-semibold">{c.SignLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-yellow-400/90 font-medium">{c.StarLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-indigo-400 font-bold">{c.SubLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-emerald-400/80">{c.SubSubLord || "Saturn"}</td>
                       </tr>
                     );
                   })}
@@ -809,14 +809,14 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
-            <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider border-b border-slate-800 pb-1.5">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+            <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider border-b border-slate-200 pb-1.5">
               II. KP Planets (Stellar Placement Coordinates) [Table: KP_PLANETS]
             </h5>
             <div className="overflow-x-auto">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
+                  <tr className="bg-slate-900/60 text-slate-600 border-b border-slate-200 text-[10px] uppercase font-bold tracking-wider font-mono">
                     <th className="py-2.5 px-3">Planet</th>
                     <th className="py-2.5 px-3">AbsoluteLongitude</th>
                     <th className="py-2.5 px-3">ZodiacSign</th>
@@ -826,7 +826,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                     <th className="py-2.5 px-3 text-yellow-400">StarLord</th>
                     <th className="py-2.5 px-3 text-indigo-400">SubLord (PSL)</th>
                     <th className="py-2.5 px-3 text-emerald-400">SubSubLord</th>
-                    <th className="py-2.5 px-3 text-slate-400">OwnedHouses</th>
+                    <th className="py-2.5 px-3 text-slate-600">OwnedHouses</th>
                     <th className="py-2.5 px-3 text-rose-400">Retrograde</th>
                     <th className="py-2.5 px-3 text-orange-400">Combust</th>
                   </tr>
@@ -843,26 +843,26 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                             .join(", ");
 
                     return (
-                      <tr key={idx} className="hover:bg-slate-900/30">
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-bold font-sans">
+                      <tr key={idx} className="hover:bg-slate-50">
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-amber-500 font-bold font-sans">
                           {p.Planet}
                         </td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{typeof p.AbsoluteLongitude === "number" ? p.AbsoluteLongitude.toFixed(4) : p.AbsoluteLongitude}°</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-200 font-sans font-semibold">{p.ZodiacSign}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{typeof p.DegreeInSign === "number" ? p.DegreeInSign.toFixed(4) : p.DegreeInSign}°</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300 font-bold">House {p.OccupiedHouse}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-semibold">{p.SignLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-yellow-400/90 font-medium">{p.StarLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400 font-bold">{p.SubLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400/80">{p.SubSubLord || "Saturn"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{ownedHousesStr || "None"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.Retrograde === "Yes" ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : "text-slate-500"}`}>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-600">{typeof p.AbsoluteLongitude === "number" ? p.AbsoluteLongitude.toFixed(4) : p.AbsoluteLongitude}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-900 font-sans font-semibold">{p.ZodiacSign}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-800">{typeof p.DegreeInSign === "number" ? p.DegreeInSign.toFixed(4) : p.DegreeInSign}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-800 font-bold">House {p.OccupiedHouse}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-amber-500 font-semibold">{p.SignLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-yellow-400/90 font-medium">{p.StarLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-indigo-400 font-bold">{p.SubLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-emerald-400/80">{p.SubSubLord || "Saturn"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-600">{ownedHousesStr || "None"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.Retrograde === "Yes" ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : "text-slate-700"}`}>
                             {p.Retrograde}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.Combust === "Yes" ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" : "text-slate-500"}`}>
+                        <td className="py-2.5 px-3 border-b border-slate-200/40">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.Combust === "Yes" ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" : "text-slate-700"}`}>
                             {p.Combust}
                           </span>
                         </td>
@@ -957,7 +957,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
             <div className="overflow-x-auto rounded-lg border border-indigo-100">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white font-mono text-[10.5px] uppercase font-bold tracking-wider">
+                  <tr className="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-black font-mono text-[10.5px] uppercase font-bold tracking-wider">
                     <th className="py-2.5 px-3">Planet</th>
                     <th className="py-2.5 px-3">L1</th>
                     <th className="py-2.5 px-3">L2</th>
@@ -999,7 +999,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
             <div className="overflow-x-auto rounded-lg border border-indigo-100">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white font-mono text-[10.5px] uppercase font-bold tracking-wider">
+                  <tr className="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-black font-mono text-[10.5px] uppercase font-bold tracking-wider">
                     <th className="py-2.5 px-3">House</th>
                     <th className="py-2.5 px-3">L1</th>
                     <th className="py-2.5 px-3">L2</th>
@@ -1052,7 +1052,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       };
 
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -1069,10 +1069,10 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                   ? `${placement.sign || ""} (House ${placement.house || ""})`
                   : String(placement);
                 return (
-                  <tr key={key} className="hover:bg-slate-900/30">
+                  <tr key={key} className="hover:bg-slate-50">
                     <td className={`${tdStyle} font-bold text-amber-500`}>{key}</td>
                     <td className={tdStyle}>{label}</td>
-                    <td className={`${tdStyle} text-slate-200 font-bold`}>
+                    <td className={`${tdStyle} text-slate-900 font-bold`}>
                       <span className="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
                         {displayPlacement}
                       </span>
@@ -1089,7 +1089,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const argalas = data || astrologyData?.argalas || profile?.Vedic?.argalas || profile?.Jaimini?.argala || profile?.Vedic?.argala || astrologyData?.jaimini?.argala || astrologyData?.horoscope?.argalas || {};
       const houseEntries = Array.from({ length: 12 }, (_, i) => String(i + 1));
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -1104,16 +1104,16 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 const configs = argalas[hKey] || [];
                 if (configs.length === 0) {
                   return (
-                    <tr key={hKey} className="hover:bg-slate-900/30">
+                    <tr key={hKey} className="hover:bg-slate-50">
                       <td className={`${tdStyle} font-bold text-amber-500`}>House {hKey}</td>
                       <td className={tdStyle} colSpan={3}>
-                        <span className="text-slate-500 italic">No significant Argalas found</span>
+                        <span className="text-slate-700 italic">No significant Argalas found</span>
                       </td>
                     </tr>
                   );
                 }
                 return configs.map((cfg: any, idx: number) => (
-                  <tr key={`${hKey}-${idx}`} className="hover:bg-slate-900/30 border-b border-slate-900/40">
+                  <tr key={`${hKey}-${idx}`} className="hover:bg-slate-50 border-b border-slate-900/40">
                     {idx === 0 ? (
                       <td className={`${tdStyle} font-bold text-amber-500 border-r border-slate-900/50`} rowSpan={configs.length}>
                         House {hKey}
@@ -1124,10 +1124,10 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                         <span className={`px-1 rounded text-[9px] font-bold ${cfg.type === "Primary" ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"}`}>
                           {cfg.type}
                         </span>
-                        <span className="text-slate-200 font-mono">
+                        <span className="text-slate-900 font-mono">
                           {cfg.argalaPlanets?.join(", ") || "None"}
                         </span>
-                        <span className="text-slate-500 text-[10px]">
+                        <span className="text-slate-700 text-[10px]">
                           (in H{cfg.argalaHouse})
                         </span>
                       </div>
@@ -1136,7 +1136,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                       {cfg.virodhaPlanets && cfg.virodhaPlanets.length > 0 ? (
                         <div className="flex items-center gap-1.5 flex-wrap font-mono">
                           <span className="text-rose-400">{cfg.virodhaPlanets.join(", ")}</span>
-                          <span className="text-slate-500 text-[10px]">(in H{cfg.virodhaHouse})</span>
+                          <span className="text-slate-700 text-[10px]">(in H{cfg.virodhaHouse})</span>
                         </div>
                       ) : (
                         <span className="text-emerald-500 text-[10px] font-bold">Unobstructed</span>
@@ -1146,7 +1146,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                       <span className={`text-[11px] ${cfg.isObstructed ? "text-amber-500" : "text-emerald-400 font-bold"}`}>
                         {cfg.isObstructed ? "Obstructed" : "Active / Unobstructed"}
                       </span>
-                      <p className="text-[10px] text-slate-500 leading-normal mt-0.5 max-w-sm">
+                      <p className="text-[10px] text-slate-700 leading-normal mt-0.5 max-w-sm">
                         {cfg.verdict || `${cfg.type} Argala from H${hKey} in H${cfg.argalaHouse}`}
                       </p>
                     </td>
@@ -1262,10 +1262,10 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       });
 
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs font-mono">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs font-mono">
           <table className={baseTableStyle}>
             <thead>
-              <tr className="bg-slate-900 border-b border-slate-800 text-slate-400 font-sans text-[10px] uppercase font-bold tracking-wider">
+              <tr className="bg-slate-900 border-b border-slate-200 text-slate-600 font-sans text-[10px] uppercase font-bold tracking-wider">
                 <th className="py-2.5 px-3">Lagna Type</th>
                 <th className="py-2.5 px-3">Longitude</th>
                 <th className="py-2.5 px-3">Zodiac Sign</th>
@@ -1274,22 +1274,22 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 <th className="py-2.5 px-3">Primary Use</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/30 text-slate-300">
+            <tbody className="divide-y divide-slate-800/30 text-slate-800">
               {lagnas.map((lagna, idx) => (
-                <tr key={`${lagna.name}-${idx}`} className="hover:bg-slate-900/30">
+                <tr key={`${lagna.name}-${idx}`} className="hover:bg-slate-50">
                   <td className="py-2.5 px-3 font-bold text-amber-500 font-sans">{lagna.name}</td>
-                  <td className="py-2.5 px-3 text-slate-200 font-bold">
+                  <td className="py-2.5 px-3 text-slate-900 font-bold">
                     <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                       {lagna.longitude}
                     </span>
                   </td>
-                  <td className="py-2.5 px-3 font-sans text-slate-300">{lagna.sign}</td>
+                  <td className="py-2.5 px-3 font-sans text-slate-800">{lagna.sign}</td>
                   <td className="py-2.5 px-3 text-center">
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-800 font-bold">
                       {lagna.house}
                     </span>
                   </td>
-                  <td className="py-2.5 px-3 text-slate-400 font-sans leading-tight text-[11px]">
+                  <td className="py-2.5 px-3 text-slate-600 font-sans leading-tight text-[11px]">
                     {lagna.basis}
                   </td>
                   <td className="py-2.5 px-3 text-amber-400/80 font-sans leading-tight text-[11px]">
@@ -1306,7 +1306,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const shadbala = data || astrologyData?.vedic?.strengths?.shadbala || astrologyData?.strengths?.shadbala || profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || {};
       const planets = Object.keys(shadbala).length > 0 ? Object.keys(shadbala) : ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -1337,7 +1337,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 }
 
                 return (
-                  <tr key={pName} className="hover:bg-slate-900/30">
+                  <tr key={pName} className="hover:bg-slate-50">
                     <td className={`${tdStyle} font-bold text-amber-500`}>{pName}</td>
                     <td className={tdStyle}>{Number(pBala.sthana_bala || pBala.sthana || 0).toFixed(1)}</td>
                     <td className={tdStyle}>{Number(pBala.dig_bala || pBala.dig || 0).toFixed(1)}</td>
@@ -1345,7 +1345,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                     <td className={tdStyle}>{Number(pBala.cheshta_bala || pBala.cheshta || 0).toFixed(1)}</td>
                     <td className={tdStyle}>{Number(pBala.naisargika_bala || pBala.naisargika || 0).toFixed(1)}</td>
                     <td className={tdStyle}>{Number(pBala.drig_bala || pBala.drig || 0).toFixed(1)}</td>
-                    <td className={`${tdStyle} font-bold text-slate-200`}>
+                    <td className={`${tdStyle} font-bold text-slate-900`}>
                       {Number(total).toFixed(1)}
                     </td>
                     <td className={tdStyle}>
@@ -1410,7 +1410,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       ];
 
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -1436,19 +1436,19 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                   house = dynamicVal.house || s.defaultHouse;
                 }
                 return (
-                  <tr key={s.key} className="hover:bg-slate-900/30">
+                  <tr key={s.key} className="hover:bg-slate-50">
                     <td className={`${tdStyle} font-bold text-amber-500`}>{s.name}</td>
-                    <td className="py-2 px-3 border-b border-slate-800/40 text-slate-400 text-[11px] leading-tight font-sans">
+                    <td className="py-2 px-3 border-b border-slate-200/40 text-slate-600 text-[11px] leading-tight font-sans">
                       {s.formula}
                     </td>
-                    <td className={`${tdStyle} text-slate-200 font-bold font-mono`}>
+                    <td className={`${tdStyle} text-slate-900 font-bold font-mono`}>
                       <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold">
                         {coord}
                       </span>
                     </td>
                     <td className={tdStyle}>{sign}</td>
                     <td className={tdStyle}>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold font-mono">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-800 font-bold font-mono">
                         {house}
                       </span>
                     </td>
@@ -1507,7 +1507,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       ];
 
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -1535,16 +1535,16 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                   nakshatra = dynamicVal.nakshatra || u.defaultNakshatra;
                 }
                 return (
-                  <tr key={u.key} className="hover:bg-slate-900/30">
+                  <tr key={u.key} className="hover:bg-slate-50">
                     <td className={`${tdStyle} font-bold text-amber-500`}>{u.name}</td>
                     <td className={tdStyle}>{sign}</td>
-                    <td className={`${tdStyle} text-slate-200 font-bold font-mono`}>
+                    <td className={`${tdStyle} text-slate-900 font-bold font-mono`}>
                       <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold">
                         {coord}
                       </span>
                     </td>
                     <td className={tdStyle}>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold font-mono">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-800 font-bold font-mono">
                         {house}
                       </span>
                     </td>
@@ -1566,18 +1566,18 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const ZODIAC_SIGNS_FULL = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
 
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
+        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2">
           <table className={baseTableStyle}>
             <thead>
-              <tr className="bg-slate-900 border-b border-slate-800 text-amber-500">
-                <th className={`${thStyle} border-r border-slate-800/60`}>Varga Chart</th>
+              <tr className="bg-slate-900 border-b border-slate-200 text-amber-500">
+                <th className={`${thStyle} border-r border-slate-200`}>Varga Chart</th>
                 <th className={thStyle}>ASC</th>
                 {PLANET_ORDER.map(p => (
                   <th key={p} className={thStyle}>{p.substring(0, 3).toUpperCase()}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/30 text-slate-300">
+            <tbody className="divide-y divide-slate-800/30 text-slate-800">
               {STANDARD_VARGAS.map(vKey => {
                 const vObj = divisional[vKey] || {};
                 const ascObj = vObj.ascendant || {};
@@ -1592,10 +1592,10 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 
                 return (
                   <tr key={vKey} className="hover:bg-amber-500/5 transition-colors">
-                    <td className="py-2 px-3 font-bold text-amber-500 font-sans border-r border-slate-800/60">
+                    <td className="py-2 px-3 font-bold text-amber-500 font-sans border-r border-slate-200">
                       {vKey} {vKey === "D1" ? "Rasi" : vKey === "D9" ? "Navamsa" : vKey === "D10" ? "Dasamsa" : ""}
                     </td>
-                    <td className="py-2 px-3 text-slate-400">
+                    <td className="py-2 px-3 text-slate-600">
                       {ascSignAbbr} <span className="text-[9px] text-amber-500 font-bold">(H1)</span>
                     </td>
                     {PLANET_ORDER.map(pName => {
@@ -1630,7 +1630,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 
                       return (
                         <td key={pName} className="py-2 px-3">
-                          <span className="text-slate-200">{signAbbr}</span>{" "}
+                          <span className="text-slate-900">{signAbbr}</span>{" "}
                           <span className="text-[9px] text-amber-500 font-bold">{houseNum}</span>
                         </td>
                       );
@@ -1651,23 +1651,23 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const ZODIAC_SIGNS_FULL = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
       
       return (
-        <div className="overflow-x-auto font-mono text-[11px] rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
+        <div className="overflow-x-auto font-mono text-[11px] rounded-lg border border-slate-200 bg-white mt-2">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-900 text-slate-300 border-b border-slate-800 font-sans">
+              <tr className="bg-slate-900 text-slate-800 border-b border-slate-200 font-sans">
                 <th className={thStyle}>Graha (Variable)</th>
                 {ZODIAC_SIGNS_FULL.map(s => (
                   <th key={s} className="py-2 px-1.5 text-center font-bold text-[10px]">{s.substring(0,3).toUpperCase()}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/30 text-slate-300">
+            <tbody className="divide-y divide-slate-800/30 text-slate-800">
               {Object.keys(bav).length > 0 ? (
                 Object.entries(bav).map(([pName, bList]: [string, any]) => (
                   <tr key={pName} className="hover:bg-slate-900/10">
-                    <td className="py-2 px-3 font-sans font-semibold text-slate-200 border-r border-slate-800/55">{pName}</td>
+                    <td className="py-2 px-3 font-sans font-semibold text-slate-900 border-r border-slate-200/55">{pName}</td>
                     {Array.isArray(bList) && bList.map((pts: number, idx: number) => (
-                      <td key={idx} className={`p-2 text-center font-bold ${pts >= 5 ? "text-emerald-400" : pts <= 2 ? "text-rose-400" : "text-slate-400"}`}>
+                      <td key={idx} className={`p-2 text-center font-bold ${pts >= 5 ? "text-emerald-400" : pts <= 2 ? "text-rose-400" : "text-slate-600"}`}>
                         {pts}
                       </td>
                     ))}
@@ -1675,14 +1675,14 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 ))
               ) : (
                 <tr className="hover:bg-slate-900/10">
-                  <td colSpan={13} className="p-4 text-center text-slate-500 italic">No individual Ashtakavarga data available.</td>
+                  <td colSpan={13} className="p-4 text-center text-slate-700 italic">No individual Ashtakavarga data available.</td>
                 </tr>
               )}
               {Array.isArray(sav) && sav.length > 0 && (
-                <tr className="bg-cyan-500/5 font-sans font-bold text-cyan-400 border-t border-slate-800">
-                  <td className="py-3 px-3 border-r border-slate-800">SAMUDHAYA (SAV)</td>
+                <tr className="bg-cyan-500/5 font-sans font-bold text-cyan-400 border-t border-slate-200">
+                  <td className="py-3 px-3 border-r border-slate-200">SAMUDHAYA (SAV)</td>
                   {sav.map((pts: number, idx: number) => (
-                    <td key={idx} className={`p-3 text-center text-sm font-mono font-black ${pts >= 28 ? "text-emerald-300" : "text-slate-400"}`}>
+                    <td key={idx} className={`p-3 text-center text-sm font-mono font-black ${pts >= 28 ? "text-emerald-300" : "text-slate-600"}`}>
                       {pts}
                     </td>
                   ))}
@@ -1698,18 +1698,18 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const bhava_bala = vData.strengths?.bhava_bala || {};
       
       return (
-        <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 mt-2">
+        <div className="p-4 rounded-xl border border-slate-200 bg-white mt-2">
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono">
             {Object.keys(bhava_bala).length > 0 ? (
               Object.entries(bhava_bala).map(([hKey, bVal]: [string, any]) => (
-                <div key={hKey} className="p-2 rounded bg-slate-900/50 border border-slate-800">
+                <div key={hKey} className="p-2 rounded bg-slate-900/50 border border-slate-200">
                   <span className="font-bold text-indigo-400 block font-sans text-xs">{hKey.replace("H", "House ")}</span>
-                  <span className="text-slate-300 block mt-1 text-sm">{bVal.strength_shashtiamsas}</span>
+                  <span className="text-slate-800 block mt-1 text-sm">{bVal.strength_shashtiamsas}</span>
                   <span className="text-[9px] text-amber-500 font-bold block mt-0.5">Rank: {bVal.rank}</span>
                 </div>
               ))
             ) : (
-              <div className="col-span-6 text-center py-4 text-slate-500 italic text-xs">No Bhava Bala data available.</div>
+              <div className="col-span-6 text-center py-4 text-slate-700 italic text-xs">No Bhava Bala data available.</div>
             )}
           </div>
         </div>
@@ -1721,7 +1721,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const kashta_phala = vData.strengths?.kashta_phala || {};
       
       return (
-        <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 mt-2">
+        <div className="p-4 rounded-xl border border-slate-200 bg-white mt-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs mt-2">
             {Object.keys(ishta_phala).length > 0 ? (
               Object.entries(ishta_phala).map(([pName, ishtaVal]: [string, any]) => {
@@ -1729,7 +1729,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 return (
                   <div key={pName} className="p-4 rounded-lg bg-slate-900/20 border border-slate-850 space-y-2">
                     <div className="flex justify-between font-bold">
-                      <span className="font-sans text-slate-200 text-sm">{pName}</span>
+                      <span className="font-sans text-slate-900 text-sm">{pName}</span>
                       <span className="text-xs">Ishta: <span className="text-emerald-400">{ishtaVal}</span> / Kashta: <span className="text-rose-400">{kashtaVal}</span></span>
                     </div>
                     <div className="w-full bg-slate-900 h-2.5 rounded overflow-hidden flex border border-slate-955">
@@ -1740,7 +1740,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 );
               })
             ) : (
-              <div className="col-span-2 text-center py-4 text-slate-500 italic text-xs">No Ishtaphala & Kashtaphala data available.</div>
+              <div className="col-span-2 text-center py-4 text-slate-700 italic text-xs">No Ishtaphala & Kashtaphala data available.</div>
             )}
           </div>
         </div>
@@ -3030,7 +3030,7 @@ export function MyPageView({
                   All dossiers are compiled dynamically for your birth coordinates. Reports are automatically refreshed every 24 hours.
                 </p>
                 {lastRefreshed && (
-                  <p className="text-[9px] font-mono text-slate-500 mt-1">
+                  <p className="text-[9px] font-mono text-slate-700 mt-1">
                     Last Synced: {lastRefreshed}
                   </p>
                 )}
@@ -3072,7 +3072,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-2 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
+                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3090,7 +3090,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     Comprehensive Soul Blueprint Dossier
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
                     Full astrological synthesis report compiling Panchanga, Divisional Charts, Shodashavarga, Jaimini, Lal Kitab, and Varshaphal.
                   </p>
                 </div>
@@ -3128,7 +3128,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
+                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3146,7 +3146,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     50-Year Vimshottari Dasha
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
                     Recursive timing chronology down to Prana level for your active period. Explores Mahadasha, Bhukti, and Antara timelines with high-precision.
                   </p>
                 </div>
@@ -3184,7 +3184,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-rose-500/40" 
+                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-rose-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-rose-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3202,7 +3202,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     Emotional & Mood Cycles
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
                     Esoteric mood and emotional state indicators tracking Houses 1, 3, 4, 5, 6, and 12.
                   </p>
                 </div>
@@ -3240,7 +3240,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-teal-500/40" 
+                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-teal-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-teal-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3258,7 +3258,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     Behavioral Patterns
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
                     Career vocations, communication styles, and themes mapping Houses 2, 3, 6, 7, 10, and 11.
                   </p>
                 </div>
@@ -3296,7 +3296,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-sky-500/40" 
+                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-sky-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-sky-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3314,7 +3314,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     Transit DBA Alignment
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
                     Maps actual transit movements of Saturn, Jupiter, and Moon over natal period rulers.
                   </p>
                 </div>
@@ -3385,7 +3385,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-3 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-indigo-500/40" 
+                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-indigo-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-indigo-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3403,7 +3403,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     All Aspects Alignment
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
                     Dynamic tabular dump aligning Parashari, KP, Jaimini, Lalkitab and Western based on active tabs.
                   </p>
                 </div>
@@ -3605,7 +3605,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-3 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
+                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
                 }`}
                 id="download-my-report-button"
@@ -3624,7 +3624,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     My Report
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
                     Comprehensive dossier compiling all user data across all sections, submenus, and all 19 raw tables (JH1 to JH19 consecutively).
                   </p>
                 </div>
@@ -3645,11 +3645,11 @@ export function MyPageView({
             {/* Bottom Section: Active JSON Export */}
             <div className="mt-6 pt-6 border-t border-slate-500/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="space-y-0.5">
-                <h4 className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${isDark ? "text-slate-300" : "text-neutral-800"}`}>
+                <h4 className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${isDark ? "text-slate-800" : "text-neutral-800"}`}>
                   <Shield className="w-4 h-4 text-indigo-400" />
                   Vedic Data Model Export
                 </h4>
-                <p className={`text-[10px] font-sans ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
+                <p className={`text-[10px] font-sans ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
                   Export the active calculated high-fidelity JSON payload containing all traditional astronomical structures.
                 </p>
               </div>
@@ -3698,43 +3698,43 @@ export function MyPageView({
 
           {/* LAGNA INFO IN SMALL FONTS */}
           <div className="p-4 rounded-xl border border-slate-500/10 bg-slate-500/5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-slate-400">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-slate-600">
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Lagna (Ascendant):</strong>{" "}
                 <span className={`${textStyle} font-bold`}>{lagna.sign || ascendantSign || "Cancer"}</span>{" "}
                 ({lagna.degree !== undefined ? formatDegree(lagna.degree) : "07° 12'"})
               </span>
-              <span className="opacity-25 text-slate-500">|</span>
+              <span className="opacity-25 text-slate-700">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Ascendant Nakshatra:</strong>{" "}
                 <span className={`${textStyle} font-bold`}>{lagna.nakshatra || ascendantNakshatra || "Pushya"}</span>{" "}
                 (Pada {lagna.pada || "2"})
               </span>
-              <span className="opacity-25 text-slate-500">|</span>
+              <span className="opacity-25 text-slate-700">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Ascendant Nak Lord:</strong>{" "}
                 <span className={textStyle}>{lagna.nakshatra_lord || lagna.nakLord || ascendantNakLord || "Saturn"}</span>
               </span>
-              <span className="opacity-25 text-slate-500">|</span>
+              <span className="opacity-25 text-slate-700">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Birth Nakshatra:</strong>{" "}
                 <span className={`${textStyle} font-bold text-amber-400`}>{lagna.moon_nakshatra || profile?.Vedic?.planets?.Moon?.nakshatra || "Shatabhisha"}</span>
               </span>
-              <span className="opacity-25 text-slate-500">|</span>
+              <span className="opacity-25 text-slate-700">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Moon Nakshatra:</strong>{" "}
                 <span className={`${textStyle} font-bold`}>{lagna.moon_nakshatra || profile?.Vedic?.planets?.Moon?.nakshatra || "Shatabhisha"}</span>
               </span>
-              <span className="opacity-25 text-slate-500">|</span>
+              <span className="opacity-25 text-slate-700">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Sun Nakshatra:</strong>{" "}
                 <span className={`${textStyle} font-bold`}>{lagna.sun_nakshatra || profile?.Vedic?.planets?.Sun?.nakshatra || "Purva Ashadha"}</span>
               </span>
-              <span className="opacity-25 text-slate-500">|</span>
+              <span className="opacity-25 text-slate-700">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">KP Lords:</strong> Star: <span className={textStyle}>{lagna.star_lord || "Saturn"}</span> • Sub: <span className={textStyle}>{lagna.sub_lord || "Mercury"}</span> • Sub-Sub: <span className={textStyle}>{lagna.sub_sub_lord || "Rahu"}</span>
               </span>
-              <span className="opacity-25 text-slate-500">|</span>
+              <span className="opacity-25 text-slate-700">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Status:</strong>{" "}
                 <span className={lagna.gandanta ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
@@ -4607,7 +4607,7 @@ export function MyPageView({
                         {table.title}
                       </h4>
                     </div>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${isPopulated ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-slate-500/10 text-slate-400"}`}>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${isPopulated ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-slate-500/10 text-slate-600"}`}>
                       {isPopulated ? "POPULATED & INDEXED" : "PENDING INDEX"}
                     </span>
                   </div>
@@ -4633,7 +4633,7 @@ export function MyPageView({
                         <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider">
                           🟢 LIVE INDEXED DATA (Active Timeline)
                         </span>
-                        <span className="text-[9px] font-mono text-slate-500">
+                        <span className="text-[9px] font-mono text-slate-700">
                           Indexed: {new Date(indexedTable.indexedAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -4662,16 +4662,16 @@ export function MyPageView({
                       {renderIndexedTable(`table_${table.table_number}`, null, profile, astrologyData)}
                     </div>
                   ) : (
-                    <div className="p-3.5 rounded-lg bg-slate-950/40 border border-slate-800/80 space-y-2">
-                      <div className="flex justify-between items-center border-b border-slate-800 pb-1 mb-1.5">
-                        <span className="text-[10px] font-mono text-slate-500 uppercase font-bold tracking-wider block">
+                    <div className="p-3.5 rounded-lg bg-white border border-slate-200 space-y-2">
+                      <div className="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5">
+                        <span className="text-[10px] font-mono text-slate-700 uppercase font-bold tracking-wider block">
                           Data Sample / Metadata Registry
                         </span>
                         <span className="text-[9px] font-mono text-amber-500/80">
                           Pending Live Indexing
                         </span>
                       </div>
-                      <pre className="text-[11px] font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+                      <pre className="text-[11px] font-mono text-slate-800 overflow-x-auto whitespace-pre-wrap leading-relaxed">
                         {JSON.stringify(table.data_sample || {}, null, 2)}
                       </pre>
                     </div>
@@ -4699,7 +4699,7 @@ export function MyPageView({
               const rawDashas = astrologyData?.dashas || profile?.Vedic?.dashas?.vimshottari || [];
               if (rawDashas.length === 0) {
                 return (
-                  <div className="text-center py-8 text-xs text-slate-500 font-mono">
+                  <div className="text-center py-8 text-xs text-slate-700 font-mono">
                     ⚠️ No Vimshottari dasha data available. Please generate or load user particulars.
                   </div>
                 );
@@ -4717,7 +4717,7 @@ export function MyPageView({
               const divisional = profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts || {};
               if (Object.keys(divisional).length === 0) {
                 return (
-                  <div className="text-center py-8 text-xs text-slate-500 font-mono">
+                  <div className="text-center py-8 text-xs text-slate-700 font-mono">
                     ⚠️ No Divisional Chart data available. Please generate or load user particulars.
                   </div>
                 );
@@ -4882,7 +4882,7 @@ export function MyPageView({
             </div>
           </div>
 
-          {/* Table 10: Argalas */}
+          {/* Additional: Jaimini Argalas */}
           <div className="space-y-3">
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
@@ -4890,15 +4890,9 @@ export function MyPageView({
             </div>
           </div>
 
-          {/* Table 14: Arudhas */}
-          <div className="space-y-3">
-            
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              {renderIndexedTable("table_14", null, profile, astrologyData)}
-            </div>
-          </div>
+          
 
-          {/* Table 15: Sphutas */}
+          {/* Additional: Jaimini Sphutas */}
           <div className="space-y-3">
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
@@ -4906,15 +4900,9 @@ export function MyPageView({
             </div>
           </div>
 
-          {/* Table 16: Shadbala */}
-          <div className="space-y-3">
-            
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              {renderIndexedTable("table_16", null, profile, astrologyData)}
-            </div>
-          </div>
+          
 
-          {/* Table 17: Sahams */}
+          {/* Additional: Jaimini Sahams */}
           <div className="space-y-3">
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
@@ -4922,7 +4910,7 @@ export function MyPageView({
             </div>
           </div>
 
-          {/* Table 18: Vedic Upgrahas */}
+          {/* Additional: Vedic Upgrahas */}
           <div className="space-y-3">
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
@@ -4930,23 +4918,11 @@ export function MyPageView({
             </div>
           </div>
 
-          {/* Table 20: Ashtakavarga Bindus */}
-          <div className="space-y-3">
-            
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              {renderIndexedTable("table_20", null, profile, astrologyData)}
-            </div>
-          </div>
+          
 
-          {/* Table 21: Bhava Bala */}
-          <div className="space-y-3">
-            
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              {renderIndexedTable("table_21", null, profile, astrologyData)}
-            </div>
-          </div>
+          
 
-          {/* Table 22: Ishtaphala & Kashtaphala */}
+          {/* Additional: Ishtaphala & Kashtaphala */}
           <div className="space-y-3">
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
@@ -4954,7 +4930,7 @@ export function MyPageView({
             </div>
           </div>
 
-          {/* Table 23: Jaimini Chara Dasha */}
+          {/* Additional: Jaimini Chara Dasha */}
           <div className="space-y-3">
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
@@ -4970,7 +4946,7 @@ export function MyPageView({
               profile={profile}
             />
           ) : (
-            <div className="text-center py-8 text-xs text-slate-500 font-mono">
+            <div className="text-center py-8 text-xs text-slate-700 font-mono">
               ⚠️ Please cast a horoscope first to view real-time transits.
             </div>
           )}
@@ -4981,7 +4957,7 @@ export function MyPageView({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Left Column: Chara Karakas */}
             <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+              <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
                 <Award className="w-4 h-4 text-amber-400" />
                 <h4 className={`text-sm font-bold font-sans ${textStyle}`}>
                   Sage Jaimini's Chara Karakas (Planetary Roles)
@@ -4990,10 +4966,10 @@ export function MyPageView({
               <p className={`text-[11px] ${textMutedStyle} leading-relaxed`}>
                 The seven standard planets (Sun to Saturn) are ranked by their degree longitudes in descending order to assign vital life significations.
               </p>
-              <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/20 text-xs">
+              <div className="overflow-x-auto rounded-lg border border-slate-200 bg-slate-950/20 text-xs">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider">
+                    <tr className="bg-slate-900/60 text-slate-600 border-b border-slate-200 text-[10px] uppercase font-bold tracking-wider">
                       <th className="py-2 px-3">Karaka Name</th>
                       <th className="py-2 px-3">Significance</th>
                       <th className="py-2 px-3">Graha (Planet)</th>
@@ -5017,10 +4993,10 @@ export function MyPageView({
                         const planet = karakas[key] || "Unknown";
                         const sig = karakaSignifications[key];
                         return (
-                          <tr key={key} className="hover:bg-slate-900/30 border-b border-slate-900/40">
+                          <tr key={key} className="hover:bg-slate-50 border-b border-slate-900/40">
                             <td className="py-2 px-3 font-bold text-amber-500 font-sans">{sig.label}</td>
-                            <td className="py-2 px-3 text-slate-400 text-[10px] leading-tight">{sig.desc}</td>
-                            <td className="py-2 px-3 font-mono font-bold text-slate-200">
+                            <td className="py-2 px-3 text-slate-600 text-[10px] leading-tight">{sig.desc}</td>
+                            <td className="py-2 px-3 font-mono font-bold text-slate-900">
                               <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 border border-slate-700 text-amber-400">
                                 {planet}
                               </span>
@@ -5036,7 +5012,7 @@ export function MyPageView({
 
             {/* Right Column: Jaimini Soul Coordinates & Karakamsha */}
             <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
+              <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
                 <Shield className="w-4 h-4 text-emerald-400" />
                 <h4 className={`text-sm font-bold font-sans ${textStyle}`}>
                   Jaimini Soul Coordinates & Swamsha Lagnas
@@ -5047,26 +5023,26 @@ export function MyPageView({
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-3 bg-slate-950/40 border border-slate-800/80 rounded-lg space-y-1">
-                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">
+                <div className="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
+                  <span className="text-[10px] font-mono text-slate-700 uppercase tracking-wider block">
                     Karakamsha Sign
                   </span>
                   <span className="text-sm font-bold text-emerald-400 block font-sans">
                     {profile?.Jaimini?.karakamsha || "Cancer"}
                   </span>
-                  <p className="text-[9px] text-slate-400 leading-normal font-sans">
+                  <p className="text-[9px] text-slate-600 leading-normal font-sans">
                     Navamsha sign occupied by the natal Atmakaraka. Indicates soul's inner light and path to liberation (Moksha).
                   </p>
                 </div>
 
-                <div className="p-3 bg-slate-950/40 border border-slate-800/80 rounded-lg space-y-1">
-                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">
+                <div className="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
+                  <span className="text-[10px] font-mono text-slate-700 uppercase tracking-wider block">
                     Swamsha Sign
                   </span>
                   <span className="text-sm font-bold text-emerald-400 block font-sans">
                     {profile?.Jaimini?.swamsha || "Cancer"}
                   </span>
-                  <p className="text-[9px] text-slate-400 leading-normal font-sans">
+                  <p className="text-[9px] text-slate-600 leading-normal font-sans">
                     The Navamsha Lagna sign / Atmakaraka alignment in the divisional charts. Maps soul projection to physical manifest destiny.
                   </p>
                 </div>
@@ -5080,7 +5056,7 @@ export function MyPageView({
                     Calculation Standard Reference
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-400 leading-normal">
+                <p className="text-[10px] text-slate-600 leading-normal">
                   Calculated based on <strong>Sage Jaimini's Upadesha Sutras</strong>. Degrees sorted precisely client-side with secondary planet longitude filters to avoid static placeholder dates.
                 </p>
               </div>
@@ -5601,7 +5577,7 @@ export function MyPageView({
                   <button
                     onClick={() => setTajikSubTab("relationship")}
                     className={`px-2 py-1 rounded transition-all cursor-pointer ${
-                      tajikSubTab === "relationship" ? "bg-indigo-500 text-slate-950" : "text-slate-400"
+                      tajikSubTab === "relationship" ? "bg-indigo-500 text-slate-950" : "text-slate-600"
                     }`}
                   >
                     Relationship Engine
@@ -5609,7 +5585,7 @@ export function MyPageView({
                   <button
                     onClick={() => setTajikSubTab("solarReturn")}
                     className={`px-2 py-1 rounded transition-all cursor-pointer ${
-                      tajikSubTab === "solarReturn" ? "bg-indigo-500 text-slate-950" : "text-slate-400"
+                      tajikSubTab === "solarReturn" ? "bg-indigo-500 text-slate-950" : "text-slate-600"
                     }`}
                   >
                     Solar Return
@@ -6443,7 +6419,7 @@ export function MyPageView({
                   </p>
                 </div>
                 {/* Date switcher tabs */}
-                <div className="flex items-center gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
+                <div className="flex items-center gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-200">
                   {datesList.map((d, idx) => {
                     const dayLabel = idx === 0 ? "Today" : idx === 1 ? "Tomorrow" : "Day After";
                     const isSelected = selectedDateOffset === idx;
@@ -6454,7 +6430,7 @@ export function MyPageView({
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                           isSelected
                             ? "bg-gradient-to-r from-amber-500/10 to-indigo-500/10 border border-amber-500/30 text-amber-200"
-                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
+                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-900/40"
                         }`}
                       >
                         <span className="block font-bold text-[9px] uppercase tracking-wider text-indigo-400">
@@ -6484,7 +6460,7 @@ export function MyPageView({
                       <span className="text-[10px] uppercase font-mono tracking-wider font-bold bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded border border-indigo-500/10">
                         Daily Mental State
                       </span>
-                      <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
+                      <span className="text-xs font-mono text-slate-600 flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-indigo-400" />
                         Moon in {transitMoon.nakshatraName}
                       </span>
@@ -6493,7 +6469,7 @@ export function MyPageView({
                     <div className="space-y-4">
                       <div>
                         <span className="text-xs text-indigo-300 font-mono">DOMINANT COGNITIVE CONVERGENCE</span>
-                        <h4 className="text-2xl font-bold text-white mt-1">
+                        <h4 className="text-2xl font-bold text-black mt-1">
                           Houses: {strongestCombo}
                         </h4>
                         <div className="text-xs text-amber-200 font-medium mt-1">
@@ -6501,11 +6477,11 @@ export function MyPageView({
                         </div>
                       </div>
 
-                      <div className="space-y-3 text-sm text-slate-300 leading-relaxed bg-slate-950/50 border border-slate-900 p-5 rounded-xl">
+                      <div className="space-y-3 text-sm text-slate-800 leading-relaxed bg-slate-950/50 border border-slate-900 p-5 rounded-xl">
                         <p>
                           {getPrimaryNarrative()}
                         </p>
-                        <p className="border-t border-slate-800/60 pt-2 text-xs text-indigo-200">
+                        <p className="border-t border-slate-200 pt-2 text-xs text-indigo-200">
                           <strong>Transit Color Overlay:</strong> {getMoonNarrative()}
                         </p>
                       </div>
@@ -6525,8 +6501,8 @@ export function MyPageView({
                                   {h}
                                 </span>
                                 <div>
-                                  <strong className="block text-xs text-white">{m.title}</strong>
-                                  <span className="text-[11px] text-slate-400 leading-normal block mt-0.5 font-sans">
+                                  <strong className="block text-xs text-black">{m.title}</strong>
+                                  <span className="text-[11px] text-slate-600 leading-normal block mt-0.5 font-sans">
                                     {m.desc}
                                   </span>
                                 </div>
@@ -6534,7 +6510,7 @@ export function MyPageView({
                             );
                           })}
                           {primaryThemeHouses.length === 0 && (
-                            <div className="col-span-2 text-center text-xs text-slate-500 py-4 font-mono">
+                            <div className="col-span-2 text-center text-xs text-slate-700 py-4 font-mono">
                               No primary theme houses (&ge; 5 layers) triggered for this date.
                             </div>
                           )}
@@ -6554,9 +6530,9 @@ export function MyPageView({
                       </p>
                     </div>
 
-                    <table className="w-full text-left text-xs text-slate-300 font-mono">
+                    <table className="w-full text-left text-xs text-slate-800 font-mono">
                       <thead>
-                        <tr className="border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
+                        <tr className="border-b border-slate-200 text-[10px] text-slate-600 uppercase tracking-wider">
                           <th className="py-2.5">Index</th>
                           <th className="py-2.5">Theme / Area</th>
                           <th className="py-2.5 text-center">Frequency</th>
@@ -6572,7 +6548,7 @@ export function MyPageView({
                           const m = LOCAL_HOUSE_MOOD_MAP[house];
                           
                           let tier = "Inactive";
-                          let badgeClass = "text-slate-500 bg-slate-900/30";
+                          let badgeClass = "text-slate-700 bg-slate-900/30";
                           if (count >= 5) {
                             tier = "Primary Theme";
                             badgeClass = "text-amber-300 bg-amber-500/10 border border-amber-500/20";
@@ -6581,17 +6557,17 @@ export function MyPageView({
                             badgeClass = "text-indigo-300 bg-indigo-500/10 border border-indigo-500/20";
                           } else if (count > 0) {
                             tier = "Background Overlay";
-                            badgeClass = "text-slate-400 bg-slate-800/30";
+                            badgeClass = "text-slate-600 bg-slate-800/30";
                           }
 
                           return (
                             <tr key={house} className="hover:bg-slate-900/20 transition-colors">
                               <td className="py-2.5 font-bold text-indigo-400">JH{house}</td>
                               <td className="py-2.5 font-sans">
-                                <div className="font-semibold text-white text-[11px]">{m?.title || `House ${house}`}</div>
-                                <div className="text-[10px] text-slate-400 line-clamp-1">{m?.desc || "No custom significations."}</div>
+                                <div className="font-semibold text-black text-[11px]">{m?.title || `House ${house}`}</div>
+                                <div className="text-[10px] text-slate-600 line-clamp-1">{m?.desc || "No custom significations."}</div>
                               </td>
-                              <td className="py-2.5 text-center text-slate-200 font-bold">{count} / 8</td>
+                              <td className="py-2.5 text-center text-slate-900 font-bold">{count} / 8</td>
                               <td className="py-2.5 text-right text-indigo-300 font-bold">{score.toFixed(2)}</td>
                               <td className="py-2.5 text-center">
                                 <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold ${badgeClass}`}>
@@ -6622,9 +6598,9 @@ export function MyPageView({
                     </div>
 
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs text-slate-300 font-mono">
+                      <table className="w-full text-left text-xs text-slate-800 font-mono">
                         <thead>
-                          <tr className="border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
+                          <tr className="border-b border-slate-200 text-[10px] text-slate-600 uppercase tracking-wider">
                             <th className="py-2">Layer</th>
                             <th className="py-2">Ruler</th>
                             <th className="py-2 text-right">Weight</th>
@@ -6636,9 +6612,9 @@ export function MyPageView({
                           {layerHouseMaps.map(layer => {
                             return (
                               <tr key={layer.id} className="hover:bg-slate-900/20 transition-colors">
-                                <td className="py-2 text-[10px] text-slate-400 uppercase tracking-wider font-sans">{layer.name.replace(" Lord", "")}</td>
-                                <td className="py-2 text-white font-bold">{layer.planet}</td>
-                                <td className="py-2 text-right text-slate-300">{layer.weight}</td>
+                                <td className="py-2 text-[10px] text-slate-600 uppercase tracking-wider font-sans">{layer.name.replace(" Lord", "")}</td>
+                                <td className="py-2 text-black font-bold">{layer.planet}</td>
+                                <td className="py-2 text-right text-slate-800">{layer.weight}</td>
                                 <td className="py-2 text-right text-emerald-400">{layer.strength.toFixed(2)}x</td>
                                 <td className="py-2 text-right">
                                   <div className="flex gap-1 justify-end flex-wrap">
@@ -6677,7 +6653,7 @@ export function MyPageView({
                               H{h}
                             </span>
                           ))}
-                          {primaryThemeHouses.length === 0 && <span className="text-[10px] text-slate-500 italic">None active</span>}
+                          {primaryThemeHouses.length === 0 && <span className="text-[10px] text-slate-700 italic">None active</span>}
                         </div>
                         <p className={`text-[11px] ${textMuted} mt-1.5 leading-normal font-sans`}>
                           Represents highly recurring mental states, environmental opportunities, and major focus vectors.
@@ -6692,7 +6668,7 @@ export function MyPageView({
                               H{h}
                             </span>
                           ))}
-                          {secondaryThemeHouses.length === 0 && <span className="text-[10px] text-slate-500 italic">None active</span>}
+                          {secondaryThemeHouses.length === 0 && <span className="text-[10px] text-slate-700 italic">None active</span>}
                         </div>
                         <p className={`text-[11px] ${textMuted} mt-1.5 leading-normal font-sans`}>
                           Reflects secondary, supporting emotional impulses or daily objectives that play a solid part in your day.
@@ -6700,10 +6676,10 @@ export function MyPageView({
                       </div>
 
                       <div className="border-l-2 border-slate-600 pl-3 py-1">
-                        <strong className="block text-slate-400 text-[11px]">Background Overlays (1 to 2 Layers)</strong>
+                        <strong className="block text-slate-600 text-[11px]">Background Overlays (1 to 2 Layers)</strong>
                         <div className="flex flex-wrap gap-1 mt-1.5">
                           {backgroundOverlayHouses.map(h => (
-                            <span key={h} className="px-2 py-0.5 rounded bg-slate-900/60 text-slate-400 border border-slate-800 font-mono text-[10px]">
+                            <span key={h} className="px-2 py-0.5 rounded bg-slate-900/60 text-slate-600 border border-slate-200 font-mono text-[10px]">
                               H{h}
                             </span>
                           ))}
@@ -6730,7 +6706,7 @@ export function MyPageView({
               subTab={activeTab}
             />
           ) : (
-            <div className="text-center py-8 text-xs text-slate-500 font-mono">
+            <div className="text-center py-8 text-xs text-slate-700 font-mono">
               ⚠️ Please cast a horoscope first to view real-time transits.
             </div>
           )}
@@ -6744,13 +6720,13 @@ export function MyPageView({
         </div>
       ) : activeTab === "my_life_analysis" ? (
         <div className="space-y-6 animate-fade-in">
-          <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
+          <div className="bg-slate-900/40 border border-slate-200 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
             <div className="p-3.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
               <Layers className="w-6 h-6 animate-pulse" />
             </div>
             <div className="space-y-1.5 max-w-sm">
-              <h4 className="text-base font-bold text-slate-200">My Life Analysis</h4>
-              <p className="text-xs text-slate-400 leading-relaxed font-sans">
+              <h4 className="text-base font-bold text-slate-900">My Life Analysis</h4>
+              <p className="text-xs text-slate-600 leading-relaxed font-sans">
                 This section is reserved for your comprehensive life analysis. Custom charts, transit trends, and predictive matrices will reside here.
               </p>
             </div>
@@ -7056,7 +7032,7 @@ export function MyPageView({
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-800">
+                <div className="flex items-center gap-2 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-200">
                   <button
                     disabled={futurePage === 0}
                     onClick={() => setFuturePage(p => Math.max(0, p - 1))}
@@ -7064,7 +7040,7 @@ export function MyPageView({
                   >
                     Prev
                   </button>
-                  <span className="text-[11px] font-mono text-slate-400 px-1">
+                  <span className="text-[11px] font-mono text-slate-600 px-1">
                     Page {futurePage + 1} of {totalPages}
                   </span>
                   <button
@@ -7097,17 +7073,17 @@ export function MyPageView({
                         <span className="text-[9px] uppercase tracking-wider font-bold text-indigo-400">
                           H{fd.house}
                         </span>
-                        <span className="text-xl font-bold text-white mt-0.5">
+                        <span className="text-xl font-bold text-black mt-0.5">
                           {fd.house}
                         </span>
-                        <span className="text-[8px] font-mono text-slate-500 uppercase mt-0.5">
+                        <span className="text-[8px] font-mono text-slate-700 uppercase mt-0.5">
                           {fd.count}/7 Layers
                         </span>
                       </div>
 
                       <div className="flex-1 space-y-1 min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-sm font-bold text-white truncate">
+                          <span className="text-sm font-bold text-black truncate">
                             {dateString}
                           </span>
                           {isToday && (
@@ -7125,7 +7101,7 @@ export function MyPageView({
                           {m?.desc}
                         </p>
 
-                        <div className="text-[10px] font-mono text-slate-500 flex items-center gap-1.5 flex-wrap">
+                        <div className="text-[10px] font-mono text-slate-700 flex items-center gap-1.5 flex-wrap">
                           <span>Moon: {fd.moonNak} ({fd.moonSign})</span>
                         </div>
                       </div>
