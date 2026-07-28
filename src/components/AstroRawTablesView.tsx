@@ -127,7 +127,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
   
   const cardStyle = "bg-white border border-slate-200 shadow-sm";
 
-  const tableHeaderStyle = "bg-slate-50/80 border-b border-slate-200 text-slate-700 text-[10px] font-bold uppercase tracking-wider";
+  const tableHeaderStyle = "bg-white border-b border-slate-200 text-black text-[10px] font-bold uppercase tracking-wider";
 
   const tableRowStyle = "border-b border-slate-100 hover:bg-slate-50 text-black text-[10px]";
 

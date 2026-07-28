@@ -65,16 +65,12 @@ export function TableIndexView({
     loadProfile();
   }, [activeUser]);
 
-  const containerStyle = isDark 
-    ? "bg-slate-900/60 border border-slate-800 text-slate-200" 
-    : "bg-white border border-neutral-200 text-neutral-800";
+  const containerStyle = "bg-white border border-neutral-200 text-black";
   
-  const cardStyle = isDark 
-    ? "bg-slate-950/40 border border-slate-900/60" 
-    : "bg-neutral-50/50 border border-neutral-200";
+  const cardStyle = "bg-white border border-neutral-200";
 
-  const textStyle = isDark ? "text-slate-100" : "text-neutral-800";
-  const textMutedStyle = isDark ? "text-slate-400" : "text-neutral-500";
+  const textStyle = "text-black";
+  const textMutedStyle = "text-slate-500";
 
   // Strictly Indexed JH1 to JH25 consecutively to maintain cohesive mapping bounds
   const tablesRegistry = [
@@ -453,9 +449,7 @@ export function TableIndexView({
               placeholder="Filter JH tables by ID, title, source or database section..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full pl-9 pr-4 py-2 text-xs border rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono ${
-                isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-              }`}
+              className="w-full pl-9 pr-4 py-2 text-xs border border-neutral-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono bg-white text-black"
             />
           </div>
           <span className="text-[10px] font-mono text-slate-400">
@@ -520,8 +514,8 @@ export function TableIndexView({
                 </div>
                 
                 {/* Renders custom table index live preview where available, fallback to beautiful JSON */}
-                <div className="p-3.5 rounded-lg bg-slate-950/40 border border-slate-800/80 max-h-56 overflow-y-auto scrollbar-thin">
-                  <pre className="text-[10px] font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+                <div className="p-3.5 rounded-lg bg-neutral-50 border border-neutral-200 max-h-56 overflow-y-auto scrollbar-thin">
+                  <pre className="text-[10px] font-mono text-neutral-800 overflow-x-auto whitespace-pre-wrap leading-relaxed">
                     {JSON.stringify(table.data_sample || {}, null, 2)}
                   </pre>
                 </div>
