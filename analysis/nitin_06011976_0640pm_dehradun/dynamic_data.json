@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin_06011976_0640pm_dehradun",
-    "lastUpdated": "2026-07-28T13:07:15.680Z",
+    "lastUpdated": "2026-07-28T13:12:08.146Z",
     "evaluationDate": "2026-07-28",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-28T13:07:14.756Z",
-      "localTime": "2026-07-28T06:07:14-07:00",
+      "utcTime": "2026-07-28T13:12:08.036Z",
+      "localTime": "2026-07-28T06:12:08-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Capricorn",
         "displayName": "Capricorn",
-        "longitude": 280.55
+        "longitude": 280.59
       },
       "currentNakshatra": {
         "id": "Shravana",
@@ -30,15 +30,15 @@
         "displayName": "Moon"
       },
       "currentSubLord": {
-        "id": "Venus",
-        "displayName": "Venus"
+        "id": "Jupiter",
+        "displayName": "Jupiter"
       },
       "moonPhase": {
         "type": "Waxing Gibbous",
         "displayName": "Sukla Purnima",
         "illuminationPercentage": 99.4
       },
-      "moonLongitude": 280.55,
+      "moonLongitude": 280.59,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -76,34 +76,34 @@
       },
       "moon": {
         "currentSign": "Capricorn",
-        "longitude": 280.55,
+        "longitude": 280.59,
         "nakshatra": "Shravana",
         "pada": 1,
         "starLord": "Moon",
-        "subLord": "Venus",
+        "subLord": "Jupiter",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mars": {
         "currentSign": "Virgo",
-        "longitude": 167.39,
+        "longitude": 168.27,
         "nakshatra": "Hasta",
         "pada": 3,
         "starLord": "Moon",
-        "subLord": "Mercury",
-        "retrograde": true,
+        "subLord": "Rahu",
+        "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mercury": {
         "currentSign": "Scorpio",
-        "longitude": 238,
+        "longitude": 238.01,
         "nakshatra": "Jyeshtha",
         "pada": 4,
         "starLord": "Mercury",
-        "subLord": "Moon",
-        "retrograde": false,
+        "subLord": "Rahu",
+        "retrograde": true,
         "combust": false,
         "stationary": false
       },
@@ -120,12 +120,12 @@
       },
       "venus": {
         "currentSign": "Leo",
-        "longitude": 135.8,
+        "longitude": 135.81,
         "nakshatra": "Purva Phalguni",
         "pada": 1,
         "starLord": "Venus",
-        "subLord": "Saturn",
-        "retrograde": false,
+        "subLord": "Mercury",
+        "retrograde": true,
         "combust": false,
         "stationary": false
       },
@@ -232,6 +232,19 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-28T13:12:08.145Z",
+      "evaluationDate": "2026-07-28",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Health and Disease Propensity via 1st and 6th CSL",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+    },
     {
       "timestamp": "2026-07-28T13:07:15.680Z",
       "evaluationDate": "2026-07-28",
@@ -1508,19 +1521,6 @@
     },
     {
       "timestamp": "2026-07-28T08:57:53.681Z",
-      "evaluationDate": "2026-07-28",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-28T08:55:54.093Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
