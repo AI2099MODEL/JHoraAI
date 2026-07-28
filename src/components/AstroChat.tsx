@@ -799,9 +799,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                   {/* My Astro Systems */}
                   <div className="space-y-1 pt-1">
                     {[
-                      { id: "vedic", label: "My Astro Details", theme: "bg-amber-50/80 text-amber-950 border-amber-200/80" },
-                      { id: "jaimini", label: "Jaimini", theme: "bg-purple-50/80 text-purple-950 border-purple-200/80" },
-                      { id: "western", label: "Western", theme: "bg-sky-50/80 text-sky-950 border-sky-200/80" }
+                      { id: "vedic", label: "My Astro Details", theme: "bg-amber-50/80 text-amber-950 border-amber-200/80" }
                     ].map((sub) => (
                       <button
                         key={sub.id}
