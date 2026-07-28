@@ -72,7 +72,7 @@ export function TableIndexView({
   const textStyle = "text-black";
   const textMutedStyle = "text-slate-500";
 
-  // Strictly Indexed JH1 to JH25 consecutively to maintain cohesive mapping bounds
+  // Strictly Indexed JH1 to JH31 consecutively to maintain cohesive mapping bounds
   const tablesRegistry = [
     {
       table_number: 1,
@@ -384,7 +384,61 @@ export function TableIndexView({
       data_sample: {
         dashas: ["Aries", "Taurus", "Gemini", "Cancer"]
       }
-    }
+    },
+{
+  "table_number": 26,
+  "jh_id": "JH26",
+  "title": "Personal & Birth Details",
+  "source_origin": "Input",
+  "section_key": "Birth.details",
+  "api_source": "Native Profile",
+  "is_populated": true
+},
+{
+  "table_number": 27,
+  "jh_id": "JH27",
+  "title": "Ascendant & Luminaries",
+  "source_origin": "Engine",
+  "section_key": "Ascendant.luminaries",
+  "api_source": "Engine",
+  "is_populated": true
+},
+{
+  "table_number": 28,
+  "jh_id": "JH28",
+  "title": "Astrological Summary",
+  "source_origin": "Engine",
+  "section_key": "Astro.summary",
+  "api_source": "Engine",
+  "is_populated": true
+},
+{
+  "table_number": 29,
+  "jh_id": "JH29",
+  "title": "Birth Panchanga",
+  "source_origin": "Engine",
+  "section_key": "Birth.panchanga",
+  "api_source": "Engine",
+  "is_populated": true
+},
+{
+  "table_number": 30,
+  "jh_id": "JH30",
+  "title": "Strength Summary",
+  "source_origin": "Engine",
+  "section_key": "Strength.summary",
+  "api_source": "Engine",
+  "is_populated": true
+},
+{
+  "table_number": 31,
+  "jh_id": "JH31",
+  "title": "Astronomical Data",
+  "source_origin": "Engine",
+  "section_key": "Astro.data",
+  "api_source": "Engine",
+  "is_populated": true
+}
   ];
 
   const filteredTables = tablesRegistry.filter(table => {
@@ -409,7 +463,7 @@ export function TableIndexView({
                 Deployment Node
               </span>
               <span className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider font-mono">
-                JH1-JH25 Registry
+                JH1-JH31 Registry
               </span>
             </div>
             <h2 className={`text-xl font-sans font-bold flex items-center gap-2 ${textStyle}`}>
@@ -453,7 +507,7 @@ export function TableIndexView({
             />
           </div>
           <span className="text-[10px] font-mono text-slate-400">
-            Showing {filteredTables.length} of 25 Tables
+            Showing {filteredTables.length} of 31 Tables
           </span>
         </div>
       </div>

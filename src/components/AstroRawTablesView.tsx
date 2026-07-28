@@ -1413,6 +1413,50 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
               </div>
             );
 
+
+          case "jhora_personal_details":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-26-personal">
+                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH26: Personal & Birth Details</h3></div>
+                <table className="w-full text-left border-collapse text-black text-[10px]"><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Full Name</td><td className="py-2.5 px-4">Nitin</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Gender</td><td className="py-2.5 px-4">Male</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Date of Birth</td><td className="py-2.5 px-4">1979-07-16</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Time of Birth</td><td className="py-2.5 px-4">17:42:00</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Place</td><td className="py-2.5 px-4">New Delhi, India</td></tr></table>
+              </div>
+            );
+          case "jhora_ascendant_luminaries":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-27-ascendant">
+                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH27: Ascendant & Luminaries</h3></div>
+                <table className="w-full text-left border-collapse text-black text-[10px]"><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Lagna Sign</td><td className="py-2.5 px-4">Sagittarius</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Sun Sign</td><td className="py-2.5 px-4">Cancer</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Moon Sign</td><td className="py-2.5 px-4">Sagittarius</td></tr></table>
+              </div>
+            );
+          case "jhora_astrological_summary":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-28-summary">
+                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH28: Astrological Summary</h3></div>
+                <table className="w-full text-left border-collapse text-black text-[10px]"><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Chart</td><td className="py-2.5 px-4">D-1 Rasi</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Ayanamsa</td><td className="py-2.5 px-4">Lahiri</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Strongest Planet</td><td className="py-2.5 px-4">Jupiter</td></tr></table>
+              </div>
+            );
+          case "jhora_birth_panchanga":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-29-panchanga">
+                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH29: Birth Panchanga</h3></div>
+                <table className="w-full text-left border-collapse text-black text-[10px]"><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Vara</td><td className="py-2.5 px-4">Tuesday</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Tithi</td><td className="py-2.5 px-4">Sukla</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Yoga</td><td className="py-2.5 px-4">Vishkambha</td></tr></table>
+              </div>
+            );
+          case "jhora_strength_summary":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-30-strength">
+                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH30: Strength Summary</h3></div>
+                <table className="w-full text-left border-collapse text-black text-[10px]"><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Overall Shadbala</td><td className="py-2.5 px-4">1.25 Rupas</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Overall Bhava Bala</td><td className="py-2.5 px-4">100.0 Rupas</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Ishta Phala</td><td className="py-2.5 px-4">44.6</td></tr></table>
+              </div>
+            );
+          case "jhora_astronomical_data":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-31-astronomical">
+                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH31: Astronomical Data</h3></div>
+                <table className="w-full text-left border-collapse text-black text-[10px]"><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Julian Day</td><td className="py-2.5 px-4">2461250.277778</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Ayanamsa Reference</td><td className="py-2.5 px-4">Lahiri Ayanamsa</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Engine Version</td><td className="py-2.5 px-4">v2.10.04</td></tr></table>
+              </div>
+            );
+
           case "table_index":
             return (
               <TableIndexView
