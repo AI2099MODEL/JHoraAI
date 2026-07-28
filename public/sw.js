@@ -4,7 +4,7 @@
  */
 
 // Cache name containing versioning for safe caching
-const CACHE_NAME = "jhoraai-cache-v1.0.0";
+const CACHE_NAME = "jhoraai-cache-v1.0.1";
 const ASSETS_TO_CACHE = [
   "/",
   "/index.html",
