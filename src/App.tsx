@@ -1501,9 +1501,9 @@ export default function App() {
         { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "JH19: Lal Kitab Teva & Sleeping Status.", systemId: "ai_assistant", category: "LAL KITAB" },
 
         // Category 7: EVENTS
-        { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "ai_assistant", category: "EVENTS" },
-        { id: "engine_guide", label: "Astrological Rule Engine", description: "Master Astrological Rule Engine Specification V2.0.", systemId: "ai_assistant", category: "EVENTS" },
-        { id: "kp_book", label: "KP Book", description: "Interactive astrological rules terminal and validation panel.", systemId: "ai_assistant", category: "EVENTS" },
+        { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "engine_guide", label: "Astrological Rule Engine", description: "Master Astrological Rule Engine Specification V2.0.", systemId: "ai_assistant", category: "SETTINGS" },
+        { id: "kp_book", label: "KP Book", description: "Interactive astrological rules terminal and validation panel.", systemId: "ai_assistant", category: "SETTINGS" },
 
         // Category 8: DEPLOYMENT
         { id: "table_index", label: "Table Index", description: "JH1 to JH19 Master Tables Registry & Mapping.", systemId: "ai_assistant", category: "DEPLOYMENT" },

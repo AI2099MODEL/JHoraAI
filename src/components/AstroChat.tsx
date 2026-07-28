@@ -645,50 +645,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
         <div className="flex-1 overflow-y-auto px-2 py-3 space-y-3 scrollbar-thin">
           
           {/* Main ChatGPT Menu items */}
-          <div className="space-y-4">
-            
-            <div className="space-y-1.5">
-              <span className="text-[9px] font-mono text-orange-500 font-extrabold uppercase tracking-widest block px-2 mb-1 drop-shadow-sm">AI</span>
-              <button
-                onClick={() => {
-                  setActiveSubmenuPanel(null);
-                  if (typeof onNavigateMenu === 'function') {
-                    onNavigateMenu("ai_assistant", "chat");
-                  }
-                  setSidebarOpen(false);
-                }}
-                className={`flex flex-col gap-0.5 py-1.5 px-3 rounded-lg transition-all cursor-pointer w-full text-left shadow-2xs ${
-                  !activeSubmenuPanel || activeSubmenuPanel === "chat"
-                    ? "bg-slate-900 text-slate-100 border-slate-700"
-                    : "bg-transparent hover:bg-slate-100 text-slate-400 hover:text-slate-800 border-transparent"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-bold ${!activeSubmenuPanel || activeSubmenuPanel === "chat" ? "text-slate-100" : "text-slate-700"}`}>AI Assistant Chat</span>
-                </div>
-                <span className="text-[10px] opacity-70">Interactive astrological AI consultation.</span>
-              </button>
-            </div>
-
-            <div className="space-y-1.5">
-              <span className="text-[9px] font-mono text-orange-500 font-extrabold uppercase tracking-widest block px-2 mb-1 drop-shadow-sm">OVERVIEW</span>
-              <button
-                onClick={() => {
-                  if (typeof onCloseStandalone === 'function') {
-                    onCloseStandalone();
-                  } else if (typeof onNavigateMenu === 'function') {
-                    onNavigateMenu("dashboard");
-                  }
-                  setSidebarOpen(false);
-                }}
-                className="flex flex-col gap-0.5 py-1.5 px-3 rounded-lg transition-all cursor-pointer w-full text-left bg-transparent hover:bg-slate-100 text-slate-400 hover:text-slate-800 border-transparent shadow-2xs"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-700">Dashboard</span>
-                </div>
-                <span className="text-[10px] opacity-70">Horoscope overview and panchanga.</span>
-              </button>
-            </div>
+          <div className="space-y-2">
             {/* 1. My Life (Renamed from My Journey) */}
             <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
               <button
