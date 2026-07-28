@@ -556,7 +556,7 @@ export default function App() {
   };
 
   // Active Navigation Coordinate Graph
-  const [activeMenu, setActiveMenu] = useState<string>("astro");
+  const [activeMenu, setActiveMenu] = useState<string>("my_page");
   const [activeSubMenu, setActiveSubMenu] = useState<{ [key: string]: string }>({
     horoscope: "overview",
     charts: "d1_rasi",
@@ -567,12 +567,13 @@ export default function App() {
     transit: "current_gochara",
     muhurta: "daily_muhurta",
     reports: "generate_pdf",
+    ai_assistant: "chat",
     kp_stellar: "dashboard",
     western_astrology: "dashboard",
     esoteric: "nadi",
     settings: "theme",
     developer: "raw_json",
-    astro: "jhora_birth_details"
+    my_page: "overview"
   });
 
   // Dynamic Plugin Registry
@@ -1224,8 +1225,7 @@ export default function App() {
             };
             
             if (!isInitial) {
-              setActiveMenu("astro");
-              setActiveSubMenu(prev => ({ ...prev, astro: "ai_assistant" }));
+              setActiveMenu("ai_assistant");
             }
             setLoading(false);
             return; // Exit early
@@ -1324,8 +1324,7 @@ export default function App() {
       }
 
       if (!isInitial) {
-        setActiveMenu("astro");
-        setActiveSubMenu(prev => ({ ...prev, astro: "ai_assistant" }));
+        setActiveMenu("ai_assistant");
       }
     } catch (error: any) {
       console.error("Calculation failed:", error);
@@ -1368,8 +1367,7 @@ export default function App() {
     };
 
     runAutomatedSync(updatedInputs);
-    setActiveMenu("astro");
-    setActiveSubMenu(prev => ({ ...prev, astro: "jhora_birth_details" }));
+    setActiveMenu("dashboard");
   };
 
   const handleLoadCachedParametersOnly = (record: CachedHoroscopeRecord) => {
@@ -1474,8 +1472,18 @@ export default function App() {
   const isDark = theme !== "vedic-sandalwood";
 
   // Navigation configuration representing Phase 10 spec
-  // Navigation configuration representing Phase 10 spec
   const MAIN_MENU_STRUCTURE: MainMenuNode[] = [
+    { id: "dashboard", label: "Dashboard", icon: Compass },
+    {
+      id: "ai_assistant",
+      label: "AI Assistant",
+      icon: Sparkles
+    },
+    {
+      id: "my_page",
+      label: "My Page",
+      icon: User
+    },
     {
       id: "astro",
       label: "Astro",
@@ -1505,8 +1513,7 @@ export default function App() {
         { id: "lalkitab_houses", label: "LKB Houses", description: "JH18: Lal Kitab Planetary Houses.", systemId: "astro", category: "LAL KITAB" },
         { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "JH19: Lal Kitab Teva & Sleeping Status.", systemId: "astro", category: "LAL KITAB" },
 
-        // Category 7: EVENTS & AI ASSISTANT
-        { id: "ai_assistant", label: "AI Assistant", description: "AI astrological consultation chat.", systemId: "astro", category: "EVENTS" },
+        // Category 7: EVENTS
         { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "astro", category: "EVENTS" },
         { id: "engine_guide", label: "Astrological Rule Engine", description: "Master Astrological Rule Engine Specification V2.0.", systemId: "astro", category: "EVENTS" },
         { id: "kp_book", label: "KP Book", description: "Interactive astrological rules terminal and validation panel.", systemId: "astro", category: "EVENTS" },
@@ -1694,8 +1701,7 @@ export default function App() {
         setAstrologyData(record.data);
         localStorage.setItem("jhora_astrology_data", JSON.stringify(record.data));
         setProfileVerify(prev => ({ ...prev, isOpen: false }));
-        setActiveMenu("astro");
-        setActiveSubMenu(prev => ({ ...prev, astro: "jhora_birth_details" }));
+        setActiveMenu("dashboard");
       }, 1500);
     }
   };
@@ -1891,8 +1897,7 @@ export default function App() {
       }
 
       setProfileVerify(prev => ({ ...prev, isOpen: false }));
-      setActiveMenu("astro");
-      setActiveSubMenu(prev => ({ ...prev, astro: "jhora_birth_details" }));
+      setActiveMenu("dashboard");
     } catch (err) {
       console.error("Failed to parse or calculate imported profile:", err);
       alert("Invalid JSON format. Please upload a valid JHoraAI Astrology Profile JSON file.");
@@ -1993,8 +1998,7 @@ export default function App() {
           astrologyData={astrologyData} 
           isStandalone={true} 
           onCloseStandalone={() => {
-            setActiveMenu("astro");
-            setActiveSubMenu(prev => ({ ...prev, astro: "jhora_birth_details" }));
+            setActiveMenu("dashboard");
           }}
         />
       </div>
@@ -2881,6 +2885,49 @@ export default function App() {
                 )}
               </motion.div>
             </AnimatePresence>
+          ) : activeMenu === "ai_assistant" ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="ai_assistant"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="space-y-6"
+              >
+                <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
+                  <AstroChat 
+                    astrologyData={astrologyData} 
+                    onNavigateMenu={(menu, submenu) => {
+                      setActiveMenu(menu);
+                      if (submenu) {
+                        setActiveSubMenu(prev => ({ ...prev, [menu]: submenu }));
+                      }
+                    }}
+                  />
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          ) : activeMenu === "my_page" ? (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="my_page"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                className="space-y-6"
+              >
+                <MyPageView
+                  astrologyData={astrologyData}
+                  activeUser={activeUser}
+                  isDark={isDark}
+                  containerStyle={containerStyle}
+                  cardStyle={cardStyle}
+                  textMuted={textMuted}
+                  activeSubmenuId={activeSubmenuId}
+                  onSubmenuSelect={handleSubmenuSelect}
+                />
+              </motion.div>
+            </AnimatePresence>
           ) : activeMenu === "astro" ? (
             <AnimatePresence mode="wait">
               <motion.div
@@ -2890,19 +2937,7 @@ export default function App() {
                 exit={{ opacity: 0, y: -5 }}
                 className="space-y-6"
               >
-                {activeSubmenuId === "ai_assistant" ? (
-                  <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                    <AstroChat 
-                      astrologyData={astrologyData} 
-                      onNavigateMenu={(menu, submenu) => {
-                        setActiveMenu(menu);
-                        if (submenu) {
-                          setActiveSubMenu(prev => ({ ...prev, [menu]: submenu }));
-                        }
-                      }}
-                    />
-                  </div>
-                ) : SETTINGS_SUBMENU_IDS.includes(activeSubmenuId) ? (
+                {SETTINGS_SUBMENU_IDS.includes(activeSubmenuId) ? (
                   /* Interactive settings panel rendered inside Astro menu */
                   [
                     "raw_json",
