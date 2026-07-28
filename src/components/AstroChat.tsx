@@ -47,7 +47,8 @@ import {
   Briefcase,
   Moon,
   Sun,
-  Orbit
+  Orbit,
+  X
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
@@ -550,82 +551,65 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
             <Menu className="w-4 h-4" />
           </button>
 
-          {activeSubmenuPanel ? (
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={() => setActiveSubmenuPanel(null)}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-950 border border-indigo-200/90 text-[10.5px] font-bold transition-all cursor-pointer shadow-2xs"
-              >
-                <ArrowLeft className="w-3 h-3 text-indigo-600" />
-                <span>Back to Assistant</span>
-              </button>
-              <span className="text-xs font-bold text-neutral-800 capitalize tracking-tight ml-1">
-                {activeSubmenuPanel.replace(/_/g, " ")} Module
+          <div className="flex items-center gap-1.5 overflow-x-auto text-[10px] font-sans scrollbar-none py-0.5 min-w-0">
+            {/* Transit Moon Nakshatra & Lord/Sublord Pill */}
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50/90 border border-indigo-200/80 text-indigo-900 font-medium shrink-0 shadow-2xs text-[10px]">
+              <Moon className="w-3 h-3 text-indigo-600 shrink-0" />
+              <span className="font-bold text-indigo-950">{transitMoonSign}</span>
+              <span className="text-indigo-300">·</span>
+              <span className="font-semibold">{transitMoonNak}</span>
+              <span className="text-indigo-300">|</span>
+              <span className="font-mono text-[9.5px] text-indigo-800 flex items-center gap-0.5">
+                <strong className="text-indigo-950 font-bold">Ld:</strong> {transitMoonStarLord}
+                <span className="text-indigo-300">·</span>
+                <strong className="text-indigo-950 font-bold">Sub:</strong> {transitMoonSubLord}
               </span>
             </div>
-          ) : (
-            <div className="flex items-center gap-1.5 overflow-x-auto text-[10px] font-sans scrollbar-none py-0.5 min-w-0">
-              {/* Transit Moon Nakshatra & Lord/Sublord Pill */}
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50/90 border border-indigo-200/80 text-indigo-900 font-medium shrink-0 shadow-2xs text-[10px]">
-                <Moon className="w-3 h-3 text-indigo-600 shrink-0" />
-                <span className="font-bold text-indigo-950">{transitMoonSign}</span>
-                <span className="text-indigo-300">·</span>
-                <span className="font-semibold">{transitMoonNak}</span>
-                <span className="text-indigo-300">|</span>
-                <span className="font-mono text-[9.5px] text-indigo-800 flex items-center gap-0.5">
-                  <strong className="text-indigo-950 font-bold">Ld:</strong> {transitMoonStarLord}
-                  <span className="text-indigo-300">·</span>
-                  <strong className="text-indigo-950 font-bold">Sub:</strong> {transitMoonSubLord}
-                </span>
-              </div>
 
-              {/* Major Planets Transit Summary Pill */}
-              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50/80 border border-amber-200/80 text-amber-900 text-[9.5px] font-mono shrink-0 shadow-2xs">
-                <Orbit className="w-3 h-3 text-amber-600 shrink-0" />
-                <span className="flex items-center gap-0.5">
-                  <Sun className="w-2.5 h-2.5 text-amber-600 shrink-0" />
-                  <strong className="text-amber-950 font-bold">{transitSunSign}</strong> <span className="text-[9px] text-amber-800">({transitSunNak})</span>
-                </span>
-                <span className="text-amber-300">|</span>
-                <span>
-                  <strong className="text-purple-900 font-bold">Jup:</strong> {transitJupSign}
-                </span>
-                <span className="text-amber-300">|</span>
-                <span>
-                  <strong className="text-slate-900 font-bold">Sat:</strong> {transitSatSign}
-                </span>
-                <span className="text-amber-300">|</span>
-                <span>
-                  <strong className="text-rose-900 font-bold">Mar:</strong> {transitMarSign}
-                </span>
-              </div>
+            {/* Major Planets Transit Summary Pill */}
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50/80 border border-amber-200/80 text-amber-900 text-[9.5px] font-mono shrink-0 shadow-2xs">
+              <Orbit className="w-3 h-3 text-amber-600 shrink-0" />
+              <span className="flex items-center gap-0.5">
+                <Sun className="w-2.5 h-2.5 text-amber-600 shrink-0" />
+                <strong className="text-amber-950 font-bold">{transitSunSign}</strong> <span className="text-[9px] text-amber-800">({transitSunNak})</span>
+              </span>
+              <span className="text-amber-300">|</span>
+              <span>
+                <strong className="text-purple-900 font-bold">Jup:</strong> {transitJupSign}
+              </span>
+              <span className="text-amber-300">|</span>
+              <span>
+                <strong className="text-slate-900 font-bold">Sat:</strong> {transitSatSign}
+              </span>
+              <span className="text-amber-300">|</span>
+              <span>
+                <strong className="text-rose-900 font-bold">Mar:</strong> {transitMarSign}
+              </span>
             </div>
-          )}
+          </div>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0 ml-1">
-          {!activeSubmenuPanel && (
-            /* Current Date, Live Time & Location details pill */
-            <div className="hidden sm:flex items-center gap-1.5 bg-neutral-50 border border-neutral-200/80 px-2 py-0.5 rounded-full text-[10px] font-medium text-neutral-700 shadow-2xs shrink-0">
-              <div className="flex items-center gap-1">
-                <Clock className="w-3 h-3 text-indigo-500 shrink-0" />
-                <span className="font-semibold text-neutral-800">
-                  {currentDateTime.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                </span>
-                <span className="text-neutral-300">·</span>
-                <span className="font-mono text-indigo-600 font-bold text-[10px]">
-                  {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit" })}
-                </span>
-              </div>
-              <span className="text-neutral-300">|</span>
-              <div className="flex items-center gap-1 text-neutral-700">
-                <MapPin className="w-3 h-3 text-indigo-500 shrink-0" />
-                <span className="font-medium text-neutral-800 truncate max-w-[90px]">
-                  {locationLoading ? "Locating..." : locationName}
-                </span>
-              </div>
+          {/* Current Date, Live Time & Location details pill */}
+          <div className="hidden sm:flex items-center gap-1.5 bg-neutral-50 border border-neutral-200/80 px-2 py-0.5 rounded-full text-[10px] font-medium text-neutral-700 shadow-2xs shrink-0">
+            <div className="flex items-center gap-1">
+              <Clock className="w-3 h-3 text-indigo-500 shrink-0" />
+              <span className="font-semibold text-neutral-800">
+                {currentDateTime.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              </span>
+              <span className="text-neutral-300">·</span>
+              <span className="font-mono text-indigo-600 font-bold text-[10px]">
+                {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit" })}
+              </span>
             </div>
-          )}
+            <span className="text-neutral-300">|</span>
+            <div className="flex items-center gap-1 text-neutral-700">
+              <MapPin className="w-3 h-3 text-indigo-500 shrink-0" />
+              <span className="font-medium text-neutral-800 truncate max-w-[90px]">
+                {locationLoading ? "Locating..." : locationName}
+              </span>
+            </div>
+          </div>
 
           {/* Compact unified action icon stack */}
           <div className="inline-flex items-center bg-white border border-neutral-200/90 rounded-full p-0.5 shadow-2xs shrink-0">
@@ -905,7 +889,20 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           <div className="max-w-4xl mx-auto space-y-6 w-full">
             
             {activeSubmenuPanel ? (
-              <div className="space-y-6 w-full">
+              <div className="space-y-4 w-full">
+                <div className="flex items-center justify-between bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 px-4 py-2.5 rounded-xl border border-indigo-200/80 shadow-2xs">
+                  <span className="text-xs font-extrabold text-indigo-950 capitalize tracking-tight flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                    {activeSubmenuPanel.replace(/_/g, " ")}
+                  </span>
+                  <button
+                    onClick={() => setActiveSubmenuPanel(null)}
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-indigo-200/80 text-xs font-bold text-indigo-950 hover:bg-indigo-50 transition-all cursor-pointer shadow-2xs"
+                  >
+                    <X className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Close View</span>
+                  </button>
+                </div>
                 <MyPageView
                   astrologyData={astrologyData}
                   activeUser={null}

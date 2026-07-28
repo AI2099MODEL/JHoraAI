@@ -433,56 +433,60 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
   if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_7", "table_8", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18", "table_20", "table_21", "table_22", "table_23"].includes(tableId)) return null;
   
   const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
-  const thStyle = "py-2 px-3 bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider";
-  const tdStyle = "py-2 px-3 border-b border-slate-800/40 text-slate-300 font-mono";
+  const thStyle = "py-2.5 px-3.5 bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white font-mono text-[10.5px] uppercase font-bold tracking-wider border-b border-indigo-900";
+  const tdStyle = "py-2 px-3.5 border-b border-indigo-100/80 text-neutral-900 font-sans font-semibold text-xs";
 
   switch (tableId) {
     case "table_1":
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 font-mono text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-xl border border-indigo-200/90 font-sans text-xs shadow-2xs text-neutral-900">
           <div className="space-y-1.5">
-            <h5 className="font-bold text-amber-400 font-sans text-[10px] uppercase tracking-wider mb-2 border-b border-slate-800 pb-1">Birth Particulars</h5>
-            <div className="flex justify-between py-1 border-b border-slate-900/10">
-              <span className="text-slate-500">Name:</span>
-              <span className="text-slate-200 font-bold">{data.name || "Nitin Jain"}</span>
+            <h5 className="font-extrabold text-indigo-950 font-sans text-xs uppercase tracking-wider mb-2 border-b border-indigo-100 pb-1.5 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-indigo-600"></span> Birth Particulars
+            </h5>
+            <div className="flex justify-between py-1 border-b border-indigo-50">
+              <span className="text-neutral-500 font-medium">Name:</span>
+              <span className="text-indigo-950 font-extrabold">{data.name || "Nitin Jain"}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-900/10">
-              <span className="text-slate-500">Date:</span>
-              <span className="text-slate-200">{data.date || data.birthDate}</span>
+            <div className="flex justify-between py-1 border-b border-indigo-50">
+              <span className="text-neutral-500 font-medium">Date:</span>
+              <span className="text-neutral-900 font-bold">{data.date || data.birthDate}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-900/10">
-              <span className="text-slate-500">Time:</span>
-              <span className="text-slate-200">{data.time || data.birthTime}</span>
+            <div className="flex justify-between py-1 border-b border-indigo-50">
+              <span className="text-neutral-500 font-medium">Time:</span>
+              <span className="text-neutral-900 font-bold">{data.time || data.birthTime}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-900/10">
-              <span className="text-slate-500">Place:</span>
-              <span className="text-slate-200">{data.location || data.birthPlace}</span>
+            <div className="flex justify-between py-1 border-b border-indigo-50">
+              <span className="text-neutral-500 font-medium">Place:</span>
+              <span className="text-neutral-900 font-bold">{data.location || data.birthPlace}</span>
             </div>
           </div>
           <div className="space-y-1.5">
-            <h5 className="font-bold text-amber-400 font-sans text-[10px] uppercase tracking-wider mb-2 border-b border-slate-800 pb-1">Ascendant Coordinates</h5>
-            <div className="flex justify-between py-1 border-b border-slate-900/10">
-              <span className="text-slate-500">Zodiac Sign (Lagna):</span>
-              <span className="text-slate-200 font-bold">{data.lagnaSign || "Cancer"}</span>
+            <h5 className="font-extrabold text-indigo-950 font-sans text-xs uppercase tracking-wider mb-2 border-b border-indigo-100 pb-1.5 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span> Ascendant Coordinates
+            </h5>
+            <div className="flex justify-between py-1 border-b border-indigo-50">
+              <span className="text-neutral-500 font-medium">Zodiac Sign (Lagna):</span>
+              <span className="text-indigo-950 font-extrabold">{data.lagnaSign || "Cancer"}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-900/10">
-              <span className="text-slate-500">Nakshatra:</span>
-              <span className="text-slate-200">{data.lagnaNakshatra || "Pushya"}</span>
+            <div className="flex justify-between py-1 border-b border-indigo-50">
+              <span className="text-neutral-500 font-medium">Nakshatra:</span>
+              <span className="text-neutral-900 font-bold">{data.lagnaNakshatra || "Pushya"}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-900/10">
-              <span className="text-slate-500">Nakshatra Lord:</span>
-              <span className="text-slate-200">{data.lagnaNakLord || "Saturn"}</span>
+            <div className="flex justify-between py-1 border-b border-indigo-50">
+              <span className="text-neutral-500 font-medium">Nakshatra Lord:</span>
+              <span className="text-indigo-900 font-bold">{data.lagnaNakLord || "Saturn"}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-900/10">
-              <span className="text-slate-500">KP Sub-Lord:</span>
-              <span className="text-slate-200">{data.lagnaSubLord || "Mercury"}</span>
+            <div className="flex justify-between py-1 border-b border-indigo-50">
+              <span className="text-neutral-500 font-medium">KP Sub-Lord:</span>
+              <span className="text-indigo-900 font-bold">{data.lagnaSubLord || "Mercury"}</span>
             </div>
           </div>
         </div>
       );
     case "table_2":
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
+        <div className="overflow-x-auto rounded-xl border border-indigo-200/90 bg-white shadow-2xs mt-2">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -494,16 +498,16 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 <th className={thStyle}>Dignity / Avastha</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-indigo-100/80">
               {Array.isArray(planetsArray) && planetsArray.map((p: any, idx: number) => (
-                <tr key={idx} className="hover:bg-slate-900/30">
-                  <td className={`${tdStyle} font-bold text-amber-500`}>{p.name || p.lord}</td>
-                  <td className={tdStyle}>{p.sign}</td>
-                  <td className={tdStyle}>{p.degree}° {p.minute || 0}'</td>
-                  <td className={tdStyle}>{p.nakshatra} ({p.pada})</td>
-                  <td className={tdStyle}>House {p.house}</td>
+                <tr key={idx} className={idx % 2 === 0 ? "bg-white hover:bg-purple-50/60 transition-colors" : "bg-indigo-50/30 hover:bg-purple-50/60 transition-colors"}>
+                  <td className={`${tdStyle} font-extrabold text-indigo-950`}>{p.name || p.lord}</td>
+                  <td className={`${tdStyle} font-medium text-neutral-900`}>{p.sign}</td>
+                  <td className={`${tdStyle} font-mono font-bold text-neutral-800`}>{p.degree}° {p.minute || 0}'</td>
+                  <td className={`${tdStyle} font-semibold text-amber-900`}>{p.nakshatra} ({p.pada})</td>
+                  <td className={`${tdStyle} font-bold text-indigo-800`}>House {p.house}</td>
                   <td className={tdStyle}>
-                    <span className="px-1.5 py-0.5 rounded text-[9px] bg-amber-500/10 text-amber-400 font-bold">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 font-bold border border-amber-200">
                       {p.dignity || p.avastha || "Neutral"}
                     </span>
                   </td>
@@ -523,19 +527,19 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
         else if (tableId === "table_5") dashaData = profile?.Vedic?.dashas?.ashtottari || [];
       }
       return (
-        <div className="p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 text-xs font-mono max-h-[300px] overflow-y-auto space-y-1.5">
-          <div className="flex justify-between text-slate-500 border-b border-slate-800 pb-1 text-[10px] uppercase font-bold tracking-wider mb-2 font-sans">
+        <div className="p-3 bg-white rounded-xl border border-indigo-200/90 text-xs font-sans max-h-[300px] overflow-y-auto space-y-1.5 shadow-2xs">
+          <div className="flex justify-between text-indigo-950 border-b border-indigo-100 pb-1.5 text-[10.5px] uppercase font-extrabold tracking-wider mb-2 font-sans bg-indigo-50/60 p-2 rounded-lg">
             <span>Dasha Lord (Period)</span>
             <span>Completion Date</span>
           </div>
           {Array.isArray(dashaData) && dashaData.map((d: any, idx: number) => (
-            <div key={idx} className="flex justify-between py-1 border-b border-slate-900/10 hover:bg-slate-900/20 px-1 rounded">
-              <span className="font-bold text-amber-500">{d.lord}</span>
-              <span className="text-slate-300">Until {d.end_date || d.endDate || d.end}</span>
+            <div key={idx} className="flex justify-between py-1.5 border-b border-indigo-50 hover:bg-purple-50/60 px-2 rounded-lg transition-colors">
+              <span className="font-extrabold text-indigo-950">{d.lord}</span>
+              <span className="text-neutral-800 font-medium">Until {d.end_date || d.endDate || d.end}</span>
             </div>
           ))}
           {typeof dashaData === "object" && !Array.isArray(dashaData) && (
-            <pre className="text-[10px] text-slate-300 leading-relaxed overflow-x-auto">
+            <pre className="text-xs text-neutral-800 leading-relaxed overflow-x-auto p-2 bg-indigo-50/40 rounded-lg">
               {JSON.stringify(dashaData, null, 2)}
             </pre>
           )}
@@ -939,39 +943,40 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 
       return (
         <div className="space-y-6 text-xs animate-fade-in">
-          <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
-            <div className="flex justify-between items-center border-b border-slate-800 pb-1.5 flex-wrap gap-2">
-              <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider">
+          <div className="rounded-xl border border-indigo-200/90 bg-white p-4 space-y-3 shadow-2xs text-neutral-900">
+            <div className="flex justify-between items-center border-b border-indigo-100 pb-2 flex-wrap gap-2">
+              <h5 className="font-extrabold text-indigo-950 font-sans text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-teal-600"></span>
                 I. Planet Significators [Table: KP_PLANET_SIGNIFICATORS]
               </h5>
-              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+              <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider font-semibold">
                 Levels 1-6 Cusp Outputs
               </span>
             </div>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-lg border border-indigo-100">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
+                  <tr className="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white font-mono text-[10.5px] uppercase font-bold tracking-wider">
                     <th className="py-2.5 px-3">Planet</th>
-                    <th className="py-2.5 px-3 text-emerald-400">L1</th>
-                    <th className="py-2.5 px-3 text-teal-400">L2</th>
-                    <th className="py-2.5 px-3 text-slate-300">L3</th>
-                    <th className="py-2.5 px-3 text-slate-300">L4</th>
-                    <th className="py-2.5 px-3 text-indigo-400">L5</th>
-                    <th className="py-2.5 px-3 text-slate-500">L6</th>
+                    <th className="py-2.5 px-3">L1</th>
+                    <th className="py-2.5 px-3">L2</th>
+                    <th className="py-2.5 px-3">L3</th>
+                    <th className="py-2.5 px-3">L4</th>
+                    <th className="py-2.5 px-3">L5</th>
+                    <th className="py-2.5 px-3">L6</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/20 font-mono">
-                  {planetSignificatorsList.map((sig) => {
+                <tbody className="divide-y divide-indigo-100/80 font-sans text-xs">
+                  {planetSignificatorsList.map((sig, idx) => {
                     return (
-                      <tr key={sig.Planet} className="hover:bg-slate-900/30">
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-bold font-sans">{sig.Planet}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400 font-bold">{sig.L1.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-teal-400 font-semibold">{sig.L2.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L3.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L4.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400">{sig.L5.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{sig.L6.join(", ") || "-"}</td>
+                      <tr key={sig.Planet} className={idx % 2 === 0 ? "bg-white hover:bg-purple-50/60 transition-colors" : "bg-indigo-50/30 hover:bg-purple-50/60 transition-colors"}>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-indigo-950 font-extrabold font-sans">{sig.Planet}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-emerald-800 font-bold">{sig.L1.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-teal-800 font-semibold">{sig.L2.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-800 font-medium">{sig.L3.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-800 font-medium">{sig.L4.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-indigo-900 font-bold">{sig.L5.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-600">{sig.L6.join(", ") || "-"}</td>
                       </tr>
                     );
                   })}
@@ -980,39 +985,40 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
-            <div className="flex justify-between items-center border-b border-slate-800 pb-1.5 flex-wrap gap-2">
-              <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider">
+          <div className="rounded-xl border border-indigo-200/90 bg-white p-4 space-y-3 shadow-2xs text-neutral-900">
+            <div className="flex justify-between items-center border-b border-indigo-100 pb-2 flex-wrap gap-2">
+              <h5 className="font-extrabold text-indigo-950 font-sans text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
                 II. House Significators [Table: KP_HOUSE_SIGNIFICATORS]
               </h5>
-              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+              <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider font-semibold">
                 Reverse Lookup Map
               </span>
             </div>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-lg border border-indigo-100">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
+                  <tr className="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white font-mono text-[10.5px] uppercase font-bold tracking-wider">
                     <th className="py-2.5 px-3">House</th>
-                    <th className="py-2.5 px-3 text-emerald-400">L1</th>
-                    <th className="py-2.5 px-3 text-teal-400">L2</th>
-                    <th className="py-2.5 px-3 text-slate-300">L3</th>
-                    <th className="py-2.5 px-3 text-slate-300">L4</th>
-                    <th className="py-2.5 px-3 text-indigo-400">L5</th>
-                    <th className="py-2.5 px-3 text-slate-500">L6</th>
+                    <th className="py-2.5 px-3">L1</th>
+                    <th className="py-2.5 px-3">L2</th>
+                    <th className="py-2.5 px-3">L3</th>
+                    <th className="py-2.5 px-3">L4</th>
+                    <th className="py-2.5 px-3">L5</th>
+                    <th className="py-2.5 px-3">L6</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/20 font-mono">
-                  {houseSignificatorsList.map((sig) => {
+                <tbody className="divide-y divide-indigo-100/80 font-sans text-xs">
+                  {houseSignificatorsList.map((sig, idx) => {
                     return (
-                      <tr key={sig.House} className="hover:bg-slate-900/30">
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300 font-bold font-sans">House {sig.House}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400 font-bold">{sig.L1.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-teal-400 font-semibold">{sig.L2.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L3.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L4.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400">{sig.L5.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{sig.L6.join(", ") || "-"}</td>
+                      <tr key={sig.House} className={idx % 2 === 0 ? "bg-white hover:bg-purple-50/60 transition-colors" : "bg-indigo-50/30 hover:bg-purple-50/60 transition-colors"}>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-indigo-950 font-extrabold font-sans">House {sig.House}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-emerald-800 font-bold">{sig.L1.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-teal-800 font-semibold">{sig.L2.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-800 font-medium">{sig.L3.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-800 font-medium">{sig.L4.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-indigo-900 font-bold">{sig.L5.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-600">{sig.L6.join(", ") || "-"}</td>
                       </tr>
                     );
                   })}
