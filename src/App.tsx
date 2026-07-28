@@ -2002,6 +2002,7 @@ export default function App() {
           onCloseStandalone={() => {
             setActiveMenu("dashboard");
           }}
+          onNavigateMenu={(menu, sub) => setActiveMenu(menu)}
         />
       </div>
     );
@@ -2836,7 +2837,10 @@ export default function App() {
                 className="space-y-6"
               >
                 <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                  <AstroChat astrologyData={astrologyData} />
+                  <AstroChat 
+                    astrologyData={astrologyData} 
+                    onNavigateMenu={(menu, sub) => setActiveMenu(menu)}
+                  />
                 </div>
               </motion.div>
             </AnimatePresence>
