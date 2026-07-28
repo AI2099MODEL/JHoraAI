@@ -525,43 +525,46 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
             </div>
           )}
 
-          {onCloseStandalone && (
-            <button
-              onClick={onCloseStandalone}
-              className="p-1.5 sm:p-2 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer shrink-0"
-              title="Return to Dashboard"
+          {/* Compact unified action icon stack */}
+          <div className="inline-flex items-center bg-white border border-neutral-200/90 rounded-full p-1 shadow-2xs shrink-0">
+            {onCloseStandalone && (
+              <button
+                onClick={onCloseStandalone}
+                className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer"
+                title="Return to Dashboard"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+              </button>
+            )}
+
+            <button 
+              onClick={() => {
+                window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
+              }}
+              className="p-1.5 rounded-full hover:bg-neutral-100 text-[#5c4df2] transition-all cursor-pointer"
+              title="Open in New Window"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ExternalLink className="w-3.5 h-3.5" />
             </button>
-          )}
 
-          <button 
-            onClick={() => {
-              window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
-            }}
-            className="p-1.5 sm:p-2 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer shrink-0"
-            title="Open in New Window"
-          >
-            <ExternalLink className="w-4 h-4 text-[#5c4df2]" />
-          </button>
+            <button 
+              onClick={() => {
+                alert("Share Link: Astrological conversation state serialized securely.");
+              }}
+              className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer"
+              title="Share conversation"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+            </button>
 
-          <button 
-            onClick={() => {
-              alert("Share Link: Astrological conversation state serialized securely.");
-            }}
-            className="p-1.5 sm:p-2 rounded-full border border-neutral-200 bg-white hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer shrink-0"
-            title="Share conversation"
-          >
-            <Share2 className="w-4 h-4 text-neutral-600" />
-          </button>
-
-          <button
-            onClick={clearChat}
-            title="Reset Conversation"
-            className="p-1.5 sm:p-2 rounded-full border border-neutral-200 bg-white hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer shrink-0"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+            <button
+              onClick={clearChat}
+              title="Reset Conversation"
+              className="p-1.5 rounded-full hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 
