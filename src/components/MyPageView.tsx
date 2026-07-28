@@ -6167,13 +6167,12 @@ export function MyPageView({
           };
 
           return (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* SVG Chart Wheel */}
-                <div className={`p-6 border rounded-xl ${cardStyle} flex flex-col items-center justify-center`}>
-                  <span className="text-[10px] font-mono font-bold text-sky-500 mb-4 uppercase tracking-wider">WESTERN PLACIDUS WHEEL</span>
-                  
-                  <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="mx-auto select-none">
+            <div className="space-y-6 flex justify-center">
+              {/* SVG Chart Wheel */}
+              <div className={`p-6 border rounded-xl ${cardStyle} flex flex-col items-center justify-center w-full max-w-xl`}>
+                <span className="text-[10px] font-mono font-bold text-sky-500 mb-4 uppercase tracking-wider">WESTERN PLACIDUS WHEEL</span>
+                
+                <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="mx-auto select-none">
                     {/* Background */}
                     <circle cx={center} cy={center} r={r1} fill="none" stroke={isDark ? "#334155" : "#cbd5e1"} strokeWidth="1" />
                     <circle cx={center} cy={center} r={r2} fill="none" stroke={isDark ? "#475569" : "#94a3b8"} strokeWidth="1" />
@@ -6274,41 +6273,8 @@ export function MyPageView({
                     })}
                   </svg>
                 </div>
-
-                {/* Planets & Aspects Listing */}
-                <div className="space-y-4">
-                  <div className={`p-4 border rounded-xl ${cardStyle}`}>
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-sky-400 mb-2">Tropical Planetary Coordinates</h4>
-                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                      {resolvedData.planets.map(p => (
-                        <div key={p.name} className="flex justify-between border-b border-slate-500/10 py-1">
-                          <span className={textMutedStyle}>{p.name}:</span>
-                          <span className={`${textStyle} font-bold`}>{p.degree.toFixed(1)}° {p.sign.substring(0, 3)} (H{p.house})</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className={`p-4 border rounded-xl ${cardStyle}`}>
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-sky-400 mb-2">Major Planetary Aspects</h4>
-                    <div className="max-h-[160px] overflow-y-auto space-y-1.5 text-xs font-mono">
-                      {aspects.length > 0 ? (
-                        aspects.slice(0, 10).map((asp, i) => (
-                          <div key={i} className="flex justify-between items-center py-1 border-b border-dashed border-slate-500/10">
-                            <span className={textStyle}>{asp.p1} • {asp.p2}</span>
-                            <span style={{ color: asp.color }} className="font-bold">{asp.type}</span>
-                            <span className={textMutedStyle}>Orb: {asp.orb}°</span>
-                          </div>
-                        ))
-                      ) : (
-                        <p className={`text-[11px] ${textMutedStyle}`}>No major aspects computed inside standard orb tolerances.</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
               </div>
-            </div>
-          );
+            );
         })()
       ) : activeTab === "daily" ? (
         (() => {
