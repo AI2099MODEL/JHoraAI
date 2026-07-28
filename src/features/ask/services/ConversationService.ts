@@ -2,23 +2,25 @@ import { Conversation, Message } from "../models/Conversation";
 import { BirthProfile } from "../models/BirthProfile";
 
 export interface Preferences {
-  preferredProvider: "openai" | "gemini" | "claude";
+  preferredProvider: "groq" | "gemini" | "claude";
+  groqApiKey?: string;
   openaiApiKey?: string;
   geminiApiKey?: string;
   claudeApiKey?: string;
   preferredModels: {
-    openai?: string;
+    groq?: string;
     gemini?: string;
     claude?: string;
+    openai?: string;
   };
   language: string;
   lastOpenChartId?: string;
 }
 
 const DEFAULT_PREFERENCES: Preferences = {
-  preferredProvider: "openai",
+  preferredProvider: "groq",
   preferredModels: {
-    openai: "gpt-4o-mini",
+    groq: "llama-3.3-70b-versatile",
     gemini: "gemini-3.6-flash",
     claude: "claude-3-5-sonnet-latest"
   },
@@ -49,7 +51,7 @@ export class ConversationService {
     return this.getConversations().find((c) => c.id === id);
   }
 
-  static createConversation(provider: "openai" | "gemini" | "claude", title?: string): Conversation {
+  static createConversation(provider: "groq" | "gemini" | "claude", title?: string): Conversation {
     const conversations = this.getConversations();
     const newConv: Conversation = {
       id: "conv_" + Math.random().toString(36).substring(2, 11),

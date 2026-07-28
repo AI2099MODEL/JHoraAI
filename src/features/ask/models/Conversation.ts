@@ -42,5 +42,5 @@ export interface Conversation {
   messages: Message[];
   createdAt: string;
   updatedAt: string;
-  provider: 'openai' | 'gemini' | 'claude';
+  provider: 'groq' | 'gemini' | 'claude';
 }

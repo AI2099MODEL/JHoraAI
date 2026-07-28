@@ -2176,12 +2176,12 @@ export function MyPageView({
     try {
       const preferences = ConversationService.getPreferences();
       const geminiApiKey = preferences?.geminiApiKey;
-      const openaiApiKey = preferences?.openaiApiKey;
+      const groqApiKey = preferences?.groqApiKey || (typeof window !== "undefined" ? localStorage.getItem("user_groq_api_key") : undefined);
 
       const response = await fetch("/api/user-profile/generate-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profile, geminiApiKey, openaiApiKey }),
+        body: JSON.stringify({ profile, geminiApiKey, groqApiKey }),
       });
 
       if (!response.ok) {

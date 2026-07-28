@@ -498,8 +498,8 @@ export default function App() {
   const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("English");
   const [notificationsActive, setNotificationsActive] = useState<boolean>(true);
-  const [userOpenaiApiKey, setUserOpenaiApiKey] = useState<string>(() => {
-    return localStorage.getItem("user_openai_api_key") || "";
+  const [userGroqApiKey, setUserGroqApiKey] = useState<string>(() => {
+    return localStorage.getItem("user_groq_api_key") || localStorage.getItem("user_openai_api_key") || "";
   });
 
   // Free mobile push notifications settings (via ntfy.sh)
@@ -549,9 +549,9 @@ export default function App() {
     }
   };
 
-  const handleOpenaiKeyChange = (key: string) => {
-    setUserOpenaiApiKey(key);
-    localStorage.setItem("user_openai_api_key", key);
+  const handleGroqKeyChange = (key: string) => {
+    setUserGroqApiKey(key);
+    localStorage.setItem("user_groq_api_key", key);
   };
 
   // Active Navigation Coordinate Graph

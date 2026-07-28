@@ -161,7 +161,7 @@ export function useConversation() {
 
     const provider = preferences.preferredProvider;
     const model = preferences.preferredModels[provider];
-    const apiKey = provider === "gemini" ? preferences.geminiApiKey : (provider === "openai" ? preferences.openaiApiKey : preferences.claudeApiKey);
+    const apiKey = provider === "groq" ? preferences.groqApiKey : (provider === "gemini" ? preferences.geminiApiKey : preferences.claudeApiKey);
 
     try {
       const response = await fetch("/api/ai/consultation", {

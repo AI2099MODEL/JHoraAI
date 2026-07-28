@@ -12,7 +12,7 @@ import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import cors from "cors";
 import { GoogleGenAI, Type } from "@google/genai";
-import OpenAI from "openai";
+import Groq from "groq-sdk";
 import { KpService } from "./src/lib/kp/KpService";
 import { WesternService } from "./src/lib/western/WesternService";
 import { calculateAstrology, NAKSHATRAS } from "./src/lib/astrology";
@@ -118,25 +118,21 @@ function enqueueGitCommand(cmd: string, callback?: (err: Error | null, stdout: s
   processGitQueue();
 }
 
-// Lazy-initialize OpenAI API client to avoid startup crashes if key is missing
-let openaiClient: OpenAI | null = null;
-function getOpenAIClient(req?: any): OpenAI {
-  const userKey = req?.headers?.["x-openai-api-key"] || req?.body?.openaiApiKey || req?.headers?.["authorization"]?.toString().replace("Bearer ", "");
-  const key = userKey || process.env.OPENAI_API_KEY;
+// Lazy-initialize Groq API client to avoid startup crashes if key is missing
+let groqClient: Groq | null = null;
+function getGroqClient(req?: any): Groq {
+  const userKey = req?.headers?.["x-groq-api-key"] || req?.body?.groqApiKey || req?.headers?.["authorization"]?.toString().replace("Bearer ", "");
+  const key = userKey || process.env.GROQ_API_KEY;
   if (!key) {
-    throw new Error("No OpenAI API key found. Please configure your own ChatGPT/OpenAI API key in the app Settings (top right corner) or provide an OPENAI_API_KEY.");
+    throw new Error("No Groq API key found. Please configure GROQ_API_KEY in environment variables or app Settings.");
   }
   if (userKey) {
-    return new OpenAI({
-      apiKey: userKey,
-    });
+    return new Groq({ apiKey: userKey });
   }
-  if (!openaiClient) {
-    openaiClient = new OpenAI({
-      apiKey: key,
-    });
+  if (!groqClient) {
+    groqClient = new Groq({ apiKey: key });
   }
-  return openaiClient;
+  return groqClient;
 }
 
 // Lazy-initialize Gemini API client to avoid startup crashes if key is missing
@@ -287,35 +283,45 @@ async function triggerAstrologyEmail(profile: any) {
   setTimeout(async () => {
     try {
       let analysisText = "";
+      const prompt = `
+        You are a master Vedic and KP Astrologer. Generate a highly detailed, personalized, and visually beautiful Vedic Astrology Analysis and Reading Report for:
+        Name: ${profile.name}
+        Email: ${profile.email}
+        Phone: ${profile.phoneNumber || "Not provided"}
+        Theme: Premium JHoraAI Vedic and KP Astrology Engine
+
+        Include:
+        1. A warm, mystical greeting.
+        2. An analysis of their general personality based on their cosmic alignment.
+        3. Practical predictions for their Career, Relationships, and Spiritual Growth.
+        4. Remedial measures (Upayas) such as mantras or gemstone suggestions.
+        5. A welcoming invitation to return to JHoraAI for deeper Kundli calculations.
+
+        Format the output as clean, professional, and readable HTML inside a gorgeous modern email template. Keep it elegant, using professional typography spacing.
+      `;
+
       try {
-        const openai = getOpenAIClient();
-        const prompt = `
-          You are a master Vedic and KP Astrologer. Generate a highly detailed, personalized, and visually beautiful Vedic Astrology Analysis and Reading Report for:
-          Name: ${profile.name}
-          Email: ${profile.email}
-          Phone: ${profile.phoneNumber || "Not provided"}
-          Theme: Premium JHoraAI Vedic and KP Astrology Engine
-
-          Include:
-          1. A warm, mystical greeting.
-          2. An analysis of their general personality based on their cosmic alignment.
-          3. Practical predictions for their Career, Relationships, and Spiritual Growth.
-          4. Remedial measures (Upayas) such as mantras or gemstone suggestions.
-          5. A welcoming invitation to return to JHoraAI for deeper Kundli calculations.
-
-          Format the output as clean, professional, and readable HTML inside a gorgeous modern email template. Keep it elegant, using professional typography spacing.
-        `;
-        const response = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
+        const groq = getGroqClient();
+        const response = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
           messages: [{ role: "user", content: prompt }],
         });
-        analysisText = response.choices[0]?.message?.content || "Cosmic energies are aligning. Check your profile dashboard for complete KP stellar and Western synastry calculations.";
-      } catch (aiErr: any) {
-        if (aiErr.message?.includes("No OpenAI API key found")) {
-          console.info("OpenAI API key not provided for background email report; using backup template.");
-        } else {
-          console.error("OpenAI failed to generate email report, using backup:", aiErr);
+        analysisText = response.choices[0]?.message?.content || "";
+      } catch (groqErr: any) {
+        console.warn("Primary Groq API unavailable for email report, trying Gemini secondary...", groqErr.message || groqErr);
+        try {
+          const ai = getGeminiClient();
+          const response = await ai.models.generateContent({
+            model: "gemini-3.6-flash",
+            contents: prompt,
+          });
+          analysisText = response.text || "";
+        } catch (geminiErr: any) {
+          console.error("Gemini secondary fallback also failed for email report:", geminiErr);
         }
+      }
+
+      if (!analysisText) {
         analysisText = `
           <h2>Your JHoraAI Astro Reading</h2>
           <p>Welcome to JHoraAI, ${profile.name}!</p>
@@ -1673,9 +1679,7 @@ app.post("/api/astrology/ai-analyze", async (req, res) => {
   }
 
   try {
-    const openai = getOpenAIClient(req);
-
-    // Create a precise, comprehensive prompt for OpenAI
+    // Create a precise, comprehensive prompt for Groq/Gemini
     const planetsDesc = astrologyData.planets
       .map((p: any) => `${p.name}: ${p.sign} (Degree: ${p.degree.toFixed(2)}°), House ${p.house}, Nakshatra: ${p.nakshatra} (Pada ${p.pada}), Strength: ${p.strength}%`)
       .join("\n");
@@ -1731,29 +1735,42 @@ ${doshasDesc}
 5. **Practical Guidance**: Offer actionable, grounding advice for their spiritual, emotional, and practical progress.`;
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt }
-      ],
-      temperature: 0.7,
-    });
+    let analysisText = "";
 
-    const analysisText = response.choices[0]?.message?.content || "";
-    const userName = astrologyData.birthDetails?.name || "Seeker";
-    saveUserAnalysisToFolder(userName, analysisText, astrologyData);
-
-    res.json({ analysis: analysisText });
-  } catch (apiErr: any) {
-    let prependedNotice = "";
-    if (apiErr.message?.includes("No OpenAI API key found")) {
-      console.info("OpenAI API key not provided for ai-analyze; using local synthesis fallback.");
-      prependedNotice = `> ⚠️ **ChatGPT API Key Missing**: Please set your personal ChatGPT/OpenAI API key in the Settings panel (top-right corner ⚙️) to unlock live GPT-4o-mini readings!\n> Currently running on the JHora local high-fidelity rules engine fallback.\n\n`;
-    } else {
-      console.warn("OpenAI API error during AI Analyze, using high-fidelity local synthesis fallback:", apiErr);
+    // 1. Primary: Try Groq
+    try {
+      const groq = getGroqClient(req);
+      const response = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ],
+        temperature: 0.7,
+      });
+      analysisText = response.choices[0]?.message?.content || "";
+    } catch (groqErr: any) {
+      console.warn("Primary Groq API failed for ai-analyze. Trying Gemini secondary...", groqErr.message || groqErr);
+      try {
+        const geminiKey = req.body?.geminiApiKey;
+        const ai = getGeminiClient(geminiKey);
+        const response = await ai.models.generateContent({
+          model: "gemini-3.6-flash",
+          contents: `${systemPrompt}\n\n${userPrompt}`,
+        });
+        analysisText = response.text || "";
+      } catch (geminiErr: any) {
+        console.warn("Gemini secondary error during AI Analyze, using high-fidelity local synthesis fallback:", geminiErr);
+      }
     }
-    
+
+    if (analysisText) {
+      const userName = astrologyData.birthDetails?.name || "Seeker";
+      saveUserAnalysisToFolder(userName, analysisText, astrologyData);
+      return res.json({ analysis: analysisText });
+    }
+
+    let prependedNotice = "";
     const birthDetails = astrologyData.birthDetails || {};
     const lagnaSign = astrologyData.lagna?.sign || "Aries";
     const activeMahadasha = astrologyData.dashas?.[0]?.lord || "Jupiter";
@@ -1794,6 +1811,9 @@ To harmonize any planetary imbalances, consider the following traditional measur
     saveUserAnalysisToFolder(fallbackName, finalFallback, astrologyData);
 
     res.json({ analysis: finalFallback });
+  } catch (err: any) {
+    console.error("ai-analyze error:", err);
+    res.status(500).json({ error: err.message || "Failed to generate analysis." });
   }
 });
 
@@ -1853,11 +1873,11 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
 
     let responseText: string | null = null;
 
-    // 1. Primary: Try ChatGPT (OpenAI)
+    // 1. Primary: Try Groq
     try {
-      const openai = getOpenAIClient(req);
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+      const groq = getGroqClient(req);
+      const completion = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
         messages: [
           { role: "system", content: "You are an expert Vedic astrologer and counselor. Output raw JSON matching the required schema with keys 'summary' and 'sections'." },
           { role: "user", content: prompt }
@@ -1866,8 +1886,8 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
         temperature: 0.3
       });
       responseText = completion.choices[0]?.message?.content || null;
-    } catch (openaiErr: any) {
-      console.warn("Primary ChatGPT (OpenAI) failed or key unavailable in generate-summary. Trying Gemini secondary fallback...", openaiErr.message || openaiErr);
+    } catch (groqErr: any) {
+      console.warn("Primary Groq failed or key unavailable in generate-summary. Trying Gemini secondary fallback...", groqErr.message || groqErr);
     }
 
     // 2. Secondary Fallback: Gemini API
@@ -1977,8 +1997,6 @@ app.post("/api/astrology/ai-relationship-expert", async (req, res) => {
   }
 
   try {
-    const openai = getOpenAIClient(req);
-
     const systemPrompt = `You are JHoraAI's AI Relationship Expert, a specialized partner interpreter.
 CRITICAL RULES OF PRACTICE:
 1. You are NOT an astrologer.
@@ -2008,27 +2026,43 @@ Current User Question or Focus:
 Analyze the unified evidence across all dimensions, calculate consensus stats, extract strengths, weaknesses, positive factors, risk factors, recommendations with remedies, and provide FAQs.
 If a specific user question is asked above, answer it beautifully in the "chatReply" field, ensuring you explain the why, explain the confidence level, and explain the evidence while strictly citing the specific Decision IDs, Evidence/Rule IDs, and System IDs. Remember, every section's narrative MUST contain these citations!
 `;
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.2,
-        response_format: { type: "json_object" }
-      });
+      let outputJson: any = null;
 
-      const text = response.choices[0]?.message?.content || "{}";
-      const output = JSON.parse(text);
-      res.json(output);
-    } catch (apiErr: any) {
-      let keyNotice = "";
-      if (apiErr.message?.includes("No OpenAI API key found")) {
-        console.info("OpenAI API key not provided for ai-relationship-expert; using local synthesis fallback.");
-        keyNotice = "⚠️ **ChatGPT API Key Missing**: Please set your personal ChatGPT/OpenAI API key in the Settings panel (top-right corner ⚙️) to unlock live GPT-4o-mini readings! (Currently running on JHora local high-fidelity rules engine fallback)\n\n";
-      } else {
-        console.warn("OpenAI API error during AI Relationship Expert, using high-fidelity local JSON synthesis fallback:", apiErr);
+      // 1. Primary: Try Groq
+      try {
+        const groq = getGroqClient(req);
+        const response = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          temperature: 0.2,
+          response_format: { type: "json_object" }
+        });
+        const text = response.choices[0]?.message?.content || "{}";
+        outputJson = JSON.parse(text);
+      } catch (groqErr: any) {
+        console.warn("Primary Groq API failed for ai-relationship-expert. Trying Gemini secondary...", groqErr.message || groqErr);
+        try {
+          const geminiKey = req.body?.geminiApiKey;
+          const ai = getGeminiClient(geminiKey);
+          const response = await ai.models.generateContent({
+            model: "gemini-3.6-flash",
+            contents: `${systemPrompt}\n\n${userPrompt}`,
+          });
+          const text = response.text || "{}";
+          outputJson = JSON.parse(text);
+        } catch (geminiErr: any) {
+          console.warn("Gemini secondary error during AI Relationship Expert, using high-fidelity local JSON synthesis fallback:", geminiErr);
+        }
       }
+
+      if (outputJson) {
+        return res.json(outputJson);
+      }
+
+      let keyNotice = "";
 
       const score = evidence?.consensusStats?.score || 72;
       const confidence = evidence?.consensusStats?.confidence || 85;
@@ -2164,7 +2198,10 @@ If a specific user question is asked above, answer it beautifully in the "chatRe
       };
 
       res.json(fallbackOutput);
-    }
+  } catch (err: any) {
+    console.error("ai-relationship-expert error:", err);
+    res.status(500).json({ error: err.message || "Failed relationship expert analysis." });
+  }
 });
 
 // Endpoint for Professional Relationship Consultation Framework (Phase 19)
@@ -2176,8 +2213,6 @@ app.post("/api/astrology/relationship-consultation", async (req, res) => {
   }
 
   try {
-    const openai = getOpenAIClient(req);
-
     const systemPrompt = `You are JHoraAI's Senior Professional Relationship Consultant, a highly compassionate and expert clinical guidance synthesizer.
 CRITICAL LAWS OF ENGAGEMENT:
 1. You are NOT an astrologer. You NEVER perform calculations, chart casting, or primary calculations.
@@ -2207,27 +2242,43 @@ Current User Query or Focus:
 
 Synthesize a professional, beautifully structured consultation. Return a JSON matching the requested schema. Ensure every narrative paragraph includes specific citations in brackets (e.g., [KP_DEC_PROMISE_01], [System: Vedic]).
 `;
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.25,
-        response_format: { type: "json_object" }
-      });
+      let outputJson: any = null;
 
-      const text = response.choices[0]?.message?.content || "{}";
-      const output = JSON.parse(text);
-      res.json(output);
-    } catch (apiErr: any) {
-      let keyNotice = "";
-      if (apiErr.message?.includes("No OpenAI API key found")) {
-        console.info("OpenAI API key not provided for relationship-consultation; using local synthesis fallback.");
-        keyNotice = "⚠️ **ChatGPT API Key Missing**: Please set your personal ChatGPT/OpenAI API key in the Settings panel (top-right corner ⚙️) to unlock live GPT-4o-mini readings! (Currently running on JHora local high-fidelity rules engine fallback)\n\n";
-      } else {
-        console.warn("OpenAI API error during Relationship Consultation, using high-fidelity local JSON synthesis fallback:", apiErr);
+      // 1. Primary: Try Groq
+      try {
+        const groq = getGroqClient(req);
+        const response = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+          ],
+          temperature: 0.25,
+          response_format: { type: "json_object" }
+        });
+        const text = response.choices[0]?.message?.content || "{}";
+        outputJson = JSON.parse(text);
+      } catch (groqErr: any) {
+        console.warn("Primary Groq API failed for relationship-consultation. Trying Gemini secondary...", groqErr.message || groqErr);
+        try {
+          const geminiKey = req.body?.geminiApiKey;
+          const ai = getGeminiClient(geminiKey);
+          const response = await ai.models.generateContent({
+            model: "gemini-3.6-flash",
+            contents: `${systemPrompt}\n\n${userPrompt}`,
+          });
+          const text = response.text || "{}";
+          outputJson = JSON.parse(text);
+        } catch (geminiErr: any) {
+          console.warn("Gemini secondary error during Relationship Consultation, using high-fidelity local JSON synthesis fallback:", geminiErr);
+        }
       }
+
+      if (outputJson) {
+        return res.json(outputJson);
+      }
+
+      let keyNotice = "";
 
       const score = evidence?.consensusStats?.score || 72;
 
@@ -2265,7 +2316,10 @@ Synthesize a professional, beautifully structured consultation. Return a JSON ma
       };
 
       res.json(fallbackOutput);
-    }
+  } catch (err: any) {
+    console.error("relationship-consultation error:", err);
+    res.status(500).json({ error: err.message || "Failed relationship consultation." });
+  }
 });
 
 // Helper to build canonical AI Context object
@@ -2519,13 +2573,13 @@ LAWS OF CELESTIAL ANALYSIS:
     promptSize = Buffer.byteLength(userPrompt, "utf-8");
 
     let responseText: string | null = null;
-    let modelUsed = "ChatGPT (gpt-4o-mini)";
+    let modelUsed = "Groq (llama-3.3-70b-versatile)";
 
-    // 1. Primary: Try ChatGPT (OpenAI)
+    // 1. Primary: Try Groq
     try {
-      const openai = getOpenAIClient(req);
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+      const groq = getGroqClient(req);
+      const completion = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
         messages: [
           {
             role: "system",
@@ -2537,8 +2591,8 @@ LAWS OF CELESTIAL ANALYSIS:
         temperature: 0.3
       });
       responseText = completion.choices[0]?.message?.content || null;
-    } catch (openaiErr: any) {
-      console.warn("Primary ChatGPT (OpenAI) failed or key unavailable in Master Ask. Trying Gemini secondary fallback...", openaiErr.message || openaiErr);
+    } catch (groqErr: any) {
+      console.warn("Primary Groq failed or key unavailable in Master Ask. Trying Gemini secondary fallback...", groqErr.message || groqErr);
     }
 
     // 2. Secondary Fallback: Gemini API

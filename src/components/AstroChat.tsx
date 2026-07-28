@@ -354,7 +354,7 @@ FINAL REPORT FORMAT:
     try {
       const preferences = ConversationService.getPreferences();
       const geminiApiKey = preferences?.geminiApiKey;
-      const openaiApiKey = preferences?.openaiApiKey;
+      const groqApiKey = preferences?.groqApiKey || (typeof window !== "undefined" ? localStorage.getItem("user_groq_api_key") : undefined);
 
       const response = await fetch("/api/astrology/master-ask", {
         method: "POST",
@@ -366,7 +366,7 @@ FINAL REPORT FORMAT:
           mode: responseMode,
           history: messages.slice(-6).map(m => ({ sender: m.sender, text: m.text })),
           geminiApiKey,
-          openaiApiKey
+          groqApiKey
         })
       });
 

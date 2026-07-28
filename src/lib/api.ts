@@ -317,10 +317,10 @@ Hello! I have analyzed your Vedic Astrology Birth Chart calculated dynamically f
   
   const finalInit = init ? { ...init } : {};
   if (typeof window !== "undefined") {
-    const userOpenaiKey = window.localStorage.getItem("user_openai_api_key");
-    if (userOpenaiKey && userOpenaiKey.trim()) {
+    const userGroqKey = window.localStorage.getItem("user_groq_api_key") || window.localStorage.getItem("user_openai_api_key");
+    if (userGroqKey && userGroqKey.trim()) {
       const headers = new Headers(finalInit.headers || {});
-      headers.set("x-openai-api-key", userOpenaiKey.trim());
+      headers.set("x-groq-api-key", userGroqKey.trim());
       finalInit.headers = headers;
     }
   }
