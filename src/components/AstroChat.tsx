@@ -55,14 +55,17 @@ import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
 import { ConversationService } from "../features/ask/services/ConversationService";
 import moodRules from "../knowledgebase/checklist_engine/mood_analysis_rules.json";
-import HoroscopeDashboard from "./HoroscopeDashboard";
-import { AstroRawTablesView } from "./AstroRawTablesView";
+import { BirthDataAndProfileRepository } from "./BirthDataAndProfileRepository";
 
 interface AstroChatProps {
   astrologyData: AstrologyData | null;
   isStandalone?: boolean;
   onCloseStandalone?: () => void;
   onNavigateMenu?: (menu: string, submenu?: string) => void;
+  inputs?: any;
+  setInputs?: React.Dispatch<React.SetStateAction<any>>;
+  onCalculate?: (isInitial?: boolean, forceRefresh?: boolean) => Promise<void>;
+  activeUser?: any;
 }
 
 interface Message {
@@ -73,7 +76,16 @@ interface Message {
   debugInfo?: any;
 }
 
-export default function AstroChat({ astrologyData, isStandalone, onCloseStandalone, onNavigateMenu }: AstroChatProps) {
+export default function AstroChat({
+  astrologyData,
+  isStandalone,
+  onCloseStandalone,
+  onNavigateMenu,
+  inputs,
+  setInputs,
+  onCalculate,
+  activeUser
+}: AstroChatProps) {
   // Sidebar open/close state on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -906,25 +918,9 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                 <div className="flex items-center justify-between bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 px-4 py-2.5 rounded-xl border border-indigo-200/80 shadow-2xs">
                   <span className="text-xs font-extrabold text-indigo-950 capitalize tracking-tight flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                    {activeSubmenuPanel === "vedic" ? "My Astro Details" : activeSubmenuPanel === "dashboard" ? "Astrological Dashboard & Tables" : activeSubmenuPanel.replace(/_/g, " ")}
+                    {activeSubmenuPanel === "vedic" ? "My Astro Details" : activeSubmenuPanel === "dashboard" ? "Birth Data & Profile Repository" : activeSubmenuPanel.replace(/_/g, " ")}
                   </span>
                   <div className="flex items-center gap-2">
-                    {activeSubmenuPanel === "dashboard" && (
-                      <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-indigo-200 text-xs">
-                        <button
-                          onClick={() => setDashboardTab("tables")}
-                          className={`px-2.5 py-1 rounded-md font-bold transition-all cursor-pointer ${dashboardTab === "tables" ? "bg-indigo-600 text-white shadow-xs" : "text-neutral-600 hover:text-indigo-600"}`}
-                        >
-                          Raw Tables (JH1-JH19)
-                        </button>
-                        <button
-                          onClick={() => setDashboardTab("dashboard")}
-                          className={`px-2.5 py-1 rounded-md font-bold transition-all cursor-pointer ${dashboardTab === "dashboard" ? "bg-indigo-600 text-white shadow-xs" : "text-neutral-600 hover:text-indigo-600"}`}
-                        >
-                          Charts Dashboard
-                        </button>
-                      </div>
-                    )}
                     <button
                       onClick={() => setActiveSubmenuPanel(null)}
                       className="px-2.5 py-1 text-xs font-bold text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-100 rounded-lg border border-neutral-300 transition-colors shadow-2xs cursor-pointer flex items-center gap-1"
@@ -935,31 +931,14 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                   </div>
                 </div>
                 {activeSubmenuPanel === "dashboard" ? (
-                  dashboardTab === "tables" ? (
-                    <AstroRawTablesView
-                      astrologyData={astrologyData}
-                      activeSubmenuId="jhora_birth_details"
-                      isDark={false}
-                      hideHeaders={false}
-                    />
-                  ) : astrologyData ? (
-                    <HoroscopeDashboard
-                      astrologyData={astrologyData}
-                      activeSubTab="dashboard"
-                      setActiveSubTab={() => {}}
-                      selectedVarga="D1"
-                      setSelectedVarga={() => {}}
-                      selectedBavPlanet="Jupiter"
-                      setSelectedBavPlanet={() => {}}
-                      activeDashaSystem="vimshottari"
-                      setActiveDashaSystem={() => {}}
-                      chartStyle="north"
-                    />
-                  ) : (
-                    <div className="p-8 text-center text-sm text-neutral-500 bg-neutral-50 rounded-xl border border-neutral-200">
-                      No chart data available. Please generate or load astrology data.
-                    </div>
-                  )
+                  <BirthDataAndProfileRepository
+                    astrologyData={astrologyData}
+                    inputs={inputs}
+                    setInputs={setInputs}
+                    onCalculate={onCalculate}
+                    activeUser={activeUser}
+                    isDark={false}
+                  />
                 ) : (
                   <MyPageView
                     astrologyData={astrologyData}

@@ -2002,6 +2002,10 @@ export default function App() {
             setActiveMenu("dashboard");
           }}
           onNavigateMenu={(menu, sub) => setActiveMenu(menu)}
+          inputs={inputs}
+          setInputs={setInputs}
+          onCalculate={handleCalculate}
+          activeUser={activeUser}
         />
       </div>
     );
@@ -2839,6 +2843,10 @@ export default function App() {
                   <AstroChat 
                     astrologyData={astrologyData} 
                     onNavigateMenu={(menu, sub) => setActiveMenu(menu)}
+                    inputs={inputs}
+                    setInputs={setInputs}
+                    onCalculate={handleCalculate}
+                    activeUser={activeUser}
                   />
                 </div>
               </motion.div>
