@@ -98,7 +98,6 @@ import EventBookView from "./components/EventBookView";
 import { UserProfile, SessionManager, AuthManager, UserProfileRepository } from "./lib/firebaseAuth";
 import AuthScreen from "./components/AuthScreen";
 import WorkspaceTab from "./components/WorkspaceTab";
-import { AndroidInstallerPromo } from "./components/AndroidInstallerPromo";
 import UpdateNotification from "./components/UpdateNotification";
 import { UpdateManager, UpdateManifest } from "./lib/androidOta";
 import GithubOtaView from "./components/GithubOtaView";
