@@ -72,7 +72,7 @@ export function TableIndexView({
   const textStyle = "text-black";
   const textMutedStyle = "text-slate-500";
 
-  // Strictly Indexed JH1 to JH31 consecutively to maintain cohesive mapping bounds
+  // Strictly Indexed JH1 to JH47 consecutively to maintain cohesive mapping bounds
   const tablesRegistry = [
     {
       table_number: 1,
@@ -347,6 +347,231 @@ export function TableIndexView({
         teva_types: ["Dharmi Teva", "Andha Teva", "Nisphal Teva"],
         sleeping_status: "Soye Grah (Dormant Planet Analysis)"
       }
+    },
+    {
+      table_number: 23,
+      jh_id: "JH23",
+      title: "Personal & Birth Details",
+      source_origin: "Input Profile",
+      section_key: "Birth.details",
+      api_source: "Native Profile",
+      is_populated: true
+    },
+    {
+      table_number: 24,
+      jh_id: "JH24",
+      title: "Ascendant & Luminaries",
+      source_origin: "Engine",
+      section_key: "Ascendant.luminaries",
+      api_source: "Engine",
+      is_populated: true
+    },
+    {
+      table_number: 25,
+      jh_id: "JH25",
+      title: "Astrological Summary",
+      source_origin: "Engine",
+      section_key: "Astro.summary",
+      api_source: "Engine",
+      is_populated: true
+    },
+    {
+      table_number: 26,
+      jh_id: "JH26",
+      title: "Birth Panchanga",
+      source_origin: "Engine",
+      section_key: "Birth.panchanga",
+      api_source: "Engine",
+      is_populated: true
+    },
+    {
+      table_number: 27,
+      jh_id: "JH27",
+      title: "Strength Summary",
+      source_origin: "Engine",
+      section_key: "Strength.summary",
+      api_source: "Engine",
+      is_populated: true
+    },
+    {
+      table_number: 28,
+      jh_id: "JH28",
+      title: "Astronomical Data",
+      source_origin: "Engine",
+      section_key: "Astro.data",
+      api_source: "Engine",
+      is_populated: true
+    },
+    {
+      table_number: 29,
+      jh_id: "JH29",
+      title: "Jaimini Argalas",
+      source_origin: "Jaimini Engine",
+      section_key: "Jaimini.argalas",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true
+    },
+    {
+      table_number: 30,
+      jh_id: "JH30",
+      title: "Jaimini Sphutas",
+      source_origin: "Jaimini Engine",
+      section_key: "Jaimini.sphutas",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true
+    },
+    {
+      table_number: 31,
+      jh_id: "JH31",
+      title: "Jaimini Sahams",
+      source_origin: "Jaimini Engine",
+      section_key: "Jaimini.sahams",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true
+    },
+    {
+      table_number: 32,
+      jh_id: "JH32",
+      title: "Vedic Upgrahas",
+      source_origin: "Vedic Engine",
+      section_key: "Vedic.upgrahas",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true
+    },
+    {
+      table_number: 33,
+      jh_id: "JH33",
+      title: "Ishtaphala & Kashtaphala",
+      source_origin: "Vedic Engine",
+      section_key: "Vedic.phalas",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true
+    },
+    {
+      table_number: 34,
+      jh_id: "JH34",
+      title: "Jaimini Chara Dasha",
+      source_origin: "Jaimini Engine",
+      section_key: "Jaimini.chara_dasha",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true
+    },
+    {
+      table_number: 35,
+      jh_id: "JH35",
+      title: "Gochara (Transit Status)",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.status",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 36,
+      jh_id: "JH36",
+      title: "Current Planetary Longitudes",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.longitudes",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 37,
+      jh_id: "JH37",
+      title: "Current Panchanga",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.panchanga",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 38,
+      jh_id: "JH38",
+      title: "Current Planetary Strengths",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.strengths",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 39,
+      jh_id: "JH39",
+      title: "Current Planetary Yogas",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.yogas",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 40,
+      jh_id: "JH40",
+      title: "Current Transiting Doshas",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.doshas",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 41,
+      jh_id: "JH41",
+      title: "Current Planetary Aspects",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.aspects",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 42,
+      jh_id: "JH42",
+      title: "House Activation Metrics",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.activation",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 43,
+      jh_id: "JH43",
+      title: "Current Nakshatra Positions",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.nakshatras",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 44,
+      jh_id: "JH44",
+      title: "Sensitive Transit Points",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.sensitive_points",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 45,
+      jh_id: "JH45",
+      title: "Current Astronomical Events",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.events",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 46,
+      jh_id: "JH46",
+      title: "Planetary Transit Timeline",
+      source_origin: "Transit Engine",
+      section_key: "Gochara.timeline",
+      api_source: "Transit API",
+      is_populated: true
+    },
+    {
+      table_number: 47,
+      jh_id: "JH47",
+      title: "Upcoming Planet Ingress Schedules & Muhurtas",
+      source_origin: "Muhurta & Transit Engine",
+      section_key: "Gochara.muhurta",
+      api_source: "Muhurta API",
+      is_populated: true
     }
   ];
 
@@ -372,7 +597,7 @@ export function TableIndexView({
                 Deployment Node
               </span>
               <span className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider font-mono">
-                JH1-JH22 Registry
+                JH1-JH47 Registry
               </span>
             </div>
             <h2 className={`text-xl font-sans font-bold flex items-center gap-2 ${textStyle}`}>
@@ -416,7 +641,7 @@ export function TableIndexView({
             />
           </div>
           <span className="text-[10px] font-mono text-slate-400">
-            Showing {filteredTables.length} of 22 Tables
+            Showing {filteredTables.length} of 47 Tables
           </span>
         </div>
       </div>
