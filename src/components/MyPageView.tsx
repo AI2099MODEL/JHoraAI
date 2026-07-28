@@ -2998,117 +2998,12 @@ export function MyPageView({
 
   return (
     <div className="space-y-4">
-      {/* COMPACT FIRST LINE: USER NAME, DOB DETAILS, AND ACTIVE DASHA LORDS */}
-      <div className={`px-4 py-3 rounded-xl border ${containerStyle} shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs`}>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full bg-amber-500 animate-pulse`}></span>
-            <span className={`font-bold font-sans text-sm ${textStyle}`}>{userName}</span>
-          </div>
-          <span className="opacity-20 text-slate-500">|</span>
-          <span className={`${textMutedStyle} font-mono`}>DOB:</span>
-          <span className={`font-medium ${textStyle}`}>{birthDate} @ {birthTime}</span>
-          <span className="opacity-20 text-slate-500">|</span>
-          <span className={`${textMutedStyle} font-mono`}>Place:</span>
-          <span className={`font-medium ${textStyle} truncate max-w-[200px]`} title={birthPlace}>{birthPlace}</span>
-        </div>
-
-        <div className="flex items-center gap-3 shrink-0 self-start md:self-auto flex-wrap">
-          {headerLords && (
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/10 font-mono text-xs">
-              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Antara:</span>
-              <span className="font-bold">{headerLords.pratyantar}</span>
-              <span className="opacity-30">|</span>
-              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Prana:</span>
-              <span className="font-bold">{headerLords.prana}</span>
-            </div>
-          )}
-          {currentSkyJson?.moon && (
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/10 font-mono text-xs">
-              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Transit Moon Nakshatra:</span>
-              <span className="font-bold text-indigo-300">{currentSkyJson.moon.currentNakshatra?.displayName || "Pushya"}</span>
-              <span className="opacity-30">|</span>
-              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Sub:</span>
-              <span className="font-bold text-indigo-300">{currentSkyJson.moon.currentSubLord?.displayName || "Venus"}</span>
-            </div>
-          )}
-        </div>
-      </div>
-
       {errorMsg && (
         <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-2.5">
           <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
           <p className="text-xs text-red-400">{errorMsg}</p>
         </div>
       )}
-
-      {/* Primary Submenus Switcher */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-1.5 bg-slate-950/60 rounded-xl border border-slate-800/40" id="primary-submenu-bar">
-        <button
-          onClick={() => {
-            setActiveSubmenu("my_life");
-            setActiveTab("daily");
-            onSubmenuSelect?.("daily");
-          }}
-          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-            activeSubmenu === "my_life"
-              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
-              : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
-          }`}
-          id="submenu-my-life"
-        >
-          <User className="w-4 h-4 shrink-0" />
-          <span>My Life</span>
-        </button>
-        <button
-          onClick={() => {
-            setActiveSubmenu("my_journey");
-            setActiveTab("overview");
-            onSubmenuSelect?.("overview");
-          }}
-          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-            activeSubmenu === "my_journey"
-              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
-              : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
-          }`}
-          id="submenu-my-journey"
-        >
-          <Compass className="w-4 h-4 shrink-0" />
-          <span>My Journey</span>
-        </button>
-        <button
-          onClick={() => {
-            setActiveSubmenu("my_astro");
-            setActiveTab("dasha");
-            onSubmenuSelect?.("dasha");
-          }}
-          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-            activeSubmenu === "my_astro"
-              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
-              : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
-          }`}
-          id="submenu-my-astro"
-        >
-          <Sparkles className="w-4 h-4 shrink-0" />
-          <span>My Astro</span>
-        </button>
-        <button
-          onClick={() => {
-            setActiveSubmenu("my_reports");
-            setActiveTab("reports_hub");
-            onSubmenuSelect?.("reports_hub");
-          }}
-          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
-            activeSubmenu === "my_reports"
-              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
-              : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
-          }`}
-          id="submenu-my-reports"
-        >
-          <FileText className="w-4 h-4 shrink-0" />
-          <span>My Reports</span>
-        </button>
-      </div>
 
       {/* Submenu Astrological Tabs */}
       {currentTabs.length > 0 && (

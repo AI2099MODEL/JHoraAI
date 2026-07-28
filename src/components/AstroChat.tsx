@@ -641,12 +641,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
             {activeSubmenuPanel ? (
               <div className="flex items-center gap-2.5">
-                <button
-                  onClick={() => setActiveSubmenuPanel(null)}
-                  className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-xs font-semibold text-neutral-700 flex items-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  ← Back to Chat
-                </button>
                 <span className="text-sm font-bold text-neutral-800 capitalize tracking-tight">
                   {activeSubmenuPanel.replace(/_/g, " ")} Module
                 </span>
@@ -734,15 +728,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
             
             {activeSubmenuPanel ? (
               <div className="space-y-6 w-full">
-                <div className="flex items-center justify-end pb-2">
-                  <button
-                    onClick={() => setActiveSubmenuPanel(null)}
-                    className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-xs font-semibold text-neutral-700 flex items-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    ← Back to Chat
-                  </button>
-                </div>
-
                 <MyPageView
                   astrologyData={astrologyData}
                   activeUser={null}
