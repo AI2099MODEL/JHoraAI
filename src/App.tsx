@@ -1478,8 +1478,6 @@ export default function App() {
         { id: "tajik", label: "Tajik Annual", description: "Tajik solar return charts.", systemId: "ai_assistant", category: "JOURNEY" },
         { id: "my_life_analysis", label: "Life Analysis", description: "Comprehensive life analysis report.", systemId: "ai_assistant", category: "JOURNEY" },
         { id: "vedic", label: "My Astro Details", description: "Vedic chart details.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "jaimini", label: "Jaimini Astrology", description: "Jaimini chara dasha and karakas.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "western", label: "Western Astrology", description: "Western chart coordinates.", systemId: "ai_assistant", category: "JOURNEY" },
 
         // Category 1: JHORA
         { id: "jhora_birth_details", label: "Birth Details", description: "JH1: Birth Details & Astronomical Metrics.", systemId: "ai_assistant", category: "JHORA" },
