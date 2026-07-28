@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-28T06:58:40.477Z",
+    "lastUpdated": "2026-07-28T07:01:14.723Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-28T06:58:40.477Z",
-    "localTime": "2026-07-27T23:58:40-07:00",
+    "utcTime": "2026-07-28T07:01:14.723Z",
+    "localTime": "2026-07-28T00:01:14-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 277.17
+      "longitude": 277.2
     },
     "currentNakshatra": {
       "id": "Uttara Ashadha",
@@ -28,15 +28,15 @@
       "displayName": "Sun"
     },
     "currentSubLord": {
-      "id": "Jupiter",
-      "displayName": "Jupiter"
+      "id": "Mercury",
+      "displayName": "Mercury"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Purnima",
       "illuminationPercentage": 97.7
     },
-    "moonLongitude": 277.17,
+    "moonLongitude": 277.2,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -67,41 +67,41 @@
       "nakshatra": "Pushya",
       "pada": 3,
       "starLord": "Saturn",
-      "subLord": "Moon",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 277.17,
+      "longitude": 277.2,
       "nakshatra": "Uttara Ashadha",
       "pada": 4,
       "starLord": "Sun",
-      "subLord": "Jupiter",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Cancer",
-      "longitude": 102.5,
+      "longitude": 103.03,
       "nakshatra": "Pushya",
       "pada": 3,
       "starLord": "Saturn",
-      "subLord": "Mercury",
+      "subLord": "Saturn",
       "retrograde": false,
       "combust": true,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Scorpio",
-      "longitude": 236.7,
+      "longitude": 236.71,
       "nakshatra": "Jyeshtha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Mercury",
-      "retrograde": true,
+      "subLord": "Ketu",
+      "retrograde": false,
       "combust": false,
       "stationary": false
     },
@@ -122,7 +122,7 @@
       "nakshatra": "Purva Phalguni",
       "pada": 1,
       "starLord": "Venus",
-      "subLord": "Mars",
+      "subLord": "Rahu",
       "retrograde": true,
       "combust": false,
       "stationary": false
@@ -272,39 +272,39 @@
     ]
   },
   "rulingPlanets": {
-    "dayLord": "Monday",
+    "dayLord": "Tuesday",
     "ascendantLord": "Mars",
     "ascendantStarLord": "Ketu",
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Sun",
-    "moonSubLord": "Jupiter"
+    "moonSubLord": "Mercury"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Purnima",
       "index": 15,
       "paksha": "Sukla",
-      "endDate": "2026-07-28T18:58:40.477Z"
+      "endDate": "2026-07-28T19:01:14.723Z"
     },
     "vara": {
-      "name": "Monday",
-      "lord": "Moon"
+      "name": "Tuesday",
+      "lord": "Mars"
     },
     "nakshatra": {
       "name": "Uttara Ashadha",
       "lord": "Sun",
-      "endDate": "2026-07-29T00:58:40.477Z"
+      "endDate": "2026-07-29T01:01:14.723Z"
     },
     "yoga": {
       "name": "Preeti",
       "lord": "Venus",
-      "endDate": "2026-07-28T20:58:40.477Z"
+      "endDate": "2026-07-28T21:01:14.723Z"
     },
     "karana": {
       "name": "Bava",
       "lord": "Sun",
-      "endDate": "2026-07-28T12:58:40.477Z"
+      "endDate": "2026-07-28T13:01:14.723Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -391,7 +391,6 @@
       "Physical vitality"
     ],
     "negativeThemes": [
-      "Communication hiccups",
       "Physical impatience"
     ],
     "emotionalTone": "The sky carries a highly reflective and analytical emotional tone governed by Moon in Capricorn."
@@ -440,11 +439,8 @@
   },
   "currentChallenges": {
     "delays": {
-      "active": true,
-      "affectedAreas": [
-        "Documentation workflows",
-        "Long distance transits"
-      ]
+      "active": false,
+      "affectedAreas": []
     },
     "stress": {
       "active": false,
