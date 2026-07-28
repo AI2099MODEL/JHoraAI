@@ -1,8 +1,8 @@
 {
   "agentName": "NatalRulesEvaluatorAgent",
   "status": "Healthy / Active",
-  "lastChecked": "2026-07-28T11:51:24.536Z",
-  "nextScheduledCheck": "2026-07-28T23:51:24.536Z",
+  "lastChecked": "2026-07-28T12:00:31.707Z",
+  "nextScheduledCheck": "2026-07-29T00:00:31.707Z",
   "checkedProfile": "Guest",
   "checkedProfileFile": "userprofile.json",
   "intervalMs": 43200000,
