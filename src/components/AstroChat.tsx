@@ -100,7 +100,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const [myLifeExpanded, setMyLifeExpanded] = useState(false);
   const [myJourneyExpanded, setMyJourneyExpanded] = useState(false);
   const [myReportsExpanded, setMyReportsExpanded] = useState(false);
-  const [settingsExpanded, setSettingsExpanded] = useState(false);
   const [activeSubmenuPanel, setActiveSubmenuPanel] = useState<string | null>(null);
 
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -646,52 +645,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           
           {/* Main ChatGPT Menu items */}
           <div className="space-y-2">
-            {/* 1. My Life (Renamed from My Journey) */}
-            <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
-              <button
-                onClick={() => setMyJourneyExpanded(!myJourneyExpanded)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
-                  myJourneyExpanded 
-                    ? "bg-gradient-to-r from-amber-100/90 via-rose-100/70 to-purple-50 text-amber-950 border border-amber-200" 
-                    : "bg-neutral-50/80 hover:bg-amber-50/60 text-neutral-800 hover:text-amber-900 border border-neutral-200/70"
-                }`}
-              >
-                <Heart className={`w-4 h-4 shrink-0 ${myJourneyExpanded ? "text-rose-600" : "text-rose-500"}`} />
-                <span className="font-sans tracking-tight">My Life</span>
-                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${myJourneyExpanded ? "rotate-180 text-amber-700" : ""}`} />
-              </button>
-
-              {myJourneyExpanded && (
-                <div className="mt-1 ml-2 pl-2 border-l-2 border-rose-200 space-y-2 py-1">
-                  {/* My Life Section */}
-                  <div className="space-y-1">
-                    {[
-                      { id: "birth", label: "Birth", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
-                      { id: "my_life_analysis", label: "My Life Analysis", theme: "bg-rose-50 text-rose-950 border-rose-200 hover:bg-rose-600 hover:text-white" }
-                    ].map((sub) => (
-                      <button
-                        key={sub.id}
-                        onClick={() => {
-                          setActiveSubmenuPanel(sub.id);
-                          onNavigateMenu?.("ai_assistant", sub.id);
-                          setSidebarOpen(false);
-                        }}
-                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
-                          activeSubmenuPanel === sub.id
-                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
-                            : `${sub.theme}`
-                        }`}
-                      >
-                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
-                        <span>{sub.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 2. My Journey (Renamed from My Mood Analysis) */}
+            {/* 1. My Journey (Renamed from My Mood Analysis) */}
             <div className="space-y-0.5">
               <button
                 onClick={() => setMoodAnalysisExpanded(!moodAnalysisExpanded)}
@@ -711,6 +665,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                   {/* Journey Navigation Pages */}
                   <div className="space-y-1">
                     {[
+                      { id: "birth", label: "Birth", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
                       { id: "daily", label: "Today", theme: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-500 hover:text-white" },
                       { id: "weekly", label: "Weekly", theme: "bg-orange-50 text-orange-950 border-orange-200 hover:bg-orange-600 hover:text-white" },
                       { id: "monthly", label: "Monthly", theme: "bg-blue-50 text-blue-950 border-blue-200 hover:bg-blue-600 hover:text-white" },
@@ -763,6 +718,74 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
               )}
             </div>
 
+            {/* 2. My Life (Renamed from My Journey) */}
+            <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
+              <button
+                onClick={() => setMyJourneyExpanded(!myJourneyExpanded)}
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
+                  myJourneyExpanded 
+                    ? "bg-gradient-to-r from-amber-100/90 via-rose-100/70 to-purple-50 text-amber-950 border border-amber-200" 
+                    : "bg-neutral-50/80 hover:bg-amber-50/60 text-neutral-800 hover:text-amber-900 border border-neutral-200/70"
+                }`}
+              >
+                <Heart className={`w-4 h-4 shrink-0 ${myJourneyExpanded ? "text-rose-600" : "text-rose-500"}`} />
+                <span className="font-sans tracking-tight">My Life</span>
+                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${myJourneyExpanded ? "rotate-180 text-amber-700" : ""}`} />
+              </button>
+
+              {myJourneyExpanded && (
+                <div className="mt-1 ml-2 pl-2 border-l-2 border-rose-200 space-y-2 py-1">
+                  {/* My Life Section */}
+                  <div className="space-y-1">
+                    {[
+                      { id: "my_life_analysis", label: "My Life Analysis", theme: "bg-rose-50 text-rose-950 border-rose-200 hover:bg-rose-600 hover:text-white" }
+                    ].map((sub) => (
+                      <button
+                        key={sub.id}
+                        onClick={() => {
+                          setActiveSubmenuPanel(sub.id);
+                          onNavigateMenu?.("ai_assistant", sub.id);
+                          setSidebarOpen(false);
+                        }}
+                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
+                          activeSubmenuPanel === sub.id
+                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
+                            : `${sub.theme}`
+                        }`}
+                      >
+                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
+                        <span>{sub.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* My Astro Systems */}
+                  <div className="space-y-1 pt-1">
+                    {[
+                      { id: "vedic", label: "My Astro Details", theme: "bg-amber-50/80 text-amber-950 border-amber-200/80" },
+                    ].map((sub) => (
+                      <button
+                        key={sub.id}
+                        onClick={() => {
+                          setActiveSubmenuPanel(sub.id);
+                          onNavigateMenu?.("ai_assistant", sub.id);
+                          setSidebarOpen(false);
+                        }}
+                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
+                          activeSubmenuPanel === sub.id
+                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
+                            : `${sub.theme} hover:brightness-95`
+                        }`}
+                      >
+                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
+                        <span>{sub.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* 3. My Reports */}
             <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
               <button
@@ -801,46 +824,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                       }`}
                     >
                       <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
-                      <span>{sub.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            {/* 4. Settings */}
-            <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
-              <button
-                onClick={() => setSettingsExpanded(!settingsExpanded)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
-                  settingsExpanded 
-                    ? "bg-gradient-to-r from-slate-100/90 via-gray-100/70 to-zinc-50 text-slate-950 border border-slate-200" 
-                    : "bg-neutral-50/80 hover:bg-slate-50/60 text-neutral-800 hover:text-slate-900 border border-neutral-200/70"
-                }`}
-              >
-                <Settings className={`w-4 h-4 shrink-0 ${settingsExpanded ? "text-slate-600" : "text-slate-500"}`} />
-                <span className="font-sans tracking-tight">Settings</span>
-                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${settingsExpanded ? "rotate-180 text-slate-700" : ""}`} />
-              </button>
-              {settingsExpanded && (
-                <div className="mt-1 ml-2 pl-2 border-l-2 border-slate-200 space-y-1 py-1">
-                  {[
-                    { id: "account_settings", label: "Account Settings", theme: "bg-slate-50 text-slate-950 border-slate-200/80" },
-                    { id: "preferences", label: "Preferences", theme: "bg-gray-50 text-gray-950 border-gray-200/80" }
-                  ].map((sub) => (
-                    <button
-                      key={sub.id}
-                      onClick={() => {
-                        setActiveSubmenuPanel(sub.id);
-                        onNavigateMenu?.("ai_assistant", sub.id);
-                        setSidebarOpen(false);
-                      }}
-                      className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
-                        activeSubmenuPanel === sub.id
-                          ? "bg-gradient-to-r from-slate-600 to-gray-600 text-white font-bold border-slate-700"
-                          : `${sub.theme} hover:brightness-95`
-                      }`}
-                    >
-                      <Settings className="w-3 h-3 shrink-0 opacity-80" />
                       <span>{sub.label}</span>
                     </button>
                   ))}
