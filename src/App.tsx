@@ -556,7 +556,7 @@ export default function App() {
   };
 
   // Active Navigation Coordinate Graph
-  const [activeMenu, setActiveMenu] = useState<string>("my_page");
+  const [activeMenu, setActiveMenu] = useState<string>("dashboard");
   const [activeSubMenu, setActiveSubMenu] = useState<{ [key: string]: string }>({
     horoscope: "overview",
     charts: "d1_rasi",
@@ -1480,14 +1480,9 @@ export default function App() {
       icon: Sparkles
     },
     {
-      id: "my_page",
-      label: "My Page",
-      icon: User
-    },
-    {
       id: "astro",
-      label: "Astro",
-      icon: Activity,
+      label: "Settings",
+      icon: SettingsIcon,
       submenus: [
         // Category 1: JHORA
         { id: "jhora_birth_details", label: "Birth Details", description: "JH1: Birth Details & Astronomical Metrics.", systemId: "astro", category: "JHORA" },
@@ -2904,27 +2899,6 @@ export default function App() {
                 <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
                   <AstroChat astrologyData={astrologyData} />
                 </div>
-              </motion.div>
-            </AnimatePresence>
-          ) : activeMenu === "my_page" ? (
-            <AnimatePresence mode="wait">
-              <motion.div
-                key="my_page"
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="space-y-6"
-              >
-                <MyPageView
-                  astrologyData={astrologyData}
-                  activeUser={activeUser}
-                  isDark={isDark}
-                  containerStyle={containerStyle}
-                  cardStyle={cardStyle}
-                  textMuted={textMuted}
-                  activeSubmenuId={activeSubmenuId}
-                  onSubmenuSelect={handleSubmenuSelect}
-                />
               </motion.div>
             </AnimatePresence>
           ) : activeMenu === "astro" ? (
