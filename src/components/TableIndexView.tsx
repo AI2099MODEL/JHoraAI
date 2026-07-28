@@ -153,6 +153,18 @@ export function TableIndexView({
       }
     },
     {
+      table_number: 13,
+      jh_id: "JH6-B",
+      title: "Shodashavargas Divisional Planetary Placements Matrix",
+      source_origin: "Divisional Chart Calculation Engine",
+      section_key: "Vedic.divisional_charts",
+      api_source: "Vedic Astro API: /api/astrology/calculate (divisional_charts)",
+      is_populated: !!(profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts),
+      data_sample: {
+        dimensions: "Standard Vargas (D1 to D60) mapped to Ascendant and 9 Natal Planets"
+      }
+    },
+    {
       table_number: 7,
       jh_id: "JH7",
       title: "Vimshottari Mahadasha Timelines",
@@ -507,7 +519,7 @@ export function TableIndexView({
             />
           </div>
           <span className="text-[10px] font-mono text-slate-400">
-            Showing {filteredTables.length} of 31 Tables
+            Showing {filteredTables.length} of 32 Tables
           </span>
         </div>
       </div>

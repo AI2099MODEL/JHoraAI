@@ -1764,7 +1764,6 @@ const journeyTabs = [
 ];
 
 const astroTabs = [
-  { id: "charts", label: "Charts" },
   { id: "vedic", label: "My Astro Details" },
   { id: "jaimini", label: "Jaimini" },
   { id: "lalkitab", label: "Lalkitab" },
@@ -4708,22 +4707,6 @@ export function MyPageView({
             })()}
           </div>
         </div>
-      ) : activeTab === "charts" ? (
-        <div className="space-y-4">
-          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
-            {(() => {
-              const divisional = profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts || {};
-              if (Object.keys(divisional).length === 0) {
-                return (
-                  <div className="text-center py-8 text-xs text-slate-700 font-mono">
-                    ⚠️ No Divisional Chart data available. Please generate or load user particulars.
-                  </div>
-                );
-              }
-              return renderIndexedTable("table_13", divisional, profile, astrologyData);
-            })()}
-          </div>
-        </div>
       ) : activeTab === "vedic" ? (
         <div className="space-y-6">
           {/* Table JH1: Birth Details */}
@@ -4765,6 +4748,29 @@ export function MyPageView({
           <div className="space-y-3" id="table-jh6-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_divisional" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
+            </div>
+          </div>
+
+          {/* Table JH6-B: Shodashavargas Divisional Planetary Placements Matrix */}
+          <div className="space-y-3" id="table-jh6b-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH6-B</span>
+                Shodashavargas Divisional Planetary Placements Matrix
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+              {(() => {
+                const divisional = profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts || {};
+                if (Object.keys(divisional).length === 0) {
+                  return (
+                    <div className="text-center py-8 text-xs text-slate-700 font-mono">
+                      ⚠️ No Divisional Chart data available. Please generate or load user particulars.
+                    </div>
+                  );
+                }
+                return renderIndexedTable("table_13", divisional, profile, astrologyData);
+              })()}
             </div>
           </div>
 

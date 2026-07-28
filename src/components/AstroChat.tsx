@@ -778,9 +778,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                   {/* My Astro Systems */}
                   <div className="space-y-1 pt-1">
                     {[
-                      { id: "charts", label: "Charts", theme: "bg-blue-50/80 text-blue-950 border-blue-200/80" },
                       { id: "vedic", label: "My Astro Details", theme: "bg-amber-50/80 text-amber-950 border-amber-200/80" },
-                      { id: "transits_data", label: "Transits", theme: "bg-cyan-50/80 text-cyan-950 border-cyan-200/80" },
                       { id: "jaimini", label: "Jaimini", theme: "bg-purple-50/80 text-purple-950 border-purple-200/80" },
                       { id: "lalkitab", label: "Lalkitab", theme: "bg-rose-50/80 text-rose-950 border-rose-200/80" },
                       { id: "chinese", label: "Chinese", theme: "bg-teal-50/80 text-teal-950 border-teal-200/80" },
