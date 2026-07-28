@@ -1844,9 +1844,7 @@ const journeyTabs = [
 ];
 
 const astroTabs = [
-  { id: "vedic", label: "My Astro Details" },
-  { id: "jaimini", label: "Jaimini" },
-  { id: "western", label: "Western" }
+  { id: "vedic", label: "My Astro Details" }
 ];
 
 const tabs = [...lifeTabs, ...journeyTabs, ...astroTabs];

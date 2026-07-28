@@ -107,66 +107,78 @@ export function TableIndexView({
     {
       table_number: 3,
       jh_id: "JH3",
-      title: "Shadbala Planet Strength Matrix",
-      source_origin: "Shadbala Calculation Engine",
-      section_key: "Vedic.strengths.shadbala",
-      api_source: "Computed Client-side / JHora Mapper (Shadbala)",
-      is_populated: !!(profile?.Vedic?.strengths?.shadbala || astrologyData?.vedic?.strengths?.shadbala || true),
+      title: "Planet Dignity Registry",
+      source_origin: "Engine / Parashari Rules",
+      section_key: "Vedic.dignities",
+      api_source: "Parashari Dignity calculations engine",
+      is_populated: true,
       data_sample: {
-        shadbala_strengths: "Calculated dynamically based on Sthana, Dig, Kala, Cheshta, Naisargika, Drik"
+        dignities: "Own sign, Exalted, Debilitated, Moolatrikona, Vargottama, Pushkara, Neecha Bhanga"
       }
     },
     {
       table_number: 4,
       jh_id: "JH4",
-      title: "Bhava Balas (House Strengths)",
-      source_origin: "Bhava Bala Calculation Engine",
-      section_key: "Vedic.strengths.bhava_bala",
-      api_source: "Computed Client-side / JHora Mapper (Bhava Bala)",
-      is_populated: !!(profile?.Vedic?.strengths?.bhava_bala || astrologyData?.vedic?.strengths?.bhava_bala || true),
+      title: "Shadbala Planet Strength Matrix",
+      source_origin: "Shadbala Calculation Engine",
+      section_key: "Vedic.strengths.shadbala",
+      api_source: "Computed Client-side / JHora Mapper (Shadbala)",
+      is_populated: true,
       data_sample: {
-        bhava_bala: "Calculated down to house lordship, aspects, and planetary placements"
+        shadbala_strengths: "Calculated dynamically based on Sthana, Dig, Kala, Cheshta, Naisargika, Drik"
       }
     },
     {
       table_number: 5,
       jh_id: "JH5",
-      title: "Samudhaya Ashtakavarga Points",
-      source_origin: "Ashtakavarga Engine",
-      section_key: "Vedic.strengths.ashtakavarga",
-      api_source: "Computed Client-side / JHora Mapper (Ashtakavarga)",
-      is_populated: !!(profile?.Vedic?.strengths?.ashtakavarga || astrologyData?.vedic?.strengths?.ashtakavarga || true),
+      title: "Bhava Balas (House Strengths)",
+      source_origin: "Bhava Bala Calculation Engine",
+      section_key: "Vedic.strengths.bhava_bala",
+      api_source: "Computed Client-side / JHora Mapper (Bhava Bala)",
+      is_populated: true,
       data_sample: {
-        sarvashtakavarga: [28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28]
+        bhava_bala: "Calculated down to house lordship, aspects, and planetary placements"
       }
     },
     {
       table_number: 6,
       jh_id: "JH6",
-      title: "Divisional Vargas D1 to D60",
-      source_origin: "Divisional Chart Calculation Engine",
-      section_key: "Vedic.divisional_charts",
-      api_source: "Vedic Astro API: /api/astrology/calculate (divisional_charts)",
-      is_populated: !!(profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts),
+      title: "Samudhaya Ashtakavarga Points",
+      source_origin: "Ashtakavarga Engine",
+      section_key: "Vedic.strengths.ashtakavarga",
+      api_source: "Computed Client-side / JHora Mapper (Ashtakavarga)",
+      is_populated: true,
       data_sample: {
-        charts_available: ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D16", "D20", "D24", "D27", "D30", "D40", "D45", "D60"]
-      }
-    },
-    {
-      table_number: 13,
-      jh_id: "JH6-B",
-      title: "Shodashavargas Divisional Planetary Placements Matrix",
-      source_origin: "Divisional Chart Calculation Engine",
-      section_key: "Vedic.divisional_charts",
-      api_source: "Vedic Astro API: /api/astrology/calculate (divisional_charts)",
-      is_populated: !!(profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts),
-      data_sample: {
-        dimensions: "Standard Vargas (D1 to D60) mapped to Ascendant and 9 Natal Planets"
+        sarvashtakavarga: [28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28, 28]
       }
     },
     {
       table_number: 7,
       jh_id: "JH7",
+      title: "Divisional Vargas D1 to D60",
+      source_origin: "Divisional Chart Calculation Engine",
+      section_key: "Vedic.divisional_charts",
+      api_source: "Vedic Astro API: /api/astrology/calculate (divisional_charts)",
+      is_populated: true,
+      data_sample: {
+        charts_available: ["D1", "D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12", "D16", "D20", "D24", "D27", "D30", "D40", "D45", "D60"]
+      }
+    },
+    {
+      table_number: 8,
+      jh_id: "JH8",
+      title: "Shodashavargas Divisional Planetary Placements Matrix",
+      source_origin: "Divisional Chart Calculation Engine",
+      section_key: "Vedic.divisional_charts",
+      api_source: "Vedic Astro API: /api/astrology/calculate (divisional_charts)",
+      is_populated: true,
+      data_sample: {
+        dimensions: "Standard Vargas (D1 to D60) mapped to Ascendant and 9 Natal Planets"
+      }
+    },
+    {
+      table_number: 9,
+      jh_id: "JH9",
       title: "Vimshottari Mahadasha Timelines",
       source_origin: "Dehradun JHora REST API & Dasha Engine",
       section_key: "Vedic.dashas.vimshottari",
@@ -177,57 +189,57 @@ export function TableIndexView({
       }
     },
     {
-      table_number: 8,
-      jh_id: "JH8",
+      table_number: 10,
+      jh_id: "JH10",
       title: "Placidus House Cusp Coordinates",
       source_origin: "Placidus Cusps Engine",
       section_key: "KP.cusps",
       api_source: "KP Astro API Suite: /api/jhora/horoscope",
-      is_populated: !!(profile?.KP?.cusps || astrologyData?.kp?.cusps || true),
+      is_populated: true,
       data_sample: {
         cusps_mapped: 12,
         coordinate_system: "Placidus House Division"
       }
     },
     {
-      table_number: 9,
-      jh_id: "JH9",
+      table_number: 11,
+      jh_id: "JH11",
       title: "KP Planetary Sub-Lords",
       source_origin: "KP Stellar Division Engine",
       section_key: "KP.planets",
       api_source: "KP Astro API Suite: /api/jhora/horoscope",
-      is_populated: !!(profile?.KP?.planets || astrologyData?.kp?.planets || true),
+      is_populated: true,
       data_sample: {
         planetary_star_lords: "Calculated down to Star Lord, Sub Lord and Sub-Sub Lord levels"
       }
     },
     {
-      table_number: 10,
-      jh_id: "JH10",
+      table_number: 12,
+      jh_id: "JH12",
       title: "KP Planet-Level Significators",
       source_origin: "KP Significators Engine",
       section_key: "KP.planet_significators",
       api_source: "KP Astro API Suite: /api/jhora/horoscope",
-      is_populated: !!(profile?.KP?.planet_significators || astrologyData?.kp?.planet_significators || true),
+      is_populated: true,
       data_sample: {
         significators: "Planetary representations across levels A, B, C, D"
       }
     },
     {
-      table_number: 11,
-      jh_id: "JH11",
+      table_number: 13,
+      jh_id: "JH13",
       title: "KP House-Level Significators",
       source_origin: "KP House Significators Engine",
       section_key: "KP.house_significators",
       api_source: "KP Astro API Suite: /api/jhora/horoscope",
-      is_populated: !!(profile?.KP?.house_significators || astrologyData?.kp?.house_significators || true),
+      is_populated: true,
       data_sample: {
         house_significators: "House representations from Level 1 to Level 4"
       }
     },
     {
-      table_number: 12,
-      jh_id: "JH12",
+      table_number: 14,
+      jh_id: "JH14",
       title: "Jaimini Chara Karakas",
       source_origin: "Jaimini Sutra Engine",
       section_key: "Jaimini.karakas",
@@ -238,8 +250,8 @@ export function TableIndexView({
       }
     },
     {
-      table_number: 13,
-      jh_id: "JH13",
+      table_number: 15,
+      jh_id: "JH15",
       title: "Jaimini Arudhas & Padas",
       source_origin: "Jaimini Arudha Pada Engine",
       section_key: "Jaimini.arudha",
@@ -251,8 +263,8 @@ export function TableIndexView({
       }
     },
     {
-      table_number: 14,
-      jh_id: "JH14",
+      table_number: 16,
+      jh_id: "JH16",
       title: "Tropical Planetary Placements",
       source_origin: "Western Tropical Engine",
       section_key: "Western.tropical",
@@ -264,8 +276,8 @@ export function TableIndexView({
       }
     },
     {
-      table_number: 15,
-      jh_id: "JH15",
+      table_number: 17,
+      jh_id: "JH17",
       title: "Tropical Planetary Aspects Matrix",
       source_origin: "Western Aspect Engine",
       section_key: "Western.aspects",
@@ -276,8 +288,20 @@ export function TableIndexView({
       }
     },
     {
-      table_number: 16,
-      jh_id: "JH16",
+      table_number: 18,
+      jh_id: "JH18",
+      title: "Western Placidus House Wheel Interpretation Table",
+      source_origin: "Western Placidus Engine",
+      section_key: "Western.placidus_wheel",
+      api_source: "Western Placidus House Interpretation calculations engine",
+      is_populated: true,
+      data_sample: {
+        wheel_houses: "12 Houses Placidus Cusp Interpretations & Rulers"
+      }
+    },
+    {
+      table_number: 19,
+      jh_id: "JH19",
       title: "Varshaphal Planetary Coordinates",
       source_origin: "Tajika Varshaphal Engine",
       section_key: "Tajika.varshaphal",
@@ -288,20 +312,20 @@ export function TableIndexView({
       }
     },
     {
-      table_number: 17,
-      jh_id: "JH17",
+      table_number: 20,
+      jh_id: "JH20",
       title: "Tajik Harsha Balas",
       source_origin: "Tajik Harsha Bala Engine",
       section_key: "Tajika.harshabala",
       api_source: "KP Astro API Suite: /api/jhora/horoscope",
       is_populated: true,
       data_sample: {
-        strength_parameters: ["First Strength (Prathama Bala)", "Second Strength (Dwitiya Bala)", "Third Strength (Tritiya Bala)", "Fourth Strength (Chaturtha Bala)"]
+        strength_parameters: ["First Strength", "Second Strength", "Third Strength", "Fourth Strength"]
       }
     },
     {
-      table_number: 18,
-      jh_id: "JH18",
+      table_number: 21,
+      jh_id: "JH21",
       title: "Lal Kitab Planetary Houses",
       source_origin: "Lal Kitab House Engine",
       section_key: "LalKitab.houses",
@@ -312,8 +336,8 @@ export function TableIndexView({
       }
     },
     {
-      table_number: 19,
-      jh_id: "JH19",
+      table_number: 22,
+      jh_id: "JH22",
       title: "Lal Kitab Teva & Sleeping Status",
       source_origin: "Lal Kitab Teva Engine",
       section_key: "LalKitab.teva",
@@ -323,152 +347,7 @@ export function TableIndexView({
         teva_types: ["Dharmi Teva", "Andha Teva", "Nisphal Teva"],
         sleeping_status: "Soye Grah (Dormant Planet Analysis)"
       }
-
-    },
-    {
-      table_number: 10,
-      jh_id: "JH20",
-      title: "Jaimini Argalas",
-      source_origin: "Jaimini Engine",
-      section_key: "Jaimini.argalas",
-      api_source: "Computed Client-side / JHora Mapper",
-      is_populated: true,
-      data_sample: {
-        houses: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
-      }
-    },
-    {
-      table_number: 15,
-      jh_id: "JH21",
-      title: "Jaimini Sphutas",
-      source_origin: "Jaimini Engine",
-      section_key: "Jaimini.sphutas",
-      api_source: "Computed Client-side / JHora Mapper",
-      is_populated: true,
-      data_sample: {
-        lagnas: ["Hora Lagna", "Ghati Lagna", "Bhava Lagna", "Pranapada Lagna"]
-      }
-    },
-    {
-      table_number: 17,
-      jh_id: "JH22",
-      title: "Jaimini Sahams",
-      source_origin: "Jaimini Engine",
-      section_key: "Jaimini.sahams",
-      api_source: "Computed Client-side / JHora Mapper",
-      is_populated: true,
-      data_sample: {
-        sahams: ["Punya", "Vidya", "Yasas", "Mitra"]
-      }
-    },
-    {
-      table_number: 18,
-      jh_id: "JH23",
-      title: "Vedic Upgrahas",
-      source_origin: "Vedic Engine",
-      section_key: "Vedic.upgrahas",
-      api_source: "Computed Client-side / JHora Mapper",
-      is_populated: true,
-      data_sample: {
-        upgrahas: ["Gulika", "Mandi", "Dhooma", "Vyatipata"]
-      }
-    },
-    {
-      table_number: 22,
-      jh_id: "JH24",
-      title: "Ishtaphala & Kashtaphala",
-      source_origin: "Vedic Engine",
-      section_key: "Vedic.phalas",
-      api_source: "Computed Client-side / JHora Mapper",
-      is_populated: true,
-      data_sample: {
-        status: "Strengths matrix"
-      }
-    },
-    {
-      table_number: 23,
-      jh_id: "JH25",
-      title: "Jaimini Chara Dasha",
-      source_origin: "Jaimini Engine",
-      section_key: "Jaimini.chara_dasha",
-      api_source: "Computed Client-side / JHora Mapper",
-      is_populated: true,
-      data_sample: {
-        dashas: ["Aries", "Taurus", "Gemini", "Cancer"]
-      }
-    },
-{
-  "table_number": 26,
-  "jh_id": "JH26",
-  "title": "Personal & Birth Details",
-  "source_origin": "Input",
-  "section_key": "Birth.details",
-  "api_source": "Native Profile",
-  "is_populated": true
-},
-{
-  "table_number": 27,
-  "jh_id": "JH27",
-  "title": "Ascendant & Luminaries",
-  "source_origin": "Engine",
-  "section_key": "Ascendant.luminaries",
-  "api_source": "Engine",
-  "is_populated": true
-},
-{
-  "table_number": 28,
-  "jh_id": "JH28",
-  "title": "Astrological Summary",
-  "source_origin": "Engine",
-  "section_key": "Astro.summary",
-  "api_source": "Engine",
-  "is_populated": true
-},
-{
-  "table_number": 29,
-  "jh_id": "JH29",
-  "title": "Birth Panchanga",
-  "source_origin": "Engine",
-  "section_key": "Birth.panchanga",
-  "api_source": "Engine",
-  "is_populated": true
-},
-{
-  "table_number": 30,
-  "jh_id": "JH30",
-  "title": "Strength Summary",
-  "source_origin": "Engine",
-  "section_key": "Strength.summary",
-  "api_source": "Engine",
-  "is_populated": true
-},
-{
-  "table_number": 31,
-  "jh_id": "JH31",
-  "title": "Astronomical Data",
-  "source_origin": "Engine",
-  "section_key": "Astro.data",
-  "api_source": "Engine",
-  "is_populated": true
-},
-{
-  "table_number": 32,
-  "jh_id": "JH32",
-  "title": "Planet Dignity Registry",
-  "source_origin": "Engine / Parashari Rules",
-  "section_key": "Vedic.dignities",
-  "api_source": "Parashari Dignity calculations engine",
-  "is_populated": true
-},
-{
-  "table_number": 33,
-  "jh_id": "JH33",
-  "title": "Western Placidus House Wheel Interpretation Table",
-  "source_origin": "Western Placidus Engine",
-  "section_key": "Western.placidus_wheel",
-  "api_source": "Western Placidus House Interpretation calculations engine",
-  "is_populated": true
-}
+    }
   ];
 
   const filteredTables = tablesRegistry.filter(table => {
