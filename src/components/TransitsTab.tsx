@@ -26,7 +26,6 @@ interface TransitsTabProps {
   subTab?: string;
   chartStyle?: "north" | "south";
   profile?: any;
-  isDark?: boolean;
 }
 
 interface TransitPlanet {
@@ -99,8 +98,7 @@ export default function TransitsTab({
   transitTimezone,
   subTab: propSubTab,
   chartStyle = "north",
-  profile,
-  isDark = false
+  profile
 }: TransitsTabProps) {
   const getLocalDateString = () => {
     const d = new Date();
@@ -1204,7 +1202,7 @@ export default function TransitsTab({
   const SUB_TABS = [
     { id: "birth_panchanga", name: "Birth Panchang", icon: Star },
     { id: "current_gochara", name: "Current Gochara", icon: RefreshCw },
-    { id: "current_dasha", name: "Active Period", icon: Calendar },
+    { id: "current_dasha", name: "Current Dasha", icon: Calendar },
     { id: "current_transits", name: "Current Transits", icon: Layers },
     { id: "panchanga", name: "Current Panchanga", icon: Clock },
     { id: "current_strengths", name: "Current Strengths", icon: Award },
@@ -1515,20 +1513,20 @@ export default function TransitsTab({
           {subTab === "current_dasha" && (
             <div className="space-y-6 animate-fade-in">
               {/* Vimshottari Dasha Alignments Card (Full-Width Hero Section) */}
-              <div className={isDark ? "bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md relative overflow-hidden text-slate-200" : "bg-gradient-to-br from-indigo-50/90 via-purple-50/40 to-white border border-indigo-200/90 rounded-2xl p-6 shadow-sm relative overflow-hidden text-neutral-900"}>
+              <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
                 
-                <div className={`border-b ${isDark ? "border-slate-800" : "border-indigo-100"} pb-4 mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4`}>
+                <div className="border-b border-slate-800 pb-4 mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <h4 className={`text-base font-extrabold flex items-center gap-2 ${isDark ? "text-amber-100" : "text-indigo-950"}`}>
-                      <Clock className={`w-5 h-5 ${isDark ? "text-amber-400" : "text-indigo-600"}`} />
+                    <h4 className="text-base font-bold text-amber-100 flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-amber-400" />
                       Vimshottari Dasha Alignments
                     </h4>
-                    <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-neutral-600 font-medium"}`}>
-                      Current active levels representing planetary periods of influence on <span className={isDark ? "text-amber-400 font-mono font-bold" : "text-indigo-900 font-mono font-bold bg-indigo-100 px-2 py-0.5 rounded border border-indigo-200"}>{transitDate} {transitTime}</span>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Current active levels representing planetary periods of influence on <span className="text-amber-400 font-mono font-bold">{transitDate} {transitTime}</span>
                     </p>
                   </div>
-                  <span className={isDark ? "text-[10px] uppercase font-mono tracking-wider text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 self-start md:self-auto font-bold" : "text-[10px] uppercase font-mono tracking-wider text-indigo-950 bg-indigo-100 px-3 py-1 rounded-full border border-indigo-200 self-start md:self-auto font-extrabold"}>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 self-start md:self-auto font-bold">
                     Active Period Engine
                   </span>
                 </div>
@@ -1537,50 +1535,20 @@ export default function TransitsTab({
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                       {[
-                        { 
-                          title: "Maha (L1)", lord: dashaAlignment.maha.lord, start: dashaAlignment.maha.startDate, end: dashaAlignment.maha.endDate, 
-                          color: isDark ? "text-indigo-300" : "text-indigo-700", 
-                          bg: isDark ? "from-indigo-500/10 to-transparent bg-gradient-to-b" : "bg-white/90", 
-                          border: isDark ? "border-indigo-500/30" : "border-indigo-200",
-                          titleColor: isDark ? "text-slate-400" : "text-indigo-950 font-extrabold"
-                        },
-                        { 
-                          title: "Bhukti / Antar (L2)", lord: dashaAlignment.antar?.lord || "None", start: dashaAlignment.antar?.startDate, end: dashaAlignment.antar?.endDate, 
-                          color: isDark ? "text-amber-400" : "text-amber-700", 
-                          bg: isDark ? "from-amber-500/10 to-transparent bg-gradient-to-b" : "bg-white/90", 
-                          border: isDark ? "border-amber-500/30" : "border-amber-200",
-                          titleColor: isDark ? "text-slate-400" : "text-amber-950 font-extrabold"
-                        },
-                        { 
-                          title: "Antara (L3)", lord: dashaAlignment.pratyantar?.lord || "None", start: dashaAlignment.pratyantar?.startDate || dashaAlignment.pratyantar?.start, end: dashaAlignment.pratyantar?.endDate || dashaAlignment.pratyantar?.end, 
-                          color: isDark ? "text-emerald-400" : "text-emerald-700", 
-                          bg: isDark ? "from-emerald-500/10 to-transparent bg-gradient-to-b" : "bg-white/90", 
-                          border: isDark ? "border-emerald-500/30" : "border-emerald-200",
-                          titleColor: isDark ? "text-slate-400" : "text-emerald-950 font-extrabold"
-                        },
-                        { 
-                          title: "Sukshma (L4)", lord: dashaAlignment.sookshma?.lord || "None", start: dashaAlignment.sookshma?.start, end: dashaAlignment.sookshma?.end, 
-                          color: isDark ? "text-cyan-400" : "text-cyan-700", 
-                          bg: isDark ? "from-cyan-500/10 to-transparent bg-gradient-to-b" : "bg-white/90", 
-                          border: isDark ? "border-cyan-500/30" : "border-cyan-200",
-                          titleColor: isDark ? "text-slate-400" : "text-cyan-950 font-extrabold"
-                        },
-                        { 
-                          title: "Prana (L5)", lord: dashaAlignment.prana?.lord || "None", start: dashaAlignment.prana?.start, end: dashaAlignment.prana?.end, 
-                          color: isDark ? "text-purple-400" : "text-purple-700", 
-                          bg: isDark ? "from-purple-500/10 to-transparent bg-gradient-to-b" : "bg-white/90", 
-                          border: isDark ? "border-purple-500/30" : "border-purple-200",
-                          titleColor: isDark ? "text-slate-400" : "text-purple-950 font-extrabold"
-                        }
+                        { title: "Maha (L1)", lord: dashaAlignment.maha.lord, start: dashaAlignment.maha.startDate, end: dashaAlignment.maha.endDate, color: "text-indigo-300", bg: "from-indigo-500/10 to-transparent", border: "border-indigo-500/30" },
+                        { title: "Bhukti / Antar (L2)", lord: dashaAlignment.antar?.lord || "None", start: dashaAlignment.antar?.startDate, end: dashaAlignment.antar?.endDate, color: "text-amber-400", bg: "from-amber-500/10 to-transparent", border: "border-amber-500/30" },
+                        { title: "Antara (L3)", lord: dashaAlignment.pratyantar?.lord || "None", start: dashaAlignment.pratyantar?.startDate || dashaAlignment.pratyantar?.start, end: dashaAlignment.pratyantar?.endDate || dashaAlignment.pratyantar?.end, color: "text-emerald-400", bg: "from-emerald-500/10 to-transparent", border: "border-emerald-500/30" },
+                        { title: "Sukshma (L4)", lord: dashaAlignment.sookshma?.lord || "None", start: dashaAlignment.sookshma?.start, end: dashaAlignment.sookshma?.end, color: "text-cyan-400", bg: "from-cyan-500/10 to-transparent", border: "border-cyan-500/30" },
+                        { title: "Prana (L5)", lord: dashaAlignment.prana?.lord || "None", start: dashaAlignment.prana?.start, end: dashaAlignment.prana?.end, color: "text-purple-400", bg: "from-purple-500/10 to-transparent", border: "border-purple-500/30" }
                       ].map((level, i) => (
-                        <div key={i} className={`p-4 rounded-xl border ${level.border} ${level.bg} flex flex-col justify-between h-36 hover:scale-[1.02] transition-all shadow-sm`}>
+                        <div key={i} className={`p-4 rounded-xl border ${level.border} bg-gradient-to-b ${level.bg} flex flex-col justify-between h-36 hover:scale-[1.02] transition-all shadow-md`}>
                           <div>
-                            <span className={`text-[10px] uppercase font-bold font-mono tracking-wider block ${level.titleColor}`}>{level.title}</span>
-                            <h5 className={`text-xl font-black mt-2 ${level.color}`}>{level.lord}</h5>
+                            <span className="text-[9px] uppercase font-bold font-mono text-slate-500 tracking-wider block">{level.title}</span>
+                            <h5 className={`text-xl font-extrabold mt-2 ${level.color}`}>{level.lord}</h5>
                           </div>
-                          <div className={`text-[10px] space-y-0.5 font-mono border-t ${isDark ? "border-slate-800/60 text-slate-300" : "border-indigo-100 text-neutral-800"} pt-2`}>
-                            <div className="flex justify-between"><span className={isDark ? "text-slate-500" : "text-neutral-500 font-semibold"}>From:</span> <span className="font-bold">{level.start ? new Date(level.start).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</span></div>
-                            <div className="flex justify-between"><span className={isDark ? "text-slate-500" : "text-neutral-500 font-semibold"}>To:</span> <span className="font-bold">{level.end ? new Date(level.end).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</span></div>
+                          <div className="text-[10px] text-slate-400 space-y-0.5 font-mono border-t border-slate-800/60 pt-2">
+                            <div className="flex justify-between"><span className="text-slate-500">From:</span> {level.start ? new Date(level.start).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</div>
+                            <div className="flex justify-between"><span className="text-slate-500">To:</span> {level.end ? new Date(level.end).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' }) : "—"}</div>
                           </div>
                         </div>
                       ))}
@@ -1612,25 +1580,25 @@ export default function TransitsTab({
                       }
 
                       return (
-                        <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 pt-5 border-t ${isDark ? "border-slate-800/60" : "border-indigo-100"}`}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-5 border-t border-slate-800/60">
                           {/* Mahadasha Progress */}
-                          <div className={isDark ? "bg-slate-950/40 border border-slate-800/80 rounded-xl p-5 space-y-3 shadow-md relative overflow-hidden" : "bg-white border border-indigo-200/90 rounded-xl p-5 space-y-3 shadow-2xs relative overflow-hidden"}>
+                          <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-5 space-y-3 shadow-md relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
                             <div className="flex justify-between items-center relative z-10">
                               <div className="space-y-0.5">
-                                <span className={`text-[10px] font-mono uppercase tracking-wider font-extrabold ${isDark ? "text-indigo-400" : "text-indigo-800"}`}>Mahadasha Timeline Progress</span>
-                                <h5 className={`text-sm font-bold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>{dashaAlignment.maha.lord} Period</h5>
+                                <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-wider font-extrabold">Mahadasha Timeline Progress</span>
+                                <h5 className="text-sm font-bold text-slate-200">{dashaAlignment.maha.lord} Period</h5>
                               </div>
-                              <span className={isDark ? "text-xs font-mono font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/25" : "text-xs font-mono font-extrabold text-indigo-950 bg-indigo-100 px-2.5 py-0.5 rounded-full border border-indigo-200"}>
+                              <span className="text-xs font-mono font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/25">
                                 {mPercent.toFixed(1)}% Elapsed
                               </span>
                             </div>
                             
-                            <div className={isDark ? "w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800/60 relative z-10" : "w-full bg-indigo-50 h-2.5 rounded-full overflow-hidden border border-indigo-100 relative z-10"}>
-                              <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-500" style={{ width: `${mPercent}%` }} />
+                            <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800/60 relative z-10">
+                              <div className="h-full bg-indigo-500 rounded-full transition-all duration-500" style={{ width: `${mPercent}%` }} />
                             </div>
 
-                            <div className={`flex justify-between items-center text-[10px] font-mono relative z-10 ${isDark ? "text-slate-400" : "text-neutral-600 font-medium"}`}>
+                            <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 relative z-10">
                               <span>Start: {new Date(dashaAlignment.maha.startDate).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                               <span>End: {new Date(dashaAlignment.maha.endDate).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                             </div>
@@ -1638,23 +1606,23 @@ export default function TransitsTab({
 
                           {/* Antardasha Progress */}
                           {hasAntar && (
-                            <div className={isDark ? "bg-slate-950/40 border border-slate-800/80 rounded-xl p-5 space-y-3 shadow-md relative overflow-hidden" : "bg-white border border-amber-200/90 rounded-xl p-5 space-y-3 shadow-2xs relative overflow-hidden"}>
+                            <div className="bg-slate-950/40 border border-slate-800/80 rounded-xl p-5 space-y-3 shadow-md relative overflow-hidden">
                               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
                               <div className="flex justify-between items-center relative z-10">
                                 <div className="space-y-0.5">
-                                  <span className={`text-[10px] font-mono uppercase tracking-wider font-extrabold ${isDark ? "text-amber-400" : "text-amber-800"}`}>Antardasha Timeline Progress</span>
-                                  <h5 className={`text-sm font-bold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>{dashaAlignment.antar.lord} Period</h5>
+                                  <span className="text-[10px] font-mono text-amber-400 uppercase tracking-wider font-extrabold">Antardasha Timeline Progress</span>
+                                  <h5 className="text-sm font-bold text-slate-200">{dashaAlignment.antar.lord} Period</h5>
                                 </div>
-                                <span className={isDark ? "text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/25" : "text-xs font-mono font-extrabold text-amber-950 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200"}>
+                                <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/25">
                                   {aPercent.toFixed(1)}% Elapsed
                                 </span>
                               </div>
                               
-                              <div className={isDark ? "w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800/60 relative z-10" : "w-full bg-amber-50 h-2.5 rounded-full overflow-hidden border border-amber-100 relative z-10"}>
-                                <div className="h-full bg-gradient-to-r from-amber-500 to-orange-600 rounded-full transition-all duration-500" style={{ width: `${aPercent}%` }} />
+                              <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800/60 relative z-10">
+                                <div className="h-full bg-amber-500 rounded-full transition-all duration-500" style={{ width: `${aPercent}%` }} />
                               </div>
 
-                              <div className={`flex justify-between items-center text-[10px] font-mono relative z-10 ${isDark ? "text-slate-400" : "text-neutral-600 font-medium"}`}>
+                              <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 relative z-10">
                                 <span>Start: {new Date(aStart).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                                 <span>End: {new Date(aEnd).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                               </div>
@@ -1665,7 +1633,7 @@ export default function TransitsTab({
                     })()}
                   </div>
                 ) : (
-                  <div className={isDark ? "text-slate-500 text-xs italic bg-slate-900/20 p-4 rounded-xl border border-dashed border-slate-800" : "text-neutral-500 text-xs italic bg-neutral-50 p-4 rounded-xl border border-dashed border-neutral-300"}>
+                  <div className="text-slate-500 text-xs italic bg-slate-900/20 p-4 rounded-xl border border-dashed border-slate-800">
                     No Vimshottari dasha found inside native profile.
                   </div>
                 )}
@@ -1678,35 +1646,35 @@ export default function TransitsTab({
                 <div className="lg:col-span-7 space-y-6">
                   
                   {/* Interactive Transit Health, Spirit & Career Synthesizer */}
-                  <div className={isDark ? "bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-6" : "bg-white border border-indigo-200/90 rounded-2xl p-6 shadow-2xs space-y-6 text-neutral-900"}>
+                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-6">
                     <div>
-                      <h4 className={`text-base font-extrabold flex items-center gap-2 ${isDark ? "text-slate-100" : "text-indigo-950"}`}>
-                        <TrendingUp className={`w-5 h-5 ${isDark ? "text-indigo-400" : "text-indigo-600"}`} />
+                      <h4 className="text-base font-bold text-slate-100 flex items-center gap-2">
+                        <TrendingUp className="w-5 h-5 text-indigo-400" />
                         Transit Health, Spirit & Career Synthesizer
                       </h4>
-                      <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-neutral-600 font-medium"}`}>Real-time calculations for mental, physical and spiritual alignments</p>
+                      <p className="text-xs text-slate-400 mt-1">Real-time calculations for mental, physical and spiritual alignments</p>
                     </div>
 
                     <div className="space-y-4">
-                      <h5 className={`text-[10px] font-mono uppercase tracking-widest font-extrabold ${isDark ? "text-indigo-400" : "text-indigo-800"}`}>
+                      <h5 className="text-[10px] font-mono text-indigo-400 uppercase tracking-widest font-bold">
                         Cosmic Health Energy Scores
                       </h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[
-                          { label: "Mental Clarity & Comm", score: dynamicEnergy.mental.score, tone: dynamicEnergy.mental.tone, color: "bg-cyan-500", text: isDark ? "text-cyan-400" : "text-cyan-950", bg: isDark ? "bg-cyan-500/10" : "bg-cyan-100 border border-cyan-200" },
-                          { label: "Physical Stamina & Drive", score: dynamicEnergy.physical.score, tone: dynamicEnergy.physical.tone, color: "bg-rose-500", text: isDark ? "text-rose-400" : "text-rose-950", bg: isDark ? "bg-rose-500/10" : "bg-rose-100 border border-rose-200" },
-                          { label: "Financial Flow & Strength", score: dynamicEnergy.financial.score, tone: dynamicEnergy.financial.tone, color: "bg-emerald-500", text: isDark ? "text-emerald-400" : "text-emerald-950", bg: isDark ? "bg-emerald-500/10" : "bg-emerald-100 border border-emerald-200" },
-                          { label: "Relationship Harmony", score: dynamicEnergy.relationship.score, tone: dynamicEnergy.relationship.tone, color: "bg-pink-500", text: isDark ? "text-pink-400" : "text-pink-950", bg: isDark ? "bg-pink-500/10" : "bg-pink-100 border border-pink-200" },
-                          { label: "Career Focus & Authority", score: dynamicEnergy.career.score, tone: dynamicEnergy.career.tone, color: "bg-amber-500", text: isDark ? "text-amber-400" : "text-amber-950", bg: isDark ? "bg-amber-500/10" : "bg-amber-100 border border-amber-200" },
-                          { label: "Spiritual Alignment", score: dynamicEnergy.spiritual.score, tone: dynamicEnergy.spiritual.tone, color: "bg-violet-500", text: isDark ? "text-violet-400" : "text-violet-950", bg: isDark ? "bg-violet-500/10" : "bg-violet-100 border border-violet-200" },
+                          { label: "Mental Clarity & Comm", score: dynamicEnergy.mental.score, tone: dynamicEnergy.mental.tone, color: "bg-cyan-500", text: "text-cyan-400", bg: "bg-cyan-500/10" },
+                          { label: "Physical Stamina & Drive", score: dynamicEnergy.physical.score, tone: dynamicEnergy.physical.tone, color: "bg-rose-500", text: "text-rose-400", bg: "bg-rose-500/10" },
+                          { label: "Financial Flow & Strength", score: dynamicEnergy.financial.score, tone: dynamicEnergy.financial.tone, color: "bg-emerald-500", text: "text-emerald-400", bg: "bg-emerald-500/10" },
+                          { label: "Relationship Harmony", score: dynamicEnergy.relationship.score, tone: dynamicEnergy.relationship.tone, color: "bg-pink-500", text: "text-pink-400", bg: "bg-pink-500/10" },
+                          { label: "Career Focus & Authority", score: dynamicEnergy.career.score, tone: dynamicEnergy.career.tone, color: "bg-amber-500", text: "text-amber-400", bg: "bg-amber-500/10" },
+                          { label: "Spiritual Alignment", score: dynamicEnergy.spiritual.score, tone: dynamicEnergy.spiritual.tone, color: "bg-violet-500", text: "text-violet-400", bg: "bg-violet-500/10" },
                         ].map((bar, idx) => (
-                          <div key={idx} className={isDark ? "space-y-2 bg-slate-950/40 p-3.5 rounded-xl border border-slate-800/60" : "space-y-2 bg-indigo-50/40 p-3.5 rounded-xl border border-indigo-100"}>
+                          <div key={idx} className="space-y-2 bg-slate-950/40 p-3.5 rounded-xl border border-slate-800/60">
                             <div className="flex justify-between items-start gap-1">
-                              <span className={`text-xs font-bold truncate ${isDark ? "text-slate-300" : "text-neutral-900"}`}>{bar.label}</span>
-                              <span className={`text-[10px] font-mono shrink-0 ${isDark ? "text-slate-400" : "text-neutral-500"}`}>({bar.tone})</span>
+                              <span className="text-xs font-semibold text-slate-300 truncate">{bar.label}</span>
+                              <span className="text-[10px] font-mono text-slate-400 shrink-0">({bar.tone})</span>
                             </div>
                             <div className="flex items-center gap-3">
-                              <div className={isDark ? "flex-1 bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800/80" : "flex-1 bg-white h-2 rounded-full overflow-hidden border border-indigo-200"}>
+                              <div className="flex-1 bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800/80">
                                 <div className={`h-full ${bar.color} transition-all`} style={{ width: `${bar.score * 100}%` }} />
                               </div>
                               <span className={`text-[11px] font-mono font-bold ${bar.text} ${bar.bg} px-1.5 py-0.5 rounded shrink-0`}>
@@ -1719,36 +1687,36 @@ export default function TransitsTab({
                     </div>
 
                     {/* Synthesis from dynamic calculations */}
-                    <div className={isDark ? "p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 space-y-2.5" : "p-4 rounded-xl border border-indigo-200 bg-indigo-50/60 space-y-2.5"}>
-                      <span className={`text-[9px] font-mono uppercase tracking-widest font-extrabold block ${isDark ? "text-indigo-400" : "text-indigo-900"}`}>
+                    <div className="p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 space-y-2.5">
+                      <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest font-extrabold block">
                         Vedic Sky Synthesis
                       </span>
-                      <p className={`text-xs leading-relaxed font-sans ${isDark ? "text-slate-300" : "text-neutral-800 font-medium"}`}>
-                        The active sky indicates peak <strong className={isDark ? "text-indigo-400" : "text-indigo-700 font-bold"}>Spiritual Alignment ({(dynamicEnergy.spiritual.score * 100).toFixed(0)}%)</strong> and high <strong className={isDark ? "text-cyan-400" : "text-teal-700 font-bold"}>Mental Clarity ({(dynamicEnergy.mental.score * 100).toFixed(0)}%)</strong>. Dominated by {dynamicMood.dominantPlanets[0]?.planet || "Jupiter"}'s supportive transit across your natal horizon, you are gifted with heightened intuition. Excellent day for domestic consolidation, organizing intellectual projects, and practicing mantra sadhana. Avoid long taxing journeys or physical confrontations during inauspicious solar transit sectors.
+                      <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                        The active sky indicates peak <strong className="text-indigo-400">Spiritual Alignment ({(dynamicEnergy.spiritual.score * 100).toFixed(0)}%)</strong> and high <strong className="text-cyan-400">Mental Clarity ({(dynamicEnergy.mental.score * 100).toFixed(0)}%)</strong>. Dominated by {dynamicMood.dominantPlanets[0]?.planet || "Jupiter"}'s supportive transit across your natal horizon, you are gifted with heightened intuition. Excellent day for domestic consolidation, organizing intellectual projects, and practicing mantra sadhana. Avoid long taxing journeys or physical confrontations during inauspicious solar transit sectors.
                       </p>
                     </div>
                   </div>
 
                   {/* Bhava House Activations */}
-                  <div className={isDark ? "bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4" : "bg-white border border-indigo-200/90 rounded-2xl p-6 shadow-2xs space-y-4 text-neutral-900"}>
+                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4">
                     <div>
-                      <h4 className={`text-base font-extrabold flex items-center gap-2 ${isDark ? "text-slate-100" : "text-indigo-950"}`}>
-                        <Layers className={`w-5 h-5 ${isDark ? "text-indigo-400" : "text-indigo-600"}`} />
+                      <h4 className="text-base font-bold text-slate-100 flex items-center gap-2">
+                        <Layers className="w-5 h-5 text-indigo-400" />
                         Bhava House Activations
                       </h4>
-                      <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-neutral-600 font-medium"}`}>Sectors currently vitalized by major transit configurations</p>
+                      <p className="text-xs text-slate-400 mt-1">Sectors currently vitalized by major transit configurations</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {houseActivation.map((item) => (
-                        <div key={item.house} className={isDark ? "p-4 rounded-xl border border-slate-800 bg-slate-950/20 hover:border-indigo-500/20 transition-all flex flex-col justify-between h-36" : "p-4 rounded-xl border border-indigo-100 bg-indigo-50/30 hover:border-indigo-300 transition-all flex flex-col justify-between h-36"}>
+                        <div key={item.house} className="p-4 rounded-xl border border-slate-800 bg-slate-950/20 hover:border-indigo-500/20 transition-all flex flex-col justify-between h-36">
                           <div>
-                            <div className={`flex justify-between items-center border-b pb-1.5 ${isDark ? "border-slate-800/45" : "border-indigo-100"}`}>
-                              <span className={`text-xs font-bold font-mono ${isDark ? "text-amber-400" : "text-amber-700"}`}>House {item.house}</span>
-                              <span className={`text-[11px] font-bold truncate max-w-[120px] ${isDark ? "text-slate-300" : "text-neutral-900"}`}>{item.title}</span>
+                            <div className="flex justify-between items-center border-b border-slate-800/45 pb-1.5">
+                              <span className="text-xs font-bold text-amber-400 font-mono">House {item.house}</span>
+                              <span className="text-[11px] font-semibold text-slate-300 truncate max-w-[120px]">{item.title}</span>
                             </div>
-                            <p className={`text-[11px] mt-2 leading-normal line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-700"}`}>{item.focus}</p>
+                            <p className="text-[11px] text-slate-400 mt-2 leading-normal line-clamp-2">{item.focus}</p>
                           </div>
-                          <div className={isDark ? "bg-indigo-950/20 border border-indigo-900/20 px-2.5 py-1 rounded text-[10px] font-mono text-indigo-300 text-center truncate" : "bg-indigo-100/80 border border-indigo-200 px-2.5 py-1 rounded text-[10px] font-mono text-indigo-950 font-bold text-center truncate"}>
+                          <div className="bg-indigo-950/20 border border-indigo-900/20 px-2.5 py-1 rounded text-[10px] font-mono text-indigo-300 text-center truncate">
                             {item.trigger}
                           </div>
                         </div>
@@ -1757,22 +1725,22 @@ export default function TransitsTab({
                   </div>
 
                   {/* Coordinate Sensitive Points */}
-                  <div className={isDark ? "bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4" : "bg-white border border-indigo-200/90 rounded-2xl p-6 shadow-2xs space-y-4 text-neutral-900"}>
+                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4">
                     <div>
-                      <h4 className={`text-base font-extrabold flex items-center gap-2 ${isDark ? "text-slate-100" : "text-indigo-950"}`}>
-                        <MapPin className={`w-5 h-5 ${isDark ? "text-indigo-400" : "text-indigo-600"}`} />
+                      <h4 className="text-base font-bold text-slate-100 flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-indigo-400" />
                         Coordinate Sensitive Points
                       </h4>
-                      <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-neutral-600 font-medium"}`}>High-potency mathematical degrees currently active in transit</p>
+                      <p className="text-xs text-slate-400 mt-1">High-potency mathematical degrees currently active in transit</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {sensitivePointsList.map((pt, i) => (
-                        <div key={i} className={isDark ? "p-4 rounded-xl border border-slate-800 bg-slate-950/20 hover:border-indigo-500/20 transition-all flex flex-col justify-between space-y-2" : "p-4 rounded-xl border border-indigo-100 bg-indigo-50/30 hover:border-indigo-300 transition-all flex flex-col justify-between space-y-2"}>
+                        <div key={i} className="p-4 rounded-xl border border-slate-800 bg-slate-950/20 hover:border-indigo-500/20 transition-all flex flex-col justify-between space-y-2">
                           <div className="flex justify-between items-start gap-2">
-                            <strong className={`text-xs ${isDark ? "text-slate-200" : "text-neutral-900 font-bold"}`}>{pt.name}</strong>
-                            <span className={isDark ? "text-[10px] font-bold font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/25 shrink-0" : "text-[10px] font-bold font-mono text-indigo-950 bg-indigo-100 px-2 py-0.5 rounded border border-indigo-200 shrink-0"}>{pt.coord}</span>
+                            <strong className="text-xs text-slate-200">{pt.name}</strong>
+                            <span className="text-[10px] font-bold font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/25 shrink-0">{pt.coord}</span>
                           </div>
-                          <p className={`text-[11px] leading-relaxed ${isDark ? "text-slate-400" : "text-neutral-600"}`}>{pt.desc}</p>
+                          <p className="text-[11px] text-slate-400 leading-relaxed">{pt.desc}</p>
                         </div>
                       ))}
                     </div>
@@ -1784,18 +1752,18 @@ export default function TransitsTab({
                 <div className="lg:col-span-5 space-y-6">
                   
                   {/* Dominant Cosmic Anchors */}
-                  <div className={isDark ? "bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4" : "bg-white border border-indigo-200/90 rounded-2xl p-6 shadow-2xs space-y-4 text-neutral-900"}>
-                    <h4 className={`text-base font-extrabold flex items-center gap-2 ${isDark ? "text-indigo-300" : "text-indigo-950"}`}>
-                      <Star className={`w-5 h-5 ${isDark ? "text-indigo-400" : "text-indigo-600"}`} />
+                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4">
+                    <h4 className="text-base font-bold text-indigo-300 flex items-center gap-2">
+                      <Star className="w-5 h-5 text-indigo-400" />
                       Dominant Cosmic Anchors
                     </h4>
                     <div className="space-y-3">
                       {/* Dominant House */}
                       {dynamicMood.dominantHouses.map((house, idx) => (
-                        <div key={idx} className={isDark ? "p-4 rounded-xl border border-slate-800/80 bg-slate-950/40" : "p-4 rounded-xl border border-indigo-100 bg-indigo-50/40"}>
-                          <span className={`text-[9px] font-mono uppercase tracking-widest font-extrabold block ${isDark ? "text-indigo-400" : "text-indigo-900"}`}>Active Focus House</span>
-                          <h5 className={`text-xs font-extrabold mt-1.5 ${isDark ? "text-white" : "text-neutral-900"}`}>House {house.houseNumber} Transit</h5>
-                          <p className={`text-[11px] mt-1 leading-relaxed ${isDark ? "text-slate-400" : "text-neutral-600 font-medium"}`}>
+                        <div key={idx} className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/40">
+                          <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest font-bold block">Active Focus House</span>
+                          <h5 className="text-xs font-bold text-white mt-1.5">House {house.houseNumber} Transit</h5>
+                          <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
                             {house.significance}. Amplifying focus and active planetary alignments.
                           </p>
                         </div>
@@ -1803,10 +1771,10 @@ export default function TransitsTab({
 
                       {/* Dominant Planet */}
                       {dynamicMood.dominantPlanets.map((planet, idx) => (
-                        <div key={idx} className={isDark ? "p-4 rounded-xl border border-slate-800/80 bg-slate-950/40" : "p-4 rounded-xl border border-amber-200/80 bg-amber-50/40"}>
-                          <span className={`text-[9px] font-mono uppercase tracking-widest font-extrabold block ${isDark ? "text-indigo-400" : "text-amber-900"}`}>Dominant Planet Anchor</span>
-                          <h5 className={`text-xs font-extrabold mt-1.5 ${isDark ? "text-amber-400" : "text-amber-950"}`}>{planet.planet} (Strength: {planet.strength})</h5>
-                          <p className={`text-[11px] mt-1 leading-relaxed ${isDark ? "text-slate-400" : "text-neutral-700 font-medium"}`}>
+                        <div key={idx} className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/40">
+                          <span className="text-[9px] font-mono text-indigo-400 uppercase tracking-widest font-bold block">Dominant Planet Anchor</span>
+                          <h5 className="text-xs font-bold text-amber-400 mt-1.5">{planet.planet} (Strength: {planet.strength})</h5>
+                          <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
                             {planet.influenceType}. Highly supportive of deep analytical and intuitive clarity.
                           </p>
                         </div>
@@ -1815,46 +1783,46 @@ export default function TransitsTab({
                   </div>
 
                   {/* Yogas Active Due to Current Transit */}
-                  <div className={isDark ? "bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4" : "bg-white border border-amber-200/90 rounded-2xl p-6 shadow-2xs space-y-4 text-neutral-900"}>
-                    <h4 className={`text-base font-extrabold flex items-center gap-2 ${isDark ? "text-amber-100" : "text-amber-950"}`}>
-                      <Sparkles className={`w-5 h-5 ${isDark ? "text-amber-400" : "text-amber-600"}`} />
+                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4">
+                    <h4 className="text-base font-bold text-amber-100 flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-amber-400" />
                       Yogas Active
                     </h4>
                     <div className="space-y-3.5 max-h-[350px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800">
                       {getActiveTransitYogas().map((yoga, i) => (
-                        <div key={i} className={isDark ? "p-4 rounded-xl border border-indigo-500/10 bg-slate-950/35 hover:border-amber-500/20 transition-all space-y-2" : "p-4 rounded-xl border border-amber-200/80 bg-amber-50/40 hover:border-amber-300 transition-all space-y-2"}>
-                          <div className={`flex items-center gap-2 ${isDark ? "text-amber-400" : "text-amber-950"}`}>
+                        <div key={i} className="p-4 rounded-xl border border-indigo-500/10 bg-slate-950/35 hover:border-amber-500/20 transition-all space-y-2">
+                          <div className="flex items-center gap-2 text-amber-400">
                             <Sparkles className="w-3.5 h-3.5 shrink-0" />
                             <strong className="text-xs font-bold">{yoga.name}</strong>
                           </div>
-                          <p className={`text-[11px] leading-relaxed ${isDark ? "text-slate-300" : "text-neutral-700"}`}>{yoga.desc}</p>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">{yoga.desc}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Transit-Related Celestial Doshas */}
-                  <div className={isDark ? "bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4" : "bg-white border border-rose-200/90 rounded-2xl p-6 shadow-2xs space-y-4 text-neutral-900"}>
-                    <h4 className={`text-base font-extrabold flex items-center gap-2 ${isDark ? "text-rose-300" : "text-rose-950"}`}>
-                      <AlertTriangle className={`w-5 h-5 ${isDark ? "text-rose-400" : "text-rose-600"}`} />
+                  <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4">
+                    <h4 className="text-base font-bold text-rose-300 flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-rose-400" />
                       Celestial Doshas & Remedies
                     </h4>
                     <div className="space-y-4 max-h-[450px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-800">
                       {getActiveTransitDoshas().map((dosha, i) => (
-                        <div key={i} className={isDark ? "p-4 rounded-xl border border-rose-500/10 bg-slate-950/35 hover:border-rose-500/20 transition-all space-y-3" : "p-4 rounded-xl border border-rose-200/80 bg-rose-50/40 hover:border-rose-300 transition-all space-y-3"}>
-                          <div className={`flex justify-between items-center border-b pb-2 ${isDark ? "border-slate-800/40" : "border-rose-200/60"}`}>
-                            <span className={`font-bold text-xs flex items-center gap-1.5 ${isDark ? "text-rose-400" : "text-rose-950"}`}>
+                        <div key={i} className="p-4 rounded-xl border border-rose-500/10 bg-slate-950/35 hover:border-rose-500/20 transition-all space-y-3">
+                          <div className="flex justify-between items-center border-b border-slate-800/40 pb-2">
+                            <span className="font-bold text-rose-400 text-xs flex items-center gap-1.5">
                               <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                               {dosha.name}
                             </span>
-                            <span className={isDark ? "text-[8px] font-mono bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded uppercase font-extrabold" : "text-[8px] font-mono bg-rose-100 text-rose-950 border border-rose-200 px-2 py-0.5 rounded uppercase font-extrabold"}>{dosha.severity}</span>
+                            <span className="text-[8px] font-mono bg-rose-500/10 text-rose-400 px-2 py-0.5 rounded uppercase font-extrabold">{dosha.severity}</span>
                           </div>
 
-                          <p className={`text-[11px] leading-relaxed ${isDark ? "text-slate-300" : "text-neutral-700 font-medium"}`}>{dosha.desc}</p>
+                          <p className="text-[11px] text-slate-300 leading-relaxed">{dosha.desc}</p>
 
-                          <div className={isDark ? "p-2.5 rounded bg-slate-950/65 border border-slate-800/80" : "p-2.5 rounded-lg bg-white border border-rose-200"}>
-                            <span className={`text-[9px] uppercase block font-extrabold font-mono tracking-wider ${isDark ? "text-amber-400" : "text-amber-900"}`}>Remedial Suggestion:</span>
-                            <span className={`text-[11px] mt-1 block leading-normal ${isDark ? "text-slate-300" : "text-neutral-800 font-medium"}`}>{dosha.remedy}</span>
+                          <div className="p-2.5 rounded bg-slate-950/65 border border-slate-800/80">
+                            <span className="text-[9px] text-amber-400 uppercase block font-extrabold font-mono tracking-wider">Remedial Suggestion:</span>
+                            <span className="text-slate-300 text-[11px] mt-1 block leading-normal">{dosha.remedy}</span>
                           </div>
                         </div>
                       ))}
@@ -1869,19 +1837,19 @@ export default function TransitsTab({
 
           {/* TAB 3: CURRENT TRANSITS */}
           {subTab === "current_transits" && (
-            <div className={isDark ? "bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-4" : "bg-white border border-indigo-200/90 rounded-2xl p-6 space-y-4 text-neutral-900 shadow-2xs"}>
-              <div className={`border-b pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 ${isDark ? "border-slate-800" : "border-indigo-100"}`}>
+            <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-4">
+              <div className="border-b border-slate-800 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
-                  <h4 className={`text-base font-extrabold ${isDark ? "text-amber-100" : "text-indigo-950"}`}>Planetary Transits Table</h4>
-                  <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-neutral-600 font-medium"}`}>
+                  <h4 className="text-base font-semibold text-amber-100">Planetary Transits Table</h4>
+                  <p className="text-xs text-slate-400 mt-1">
                     Real-time transit positions (Gochara) mapped against your natal birth houses.
                   </p>
                 </div>
               </div>
 
-              <div className={isDark ? "overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/10" : "overflow-x-auto rounded-xl border border-indigo-200 bg-white shadow-2xs"}>
-                <table className="min-w-full divide-y border-collapse text-left text-xs font-sans">
-                  <thead className={isDark ? "bg-slate-900/60 font-mono text-[10px] text-slate-400 uppercase tracking-wider" : "bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white font-mono text-[10.5px] uppercase font-bold tracking-wider"}>
+              <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/10">
+                <table className="min-w-full divide-y divide-slate-800 text-left text-xs font-sans">
+                  <thead className="bg-slate-900/60 font-mono text-[10px] text-slate-400 uppercase tracking-wider">
                     <tr>
                       <th className="px-4 py-3">Planet</th>
                       <th className="px-4 py-3">Zodiac Sign</th>
@@ -1895,7 +1863,7 @@ export default function TransitsTab({
                       <th className="px-4 py-3 text-center">Status</th>
                     </tr>
                   </thead>
-                  <tbody className={isDark ? "divide-y divide-slate-800/60" : "divide-y divide-indigo-100/80"}>
+                  <tbody className="divide-y divide-slate-800/60">
                     {["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].map((pName) => {
                       let natalHouse = -1;
                       for (let h = 1; h <= 12; h++) {
@@ -1905,9 +1873,9 @@ export default function TransitsTab({
                       const tp = transitPlanets.find(p => p.name === pName);
                       if (!tp) {
                         return (
-                          <tr key={pName} className={isDark ? "hover:bg-slate-900/30 transition-colors" : "hover:bg-purple-50/60 transition-colors"}>
-                            <td className={`px-4 py-3 font-bold ${isDark ? "text-slate-200" : "text-neutral-900"}`}>{pName}</td>
-                            <td colSpan={9} className={`px-4 py-3 italic ${isDark ? "text-slate-500" : "text-neutral-500"}`}>No transit data available</td>
+                          <tr key={pName} className="hover:bg-slate-900/30 transition-colors">
+                            <td className="px-4 py-3 font-medium text-slate-200">{pName}</td>
+                            <td colSpan={9} className="px-4 py-3 text-slate-500 italic">No transit data available</td>
                           </tr>
                         );
                       }
@@ -1926,21 +1894,19 @@ export default function TransitsTab({
                       const formattedDegree = `${degFloor}° ${minVal.toString().padStart(2, '0')}′`;
 
                       return (
-                        <tr key={pName} className={isDark ? "hover:bg-slate-900/30 transition-colors" : "hover:bg-purple-50/60 transition-colors"}>
-                          <td className={`px-4 py-3.5 font-bold ${isDark ? "text-slate-100" : "text-indigo-950 font-extrabold"}`}>{pName}</td>
-                          <td className={`px-4 py-3.5 font-medium ${isDark ? "text-slate-300" : "text-neutral-900"}`}>{tp.sign}</td>
-                          <td className={`px-4 py-3.5 font-mono font-bold ${isDark ? "text-slate-400" : "text-neutral-700"}`}>{formattedDegree}</td>
-                          <td className={`px-4 py-3.5 font-bold ${isDark ? "text-amber-200" : "text-amber-900"}`}>{nakDetails.name}</td>
-                          <td className={`px-4 py-3.5 text-center font-mono font-bold ${isDark ? "text-slate-300" : "text-neutral-800"}`}>{nakDetails.pada}</td>
-                          <td className={`px-4 py-3.5 font-medium ${isDark ? "text-slate-400" : "text-neutral-800"}`}>{nakDetails.lord}</td>
-                          <td className={`px-4 py-3.5 font-bold ${isDark ? "text-slate-400" : "text-indigo-900"}`}>{subLord}</td>
-                          <td className={`px-4 py-3.5 text-center font-mono font-bold ${isDark ? "text-indigo-400" : "text-indigo-800"}`}>H{natalHouse !== -1 ? natalHouse : "—"}</td>
-                          <td className={`px-4 py-3.5 text-center font-mono font-bold ${isDark ? "text-amber-400" : "text-amber-800"}`}>H{transitHouse}</td>
+                        <tr key={pName} className="hover:bg-slate-900/30 transition-colors">
+                          <td className="px-4 py-3.5 font-bold text-slate-100">{pName}</td>
+                          <td className="px-4 py-3.5 text-slate-300">{tp.sign}</td>
+                          <td className="px-4 py-3.5 font-mono text-slate-400">{formattedDegree}</td>
+                          <td className="px-4 py-3.5 font-medium text-amber-200">{nakDetails.name}</td>
+                          <td className="px-4 py-3.5 text-center text-slate-300 font-mono">{nakDetails.pada}</td>
+                          <td className="px-4 py-3.5 text-slate-400">{nakDetails.lord}</td>
+                          <td className="px-4 py-3.5 text-slate-400 font-medium">{subLord}</td>
+                          <td className="px-4 py-3.5 text-center font-mono text-indigo-400 font-semibold">H{natalHouse !== -1 ? natalHouse : "—"}</td>
+                          <td className="px-4 py-3.5 text-center font-mono text-amber-400 font-semibold">H{transitHouse}</td>
                           <td className="px-4 py-3.5 text-center">
-                            <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
-                              isBenefic 
-                                ? (isDark ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-emerald-100 text-emerald-900 border-emerald-300")
-                                : (isDark ? "bg-slate-500/5 text-slate-400 border-slate-500/10" : "bg-neutral-100 text-neutral-800 border-neutral-300")
+                            <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded border ${
+                              isBenefic ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-slate-500/5 text-slate-400 border-slate-500/10"
                             }`}>
                               {isBenefic ? "Benefic" : "Neutral"}
                             </span>
@@ -1956,10 +1922,10 @@ export default function TransitsTab({
 
           {/* TAB 4: PANCHANGA */}
           {subTab === "panchanga" && (
-            <div className={isDark ? "bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-6" : "bg-white border border-indigo-200/90 rounded-2xl p-6 space-y-6 text-neutral-900 shadow-2xs"}>
-              <div className={`border-b pb-3 ${isDark ? "border-slate-800" : "border-indigo-100"}`}>
-                <h4 className={`text-base font-extrabold ${isDark ? "text-amber-100" : "text-indigo-950"}`}>Moment Panchanga (Current Sky)</h4>
-                <p className={`text-xs mt-1 ${isDark ? "text-slate-400" : "text-neutral-600 font-medium"}`}>Continuous ephemeris indices computed for the active transit target coordinate.</p>
+            <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 space-y-6">
+              <div className="border-b border-slate-800 pb-3">
+                <h4 className="text-base font-semibold text-amber-100 font-sans">Moment Panchanga (Current Sky)</h4>
+                <p className="text-xs text-slate-400 mt-1">Continuous ephemeris indices computed for the active transit target coordinate.</p>
               </div>
 
               {transitPanchanga ? (
