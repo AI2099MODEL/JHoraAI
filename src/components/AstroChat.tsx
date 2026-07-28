@@ -337,13 +337,13 @@ FINAL REPORT FORMAT:
     return () => clearInterval(interval);
   }, [analysisLoading]);
 
-  const runAnalysis = async (queryText: string) => {
+  const runAnalysis = async (queryText: string, displayText?: string) => {
     if (analysisLoading) return;
 
     const userMsg: Message = {
       id: Math.random().toString(36).substr(2, 9),
       sender: "user",
-      text: queryText,
+      text: displayText || queryText,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -694,7 +694,7 @@ FINAL REPORT FORMAT:
                       <button
                         key={p.id}
                         onClick={() => {
-                          runAnalysis(p.query);
+                          runAnalysis(p.query, p.label);
                           setSidebarOpen(false);
                         }}
                         className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] font-medium text-neutral-800 hover:text-blue-950 bg-neutral-50/60 hover:bg-blue-50 border border-transparent hover:border-blue-200/80 w-full text-left transition-all cursor-pointer group shadow-2xs"
