@@ -4945,6 +4945,13 @@ export function MyPageView({
             </div>
           </div>
 
+          {/* Table JH33: Western Placidus House Wheel Interpretation */}
+          <div className="space-y-3" id="table-jh33-container">
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="western_placidus_wheel" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
+            </div>
+          </div>
+
           {/* Table JH16: Tajik Varshaphal Sahams */}
           <div className="space-y-3" id="table-jh16-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">

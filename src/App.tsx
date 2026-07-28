@@ -1505,14 +1505,6 @@ export default function App() {
         { id: "kp_planet_significators", label: "Planet Significators", description: "JH10: KP Planet-Level Significators.", systemId: "astro", category: "KP STELLAR" },
         { id: "kp_house_significators", label: "House Significators", description: "JH11: KP House-Level Significators.", systemId: "astro", category: "KP STELLAR" },
 
-        // Category 3: JAIMINI
-        { id: "jaimini_karakas", label: "Chara Karakas", description: "JH12: Jaimini Chara Karakas.", systemId: "astro", category: "JAIMINI" },
-        { id: "jaimini_arudhas", label: "Arudha Padas", description: "JH13: Jaimini Arudhas & Padas.", systemId: "astro", category: "JAIMINI" },
-
-        // Category 4: WESTERN
-        { id: "western_tropical", label: "Tropical Placements", description: "JH14: Tropical Planetary Placements.", systemId: "astro", category: "WESTERN" },
-        { id: "western_aspects", label: "Aspects Matrix", description: "JH15: Tropical Planetary Aspects Matrix.", systemId: "astro", category: "WESTERN" },
-
         // Category 5: TAJIKA
         { id: "tajika_varshaphal", label: "Varshaphal Coordinates", description: "JH16: Varshaphal Planetary Coordinates.", systemId: "astro", category: "TAJIKA" },
         { id: "tajika_harshabala", label: "Harsha Balas", description: "JH17: Tajik Harsha Balas.", systemId: "astro", category: "TAJIKA" },

@@ -459,6 +459,15 @@ export function TableIndexView({
   "section_key": "Vedic.dignities",
   "api_source": "Parashari Dignity calculations engine",
   "is_populated": true
+},
+{
+  "table_number": 33,
+  "jh_id": "JH33",
+  "title": "Western Placidus House Wheel Interpretation Table",
+  "source_origin": "Western Placidus Engine",
+  "section_key": "Western.placidus_wheel",
+  "api_source": "Western Placidus House Interpretation calculations engine",
+  "is_populated": true
 }
   ];
 

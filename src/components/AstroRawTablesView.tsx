@@ -1439,6 +1439,76 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
               </div>
             );
 
+          case "western_placidus_wheel":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-33-western-placidus">
+                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                    <Compass className="w-4 h-4" />
+                    JH33: Western Placidus House Wheel Interpretation Table
+                  </h3>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Placidus Quadrant System</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
+                    <thead>
+                      <tr className={tableHeaderStyle}>
+                        <th className="py-3 px-4 font-semibold">House</th>
+                        <th className="py-3 px-4 font-semibold text-amber-800">Cusp Sign & Deg</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-700">Core Astrological Focus</th>
+                        <th className="py-3 px-4 font-semibold">Placidus Psychological Interpretation</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(() => {
+                        const cusps = westernChart?.cusps || astrologyData?.kp?.cusps || astrologyData?.houses || [];
+                        const houseMeanings = [
+                          { house: 1, focus: "Self & Persona", interp: "The Ascendant: Vitality, outer expression, physical appearance, and initial approach to life." },
+                          { house: 2, focus: "Values & Resources", interp: "Personal assets, earned income, self-worth, and material security." },
+                          { house: 3, focus: "Mind & Environment", interp: "Intellect, communication, short journeys, siblings, and immediate neighborhood." },
+                          { house: 4, focus: "Home & Roots", interp: "Family background, inner emotional foundation, private life, and psychological roots." },
+                          { house: 5, focus: "Creativity & Joy", interp: "Self-expression, romance, hobbies, children, speculative ventures, and pleasure." },
+                          { house: 6, focus: "Work & Wellness", interp: "Daily routine, employment, health habits, service, and pets." },
+                          { house: 7, focus: "Partnerships", interp: "One-on-one relationships, marriage, business partnerships, and open contracts." },
+                          { house: 8, focus: "Transformation", interp: "Shared finances, deep psychology, regeneration, occult studies, and mortality." },
+                          { house: 9, focus: "Philosophy & Expansion", interp: "Higher education, long-distance travel, philosophy, publishing, and spiritual quests." },
+                          { house: 10, focus: "Career & Status", interp: "Midheaven: Public reputation, profession, life path, and major ambitions." },
+                          { house: 11, focus: "Community & Hopes", interp: "Friendships, group associations, social ideals, and long-term aspirations." },
+                          { house: 12, focus: "Unconscious & Retreat", interp: "Spiritual transcendence, solitude, hidden strengths, and subconscious patterns." },
+                        ];
+
+                        return houseMeanings.map((h, idx) => {
+                          const cuspData = cusps[idx] || {};
+                          return (
+                            <tr key={h.house} className={tableRowStyle}>
+                              <td className="py-3 px-4 font-bold text-black">House {h.house}</td>
+                              <td className="py-3 px-4 font-mono font-bold text-amber-700">
+                                {cuspData.sign || cuspData.rasi || "Sign"} {cuspData.degree !== undefined ? formatDegree(cuspData.degree) : `${(idx * 30).toFixed(2)}°`}
+                              </td>
+                              <td className="py-3 px-4 font-semibold text-indigo-700">{h.focus}</td>
+                              <td className="py-3 px-4 text-xs text-slate-700 leading-relaxed">{h.interp}</td>
+                            </tr>
+                          );
+                        });
+                      })()}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+
 
           // ==================== V. TAJIKA SYSTEM ====================
           case "tajika_varshaphal":
