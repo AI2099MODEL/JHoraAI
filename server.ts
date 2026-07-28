@@ -1854,7 +1854,7 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
     let response;
     try {
       response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.6-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -1885,12 +1885,12 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
       });
     } catch (apiErr: any) {
       const errMsg = (apiErr.message || "").toLowerCase();
-      const isQuotaError = apiErr.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
+      const isQuotaError = apiErr.status === 429 || apiErr.status === 404 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource") || errMsg.includes("not found");
       if (isQuotaError) {
-        console.warn("Gemini 2.5-flash quota exceeded in generate-summary. Trying gemini-2.5-pro...");
+        console.warn("Gemini 3.6-flash error in generate-summary. Trying gemini-3.1-pro-preview...");
         try {
           response = await ai.models.generateContent({
-            model: "gemini-2.5-pro",
+            model: "gemini-3.1-pro-preview",
             contents: prompt,
             config: {
               responseMimeType: "application/json",
@@ -2501,10 +2501,10 @@ LAWS OF CELESTIAL ANALYSIS:
 
     const ai = getGeminiClient(geminiApiKey);
     let response;
-    let modelUsed = "gemini-2.5-flash";
+    let modelUsed = "gemini-3.6-flash";
     try {
       response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.6-flash",
         contents: userPrompt,
         config: {
           systemInstruction,
@@ -2600,13 +2600,13 @@ LAWS OF CELESTIAL ANALYSIS:
       });
     } catch (apiErr: any) {
       const errMsg = (apiErr.message || "").toLowerCase();
-      const isQuotaError = apiErr.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
+      const isQuotaError = apiErr.status === 429 || apiErr.status === 404 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource") || errMsg.includes("not found");
       if (isQuotaError) {
-        console.warn("Gemini 2.5-flash quota exceeded in Master Ask. Trying gemini-2.5-pro...");
-        modelUsed = "gemini-2.5-pro";
+        console.warn("Gemini 3.6-flash error in Master Ask. Trying gemini-3.1-pro-preview...");
+        modelUsed = "gemini-3.1-pro-preview";
         try {
           response = await ai.models.generateContent({
-            model: "gemini-2.5-pro",
+            model: "gemini-3.1-pro-preview",
           contents: userPrompt,
           config: {
             systemInstruction,
