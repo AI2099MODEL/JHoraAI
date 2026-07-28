@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-28T15:36:51.212Z",
+    "lastUpdated": "2026-07-28T16:42:12.530Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-28T15:36:51.212Z",
-    "localTime": "2026-07-28T08:36:51-07:00",
+    "utcTime": "2026-07-28T16:42:12.530Z",
+    "localTime": "2026-07-28T09:42:12-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 281.92
+      "longitude": 282.51
     },
     "currentNakshatra": {
       "id": "Shravana",
@@ -28,15 +28,15 @@
       "displayName": "Moon"
     },
     "currentSubLord": {
-      "id": "Moon",
-      "displayName": "Moon"
+      "id": "Ketu",
+      "displayName": "Ketu"
     },
     "moonPhase": {
       "type": "Waning Gibbous",
       "displayName": "Krishna Prathama",
-      "illuminationPercentage": 99.9
+      "illuminationPercentage": 99.6
     },
-    "moonLongitude": 281.92,
+    "moonLongitude": 282.51,
     "waxing": false,
     "waning": true,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 101.73,
+    "longitude": 101.78,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,66 +63,66 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 101.73,
+      "longitude": 101.78,
       "nakshatra": "Pushya",
       "pada": 3,
       "starLord": "Saturn",
-      "subLord": "Moon",
+      "subLord": "Saturn",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 281.92,
+      "longitude": 282.51,
       "nakshatra": "Shravana",
       "pada": 1,
       "starLord": "Moon",
-      "subLord": "Moon",
+      "subLord": "Ketu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Libra",
-      "longitude": 193.59,
-      "nakshatra": "Swati",
-      "pada": 3,
-      "starLord": "Rahu",
-      "subLord": "Ketu",
-      "retrograde": false,
+      "longitude": 205.2,
+      "nakshatra": "Vishakha",
+      "pada": 2,
+      "starLord": "Jupiter",
+      "subLord": "Mercury",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Scorpio",
-      "longitude": 238.52,
+      "longitude": 238.75,
       "nakshatra": "Jyeshtha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Sun",
-      "retrograde": false,
+      "subLord": "Saturn",
+      "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "jupiter": {
       "currentSign": "Sagittarius",
-      "longitude": 268.6,
+      "longitude": 268.61,
       "nakshatra": "Uttara Ashadha",
       "pada": 1,
       "starLord": "Sun",
-      "subLord": "Mars",
+      "subLord": "Rahu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "venus": {
       "currentSign": "Leo",
-      "longitude": 136.07,
+      "longitude": 136.19,
       "nakshatra": "Purva Phalguni",
       "pada": 1,
       "starLord": "Venus",
-      "subLord": "Saturn",
+      "subLord": "Venus",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -140,7 +140,7 @@
     },
     "rahu": {
       "currentSign": "Leo",
-      "longitude": 131.45,
+      "longitude": 131.44,
       "nakshatra": "Magha",
       "pada": 4,
       "starLord": "Ketu",
@@ -151,7 +151,7 @@
     },
     "ketu": {
       "currentSign": "Aquarius",
-      "longitude": 311.45,
+      "longitude": 311.44,
       "nakshatra": "Shatabhisha",
       "pada": 2,
       "starLord": "Rahu",
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Moon",
-    "moonSubLord": "Moon"
+    "moonSubLord": "Ketu"
   },
   "panchanga": {
     "tithi": {
       "name": "Krishna Prathama",
       "index": 16,
       "paksha": "Krishna",
-      "endDate": "2026-07-29T03:36:51.212Z"
+      "endDate": "2026-07-29T04:42:12.530Z"
     },
     "vara": {
       "name": "Tuesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Shravana",
       "lord": "Moon",
-      "endDate": "2026-07-29T09:36:51.212Z"
+      "endDate": "2026-07-29T10:42:12.530Z"
     },
     "yoga": {
       "name": "Preeti",
       "lord": "Venus",
-      "endDate": "2026-07-29T05:36:51.212Z"
+      "endDate": "2026-07-29T06:42:12.530Z"
     },
     "karana": {
       "name": "Balava",
       "lord": "Sun",
-      "endDate": "2026-07-28T21:36:51.212Z"
+      "endDate": "2026-07-28T22:42:12.530Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -391,8 +391,7 @@
       "Physical vitality"
     ],
     "negativeThemes": [
-      "Over-thinking",
-      "Restlessness"
+      "Communication hiccups"
     ],
     "emotionalTone": "The sky carries a highly reflective and analytical emotional tone governed by Moon in Capricorn."
   },
@@ -440,8 +439,11 @@
   },
   "currentChallenges": {
     "delays": {
-      "active": false,
-      "affectedAreas": []
+      "active": true,
+      "affectedAreas": [
+        "Documentation workflows",
+        "Long distance transits"
+      ]
     },
     "stress": {
       "active": false,
