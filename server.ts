@@ -3870,6 +3870,7 @@ app.post("/api/rules/current-sky-refresh", (req, res) => {
 
 // Run background agent on boot
 setTimeout(() => {
+  exec('git config user.name "JHora AI Agent" && git config user.email "agent@jhora.ai"', () => {});
   runCurrentSkyUpdaterAgent();
   runNatalRulesEvaluatorAgent();
   runAnalysisSyncAgent();
