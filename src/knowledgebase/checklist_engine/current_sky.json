@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-28T07:41:08.035Z",
+    "lastUpdated": "2026-07-28T07:42:33.433Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-28T07:41:08.035Z",
-    "localTime": "2026-07-28T00:41:08-07:00",
+    "utcTime": "2026-07-28T07:42:33.433Z",
+    "localTime": "2026-07-28T00:42:33-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 277.56
+      "longitude": 277.58
     },
     "currentNakshatra": {
       "id": "Uttara Ashadha",
@@ -28,15 +28,15 @@
       "displayName": "Sun"
     },
     "currentSubLord": {
-      "id": "Ketu",
-      "displayName": "Ketu"
+      "id": "Venus",
+      "displayName": "Venus"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Purnima",
       "illuminationPercentage": 97.9
     },
-    "moonLongitude": 277.56,
+    "moonLongitude": 277.58,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -74,18 +74,18 @@
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 277.56,
+      "longitude": 277.58,
       "nakshatra": "Uttara Ashadha",
       "pada": 4,
       "starLord": "Sun",
-      "subLord": "Ketu",
+      "subLord": "Venus",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Cancer",
-      "longitude": 110.07,
+      "longitude": 110.24,
       "nakshatra": "Ashlesha",
       "pada": 2,
       "starLord": "Mercury",
@@ -100,7 +100,7 @@
       "nakshatra": "Jyeshtha",
       "pada": 4,
       "starLord": "Mercury",
-      "subLord": "Rahu",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -118,7 +118,7 @@
     },
     "venus": {
       "currentSign": "Leo",
-      "longitude": 135.21,
+      "longitude": 135.22,
       "nakshatra": "Purva Phalguni",
       "pada": 1,
       "starLord": "Venus",
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Sun",
-    "moonSubLord": "Ketu"
+    "moonSubLord": "Venus"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Purnima",
       "index": 15,
       "paksha": "Sukla",
-      "endDate": "2026-07-28T19:41:08.035Z"
+      "endDate": "2026-07-28T19:42:33.433Z"
     },
     "vara": {
       "name": "Tuesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Uttara Ashadha",
       "lord": "Sun",
-      "endDate": "2026-07-29T01:41:08.035Z"
+      "endDate": "2026-07-29T01:42:33.433Z"
     },
     "yoga": {
       "name": "Preeti",
       "lord": "Venus",
-      "endDate": "2026-07-28T21:41:08.035Z"
+      "endDate": "2026-07-28T21:42:33.433Z"
     },
     "karana": {
       "name": "Bava",
       "lord": "Sun",
-      "endDate": "2026-07-28T13:41:08.035Z"
+      "endDate": "2026-07-28T13:42:33.433Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",

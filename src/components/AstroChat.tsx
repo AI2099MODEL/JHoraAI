@@ -465,19 +465,9 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
               </span>
             </div>
           ) : (
-            /* Profile details merged seamlessly as one line without column split */
-            <div className="flex items-center gap-2 overflow-x-auto text-[11px] font-sans text-neutral-600 whitespace-nowrap scrollbar-none py-1 min-w-0">
-              <span className="font-bold text-neutral-800 flex items-center gap-1.5 shrink-0">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block shrink-0"></span>
-                {profileName}
-              </span>
-              <span className="text-neutral-300 shrink-0">|</span>
-              <span className="shrink-0"><strong className="font-semibold text-neutral-500">DOB:</strong> {profileDob} @ {profileTob}</span>
-              <span className="text-neutral-300 shrink-0">|</span>
-              <span className="shrink-0"><strong className="font-semibold text-neutral-500">Place:</strong> {profilePob}</span>
-              <span className="text-neutral-300 shrink-0">|</span>
-              <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-mono text-[10px] font-medium shrink-0">
-                <strong>ANTARA:</strong> {antaraLord} <span className="opacity-40">|</span> <strong>PRANA:</strong> {pranaLord}
+            <div className="flex items-center gap-2.5 shrink-0">
+              <span className="text-sm font-bold text-neutral-800 tracking-tight">
+                JHora AI
               </span>
             </div>
           )}
@@ -978,6 +968,22 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                 <ArrowUp className="w-4 h-4 stroke-[3]" />
               </button>
             </form>
+
+            {/* Profile summary details bar below input */}
+            <div className="flex items-center justify-center gap-2 overflow-x-auto text-[11px] font-sans text-neutral-600 whitespace-nowrap scrollbar-none pt-1 min-w-0">
+              <span className="font-bold text-neutral-800 flex items-center gap-1.5 shrink-0">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block shrink-0"></span>
+                {profileName}
+              </span>
+              <span className="text-neutral-300 shrink-0">|</span>
+              <span className="shrink-0"><strong className="font-semibold text-neutral-500">DOB:</strong> {profileDob} @ {profileTob}</span>
+              <span className="text-neutral-300 shrink-0">|</span>
+              <span className="shrink-0"><strong className="font-semibold text-neutral-500">Place:</strong> {profilePob}</span>
+              <span className="text-neutral-300 shrink-0">|</span>
+              <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-mono text-[10px] font-medium shrink-0">
+                <strong>ANTARA:</strong> {antaraLord} <span className="opacity-40">|</span> <strong>PRANA:</strong> {pranaLord}
+              </span>
+            </div>
 
 
 
