@@ -18,7 +18,9 @@ import {
   RefreshCw,
   Download,
   FileText,
-  Code
+  Code,
+  Save,
+  Printer
 } from "lucide-react";
 import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
 import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
@@ -641,6 +643,17 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     <Map className="w-4 h-4" />
                     JH6: All Divisional Vargas (D1-D60) Planetary House Distributions
                   </h3>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-slate-200">
