@@ -426,30 +426,112 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     }
   ];
 
-  // Custom rich renderer for markdown text
+  // Custom rich renderer for markdown text with vibrant tables & formatting
   const renderMarkdown = (text: string) => {
-    return text.split("\n").map((line, idx) => {
+    const lines = text.split("\n");
+    const elements: React.ReactNode[] = [];
+    let i = 0;
+
+    while (i < lines.length) {
+      const line = lines[i];
+
+      // Check if line looks like a table row (contains '|' and starts/ends with '|')
+      if (line.trim().startsWith("|") && line.trim().endsWith("|")) {
+        const tableLines: string[] = [];
+        while (i < lines.length && lines[i].trim().startsWith("|") && lines[i].trim().endsWith("|")) {
+          tableLines.push(lines[i].trim());
+          i++;
+        }
+
+        // Filter out divider lines like |---|---|
+        const dataRows = tableLines.filter(row => !/^\|[\s\-:|]+\|$/.test(row));
+        if (dataRows.length > 0) {
+          const headerCells = dataRows[0]
+            .split("|")
+            .slice(1, -1)
+            .map(c => c.trim());
+
+          const bodyRows = dataRows.slice(1).map(row =>
+            row
+              .split("|")
+              .slice(1, -1)
+              .map(c => c.trim())
+          );
+
+          elements.push(
+            <div key={`table-${i}`} className="my-3 overflow-x-auto rounded-xl border border-indigo-200/90 shadow-2xs bg-white">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white font-mono text-xs uppercase tracking-wider">
+                    {headerCells.map((h, hIdx) => (
+                      <th key={hIdx} className="py-2.5 px-3.5 font-bold border-b border-indigo-900/80">
+                        {h.replace(/\*\*(.*?)\*\*/g, "$1")}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-indigo-100/80">
+                  {bodyRows.map((rowCells, rIdx) => (
+                    <tr key={rIdx} className={rIdx % 2 === 0 ? "bg-white hover:bg-purple-50/60 transition-colors" : "bg-indigo-50/50 hover:bg-purple-50/60 transition-colors"}>
+                      {rowCells.map((cell, cIdx) => {
+                        const bolded = cell.replace(/\*\*(.*?)\*\*/g, "<strong class='text-indigo-950 font-bold'>$1</strong>");
+                        return (
+                          <td key={cIdx} className="py-2 px-3.5 text-xs text-neutral-900 font-medium leading-relaxed" dangerouslySetInnerHTML={{ __html: bolded }} />
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+          continue;
+        }
+      }
+
+      // Headers
       if (line.startsWith("### ")) {
-        return <h4 key={idx} className="text-sm font-bold text-indigo-600 mt-3 mb-1.5 uppercase font-mono tracking-wider">{line.replace("### ", "")}</h4>;
-      }
-      if (line.startsWith("## ")) {
-        return <h3 key={idx} className="text-base font-bold text-neutral-800 mt-4 mb-2 border-b border-neutral-100 pb-1 font-sans">{line.replace("## ", "")}</h3>;
-      }
-      if (line.startsWith("# ")) {
-        return <h2 key={idx} className="text-lg font-bold text-neutral-900 mt-5 mb-2 font-sans tracking-tight">{line.replace("# ", "")}</h2>;
-      }
-      if (line.startsWith("- ") || line.startsWith("* ")) {
+        elements.push(
+          <h4 key={`h4-${i}`} className="text-xs font-extrabold uppercase font-mono tracking-wider bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 bg-clip-text text-transparent mt-4 mb-2 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+            {line.replace("### ", "")}
+          </h4>
+        );
+      } else if (line.startsWith("## ")) {
+        elements.push(
+          <h3 key={`h3-${i}`} className="text-sm font-bold text-neutral-900 mt-5 mb-2 font-sans border-l-4 border-indigo-600 pl-2.5 py-1 bg-gradient-to-r from-indigo-50 to-purple-50/40 rounded-r-lg shadow-2xs">
+            {line.replace("## ", "")}
+          </h3>
+        );
+      } else if (line.startsWith("# ")) {
+        elements.push(
+          <h2 key={`h2-${i}`} className="text-base font-extrabold text-indigo-950 mt-6 mb-3 font-sans tracking-tight bg-gradient-to-r from-indigo-800 via-purple-800 to-indigo-950 bg-clip-text text-transparent border-b border-indigo-100 pb-1">
+            {line.replace("# ", "")}
+          </h2>
+        );
+      } else if (line.startsWith("- ") || line.startsWith("* ")) {
         const cleanLine = line.replace(/^[-*]\s+/, "");
-        const bolded = cleanLine.replace(/\*\*(.*?)\*\*/g, "<strong class='text-neutral-900 font-semibold'>$1</strong>");
-        return (
-          <li key={idx} className="ml-4 list-disc text-neutral-700 text-sm mb-1.5 leading-relaxed" dangerouslySetInnerHTML={{ __html: bolded }} />
+        const bolded = cleanLine.replace(/\*\*(.*?)\*\*/g, "<strong class='text-neutral-950 font-bold'>$1</strong>");
+        elements.push(
+          <li key={`li-${i}`} className="ml-4 list-disc text-neutral-800 text-xs mb-1.5 leading-relaxed marker:text-indigo-600" dangerouslySetInnerHTML={{ __html: bolded }} />
+        );
+      } else if (line.startsWith("> ")) {
+        const cleanLine = line.replace(/^>\s+/, "");
+        const bolded = cleanLine.replace(/\*\*(.*?)\*\*/g, "<strong class='text-amber-950 font-bold'>$1</strong>");
+        elements.push(
+          <blockquote key={`bq-${i}`} className="my-2 p-3 rounded-r-xl border-l-4 border-amber-500 bg-gradient-to-r from-amber-50 via-orange-50/60 to-amber-50/30 text-amber-950 text-xs font-medium shadow-2xs leading-relaxed" dangerouslySetInnerHTML={{ __html: bolded }} />
+        );
+      } else if (line.trim().length > 0) {
+        const bolded = line.replace(/\*\*(.*?)\*\*/g, "<strong class='text-neutral-950 font-bold'>$1</strong>");
+        elements.push(
+          <p key={`p-${i}`} className="mb-2.5 leading-relaxed text-neutral-800 text-xs font-sans" dangerouslySetInnerHTML={{ __html: bolded }} />
         );
       }
-      const bolded = line.replace(/\*\*(.*?)\*\*/g, "<strong class='text-neutral-900 font-semibold'>$1</strong>");
-      return (
-        <p key={idx} className="mb-3 leading-relaxed text-neutral-700 text-sm" dangerouslySetInnerHTML={{ __html: bolded }} />
-      );
-    });
+
+      i++;
+    }
+
+    return elements;
   };
 
   const activeDebugInfo = selectedDebugMsg?.debugInfo || messages[messages.length - 1]?.debugInfo;
@@ -594,23 +676,23 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           
           {/* Main ChatGPT Menu items */}
           <div className="space-y-2">
-            {/* 1. My Mood Analysis */}
+            {/* 1. My Journey (Renamed from My Mood Analysis) */}
             <div className="space-y-0.5">
               <button
                 onClick={() => setMoodAnalysisExpanded(!moodAnalysisExpanded)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold w-full text-left transition-colors cursor-pointer ${
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
                   moodAnalysisExpanded 
-                    ? "bg-neutral-100/90 text-[#5c4df2]" 
-                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                    ? "bg-gradient-to-r from-indigo-100/90 via-purple-100/70 to-indigo-50 text-indigo-950 border border-indigo-200" 
+                    : "bg-neutral-50/80 hover:bg-indigo-50/60 text-neutral-800 hover:text-indigo-900 border border-neutral-200/70"
                 }`}
               >
-                <Activity className={`w-4 h-4 shrink-0 ${moodAnalysisExpanded ? "text-[#5c4df2]" : "text-neutral-400"}`} />
-                <span>My Mood Analysis</span>
-                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-400 transition-transform duration-200 ${moodAnalysisExpanded ? "rotate-180" : ""}`} />
+                <Compass className={`w-4 h-4 shrink-0 ${moodAnalysisExpanded ? "text-indigo-600" : "text-indigo-500"}`} />
+                <span className="font-sans tracking-tight">My Journey</span>
+                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${moodAnalysisExpanded ? "rotate-180 text-indigo-700" : ""}`} />
               </button>
 
               {moodAnalysisExpanded && (
-                <div className="mt-1 ml-3 pl-2.5 border-l border-neutral-200/80 space-y-1 py-1 max-h-[220px] overflow-y-auto scrollbar-thin">
+                <div className="mt-1 ml-2 pl-2 border-l-2 border-indigo-200 space-y-1 py-1 max-h-[220px] overflow-y-auto scrollbar-thin">
                   {getMoodPromptsFromJSON().map((p) => (
                     <button
                       key={p.id}
@@ -618,10 +700,10 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                         runAnalysis(p.query);
                         setSidebarOpen(false);
                       }}
-                      className="flex items-center gap-2 py-1.5 px-2 rounded-md text-[10px] font-medium text-neutral-500 hover:text-[#5c4df2] hover:bg-neutral-100/60 w-full text-left transition-all cursor-pointer group"
+                      className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] font-medium text-neutral-800 hover:text-indigo-950 bg-neutral-50/60 hover:bg-indigo-50 border border-transparent hover:border-indigo-200/80 w-full text-left transition-all cursor-pointer group shadow-2xs"
                       title={p.label}
                     >
-                      <Sparkles className="w-3 h-3 text-neutral-300 group-hover:text-[#5c4df2] shrink-0" />
+                      <Sparkles className="w-3 h-3 text-indigo-500 group-hover:text-purple-600 shrink-0" />
                       <span className="truncate">{p.label}</span>
                     </button>
                   ))}
@@ -629,29 +711,29 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
               )}
             </div>
 
-            {/* 2. My Journey */}
-            <div className="space-y-0.5 pt-2 border-t border-neutral-200/40">
+            {/* 2. My Life (Renamed from My Journey) */}
+            <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
               <button
                 onClick={() => setMyJourneyExpanded(!myJourneyExpanded)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold w-full text-left transition-colors cursor-pointer ${
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
                   myJourneyExpanded 
-                    ? "bg-neutral-100/90 text-[#5c4df2]" 
-                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                    ? "bg-gradient-to-r from-amber-100/90 via-rose-100/70 to-purple-50 text-amber-950 border border-amber-200" 
+                    : "bg-neutral-50/80 hover:bg-amber-50/60 text-neutral-800 hover:text-amber-900 border border-neutral-200/70"
                 }`}
               >
-                <Compass className={`w-4 h-4 shrink-0 ${myJourneyExpanded ? "text-[#5c4df2]" : "text-neutral-400"}`} />
-                <span>My Journey</span>
-                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-400 transition-transform duration-200 ${myJourneyExpanded ? "rotate-180" : ""}`} />
+                <Heart className={`w-4 h-4 shrink-0 ${myJourneyExpanded ? "text-rose-600" : "text-rose-500"}`} />
+                <span className="font-sans tracking-tight">My Life</span>
+                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${myJourneyExpanded ? "rotate-180 text-amber-700" : ""}`} />
               </button>
 
               {myJourneyExpanded && (
-                <div className="mt-1 ml-2 pl-2 border-l border-neutral-200/80 space-y-2 py-1">
+                <div className="mt-1 ml-2 pl-2 border-l-2 border-rose-200 space-y-2 py-1">
                   {/* My Life Section */}
-                  <div className="space-y-0.5">
-                    <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">My Life</div>
+                  <div className="space-y-1">
+                    <div className="px-2 py-0.5 rounded-full bg-emerald-100/90 border border-emerald-200 text-[10px] font-extrabold text-emerald-950 uppercase tracking-wider inline-block">My Life</div>
                     {[
-                      { id: "daily", label: "Daily" },
-                      { id: "current_dasha", label: "Current Dasha" }
+                      { id: "daily", label: "Daily", theme: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-500 hover:text-white" },
+                      { id: "current_dasha", label: "Current Dasha", theme: "bg-emerald-50 text-emerald-950 border-emerald-200 hover:bg-emerald-600 hover:text-white" }
                     ].map((sub) => (
                       <button
                         key={sub.id}
@@ -660,26 +742,26 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                           onNavigateMenu?.("my_page", sub.id);
                           setSidebarOpen(false);
                         }}
-                        className={`flex items-center gap-2 py-1.5 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer w-full text-left ${
+                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
                           activeSubmenuPanel === sub.id
-                            ? "bg-indigo-50 text-[#5c4df2] font-semibold"
-                            : "text-neutral-600 hover:text-[#5c4df2] hover:bg-neutral-100/60"
+                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
+                            : `${sub.theme}`
                         }`}
                       >
-                        <Sparkles className="w-3 h-3 text-neutral-400 shrink-0" />
+                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
                         <span>{sub.label}</span>
                       </button>
                     ))}
                   </div>
 
                   {/* Journey Submenu List */}
-                  <div className="space-y-0.5 pt-1">
-                    <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Journey</div>
+                  <div className="space-y-1 pt-1">
+                    <div className="px-2 py-0.5 rounded-full bg-blue-100/90 border border-blue-200 text-[10px] font-extrabold text-blue-950 uppercase tracking-wider inline-block">Journey</div>
                     {[
-                      { id: "overview", label: "My Soul" },
-                      { id: "predictions", label: "Predictions" },
-                      { id: "future", label: "Future" },
-                      { id: "my_life_analysis", label: "My Life Analysis" }
+                      { id: "overview", label: "My Soul", theme: "bg-purple-50 text-purple-950 border-purple-200 hover:bg-purple-600 hover:text-white" },
+                      { id: "predictions", label: "Predictions", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
+                      { id: "future", label: "Future", theme: "bg-cyan-50 text-cyan-950 border-cyan-200 hover:bg-cyan-600 hover:text-white" },
+                      { id: "my_life_analysis", label: "My Life Analysis", theme: "bg-rose-50 text-rose-950 border-rose-200 hover:bg-rose-600 hover:text-white" }
                     ].map((sub) => (
                       <button
                         key={sub.id}
@@ -688,32 +770,32 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                           onNavigateMenu?.("my_page", sub.id);
                           setSidebarOpen(false);
                         }}
-                        className={`flex items-center gap-2 py-1.5 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer w-full text-left ${
+                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
                           activeSubmenuPanel === sub.id
-                            ? "bg-indigo-50 text-[#5c4df2] font-semibold"
-                            : "text-neutral-600 hover:text-[#5c4df2] hover:bg-neutral-100/60"
+                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
+                            : `${sub.theme}`
                         }`}
                       >
-                        <Sparkles className="w-3 h-3 text-neutral-400 shrink-0" />
+                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
                         <span>{sub.label}</span>
                       </button>
                     ))}
                   </div>
 
                   {/* My Astro Systems */}
-                  <div className="space-y-0.5 pt-1">
-                    <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">My Astro</div>
+                  <div className="space-y-1 pt-1">
+                    <div className="px-2 py-0.5 rounded-full bg-violet-100/90 border border-violet-200 text-[10px] font-extrabold text-violet-950 uppercase tracking-wider inline-block">My Astro Systems</div>
                     {[
-                      { id: "dasha", label: "Vimshottari" },
-                      { id: "charts", label: "Charts" },
-                      { id: "vedic", label: "Vedic" },
-                      { id: "transits_data", label: "Transits" },
-                      { id: "jaimini", label: "Jaimini" },
-                      { id: "kp", label: "KP" },
-                      { id: "lalkitab", label: "Lalkitab" },
-                      { id: "chinese", label: "Chinese" },
-                      { id: "tajik", label: "Tajik" },
-                      { id: "western", label: "Western" }
+                      { id: "dasha", label: "Vimshottari", theme: "bg-indigo-50/80 text-indigo-950 border-indigo-200/80" },
+                      { id: "charts", label: "Charts", theme: "bg-blue-50/80 text-blue-950 border-blue-200/80" },
+                      { id: "vedic", label: "Vedic", theme: "bg-amber-50/80 text-amber-950 border-amber-200/80" },
+                      { id: "transits_data", label: "Transits", theme: "bg-cyan-50/80 text-cyan-950 border-cyan-200/80" },
+                      { id: "jaimini", label: "Jaimini", theme: "bg-purple-50/80 text-purple-950 border-purple-200/80" },
+                      { id: "kp", label: "KP", theme: "bg-emerald-50/80 text-emerald-950 border-emerald-200/80" },
+                      { id: "lalkitab", label: "Lalkitab", theme: "bg-rose-50/80 text-rose-950 border-rose-200/80" },
+                      { id: "chinese", label: "Chinese", theme: "bg-teal-50/80 text-teal-950 border-teal-200/80" },
+                      { id: "tajik", label: "Tajik", theme: "bg-fuchsia-50/80 text-fuchsia-950 border-fuchsia-200/80" },
+                      { id: "western", label: "Western", theme: "bg-sky-50/80 text-sky-950 border-sky-200/80" }
                     ].map((sub) => (
                       <button
                         key={sub.id}
@@ -722,13 +804,13 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                           onNavigateMenu?.("my_page", sub.id);
                           setSidebarOpen(false);
                         }}
-                        className={`flex items-center gap-2 py-1.5 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer w-full text-left ${
+                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
                           activeSubmenuPanel === sub.id
-                            ? "bg-indigo-50 text-[#5c4df2] font-semibold"
-                            : "text-neutral-600 hover:text-[#5c4df2] hover:bg-neutral-100/60"
+                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
+                            : `${sub.theme} hover:brightness-95`
                         }`}
                       >
-                        <Sparkles className="w-3 h-3 text-neutral-400 shrink-0" />
+                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
                         <span>{sub.label}</span>
                       </button>
                     ))}
@@ -738,28 +820,28 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
             </div>
 
             {/* 3. My Reports */}
-            <div className="space-y-0.5 pt-2 border-t border-neutral-200/40">
+            <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
               <button
                 onClick={() => setMyReportsExpanded(!myReportsExpanded)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold w-full text-left transition-colors cursor-pointer ${
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
                   myReportsExpanded 
-                    ? "bg-neutral-100/90 text-[#5c4df2]" 
-                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                    ? "bg-gradient-to-r from-teal-100/90 via-emerald-100/70 to-cyan-50 text-teal-950 border border-teal-200" 
+                    : "bg-neutral-50/80 hover:bg-teal-50/60 text-neutral-800 hover:text-teal-900 border border-neutral-200/70"
                 }`}
               >
-                <FileText className={`w-4 h-4 shrink-0 ${myReportsExpanded ? "text-[#5c4df2]" : "text-neutral-400"}`} />
-                <span>My Reports</span>
-                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-400 transition-transform duration-200 ${myReportsExpanded ? "rotate-180" : ""}`} />
+                <FileText className={`w-4 h-4 shrink-0 ${myReportsExpanded ? "text-teal-600" : "text-teal-500"}`} />
+                <span className="font-sans tracking-tight">My Reports</span>
+                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${myReportsExpanded ? "rotate-180 text-teal-700" : ""}`} />
               </button>
 
               {myReportsExpanded && (
-                <div className="mt-1 ml-3 pl-2.5 border-l border-neutral-200/80 space-y-1 py-1">
+                <div className="mt-1 ml-2 pl-2 border-l-2 border-teal-200 space-y-1 py-1">
                   {[
-                    { id: "reports_hub", label: "Reports Hub" },
-                    { id: "my_life_analysis", label: "Life Analysis Report" },
-                    { id: "predictions", label: "Dasha & Predictions Report" },
-                    { id: "kp", label: "KP Horary & Event Report" },
-                    { id: "vedic", label: "Vedic Chart Summary" }
+                    { id: "reports_hub", label: "Reports Hub", theme: "bg-teal-50 text-teal-950 border-teal-200/80" },
+                    { id: "my_life_analysis", label: "Life Analysis Report", theme: "bg-emerald-50 text-emerald-950 border-emerald-200/80" },
+                    { id: "predictions", label: "Dasha & Predictions Report", theme: "bg-indigo-50 text-indigo-950 border-indigo-200/80" },
+                    { id: "kp", label: "KP Horary & Event Report", theme: "bg-cyan-50 text-cyan-950 border-cyan-200/80" },
+                    { id: "vedic", label: "Vedic Chart Summary", theme: "bg-amber-50 text-amber-950 border-amber-200/80" }
                   ].map((sub) => (
                     <button
                       key={sub.id}
@@ -768,13 +850,13 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                         onNavigateMenu?.("my_page", sub.id);
                         setSidebarOpen(false);
                       }}
-                      className={`flex items-center gap-2 py-1.5 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer w-full text-left ${
+                      className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
                         activeSubmenuPanel === sub.id
-                          ? "bg-indigo-50 text-[#5c4df2] font-semibold"
-                          : "text-neutral-600 hover:text-[#5c4df2] hover:bg-neutral-100/60"
+                          ? "bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-bold border-teal-700"
+                          : `${sub.theme} hover:brightness-95`
                       }`}
                     >
-                      <Sparkles className="w-3 h-3 text-neutral-400 shrink-0" />
+                      <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
                       <span>{sub.label}</span>
                     </button>
                   ))}
@@ -833,14 +915,35 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
             ) : (
               <div className="max-w-2xl mx-auto space-y-6 w-full">
                 {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center text-center py-20 min-h-[50vh] select-none">
-                    <Sparkles className="w-8 h-8 text-neutral-300 mb-4 animate-pulse" />
-                    <h1 className="text-xl font-sans font-medium text-neutral-700 tracking-tight mb-2">
-                      JHora Astro AI
+                  <div className="flex flex-col items-center justify-center text-center py-12 px-6 min-h-[50vh] select-none rounded-2xl bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-pink-50/30 border border-indigo-200/80 shadow-sm">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center shadow-md mb-4">
+                      <Sparkles className="w-6 h-6 animate-pulse" />
+                    </div>
+                    <h1 className="text-2xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 bg-clip-text text-transparent font-sans">
+                      JHora AI Assistant
                     </h1>
-                    <p className="text-neutral-400 text-xs font-sans">
-                      Ask any astrological or computational questions to start.
+                    <p className="text-neutral-700 text-xs max-w-md leading-relaxed font-medium mb-6">
+                      Your intelligent Vedic & KP astrological assistant. Ask any question about your chart, dasha, transit trends, or remedies.
                     </p>
+
+                    {/* Quick prompts grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg text-left">
+                      {quickPrompts.map((p, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => runAnalysis(p.query)}
+                          className="p-3 rounded-xl bg-white/90 hover:bg-white border border-indigo-200/80 hover:border-indigo-400/90 shadow-2xs hover:shadow-xs transition-all cursor-pointer group flex flex-col gap-1"
+                        >
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-900 group-hover:text-purple-700">
+                            <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                            <span>{p.title}</span>
+                          </div>
+                          <span className="text-[10px] text-neutral-600 line-clamp-2 leading-tight">
+                            {p.query}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 ) : (
                   messages.map((msg) => (
@@ -848,34 +951,39 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                       
                       {/* Message Sender Icon/Avatar */}
                       {msg.sender === "assistant" ? (
-                        <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-[#5c4df2] flex items-center justify-center font-bold text-xs shrink-0 shadow-sm select-none">
-                          <Sparkles className="w-4 h-4 text-[#5c4df2]" />
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-md select-none">
+                          <Sparkles className="w-4 h-4 text-white" />
                         </div>
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-neutral-800 text-white flex items-center justify-center font-bold text-xs shrink-0 select-none">
+                        <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 select-none shadow-sm border border-slate-700">
                           NJ
                         </div>
                       )}
 
                       {/* Message Balloon */}
-                      <div className="flex-1 space-y-2">
+                      <div className="flex-1 space-y-2 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-neutral-800">
-                            {msg.sender === "user" ? "You" : "JHora Astro AI"}
+                          <span className="text-xs font-extrabold text-neutral-900">
+                            {msg.sender === "user" ? "You" : "JHora AI Assistant"}
                           </span>
-                          <span className="text-[10px] text-neutral-400 font-mono">
+                          {msg.sender === "assistant" && (
+                            <span className="bg-indigo-100 text-indigo-950 font-bold border border-indigo-200 px-2 py-0.5 rounded-full text-[10px]">
+                              KP & Vedic Engine
+                            </span>
+                          )}
+                          <span className="text-[10px] text-neutral-400 font-mono ml-auto">
                             {msg.timestamp}
                           </span>
                         </div>
 
                         {/* Body Text */}
-                        <div className="text-neutral-700 leading-relaxed text-sm select-text selection:bg-[#5c4df2]/10">
+                        <div className="text-neutral-800 leading-relaxed text-sm select-text selection:bg-purple-100">
                           {msg.sender === "user" ? (
-                            <p className="text-xs font-sans text-neutral-800 bg-neutral-100/80 px-4 py-2.5 rounded-2xl max-w-[90%] inline-block">
+                            <p className="text-xs font-sans text-white bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2.5 rounded-2xl max-w-[90%] inline-block shadow-xs font-medium">
                               {msg.text}
                             </p>
                           ) : (
-                            <div className="space-y-1 bg-white">
+                            <div className="space-y-1 bg-gradient-to-br from-indigo-50/40 via-purple-50/20 to-white border-l-4 border-indigo-600 p-4 rounded-2xl border border-indigo-100/90 shadow-2xs">
                               {renderMarkdown(msg.text)}
                             </div>
                           )}
