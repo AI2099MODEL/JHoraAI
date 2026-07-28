@@ -4877,8 +4877,50 @@ export function MyPageView({
           {/* Table JH19: Lalkitab Teva Kundli Coordinates */}
           <div className="space-y-3">
             
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="lalkitab_teva" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
+            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
+              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="lalkitab_teva" isDark={false} activeUser={activeUser} hideHeaders={true} />
+            </div>
+          </div>
+
+          {/* Table JH26: Personal & Birth Details */}
+          <div className="space-y-3">
+            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
+              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_personal_details" isDark={false} activeUser={activeUser} hideHeaders={true} />
+            </div>
+          </div>
+
+          {/* Table JH27: Ascendant & Luminaries */}
+          <div className="space-y-3">
+            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
+              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_ascendant_luminaries" isDark={false} activeUser={activeUser} hideHeaders={true} />
+            </div>
+          </div>
+
+          {/* Table JH28: Astrological Summary */}
+          <div className="space-y-3">
+            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
+              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_astrological_summary" isDark={false} activeUser={activeUser} hideHeaders={true} />
+            </div>
+          </div>
+
+          {/* Table JH29: Birth Panchanga */}
+          <div className="space-y-3">
+            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
+              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_birth_panchanga" isDark={false} activeUser={activeUser} hideHeaders={true} />
+            </div>
+          </div>
+
+          {/* Table JH30: Strength Summary */}
+          <div className="space-y-3">
+            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
+              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_strength_summary" isDark={false} activeUser={activeUser} hideHeaders={true} />
+            </div>
+          </div>
+
+          {/* Table JH31: Astronomical Data */}
+          <div className="space-y-3">
+            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
+              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_astronomical_data" isDark={false} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
