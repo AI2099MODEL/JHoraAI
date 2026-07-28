@@ -4874,14 +4874,6 @@ export function MyPageView({
             </div>
           </div>
 
-          {/* Table JH19: Lalkitab Teva Kundli Coordinates */}
-          <div className="space-y-3">
-            
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="lalkitab_teva" isDark={false} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
           {/* Table JH26: Personal & Birth Details */}
           <div className="space-y-3">
             <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
