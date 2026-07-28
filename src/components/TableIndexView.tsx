@@ -450,6 +450,15 @@ export function TableIndexView({
   "section_key": "Astro.data",
   "api_source": "Engine",
   "is_populated": true
+},
+{
+  "table_number": 32,
+  "jh_id": "JH32",
+  "title": "Planet Dignity Registry",
+  "source_origin": "Engine / Parashari Rules",
+  "section_key": "Vedic.dignities",
+  "api_source": "Parashari Dignity calculations engine",
+  "is_populated": true
 }
   ];
 
@@ -475,7 +484,7 @@ export function TableIndexView({
                 Deployment Node
               </span>
               <span className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider font-mono">
-                JH1-JH31 Registry
+                JH1-JH32 Registry
               </span>
             </div>
             <h2 className={`text-xl font-sans font-bold flex items-center gap-2 ${textStyle}`}>

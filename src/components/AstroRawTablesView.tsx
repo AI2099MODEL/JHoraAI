@@ -25,6 +25,7 @@ import {
 import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
 import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
 import { TableIndexView } from "./TableIndexView";
+import { calculatePlanetDignityRegistry, DignityRegistryItem } from "../lib/dignityCalculator";
 
 interface AstroRawTablesViewProps {
   astrologyData: any;
@@ -103,7 +104,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
         profileName: profileJson.User?.profile_name || astrologyData?.birthDetails?.name || "Vedic Native",
         targetAge: targetAge,
         submenus: [
-          "jhora_birth_details", "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", 
+          "jhora_birth_details", "jhora_planets", "jhora_dignity", "jhora_shadbala", "jhora_bhava_balas", 
           "jhora_ashtakavarga", "jhora_divisional", "jhora_vimshottari", 
           "kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_house_significators", 
           "jaimini_karakas", "jaimini_arudhas", "western_tropical", "western_aspects", 
@@ -508,6 +509,105 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 </div>
               </div>
             );
+
+          case "jhora_dignity": {
+            const rawPlanets = (astrologyData.planets || []).map((p: any) => ({
+              name: p.name,
+              longitude: p.longitude,
+              degree: p.degree,
+              sign: p.sign,
+              house: p.house,
+              lord: p.lord
+            }));
+            const lagna = astrologyData.lagna || {};
+            const dignityData = calculatePlanetDignityRegistry(rawPlanets, lagna);
+
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-32-planet-dignities">
+                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                    <Award className="w-4 h-4" />
+                    JH32: Planet Dignity Registry
+                  </h3>
+                  <span className="text-[10px] font-mono text-slate-700 font-medium">Parashari Dignities</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
+                      <Save className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
+                      <Printer className="w-4 h-4" />
+                    </button>
+                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
+                      <FileText className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-slate-200">
+                  <table className="w-full text-left border-collapse ">
+                    <thead>
+                      <tr className={tableHeaderStyle}>
+                        <th className="py-2.5 px-4 font-semibold">Planet</th>
+                        <th className="py-2.5 px-4 font-semibold">Chart</th>
+                        <th className="py-2.5 px-4 font-semibold">Sign</th>
+                        <th className="py-2.5 px-4 font-semibold">Longitude</th>
+                        <th className="py-2.5 px-4 font-semibold">Own Sign</th>
+                        <th className="py-2.5 px-4 font-semibold">Moolatrikona</th>
+                        <th className="py-2.5 px-4 font-semibold">Exalted</th>
+                        <th className="py-2.5 px-4 font-semibold">Debilitated</th>
+                        <th className="py-2.5 px-4 font-semibold">Exaltation Deg</th>
+                        <th className="py-2.5 px-4 font-semibold">Debilitation Deg</th>
+                        <th className="py-2.5 px-4 font-semibold">Friendly Sign</th>
+                        <th className="py-2.5 px-4 font-semibold">Enemy Sign</th>
+                        <th className="py-2.5 px-4 font-semibold">Neutral Sign</th>
+                        <th className="py-2.5 px-4 font-semibold">Vargottama</th>
+                        <th className="py-2.5 px-4 font-semibold">Pushkara</th>
+                        <th className="py-2.5 px-4 font-semibold">Neecha Bhanga</th>
+                        <th className="py-2.5 px-4 font-semibold text-right">Dignity Rank / Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dignityData.map((row, idx) => (
+                        <tr key={idx} className={tableRowStyle}>
+                          <td className="py-2.5 px-4 font-bold text-black">{row.planet}</td>
+                          <td className="py-2.5 px-4 font-bold text-indigo-700">{row.chart}</td>
+                          <td className="py-2.5 px-4 font-semibold text-amber-700">{row.sign}</td>
+                          <td className="py-2.5 px-4 font-mono text-slate-600">{row.longitudeFormatted}</td>
+                          <td className="py-2.5 px-4 font-mono">{row.ownSign}</td>
+                          <td className="py-2.5 px-4 font-mono">{row.moolatrikona}</td>
+                          <td className="py-2.5 px-4 font-mono">{row.exalted}</td>
+                          <td className="py-2.5 px-4 font-mono">{row.debilitated}</td>
+                          <td className="py-2.5 px-4 font-mono text-slate-500">{row.exaltationDegree}</td>
+                          <td className="py-2.5 px-4 font-mono text-slate-500">{row.debilitationDegree}</td>
+                          <td className="py-2.5 px-4 font-mono">{row.friendlySign}</td>
+                          <td className="py-2.5 px-4 font-mono">{row.enemySign}</td>
+                          <td className="py-2.5 px-4 font-mono">{row.neutralSign}</td>
+                          <td className="py-2.5 px-4 font-mono">{row.vargottama}</td>
+                          <td className="py-2.5 px-4 font-mono">{row.pushkara}</td>
+                          <td className="py-2.5 px-4 font-mono">{row.neechaBhanga}</td>
+                          <td className="py-2.5 px-4 text-right">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${
+                              row.dignityRank.includes("Exalted") || row.dignityRank.includes("Moolatrikona")
+                                ? "bg-amber-100 text-amber-950"
+                                : row.dignityRank.includes("Own")
+                                ? "bg-emerald-100 text-emerald-950"
+                                : row.dignityRank.includes("Friendly")
+                                ? "bg-sky-100 text-sky-950"
+                                : row.dignityRank.includes("Debilitated") || row.dignityRank.includes("Inimical")
+                                ? "bg-rose-100 text-rose-950"
+                                : "bg-slate-100 text-slate-800"
+                            }`}>
+                              {row.dignityRank}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          }
 
           case "jhora_shadbala":
             return (

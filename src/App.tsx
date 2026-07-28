@@ -1492,6 +1492,7 @@ export default function App() {
         // Category 1: JHORA
         { id: "jhora_birth_details", label: "Birth Details", description: "JH1: Birth Details & Astronomical Metrics.", systemId: "astro", category: "JHORA" },
         { id: "jhora_planets", label: "Planets Placements", description: "JH2: Natal Planets Longitudes & Rasi Placements.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_dignity", label: "Dignity Registry", description: "JH32: Planet Dignity Registry.", systemId: "astro", category: "JHORA" },
         { id: "jhora_shadbala", label: "Shadbala Matrix", description: "JH3: Shadbala Planet Strength Matrix.", systemId: "astro", category: "JHORA" },
         { id: "jhora_bhava_balas", label: "Bhava Strengths", description: "JH4: Bhava Balas (House Strengths).", systemId: "astro", category: "JHORA" },
         { id: "jhora_ashtakavarga", label: "SAV Ashtakavarga", description: "JH5: Samudhaya Ashtakavarga Points.", systemId: "astro", category: "JHORA" },

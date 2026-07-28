@@ -29,6 +29,7 @@ import {
   generateTransitDBAConvergencePDF
 } from "../lib/specializedReports";
 import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelationshipEvidenceEngine";
+import { calculatePlanetDignityRegistry } from "../lib/dignityCalculator";
 import { ConversationService } from "../features/ask/services/ConversationService";
 import {
   User,
@@ -431,7 +432,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
     }
   }
 
-  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_7", "table_8", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18", "table_20", "table_21", "table_22", "table_23"].includes(tableId)) return null;
+  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_7", "table_8", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18", "table_20", "table_21", "table_22", "table_23", "table_32"].includes(tableId)) return null;
   
   const baseTableStyle = "w-full text-left border-collapse mt-2";
   const thStyle = "py-2 px-3.5 bg-slate-50 text-slate-800 font-bold font-mono text-[10px] uppercase tracking-wider border-b border-slate-200";
@@ -544,6 +545,84 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
               {JSON.stringify(dashaData, null, 2)}
             </pre>
           )}
+        </div>
+      );
+    }
+    case "table_32": {
+      const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets || astrologyData?.planets || {};
+      const rawPlanets = Object.entries(planetsObj).map(([name, p]: [string, any]) => ({
+        name,
+        ...p
+      }));
+      const lagna = profile?.Vedic?.ascendant || astrologyData?.lagna || {};
+      const dignityData = calculatePlanetDignityRegistry(rawPlanets, lagna);
+
+      return (
+        <div className="overflow-x-auto rounded-xl border border-indigo-200/90 bg-white shadow-xs mt-2">
+          <table className={baseTableStyle}>
+            <thead>
+              <tr>
+                <th className={thStyle}>Planet</th>
+                <th className={thStyle}>Chart</th>
+                <th className={thStyle}>Sign</th>
+                <th className={thStyle}>Longitude</th>
+                <th className={thStyle}>Own Sign</th>
+                <th className={thStyle}>Moolatrikona</th>
+                <th className={thStyle}>Exalted</th>
+                <th className={thStyle}>Debilitated</th>
+                <th className={thStyle}>Exaltation Deg</th>
+                <th className={thStyle}>Debilitation Deg</th>
+                <th className={thStyle}>Friendly Sign</th>
+                <th className={thStyle}>Enemy Sign</th>
+                <th className={thStyle}>Neutral Sign</th>
+                <th className={thStyle}>Vargottama</th>
+                <th className={thStyle}>Pushkara</th>
+                <th className={thStyle}>Neecha Bhanga</th>
+                <th className={thStyle}>Dignity Rank / Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-indigo-100/80">
+              {dignityData.map((row, idx) => (
+                <tr key={idx} className={idx % 2 === 0 ? "bg-white hover:bg-indigo-50/40 transition-colors" : "bg-indigo-50/20 hover:bg-indigo-50/40 transition-colors"}>
+                  <td className={`${tdStyle} font-extrabold text-indigo-950`}>{row.planet}</td>
+                  <td className={`${tdStyle} font-bold text-center`}>
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${row.chart === "D1" ? "bg-indigo-100 text-indigo-800" : "bg-purple-100 text-purple-800"}`}>
+                      {row.chart}
+                    </span>
+                  </td>
+                  <td className={`${tdStyle} font-semibold text-neutral-900`}>{row.sign}</td>
+                  <td className={`${tdStyle} font-mono font-bold text-neutral-800`}>{row.longitudeFormatted}</td>
+                  <td className={`${tdStyle} text-center font-bold ${row.ownSign === "Yes" ? "text-emerald-600 bg-emerald-50" : "text-slate-400"}`}>{row.ownSign}</td>
+                  <td className={`${tdStyle} text-center font-bold ${row.moolatrikona === "Yes" ? "text-emerald-600 bg-emerald-50" : "text-slate-400"}`}>{row.moolatrikona}</td>
+                  <td className={`${tdStyle} text-center font-bold ${row.exalted === "Yes" ? "text-amber-600 bg-amber-50" : "text-slate-400"}`}>{row.exalted}</td>
+                  <td className={`${tdStyle} text-center font-bold ${row.debilitated === "Yes" ? "text-rose-600 bg-rose-50" : "text-slate-400"}`}>{row.debilitated}</td>
+                  <td className={`${tdStyle} text-slate-600 font-mono text-[9px]`}>{row.exaltationDegree}</td>
+                  <td className={`${tdStyle} text-slate-600 font-mono text-[9px]`}>{row.debilitationDegree}</td>
+                  <td className={`${tdStyle} text-center font-bold ${row.friendlySign === "Yes" ? "text-sky-600 bg-sky-50" : "text-slate-400"}`}>{row.friendlySign}</td>
+                  <td className={`${tdStyle} text-center font-bold ${row.enemySign === "Yes" ? "text-rose-500 bg-rose-50" : "text-slate-400"}`}>{row.enemySign}</td>
+                  <td className={`${tdStyle} text-center font-bold ${row.neutralSign === "Yes" ? "text-slate-600 bg-slate-50" : "text-slate-400"}`}>{row.neutralSign}</td>
+                  <td className={`${tdStyle} text-center font-bold ${row.vargottama === "Yes" ? "text-amber-600 bg-amber-50" : "text-slate-400"}`}>{row.vargottama}</td>
+                  <td className={`${tdStyle} text-center font-bold ${row.pushkara === "Yes" ? "text-teal-600 bg-teal-50" : row.pushkara === "N/A" ? "text-slate-300" : "text-slate-400"}`}>{row.pushkara}</td>
+                  <td className={`${tdStyle} text-center font-bold ${row.neechaBhanga === "Yes" ? "text-emerald-600 bg-emerald-50" : row.neechaBhanga === "N/A" ? "text-slate-300" : "text-slate-400"}`}>{row.neechaBhanga}</td>
+                  <td className={tdStyle}>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${
+                      row.dignityRank.includes("Exalted") || row.dignityRank.includes("Moolatrikona")
+                        ? "bg-amber-100 text-amber-950 border-amber-300"
+                        : row.dignityRank.includes("Own")
+                        ? "bg-emerald-100 text-emerald-950 border-emerald-300"
+                        : row.dignityRank.includes("Friendly")
+                        ? "bg-sky-100 text-sky-950 border-sky-300"
+                        : row.dignityRank.includes("Debilitated") || row.dignityRank.includes("Inimical")
+                        ? "bg-rose-100 text-rose-950 border-rose-300"
+                        : "bg-slate-100 text-slate-800 border-slate-300"
+                    }`}>
+                      {row.dignityRank}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       );
     }
@@ -3339,7 +3418,7 @@ export function MyPageView({
                     const submenusMap: { [key: string]: string[] } = {
                       charts: ["jhora_divisional"],
                       vedic: [
-                        "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", "jhora_ashtakavarga", "jhora_vimshottari",
+                        "jhora_planets", "jhora_dignity", "jhora_shadbala", "jhora_bhava_balas", "jhora_ashtakavarga", "jhora_vimshottari",
                         "kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_house_significators",
                         "jaimini_karakas", "jaimini_arudhas", "western_tropical", "western_aspects",
                         "tajika_varshaphal", "tajika_harshabala", "lalkitab_houses", "lalkitab_teva"
@@ -3358,7 +3437,7 @@ export function MyPageView({
                     
                     if (activeSubmenuIds.length <= 1) {
                       activeSubmenuIds = [
-                        "jhora_birth_details", "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", 
+                        "jhora_birth_details", "jhora_planets", "jhora_dignity", "jhora_shadbala", "jhora_bhava_balas", 
                         "jhora_ashtakavarga", "jhora_divisional", "jhora_vimshottari", "kp_cusps", 
                         "kp_sub_lords", "kp_planet_significators", "kp_house_significators", "jaimini_karakas", 
                         "jaimini_arudhas", "western_tropical", "western_aspects", "tajika_varshaphal", 
@@ -3579,7 +3658,7 @@ export function MyPageView({
                     };
 
                     const activeSubmenuIds = [
-                      "jhora_birth_details", "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", 
+                      "jhora_birth_details", "jhora_planets", "jhora_dignity", "jhora_shadbala", "jhora_bhava_balas", 
                       "jhora_ashtakavarga", "jhora_divisional", "jhora_vimshottari", "kp_cusps", 
                       "kp_sub_lords", "kp_planet_significators", "kp_house_significators", "jaimini_karakas", 
                       "jaimini_arudhas", "western_tropical", "western_aspects", "tajika_varshaphal", 
