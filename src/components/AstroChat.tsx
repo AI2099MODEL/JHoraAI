@@ -540,46 +540,44 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     <div className={`w-full ${isStandalone ? "h-screen border-none rounded-none shadow-none" : "h-[calc(100vh-140px)] min-h-[580px] rounded-2xl border border-neutral-200 shadow-xl"} bg-white text-neutral-800 flex flex-col overflow-hidden relative font-sans`}>
       
       {/* UNIFIED TOP COMPACT HEADER (Full width across entire app window) */}
-      <div className="h-14 border-b border-neutral-200/80 px-4 flex items-center justify-between bg-white text-neutral-800 shrink-0 z-30">
-        <div className="flex items-center gap-2.5 min-w-0 overflow-hidden">
+      <div className="h-12 border-b border-neutral-200/80 px-3 flex items-center justify-between bg-white text-neutral-800 shrink-0 z-30 gap-2">
+        <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
           {/* Sidebar toggle button (Mobile only) */}
           <button 
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-1.5 rounded-lg hover:bg-neutral-100 lg:hidden text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer shrink-0"
+            className="p-1 rounded-lg hover:bg-neutral-100 lg:hidden text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer shrink-0"
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-4 h-4" />
           </button>
 
-
-
           {activeSubmenuPanel ? (
-            <div className="flex items-center gap-2.5 shrink-0">
-              <span className="text-sm font-bold text-neutral-800 capitalize tracking-tight">
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs font-bold text-neutral-800 capitalize tracking-tight">
                 {activeSubmenuPanel.replace(/_/g, " ")} Module
               </span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 overflow-x-auto text-[11px] font-sans scrollbar-none py-1 min-w-0">
+            <div className="flex items-center gap-1.5 overflow-x-auto text-[10px] font-sans scrollbar-none py-0.5 min-w-0">
               {/* Transit Moon Nakshatra & Lord/Sublord Pill */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50/90 border border-indigo-200/80 text-indigo-900 font-medium shrink-0 shadow-2xs">
-                <Moon className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                <span className="font-bold">{transitMoonSign}</span>
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50/90 border border-indigo-200/80 text-indigo-900 font-medium shrink-0 shadow-2xs text-[10px]">
+                <Moon className="w-3 h-3 text-indigo-600 shrink-0" />
+                <span className="font-bold text-indigo-950">{transitMoonSign}</span>
                 <span className="text-indigo-300">·</span>
                 <span className="font-semibold">{transitMoonNak}</span>
                 <span className="text-indigo-300">|</span>
-                <span className="font-mono text-[10px] text-indigo-700 flex items-center gap-1">
-                  <strong className="text-indigo-950 font-bold">Lord:</strong> {transitMoonStarLord}
-                  <span className="text-indigo-300">|</span>
+                <span className="font-mono text-[9.5px] text-indigo-800 flex items-center gap-0.5">
+                  <strong className="text-indigo-950 font-bold">Ld:</strong> {transitMoonStarLord}
+                  <span className="text-indigo-300">·</span>
                   <strong className="text-indigo-950 font-bold">Sub:</strong> {transitMoonSubLord}
                 </span>
               </div>
 
               {/* Major Planets Transit Summary Pill */}
-              <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-50/80 border border-amber-200/80 text-amber-900 text-[10px] font-mono shrink-0 shadow-2xs">
-                <Orbit className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                <span className="flex items-center gap-1">
-                  <Sun className="w-3 h-3 text-amber-600 shrink-0" />
-                  <strong className="text-amber-950 font-bold">{transitSunSign}</strong> ({transitSunNak})
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50/80 border border-amber-200/80 text-amber-900 text-[9.5px] font-mono shrink-0 shadow-2xs">
+                <Orbit className="w-3 h-3 text-amber-600 shrink-0" />
+                <span className="flex items-center gap-0.5">
+                  <Sun className="w-2.5 h-2.5 text-amber-600 shrink-0" />
+                  <strong className="text-amber-950 font-bold">{transitSunSign}</strong> <span className="text-[9px] text-amber-800">({transitSunNak})</span>
                 </span>
                 <span className="text-amber-300">|</span>
                 <span>
@@ -598,24 +596,24 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           )}
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 ml-2">
+        <div className="flex items-center gap-1.5 shrink-0 ml-1">
           {!activeSubmenuPanel && (
             /* Current Date, Live Time & Location details pill */
-            <div className="hidden lg:flex items-center gap-2 bg-neutral-50 border border-neutral-200/80 px-3 py-1.5 rounded-full text-xs font-medium text-neutral-700 shadow-2xs">
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+            <div className="hidden sm:flex items-center gap-1.5 bg-neutral-50 border border-neutral-200/80 px-2 py-0.5 rounded-full text-[10px] font-medium text-neutral-700 shadow-2xs shrink-0">
+              <div className="flex items-center gap-1">
+                <Clock className="w-3 h-3 text-indigo-500 shrink-0" />
                 <span className="font-semibold text-neutral-800">
                   {currentDateTime.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                 </span>
-                <span className="text-neutral-300">|</span>
-                <span className="font-mono text-indigo-600 font-bold text-[11px] tracking-wide">
-                  {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+                <span className="text-neutral-300">·</span>
+                <span className="font-mono text-indigo-600 font-bold text-[10px]">
+                  {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit" })}
                 </span>
               </div>
               <span className="text-neutral-300">|</span>
-              <div className="flex items-center gap-1.5 text-neutral-700">
-                <MapPin className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
-                <span className="font-medium text-neutral-800 truncate max-w-[120px]">
+              <div className="flex items-center gap-1 text-neutral-700">
+                <MapPin className="w-3 h-3 text-indigo-500 shrink-0" />
+                <span className="font-medium text-neutral-800 truncate max-w-[90px]">
                   {locationLoading ? "Locating..." : locationName}
                 </span>
               </div>
@@ -623,14 +621,14 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           )}
 
           {/* Compact unified action icon stack */}
-          <div className="inline-flex items-center bg-white border border-neutral-200/90 rounded-full p-1 shadow-2xs shrink-0">
+          <div className="inline-flex items-center bg-white border border-neutral-200/90 rounded-full p-0.5 shadow-2xs shrink-0">
             {onCloseStandalone && (
               <button
                 onClick={onCloseStandalone}
-                className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer"
+                className="p-1 rounded-full hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer"
                 title="Return to Dashboard"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
+                <ArrowLeft className="w-3 h-3" />
               </button>
             )}
 
@@ -638,28 +636,28 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
               onClick={() => {
                 window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
               }}
-              className="p-1.5 rounded-full hover:bg-neutral-100 text-[#5c4df2] transition-all cursor-pointer"
+              className="p-1 rounded-full hover:bg-neutral-100 text-[#5c4df2] transition-all cursor-pointer"
               title="Open in New Window"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
+              <ExternalLink className="w-3 h-3" />
             </button>
 
             <button 
               onClick={() => {
                 alert("Share Link: Astrological conversation state serialized securely.");
               }}
-              className="p-1.5 rounded-full hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer"
+              className="p-1 rounded-full hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer"
               title="Share conversation"
             >
-              <Share2 className="w-3.5 h-3.5" />
+              <Share2 className="w-3 h-3" />
             </button>
 
             <button
               onClick={clearChat}
               title="Reset Conversation"
-              className="p-1.5 rounded-full hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer"
+              className="p-1 rounded-full hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3 h-3" />
             </button>
           </div>
         </div>
