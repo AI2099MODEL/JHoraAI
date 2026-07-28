@@ -406,28 +406,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     setDislikedMessages(prev => ({ ...prev, [msgId]: !prev[msgId] }));
     setLikedMessages(prev => ({ ...prev, [msgId]: false }));
   };
-
-  // Pre-defined quick queries
-  const quickPrompts = [
-    {
-      title: "Today's Mood & Wellness",
-      query: `Analyze my daily mood, emotional energy, and general wellness today. Combine my natal coordinates (${lagnaSign} Lagna, ${natalMoonSign} ${natalMoonNak} Moon) with today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra to yield deep psychological metrics.`
-    },
-    {
-      title: "Action & Behavior Drive",
-      query: `Analyze my behavior metrics, personal charisma, and actionable guidelines today. Focus on how transit Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"} (aspecting natal positions) and today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} shape my interactions and productivity.`
-    },
-    {
-      title: "Professional Gains",
-      query: `What is my professional and wealth trend today? Evaluate my 2nd house of assets and 11th house of gains under the influence of transiting planets (Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"}, Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"}) and my active dasha to highlight immediate strategic opportunities.`
-    },
-    {
-      title: "Dasha Roadmap & Remedies",
-      query: `Detail my active ${activeDasha} Vimshottari roadmap. What are the key directives, upcoming turning points, and immediate practical remedies for my life right now?`
-    }
-  ];
-
-  // Custom rich renderer for markdown text with vibrant tables & formatting
+// Custom rich renderer for markdown text with vibrant tables & formatting
   const renderMarkdown = (text: string) => {
     const lines = text.split("\n");
     const elements: React.ReactNode[] = [];
@@ -919,25 +898,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                     <p className="text-neutral-700 text-xs max-w-md leading-relaxed font-medium mb-6">
                       Your intelligent Vedic & KP astrological assistant. Ask any question about your chart, dasha, transit trends, or remedies.
                     </p>
-
-                    {/* Quick prompts grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg text-left">
-                      {quickPrompts.map((p, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => runAnalysis(p.query)}
-                          className="p-3 rounded-xl bg-white/90 hover:bg-white border border-indigo-200/80 hover:border-indigo-400/90 shadow-2xs hover:shadow-xs transition-all cursor-pointer group flex flex-col gap-1"
-                        >
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-900 group-hover:text-purple-700">
-                            <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                            <span>{p.title}</span>
-                          </div>
-                          <span className="text-[10px] text-neutral-600 line-clamp-2 leading-tight">
-                            {p.query}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
                   </div>
                 ) : (
                   messages.map((msg) => (
@@ -1082,23 +1042,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
         {!activeSubmenuPanel && (
           <div className="p-4 bg-white border-t border-neutral-100">
             <div className="max-w-2xl mx-auto space-y-2">
-              
-              {/* Quick action pills when input is empty and we already have some messages on screen */}
-              {messages.length > 0 && !input.trim() && !analysisLoading && (
-                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none justify-center">
-                  {quickPrompts.map((p, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => runAnalysis(p.query)}
-                      className="px-3 py-1.5 text-[10px] font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-full transition-all whitespace-nowrap cursor-pointer shrink-0"
-                    >
-                      {p.title}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Unified Input Bar (ChatGPT exact mockup - light theme) */}
+{/* Unified Input Bar (ChatGPT exact mockup - light theme) */}
               <form onSubmit={handleCustomSubmit} className="relative bg-neutral-50 rounded-3xl p-1 px-3 flex items-center gap-2 border border-neutral-200 focus-within:border-neutral-300 shadow-sm transition-all">
                 <button
                   type="button"
