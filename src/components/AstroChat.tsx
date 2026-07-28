@@ -48,24 +48,18 @@ import {
   Moon,
   Sun,
   Orbit,
-  X,
-  LayoutDashboard
+  X
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
 import { ConversationService } from "../features/ask/services/ConversationService";
 import moodRules from "../knowledgebase/checklist_engine/mood_analysis_rules.json";
-import { BirthDataAndProfileRepository } from "./BirthDataAndProfileRepository";
 
 interface AstroChatProps {
   astrologyData: AstrologyData | null;
   isStandalone?: boolean;
   onCloseStandalone?: () => void;
   onNavigateMenu?: (menu: string, submenu?: string) => void;
-  inputs?: any;
-  setInputs?: React.Dispatch<React.SetStateAction<any>>;
-  onCalculate?: (isInitial?: boolean, forceRefresh?: boolean) => Promise<void>;
-  activeUser?: any;
 }
 
 interface Message {
@@ -76,16 +70,7 @@ interface Message {
   debugInfo?: any;
 }
 
-export default function AstroChat({
-  astrologyData,
-  isStandalone,
-  onCloseStandalone,
-  onNavigateMenu,
-  inputs,
-  setInputs,
-  onCalculate,
-  activeUser
-}: AstroChatProps) {
+export default function AstroChat({ astrologyData, isStandalone, onCloseStandalone, onNavigateMenu }: AstroChatProps) {
   // Sidebar open/close state on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -110,12 +95,11 @@ export default function AstroChat({
   const [likedMessages, setLikedMessages] = useState<Record<string, boolean>>({});
   const [dislikedMessages, setDislikedMessages] = useState<Record<string, boolean>>({});
   const [currentStatusMsg, setCurrentStatusMsg] = useState("");
-  const [moodAnalysisExpanded, setMoodAnalysisExpanded] = useState(false);
-  const [myLifeExpanded, setMyLifeExpanded] = useState(false);
-  const [myJourneyExpanded, setMyJourneyExpanded] = useState(false);
-  const [myReportsExpanded, setMyReportsExpanded] = useState(false);
+  const [moodAnalysisExpanded, setMoodAnalysisExpanded] = useState(true);
+  const [myLifeExpanded, setMyLifeExpanded] = useState(true);
+  const [myJourneyExpanded, setMyJourneyExpanded] = useState(true);
+  const [myReportsExpanded, setMyReportsExpanded] = useState(true);
   const [activeSubmenuPanel, setActiveSubmenuPanel] = useState<string | null>(null);
-  const [dashboardTab, setDashboardTab] = useState<"tables" | "dashboard">("tables");
 
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [locationName, setLocationName] = useState<string>("Gurugram, India");
@@ -423,6 +407,26 @@ export default function AstroChat({
     setLikedMessages(prev => ({ ...prev, [msgId]: false }));
   };
 
+  // Pre-defined quick queries
+  const quickPrompts = [
+    {
+      title: "Today's Mood & Wellness",
+      query: `Analyze my daily mood, emotional energy, and general wellness today. Combine my natal coordinates (${lagnaSign} Lagna, ${natalMoonSign} ${natalMoonNak} Moon) with today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra to yield deep psychological metrics.`
+    },
+    {
+      title: "Action & Behavior Drive",
+      query: `Analyze my behavior metrics, personal charisma, and actionable guidelines today. Focus on how transit Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"} (aspecting natal positions) and today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} shape my interactions and productivity.`
+    },
+    {
+      title: "Professional Gains",
+      query: `What is my professional and wealth trend today? Evaluate my 2nd house of assets and 11th house of gains under the influence of transiting planets (Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"}, Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"}) and my active dasha to highlight immediate strategic opportunities.`
+    },
+    {
+      title: "Dasha Roadmap & Remedies",
+      query: `Detail my active ${activeDasha} Vimshottari roadmap. What are the key directives, upcoming turning points, and immediate practical remedies for my life right now?`
+    }
+  ];
+
   // Custom rich renderer for markdown text with vibrant tables & formatting
   const renderMarkdown = (text: string) => {
     const lines = text.split("\n");
@@ -661,22 +665,6 @@ export default function AstroChat({
           
           {/* Main ChatGPT Menu items */}
           <div className="space-y-2">
-            {/* Dashboard Menu Item */}
-            <button
-              onClick={() => {
-                setActiveSubmenuPanel("dashboard");
-                setSidebarOpen(false);
-              }}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
-                activeSubmenuPanel === "dashboard"
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border border-indigo-700 shadow-sm"
-                  : "bg-neutral-50/80 hover:bg-indigo-50/60 text-neutral-800 hover:text-indigo-900 border border-neutral-200/70"
-              }`}
-            >
-              <LayoutDashboard className={`w-4 h-4 shrink-0 ${activeSubmenuPanel === "dashboard" ? "text-white" : "text-indigo-500"}`} />
-              <span className="font-sans tracking-tight">Dashboard</span>
-            </button>
-
             {/* 1. My Journey (Renamed from My Mood Analysis) */}
             <div className="space-y-0.5">
               <button
@@ -793,7 +781,9 @@ export default function AstroChat({
                   {/* My Astro Systems */}
                   <div className="space-y-1 pt-1">
                     {[
-                      { id: "vedic", label: "My Astro Details", theme: "bg-amber-50/80 text-amber-950 border-amber-200/80" }
+                      { id: "vedic", label: "My Astro Details", theme: "bg-amber-50/80 text-amber-950 border-amber-200/80" },
+                      { id: "jaimini", label: "Jaimini", theme: "bg-purple-50/80 text-purple-950 border-purple-200/80" },
+                      { id: "western", label: "Western", theme: "bg-sky-50/80 text-sky-950 border-sky-200/80" }
                     ].map((sub) => (
                       <button
                         key={sub.id}
@@ -902,39 +892,19 @@ export default function AstroChat({
                 <div className="flex items-center justify-between bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 px-4 py-2.5 rounded-xl border border-indigo-200/80 shadow-2xs">
                   <span className="text-xs font-extrabold text-indigo-950 capitalize tracking-tight flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                    {activeSubmenuPanel === "vedic" ? "My Astro Details" : activeSubmenuPanel === "dashboard" ? "Birth Data & Profile Repository" : activeSubmenuPanel.replace(/_/g, " ")}
+                    {activeSubmenuPanel === "vedic" ? "My Astro Details" : activeSubmenuPanel.replace(/_/g, " ")}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setActiveSubmenuPanel(null)}
-                      className="px-2.5 py-1 text-xs font-bold text-neutral-600 hover:text-neutral-900 bg-white hover:bg-neutral-100 rounded-lg border border-neutral-300 transition-colors shadow-2xs cursor-pointer flex items-center gap-1"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                      Close Panel
-                    </button>
-                  </div>
                 </div>
-                {activeSubmenuPanel === "dashboard" ? (
-                  <BirthDataAndProfileRepository
-                    astrologyData={astrologyData}
-                    inputs={inputs}
-                    setInputs={setInputs}
-                    onCalculate={onCalculate}
-                    activeUser={activeUser}
-                    isDark={false}
-                  />
-                ) : (
-                  <MyPageView
-                    astrologyData={astrologyData}
-                    activeUser={null}
-                    isDark={false}
-                    containerStyle="bg-white border-neutral-200"
-                    cardStyle="bg-neutral-50 border-neutral-200"
-                    textMuted="text-neutral-500"
-                    activeSubmenuId={activeSubmenuPanel}
-                    onSubmenuSelect={(id) => setActiveSubmenuPanel(id)}
-                  />
-                )}
+                <MyPageView
+                  astrologyData={astrologyData}
+                  activeUser={null}
+                  isDark={false}
+                  containerStyle="bg-white border-neutral-200"
+                  cardStyle="bg-neutral-50 border-neutral-200"
+                  textMuted="text-neutral-500"
+                  activeSubmenuId={activeSubmenuPanel}
+                  onSubmenuSelect={(id) => setActiveSubmenuPanel(id)}
+                />
               </div>
             ) : (
               <div className="max-w-2xl mx-auto space-y-6 w-full">
@@ -946,9 +916,28 @@ export default function AstroChat({
                     <h1 className="text-2xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 bg-clip-text text-transparent font-sans">
                       JHora AI Assistant
                     </h1>
-                    <p className="text-neutral-700 text-xs max-w-md leading-relaxed font-medium">
+                    <p className="text-neutral-700 text-xs max-w-md leading-relaxed font-medium mb-6">
                       Your intelligent Vedic & KP astrological assistant. Ask any question about your chart, dasha, transit trends, or remedies.
                     </p>
+
+                    {/* Quick prompts grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg text-left">
+                      {quickPrompts.map((p, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => runAnalysis(p.query)}
+                          className="p-3 rounded-xl bg-white/90 hover:bg-white border border-indigo-200/80 hover:border-indigo-400/90 shadow-2xs hover:shadow-xs transition-all cursor-pointer group flex flex-col gap-1"
+                        >
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-900 group-hover:text-purple-700">
+                            <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+                            <span>{p.title}</span>
+                          </div>
+                          <span className="text-[10px] text-neutral-600 line-clamp-2 leading-tight">
+                            {p.query}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 ) : (
                   messages.map((msg) => (
@@ -1093,6 +1082,21 @@ export default function AstroChat({
         {!activeSubmenuPanel && (
           <div className="p-4 bg-white border-t border-neutral-100">
             <div className="max-w-2xl mx-auto space-y-2">
+              
+              {/* Quick action pills when input is empty and we already have some messages on screen */}
+              {messages.length > 0 && !input.trim() && !analysisLoading && (
+                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none justify-center">
+                  {quickPrompts.map((p, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => runAnalysis(p.query)}
+                      className="px-3 py-1.5 text-[10px] font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-full transition-all whitespace-nowrap cursor-pointer shrink-0"
+                    >
+                      {p.title}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Unified Input Bar (ChatGPT exact mockup - light theme) */}
               <form onSubmit={handleCustomSubmit} className="relative bg-neutral-50 rounded-3xl p-1 px-3 flex items-center gap-2 border border-neutral-200 focus-within:border-neutral-300 shadow-sm transition-all">

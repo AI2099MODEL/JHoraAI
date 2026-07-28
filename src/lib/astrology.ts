@@ -130,6 +130,7 @@ export interface AstrologyData {
   westernChart?: any;
   astronomical_details?: any;
   astronomical?: any;
+  raw?: any;
 }
 
 export interface DashaPeriod {

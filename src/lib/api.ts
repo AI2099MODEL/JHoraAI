@@ -171,29 +171,16 @@ export const apiFetch = async (input: RequestInfo | URL, init?: RequestInit): Pr
           });
         }
 
-        try {
-          const geoRes = await window.fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=6&language=en&format=json`);
-          const data = await geoRes.json();
-          const results = data.results || [];
-          const suggestions = results.map((r: any) => `${r.name}, ${r.admin1 ? r.admin1 + ', ' : ''}${r.country}`);
+        const geoRes = await window.fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=6&language=en&format=json`);
+        const data = await geoRes.json();
+        const results = data.results || [];
+        const suggestions = results.map((r: any) => `${r.name}, ${r.admin1 ? r.admin1 + ', ' : ''}${r.country}`);
 
-          const responseData = { suggestions, results };
-          return new Response(JSON.stringify(responseData), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-          });
-        } catch (err) {
-          console.warn("Geocoding fetch failed, returning fallback:", err);
-          return new Response(JSON.stringify({
-            suggestions: ["New Delhi, India", "Delhi, India", "Mumbai, India"],
-            results: [
-              { name: "New Delhi", latitude: 28.6139, longitude: 77.2090, timezone: "Asia/Kolkata", country: "India" }
-            ]
-          }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-          });
-        }
+        const responseData = { suggestions, results };
+        return new Response(JSON.stringify(responseData), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
       }
 
       // 5. Planetary Ingress (Mock)
