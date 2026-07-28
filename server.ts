@@ -76,16 +76,25 @@ function processGitQueue() {
         const errMsg = err.message || "";
         const isLockError = errMsg.includes("lock") || errMsg.includes("index.lock") || errMsg.includes("Resource temporarily unavailable");
         if (isLockError) {
-          try {
-            const lockPath = path.join(process.cwd(), ".git", "index.lock");
-            if (fs.existsSync(lockPath)) {
-              fs.unlinkSync(lockPath);
-            }
-          } catch (e) {}
           if (retriesLeft > 0) {
-            console.log(`[Git Queue] Detected lock error for command "${item.cmd}", unlinked lock and retrying in 1000ms. Retries left: ${retriesLeft}`);
+            console.log(`[Git Queue] Detected lock error for command "${item.cmd}". Retrying in 1000ms without unlinking. Retries left: ${retriesLeft}`);
             setTimeout(() => attemptRun(retriesLeft - 1), 1000);
             return;
+          } else {
+            // Clean up truly orphaned lock file ONLY if it has been there for more than 30 seconds
+            try {
+              const lockPath = path.join(process.cwd(), ".git", "index.lock");
+              if (fs.existsSync(lockPath)) {
+                const stats = fs.statSync(lockPath);
+                const ageMs = Date.now() - stats.mtimeMs;
+                if (ageMs > 30000) {
+                  fs.unlinkSync(lockPath);
+                  console.log(`[Git Queue] Cleaned up truly orphaned index.lock (age: ${Math.round(ageMs / 1000)}s).`);
+                } else {
+                  console.warn(`[Git Queue] Retries exhausted but index.lock is too fresh to delete safely (age: ${Math.round(ageMs / 1000)}s). Skipping unlinking.`);
+                }
+              }
+            } catch (e) {}
           }
         }
         
