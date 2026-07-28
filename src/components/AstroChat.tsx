@@ -552,7 +552,14 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
           {activeSubmenuPanel ? (
             <div className="flex items-center gap-2 shrink-0">
-              <span className="text-xs font-bold text-neutral-800 capitalize tracking-tight">
+              <button
+                onClick={() => setActiveSubmenuPanel(null)}
+                className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-950 border border-indigo-200/90 text-[10.5px] font-bold transition-all cursor-pointer shadow-2xs"
+              >
+                <ArrowLeft className="w-3 h-3 text-indigo-600" />
+                <span>Back to Assistant</span>
+              </button>
+              <span className="text-xs font-bold text-neutral-800 capitalize tracking-tight ml-1">
                 {activeSubmenuPanel.replace(/_/g, " ")} Module
               </span>
             </div>
@@ -1082,87 +1089,87 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           </div>
         </div>
 
-        {/* BOTTOM INPUT CONTAINER */}
-        <div className="p-4 bg-white border-t border-neutral-100">
-          <div className="max-w-2xl mx-auto space-y-2">
-            
-            {/* Quick action pills when input is empty and we already have some messages on screen */}
-            {messages.length > 0 && !input.trim() && !analysisLoading && (
-              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none justify-center">
-                {quickPrompts.map((p, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => runAnalysis(p.query)}
-                    className="px-3 py-1.5 text-[10px] font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-full transition-all whitespace-nowrap cursor-pointer shrink-0"
-                  >
-                    {p.title}
-                  </button>
-                ))}
+        {/* BOTTOM INPUT CONTAINER (Hidden on submenu pages) */}
+        {!activeSubmenuPanel && (
+          <div className="p-4 bg-white border-t border-neutral-100">
+            <div className="max-w-2xl mx-auto space-y-2">
+              
+              {/* Quick action pills when input is empty and we already have some messages on screen */}
+              {messages.length > 0 && !input.trim() && !analysisLoading && (
+                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none justify-center">
+                  {quickPrompts.map((p, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => runAnalysis(p.query)}
+                      className="px-3 py-1.5 text-[10px] font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-full transition-all whitespace-nowrap cursor-pointer shrink-0"
+                    >
+                      {p.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Unified Input Bar (ChatGPT exact mockup - light theme) */}
+              <form onSubmit={handleCustomSubmit} className="relative bg-neutral-50 rounded-3xl p-1 px-3 flex items-center gap-2 border border-neutral-200 focus-within:border-neutral-300 shadow-sm transition-all">
+                <button
+                  type="button"
+                  onClick={() => {
+                    alert("File attachment: Upload birth charts, horary JSON payloads, or customized transit data to ground the companion.");
+                  }}
+                  className="p-1.5 hover:bg-neutral-200/50 text-neutral-400 hover:text-neutral-600 rounded-full transition-colors cursor-pointer shrink-0"
+                  title="Add attachment"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask anything"
+                  disabled={analysisLoading}
+                  className="flex-1 bg-transparent border-none outline-none py-2 text-xs text-neutral-800 placeholder-neutral-400 font-sans"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    alert("Speech-to-Text: Speak directly to the Master AI Companion to record and synthesize your query.");
+                  }}
+                  className="p-1.5 hover:bg-neutral-200/50 text-neutral-400 hover:text-neutral-600 rounded-full transition-colors cursor-pointer shrink-0"
+                  title="Voice input"
+                >
+                  <Mic className="w-4 h-4" />
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={analysisLoading || !input.trim()}
+                  className="bg-black hover:bg-neutral-800 disabled:bg-neutral-200 text-white disabled:text-neutral-400 rounded-full p-2 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm"
+                >
+                  <ArrowUp className="w-4 h-4 stroke-[3]" />
+                </button>
+              </form>
+
+              {/* Profile summary details bar below input */}
+              <div className="flex items-center justify-center gap-2 overflow-x-auto text-[11px] font-sans text-neutral-600 whitespace-nowrap scrollbar-none pt-1 min-w-0">
+                <span className="font-bold text-neutral-800 flex items-center gap-1.5 shrink-0">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block shrink-0"></span>
+                  {profileName}
+                </span>
+                <span className="text-neutral-300 shrink-0">|</span>
+                <span className="shrink-0"><strong className="font-semibold text-neutral-500">DOB:</strong> {profileDob} @ {profileTob}</span>
+                <span className="text-neutral-300 shrink-0">|</span>
+                <span className="shrink-0"><strong className="font-semibold text-neutral-500">Place:</strong> {profilePob}</span>
+                <span className="text-neutral-300 shrink-0">|</span>
+                <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-mono text-[10px] font-medium shrink-0">
+                  <strong>ANTARA:</strong> {antaraLord} <span className="opacity-40">|</span> <strong>PRANA:</strong> {pranaLord}
+                </span>
               </div>
-            )}
 
-            {/* Unified Input Bar (ChatGPT exact mockup - light theme) */}
-            <form onSubmit={handleCustomSubmit} className="relative bg-neutral-50 rounded-3xl p-1 px-3 flex items-center gap-2 border border-neutral-200 focus-within:border-neutral-300 shadow-sm transition-all">
-              <button
-                type="button"
-                onClick={() => {
-                  alert("File attachment: Upload birth charts, horary JSON payloads, or customized transit data to ground the companion.");
-                }}
-                className="p-1.5 hover:bg-neutral-200/50 text-neutral-400 hover:text-neutral-600 rounded-full transition-colors cursor-pointer shrink-0"
-                title="Add attachment"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask anything"
-                disabled={analysisLoading}
-                className="flex-1 bg-transparent border-none outline-none py-2 text-xs text-neutral-800 placeholder-neutral-400 font-sans"
-              />
-
-              <button
-                type="button"
-                onClick={() => {
-                  alert("Speech-to-Text: Speak directly to the Master AI Companion to record and synthesize your query.");
-                }}
-                className="p-1.5 hover:bg-neutral-200/50 text-neutral-400 hover:text-neutral-600 rounded-full transition-colors cursor-pointer shrink-0"
-                title="Voice input"
-              >
-                <Mic className="w-4 h-4" />
-              </button>
-
-              <button
-                type="submit"
-                disabled={analysisLoading || !input.trim()}
-                className="bg-black hover:bg-neutral-800 disabled:bg-neutral-200 text-white disabled:text-neutral-400 rounded-full p-2 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm"
-              >
-                <ArrowUp className="w-4 h-4 stroke-[3]" />
-              </button>
-            </form>
-
-            {/* Profile summary details bar below input */}
-            <div className="flex items-center justify-center gap-2 overflow-x-auto text-[11px] font-sans text-neutral-600 whitespace-nowrap scrollbar-none pt-1 min-w-0">
-              <span className="font-bold text-neutral-800 flex items-center gap-1.5 shrink-0">
-                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block shrink-0"></span>
-                {profileName}
-              </span>
-              <span className="text-neutral-300 shrink-0">|</span>
-              <span className="shrink-0"><strong className="font-semibold text-neutral-500">DOB:</strong> {profileDob} @ {profileTob}</span>
-              <span className="text-neutral-300 shrink-0">|</span>
-              <span className="shrink-0"><strong className="font-semibold text-neutral-500">Place:</strong> {profilePob}</span>
-              <span className="text-neutral-300 shrink-0">|</span>
-              <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-mono text-[10px] font-medium shrink-0">
-                <strong>ANTARA:</strong> {antaraLord} <span className="opacity-40">|</span> <strong>PRANA:</strong> {pranaLord}
-              </span>
             </div>
-
-
-
           </div>
-        </div>
+        )}
       </div>
     </div>
   </div>
