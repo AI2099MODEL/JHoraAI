@@ -414,10 +414,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   // Pre-defined quick queries
   const quickPrompts = [
     {
-      title: "Action & Behavior Drive",
-      query: `Analyze my behavior metrics, personal charisma, and actionable guidelines today. Focus on how transit Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"} (aspecting natal positions) and today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} shape my interactions and productivity.`
-    },
-    {
       title: "Professional Gains",
       query: `What is my professional and wealth trend today? Evaluate my 2nd house of assets and 11th house of gains under the influence of transiting planets (Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"}, Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"}) and my active dasha to highlight immediate strategic opportunities.`
     },
