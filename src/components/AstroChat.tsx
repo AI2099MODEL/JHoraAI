@@ -223,7 +223,28 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     prompts.push({
       id: "daily_mood_prediction",
       label: "Daily Mood Reading",
-      query: `Generate a personalized daily mood reading and activity guidance based on the "daily_horoscope_engine" and "mood_prediction" rules. Layer today's Moon transit (currently in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra, ${currentSky?.moon?.currentSign?.displayName || "Libra"} sign) over my current Vimshottari period (${activeDasha}) to calculate Tara Bala, Chandra Bala, and daily emotional metrics.`
+      query: `Execute the NJ COMPLETE KP LIFE ENGINE for today's daily mood reading.
+
+STEP 1: Build House Heat Map (Rank all 12 houses using Natal + DBA (${activeDasha}) + Transit + Moon (currently in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra, ${currentSky?.moon?.currentSign?.displayName || "Libra"} sign) + Convergence).
+STEP 2: Run COMPLETE KP Combination Engine across all domains (SELF, HEALTH, LONGEVITY, RELATIONSHIPS, FAMILY, CAREER, FINANCE, PROPERTY, LEGAL, TRAVEL, EDUCATION, SPIRITUAL, SOCIAL).
+STEP 3: For EVERY combination calculate Natal Promise, KP Significator Strength, Cuspal Star Lord & Sub Lord Support, DBA & Transit Support, Moon Trigger, Maraka/Badhaka Check, Contradictions, and Final Convergence.
+STEP 4: Assign Final State (★★★★★ Excellent, ★★★★☆ Supportive, ★★★☆☆ Neutral, ★★☆☆☆ Sensitive, ★☆☆☆☆ Challenging).
+STEP 5: Rank all Life Domains (Top 3 Primary, Next 5 Secondary, Remaining Background).
+
+OUTPUT RULES:
+Do not mention house numbers, specific planets, or astrology jargon in the final report. Make it entirely human-readable.
+
+FINAL REPORT FORMAT:
+😊 Mood Right Now: [Brief description]
+🌤 Overall Mood Today: [Brief description]
+🎯 Primary Focus Today:
+[Top 2-3 strongest life domains with their star ratings]
+📌 Secondary Focus Today:
+[Next 3-5 life domains with their star ratings]
+⚠ Areas Requiring Caution:
+[Only if supported by KP convergence]
+💡 Today's Advice:
+[Generated from the strongest validated combinations only]`
     });
 
     // Add domains from JSON
