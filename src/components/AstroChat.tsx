@@ -719,34 +719,9 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                 <div className="mt-1 ml-2 pl-2 border-l-2 border-rose-200 space-y-2 py-1">
                   {/* My Life Section */}
                   <div className="space-y-1">
-                    <div className="px-2 py-0.5 rounded-full bg-emerald-100/90 border border-emerald-200 text-[10px] font-extrabold text-emerald-950 uppercase tracking-wider inline-block">My Life</div>
                     {[
                       { id: "daily", label: "Daily", theme: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-500 hover:text-white" },
-                      { id: "current_dasha", label: "Current Dasha", theme: "bg-emerald-50 text-emerald-950 border-emerald-200 hover:bg-emerald-600 hover:text-white" }
-                    ].map((sub) => (
-                      <button
-                        key={sub.id}
-                        onClick={() => {
-                          setActiveSubmenuPanel(sub.id);
-                          onNavigateMenu?.("my_page", sub.id);
-                          setSidebarOpen(false);
-                        }}
-                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
-                          activeSubmenuPanel === sub.id
-                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
-                            : `${sub.theme}`
-                        }`}
-                      >
-                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
-                        <span>{sub.label}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Journey Submenu List */}
-                  <div className="space-y-1 pt-1">
-                    <div className="px-2 py-0.5 rounded-full bg-blue-100/90 border border-blue-200 text-[10px] font-extrabold text-blue-950 uppercase tracking-wider inline-block">Journey</div>
-                    {[
+                      { id: "current_dasha", label: "Current Dasha", theme: "bg-emerald-50 text-emerald-950 border-emerald-200 hover:bg-emerald-600 hover:text-white" },
                       { id: "overview", label: "My Soul", theme: "bg-purple-50 text-purple-950 border-purple-200 hover:bg-purple-600 hover:text-white" },
                       { id: "predictions", label: "Predictions", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
                       { id: "future", label: "Future", theme: "bg-cyan-50 text-cyan-950 border-cyan-200 hover:bg-cyan-600 hover:text-white" },
@@ -773,7 +748,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
                   {/* My Astro Systems */}
                   <div className="space-y-1 pt-1">
-                    <div className="px-2 py-0.5 rounded-full bg-violet-100/90 border border-violet-200 text-[10px] font-extrabold text-violet-950 uppercase tracking-wider inline-block">My Astro Systems</div>
                     {[
                       { id: "dasha", label: "Vimshottari", theme: "bg-indigo-50/80 text-indigo-950 border-indigo-200/80" },
                       { id: "charts", label: "Charts", theme: "bg-blue-50/80 text-blue-950 border-blue-200/80" },
@@ -895,13 +869,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                     <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
                     {activeSubmenuPanel === "vedic" ? "My Astro Details" : activeSubmenuPanel.replace(/_/g, " ")}
                   </span>
-                  <button
-                    onClick={() => setActiveSubmenuPanel(null)}
-                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-indigo-200/80 text-xs font-bold text-indigo-950 hover:bg-indigo-50 transition-all cursor-pointer shadow-2xs"
-                  >
-                    <X className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Close View</span>
-                  </button>
                 </div>
                 <MyPageView
                   astrologyData={astrologyData}

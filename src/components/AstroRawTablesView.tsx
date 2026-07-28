@@ -1666,6 +1666,62 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
               </div>
             );
 
+
+          case "jhora_jaimini_argalas":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-jaimini-argalas">
+                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH20: Jaimini Argalas</h3></div>
+                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+              </div>
+            );
+          case "jhora_jaimini_sphutas":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-jaimini-sphutas">
+                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH21: Jaimini Sphutas</h3></div>
+                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+              </div>
+            );
+          case "jhora_jaimini_sahams":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-jaimini-sahams">
+                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH22: Jaimini Sahams</h3></div>
+                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+              </div>
+            );
+          case "jhora_vedic_upgrahas":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-vedic-upgrahas">
+                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH23: Vedic Upgrahas</h3></div>
+                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+              </div>
+            );
+          case "jhora_ishtaphala":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-ishtaphala">
+                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH24: Ishtaphala & Kashtaphala</h3></div>
+                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+              </div>
+            );
+          case "jhora_jaimini_chara_dasha":
+            return (
+              <div className="space-y-4 animate-fade-in" id="table-jaimini-chara">
+                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center">
+                  <h3 className="text-sm font-semibold text-black">JH25: Jaimini Chara Dasha</h3>
+                  <button 
+                    onClick={() => {
+                        // Logic to be implemented. For now, trigger similar dasha download
+                        alert("CSV Download for Jaimini Chara Dasha (50 Years) trigger");
+                    }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold hover:bg-amber-600"
+                  >
+                    <Download className="w-3 h-3" />
+                    Download 50-Year CSV
+                  </button>
+                </div>
+                <div className="p-4 bg-white border border-neutral-200 rounded-lg text-black text-[10px]">Data available in profile.</div>
+              </div>
+            );
+
           case "table_index":
             return (
               <TableIndexView
