@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin06011976dehradun0640PM",
-    "lastUpdated": "2026-07-28T09:09:30.154Z",
+    "lastUpdated": "2026-07-28T09:12:03.786Z",
     "evaluationDate": "2026-07-28",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-28T09:09:29.269Z",
-      "localTime": "2026-07-28T02:09:29-07:00",
+      "utcTime": "2026-07-28T09:12:03.737Z",
+      "localTime": "2026-07-28T02:12:03-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Capricorn",
         "displayName": "Capricorn",
-        "longitude": 278.37
+        "longitude": 278.39
       },
       "currentNakshatra": {
         "id": "Uttara Ashadha",
@@ -30,15 +30,15 @@
         "displayName": "Sun"
       },
       "currentSubLord": {
-        "id": "Ketu",
-        "displayName": "Ketu"
+        "id": "Sun",
+        "displayName": "Sun"
       },
       "moonPhase": {
         "type": "Waxing Gibbous",
         "displayName": "Sukla Purnima",
         "illuminationPercentage": 98.3
       },
-      "moonLongitude": 278.37,
+      "moonLongitude": 278.39,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -76,33 +76,33 @@
       },
       "moon": {
         "currentSign": "Capricorn",
-        "longitude": 278.37,
+        "longitude": 278.39,
         "nakshatra": "Uttara Ashadha",
         "pada": 4,
         "starLord": "Sun",
-        "subLord": "Ketu",
+        "subLord": "Sun",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mars": {
         "currentSign": "Leo",
-        "longitude": 125.54,
+        "longitude": 126.07,
         "nakshatra": "Magha",
         "pada": 2,
         "starLord": "Ketu",
-        "subLord": "Saturn",
-        "retrograde": false,
+        "subLord": "Jupiter",
+        "retrograde": true,
         "combust": false,
         "stationary": false
       },
       "mercury": {
         "currentSign": "Scorpio",
-        "longitude": 237.16,
+        "longitude": 237.17,
         "nakshatra": "Jyeshtha",
         "pada": 4,
         "starLord": "Mercury",
-        "subLord": "Ketu",
+        "subLord": "Venus",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -120,7 +120,7 @@
       },
       "venus": {
         "currentSign": "Leo",
-        "longitude": 135.37,
+        "longitude": 135.38,
         "nakshatra": "Purva Phalguni",
         "pada": 1,
         "starLord": "Venus",
@@ -245,6 +245,21 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-28T09:12:03.786Z",
+      "evaluationDate": "2026-07-28",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
+    },
     {
       "timestamp": "2026-07-28T09:09:30.154Z",
       "evaluationDate": "2026-07-28",
@@ -1717,21 +1732,6 @@
     },
     {
       "timestamp": "2026-07-28T06:11:03.861Z",
-      "evaluationDate": "2026-07-28",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Cuspal Sub Lord of 7th House for Marriage Timing",
-        "10th Cuspal Sub Lord for Career and Profession Sector",
-        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-28T06:07:06.024Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
