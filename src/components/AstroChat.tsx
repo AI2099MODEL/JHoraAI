@@ -681,21 +681,52 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
               </button>
 
               {moodAnalysisExpanded && (
-                <div className="mt-1 ml-2 pl-2 border-l-2 border-indigo-200 space-y-1 py-1 max-h-[220px] overflow-y-auto scrollbar-thin">
-                  {getMoodPromptsFromJSON().map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        runAnalysis(p.query);
-                        setSidebarOpen(false);
-                      }}
-                      className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] font-medium text-neutral-800 hover:text-indigo-950 bg-neutral-50/60 hover:bg-indigo-50 border border-transparent hover:border-indigo-200/80 w-full text-left transition-all cursor-pointer group shadow-2xs"
-                      title={p.label}
-                    >
-                      <Sparkles className="w-3 h-3 text-indigo-500 group-hover:text-purple-600 shrink-0" />
-                      <span className="truncate">{p.label}</span>
-                    </button>
-                  ))}
+                <div className="mt-1 ml-2 pl-2 border-l-2 border-indigo-200 space-y-2 py-1">
+                  {/* Journey Navigation Pages */}
+                  <div className="space-y-1">
+                    {[
+                      { id: "predictions", label: "Predictions", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
+                      { id: "future", label: "Future", theme: "bg-cyan-50 text-cyan-950 border-cyan-200 hover:bg-cyan-600 hover:text-white" }
+                    ].map((sub) => (
+                      <button
+                        key={sub.id}
+                        onClick={() => {
+                          setActiveSubmenuPanel(sub.id);
+                          onNavigateMenu?.("my_page", sub.id);
+                          setSidebarOpen(false);
+                        }}
+                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
+                          activeSubmenuPanel === sub.id
+                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
+                            : `${sub.theme}`
+                        }`}
+                      >
+                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
+                        <span>{sub.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* AI Analysis Prompts */}
+                  <div className="pt-2 border-t border-neutral-200/60 space-y-1">
+                    <div className="text-[9px] font-bold text-indigo-400 uppercase tracking-wider px-1 mb-1">AI Prompt Analysis</div>
+                    <div className="space-y-1 max-h-[160px] overflow-y-auto scrollbar-thin pr-1">
+                      {getMoodPromptsFromJSON().map((p) => (
+                        <button
+                          key={p.id}
+                          onClick={() => {
+                            runAnalysis(p.query);
+                            setSidebarOpen(false);
+                          }}
+                          className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] font-medium text-neutral-800 hover:text-indigo-950 bg-neutral-50/60 hover:bg-indigo-50 border border-transparent hover:border-indigo-200/80 w-full text-left transition-all cursor-pointer group shadow-2xs"
+                          title={p.label}
+                        >
+                          <Sparkles className="w-3 h-3 text-indigo-500 group-hover:text-purple-600 shrink-0" />
+                          <span className="truncate">{p.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -722,9 +753,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                     {[
                       { id: "daily", label: "Daily", theme: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-500 hover:text-white" },
                       { id: "current_dasha", label: "Current Dasha", theme: "bg-emerald-50 text-emerald-950 border-emerald-200 hover:bg-emerald-600 hover:text-white" },
-                      { id: "overview", label: "My Soul", theme: "bg-purple-50 text-purple-950 border-purple-200 hover:bg-purple-600 hover:text-white" },
-                      { id: "predictions", label: "Predictions", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
-                      { id: "future", label: "Future", theme: "bg-cyan-50 text-cyan-950 border-cyan-200 hover:bg-cyan-600 hover:text-white" },
                       { id: "my_life_analysis", label: "My Life Analysis", theme: "bg-rose-50 text-rose-950 border-rose-200 hover:bg-rose-600 hover:text-white" }
                     ].map((sub) => (
                       <button
@@ -749,12 +777,10 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                   {/* My Astro Systems */}
                   <div className="space-y-1 pt-1">
                     {[
-                      { id: "dasha", label: "Vimshottari", theme: "bg-indigo-50/80 text-indigo-950 border-indigo-200/80" },
                       { id: "charts", label: "Charts", theme: "bg-blue-50/80 text-blue-950 border-blue-200/80" },
                       { id: "vedic", label: "My Astro Details", theme: "bg-amber-50/80 text-amber-950 border-amber-200/80" },
                       { id: "transits_data", label: "Transits", theme: "bg-cyan-50/80 text-cyan-950 border-cyan-200/80" },
                       { id: "jaimini", label: "Jaimini", theme: "bg-purple-50/80 text-purple-950 border-purple-200/80" },
-                      { id: "kp", label: "KP", theme: "bg-emerald-50/80 text-emerald-950 border-emerald-200/80" },
                       { id: "lalkitab", label: "Lalkitab", theme: "bg-rose-50/80 text-rose-950 border-rose-200/80" },
                       { id: "chinese", label: "Chinese", theme: "bg-teal-50/80 text-teal-950 border-teal-200/80" },
                       { id: "tajik", label: "Tajik", theme: "bg-fuchsia-50/80 text-fuchsia-950 border-fuchsia-200/80" },

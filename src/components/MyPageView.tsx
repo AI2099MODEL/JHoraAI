@@ -1757,7 +1757,6 @@ const lifeTabs = [
 ];
 
 const journeyTabs = [
-  { id: "overview", label: "My Soul" },
   { id: "predictions", label: "Predictions" },
   { id: "future", label: "Future" },
   { id: "my_life_analysis", label: "My Life Analysis" }
@@ -1794,7 +1793,7 @@ export function MyPageView({
   const [generatedData, setGeneratedData] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [age, setAge] = useState<{ years: number; months: number; days: number } | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("overview");
+  const [activeTab, setActiveTab] = useState<string>("vedic");
   const [activeSubmenu, setActiveSubmenu] = useState<"my_life" | "my_journey" | "my_astro" | "my_reports">("my_astro");
   const [compilingRelReport, setCompilingRelReport] = useState<string | null>(null);
   const [lastRefreshed, setLastRefreshed] = useState<string>("");
@@ -1858,7 +1857,7 @@ export function MyPageView({
       } else if (activeSubmenuId === "my_journey") {
         setActiveSubmenu("my_journey");
         if (!journeyTabs.some(t => t.id === activeTab)) {
-          setActiveTab("overview");
+          setActiveTab("predictions");
         }
       } else if (activeSubmenuId === "my_astro") {
         setActiveSubmenu("my_astro");
