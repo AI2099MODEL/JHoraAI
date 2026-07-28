@@ -670,7 +670,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
             <button
               onClick={() => {
                 setActiveSubmenuPanel("dashboard");
-                onNavigateMenu?.("ai_assistant", "dashboard");
+                onNavigateMenu?.("dashboard", "jhora_birth_details");
                 setSidebarOpen(false);
               }}
               className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
