@@ -354,6 +354,7 @@ FINAL REPORT FORMAT:
     try {
       const preferences = ConversationService.getPreferences();
       const geminiApiKey = preferences?.geminiApiKey;
+      const openaiApiKey = preferences?.openaiApiKey;
 
       const response = await fetch("/api/astrology/master-ask", {
         method: "POST",
@@ -364,7 +365,8 @@ FINAL REPORT FORMAT:
           targetAge: 50,
           mode: responseMode,
           history: messages.slice(-6).map(m => ({ sender: m.sender, text: m.text })),
-          geminiApiKey
+          geminiApiKey,
+          openaiApiKey
         })
       });
 

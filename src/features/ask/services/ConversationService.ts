@@ -16,10 +16,10 @@ export interface Preferences {
 }
 
 const DEFAULT_PREFERENCES: Preferences = {
-  preferredProvider: "gemini",
+  preferredProvider: "openai",
   preferredModels: {
-    gemini: "gemini-3.6-flash",
     openai: "gpt-4o-mini",
+    gemini: "gemini-3.6-flash",
     claude: "claude-3-5-sonnet-latest"
   },
   language: "en"

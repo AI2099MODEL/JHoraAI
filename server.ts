@@ -121,7 +121,7 @@ function enqueueGitCommand(cmd: string, callback?: (err: Error | null, stdout: s
 // Lazy-initialize OpenAI API client to avoid startup crashes if key is missing
 let openaiClient: OpenAI | null = null;
 function getOpenAIClient(req?: any): OpenAI {
-  const userKey = req?.headers?.["x-openai-api-key"] || req?.headers?.["authorization"]?.toString().replace("Bearer ", "");
+  const userKey = req?.headers?.["x-openai-api-key"] || req?.body?.openaiApiKey || req?.headers?.["authorization"]?.toString().replace("Bearer ", "");
   const key = userKey || process.env.OPENAI_API_KEY;
   if (!key) {
     throw new Error("No OpenAI API key found. Please configure your own ChatGPT/OpenAI API key in the app Settings (top right corner) or provide an OPENAI_API_KEY.");
@@ -1853,46 +1853,29 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
 
     let responseText: string | null = null;
 
-    // 1. Try Gemini first
+    // 1. Primary: Try ChatGPT (OpenAI)
     try {
-      const ai = getGeminiClient(geminiApiKey);
-      const response = await ai.models.generateContent({
-        model: "gemini-3.6-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              summary: {
-                type: Type.STRING,
-                description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
-              },
-              sections: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
-                    content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
-                    remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
-                    icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
-                  },
-                  required: ["title", "content", "remedy", "icon"]
-                }
-              }
-            },
-            required: ["summary", "sections"]
-          }
-        }
+      const openai = getOpenAIClient(req);
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: "You are an expert Vedic astrologer and counselor. Output raw JSON matching the required schema with keys 'summary' and 'sections'." },
+          { role: "user", content: prompt }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.3
       });
-      responseText = response.text || null;
-    } catch (apiErr: any) {
-      console.warn("Gemini 3.6-flash error in generate-summary. Trying gemini-3.1-pro-preview...", apiErr.message || apiErr);
+      responseText = completion.choices[0]?.message?.content || null;
+    } catch (openaiErr: any) {
+      console.warn("Primary ChatGPT (OpenAI) failed or key unavailable in generate-summary. Trying Gemini secondary fallback...", openaiErr.message || openaiErr);
+    }
+
+    // 2. Secondary Fallback: Gemini API
+    if (!responseText) {
       try {
         const ai = getGeminiClient(geminiApiKey);
         const response = await ai.models.generateContent({
-          model: "gemini-3.1-pro-preview",
+          model: "gemini-3.6-flash",
           contents: prompt,
           config: {
             responseMimeType: "application/json",
@@ -1922,28 +1905,44 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
           }
         });
         responseText = response.text || null;
-      } catch (fbErr: any) {
-        console.warn("Gemini API unavailable in generate-summary. Falling back to ChatGPT (OpenAI)...", fbErr.message || fbErr);
-      }
-    }
-
-    // 2. Fallback to ChatGPT (OpenAI) if Gemini failed or key missing
-    if (!responseText) {
-      try {
-        const openai = getOpenAIClient(req);
-        const completion = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: "You are an expert Vedic astrologer and counselor. Output raw JSON matching the required schema with keys 'summary' and 'sections'." },
-            { role: "user", content: prompt }
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.3
-        });
-        responseText = completion.choices[0]?.message?.content || null;
-      } catch (openaiErr: any) {
-        console.error("OpenAI ChatGPT fallback failed in generate-summary:", openaiErr.message || openaiErr);
-        throw openaiErr;
+      } catch (apiErr: any) {
+        console.warn("Gemini 3.6-flash error in generate-summary. Trying gemini-3.1-pro-preview...", apiErr.message || apiErr);
+        try {
+          const ai = getGeminiClient(geminiApiKey);
+          const response = await ai.models.generateContent({
+            model: "gemini-3.1-pro-preview",
+            contents: prompt,
+            config: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                  summary: {
+                    type: Type.STRING,
+                    description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
+                  },
+                  sections: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
+                        content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
+                        remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
+                        icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
+                      },
+                      required: ["title", "content", "remedy", "icon"]
+                    }
+                  }
+                },
+                required: ["summary", "sections"]
+              }
+            }
+          });
+          responseText = response.text || null;
+        } catch (fbErr: any) {
+          console.error("Gemini 3.1-pro-preview fallback error in generate-summary:", fbErr.message || fbErr);
+        }
       }
     }
 
@@ -2519,114 +2518,36 @@ LAWS OF CELESTIAL ANALYSIS:
 
     promptSize = Buffer.byteLength(userPrompt, "utf-8");
 
-    let response;
-    let modelUsed = "gemini-3.6-flash";
+    let responseText: string | null = null;
+    let modelUsed = "ChatGPT (gpt-4o-mini)";
+
+    // 1. Primary: Try ChatGPT (OpenAI)
     try {
-      const ai = getGeminiClient(geminiApiKey);
-      response = await ai.models.generateContent({
-        model: "gemini-3.6-flash",
-        contents: userPrompt,
-        config: {
-          systemInstruction,
-          tools: [{ googleSearch: {} }],
-          toolConfig: { includeServerSideToolInvocations: true },
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              reply: {
-                type: Type.STRING,
-                description: "The main conversational response to the user's question, styled elegantly with clean markdown."
-              },
-              debugInfo: {
-                type: Type.OBJECT,
-                properties: {
-                  knowledgeBookVersion: { type: Type.STRING },
-                  matchedRules: {
-                    type: Type.ARRAY,
-                    items: {
-                      type: Type.OBJECT,
-                      properties: {
-                        id: { type: Type.STRING },
-                        name: { type: Type.STRING },
-                        status: { type: Type.STRING }
-                      },
-                      required: ["id", "name", "status"]
-                    }
-                  },
-                  failedRules: {
-                    type: Type.ARRAY,
-                    items: {
-                      type: Type.OBJECT,
-                      properties: {
-                        id: { type: Type.STRING },
-                        name: { type: Type.STRING }
-                      },
-                      required: ["id", "name"]
-                    }
-                  },
-                  evidence: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING }
-                  },
-                  decision: { type: Type.STRING },
-                  timeline: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING }
-                  },
-                  eventIds: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING }
-                  },
-                  currentSkySnapshot: { type: Type.STRING },
-                  contextSourcesLoaded: {
-                    type: Type.ARRAY,
-                    items: { type: Type.STRING }
-                  }
-                },
-                required: [
-                  "knowledgeBookVersion",
-                  "matchedRules",
-                  "failedRules",
-                  "evidence",
-                  "decision",
-                  "timeline",
-                  "eventIds",
-                  "currentSkySnapshot",
-                  "contextSourcesLoaded"
-                ]
-              },
-              intentDetected: {
-                type: Type.OBJECT,
-                properties: {
-                  intent: { type: Type.STRING },
-                  confidence: { type: Type.INTEGER }
-                },
-                required: ["intent", "confidence"]
-              },
-              candidateKnowledge: {
-                type: Type.OBJECT,
-                properties: {
-                  classification: { type: Type.STRING },
-                  source: { type: Type.STRING },
-                  category: { type: Type.STRING },
-                  confidence: { type: Type.INTEGER }
-                }
-              }
-            },
-            required: ["reply", "debugInfo", "intentDetected"]
-          }
-        }
+      const openai = getOpenAIClient(req);
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `${systemInstruction}\n\nCRITICAL OUTPUT INSTRUCTION: Output ONLY a single JSON object with schema: {"reply": string, "debugInfo": {"knowledgeBookVersion": string, "matchedRules": Array, "failedRules": Array, "evidence": Array, "decision": string, "timeline": Array, "eventIds": Array, "currentSkySnapshot": string, "contextSourcesLoaded": Array}, "intentDetected": {"intent": string, "confidence": number}}`
+          },
+          { role: "user", content: userPrompt }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.3
       });
-    } catch (apiErr: any) {
-      const errMsg = (apiErr.message || "").toLowerCase();
-      const isQuotaError = apiErr.status === 429 || apiErr.status === 404 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource") || errMsg.includes("not found");
-      if (isQuotaError) {
-        console.warn("Gemini 3.6-flash error in Master Ask. Trying gemini-3.1-pro-preview...");
-        modelUsed = "gemini-3.1-pro-preview";
-        try {
-          response = await ai.models.generateContent({
-            model: "gemini-3.1-pro-preview",
+      responseText = completion.choices[0]?.message?.content || null;
+    } catch (openaiErr: any) {
+      console.warn("Primary ChatGPT (OpenAI) failed or key unavailable in Master Ask. Trying Gemini secondary fallback...", openaiErr.message || openaiErr);
+    }
+
+    // 2. Secondary Fallback: Gemini API
+    if (!responseText) {
+      try {
+        const ai = getGeminiClient(geminiApiKey);
+        modelUsed = "gemini-3.6-flash";
+        const response = await ai.models.generateContent({
+          model: "gemini-3.6-flash",
           contents: userPrompt,
           config: {
             systemInstruction,
@@ -2703,55 +2624,128 @@ LAWS OF CELESTIAL ANALYSIS:
                   properties: {
                     intent: { type: Type.STRING },
                     confidence: { type: Type.INTEGER }
+                  },
+                  required: ["intent", "confidence"]
                 },
-                required: ["intent", "confidence"]
+                candidateKnowledge: {
+                  type: Type.OBJECT,
+                  properties: {
+                    classification: { type: Type.STRING },
+                    source: { type: Type.STRING },
+                    category: { type: Type.STRING },
+                    confidence: { type: Type.INTEGER }
+                  }
+                }
               },
-              candidateKnowledge: {
+              required: ["reply", "debugInfo", "intentDetected"]
+            }
+          }
+        });
+        responseText = response.text || null;
+      } catch (apiErr: any) {
+        console.warn("Gemini 3.6-flash error in Master Ask. Trying gemini-3.1-pro-preview...", apiErr.message || apiErr);
+        try {
+          const ai = getGeminiClient(geminiApiKey);
+          modelUsed = "gemini-3.1-pro-preview";
+          const response = await ai.models.generateContent({
+            model: "gemini-3.1-pro-preview",
+            contents: userPrompt,
+            config: {
+              systemInstruction,
+              tools: [{ googleSearch: {} }],
+              toolConfig: { includeServerSideToolInvocations: true },
+              responseMimeType: "application/json",
+              responseSchema: {
                 type: Type.OBJECT,
                 properties: {
-                  classification: { type: Type.STRING },
-                  source: { type: Type.STRING },
-                  category: { type: Type.STRING },
-                  confidence: { type: Type.INTEGER }
-                }
+                  reply: {
+                    type: Type.STRING,
+                    description: "The main conversational response to the user's question, styled elegantly with clean markdown."
+                  },
+                  debugInfo: {
+                    type: Type.OBJECT,
+                    properties: {
+                      knowledgeBookVersion: { type: Type.STRING },
+                      matchedRules: {
+                        type: Type.ARRAY,
+                        items: {
+                          type: Type.OBJECT,
+                          properties: {
+                            id: { type: Type.STRING },
+                            name: { type: Type.STRING },
+                            status: { type: Type.STRING }
+                          },
+                          required: ["id", "name", "status"]
+                        }
+                      },
+                      failedRules: {
+                        type: Type.ARRAY,
+                        items: {
+                          type: Type.OBJECT,
+                          properties: {
+                            id: { type: Type.STRING },
+                            name: { type: Type.STRING }
+                          },
+                          required: ["id", "name"]
+                        }
+                      },
+                      evidence: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING }
+                      },
+                      decision: { type: Type.STRING },
+                      timeline: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING }
+                      },
+                      eventIds: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING }
+                      },
+                      currentSkySnapshot: { type: Type.STRING },
+                      contextSourcesLoaded: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING }
+                      }
+                    },
+                    required: [
+                      "knowledgeBookVersion",
+                      "matchedRules",
+                      "failedRules",
+                      "evidence",
+                      "decision",
+                      "timeline",
+                      "eventIds",
+                      "currentSkySnapshot",
+                      "contextSourcesLoaded"
+                    ]
+                  },
+                  intentDetected: {
+                    type: Type.OBJECT,
+                    properties: {
+                      intent: { type: Type.STRING },
+                      confidence: { type: Type.INTEGER }
+                    },
+                    required: ["intent", "confidence"]
+                  },
+                  candidateKnowledge: {
+                    type: Type.OBJECT,
+                    properties: {
+                      classification: { type: Type.STRING },
+                      source: { type: Type.STRING },
+                      category: { type: Type.STRING },
+                      confidence: { type: Type.INTEGER }
+                    }
+                  }
+                },
+                required: ["reply", "debugInfo", "intentDetected"]
               }
-            },
-            required: ["reply", "debugInfo", "intentDetected"]
-          }
-        }
-      });
+            }
+          });
+          responseText = response.text || null;
         } catch (fbErr: any) {
-          console.warn("Gemini API fallback error in Master Ask:", fbErr);
+          console.error("Gemini API fallback error in Master Ask:", fbErr);
         }
-      } else {
-        console.warn("Gemini API error in Master Ask:", apiErr);
-      }
-    }
-
-    let responseText = response?.text;
-
-    // 2. Fallback to ChatGPT (OpenAI) if Gemini failed or produced no output
-    if (!responseText) {
-      console.warn("Gemini produced no output or failed. Initiating ChatGPT (OpenAI) fallback...");
-      try {
-        const openai = getOpenAIClient(req);
-        const completion = await openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content: `${systemInstruction}\n\nCRITICAL OUTPUT INSTRUCTION: Output ONLY a single JSON object with schema: {"reply": string, "debugInfo": {"knowledgeBookVersion": string, "matchedRules": Array, "failedRules": Array, "evidence": Array, "decision": string, "timeline": Array, "eventIds": Array, "currentSkySnapshot": string, "contextSourcesLoaded": Array}, "intentDetected": {"intent": string, "confidence": number}}`
-            },
-            { role: "user", content: userPrompt }
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.3
-        });
-        responseText = completion.choices[0]?.message?.content || null;
-        modelUsed = "ChatGPT (gpt-4o-mini)";
-      } catch (openaiErr: any) {
-        console.error("ChatGPT fallback error in Master Ask:", openaiErr.message || openaiErr);
-        throw openaiErr;
       }
     }
 
