@@ -2460,6 +2460,37 @@ export default function App() {
                 {/* Visual Identity & PWA App Installation Promo */}
                 <AndroidInstallerPromo isDark={isDark} />
 
+                {/* Google Login Account & Profile Association Status Banner */}
+                <div className={`p-4 rounded-2xl border flex items-center justify-between gap-4 ${containerStyle} bg-gradient-to-r from-amber-500/10 via-indigo-500/5 to-transparent`}>
+                  <div className="flex items-center gap-3">
+                    {activeUser?.photoURL ? (
+                      <img src={activeUser.photoURL} alt={activeUser.name || "User"} className="w-10 h-10 rounded-full border border-amber-500/30 object-cover shadow-sm" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
+                        {activeUser?.name?.charAt(0) || "U"}
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-xs font-semibold text-amber-500 flex items-center gap-1.5 font-sans">
+                        <span>Connected Google Account Session</span>
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      </div>
+                      <div className={`text-sm font-bold ${headingStyle}`}>
+                        {activeUser?.name || "Vedic Astrologer"} <span className="text-xs font-normal text-slate-400">({activeUser?.email || "kanakjain2309@gmail.com"})</span>
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        Birth and cast settings and profiles directory are synchronized with your Google login credentials.
+                      </div>
+                    </div>
+                  </div>
+                  <div className="hidden sm:flex flex-col items-end text-right">
+                    <span className="text-[10px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full">
+                      Google OAuth Active
+                    </span>
+                    <span className="text-[10px] text-slate-400 mt-1">Cloud Firestore & Local Storage</span>
+                  </div>
+                </div>
+
                 {/* Birth Details and Cast Settings Card (First Section) */}
                 <div className={`p-6 rounded-2xl border ${containerStyle}`}>
                   <div className="border-b border-indigo-500/10 pb-4 mb-6">
@@ -2690,7 +2721,7 @@ export default function App() {
                     )}
                   </h3>
                   <p className="text-xs text-slate-400 mt-1 mb-6">
-                    Manage, check availability, and hotload horoscopes from local storage, Google Drive, or browse files manually.
+                    Manage, check availability, and hotload saved birth profiles directory associated with your Google login session ({activeUser?.email || "kanakjain2309@gmail.com"}).
                   </p>
 
                   {/* Profile JSON File Importer */}
