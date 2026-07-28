@@ -18,14 +18,11 @@ import {
   RefreshCw,
   Download,
   FileText,
-  Code,
-  Save,
-  Printer
+  Code
 } from "lucide-react";
 import { generateRawAstrologyPDF } from "../lib/rawReportGenerator";
 import { mapAstrologyDataToUserProfileJSON } from "../lib/jhoraMapper";
 import { TableIndexView } from "./TableIndexView";
-import { calculatePlanetDignityRegistry, DignityRegistryItem } from "../lib/dignityCalculator";
 
 interface AstroRawTablesViewProps {
   astrologyData: any;
@@ -56,32 +53,6 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
   const [showRawJson, setShowRawJson] = useState<boolean>(false);
 
   const [targetAge, setTargetAge] = useState<number>(30); // Default Tajik Varshaphala age
-  const [charaPage, setCharaPage] = useState<number>(0);
-  const [charaFilter, setCharaFilter] = useState<string>("All");
-
-  const downloadCharaCSV = () => {
-    const charaList = astrologyData?.raw?.rasi_dashas?.chara || [];
-    if (charaList.length === 0) {
-      alert("No Chara Dasha data available to download.");
-      return;
-    }
-    let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Index,Major Period,Sub Period,Start Date & Time\n";
-    charaList.forEach((item: any, idx: number) => {
-      const [path, dateStr] = item;
-      const parts = path.split("-");
-      const major = parts[0] || "";
-      const minor = parts[1] || "";
-      csvContent += `${idx + 1},"${major}","${minor}","${dateStr}"\n`;
-    });
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `jaimini_chara_dasha_${astrologyData?.birthDetails?.name || "native"}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
 
   // Helper to compile all 19 raw system tables into a high-fidelity PDF document
   const handleExportPDF = async () => {
@@ -104,7 +75,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
         profileName: profileJson.User?.profile_name || astrologyData?.birthDetails?.name || "Vedic Native",
         targetAge: targetAge,
         submenus: [
-          "jhora_birth_details", "jhora_planets", "jhora_dignity", "jhora_shadbala", "jhora_bhava_balas", 
+          "jhora_birth_details", "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", 
           "jhora_ashtakavarga", "jhora_divisional", "jhora_vimshottari", 
           "kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_house_significators", 
           "jaimini_karakas", "jaimini_arudhas", "western_tropical", "western_aspects", 
@@ -150,15 +121,23 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
     URL.revokeObjectURL(url);
   };
 
-  const containerStyle = "bg-white border border-slate-200 text-black";
+  const containerStyle = isDark 
+    ? "bg-slate-900/60 border border-slate-800 text-slate-200" 
+    : "bg-white border border-neutral-200 text-neutral-800";
   
-  const cardStyle = "bg-white border border-slate-200 shadow-sm";
+  const cardStyle = isDark 
+    ? "bg-slate-950/40 border border-slate-900/60" 
+    : "bg-neutral-50/50 border border-neutral-200";
 
-  const tableHeaderStyle = "bg-white border-b border-slate-200 text-black text-[10px] font-bold uppercase tracking-wider";
+  const tableHeaderStyle = isDark 
+    ? "bg-slate-950/80 border-b border-slate-800 text-slate-400" 
+    : "bg-neutral-100 border-b border-neutral-200 text-neutral-500";
 
-  const tableRowStyle = "border-b border-slate-100 hover:bg-slate-50 text-black text-[10px]";
+  const tableRowStyle = isDark 
+    ? "border-b border-slate-950/50 hover:bg-slate-900/20 text-slate-300" 
+    : "border-b border-neutral-150 hover:bg-neutral-50/50 text-neutral-700";
 
-  const textMuted = "text-slate-500";
+  const textMuted = isDark ? "text-slate-400" : "text-neutral-500";
 
   // Helper to format degree to deg-min-sec
   const formatDegree = (deg: number) => {
@@ -233,9 +212,9 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
   if (!astrologyData) {
     return (
       <div className={`p-8 rounded-2xl ${containerStyle} text-center`}>
-        <Info className="w-8 h-8 text-amber-800 mx-auto mb-3 animate-pulse" />
+        <Info className="w-8 h-8 text-amber-500 mx-auto mb-3 animate-pulse" />
         <h3 className="text-sm font-semibold">No Active Astrology Profile Loaded</h3>
-        <p className=" text-slate-600 mt-1">Please cast or import a birth profile first.</p>
+        <p className="text-xs text-slate-400 mt-1">Please cast or import a birth profile first.</p>
       </div>
     );
   }
@@ -255,24 +234,24 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div className="space-y-1 max-w-xl">
               <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-800">
+                <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-500">
                   <TableIcon className="w-5 h-5" />
                 </span>
                 <h2 className="text-lg font-bold">Raw Astro Systems Registry</h2>
               </div>
-              <p className=" text-slate-600">
+              <p className="text-xs text-slate-400">
                 Phase 10.0 Certified Raw Astrological Databases. Free of calculations, transit forecasts, or predictions.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-              <div className="flex items-center gap-2 text-[10px] font-mono bg-slate-950/45 px-2.5 py-1.5 rounded-lg border border-slate-200 mr-1">
+              <div className="flex items-center gap-2 text-[10px] font-mono bg-slate-950/45 px-2.5 py-1.5 rounded-lg border border-slate-800/80 mr-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-slate-600">Binds to userprofile.json</span>
+                <span className="text-slate-400">Binds to userprofile.json</span>
               </div>
               
               <button
                 onClick={handleDownloadJSON}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-700 border border-indigo-500/20  font-bold cursor-pointer transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 text-xs font-bold cursor-pointer transition-all"
                 title="Download JHora/KP raw JSON payload"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -282,7 +261,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
               <button
                 onClick={handleExportPDF}
                 disabled={pdfCompiling}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950  font-bold disabled:opacity-50 cursor-pointer transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold disabled:opacity-50 cursor-pointer transition-all"
                 title="Compile all raw systems into a PDF report"
               >
                 {pdfCompiling ? (
@@ -295,10 +274,10 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
 
               <button
                 onClick={() => setShowRawJson(!showRawJson)}
-                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border  font-bold cursor-pointer transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-bold cursor-pointer transition-all ${
                   showRawJson 
-                    ? "bg-slate-700/50 border-slate-600 text-slate-900" 
-                    : "bg-slate-800/20 border-slate-800 text-slate-600 hover:bg-slate-800/50"
+                    ? "bg-slate-700/50 border-slate-600 text-slate-200" 
+                    : "bg-slate-800/20 border-slate-800 text-slate-400 hover:bg-slate-800/50"
                 }`}
                 title="Toggle raw interactive JSON viewer"
               >
@@ -313,10 +292,10 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
       {!hideHeaders && showRawJson && (
         <div className={`p-4 rounded-xl border font-mono text-[11px] leading-relaxed relative ${cardStyle}`}>
           <div className="flex justify-between items-center mb-3 pb-2 border-b border-indigo-500/10">
-            <span className="text-indigo-700 font-bold uppercase tracking-wide">Raw JHora/KP/Western Combined Payload (.json)</span>
-            <span className="text-[10px] text-slate-700">Live memory state</span>
+            <span className="text-indigo-400 font-bold uppercase tracking-wide">Raw JHora/KP/Western Combined Payload (.json)</span>
+            <span className="text-[10px] text-slate-500">Live memory state</span>
           </div>
-          <pre className="overflow-x-auto max-h-[400px] text-slate-800 bg-slate-50 p-4 rounded-lg select-text">
+          <pre className="overflow-x-auto max-h-[400px] text-slate-300 bg-slate-950/85 p-4 rounded-lg select-text">
             {JSON.stringify({
               User: {
                 google_user_id: activeUser?.uid || "guest_user",
@@ -338,7 +317,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
       )}
 
       {error && (
-        <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400  flex items-center gap-2">
+        <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-400 text-xs flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
           <span>Error loading raw system fields: {error}</span>
         </div>
@@ -346,8 +325,8 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
 
       {loading && (
         <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
-          <RefreshCw className="w-6 h-6 animate-spin text-amber-800" />
-          <span className=" text-slate-600 font-mono">Retrieving remote database tables...</span>
+          <RefreshCw className="w-6 h-6 animate-spin text-amber-500" />
+          <span className="text-xs text-slate-400 font-mono">Retrieving remote database tables...</span>
         </div>
       )}
 
@@ -360,26 +339,15 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-1-birth-details">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <User className="w-4 h-4" />
                     JH1: Birth Details & Astronomical Metrics
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Parashari Baseline</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Parashari Baseline</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-2.5 px-4 font-semibold">Parameter Key</th>
@@ -390,64 +358,64 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     </thead>
                     <tbody>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.name</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.name</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.name</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.name</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.birthDetails.name}</td>
-                        <td className="py-2.5 px-4 text-slate-600">Authenticated birth record profile name.</td>
+                        <td className="py-2.5 px-4 text-slate-400">Authenticated birth record profile name.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.date</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.date</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.date</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.date</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.birthDetails.date}</td>
-                        <td className="py-2.5 px-4 text-slate-600">Standard Gregorian Date representation (YYYY-MM-DD).</td>
+                        <td className="py-2.5 px-4 text-slate-400">Standard Gregorian Date representation (YYYY-MM-DD).</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.time</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.time</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.time</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.time</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.birthDetails.time}</td>
-                        <td className="py-2.5 px-4 text-slate-600">Local Standard Time of birth (HH:MM).</td>
+                        <td className="py-2.5 px-4 text-slate-400">Local Standard Time of birth (HH:MM).</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.location</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.location</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.location</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.location</td>
                         <td className="py-2.5 px-4">{astrologyData.birthDetails.location}</td>
-                        <td className="py-2.5 px-4 text-slate-600">Resolved city name coordinates database index.</td>
+                        <td className="py-2.5 px-4 text-slate-400">Resolved city name coordinates database index.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.latitude</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.latitude</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.latitude</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.latitude</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.birthDetails.latitude.toFixed(4)}°</td>
-                        <td className="py-2.5 px-4 text-slate-600">Geographical latitude of casting coordinates.</td>
+                        <td className="py-2.5 px-4 text-slate-400">Geographical latitude of casting coordinates.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.longitude</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.longitude</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.longitude</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.longitude</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.birthDetails.longitude.toFixed(4)}°</td>
-                        <td className="py-2.5 px-4 text-slate-600">Geographical longitude of casting coordinates.</td>
+                        <td className="py-2.5 px-4 text-slate-400">Geographical longitude of casting coordinates.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-black">profile.timezone</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-700">.birthDetails.timezone</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-white">profile.timezone</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-400">.birthDetails.timezone</td>
                         <td className="py-2.5 px-4 font-mono">GMT {astrologyData.birthDetails.timezone >= 0 ? "+" : ""}{astrologyData.birthDetails.timezone}</td>
-                        <td className="py-2.5 px-4 text-slate-600">Timezone offset hours relative to Greenwich Mean Time.</td>
+                        <td className="py-2.5 px-4 text-slate-400">Timezone offset hours relative to Greenwich Mean Time.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-black">lagna.sign</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-700">.lagna.sign</td>
-                        <td className="py-2.5 px-4 font-semibold text-amber-700">{astrologyData.lagna.sign}</td>
-                        <td className="py-2.5 px-4 text-slate-600">Rasi Ascendant sign at coordinates time boundary.</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-white">lagna.sign</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-400">.lagna.sign</td>
+                        <td className="py-2.5 px-4 font-semibold text-amber-400">{astrologyData.lagna.sign}</td>
+                        <td className="py-2.5 px-4 text-slate-400">Rasi Ascendant sign at coordinates time boundary.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-black">lagna.longitude</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-700">.lagna.longitude</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-white">lagna.longitude</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-400">.lagna.longitude</td>
                         <td className="py-2.5 px-4 font-mono">{astrologyData.lagna.longitude.toFixed(4)}°</td>
-                        <td className="py-2.5 px-4 text-slate-600">Ascendant degree projected on the 360° celestial belt.</td>
+                        <td className="py-2.5 px-4 text-slate-400">Ascendant degree projected on the 360° celestial belt.</td>
                       </tr>
                       <tr className={tableRowStyle}>
-                        <td className="py-2.5 px-4 font-mono font-bold text-black">lagna.degree</td>
-                        <td className="py-2.5 px-4 font-mono text-indigo-700">.lagna.degree</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-white">lagna.degree</td>
+                        <td className="py-2.5 px-4 font-mono text-indigo-400">.lagna.degree</td>
                         <td className="py-2.5 px-4 font-mono">{formatDegree(astrologyData.lagna.degree)}</td>
-                        <td className="py-2.5 px-4 text-slate-600">Exact degree offset inside the {astrologyData.lagna.sign} sign.</td>
+                        <td className="py-2.5 px-4 text-slate-400">Exact degree offset inside the {astrologyData.lagna.sign} sign.</td>
                       </tr>
                     </tbody>
                   </table>
@@ -459,26 +427,15 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-2-natal-planets">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Compass className="w-4 h-4" />
                     JH2: Natal Planets Longitudes & Rasi Placements
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Sidereal Placements</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Sidereal Placements</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
@@ -494,14 +451,14 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     <tbody>
                       {(astrologyData.planets || []).map((p: any) => (
                         <tr key={p.name} className={tableRowStyle}>
-                          <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
-                          <td className="py-2.5 px-4 font-mono text-amber-700">{p.sign}</td>
+                          <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
+                          <td className="py-2.5 px-4 font-mono text-amber-400">{p.sign}</td>
                           <td className="py-2.5 px-4 font-mono">{formatDegree(p.degree)}</td>
-                          <td className="py-2.5 px-4 font-mono text-slate-600">{p.longitude.toFixed(2)}°</td>
-                          <td className="py-2.5 px-4 font-medium text-indigo-700">{p.nakshatra}</td>
+                          <td className="py-2.5 px-4 font-mono text-slate-400">{p.longitude.toFixed(2)}°</td>
+                          <td className="py-2.5 px-4 font-medium text-indigo-400">{p.nakshatra}</td>
                           <td className="py-2.5 px-4 font-mono">{p.pada}</td>
                           <td className="py-2.5 px-4 font-semibold">House {p.house}</td>
-                          <td className="py-2.5 px-4 font-mono text-slate-600">{p.lord || "—"}</td>
+                          <td className="py-2.5 px-4 font-mono text-slate-400">{p.lord || "—"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -509,130 +466,20 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 </div>
               </div>
             );
-
-          case "jhora_dignity": {
-            const rawPlanets = (astrologyData.planets || []).map((p: any) => ({
-              name: p.name,
-              longitude: p.longitude,
-              degree: p.degree,
-              sign: p.sign,
-              house: p.house,
-              lord: p.lord
-            }));
-            const lagna = astrologyData.lagna || {};
-            const dignityData = calculatePlanetDignityRegistry(rawPlanets, lagna);
-
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-32-planet-dignities">
-                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                    <Award className="w-4 h-4" />
-                    JH32: Planet Dignity Registry
-                  </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Parashari Dignities</span>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
-                    <thead>
-                      <tr className={tableHeaderStyle}>
-                        <th className="py-2.5 px-4 font-semibold">Planet</th>
-                        <th className="py-2.5 px-4 font-semibold">Chart</th>
-                        <th className="py-2.5 px-4 font-semibold">Sign</th>
-                        <th className="py-2.5 px-4 font-semibold">Longitude</th>
-                        <th className="py-2.5 px-4 font-semibold">Own Sign</th>
-                        <th className="py-2.5 px-4 font-semibold">Moolatrikona</th>
-                        <th className="py-2.5 px-4 font-semibold">Exalted</th>
-                        <th className="py-2.5 px-4 font-semibold">Debilitated</th>
-                        <th className="py-2.5 px-4 font-semibold">Exaltation Deg</th>
-                        <th className="py-2.5 px-4 font-semibold">Debilitation Deg</th>
-                        <th className="py-2.5 px-4 font-semibold">Friendly Sign</th>
-                        <th className="py-2.5 px-4 font-semibold">Enemy Sign</th>
-                        <th className="py-2.5 px-4 font-semibold">Neutral Sign</th>
-                        <th className="py-2.5 px-4 font-semibold">Vargottama</th>
-                        <th className="py-2.5 px-4 font-semibold">Pushkara</th>
-                        <th className="py-2.5 px-4 font-semibold">Neecha Bhanga</th>
-                        <th className="py-2.5 px-4 font-semibold text-right">Dignity Rank / Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {dignityData.map((row, idx) => (
-                        <tr key={idx} className={tableRowStyle}>
-                          <td className="py-2.5 px-4 font-bold text-black">{row.planet}</td>
-                          <td className="py-2.5 px-4 font-bold text-indigo-700">{row.chart}</td>
-                          <td className="py-2.5 px-4 font-semibold text-amber-700">{row.sign}</td>
-                          <td className="py-2.5 px-4 font-mono text-slate-600">{row.longitudeFormatted}</td>
-                          <td className="py-2.5 px-4 font-mono">{row.ownSign}</td>
-                          <td className="py-2.5 px-4 font-mono">{row.moolatrikona}</td>
-                          <td className="py-2.5 px-4 font-mono">{row.exalted}</td>
-                          <td className="py-2.5 px-4 font-mono">{row.debilitated}</td>
-                          <td className="py-2.5 px-4 font-mono text-slate-500">{row.exaltationDegree}</td>
-                          <td className="py-2.5 px-4 font-mono text-slate-500">{row.debilitationDegree}</td>
-                          <td className="py-2.5 px-4 font-mono">{row.friendlySign}</td>
-                          <td className="py-2.5 px-4 font-mono">{row.enemySign}</td>
-                          <td className="py-2.5 px-4 font-mono">{row.neutralSign}</td>
-                          <td className="py-2.5 px-4 font-mono">{row.vargottama}</td>
-                          <td className="py-2.5 px-4 font-mono">{row.pushkara}</td>
-                          <td className="py-2.5 px-4 font-mono">{row.neechaBhanga}</td>
-                          <td className="py-2.5 px-4 text-right">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-extrabold ${
-                              row.dignityRank.includes("Exalted") || row.dignityRank.includes("Moolatrikona")
-                                ? "bg-amber-100 text-amber-950"
-                                : row.dignityRank.includes("Own")
-                                ? "bg-emerald-100 text-emerald-950"
-                                : row.dignityRank.includes("Friendly")
-                                ? "bg-sky-100 text-sky-950"
-                                : row.dignityRank.includes("Debilitated") || row.dignityRank.includes("Inimical")
-                                ? "bg-rose-100 text-rose-950"
-                                : "bg-slate-100 text-slate-800"
-                            }`}>
-                              {row.dignityRank}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          }
 
           case "jhora_shadbala":
             return (
               <div className="space-y-4 animate-fade-in" id="table-3-shadbala">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Activity className="w-4 h-4" />
                     JH3: Shadbala Planet Strength Matrix (Shashtiamsas)
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Six-Fold Strength Model</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Six-Fold Strength Model</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
@@ -642,30 +489,30 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         <th className="py-3 px-4 font-semibold">Cheshta (Motional)</th>
                         <th className="py-3 px-4 font-semibold">Naisargika (Natural)</th>
                         <th className="py-3 px-4 font-semibold">Drig (Aspectual)</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Total</th>
+                        <th className="py-3 px-4 font-semibold text-amber-500">Total</th>
                         <th className="py-3 px-4 font-semibold">Required</th>
-                        <th className="py-3 px-4 font-semibold text-emerald-700">Ratio (%)</th>
+                        <th className="py-3 px-4 font-semibold text-emerald-400">Ratio (%)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {astrologyData.shadBala ? (
                         Object.entries(astrologyData.shadBala).map(([planet, b]: [string, any]) => (
                           <tr key={planet} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-bold text-black">{planet}</td>
+                            <td className="py-2.5 px-4 font-bold text-white">{planet}</td>
                             <td className="py-2.5 px-4 font-mono">{b.sthanaBala?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.digBala?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.kalaBala?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.cheshtaBala?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.naisargikaBala?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.drigBala?.toFixed(1) || "0.0"}</td>
-                            <td className="py-2.5 px-4 font-mono font-semibold text-amber-700">{b.total?.toFixed(1) || "0.0"}</td>
+                            <td className="py-2.5 px-4 font-mono font-semibold text-amber-400">{b.total?.toFixed(1) || "0.0"}</td>
                             <td className="py-2.5 px-4 font-mono">{b.required || "300"}</td>
-                            <td className="py-2.5 px-4 font-mono font-bold text-emerald-700">{(b.strengthRatio * 100)?.toFixed(1)}%</td>
+                            <td className="py-2.5 px-4 font-mono font-bold text-emerald-400">{(b.strengthRatio * 100)?.toFixed(1)}%</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={10} className="py-8 text-center text-slate-700">No raw Shadbala entries found in this profile profile.</td>
+                          <td colSpan={10} className="py-8 text-center text-slate-500">No raw Shadbala entries found in this profile profile.</td>
                         </tr>
                       )}
                     </tbody>
@@ -678,30 +525,19 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-4-bhava-balas">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Award className="w-4 h-4" />
                     JH4: Bhava Balas (House Strengths)
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">House Boundaries</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">House Boundaries</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">House Cusp</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Strength (Shashtiamsas)</th>
+                        <th className="py-3 px-4 font-semibold text-amber-500">Strength (Shashtiamsas)</th>
                         <th className="py-3 px-4 font-semibold">Rank</th>
                         <th className="py-3 px-4 font-semibold">Core Significance Description</th>
                       </tr>
@@ -725,16 +561,16 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                           };
                           return (
                             <tr key={house} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-mono font-bold text-black">House {house}</td>
-                              <td className="py-2.5 px-4 font-mono text-amber-700 font-semibold">{b.strengthShashtiamsas?.toFixed(1) || "340.0"}</td>
+                              <td className="py-2.5 px-4 font-mono font-bold text-white">House {house}</td>
+                              <td className="py-2.5 px-4 font-mono text-amber-400 font-semibold">{b.strengthShashtiamsas?.toFixed(1) || "340.0"}</td>
                               <td className="py-2.5 px-4 font-mono">#{b.rank || house}</td>
-                              <td className="py-2.5 px-4 text-slate-600">{sigMap[house] || "Astrological house significations."}</td>
+                              <td className="py-2.5 px-4 text-slate-400">{sigMap[house] || "Astrological house significations."}</td>
                             </tr>
                           );
                         })
                       ) : (
                         <tr>
-                          <td colSpan={4} className="py-8 text-center text-slate-700">No raw Bhava Bala strengths found in this profile.</td>
+                          <td colSpan={4} className="py-8 text-center text-slate-500">No raw Bhava Bala strengths found in this profile.</td>
                         </tr>
                       )}
                     </tbody>
@@ -747,35 +583,24 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-5-ashtakavarga">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Hash className="w-4 h-4" />
                     JH5: Samudhaya Ashtakavarga Points (SAV)
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Binnashtakavarga Matrix</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Binnashtakavarga Matrix</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Zodiac Sign</th>
                         {Array.from({ length: 12 }).map((_, idx) => (
-                          <th key={idx} className="py-3 px-2 font-mono text-center font-semibold text-indigo-700">
+                          <th key={idx} className="py-3 px-2 font-mono text-center font-semibold text-indigo-400">
                             H{idx + 1}
                           </th>
                         ))}
-                        <th className="py-3 px-4 font-semibold text-center text-amber-800">Total SAV</th>
+                        <th className="py-3 px-4 font-semibold text-center text-amber-500">Total SAV</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -783,28 +608,28 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         <>
                           {Object.entries(astrologyData.ashtakavarga.planets || {}).map(([planet, pts]: [string, any]) => (
                             <tr key={planet} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-black">{planet}</td>
+                              <td className="py-2.5 px-4 font-bold text-white">{planet}</td>
                               {pts.map((pt: number, idx: number) => (
-                                <td key={idx} className="py-2.5 px-2 font-mono text-center text-slate-600">{pt}</td>
+                                <td key={idx} className="py-2.5 px-2 font-mono text-center text-slate-400">{pt}</td>
                               ))}
-                              <td className="py-2.5 px-4 font-mono text-center font-bold text-slate-700">
+                              <td className="py-2.5 px-4 font-mono text-center font-bold text-slate-500">
                                 {pts.reduce((a: number, b: number) => a + b, 0)}
                               </td>
                             </tr>
                           ))}
                           <tr className="bg-amber-500/5 font-bold border-t border-slate-700/50">
-                            <td className="py-3 px-4 text-amber-700">Samudhaya (SAV)</td>
+                            <td className="py-3 px-4 text-amber-400">Samudhaya (SAV)</td>
                             {(astrologyData.ashtakavarga.sarvashtakavarga || []).map((pt: number, idx: number) => (
-                              <td key={idx} className="py-3 px-2 font-mono text-center text-amber-700 font-bold">{pt}</td>
+                              <td key={idx} className="py-3 px-2 font-mono text-center text-amber-400 font-bold">{pt}</td>
                             ))}
-                            <td className="py-3 px-4 font-mono text-center text-amber-700 font-extrabold">
+                            <td className="py-3 px-4 font-mono text-center text-amber-400 font-extrabold">
                               {(astrologyData.ashtakavarga.sarvashtakavarga || []).reduce((a: number, b: number) => a + b, 0)}
                             </td>
                           </tr>
                         </>
                       ) : (
                         <tr>
-                          <td colSpan={14} className="py-8 text-center text-slate-700">No raw Ashtakavarga charts detected.</td>
+                          <td colSpan={14} className="py-8 text-center text-slate-500">No raw Ashtakavarga charts detected.</td>
                         </tr>
                       )}
                     </tbody>
@@ -813,59 +638,112 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
               </div>
             );
 
-                    case "jhora_divisional": {
-            const vargaKeys = Object.keys(astrologyData.divisionalCharts || {}).sort();
-            const houseEntries = Array.from({ length: 12 }, (_, idx) => idx + 1);
+          case "jhora_divisional": {
+            const vargaNames: { [key: string]: string } = {
+              "D1": "Rasi (Birth Chart)",
+              "D2": "Hora (Assets & Wealth)",
+              "D3": "Drekkana (Siblings & Talents)",
+              "D4": "Chaturthamsa (Properties)",
+              "D5": "Panchamsa (Spiritual/Karma)",
+              "D6": "Shashthamsa (Debts & Diseases)",
+              "D7": "Saptamsa (Progeny & Creations)",
+              "D8": "Ashtamsa (Longevity & Obstacles)",
+              "D9": "Navamsa (Spouse & Potential)",
+              "D10": "Dasamsa (Profession & Status)",
+              "D11": "Rudramsa (Unexpected Gains/Losses)",
+              "D12": "Dwadasamsa (Parents & Ancestors)",
+              "D16": "Shodasamsa (Vehicles & Luxury)",
+              "D20": "Vimsamsa (Spiritual Alignment)",
+              "D24": "Chaturvimsamsa (Education)",
+              "D27": "Saptavimsamsa (Weaknesses)",
+              "D30": "Trimsamsa (Challenges & Evils)",
+              "D40": "Khavedamsa (Auspiciousness)",
+              "D45": "Akshavedamsa (General Fortune)",
+              "D60": "Shastiamsa (Past Life Balances)"
+            };
+
+            const vargaChart = astrologyData.divisionalCharts?.[selectedVarga];
+            const lagnaSignIdx = astrologyData.vargaLagnas?.[selectedVarga] ?? 0;
+
+            const rows = Array.from({ length: 12 }, (_, idx) => {
+              const houseNum = idx + 1;
+              const signIndex = (lagnaSignIdx + idx) % 12;
+              const signName = zodiacSigns[signIndex] || "Unknown";
+              const planetsList = vargaChart?.[houseNum] || [];
+              return {
+                houseNum,
+                signName,
+                planets: planetsList.join(", ")
+              };
+            });
 
             return (
               <div className="space-y-4 animate-fade-in" id="table-6-divisional-vargas">
-                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-3">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                    <Map className="w-4 h-4" />
-                    JH6: All Divisional Vargas (D1-D60) Planetary House Distributions
-                  </h3>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-indigo-500/10 pb-3">
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
+                      <Map className="w-4 h-4" />
+                      JH6: Divisional Vargas (D1 to D60) Planetary House Distributions
+                    </h3>
+                    <p className="text-[10px] text-slate-500 font-mono">
+                      Harmonics System • Selecting and displaying active divisional chart
+                    </p>
+                  </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
+                    <label className="text-[10px] uppercase tracking-wider font-mono font-bold text-slate-400">Select Varga:</label>
+                    <select
+                      value={selectedVarga}
+                      onChange={(e) => setSelectedVarga(e.target.value)}
+                      className={`text-xs px-3 py-1.5 rounded-xl border font-mono ${
+                        isDark 
+                          ? "bg-slate-950 border-slate-800 text-slate-300 focus:border-amber-500/50" 
+                          : "bg-white border-neutral-300 text-neutral-800 focus:border-amber-500"
+                      } outline-none cursor-pointer`}
+                    >
+                      {astrologyData.divisionalCharts ? (
+                        Object.keys(astrologyData.divisionalCharts).map((vKey) => (
+                          <option key={vKey} value={vKey}>
+                            {vKey} - {vargaNames[vKey] || vKey}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="D1">D1 - Rasi (Birth Chart)</option>
+                      )}
+                    </select>
                   </div>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse text-[10px]">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
-                        <th className="py-2 px-3 font-semibold text-slate-800 sticky left-0 bg-slate-50">House</th>
-                        {vargaKeys.map(varga => (
-                          <th key={varga} className="py-2 px-3 font-semibold text-amber-800 border-l border-slate-200">
-                            {varga}
-                          </th>
-                        ))}
+                        <th className="py-3 px-4 font-medium">House Number</th>
+                        <th className="py-3 px-4 font-medium text-amber-500">Zodiac Sign</th>
+                        <th className="py-3 px-4 font-medium text-slate-200">Occupying Planets</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {houseEntries.map(houseNum => (
-                        <tr key={houseNum} className={tableRowStyle}>
-                          <td className="py-2 px-3 font-mono font-bold text-slate-900 sticky left-0 bg-white">
-                            H{houseNum}
+                      {astrologyData.divisionalCharts && vargaChart ? (
+                        rows.map((row) => (
+                          <tr key={row.houseNum} className={tableRowStyle}>
+                            <td className="py-3 px-4 font-mono font-bold text-slate-200">
+                              House {row.houseNum} {row.houseNum === 1 ? "(Lagna)" : ""}
+                            </td>
+                            <td className="py-3 px-4 font-mono font-bold text-amber-400">
+                              {row.signName}
+                            </td>
+                            <td className="py-3 px-4 font-semibold text-slate-100 font-mono">
+                              {row.planets || "—"}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={3} className="py-8 text-center text-slate-500">
+                            No divisional chart data available.
                           </td>
-                          {vargaKeys.map(varga => {
-                            const vargaChart = astrologyData.divisionalCharts[varga];
-                            const planets = vargaChart?.[houseNum] || [];
-                            return (
-                              <td key={varga} className="py-2 px-3 font-mono text-slate-600 border-l border-slate-100">
-                                {planets.join(", ") || "—"}
-                              </td>
-                            );
-                          })}
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -877,39 +755,15 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-7-vimshottari">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Clock className="w-4 h-4" />
                     JH7: Vimshottari Mahadasha Timelines
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">120-Year Lunar Cycle</span>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => {
-                        const csvContent = "data:text/csv;charset=utf-8," + "Lord,Start Date,End Date\n" + (astrologyData.dashas || []).map((d: any) => `${d.lord},${d.startDate},${d.endDate}`).join("\n");
-                        const encodedUri = encodeURI(csvContent);
-                        const link = document.createElement("a");
-                        link.setAttribute("href", encodedUri);
-                        link.setAttribute("download", "vimshottari_dasha_50years.csv");
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold hover:bg-amber-600" title="Download 50-Year CSV">
-                      <Download className="w-3 h-3" />
-                      Download 50-Year CSV
-                    </button>
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">120-Year Lunar Cycle</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Major Lord</th>
@@ -921,10 +775,10 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     <tbody>
                       {(astrologyData.dashas || []).map((d: any, idx: number) => (
                         <tr key={idx} className={tableRowStyle}>
-                          <td className="py-3 px-4 font-bold text-black ">{d.lord} Major Cycle</td>
-                          <td className="py-3 px-4 font-mono text-amber-700">{d.startDate}</td>
-                          <td className="py-3 px-4 font-mono text-amber-700">{d.endDate}</td>
-                          <td className="py-3 px-4 text-slate-600">
+                          <td className="py-3 px-4 font-bold text-white text-xs">{d.lord} Major Cycle</td>
+                          <td className="py-3 px-4 font-mono text-amber-400">{d.startDate}</td>
+                          <td className="py-3 px-4 font-mono text-amber-400">{d.endDate}</td>
+                          <td className="py-3 px-4 text-slate-400">
                             {d.subPeriods ? d.subPeriods.map((sp: any) => `${sp.lord} (${sp.startDate} to ${sp.endDate})`).slice(0, 3).join(", ") + "..." : "—"}
                           </td>
                         </tr>
@@ -941,55 +795,44 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-8-placidus-cusps">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Shield className="w-4 h-4" />
                     JH8: Placidus House Cusp Coordinates & Lords
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">1-12 House Boundaries</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">1-12 House Boundaries</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-medium">Cusp</th>
                         <th className="py-3 px-4 font-medium">Sign (Zodiac)</th>
                         <th className="py-3 px-4 font-medium">Sign Degree</th>
                         <th className="py-3 px-4 font-medium">Absolute Longitude</th>
-                        <th className="py-3 px-4 font-medium text-amber-800">Sign Lord</th>
-                        <th className="py-3 px-4 font-medium text-indigo-700">Star Lord (Nakshatra)</th>
-                        <th className="py-3 px-4 font-medium text-emerald-700">Sub Lord</th>
-                        <th className="py-3 px-4 font-medium text-slate-600">Sub-Sub Lord</th>
+                        <th className="py-3 px-4 font-medium text-amber-500">Sign Lord</th>
+                        <th className="py-3 px-4 font-medium text-indigo-400">Star Lord (Nakshatra)</th>
+                        <th className="py-3 px-4 font-medium text-emerald-400">Sub Lord</th>
+                        <th className="py-3 px-4 font-medium text-slate-400">Sub-Sub Lord</th>
                       </tr>
                     </thead>
                     <tbody>
                       {kpCusps && kpCusps.cusps ? (
                         kpCusps.cusps.map((c: any) => (
                           <tr key={c.houseNumber} className={tableRowStyle}>
-                            <td className="py-3 px-4 font-mono font-bold text-slate-900">Cusp {c.houseNumber}</td>
-                            <td className="py-3 px-4 font-mono font-bold text-amber-700">{c.sign}</td>
+                            <td className="py-3 px-4 font-mono font-bold text-slate-200">Cusp {c.houseNumber}</td>
+                            <td className="py-3 px-4 font-mono font-bold text-amber-400">{c.sign}</td>
                             <td className="py-3 px-4 font-mono">{formatDegree(c.degree)}</td>
-                            <td className="py-3 px-4 font-mono text-slate-700">{c.longitude.toFixed(2)}°</td>
-                            <td className="py-3 px-4 font-mono text-amber-700/90">{c.signLord || "—"}</td>
-                            <td className="py-3 px-4 font-mono text-indigo-700">{c.starLord}</td>
-                            <td className="py-3 px-4 font-mono text-emerald-700 font-semibold">{c.subLord}</td>
-                            <td className="py-3 px-4 font-mono text-slate-700">{c.subSubLord || "Saturn"}</td>
+                            <td className="py-3 px-4 font-mono text-slate-500">{c.longitude.toFixed(2)}°</td>
+                            <td className="py-3 px-4 font-mono text-amber-400/90">{c.signLord || "—"}</td>
+                            <td className="py-3 px-4 font-mono text-indigo-400">{c.starLord}</td>
+                            <td className="py-3 px-4 font-mono text-emerald-400 font-semibold">{c.subLord}</td>
+                            <td className="py-3 px-4 font-mono text-slate-500">{c.subSubLord || "Saturn"}</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={8} className="py-8 text-center text-slate-700">Fetching raw Placidus cusp coordinates...</td>
+                          <td colSpan={8} className="py-8 text-center text-slate-500">Fetching raw Placidus cusp coordinates...</td>
                         </tr>
                       )}
                     </tbody>
@@ -1002,35 +845,24 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-9-kp-sublords">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Workflow className="w-4 h-4" />
                     JH9: KP Planetary Sub-Lords & Coordinates
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Vedic Stella Ratios</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Vedic Stella Ratios</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-medium">Planet</th>
                         <th className="py-3 px-4 font-medium">Sign (Zodiac)</th>
                         <th className="py-3 px-4 font-medium">Degree</th>
                         <th className="py-3 px-4 font-medium">Occupied House</th>
-                        <th className="py-3 px-4 font-medium text-amber-800">Sign Lord</th>
-                        <th className="py-3 px-4 font-medium text-indigo-700">Star Lord (Nakshatra)</th>
-                        <th className="py-3 px-4 font-medium text-emerald-700">Sub Lord</th>
+                        <th className="py-3 px-4 font-medium text-amber-500">Sign Lord</th>
+                        <th className="py-3 px-4 font-medium text-indigo-400">Star Lord (Nakshatra)</th>
+                        <th className="py-3 px-4 font-medium text-emerald-400">Sub Lord</th>
                         <th className="py-3 px-4 font-medium">Motion Status</th>
                       </tr>
                     </thead>
@@ -1038,25 +870,25 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                       {kpChart && kpChart.planets ? (
                         kpChart.planets.map((p: any) => (
                           <tr key={p.name} className={tableRowStyle}>
-                            <td className="py-3 px-4 font-bold text-black">{p.name}</td>
-                            <td className="py-3 px-4 font-mono text-amber-700">{p.sign}</td>
+                            <td className="py-3 px-4 font-bold text-white">{p.name}</td>
+                            <td className="py-3 px-4 font-mono text-amber-400">{p.sign}</td>
                             <td className="py-3 px-4 font-mono">{formatDegree(p.degree)}</td>
-                            <td className="py-3 px-4 font-mono text-slate-800">House {p.house}</td>
-                            <td className="py-3 px-4 font-mono text-amber-700/90">{p.signLord || "—"}</td>
-                            <td className="py-3 px-4 font-mono text-indigo-700">{p.starLord}</td>
-                            <td className="py-3 px-4 font-mono text-emerald-700 font-semibold">{p.subLord}</td>
+                            <td className="py-3 px-4 font-mono text-slate-300">House {p.house}</td>
+                            <td className="py-3 px-4 font-mono text-amber-400/90">{p.signLord || "—"}</td>
+                            <td className="py-3 px-4 font-mono text-indigo-400">{p.starLord}</td>
+                            <td className="py-3 px-4 font-mono text-emerald-400 font-semibold">{p.subLord}</td>
                             <td className="py-3 px-4 font-mono">
                               {p.isRetrograde ? (
-                                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-800 text-[10px] font-bold">RETROGRADE</span>
+                                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[10px] font-bold">RETROGRADE</span>
                               ) : (
-                                <span className="text-slate-700 text-[10px]">DIRECT</span>
+                                <span className="text-slate-500 text-[10px]">DIRECT</span>
                               )}
                             </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={8} className="py-8 text-center text-slate-700">Fetching planetary sub-lords and sidereal degrees...</td>
+                          <td colSpan={8} className="py-8 text-center text-slate-500">Fetching planetary sub-lords and sidereal degrees...</td>
                         </tr>
                       )}
                     </tbody>
@@ -1069,49 +901,38 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-10-planet-significators">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Activity className="w-4 h-4" />
                     JH10: KP Planet-Level Significators
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Stellar Strength Levels</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Stellar Strength Levels</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Level A (Strongest)</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-700">Level B (Medium)</th>
-                        <th className="py-3 px-4 font-semibold text-emerald-700">Level C (Mild)</th>
-                        <th className="py-3 px-4 font-semibold text-slate-600">Level D (Supporting)</th>
+                        <th className="py-3 px-4 font-semibold text-amber-500">Level A (Strongest)</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-400">Level B (Medium)</th>
+                        <th className="py-3 px-4 font-semibold text-emerald-400">Level C (Mild)</th>
+                        <th className="py-3 px-4 font-semibold text-slate-400">Level D (Supporting)</th>
                       </tr>
                     </thead>
                     <tbody>
                       {kpSignificators && kpSignificators.planets ? (
                         Object.entries(kpSignificators.planets).map(([planet, sigs]: [string, any]) => (
                           <tr key={planet} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-bold text-black">{planet}</td>
-                            <td className="py-2.5 px-4 font-mono font-bold text-amber-700">{(sigs.levelA || []).join(", ") || "—"}</td>
-                            <td className="py-2.5 px-4 font-mono text-indigo-700">{(sigs.levelB || []).join(", ") || "—"}</td>
-                            <td className="py-2.5 px-4 font-mono text-emerald-700">{(sigs.levelC || []).join(", ") || "—"}</td>
-                            <td className="py-2.5 px-4 font-mono text-slate-700">{(sigs.levelD || []).join(", ") || "—"}</td>
+                            <td className="py-2.5 px-4 font-bold text-white">{planet}</td>
+                            <td className="py-2.5 px-4 font-mono font-bold text-amber-400">{(sigs.levelA || []).join(", ") || "—"}</td>
+                            <td className="py-2.5 px-4 font-mono text-indigo-400">{(sigs.levelB || []).join(", ") || "—"}</td>
+                            <td className="py-2.5 px-4 font-mono text-emerald-400">{(sigs.levelC || []).join(", ") || "—"}</td>
+                            <td className="py-2.5 px-4 font-mono text-slate-500">{(sigs.levelD || []).join(", ") || "—"}</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-700">Retrieving planet stellar significations matrix...</td>
+                          <td colSpan={5} className="py-8 text-center text-slate-500">Retrieving planet stellar significations matrix...</td>
                         </tr>
                       )}
                     </tbody>
@@ -1124,43 +945,32 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-11-house-significators">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Shield className="w-4 h-4" />
                     JH11: KP House-Level Significators
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Placidus Boundary Mapping</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Placidus Boundary Mapping</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">House Cusp</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800 font-mono">Signifying Planets</th>
+                        <th className="py-3 px-4 font-semibold text-amber-500 font-mono">Signifying Planets</th>
                       </tr>
                     </thead>
                     <tbody>
                       {kpSignificators && kpSignificators.cusps ? (
                         Object.entries(kpSignificators.cusps).map(([house, planets]: [string, any]) => (
                           <tr key={house} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-mono font-bold text-black">Cusp {house}</td>
-                            <td className="py-2.5 px-4 font-mono font-semibold text-amber-700">{(planets || []).join(", ") || "None"}</td>
+                            <td className="py-2.5 px-4 font-mono font-bold text-white">Cusp {house}</td>
+                            <td className="py-2.5 px-4 font-mono font-semibold text-amber-400">{(planets || []).join(", ") || "None"}</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={2} className="py-8 text-center text-slate-700">Retrieving house boundary significators...</td>
+                          <td colSpan={2} className="py-8 text-center text-slate-500">Retrieving house boundary significators...</td>
                         </tr>
                       )}
                     </tbody>
@@ -1175,31 +985,20 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-12-jaimini-karakas">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Award className="w-4 h-4" />
                     JH12: Jaimini Chara Karakas
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Seven-Fold Status</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Seven-Fold Status</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet Name</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Degree within Sign</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-700">Jaimini Chara Karaka</th>
+                        <th className="py-3 px-4 font-semibold text-amber-500">Degree within Sign</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-400">Jaimini Chara Karaka</th>
                         <th className="py-3 px-4 font-semibold">Significance</th>
                       </tr>
                     </thead>
@@ -1234,10 +1033,10 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                           const karaka = karakaNames[idx] || "—";
                           return (
                             <tr key={p.name} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
-                              <td className="py-2.5 px-4 font-mono text-amber-700">{formatDegree(p.degree)}</td>
-                              <td className="py-2.5 px-4 font-semibold text-indigo-700">{karaka}</td>
-                              <td className="py-2.5 px-4 text-slate-600">{descMap[karaka] || "—"}</td>
+                              <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
+                              <td className="py-2.5 px-4 font-mono text-amber-400">{formatDegree(p.degree)}</td>
+                              <td className="py-2.5 px-4 font-semibold text-indigo-400">{karaka}</td>
+                              <td className="py-2.5 px-4 text-slate-400">{descMap[karaka] || "—"}</td>
                             </tr>
                           );
                         });
@@ -1252,31 +1051,20 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-13-arudhas-padas">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Compass className="w-4 h-4" />
                     JH13: Jaimini Arudhas & Padas
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Zodiac Reflective Points</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Zodiac Reflective Points</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Reference House</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Arudha Pada Label</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-700">Placed Sign</th>
+                        <th className="py-3 px-4 font-semibold text-amber-500">Arudha Pada Label</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-400">Placed Sign</th>
                         <th className="py-3 px-4 font-semibold">Significance</th>
                       </tr>
                     </thead>
@@ -1299,16 +1087,16 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                           };
                           return (
                             <tr key={key} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-mono font-bold text-black">House {key.replace("A", "") || "1"}</td>
-                              <td className="py-2.5 px-4 font-mono font-semibold text-amber-700">{key}</td>
-                              <td className="py-2.5 px-4 font-mono text-indigo-700">{a.sign}</td>
-                              <td className="py-2.5 px-4 text-slate-600">{sigMap[key] || "Arudha reflection."}</td>
+                              <td className="py-2.5 px-4 font-mono font-bold text-white">House {key.replace("A", "") || "1"}</td>
+                              <td className="py-2.5 px-4 font-mono font-semibold text-amber-400">{key}</td>
+                              <td className="py-2.5 px-4 font-mono text-indigo-400">{a.sign}</td>
+                              <td className="py-2.5 px-4 text-slate-400">{sigMap[key] || "Arudha reflection."}</td>
                             </tr>
                           );
                         })
                       ) : (
                         <tr>
-                          <td colSpan={4} className="py-8 text-center text-slate-700">No raw Arudha padas found in this profile.</td>
+                          <td colSpan={4} className="py-8 text-center text-slate-500">No raw Arudha padas found in this profile.</td>
                         </tr>
                       )}
                     </tbody>
@@ -1323,32 +1111,21 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-14-western-tropical">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Compass className="w-4 h-4" />
                     JH14: Tropical Planetary Placements
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Western Tropical Zodiac</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Western Tropical Zodiac</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-medium">Planet</th>
-                        <th className="py-3 px-4 font-medium text-amber-800">Sign (Tropical)</th>
+                        <th className="py-3 px-4 font-medium text-amber-500">Sign (Tropical)</th>
                         <th className="py-3 px-4 font-medium">Degree</th>
-                        <th className="py-3 px-4 font-medium text-indigo-700">House Placed</th>
+                        <th className="py-3 px-4 font-medium text-indigo-400">House Placed</th>
                         <th className="py-3 px-4 font-medium">Element</th>
                         <th className="py-3 px-4 font-medium">Modality</th>
                         <th className="py-3 px-4 font-medium">Motion</th>
@@ -1358,24 +1135,24 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                       {westernChart && westernChart.planets ? (
                         westernChart.planets.map((p: any) => (
                           <tr key={p.name} className={tableRowStyle}>
-                            <td className="py-3 px-4 font-bold text-black">{p.name}</td>
-                            <td className="py-3 px-4 font-mono font-bold text-amber-700">{p.sign}</td>
+                            <td className="py-3 px-4 font-bold text-white">{p.name}</td>
+                            <td className="py-3 px-4 font-mono font-bold text-amber-400">{p.sign}</td>
                             <td className="py-3 px-4 font-mono">{formatDegree(p.degree)}</td>
-                            <td className="py-3 px-4 font-mono text-indigo-700">House {p.house}</td>
+                            <td className="py-3 px-4 font-mono text-indigo-400">House {p.house}</td>
                             <td className="py-3 px-4 font-medium">{p.element || "Fire"}</td>
                             <td className="py-3 px-4 font-medium">{p.modality || "Cardinal"}</td>
-                            <td className="py-3 px-4 font-mono ">
+                            <td className="py-3 px-4 font-mono text-xs">
                               {p.isRetrograde ? (
-                                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-800 text-[10px] font-bold">RETROGRADE</span>
+                                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[10px] font-bold">RETROGRADE</span>
                               ) : (
-                                <span className="text-slate-700 text-[10px]">DIRECT</span>
+                                <span className="text-slate-500 text-[10px]">DIRECT</span>
                               )}
                             </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={7} className="py-8 text-center text-slate-700">Retrieving raw Western tropical chart coordinates...</td>
+                          <td colSpan={7} className="py-8 text-center text-slate-500">Retrieving raw Western tropical chart coordinates...</td>
                         </tr>
                       )}
                     </tbody>
@@ -1388,121 +1165,40 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-15-western-aspects">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Workflow className="w-4 h-4" />
                     JH15: Tropical Planetary Aspects Matrix
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Exact Orbs</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Exact Orbs</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Primary Planet</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Aspect Type</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-700">Target Planet</th>
+                        <th className="py-3 px-4 font-semibold text-amber-500">Aspect Type</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-400">Target Planet</th>
                         <th className="py-3 px-4 font-semibold">Aspect Angle (°)</th>
-                        <th className="py-3 px-4 font-semibold text-emerald-700">Orb Offset Angle</th>
+                        <th className="py-3 px-4 font-semibold text-emerald-400">Orb Offset Angle</th>
                       </tr>
                     </thead>
                     <tbody>
                       {westernChart && westernChart.aspects ? (
                         westernChart.aspects.map((asp: any, idx: number) => (
                           <tr key={idx} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-bold text-black">{asp.planet1}</td>
-                            <td className="py-2.5 px-4 font-semibold text-amber-700 font-mono">{asp.type}</td>
-                            <td className="py-2.5 px-4 font-bold text-indigo-700">{asp.planet2}</td>
+                            <td className="py-2.5 px-4 font-bold text-white">{asp.planet1}</td>
+                            <td className="py-2.5 px-4 font-semibold text-amber-400 font-mono">{asp.type}</td>
+                            <td className="py-2.5 px-4 font-bold text-indigo-400">{asp.planet2}</td>
                             <td className="py-2.5 px-4 font-mono">{asp.angle || "0"}°</td>
-                            <td className="py-2.5 px-4 font-mono text-emerald-700">{asp.orb?.toFixed(2)}°</td>
+                            <td className="py-2.5 px-4 font-mono text-emerald-400">{asp.orb?.toFixed(2)}°</td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-700">Retrieving raw Western aspect grids...</td>
+                          <td colSpan={5} className="py-8 text-center text-slate-500">Retrieving raw Western aspect grids...</td>
                         </tr>
                       )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-
-          case "western_placidus_wheel":
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-33-western-placidus">
-                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                    <Compass className="w-4 h-4" />
-                    JH33: Western Placidus House Wheel Interpretation Table
-                  </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Placidus Quadrant System</span>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
-                    <thead>
-                      <tr className={tableHeaderStyle}>
-                        <th className="py-3 px-4 font-semibold">House</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Cusp Sign & Deg</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-700">Core Astrological Focus</th>
-                        <th className="py-3 px-4 font-semibold">Placidus Psychological Interpretation</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {(() => {
-                        const cusps = westernChart?.cusps || astrologyData?.kp?.cusps || astrologyData?.houses || [];
-                        const houseMeanings = [
-                          { house: 1, focus: "Self & Persona", interp: "The Ascendant: Vitality, outer expression, physical appearance, and initial approach to life." },
-                          { house: 2, focus: "Values & Resources", interp: "Personal assets, earned income, self-worth, and material security." },
-                          { house: 3, focus: "Mind & Environment", interp: "Intellect, communication, short journeys, siblings, and immediate neighborhood." },
-                          { house: 4, focus: "Home & Roots", interp: "Family background, inner emotional foundation, private life, and psychological roots." },
-                          { house: 5, focus: "Creativity & Joy", interp: "Self-expression, romance, hobbies, children, speculative ventures, and pleasure." },
-                          { house: 6, focus: "Work & Wellness", interp: "Daily routine, employment, health habits, service, and pets." },
-                          { house: 7, focus: "Partnerships", interp: "One-on-one relationships, marriage, business partnerships, and open contracts." },
-                          { house: 8, focus: "Transformation", interp: "Shared finances, deep psychology, regeneration, occult studies, and mortality." },
-                          { house: 9, focus: "Philosophy & Expansion", interp: "Higher education, long-distance travel, philosophy, publishing, and spiritual quests." },
-                          { house: 10, focus: "Career & Status", interp: "Midheaven: Public reputation, profession, life path, and major ambitions." },
-                          { house: 11, focus: "Community & Hopes", interp: "Friendships, group associations, social ideals, and long-term aspirations." },
-                          { house: 12, focus: "Unconscious & Retreat", interp: "Spiritual transcendence, solitude, hidden strengths, and subconscious patterns." },
-                        ];
-
-                        return houseMeanings.map((h, idx) => {
-                          const cuspData = cusps[idx] || {};
-                          return (
-                            <tr key={h.house} className={tableRowStyle}>
-                              <td className="py-3 px-4 font-bold text-black">House {h.house}</td>
-                              <td className="py-3 px-4 font-mono font-bold text-amber-700">
-                                {cuspData.sign || cuspData.rasi || "Sign"} {cuspData.degree !== undefined ? formatDegree(cuspData.degree) : `${(idx * 30).toFixed(2)}°`}
-                              </td>
-                              <td className="py-3 px-4 font-semibold text-indigo-700">{h.focus}</td>
-                              <td className="py-3 px-4 text-xs text-slate-700 leading-relaxed">{h.interp}</td>
-                            </tr>
-                          );
-                        });
-                      })()}
                     </tbody>
                   </table>
                 </div>
@@ -1515,40 +1211,29 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-16-tajik-varshaphal">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Compass className="w-4 h-4" />
                     JH16: Tajik Varshaphal Planetary Coordinates
                   </h3>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono text-slate-600">Target Age:</span>
+                    <span className="text-[10px] font-mono text-slate-400">Target Age:</span>
                     <input 
                       type="number" 
                       value={targetAge} 
                       onChange={(e) => setTargetAge(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="w-12 bg-slate-950 border border-slate-800 rounded px-1  text-center font-mono text-amber-800 focus:outline-none"
+                      className="w-12 bg-slate-950 border border-slate-800 rounded px-1 text-xs text-center font-mono text-amber-500 focus:outline-none"
                     />
-                                    <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
                   </div>
                 </div>
-                </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet / sensitive Point</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Varsha Sign</th>
+                        <th className="py-3 px-4 font-semibold text-amber-500">Varsha Sign</th>
                         <th className="py-3 px-4 font-semibold">Progressed Degree</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-700">Varsha House</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-400">Varsha House</th>
                         <th className="py-3 px-4 font-semibold">Sanskrit Designation</th>
                       </tr>
                     </thead>
@@ -1560,7 +1245,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         const munthaSignName = zodiacSigns[munthaSignIdx];
                         const munthaHouseNumber = (munthaSignIdx - natalAscIdx + 12) % 12 + 1;
                         return (
-                          <tr className="bg-amber-500/5 font-semibold text-amber-700">
+                          <tr className="bg-amber-500/5 font-semibold text-amber-400">
                             <td className="py-2.5 px-4 font-bold">The Muntha Point</td>
                             <td className="py-2.5 px-4 font-mono font-bold">{munthaSignName}</td>
                             <td className="py-2.5 px-4 font-mono">{formatDegree(astrologyData.lagna.degree)}</td>
@@ -1577,11 +1262,11 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         const progressedHouse = (p.house + targetAge - 1) % 12 + 1;
                         return (
                           <tr key={p.name} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
-                            <td className="py-2.5 px-4 font-mono text-amber-800">{progressedSign}</td>
+                            <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
+                            <td className="py-2.5 px-4 font-mono text-amber-500">{progressedSign}</td>
                             <td className="py-2.5 px-4 font-mono">{formatDegree(p.degree)}</td>
-                            <td className="py-2.5 px-4 font-mono text-indigo-700">House {progressedHouse}</td>
-                            <td className="py-2.5 px-4 text-slate-700">{p.name} Progressed</td>
+                            <td className="py-2.5 px-4 font-mono text-indigo-400">House {progressedHouse}</td>
+                            <td className="py-2.5 px-4 text-slate-500">{p.name} Progressed</td>
                           </tr>
                         );
                       })}
@@ -1595,26 +1280,15 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-17-tajik-harshabala">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Activity className="w-4 h-4" />
                     JH17: Tajik Harsha Balas (4-Fold Strength)
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Persian Delight-Point System</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Persian Delight-Point System</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
@@ -1622,7 +1296,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         <th className="py-3 px-4 font-semibold">Second Strength (Temporal Delight)</th>
                         <th className="py-3 px-4 font-semibold">Third Strength (Gender Delight)</th>
                         <th className="py-3 px-4 font-semibold">Fourth Strength (Aspect Delight)</th>
-                        <th className="py-3 px-4 font-semibold text-center text-amber-800">Total Harsha Score</th>
+                        <th className="py-3 px-4 font-semibold text-center text-amber-500">Total Harsha Score</th>
                         <th className="py-3 px-4 font-semibold">Strength Ratio (%)</th>
                       </tr>
                     </thead>
@@ -1641,13 +1315,13 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                         const total = scores.reduce((a, b) => a + b, 0);
                         return (
                           <tr key={p.name} className={tableRowStyle}>
-                            <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
+                            <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
                             <td className="py-2.5 px-4 font-mono">{scores[0] === 1 ? "Present (+1)" : "Absent (0)"}</td>
                             <td className="py-2.5 px-4 font-mono">{scores[1] === 1 ? "Present (+1)" : "Absent (0)"}</td>
                             <td className="py-2.5 px-4 font-mono">{scores[2] === 1 ? "Present (+1)" : "Absent (0)"}</td>
                             <td className="py-2.5 px-4 font-mono">{scores[3] === 1 ? "Present (+1)" : "Absent (0)"}</td>
-                            <td className="py-2.5 px-4 font-mono text-center font-bold text-amber-700">{total} / 4</td>
-                            <td className="py-2.5 px-4 font-mono font-semibold text-emerald-700">{(total / 4 * 100).toFixed(0)}%</td>
+                            <td className="py-2.5 px-4 font-mono text-center font-bold text-amber-400">{total} / 4</td>
+                            <td className="py-2.5 px-4 font-mono font-semibold text-emerald-400">{(total / 4 * 100).toFixed(0)}%</td>
                           </tr>
                         );
                       })}
@@ -1663,31 +1337,20 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-18-lalkitab-houses">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Compass className="w-4 h-4" />
                     JH18: Lal Kitab Planetary Houses & Placements
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Aries Fixed Ascendant (1)</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Aries Fixed Ascendant (1)</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Sign Placement (Sidereal)</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-700">Lal Kitab House Placed</th>
+                        <th className="py-3 px-4 font-semibold text-amber-500">Sign Placement (Sidereal)</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-400">Lal Kitab House Placed</th>
                         <th className="py-3 px-4 font-semibold">House Lord</th>
                         <th className="py-3 px-4 font-semibold">Companion Planets in Same LKB House</th>
                       </tr>
@@ -1708,11 +1371,11 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                           const lords = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
                           return (
                             <tr key={p.name} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
-                              <td className="py-2.5 px-4 font-mono text-slate-600">{p.sign}</td>
-                              <td className="py-2.5 px-4 font-mono font-bold text-amber-700">House {lkHouse}</td>
-                              <td className="py-2.5 px-4 font-mono text-indigo-700">{lords[p.signIndex]}</td>
-                              <td className="py-2.5 px-4 text-slate-600">{companions.join(", ") || "Alone in House"}</td>
+                              <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
+                              <td className="py-2.5 px-4 font-mono text-slate-400">{p.sign}</td>
+                              <td className="py-2.5 px-4 font-mono font-bold text-amber-400">House {lkHouse}</td>
+                              <td className="py-2.5 px-4 font-mono text-indigo-400">{lords[p.signIndex]}</td>
+                              <td className="py-2.5 px-4 text-slate-400">{companions.join(", ") || "Alone in House"}</td>
                             </tr>
                           );
                         });
@@ -1727,31 +1390,20 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
             return (
               <div className="space-y-4 animate-fade-in" id="table-19-lalkitab-teva">
                 <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                  <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-500">
                     <Shield className="w-4 h-4" />
                     JH19: Lal Kitab Teva & Sleeping Planet Status
                   </h3>
-                  <span className="text-[10px] font-mono text-slate-700 font-medium">Dormancy Status (Soye Grah)</span>
-                                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 font-medium">Dormancy Status (Soye Grah)</span>
                 </div>
 
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse ">
+                <div className="overflow-x-auto rounded-xl border border-slate-800/80">
+                  <table className="w-full text-left border-collapse text-xs">
                     <thead>
                       <tr className={tableHeaderStyle}>
                         <th className="py-3 px-4 font-semibold">Planet</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">LKB House</th>
-                        <th className="py-3 px-4 font-semibold text-indigo-700">Sleeping Status (Soye Grah)</th>
+                        <th className="py-3 px-4 font-semibold text-amber-500">LKB House</th>
+                        <th className="py-3 px-4 font-semibold text-indigo-400">Sleeping Status (Soye Grah)</th>
                         <th className="py-3 px-4 font-semibold">Teva Category (Horoscope Class)</th>
                         <th className="py-3 px-4 font-semibold">Planetary Nature Baseline</th>
                       </tr>
@@ -1803,13 +1455,13 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
 
                           return (
                             <tr key={p.name} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-black">{p.name}</td>
+                              <td className="py-2.5 px-4 font-bold text-white">{p.name}</td>
                               <td className="py-2.5 px-4 font-mono">House {lkHouse}</td>
-                              <td className={`py-2.5 px-4 font-semibold ${sleepStatus.startsWith("Sleeping") ? "text-amber-800/90" : "text-emerald-700"}`}>
+                              <td className={`py-2.5 px-4 font-semibold ${sleepStatus.startsWith("Sleeping") ? "text-amber-500/90" : "text-emerald-400"}`}>
                                 {sleepStatus}
                               </td>
-                              <td className="py-2.5 px-4 font-mono font-medium text-indigo-700">{tevaCat}</td>
-                              <td className="py-2.5 px-4 text-slate-600">{natures[p.name] || "Dual (Nek/Manda)"}</td>
+                              <td className="py-2.5 px-4 font-mono font-medium text-indigo-400">{tevaCat}</td>
+                              <td className="py-2.5 px-4 text-slate-400">{natures[p.name] || "Dual (Nek/Manda)"}</td>
                             </tr>
                           );
                         });
@@ -1819,552 +1471,6 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                 </div>
               </div>
             );
-
-
-          case "jhora_personal_details":
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-26-personal">
-                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH26: Personal & Birth Details</h3>                  <div className="flex items-center gap-2">
-                    <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
-                      <Save className="w-4 h-4" />
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <table className="w-full text-left border-collapse text-black text-[10px]"><tbody><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Full Name</td><td className="py-2.5 px-4">Nitin</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Gender</td><td className="py-2.5 px-4">Male</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Date of Birth</td><td className="py-2.5 px-4">1979-07-16</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Time of Birth</td><td className="py-2.5 px-4">17:42:00</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Place</td><td className="py-2.5 px-4">New Delhi, India</td></tr></tbody></table>
-              </div>
-            );
-          case "jhora_ascendant_luminaries":
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-27-ascendant">
-                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH27: Ascendant & Luminaries</h3></div>
-                <table className="w-full text-left border-collapse text-black text-[10px]"><tbody><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Lagna Sign</td><td className="py-2.5 px-4">Sagittarius</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Sun Sign</td><td className="py-2.5 px-4">Cancer</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Moon Sign</td><td className="py-2.5 px-4">Sagittarius</td></tr></tbody></table>
-              </div>
-            );
-          case "jhora_astrological_summary":
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-28-summary">
-                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH28: Astrological Summary</h3></div>
-                <table className="w-full text-left border-collapse text-black text-[10px]"><tbody><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Chart</td><td className="py-2.5 px-4">D-1 Rasi</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Ayanamsa</td><td className="py-2.5 px-4">Lahiri</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Strongest Planet</td><td className="py-2.5 px-4">Jupiter</td></tr></tbody></table>
-              </div>
-            );
-          case "jhora_birth_panchanga":
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-29-panchanga">
-                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH29: Birth Panchanga</h3></div>
-                <table className="w-full text-left border-collapse text-black text-[10px]"><tbody><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Vara</td><td className="py-2.5 px-4">Tuesday</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Tithi</td><td className="py-2.5 px-4">Sukla</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Yoga</td><td className="py-2.5 px-4">Vishkambha</td></tr></tbody></table>
-              </div>
-            );
-          case "jhora_strength_summary":
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-30-strength">
-                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH30: Strength Summary</h3></div>
-                <table className="w-full text-left border-collapse text-black text-[10px]"><tbody><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Overall Shadbala</td><td className="py-2.5 px-4">1.25 Rupas</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Overall Bhava Bala</td><td className="py-2.5 px-4">100.0 Rupas</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Ishta Phala</td><td className="py-2.5 px-4">44.6</td></tr></tbody></table>
-              </div>
-            );
-          case "jhora_astronomical_data":
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-31-astronomical">
-                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH31: Astronomical Data</h3></div>
-                <table className="w-full text-left border-collapse text-black text-[10px]"><tbody><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Julian Day</td><td className="py-2.5 px-4">2461250.277778</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Ayanamsa Reference</td><td className="py-2.5 px-4">Lahiri Ayanamsa</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Engine Version</td><td className="py-2.5 px-4">v2.10.04</td></tr></tbody></table>
-              </div>
-            );
-
-
-          case "jhora_jaimini_argalas": {
-            const argalas = astrologyData?.argalas || {};
-            const hasArgalas = Object.keys(argalas).length > 0;
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-jaimini-argalas">
-                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
-                    <Workflow className="w-4 h-4" />
-                    JH20: Jaimini Argalas & Virodhas (Obstructions)
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className={tableHeaderStyle}>
-                        <th className="py-3 px-4 font-semibold w-1/5">Target House</th>
-                        <th className="py-3 px-4 font-semibold w-1/5">Argala House (Type)</th>
-                        <th className="py-3 px-4 font-semibold w-1/5">Argala Planets</th>
-                        <th className="py-3 px-4 font-semibold w-1/5">Virodha House (Obstruction)</th>
-                        <th className="py-3 px-4 font-semibold w-1/5">Virodha Planets</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Status / Verdict</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {hasArgalas ? (
-                        Object.entries(argalas).flatMap(([houseNum, list]: [string, any]) => {
-                          if (!list || list.length === 0) return [];
-                          return list.map((item: any, idx: number) => (
-                            <tr key={`${houseNum}-${idx}`} className={tableRowStyle}>
-                              {idx === 0 ? (
-                                <td rowSpan={list.length} className="py-2.5 px-4 font-bold text-black border-r border-slate-100 align-top">
-                                  House {houseNum}
-                                </td>
-                              ) : null}
-                              <td className="py-2.5 px-4 font-medium">
-                                House {item.argalaHouse} <span className="text-[9px] text-slate-500">({item.type})</span>
-                              </td>
-                              <td className="py-2.5 px-4 font-mono text-indigo-700 font-semibold">
-                                {item.argalaPlanets?.join(", ") || "—"}
-                              </td>
-                              <td className="py-2.5 px-4 text-slate-600">
-                                House {item.virodhaHouse}
-                              </td>
-                              <td className="py-2.5 px-4 font-mono text-slate-500">
-                                {item.virodhaPlanets?.join(", ") || "—"}
-                              </td>
-                              <td className="py-2.5 px-4">
-                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                                  item.isObstructed 
-                                    ? "bg-red-50 text-red-700 border border-red-200" 
-                                    : "bg-green-50 text-green-700 border border-green-200"
-                                }`}>
-                                  {item.verdict}
-                                </span>
-                              </td>
-                            </tr>
-                          ));
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan={6} className="py-8 text-center text-slate-700">No Jaimini Argalas computed.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          }
-          case "jhora_jaimini_sphutas": {
-            const sphutas = astrologyData?.sphutas || {};
-            const hasSphutas = Object.keys(sphutas).length > 0;
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-jaimini-sphutas">
-                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
-                    <Activity className="w-4 h-4" />
-                    JH21: Jaimini Sphutas (Special Astrological Degrees)
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className={tableHeaderStyle}>
-                        <th className="py-3 px-4 font-semibold">Sphuta Point (Formula Name)</th>
-                        <th className="py-3 px-4 font-semibold">Zodiac Sign Placement</th>
-                        <th className="py-3 px-4 font-semibold">Sign Degree</th>
-                        <th className="py-3 px-4 font-semibold">Absolute Longitude</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Description / Significance</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {hasSphutas ? (
-                        Object.entries(sphutas).map(([key, value]: [string, any]) => {
-                          let significance = "Sensitive degree representing specific karmic focal points.";
-                          if (key.includes("Tri")) significance = "Combined strength of Ascendant, Moon, and Yamaghantaka.";
-                          else if (key.includes("Chatur")) significance = "Represents general fortunes, four-fold auspiciousness.";
-                          else if (key.includes("Pancha")) significance = "Signifies five element balance and vital energy flow.";
-                          else if (key.includes("Prana")) significance = "Inhaled life-breath and personal physical vitality.";
-                          else if (key.includes("Deha")) significance = "Represents physical constitution, bodily health, and stamina.";
-                          else if (key.includes("Mrityu")) significance = "Points to points of physical vulnerability or transitions.";
-                          else if (key.includes("Beeja")) significance = "Male fertility potential and progeny seed strength.";
-                          else if (key.includes("Kshetra")) significance = "Female fertility potential and nurturing field strength.";
-                          else if (key.includes("Yogi")) significance = "Extremely auspicious degree attracting prosperity and fortune.";
-                          else if (key.includes("Avayogi")) significance = "Points of obstacle or lessons to be learned.";
-
-                          return (
-                            <tr key={key} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-black">{key}</td>
-                              <td className="py-2.5 px-4 font-semibold text-amber-700">{value.sign}</td>
-                              <td className="py-2.5 px-4 font-mono">{formatDegree(value.degree)}</td>
-                              <td className="py-2.5 px-4 font-mono text-slate-500">{value.longitude?.toFixed(2)}°</td>
-                              <td className="py-2.5 px-4 text-slate-600 italic">{significance}</td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-700">No special Jaimini Sphutas found in this profile.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          }
-          case "jhora_jaimini_sahams": {
-            const sahams = astrologyData?.sahams || {};
-            const hasSahams = Object.keys(sahams).length > 0;
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-jaimini-sahams">
-                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
-                    <Sparkles className="w-4 h-4" />
-                    JH22: JHora & Tajik Sahams (Sensitive Arabic Points)
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="overflow-x-auto rounded-xl border border-slate-200 max-h-[450px] overflow-y-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead className="sticky top-0 bg-white z-10">
-                      <tr className={tableHeaderStyle}>
-                        <th className="py-3 px-4 font-semibold">Saham Name</th>
-                        <th className="py-3 px-4 font-semibold">Zodiac Sign</th>
-                        <th className="py-3 px-4 font-semibold">Degree Placement</th>
-                        <th className="py-3 px-4 font-semibold">Absolute Longitude</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Core Indication / Meaning</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {hasSahams ? (
-                        Object.entries(sahams).map(([key, value]: [string, any]) => {
-                          let indication = "Sensitive points indicating dynamic fields of life experience.";
-                          if (key.includes("Punya")) indication = "Fortunes, overall merit, prosperity, and spiritual grace.";
-                          else if (key.includes("Vidya")) indication = "Higher knowledge, learning capacity, and academic pursuits.";
-                          else if (key.includes("Yasas")) indication = "Fame, reputation, recognition, and social standing.";
-                          else if (key.includes("Mitra")) indication = "Friendships, social alliances, and companions.";
-                          else if (key.includes("Mahatmya")) indication = "Greatness, honor, magnanimity, and higher purpose.";
-                          else if (key.includes("Asha")) indication = "Wishes, desires, hopes, and expectations.";
-                          else if (key.includes("Samartha")) indication = "Capability, professional competence, and executive power.";
-                          else if (key.includes("Bhratri")) indication = "Siblings, close peer groups, and support structures.";
-                          else if (key.includes("Gaurava")) indication = "Dignity, self-respect, and self-esteem.";
-                          else if (key.includes("Pithri") || key.includes("Pitri")) indication = "Father, paternal lineage, and ancestral traits.";
-                          else if (key.includes("Guru")) indication = "Teachers, advisors, wisdom, and spiritual preceptors.";
-                          else if (key.includes("Karma")) indication = "Profession, action, career drive, and deeds.";
-                          else if (key.includes("Kalatra")) indication = "Spouse, partnership, marriage, and alliances.";
-                          else if (key.includes("Putra")) indication = "Children, progeny, creativity, and investments.";
-                          else if (key.includes("Roga")) indication = "Ailments, physical vulnerabilities, and recovery paths.";
-                          else if (key.includes("Kali")) indication = "Quarrels, active conflicts, and competitive hurdles.";
-
-                          return (
-                            <tr key={key} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-black">{key}</td>
-                              <td className="py-2.5 px-4 font-semibold text-indigo-700">{value.sign}</td>
-                              <td className="py-2.5 px-4 font-mono">{formatDegree(value.degree)}</td>
-                              <td className="py-2.5 px-4 font-mono text-slate-500">{value.longitude?.toFixed(2)}°</td>
-                              <td className="py-2.5 px-4 text-slate-600 italic">{indication}</td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-700">No Saham placements computed.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          }
-          case "jhora_vedic_upgrahas": {
-            const upgrahas = astrologyData?.upagrahas || {};
-            const hasUpgrahas = Object.keys(upgrahas).length > 0;
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-vedic-upgrahas">
-                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
-                    <Shield className="w-4 h-4" />
-                    JH23: Vedic Upgrahas (Non-Luminous Shadow Planets)
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className={tableHeaderStyle}>
-                        <th className="py-3 px-4 font-semibold">Upgraha (Shadow Node)</th>
-                        <th className="py-3 px-4 font-semibold">Zodiac Sign Placement</th>
-                        <th className="py-3 px-4 font-semibold">Sign Degree</th>
-                        <th className="py-3 px-4 font-semibold">Absolute Longitude</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Nature & Significance</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {hasUpgrahas ? (
-                        Object.entries(upgrahas).map(([key, value]: [string, any]) => {
-                          let desc = "Non-luminous sensitive secondary node.";
-                          const kLower = key.toLowerCase();
-                          if (kLower.includes("dhuma")) desc = "Associated with heat, smoke, and obscured visual sight; fiery nature.";
-                          else if (kLower.includes("vyatipaata")) desc = "Extremely hostile, relates to sudden energetic reversals.";
-                          else if (kLower.includes("parivesha")) desc = "Represents halos, concentric circles, and protective barriers.";
-                          else if (kLower.includes("indrachaapa")) desc = "Indra's bow (Rainbow); brings diverse colorations and fortunes.";
-                          else if (kLower.includes("upaketu")) desc = "Cometary tail; relates to sudden bursts or localized flashes.";
-                          else if (kLower.includes("kaala")) desc = "Time-spirit node under Sun's domain; karmic timekeeper.";
-                          else if (kLower.includes("mrityu")) desc = "Points to transience, mortal limits, and physical hazards.";
-                          else if (kLower.includes("artha")) desc = "Relates to resource gathering, wealth pursuit, and security.";
-                          else if (kLower.includes("yama")) desc = "Yama Ghantaka; related to Jupiter's secondary protective wave.";
-                          else if (kLower.includes("gulika")) desc = "Most active malefic shadow node under Saturn; physical manifestation of delay.";
-                          else if (kLower.includes("maandi")) desc = "Son of Saturn; highly active karmic catalyst and focal point of physical duty.";
-
-                          return (
-                            <tr key={key} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-black capitalize">{key.replace("_", " ")}</td>
-                              <td className="py-2.5 px-4 font-semibold text-indigo-700">{value.sign}</td>
-                              <td className="py-2.5 px-4 font-mono">{formatDegree(value.degree)}</td>
-                              <td className="py-2.5 px-4 font-mono text-slate-500">{value.longitude?.toFixed(2)}°</td>
-                              <td className="py-2.5 px-4 text-slate-600 italic">{desc}</td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-700">No Vedic Upgrahas found in this profile.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          }
-          case "jhora_ishtaphala": {
-            const ishta = astrologyData?.raw?.other_bala?.ishta_phala || {};
-            const kashta = astrologyData?.raw?.other_bala?.kashta_phala || {};
-            const planetsList = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
-            const hasData = Object.keys(ishta).length > 0;
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-ishtaphala">
-                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-                  <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
-                    <Award className="w-4 h-4" />
-                    JH24: Ishtaphala & Kashtaphala Strengths (Benefactor vs Afflictor)
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className={tableHeaderStyle}>
-                        <th className="py-3 px-4 font-semibold">Planet</th>
-                        <th className="py-3 px-4 font-semibold text-green-700">Ishta Phala (Auspicious Force, max 60)</th>
-                        <th className="py-3 px-4 font-semibold text-red-700">Kashta Phala (Inauspicious Force, max 60)</th>
-                        <th className="py-3 px-4 font-semibold text-center">Net Phala Balance</th>
-                        <th className="py-3 px-4 font-semibold">Relative Dominance Vector</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {hasData ? (
-                        planetsList.map((p) => {
-                          const iVal = ishta[p] !== undefined ? ishta[p] : 30;
-                          const kVal = kashta[p] !== undefined ? kashta[p] : 30;
-                          const balance = iVal - kVal;
-                          const total = (iVal + kVal) || 1;
-                          const ratio = (iVal / total) * 100;
-                          
-                          return (
-                            <tr key={p} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-bold text-black">{p}</td>
-                              <td className="py-2.5 px-4 font-mono font-bold text-green-700">{iVal} / 60</td>
-                              <td className="py-2.5 px-4 font-mono font-bold text-red-700">{kVal} / 60</td>
-                              <td className={`py-2.5 px-4 font-mono font-bold text-center ${
-                                balance > 0 ? "text-green-700" : balance < 0 ? "text-red-700" : "text-slate-500"
-                              }`}>
-                                {balance > 0 ? `+${balance}` : balance}
-                              </td>
-                              <td className="py-2.5 px-4">
-                                <div className="flex items-center gap-2 w-full max-w-xs">
-                                  <span className="text-[9px] font-semibold text-red-600">Kashta</span>
-                                  <div className="h-2 flex-1 rounded-full bg-red-100 overflow-hidden flex">
-                                    <div className="h-full bg-green-500 rounded-full transition-all duration-300" style={{ width: `${ratio}%` }}></div>
-                                  </div>
-                                  <span className="text-[9px] font-semibold text-green-600">Ishta</span>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-700">No Ishta/Kashta Phala balances detected.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            );
-          }
-          case "jhora_jaimini_chara_dasha": {
-            const charaList = astrologyData?.raw?.rasi_dashas?.chara || [];
-            const hasChara = charaList.length > 0;
-            
-            // Get unique major signs for filtering
-            const majorSigns = ["All", ...Array.from(new Set(charaList.map((item: any) => item[0].split("-")[0])))];
-            
-            // Filter list based on selected major sign
-            const filteredChara = charaFilter === "All" 
-              ? charaList 
-              : charaList.filter((item: any) => item[0].startsWith(charaFilter + "-"));
-            
-            const totalItems = filteredChara.length;
-            const itemsPerPage = 12;
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
-            const currentPage = Math.min(charaPage, Math.max(0, totalPages - 1));
-            
-            const paginatedChara = filteredChara.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
-
-            return (
-              <div className="space-y-4 animate-fade-in" id="table-jaimini-chara">
-                <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2 flex-wrap gap-2">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-semibold text-black flex items-center gap-1.5 text-amber-800">
-                      <Clock className="w-4 h-4" />
-                      JH25: Jaimini Chara Dasha Sub-periods (Vedic Rasi Timelines)
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button 
-                      onClick={downloadCharaCSV}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 text-xs font-bold hover:bg-amber-600 shadow-sm"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      Export Complete 288-Period CSV
-                    </button>
-                    <button onClick={() => window.print()} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Print">
-                      <Printer className="w-4 h-4" />
-                    </button>
-                    <button onClick={handleExportPDF} className="p-1.5 hover:bg-slate-100 rounded-lg text-indigo-700" title="Export PDF">
-                      <FileText className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex justify-between items-center gap-4 bg-slate-50 p-3 rounded-lg flex-wrap">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-slate-700">Filter Major Sign:</span>
-                    <select 
-                      value={charaFilter} 
-                      onChange={(e) => {
-                        setCharaFilter(e.target.value);
-                        setCharaPage(0);
-                      }}
-                      className="text-[10px] border border-slate-200 rounded px-2 py-1 bg-white text-black font-semibold"
-                    >
-                      {majorSigns.map(sign => (
-                        <option key={sign} value={sign}>{sign}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="text-[10px] text-slate-600 font-mono">
-                    Showing {totalItems === 0 ? 0 : currentPage * itemsPerPage + 1} - {Math.min((currentPage + 1) * itemsPerPage, totalItems)} of {totalItems} periods
-                  </div>
-                </div>
-
-                <div className="overflow-x-auto rounded-xl border border-slate-200">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className={tableHeaderStyle}>
-                        <th className="py-3 px-4 font-semibold w-12">Index</th>
-                        <th className="py-3 px-4 font-semibold">Major Dasha Sign</th>
-                        <th className="py-3 px-4 font-semibold">Sub-Antardasha Sign</th>
-                        <th className="py-3 px-4 font-semibold">Trigger Date & Time</th>
-                        <th className="py-3 px-4 font-semibold text-amber-800">Dynamic Significance</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {hasChara && paginatedChara.length > 0 ? (
-                        paginatedChara.map((item: any, idx: number) => {
-                          const originalIdx = charaList.indexOf(item);
-                          const [path, dateStr] = item;
-                          const parts = path.split("-");
-                          const major = parts[0] || "";
-                          const minor = parts[1] || "";
-                          
-                          let focusText = `Active transition of consciousness from ${major} fields to ${minor} themes.`;
-                          if (major === minor) focusText = `Peak alignment of self-awareness within the ${major} house of destiny.`;
-
-                          return (
-                            <tr key={`${path}-${idx}`} className={tableRowStyle}>
-                              <td className="py-2.5 px-4 font-mono font-bold text-slate-500">{originalIdx + 1}</td>
-                              <td className="py-2.5 px-4 font-bold text-black">{major}</td>
-                              <td className="py-2.5 px-4 font-semibold text-indigo-700">{minor}</td>
-                              <td className="py-2.5 px-4 font-mono text-amber-800 font-semibold">{dateStr}</td>
-                              <td className="py-2.5 px-4 text-slate-600 italic">{focusText}</td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-slate-700">No Jaimini Chara Dasha periods found matching the filter.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {totalPages > 1 && (
-                  <div className="flex justify-between items-center mt-3 p-1 bg-white border border-slate-200 rounded-lg">
-                    <button
-                      disabled={currentPage === 0}
-                      onClick={() => setCharaPage(prev => Math.max(0, prev - 1))}
-                      className="px-3 py-1.5 rounded bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-[10px] font-bold text-slate-700 transition"
-                    >
-                      ← Previous
-                    </button>
-                    <span className="text-[10px] font-bold text-slate-600 font-mono">
-                      Page {currentPage + 1} of {totalPages}
-                    </span>
-                    <button
-                      disabled={currentPage >= totalPages - 1}
-                      onClick={() => setCharaPage(prev => Math.min(totalPages - 1, prev + 1))}
-                      className="px-3 py-1.5 rounded bg-slate-100 hover:bg-slate-200 disabled:opacity-50 text-[10px] font-bold text-slate-700 transition"
-                    >
-                      Next →
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          }
 
           case "table_index":
             return (
@@ -2379,7 +1485,7 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
 
           default:
             return (
-              <div className="p-8 text-center text-slate-700">
+              <div className="p-8 text-center text-slate-500">
                 Unknown raw table system selected.
               </div>
             );

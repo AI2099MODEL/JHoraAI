@@ -4,7 +4,6 @@ import { jsPDF } from "jspdf";
 import DashaTree from "./DashaTree";
 import TransitsTab from "./TransitsTab";
 import { AstroRawTablesView } from "./AstroRawTablesView";
-import { TableIndexView } from "./TableIndexView";
 import { MasterArchitectureView } from "./MasterArchitectureView";
 import currentSkyJson from "../knowledgebase/checklist_engine/current_sky.json";
 import {
@@ -29,7 +28,6 @@ import {
   generateTransitDBAConvergencePDF
 } from "../lib/specializedReports";
 import { calculateUnifiedRelationshipEvidence } from "../lib/rules/unifiedRelationshipEvidenceEngine";
-import { calculatePlanetDignityRegistry } from "../lib/dignityCalculator";
 import { ConversationService } from "../features/ask/services/ConversationService";
 import {
   User,
@@ -262,12 +260,12 @@ function CharaDashaInteractiveTable({ profile, astrologyData, isDark }: { profil
 
   const currentYear = new Date().getFullYear();
 
-  const tableBg = isDark ? "bg-white border-slate-200" : "bg-white border-neutral-200";
-  const headerBg = isDark ? "bg-slate-900 border-b border-slate-200 text-slate-600" : "bg-neutral-100 border-b border-neutral-200 text-neutral-600";
-  const textPrimary = isDark ? "text-slate-900" : "text-neutral-800";
-  const textSecondary = isDark ? "text-slate-800" : "text-neutral-700";
-  const textMuted = isDark ? "text-slate-600" : "text-neutral-500";
-  const textMutedLight = isDark ? "text-slate-700" : "text-neutral-400";
+  const tableBg = isDark ? "bg-slate-950/40 border-slate-800/60" : "bg-white border-neutral-200";
+  const headerBg = isDark ? "bg-slate-900 border-b border-slate-800 text-slate-400" : "bg-neutral-100 border-b border-neutral-200 text-neutral-600";
+  const textPrimary = isDark ? "text-slate-200" : "text-neutral-800";
+  const textSecondary = isDark ? "text-slate-300" : "text-neutral-700";
+  const textMuted = isDark ? "text-slate-400" : "text-neutral-500";
+  const textMutedLight = isDark ? "text-slate-500" : "text-neutral-400";
   const borderCol = isDark ? "divide-slate-800/30" : "divide-neutral-200/50";
   const btnBg = isDark ? "bg-slate-800 hover:bg-slate-700 border-slate-700 text-amber-400" : "bg-neutral-100 hover:bg-neutral-200 border-neutral-300 text-amber-600";
 
@@ -432,63 +430,59 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
     }
   }
 
-  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_7", "table_8", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18", "table_20", "table_21", "table_22", "table_23", "table_32"].includes(tableId)) return null;
+  if (!data && !planetsArray && !["table_3", "table_4", "table_5", "table_7", "table_8", "table_10", "table_13", "table_14", "table_15", "table_16", "table_17", "table_18", "table_20", "table_21", "table_22", "table_23"].includes(tableId)) return null;
   
-  const baseTableStyle = "w-full text-left border-collapse mt-2";
-  const thStyle = "py-2 px-3.5 bg-slate-50 text-slate-800 font-bold font-mono text-[10px] uppercase tracking-wider border-b border-slate-200";
-  const tdStyle = "py-2 px-3.5 border-b border-slate-100 text-black font-sans text-[10px]";
+  const baseTableStyle = "w-full text-left border-collapse text-xs mt-2";
+  const thStyle = "py-2 px-3 bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider";
+  const tdStyle = "py-2 px-3 border-b border-slate-800/40 text-slate-300 font-mono";
 
   switch (tableId) {
     case "table_1":
       return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white rounded-xl border border-indigo-200/90 font-sans text-xs shadow-2xs text-neutral-900">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 font-mono text-xs">
           <div className="space-y-1.5">
-            <h5 className="font-extrabold text-indigo-950 font-sans text-xs uppercase tracking-wider mb-2 border-b border-indigo-100 pb-1.5 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-indigo-600"></span> Birth Particulars
-            </h5>
-            <div className="flex justify-between py-1 border-b border-indigo-50">
-              <span className="text-neutral-500 font-medium">Name:</span>
-              <span className="text-indigo-950 font-extrabold">{data.name || "Nitin Jain"}</span>
+            <h5 className="font-bold text-amber-400 font-sans text-[10px] uppercase tracking-wider mb-2 border-b border-slate-800 pb-1">Birth Particulars</h5>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Name:</span>
+              <span className="text-slate-200 font-bold">{data.name || "Nitin Jain"}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-indigo-50">
-              <span className="text-neutral-500 font-medium">Date:</span>
-              <span className="text-neutral-900 font-bold">{data.date || data.birthDate}</span>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Date:</span>
+              <span className="text-slate-200">{data.date || data.birthDate}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-indigo-50">
-              <span className="text-neutral-500 font-medium">Time:</span>
-              <span className="text-neutral-900 font-bold">{data.time || data.birthTime}</span>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Time:</span>
+              <span className="text-slate-200">{data.time || data.birthTime}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-indigo-50">
-              <span className="text-neutral-500 font-medium">Place:</span>
-              <span className="text-neutral-900 font-bold">{data.location || data.birthPlace}</span>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Place:</span>
+              <span className="text-slate-200">{data.location || data.birthPlace}</span>
             </div>
           </div>
           <div className="space-y-1.5">
-            <h5 className="font-extrabold text-indigo-950 font-sans text-xs uppercase tracking-wider mb-2 border-b border-indigo-100 pb-1.5 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500"></span> Ascendant Coordinates
-            </h5>
-            <div className="flex justify-between py-1 border-b border-indigo-50">
-              <span className="text-neutral-500 font-medium">Zodiac Sign (Lagna):</span>
-              <span className="text-indigo-950 font-extrabold">{data.lagnaSign || "Cancer"}</span>
+            <h5 className="font-bold text-amber-400 font-sans text-[10px] uppercase tracking-wider mb-2 border-b border-slate-800 pb-1">Ascendant Coordinates</h5>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Zodiac Sign (Lagna):</span>
+              <span className="text-slate-200 font-bold">{data.lagnaSign || "Cancer"}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-indigo-50">
-              <span className="text-neutral-500 font-medium">Nakshatra:</span>
-              <span className="text-neutral-900 font-bold">{data.lagnaNakshatra || "Pushya"}</span>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Nakshatra:</span>
+              <span className="text-slate-200">{data.lagnaNakshatra || "Pushya"}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-indigo-50">
-              <span className="text-neutral-500 font-medium">Nakshatra Lord:</span>
-              <span className="text-indigo-900 font-bold">{data.lagnaNakLord || "Saturn"}</span>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">Nakshatra Lord:</span>
+              <span className="text-slate-200">{data.lagnaNakLord || "Saturn"}</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-indigo-50">
-              <span className="text-neutral-500 font-medium">KP Sub-Lord:</span>
-              <span className="text-indigo-900 font-bold">{data.lagnaSubLord || "Mercury"}</span>
+            <div className="flex justify-between py-1 border-b border-slate-900/10">
+              <span className="text-slate-500">KP Sub-Lord:</span>
+              <span className="text-slate-200">{data.lagnaSubLord || "Mercury"}</span>
             </div>
           </div>
         </div>
       );
     case "table_2":
       return (
-        <div className="overflow-x-auto rounded-xl border border-indigo-200/90 bg-white shadow-2xs mt-2">
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -500,16 +494,16 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 <th className={thStyle}>Dignity / Avastha</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-indigo-100/80">
+            <tbody>
               {Array.isArray(planetsArray) && planetsArray.map((p: any, idx: number) => (
-                <tr key={idx} className={idx % 2 === 0 ? "bg-white hover:bg-purple-50/60 transition-colors" : "bg-indigo-50/30 hover:bg-purple-50/60 transition-colors"}>
-                  <td className={`${tdStyle} font-extrabold text-indigo-950`}>{p.name || p.lord}</td>
-                  <td className={`${tdStyle} font-medium text-neutral-900`}>{p.sign}</td>
-                  <td className={`${tdStyle} font-mono font-bold text-neutral-800`}>{p.degree}° {p.minute || 0}'</td>
-                  <td className={`${tdStyle} font-semibold text-amber-900`}>{p.nakshatra} ({p.pada})</td>
-                  <td className={`${tdStyle} font-bold text-indigo-800`}>House {p.house}</td>
+                <tr key={idx} className="hover:bg-slate-900/30">
+                  <td className={`${tdStyle} font-bold text-amber-500`}>{p.name || p.lord}</td>
+                  <td className={tdStyle}>{p.sign}</td>
+                  <td className={tdStyle}>{p.degree}° {p.minute || 0}'</td>
+                  <td className={tdStyle}>{p.nakshatra} ({p.pada})</td>
+                  <td className={tdStyle}>House {p.house}</td>
                   <td className={tdStyle}>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-900 font-bold border border-amber-200">
+                    <span className="px-1.5 py-0.5 rounded text-[9px] bg-amber-500/10 text-amber-400 font-bold">
                       {p.dignity || p.avastha || "Neutral"}
                     </span>
                   </td>
@@ -529,100 +523,22 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
         else if (tableId === "table_5") dashaData = profile?.Vedic?.dashas?.ashtottari || [];
       }
       return (
-        <div className="p-3 bg-white rounded-xl border border-indigo-200/90 text-xs font-sans max-h-[300px] overflow-y-auto space-y-1.5 shadow-2xs">
-          <div className="flex justify-between text-indigo-950 border-b border-indigo-100 pb-1.5 text-[10.5px] uppercase font-extrabold tracking-wider mb-2 font-sans bg-indigo-50/60 p-2 rounded-lg">
+        <div className="p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 text-xs font-mono max-h-[300px] overflow-y-auto space-y-1.5">
+          <div className="flex justify-between text-slate-500 border-b border-slate-800 pb-1 text-[10px] uppercase font-bold tracking-wider mb-2 font-sans">
             <span>Dasha Lord (Period)</span>
             <span>Completion Date</span>
           </div>
           {Array.isArray(dashaData) && dashaData.map((d: any, idx: number) => (
-            <div key={idx} className="flex justify-between py-1.5 border-b border-indigo-50 hover:bg-purple-50/60 px-2 rounded-lg transition-colors">
-              <span className="font-extrabold text-indigo-950">{d.lord}</span>
-              <span className="text-neutral-800 font-medium">Until {d.end_date || d.endDate || d.end}</span>
+            <div key={idx} className="flex justify-between py-1 border-b border-slate-900/10 hover:bg-slate-900/20 px-1 rounded">
+              <span className="font-bold text-amber-500">{d.lord}</span>
+              <span className="text-slate-300">Until {d.end_date || d.endDate || d.end}</span>
             </div>
           ))}
           {typeof dashaData === "object" && !Array.isArray(dashaData) && (
-            <pre className="text-xs text-neutral-800 leading-relaxed overflow-x-auto p-2 bg-indigo-50/40 rounded-lg">
+            <pre className="text-[10px] text-slate-300 leading-relaxed overflow-x-auto">
               {JSON.stringify(dashaData, null, 2)}
             </pre>
           )}
-        </div>
-      );
-    }
-    case "table_32": {
-      const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets || astrologyData?.planets || {};
-      const rawPlanets = Object.entries(planetsObj).map(([name, p]: [string, any]) => ({
-        name,
-        ...p
-      }));
-      const lagna = profile?.Vedic?.ascendant || astrologyData?.lagna || {};
-      const dignityData = calculatePlanetDignityRegistry(rawPlanets, lagna);
-
-      return (
-        <div className="overflow-x-auto rounded-xl border border-indigo-200/90 bg-white shadow-xs mt-2">
-          <table className={baseTableStyle}>
-            <thead>
-              <tr>
-                <th className={thStyle}>Planet</th>
-                <th className={thStyle}>Chart</th>
-                <th className={thStyle}>Sign</th>
-                <th className={thStyle}>Longitude</th>
-                <th className={thStyle}>Own Sign</th>
-                <th className={thStyle}>Moolatrikona</th>
-                <th className={thStyle}>Exalted</th>
-                <th className={thStyle}>Debilitated</th>
-                <th className={thStyle}>Exaltation Deg</th>
-                <th className={thStyle}>Debilitation Deg</th>
-                <th className={thStyle}>Friendly Sign</th>
-                <th className={thStyle}>Enemy Sign</th>
-                <th className={thStyle}>Neutral Sign</th>
-                <th className={thStyle}>Vargottama</th>
-                <th className={thStyle}>Pushkara</th>
-                <th className={thStyle}>Neecha Bhanga</th>
-                <th className={thStyle}>Dignity Rank / Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-indigo-100/80">
-              {dignityData.map((row, idx) => (
-                <tr key={idx} className={idx % 2 === 0 ? "bg-white hover:bg-indigo-50/40 transition-colors" : "bg-indigo-50/20 hover:bg-indigo-50/40 transition-colors"}>
-                  <td className={`${tdStyle} font-extrabold text-indigo-950`}>{row.planet}</td>
-                  <td className={`${tdStyle} font-bold text-center`}>
-                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${row.chart === "D1" ? "bg-indigo-100 text-indigo-800" : "bg-purple-100 text-purple-800"}`}>
-                      {row.chart}
-                    </span>
-                  </td>
-                  <td className={`${tdStyle} font-semibold text-neutral-900`}>{row.sign}</td>
-                  <td className={`${tdStyle} font-mono font-bold text-neutral-800`}>{row.longitudeFormatted}</td>
-                  <td className={`${tdStyle} text-center font-bold ${row.ownSign === "Yes" ? "text-emerald-600 bg-emerald-50" : "text-slate-400"}`}>{row.ownSign}</td>
-                  <td className={`${tdStyle} text-center font-bold ${row.moolatrikona === "Yes" ? "text-emerald-600 bg-emerald-50" : "text-slate-400"}`}>{row.moolatrikona}</td>
-                  <td className={`${tdStyle} text-center font-bold ${row.exalted === "Yes" ? "text-amber-600 bg-amber-50" : "text-slate-400"}`}>{row.exalted}</td>
-                  <td className={`${tdStyle} text-center font-bold ${row.debilitated === "Yes" ? "text-rose-600 bg-rose-50" : "text-slate-400"}`}>{row.debilitated}</td>
-                  <td className={`${tdStyle} text-slate-600 font-mono text-[9px]`}>{row.exaltationDegree}</td>
-                  <td className={`${tdStyle} text-slate-600 font-mono text-[9px]`}>{row.debilitationDegree}</td>
-                  <td className={`${tdStyle} text-center font-bold ${row.friendlySign === "Yes" ? "text-sky-600 bg-sky-50" : "text-slate-400"}`}>{row.friendlySign}</td>
-                  <td className={`${tdStyle} text-center font-bold ${row.enemySign === "Yes" ? "text-rose-500 bg-rose-50" : "text-slate-400"}`}>{row.enemySign}</td>
-                  <td className={`${tdStyle} text-center font-bold ${row.neutralSign === "Yes" ? "text-slate-600 bg-slate-50" : "text-slate-400"}`}>{row.neutralSign}</td>
-                  <td className={`${tdStyle} text-center font-bold ${row.vargottama === "Yes" ? "text-amber-600 bg-amber-50" : "text-slate-400"}`}>{row.vargottama}</td>
-                  <td className={`${tdStyle} text-center font-bold ${row.pushkara === "Yes" ? "text-teal-600 bg-teal-50" : row.pushkara === "N/A" ? "text-slate-300" : "text-slate-400"}`}>{row.pushkara}</td>
-                  <td className={`${tdStyle} text-center font-bold ${row.neechaBhanga === "Yes" ? "text-emerald-600 bg-emerald-50" : row.neechaBhanga === "N/A" ? "text-slate-300" : "text-slate-400"}`}>{row.neechaBhanga}</td>
-                  <td className={tdStyle}>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${
-                      row.dignityRank.includes("Exalted") || row.dignityRank.includes("Moolatrikona")
-                        ? "bg-amber-100 text-amber-950 border-amber-300"
-                        : row.dignityRank.includes("Own")
-                        ? "bg-emerald-100 text-emerald-950 border-emerald-300"
-                        : row.dignityRank.includes("Friendly")
-                        ? "bg-sky-100 text-sky-950 border-sky-300"
-                        : row.dignityRank.includes("Debilitated") || row.dignityRank.includes("Inimical")
-                        ? "bg-rose-100 text-rose-950 border-rose-300"
-                        : "bg-slate-100 text-slate-800 border-slate-300"
-                    }`}>
-                      {row.dignityRank}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       );
     }
@@ -632,8 +548,8 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
     case "table_12":
     default:
       return (
-        <div className="p-3 bg-white rounded-lg border border-slate-200 text-xs font-mono max-h-[300px] overflow-y-auto">
-          <pre className="text-[10px] text-slate-800 leading-relaxed overflow-x-auto whitespace-pre-wrap">
+        <div className="p-3 bg-slate-950/40 rounded-lg border border-slate-800/60 text-xs font-mono max-h-[300px] overflow-y-auto">
+          <pre className="text-[10px] text-slate-300 leading-relaxed overflow-x-auto whitespace-pre-wrap">
             {JSON.stringify(data, null, 2)}
           </pre>
         </div>
@@ -850,14 +766,14 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 
       return (
         <div className="space-y-6 text-xs animate-fade-in">
-          <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
-            <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider border-b border-slate-200 pb-1.5">
+          <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
+            <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider border-b border-slate-800 pb-1.5">
               I. KP House Cusps (Placidus Stellar Division) [Table: KP_CUSPS]
             </h5>
             <div className="overflow-x-auto">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-600 border-b border-slate-200 text-[10px] uppercase font-bold tracking-wider font-mono">
+                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
                     <th className="py-2.5 px-3">CuspNo</th>
                     <th className="py-2.5 px-3">AbsoluteLongitude</th>
                     <th className="py-2.5 px-3">ZodiacSign</th>
@@ -871,15 +787,15 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 <tbody className="divide-y divide-slate-800/20 font-mono">
                   {kpCuspsList.map((c: any, idx: number) => {
                     return (
-                      <tr key={idx} className="hover:bg-slate-50">
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-800 font-bold">Cusp {c.CuspNo}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-600">{typeof c.AbsoluteLongitude === "number" ? c.AbsoluteLongitude.toFixed(4) : c.AbsoluteLongitude}°</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-900 font-sans font-semibold">{c.ZodiacSign}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-800">{typeof c.DegreeInSign === "number" ? c.DegreeInSign.toFixed(4) : c.DegreeInSign}°</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-amber-500 font-semibold">{c.SignLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-yellow-400/90 font-medium">{c.StarLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-indigo-400 font-bold">{c.SubLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-emerald-400/80">{c.SubSubLord || "Saturn"}</td>
+                      <tr key={idx} className="hover:bg-slate-900/30">
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300 font-bold">Cusp {c.CuspNo}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{typeof c.AbsoluteLongitude === "number" ? c.AbsoluteLongitude.toFixed(4) : c.AbsoluteLongitude}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-200 font-sans font-semibold">{c.ZodiacSign}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{typeof c.DegreeInSign === "number" ? c.DegreeInSign.toFixed(4) : c.DegreeInSign}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-semibold">{c.SignLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-yellow-400/90 font-medium">{c.StarLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400 font-bold">{c.SubLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400/80">{c.SubSubLord || "Saturn"}</td>
                       </tr>
                     );
                   })}
@@ -888,14 +804,14 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
-            <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider border-b border-slate-200 pb-1.5">
+          <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
+            <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider border-b border-slate-800 pb-1.5">
               II. KP Planets (Stellar Placement Coordinates) [Table: KP_PLANETS]
             </h5>
             <div className="overflow-x-auto">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-slate-900/60 text-slate-600 border-b border-slate-200 text-[10px] uppercase font-bold tracking-wider font-mono">
+                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
                     <th className="py-2.5 px-3">Planet</th>
                     <th className="py-2.5 px-3">AbsoluteLongitude</th>
                     <th className="py-2.5 px-3">ZodiacSign</th>
@@ -905,7 +821,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                     <th className="py-2.5 px-3 text-yellow-400">StarLord</th>
                     <th className="py-2.5 px-3 text-indigo-400">SubLord (PSL)</th>
                     <th className="py-2.5 px-3 text-emerald-400">SubSubLord</th>
-                    <th className="py-2.5 px-3 text-slate-600">OwnedHouses</th>
+                    <th className="py-2.5 px-3 text-slate-400">OwnedHouses</th>
                     <th className="py-2.5 px-3 text-rose-400">Retrograde</th>
                     <th className="py-2.5 px-3 text-orange-400">Combust</th>
                   </tr>
@@ -922,26 +838,26 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                             .join(", ");
 
                     return (
-                      <tr key={idx} className="hover:bg-slate-50">
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-amber-500 font-bold font-sans">
+                      <tr key={idx} className="hover:bg-slate-900/30">
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-bold font-sans">
                           {p.Planet}
                         </td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-600">{typeof p.AbsoluteLongitude === "number" ? p.AbsoluteLongitude.toFixed(4) : p.AbsoluteLongitude}°</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-900 font-sans font-semibold">{p.ZodiacSign}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-800">{typeof p.DegreeInSign === "number" ? p.DegreeInSign.toFixed(4) : p.DegreeInSign}°</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-800 font-bold">House {p.OccupiedHouse}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-amber-500 font-semibold">{p.SignLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-yellow-400/90 font-medium">{p.StarLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-indigo-400 font-bold">{p.SubLord}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-emerald-400/80">{p.SubSubLord || "Saturn"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40 text-slate-600">{ownedHousesStr || "None"}</td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.Retrograde === "Yes" ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : "text-slate-700"}`}>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{typeof p.AbsoluteLongitude === "number" ? p.AbsoluteLongitude.toFixed(4) : p.AbsoluteLongitude}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-200 font-sans font-semibold">{p.ZodiacSign}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{typeof p.DegreeInSign === "number" ? p.DegreeInSign.toFixed(4) : p.DegreeInSign}°</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300 font-bold">House {p.OccupiedHouse}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-semibold">{p.SignLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-yellow-400/90 font-medium">{p.StarLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400 font-bold">{p.SubLord}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400/80">{p.SubSubLord || "Saturn"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{ownedHousesStr || "None"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.Retrograde === "Yes" ? "bg-rose-500/10 text-rose-400 border border-rose-500/20" : "text-slate-500"}`}>
                             {p.Retrograde}
                           </span>
                         </td>
-                        <td className="py-2.5 px-3 border-b border-slate-200/40">
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.Combust === "Yes" ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" : "text-slate-700"}`}>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${p.Combust === "Yes" ? "bg-orange-500/10 text-orange-400 border border-orange-500/20" : "text-slate-500"}`}>
                             {p.Combust}
                           </span>
                         </td>
@@ -1023,40 +939,39 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 
       return (
         <div className="space-y-6 text-xs animate-fade-in">
-          <div className="rounded-xl border border-indigo-200/90 bg-white p-4 space-y-3 shadow-2xs text-neutral-900">
-            <div className="flex justify-between items-center border-b border-indigo-100 pb-2 flex-wrap gap-2">
-              <h5 className="font-extrabold text-indigo-950 font-sans text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-teal-600"></span>
+          <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
+            <div className="flex justify-between items-center border-b border-slate-800 pb-1.5 flex-wrap gap-2">
+              <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider">
                 I. Planet Significators [Table: KP_PLANET_SIGNIFICATORS]
               </h5>
-              <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider font-semibold">
+              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
                 Levels 1-6 Cusp Outputs
               </span>
             </div>
-            <div className="overflow-x-auto rounded-lg border border-indigo-100">
+            <div className="overflow-x-auto">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-black font-mono text-[10.5px] uppercase font-bold tracking-wider">
+                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
                     <th className="py-2.5 px-3">Planet</th>
-                    <th className="py-2.5 px-3">L1</th>
-                    <th className="py-2.5 px-3">L2</th>
-                    <th className="py-2.5 px-3">L3</th>
-                    <th className="py-2.5 px-3">L4</th>
-                    <th className="py-2.5 px-3">L5</th>
-                    <th className="py-2.5 px-3">L6</th>
+                    <th className="py-2.5 px-3 text-emerald-400">L1</th>
+                    <th className="py-2.5 px-3 text-teal-400">L2</th>
+                    <th className="py-2.5 px-3 text-slate-300">L3</th>
+                    <th className="py-2.5 px-3 text-slate-300">L4</th>
+                    <th className="py-2.5 px-3 text-indigo-400">L5</th>
+                    <th className="py-2.5 px-3 text-slate-500">L6</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-indigo-100/80 font-sans text-xs">
-                  {planetSignificatorsList.map((sig, idx) => {
+                <tbody className="divide-y divide-slate-800/20 font-mono">
+                  {planetSignificatorsList.map((sig) => {
                     return (
-                      <tr key={sig.Planet} className={idx % 2 === 0 ? "bg-white hover:bg-purple-50/60 transition-colors" : "bg-indigo-50/30 hover:bg-purple-50/60 transition-colors"}>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-indigo-950 font-extrabold font-sans">{sig.Planet}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-emerald-800 font-bold">{sig.L1.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-teal-800 font-semibold">{sig.L2.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-800 font-medium">{sig.L3.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-800 font-medium">{sig.L4.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-indigo-900 font-bold">{sig.L5.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-600">{sig.L6.join(", ") || "-"}</td>
+                      <tr key={sig.Planet} className="hover:bg-slate-900/30">
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-amber-500 font-bold font-sans">{sig.Planet}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400 font-bold">{sig.L1.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-teal-400 font-semibold">{sig.L2.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L3.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L4.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400">{sig.L5.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{sig.L6.join(", ") || "-"}</td>
                       </tr>
                     );
                   })}
@@ -1065,40 +980,39 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
             </div>
           </div>
 
-          <div className="rounded-xl border border-indigo-200/90 bg-white p-4 space-y-3 shadow-2xs text-neutral-900">
-            <div className="flex justify-between items-center border-b border-indigo-100 pb-2 flex-wrap gap-2">
-              <h5 className="font-extrabold text-indigo-950 font-sans text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+          <div className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-4 space-y-3">
+            <div className="flex justify-between items-center border-b border-slate-800 pb-1.5 flex-wrap gap-2">
+              <h5 className="font-bold text-cyan-400 font-sans text-xs uppercase tracking-wider">
                 II. House Significators [Table: KP_HOUSE_SIGNIFICATORS]
               </h5>
-              <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider font-semibold">
+              <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
                 Reverse Lookup Map
               </span>
             </div>
-            <div className="overflow-x-auto rounded-lg border border-indigo-100">
+            <div className="overflow-x-auto">
               <table className={baseTableStyle}>
                 <thead>
-                  <tr className="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-black font-mono text-[10.5px] uppercase font-bold tracking-wider">
+                  <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider font-mono">
                     <th className="py-2.5 px-3">House</th>
-                    <th className="py-2.5 px-3">L1</th>
-                    <th className="py-2.5 px-3">L2</th>
-                    <th className="py-2.5 px-3">L3</th>
-                    <th className="py-2.5 px-3">L4</th>
-                    <th className="py-2.5 px-3">L5</th>
-                    <th className="py-2.5 px-3">L6</th>
+                    <th className="py-2.5 px-3 text-emerald-400">L1</th>
+                    <th className="py-2.5 px-3 text-teal-400">L2</th>
+                    <th className="py-2.5 px-3 text-slate-300">L3</th>
+                    <th className="py-2.5 px-3 text-slate-300">L4</th>
+                    <th className="py-2.5 px-3 text-indigo-400">L5</th>
+                    <th className="py-2.5 px-3 text-slate-500">L6</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-indigo-100/80 font-sans text-xs">
-                  {houseSignificatorsList.map((sig, idx) => {
+                <tbody className="divide-y divide-slate-800/20 font-mono">
+                  {houseSignificatorsList.map((sig) => {
                     return (
-                      <tr key={sig.House} className={idx % 2 === 0 ? "bg-white hover:bg-purple-50/60 transition-colors" : "bg-indigo-50/30 hover:bg-purple-50/60 transition-colors"}>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-indigo-950 font-extrabold font-sans">House {sig.House}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-emerald-800 font-bold">{sig.L1.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-teal-800 font-semibold">{sig.L2.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-800 font-medium">{sig.L3.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-800 font-medium">{sig.L4.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-indigo-900 font-bold">{sig.L5.join(", ") || "-"}</td>
-                        <td className="py-2.5 px-3 border-b border-indigo-100/80 text-neutral-600">{sig.L6.join(", ") || "-"}</td>
+                      <tr key={sig.House} className="hover:bg-slate-900/30">
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300 font-bold font-sans">House {sig.House}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-emerald-400 font-bold">{sig.L1.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-teal-400 font-semibold">{sig.L2.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L3.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-300">{sig.L4.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-indigo-400">{sig.L5.join(", ") || "-"}</td>
+                        <td className="py-2.5 px-3 border-b border-slate-800/40 text-slate-400">{sig.L6.join(", ") || "-"}</td>
                       </tr>
                     );
                   })}
@@ -1131,7 +1045,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       };
 
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -1148,10 +1062,10 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                   ? `${placement.sign || ""} (House ${placement.house || ""})`
                   : String(placement);
                 return (
-                  <tr key={key} className="hover:bg-slate-50">
+                  <tr key={key} className="hover:bg-slate-900/30">
                     <td className={`${tdStyle} font-bold text-amber-500`}>{key}</td>
                     <td className={tdStyle}>{label}</td>
-                    <td className={`${tdStyle} text-slate-900 font-bold`}>
+                    <td className={`${tdStyle} text-slate-200 font-bold`}>
                       <span className="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
                         {displayPlacement}
                       </span>
@@ -1168,7 +1082,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const argalas = data || astrologyData?.argalas || profile?.Vedic?.argalas || profile?.Jaimini?.argala || profile?.Vedic?.argala || astrologyData?.jaimini?.argala || astrologyData?.horoscope?.argalas || {};
       const houseEntries = Array.from({ length: 12 }, (_, i) => String(i + 1));
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -1183,16 +1097,16 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 const configs = argalas[hKey] || [];
                 if (configs.length === 0) {
                   return (
-                    <tr key={hKey} className="hover:bg-slate-50">
+                    <tr key={hKey} className="hover:bg-slate-900/30">
                       <td className={`${tdStyle} font-bold text-amber-500`}>House {hKey}</td>
                       <td className={tdStyle} colSpan={3}>
-                        <span className="text-slate-700 italic">No significant Argalas found</span>
+                        <span className="text-slate-500 italic">No significant Argalas found</span>
                       </td>
                     </tr>
                   );
                 }
                 return configs.map((cfg: any, idx: number) => (
-                  <tr key={`${hKey}-${idx}`} className="hover:bg-slate-50 border-b border-slate-900/40">
+                  <tr key={`${hKey}-${idx}`} className="hover:bg-slate-900/30 border-b border-slate-900/40">
                     {idx === 0 ? (
                       <td className={`${tdStyle} font-bold text-amber-500 border-r border-slate-900/50`} rowSpan={configs.length}>
                         House {hKey}
@@ -1203,10 +1117,10 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                         <span className={`px-1 rounded text-[9px] font-bold ${cfg.type === "Primary" ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"}`}>
                           {cfg.type}
                         </span>
-                        <span className="text-slate-900 font-mono">
+                        <span className="text-slate-200 font-mono">
                           {cfg.argalaPlanets?.join(", ") || "None"}
                         </span>
-                        <span className="text-slate-700 text-[10px]">
+                        <span className="text-slate-500 text-[10px]">
                           (in H{cfg.argalaHouse})
                         </span>
                       </div>
@@ -1215,7 +1129,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                       {cfg.virodhaPlanets && cfg.virodhaPlanets.length > 0 ? (
                         <div className="flex items-center gap-1.5 flex-wrap font-mono">
                           <span className="text-rose-400">{cfg.virodhaPlanets.join(", ")}</span>
-                          <span className="text-slate-700 text-[10px]">(in H{cfg.virodhaHouse})</span>
+                          <span className="text-slate-500 text-[10px]">(in H{cfg.virodhaHouse})</span>
                         </div>
                       ) : (
                         <span className="text-emerald-500 text-[10px] font-bold">Unobstructed</span>
@@ -1225,7 +1139,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                       <span className={`text-[11px] ${cfg.isObstructed ? "text-amber-500" : "text-emerald-400 font-bold"}`}>
                         {cfg.isObstructed ? "Obstructed" : "Active / Unobstructed"}
                       </span>
-                      <p className="text-[10px] text-slate-700 leading-normal mt-0.5 max-w-sm">
+                      <p className="text-[10px] text-slate-500 leading-normal mt-0.5 max-w-sm">
                         {cfg.verdict || `${cfg.type} Argala from H${hKey} in H${cfg.argalaHouse}`}
                       </p>
                     </td>
@@ -1341,10 +1255,10 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       });
 
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs font-mono">
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs font-mono">
           <table className={baseTableStyle}>
             <thead>
-              <tr className="bg-slate-900 border-b border-slate-200 text-slate-600 font-sans text-[10px] uppercase font-bold tracking-wider">
+              <tr className="bg-slate-900 border-b border-slate-800 text-slate-400 font-sans text-[10px] uppercase font-bold tracking-wider">
                 <th className="py-2.5 px-3">Lagna Type</th>
                 <th className="py-2.5 px-3">Longitude</th>
                 <th className="py-2.5 px-3">Zodiac Sign</th>
@@ -1353,22 +1267,22 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 <th className="py-2.5 px-3">Primary Use</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/30 text-slate-800">
+            <tbody className="divide-y divide-slate-800/30 text-slate-300">
               {lagnas.map((lagna, idx) => (
-                <tr key={`${lagna.name}-${idx}`} className="hover:bg-slate-50">
+                <tr key={`${lagna.name}-${idx}`} className="hover:bg-slate-900/30">
                   <td className="py-2.5 px-3 font-bold text-amber-500 font-sans">{lagna.name}</td>
-                  <td className="py-2.5 px-3 text-slate-900 font-bold">
+                  <td className="py-2.5 px-3 text-slate-200 font-bold">
                     <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                       {lagna.longitude}
                     </span>
                   </td>
-                  <td className="py-2.5 px-3 font-sans text-slate-800">{lagna.sign}</td>
+                  <td className="py-2.5 px-3 font-sans text-slate-300">{lagna.sign}</td>
                   <td className="py-2.5 px-3 text-center">
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-800 font-bold">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold">
                       {lagna.house}
                     </span>
                   </td>
-                  <td className="py-2.5 px-3 text-slate-600 font-sans leading-tight text-[11px]">
+                  <td className="py-2.5 px-3 text-slate-400 font-sans leading-tight text-[11px]">
                     {lagna.basis}
                   </td>
                   <td className="py-2.5 px-3 text-amber-400/80 font-sans leading-tight text-[11px]">
@@ -1385,7 +1299,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const shadbala = data || astrologyData?.vedic?.strengths?.shadbala || astrologyData?.strengths?.shadbala || profile?.Vedic?.strengths?.shadbala || profile?.Vedic?.shadbala || {};
       const planets = Object.keys(shadbala).length > 0 ? Object.keys(shadbala) : ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -1416,7 +1330,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 }
 
                 return (
-                  <tr key={pName} className="hover:bg-slate-50">
+                  <tr key={pName} className="hover:bg-slate-900/30">
                     <td className={`${tdStyle} font-bold text-amber-500`}>{pName}</td>
                     <td className={tdStyle}>{Number(pBala.sthana_bala || pBala.sthana || 0).toFixed(1)}</td>
                     <td className={tdStyle}>{Number(pBala.dig_bala || pBala.dig || 0).toFixed(1)}</td>
@@ -1424,7 +1338,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                     <td className={tdStyle}>{Number(pBala.cheshta_bala || pBala.cheshta || 0).toFixed(1)}</td>
                     <td className={tdStyle}>{Number(pBala.naisargika_bala || pBala.naisargika || 0).toFixed(1)}</td>
                     <td className={tdStyle}>{Number(pBala.drig_bala || pBala.drig || 0).toFixed(1)}</td>
-                    <td className={`${tdStyle} font-bold text-slate-900`}>
+                    <td className={`${tdStyle} font-bold text-slate-200`}>
                       {Number(total).toFixed(1)}
                     </td>
                     <td className={tdStyle}>
@@ -1489,7 +1403,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       ];
 
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -1515,19 +1429,19 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                   house = dynamicVal.house || s.defaultHouse;
                 }
                 return (
-                  <tr key={s.key} className="hover:bg-slate-50">
+                  <tr key={s.key} className="hover:bg-slate-900/30">
                     <td className={`${tdStyle} font-bold text-amber-500`}>{s.name}</td>
-                    <td className="py-2 px-3 border-b border-slate-200/40 text-slate-600 text-[11px] leading-tight font-sans">
+                    <td className="py-2 px-3 border-b border-slate-800/40 text-slate-400 text-[11px] leading-tight font-sans">
                       {s.formula}
                     </td>
-                    <td className={`${tdStyle} text-slate-900 font-bold font-mono`}>
+                    <td className={`${tdStyle} text-slate-200 font-bold font-mono`}>
                       <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold">
                         {coord}
                       </span>
                     </td>
                     <td className={tdStyle}>{sign}</td>
                     <td className={tdStyle}>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-800 font-bold font-mono">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold font-mono">
                         {house}
                       </span>
                     </td>
@@ -1586,7 +1500,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       ];
 
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2 text-xs">
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2 text-xs">
           <table className={baseTableStyle}>
             <thead>
               <tr>
@@ -1614,16 +1528,16 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                   nakshatra = dynamicVal.nakshatra || u.defaultNakshatra;
                 }
                 return (
-                  <tr key={u.key} className="hover:bg-slate-50">
+                  <tr key={u.key} className="hover:bg-slate-900/30">
                     <td className={`${tdStyle} font-bold text-amber-500`}>{u.name}</td>
                     <td className={tdStyle}>{sign}</td>
-                    <td className={`${tdStyle} text-slate-900 font-bold font-mono`}>
+                    <td className={`${tdStyle} text-slate-200 font-bold font-mono`}>
                       <span className="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold">
                         {coord}
                       </span>
                     </td>
                     <td className={tdStyle}>
-                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-800 font-bold font-mono">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-bold font-mono">
                         {house}
                       </span>
                     </td>
@@ -1645,18 +1559,18 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const ZODIAC_SIGNS_FULL = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
 
       return (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white mt-2">
+        <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
           <table className={baseTableStyle}>
             <thead>
-              <tr className="bg-slate-900 border-b border-slate-200 text-amber-500">
-                <th className={`${thStyle} border-r border-slate-200`}>Varga Chart</th>
+              <tr className="bg-slate-900 border-b border-slate-800 text-amber-500">
+                <th className={`${thStyle} border-r border-slate-800/60`}>Varga Chart</th>
                 <th className={thStyle}>ASC</th>
                 {PLANET_ORDER.map(p => (
                   <th key={p} className={thStyle}>{p.substring(0, 3).toUpperCase()}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/30 text-slate-800">
+            <tbody className="divide-y divide-slate-800/30 text-slate-300">
               {STANDARD_VARGAS.map(vKey => {
                 const vObj = divisional[vKey] || {};
                 const ascObj = vObj.ascendant || {};
@@ -1671,10 +1585,10 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 
                 return (
                   <tr key={vKey} className="hover:bg-amber-500/5 transition-colors">
-                    <td className="py-2 px-3 font-bold text-amber-500 font-sans border-r border-slate-200">
+                    <td className="py-2 px-3 font-bold text-amber-500 font-sans border-r border-slate-800/60">
                       {vKey} {vKey === "D1" ? "Rasi" : vKey === "D9" ? "Navamsa" : vKey === "D10" ? "Dasamsa" : ""}
                     </td>
-                    <td className="py-2 px-3 text-slate-600">
+                    <td className="py-2 px-3 text-slate-400">
                       {ascSignAbbr} <span className="text-[9px] text-amber-500 font-bold">(H1)</span>
                     </td>
                     {PLANET_ORDER.map(pName => {
@@ -1709,7 +1623,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 
                       return (
                         <td key={pName} className="py-2 px-3">
-                          <span className="text-slate-900">{signAbbr}</span>{" "}
+                          <span className="text-slate-200">{signAbbr}</span>{" "}
                           <span className="text-[9px] text-amber-500 font-bold">{houseNum}</span>
                         </td>
                       );
@@ -1730,23 +1644,23 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const ZODIAC_SIGNS_FULL = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
       
       return (
-        <div className="overflow-x-auto font-mono text-[11px] rounded-lg border border-slate-200 bg-white mt-2">
+        <div className="overflow-x-auto font-mono text-[11px] rounded-lg border border-slate-800/60 bg-slate-950/40 mt-2">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-900 text-slate-800 border-b border-slate-200 font-sans">
+              <tr className="bg-slate-900 text-slate-300 border-b border-slate-800 font-sans">
                 <th className={thStyle}>Graha (Variable)</th>
                 {ZODIAC_SIGNS_FULL.map(s => (
                   <th key={s} className="py-2 px-1.5 text-center font-bold text-[10px]">{s.substring(0,3).toUpperCase()}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/30 text-slate-800">
+            <tbody className="divide-y divide-slate-800/30 text-slate-300">
               {Object.keys(bav).length > 0 ? (
                 Object.entries(bav).map(([pName, bList]: [string, any]) => (
                   <tr key={pName} className="hover:bg-slate-900/10">
-                    <td className="py-2 px-3 font-sans font-semibold text-slate-900 border-r border-slate-200/55">{pName}</td>
+                    <td className="py-2 px-3 font-sans font-semibold text-slate-200 border-r border-slate-800/55">{pName}</td>
                     {Array.isArray(bList) && bList.map((pts: number, idx: number) => (
-                      <td key={idx} className={`p-2 text-center font-bold ${pts >= 5 ? "text-emerald-400" : pts <= 2 ? "text-rose-400" : "text-slate-600"}`}>
+                      <td key={idx} className={`p-2 text-center font-bold ${pts >= 5 ? "text-emerald-400" : pts <= 2 ? "text-rose-400" : "text-slate-400"}`}>
                         {pts}
                       </td>
                     ))}
@@ -1754,14 +1668,14 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 ))
               ) : (
                 <tr className="hover:bg-slate-900/10">
-                  <td colSpan={13} className="p-4 text-center text-slate-700 italic">No individual Ashtakavarga data available.</td>
+                  <td colSpan={13} className="p-4 text-center text-slate-500 italic">No individual Ashtakavarga data available.</td>
                 </tr>
               )}
               {Array.isArray(sav) && sav.length > 0 && (
-                <tr className="bg-cyan-500/5 font-sans font-bold text-cyan-400 border-t border-slate-200">
-                  <td className="py-3 px-3 border-r border-slate-200">SAMUDHAYA (SAV)</td>
+                <tr className="bg-cyan-500/5 font-sans font-bold text-cyan-400 border-t border-slate-800">
+                  <td className="py-3 px-3 border-r border-slate-800">SAMUDHAYA (SAV)</td>
                   {sav.map((pts: number, idx: number) => (
-                    <td key={idx} className={`p-3 text-center text-sm font-mono font-black ${pts >= 28 ? "text-emerald-300" : "text-slate-600"}`}>
+                    <td key={idx} className={`p-3 text-center text-sm font-mono font-black ${pts >= 28 ? "text-emerald-300" : "text-slate-400"}`}>
                       {pts}
                     </td>
                   ))}
@@ -1777,18 +1691,18 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const bhava_bala = vData.strengths?.bhava_bala || {};
       
       return (
-        <div className="p-4 rounded-xl border border-slate-200 bg-white mt-2">
+        <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 mt-2">
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center font-mono">
             {Object.keys(bhava_bala).length > 0 ? (
               Object.entries(bhava_bala).map(([hKey, bVal]: [string, any]) => (
-                <div key={hKey} className="p-2 rounded bg-slate-900/50 border border-slate-200">
+                <div key={hKey} className="p-2 rounded bg-slate-900/50 border border-slate-800">
                   <span className="font-bold text-indigo-400 block font-sans text-xs">{hKey.replace("H", "House ")}</span>
-                  <span className="text-slate-800 block mt-1 text-sm">{bVal.strength_shashtiamsas}</span>
+                  <span className="text-slate-300 block mt-1 text-sm">{bVal.strength_shashtiamsas}</span>
                   <span className="text-[9px] text-amber-500 font-bold block mt-0.5">Rank: {bVal.rank}</span>
                 </div>
               ))
             ) : (
-              <div className="col-span-6 text-center py-4 text-slate-700 italic text-xs">No Bhava Bala data available.</div>
+              <div className="col-span-6 text-center py-4 text-slate-500 italic text-xs">No Bhava Bala data available.</div>
             )}
           </div>
         </div>
@@ -1800,7 +1714,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
       const kashta_phala = vData.strengths?.kashta_phala || {};
       
       return (
-        <div className="p-4 rounded-xl border border-slate-200 bg-white mt-2">
+        <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/40 mt-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs mt-2">
             {Object.keys(ishta_phala).length > 0 ? (
               Object.entries(ishta_phala).map(([pName, ishtaVal]: [string, any]) => {
@@ -1808,7 +1722,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 return (
                   <div key={pName} className="p-4 rounded-lg bg-slate-900/20 border border-slate-850 space-y-2">
                     <div className="flex justify-between font-bold">
-                      <span className="font-sans text-slate-900 text-sm">{pName}</span>
+                      <span className="font-sans text-slate-200 text-sm">{pName}</span>
                       <span className="text-xs">Ishta: <span className="text-emerald-400">{ishtaVal}</span> / Kashta: <span className="text-rose-400">{kashtaVal}</span></span>
                     </div>
                     <div className="w-full bg-slate-900 h-2.5 rounded overflow-hidden flex border border-slate-955">
@@ -1819,7 +1733,7 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
                 );
               })
             ) : (
-              <div className="col-span-2 text-center py-4 text-slate-700 italic text-xs">No Ishtaphala & Kashtaphala data available.</div>
+              <div className="col-span-2 text-center py-4 text-slate-500 italic text-xs">No Ishtaphala & Kashtaphala data available.</div>
             )}
           </div>
         </div>
@@ -1831,22 +1745,28 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 }
 
 const lifeTabs = [
-  { id: "my_life_analysis", label: "My Life Analysis" }
+  { id: "daily", label: "Daily" },
+  { id: "current_dasha", label: "Current Dasha" }
 ];
 
 const journeyTabs = [
-  { id: "daily", label: "Today" },
-  { id: "weekly", label: "Weekly" },
-  { id: "monthly", label: "Monthly" },
-  { id: "long_term", label: "Yearly" },
-  { id: "current_dasha", label: "Active Period" },
+  { id: "overview", label: "My Soul" },
   { id: "predictions", label: "Predictions" },
   { id: "future", label: "Future" },
-  { id: "tajik", label: "Tajik" }
+  { id: "my_life_analysis", label: "My Life Analysis" }
 ];
 
 const astroTabs = [
-  { id: "vedic", label: "My Astro Details" }
+  { id: "dasha", label: "Vimshottari" },
+  { id: "charts", label: "Charts" },
+  { id: "vedic", label: "Vedic" },
+  { id: "transits_data", label: "Transits" },
+  { id: "jaimini", label: "Jaimini" },
+  { id: "kp", label: "KP" },
+  { id: "lalkitab", label: "Lalkitab" },
+  { id: "chinese", label: "Chinese" },
+  { id: "tajik", label: "Tajik" },
+  { id: "western", label: "Western" }
 ];
 
 const tabs = [...lifeTabs, ...journeyTabs, ...astroTabs];
@@ -1870,95 +1790,12 @@ export function MyPageView({
   const [generatedData, setGeneratedData] = useState<any>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [age, setAge] = useState<{ years: number; months: number; days: number } | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("vedic");
+  const [activeTab, setActiveTab] = useState<string>("overview");
   const [activeSubmenu, setActiveSubmenu] = useState<"my_life" | "my_journey" | "my_astro" | "my_reports">("my_astro");
   const [compilingRelReport, setCompilingRelReport] = useState<string | null>(null);
   const [lastRefreshed, setLastRefreshed] = useState<string>("");
   const [isSyncingReports, setIsSyncingReports] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string>("");
-
-  const renderChinesePillarCard = (pillarType: "day" | "hour" | "month" | "year") => {
-    const stems = [
-      { name: "Jia (Yang Wood)", element: "Wood", color: "text-emerald-500" },
-      { name: "Yi (Yin Wood)", element: "Wood", color: "text-emerald-400" },
-      { name: "Bing (Yang Fire)", element: "Fire", color: "text-red-500" },
-      { name: "Ding (Yin Fire)", element: "Fire", color: "text-red-400" },
-      { name: "Wu (Yang Earth)", element: "Earth", color: "text-amber-500" },
-      { name: "Ji (Yin Earth)", element: "Earth", color: "text-amber-400" },
-      { name: "Geng (Yang Metal)", element: "Metal", color: "text-gray-400" },
-      { name: "Xin (Yin Metal)", element: "Metal", color: "text-gray-300" },
-      { name: "Ren (Yang Water)", element: "Water", color: "text-sky-500" },
-      { name: "Gui (Yin Water)", element: "Water", color: "text-sky-400" }
-    ];
-    const branches = [
-      { name: "Zi (Rat)", element: "Water", animal: "Rat", color: "text-sky-500" },
-      { name: "Chou (Ox)", element: "Earth", animal: "Ox", color: "text-amber-500" },
-      { name: "Yin (Tiger)", element: "Wood", animal: "Tiger", color: "text-emerald-500" },
-      { name: "Mao (Rabbit)", element: "Wood", animal: "Rabbit", color: "text-emerald-400" },
-      { name: "Chen (Dragon)", element: "Earth", animal: "Dragon", color: "text-amber-500" },
-      { name: "Si (Snake)", element: "Fire", animal: "Snake", color: "text-red-500" },
-      { name: "Wu (Horse)", element: "Fire", animal: "Horse", color: "text-red-400" },
-      { name: "Wei (Goat)", element: "Earth", animal: "Goat", color: "text-amber-500" },
-      { name: "Shen (Monkey)", element: "Metal", animal: "Monkey", color: "text-gray-400" },
-      { name: "You (Rooster)", element: "Metal", animal: "Rooster", color: "text-gray-300" },
-      { name: "Xu (Dog)", element: "Earth", animal: "Dog", color: "text-amber-500" },
-      { name: "Pig (Hai)", element: "Water", animal: "Pig", color: "text-sky-400" }
-    ];
-
-    const dateObj = new Date(profile?.Birth?.date || "1995-10-15");
-    const birthYear = dateObj.getFullYear();
-    const birthMonth = dateObj.getMonth() + 1;
-    const birthDay = dateObj.getDate();
-    const birthHour = parseInt((profile?.Birth?.time || "08:00").split(":")[0]) || 8;
-
-    const yearIdx = (birthYear - 4) % 60;
-    const yearStem = stems[yearIdx % 10];
-    const yearBranch = branches[yearIdx % 12];
-
-    const monthIdx = (birthYear * 12 + birthMonth + 12) % 60;
-    const monthStem = stems[monthIdx % 10];
-    const monthBranch = branches[(birthMonth + 1) % 12];
-
-    const baseDay = Math.abs(birthYear * 365 + birthMonth * 30 + birthDay) % 60;
-    const dayStem = stems[baseDay % 10];
-    const dayBranch = branches[baseDay % 12];
-
-    const hourBranchIdx = Math.floor(((birthHour + 1) % 24) / 2);
-    const hourStemIdx = (baseDay % 5) * 2 + hourBranchIdx;
-    const hourStem = stems[hourStemIdx % 10];
-    const hourBranch = branches[hourBranchIdx % 12];
-
-    let pillarData = { label: "TODAY'S BAZI PILLAR (Day Master)", stem: dayStem, branch: dayBranch, desc: "Core self-identity & daily vitality", isPrimary: true };
-    if (pillarType === "hour") {
-      pillarData = { label: "WEEKLY BAZI PILLAR (Hour)", stem: hourStem, branch: hourBranch, desc: "Weekly action & external interactions", isPrimary: false };
-    } else if (pillarType === "month") {
-      pillarData = { label: "MONTHLY BAZI PILLAR (Month)", stem: monthStem, branch: monthBranch, desc: "Monthly career root & foundation", isPrimary: false };
-    } else if (pillarType === "year") {
-      pillarData = { label: "YEARLY BAZI PILLAR (Year)", stem: yearStem, branch: yearBranch, desc: "Yearly overarching trend & outer world", isPrimary: false };
-    }
-
-    return (
-      <div className={`p-4 border-2 rounded-xl text-center flex flex-col justify-between max-w-sm mx-auto my-4 ${pillarData.isPrimary ? "border-emerald-500 bg-emerald-500/5 shadow-lg" : cardStyle}`}>
-        <span className={`text-[10px] font-bold tracking-widest ${pillarData.isPrimary ? "text-emerald-500" : textMutedStyle}`}>
-          {pillarData.label}
-        </span>
-        <div className="my-3 space-y-1">
-          <div className="flex flex-col">
-            <span className={`text-base font-bold ${pillarData.stem.color}`}>{pillarData.stem.name.split(" ")[0]}</span>
-            <span className={`text-[10px] ${textMutedStyle}`}>{pillarData.stem.name.split(" ")[1]}</span>
-          </div>
-          <div className="h-0.5 bg-slate-500/10 max-w-[30px] mx-auto my-1"></div>
-          <div className="flex flex-col">
-            <span className={`text-base font-bold ${pillarData.branch.color}`}>{pillarData.branch.name.split(" ")[0]}</span>
-            <span className={`text-[10px] font-semibold ${pillarData.branch.color}`}>{pillarData.branch.animal}</span>
-          </div>
-        </div>
-        <span className={`text-[9px] italic ${textMutedStyle} leading-tight`}>
-          {pillarData.desc}
-        </span>
-      </div>
-    );
-  };
 
   const triggerReportSync = async (isAuto = false) => {
     setIsSyncingReports(true);
@@ -2012,17 +1849,17 @@ export function MyPageView({
       if (activeSubmenuId === "my_life") {
         setActiveSubmenu("my_life");
         if (!lifeTabs.some(t => t.id === activeTab)) {
-          setActiveTab("my_life_analysis");
+          setActiveTab("daily");
         }
       } else if (activeSubmenuId === "my_journey") {
         setActiveSubmenu("my_journey");
         if (!journeyTabs.some(t => t.id === activeTab)) {
-          setActiveTab("daily");
+          setActiveTab("overview");
         }
       } else if (activeSubmenuId === "my_astro") {
         setActiveSubmenu("my_astro");
         if (!astroTabs.some(t => t.id === activeTab)) {
-          setActiveTab("vedic");
+          setActiveTab("dasha");
         }
       } else if (activeSubmenuId === "my_reports" || activeSubmenuId === "reports_hub") {
         setActiveSubmenu("my_reports");
@@ -3161,10 +2998,137 @@ export function MyPageView({
 
   return (
     <div className="space-y-4">
+      {/* COMPACT FIRST LINE: USER NAME, DOB DETAILS, AND ACTIVE DASHA LORDS */}
+      <div className={`px-4 py-3 rounded-xl border ${containerStyle} shadow-sm relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs`}>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <div className="flex items-center gap-1.5">
+            <span className={`w-2 h-2 rounded-full bg-amber-500 animate-pulse`}></span>
+            <span className={`font-bold font-sans text-sm ${textStyle}`}>{userName}</span>
+          </div>
+          <span className="opacity-20 text-slate-500">|</span>
+          <span className={`${textMutedStyle} font-mono`}>DOB:</span>
+          <span className={`font-medium ${textStyle}`}>{birthDate} @ {birthTime}</span>
+          <span className="opacity-20 text-slate-500">|</span>
+          <span className={`${textMutedStyle} font-mono`}>Place:</span>
+          <span className={`font-medium ${textStyle} truncate max-w-[200px]`} title={birthPlace}>{birthPlace}</span>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0 self-start md:self-auto flex-wrap">
+          {headerLords && (
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-amber-500/10 text-amber-500 border border-amber-500/10 font-mono text-xs">
+              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Antara:</span>
+              <span className="font-bold">{headerLords.pratyantar}</span>
+              <span className="opacity-30">|</span>
+              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Prana:</span>
+              <span className="font-bold">{headerLords.prana}</span>
+            </div>
+          )}
+          {currentSkyJson?.moon && (
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/10 font-mono text-xs">
+              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Transit Moon Nakshatra:</span>
+              <span className="font-bold text-indigo-300">{currentSkyJson.moon.currentNakshatra?.displayName || "Pushya"}</span>
+              <span className="opacity-30">|</span>
+              <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">Sub:</span>
+              <span className="font-bold text-indigo-300">{currentSkyJson.moon.currentSubLord?.displayName || "Venus"}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
       {errorMsg && (
         <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-2.5">
           <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
           <p className="text-xs text-red-400">{errorMsg}</p>
+        </div>
+      )}
+
+      {/* Primary Submenus Switcher */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-1.5 bg-slate-950/60 rounded-xl border border-slate-800/40" id="primary-submenu-bar">
+        <button
+          onClick={() => {
+            setActiveSubmenu("my_life");
+            setActiveTab("daily");
+            onSubmenuSelect?.("daily");
+          }}
+          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
+            activeSubmenu === "my_life"
+              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
+          }`}
+          id="submenu-my-life"
+        >
+          <User className="w-4 h-4 shrink-0" />
+          <span>My Life</span>
+        </button>
+        <button
+          onClick={() => {
+            setActiveSubmenu("my_journey");
+            setActiveTab("overview");
+            onSubmenuSelect?.("overview");
+          }}
+          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
+            activeSubmenu === "my_journey"
+              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
+          }`}
+          id="submenu-my-journey"
+        >
+          <Compass className="w-4 h-4 shrink-0" />
+          <span>My Journey</span>
+        </button>
+        <button
+          onClick={() => {
+            setActiveSubmenu("my_astro");
+            setActiveTab("dasha");
+            onSubmenuSelect?.("dasha");
+          }}
+          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
+            activeSubmenu === "my_astro"
+              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
+          }`}
+          id="submenu-my-astro"
+        >
+          <Sparkles className="w-4 h-4 shrink-0" />
+          <span>My Astro</span>
+        </button>
+        <button
+          onClick={() => {
+            setActiveSubmenu("my_reports");
+            setActiveTab("reports_hub");
+            onSubmenuSelect?.("reports_hub");
+          }}
+          className={`py-3 px-2 sm:px-4 rounded-lg font-sans font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center justify-center gap-2 ${
+            activeSubmenu === "my_reports"
+              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/15 font-extrabold"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
+          }`}
+          id="submenu-my-reports"
+        >
+          <FileText className="w-4 h-4 shrink-0" />
+          <span>My Reports</span>
+        </button>
+      </div>
+
+      {/* Submenu Astrological Tabs */}
+      {currentTabs.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 pb-2 pt-1 border-b border-slate-500/10">
+          {currentTabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                onSubmenuSelect?.(tab.id);
+              }}
+              className={`px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold tracking-wider uppercase border transition-all cursor-pointer select-none ${
+                activeTab === tab.id
+                  ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm shadow-amber-500/10"
+                  : "bg-slate-500/5 text-slate-400 border-slate-500/10 hover:bg-slate-500/10 hover:text-slate-300"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       )}
 
@@ -3186,7 +3150,7 @@ export function MyPageView({
                   All dossiers are compiled dynamically for your birth coordinates. Reports are automatically refreshed every 24 hours.
                 </p>
                 {lastRefreshed && (
-                  <p className="text-[9px] font-mono text-slate-700 mt-1">
+                  <p className="text-[9px] font-mono text-slate-500 mt-1">
                     Last Synced: {lastRefreshed}
                   </p>
                 )}
@@ -3228,7 +3192,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-2 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3246,7 +3210,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     Comprehensive Soul Blueprint Dossier
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
                     Full astrological synthesis report compiling Panchanga, Divisional Charts, Shodashavarga, Jaimini, Lal Kitab, and Varshaphal.
                   </p>
                 </div>
@@ -3284,7 +3248,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3302,7 +3266,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     50-Year Vimshottari Dasha
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
                     Recursive timing chronology down to Prana level for your active period. Explores Mahadasha, Bhukti, and Antara timelines with high-precision.
                   </p>
                 </div>
@@ -3340,7 +3304,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-rose-500/40" 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-rose-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-rose-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3358,7 +3322,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     Emotional & Mood Cycles
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
                     Esoteric mood and emotional state indicators tracking Houses 1, 3, 4, 5, 6, and 12.
                   </p>
                 </div>
@@ -3396,7 +3360,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-teal-500/40" 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-teal-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-teal-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3414,7 +3378,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     Behavioral Patterns
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
                     Career vocations, communication styles, and themes mapping Houses 2, 3, 6, 7, 10, and 11.
                   </p>
                 </div>
@@ -3452,7 +3416,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-1 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-sky-500/40" 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-sky-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-sky-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3470,7 +3434,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     Transit DBA Alignment
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
                     Maps actual transit movements of Saturn, Jupiter, and Moon over natal period rulers.
                   </p>
                 </div>
@@ -3499,14 +3463,13 @@ export function MyPageView({
                     }
                     const activeAstroTabIds = currentTabs.map(t => t.id);
                     const submenusMap: { [key: string]: string[] } = {
+                      dasha: ["jhora_vimshottari"],
                       charts: ["jhora_divisional"],
-                      vedic: [
-                        "jhora_planets", "jhora_dignity", "jhora_shadbala", "jhora_bhava_balas", "jhora_ashtakavarga", "jhora_vimshottari",
-                        "kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_house_significators",
-                        "jaimini_karakas", "jaimini_arudhas", "western_tropical", "western_aspects",
-                        "tajika_varshaphal", "tajika_harshabala", "lalkitab_houses", "lalkitab_teva"
-                      ],
+                      vedic: ["jhora_planets", "jhora_shadbala", "jhora_bhava_balas"],
+                      transits_data: [],
                       jaimini: ["jaimini_karakas", "jaimini_arudhas"],
+                      kp: ["kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_house_significators"],
+                      lalkitab: ["lalkitab_houses", "lalkitab_teva"],
                       tajik: ["tajika_varshaphal", "tajika_harshabala"],
                       western: ["western_tropical", "western_aspects"]
                     };
@@ -3520,7 +3483,7 @@ export function MyPageView({
                     
                     if (activeSubmenuIds.length <= 1) {
                       activeSubmenuIds = [
-                        "jhora_birth_details", "jhora_planets", "jhora_dignity", "jhora_shadbala", "jhora_bhava_balas", 
+                        "jhora_birth_details", "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", 
                         "jhora_ashtakavarga", "jhora_divisional", "jhora_vimshottari", "kp_cusps", 
                         "kp_sub_lords", "kp_planet_significators", "kp_house_significators", "jaimini_karakas", 
                         "jaimini_arudhas", "western_tropical", "western_aspects", "tajika_varshaphal", 
@@ -3542,7 +3505,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-3 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-indigo-500/40" 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-indigo-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-indigo-500/40 shadow-sm shadow-neutral-100"
                 }`}
               >
@@ -3560,7 +3523,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     All Aspects Alignment
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
                     Dynamic tabular dump aligning Parashari, KP, Jaimini, Lalkitab and Western based on active tabs.
                   </p>
                 </div>
@@ -3741,7 +3704,7 @@ export function MyPageView({
                     };
 
                     const activeSubmenuIds = [
-                      "jhora_birth_details", "jhora_planets", "jhora_dignity", "jhora_shadbala", "jhora_bhava_balas", 
+                      "jhora_birth_details", "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", 
                       "jhora_ashtakavarga", "jhora_divisional", "jhora_vimshottari", "kp_cusps", 
                       "kp_sub_lords", "kp_planet_significators", "kp_house_significators", "jaimini_karakas", 
                       "jaimini_arudhas", "western_tropical", "western_aspects", "tajika_varshaphal", 
@@ -3762,7 +3725,7 @@ export function MyPageView({
                 }}
                 className={`p-5 rounded-2xl border text-left md:col-span-3 transition-all flex flex-col justify-between h-44 group cursor-pointer disabled:opacity-50 ${
                   isDark 
-                    ? "border-slate-200 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
+                    ? "border-slate-800 bg-slate-900/40 hover:bg-slate-900/60 hover:border-amber-500/40" 
                     : "border-neutral-200 bg-white hover:bg-neutral-50/50 hover:border-amber-500/40 shadow-sm shadow-neutral-100"
                 }`}
                 id="download-my-report-button"
@@ -3781,7 +3744,7 @@ export function MyPageView({
                   <h4 className={`text-sm font-bold mt-3 ${isDark ? "text-slate-100" : "text-neutral-900"}`}>
                     My Report
                   </h4>
-                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
+                  <p className={`text-xs mt-1.5 line-clamp-2 ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
                     Comprehensive dossier compiling all user data across all sections, submenus, and all 19 raw tables (JH1 to JH19 consecutively).
                   </p>
                 </div>
@@ -3802,11 +3765,11 @@ export function MyPageView({
             {/* Bottom Section: Active JSON Export */}
             <div className="mt-6 pt-6 border-t border-slate-500/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="space-y-0.5">
-                <h4 className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${isDark ? "text-slate-800" : "text-neutral-800"}`}>
+                <h4 className={`text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${isDark ? "text-slate-300" : "text-neutral-800"}`}>
                   <Shield className="w-4 h-4 text-indigo-400" />
                   Vedic Data Model Export
                 </h4>
-                <p className={`text-[10px] font-sans ${isDark ? "text-slate-600" : "text-neutral-600"}`}>
+                <p className={`text-[10px] font-sans ${isDark ? "text-slate-400" : "text-neutral-600"}`}>
                   Export the active calculated high-fidelity JSON payload containing all traditional astronomical structures.
                 </p>
               </div>
@@ -3855,43 +3818,43 @@ export function MyPageView({
 
           {/* LAGNA INFO IN SMALL FONTS */}
           <div className="p-4 rounded-xl border border-slate-500/10 bg-slate-500/5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-slate-600">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-slate-400">
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Lagna (Ascendant):</strong>{" "}
                 <span className={`${textStyle} font-bold`}>{lagna.sign || ascendantSign || "Cancer"}</span>{" "}
                 ({lagna.degree !== undefined ? formatDegree(lagna.degree) : "07° 12'"})
               </span>
-              <span className="opacity-25 text-slate-700">|</span>
+              <span className="opacity-25 text-slate-500">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Ascendant Nakshatra:</strong>{" "}
                 <span className={`${textStyle} font-bold`}>{lagna.nakshatra || ascendantNakshatra || "Pushya"}</span>{" "}
                 (Pada {lagna.pada || "2"})
               </span>
-              <span className="opacity-25 text-slate-700">|</span>
+              <span className="opacity-25 text-slate-500">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Ascendant Nak Lord:</strong>{" "}
                 <span className={textStyle}>{lagna.nakshatra_lord || lagna.nakLord || ascendantNakLord || "Saturn"}</span>
               </span>
-              <span className="opacity-25 text-slate-700">|</span>
+              <span className="opacity-25 text-slate-500">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Birth Nakshatra:</strong>{" "}
                 <span className={`${textStyle} font-bold text-amber-400`}>{lagna.moon_nakshatra || profile?.Vedic?.planets?.Moon?.nakshatra || "Shatabhisha"}</span>
               </span>
-              <span className="opacity-25 text-slate-700">|</span>
+              <span className="opacity-25 text-slate-500">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Moon Nakshatra:</strong>{" "}
                 <span className={`${textStyle} font-bold`}>{lagna.moon_nakshatra || profile?.Vedic?.planets?.Moon?.nakshatra || "Shatabhisha"}</span>
               </span>
-              <span className="opacity-25 text-slate-700">|</span>
+              <span className="opacity-25 text-slate-500">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Sun Nakshatra:</strong>{" "}
                 <span className={`${textStyle} font-bold`}>{lagna.sun_nakshatra || profile?.Vedic?.planets?.Sun?.nakshatra || "Purva Ashadha"}</span>
               </span>
-              <span className="opacity-25 text-slate-700">|</span>
+              <span className="opacity-25 text-slate-500">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">KP Lords:</strong> Star: <span className={textStyle}>{lagna.star_lord || "Saturn"}</span> • Sub: <span className={textStyle}>{lagna.sub_lord || "Mercury"}</span> • Sub-Sub: <span className={textStyle}>{lagna.sub_sub_lord || "Rahu"}</span>
               </span>
-              <span className="opacity-25 text-slate-700">|</span>
+              <span className="opacity-25 text-slate-500">|</span>
               <span>
                 <strong className="text-amber-500 uppercase font-sans text-[10px]">Status:</strong>{" "}
                 <span className={lagna.gandanta ? "text-rose-400 font-bold" : "text-emerald-400 font-bold"}>
@@ -4764,7 +4727,7 @@ export function MyPageView({
                         {table.title}
                       </h4>
                     </div>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${isPopulated ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-slate-500/10 text-slate-600"}`}>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${isPopulated ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-slate-500/10 text-slate-400"}`}>
                       {isPopulated ? "POPULATED & INDEXED" : "PENDING INDEX"}
                     </span>
                   </div>
@@ -4790,7 +4753,7 @@ export function MyPageView({
                         <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-wider">
                           🟢 LIVE INDEXED DATA (Active Timeline)
                         </span>
-                        <span className="text-[9px] font-mono text-slate-700">
+                        <span className="text-[9px] font-mono text-slate-500">
                           Indexed: {new Date(indexedTable.indexedAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -4819,16 +4782,16 @@ export function MyPageView({
                       {renderIndexedTable(`table_${table.table_number}`, null, profile, astrologyData)}
                     </div>
                   ) : (
-                    <div className="p-3.5 rounded-lg bg-white border border-slate-200 space-y-2">
-                      <div className="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5">
-                        <span className="text-[10px] font-mono text-slate-700 uppercase font-bold tracking-wider block">
+                    <div className="p-3.5 rounded-lg bg-slate-950/40 border border-slate-800/80 space-y-2">
+                      <div className="flex justify-between items-center border-b border-slate-800 pb-1 mb-1.5">
+                        <span className="text-[10px] font-mono text-slate-500 uppercase font-bold tracking-wider block">
                           Data Sample / Metadata Registry
                         </span>
                         <span className="text-[9px] font-mono text-amber-500/80">
                           Pending Live Indexing
                         </span>
                       </div>
-                      <pre className="text-[11px] font-mono text-slate-800 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+                      <pre className="text-[11px] font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed">
                         {JSON.stringify(table.data_sample || {}, null, 2)}
                       </pre>
                     </div>
@@ -4856,7 +4819,7 @@ export function MyPageView({
               const rawDashas = astrologyData?.dashas || profile?.Vedic?.dashas?.vimshottari || [];
               if (rawDashas.length === 0) {
                 return (
-                  <div className="text-center py-8 text-xs text-slate-700 font-mono">
+                  <div className="text-center py-8 text-xs text-slate-500 font-mono">
                     ⚠️ No Vimshottari dasha data available. Please generate or load user particulars.
                   </div>
                 );
@@ -4866,855 +4829,249 @@ export function MyPageView({
               );
             })()}
           </div>
+
+          {/* Table JH7: Vimshottari & Yogini Dashas */}
+          <div className="space-y-3 mt-6">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table JH7
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH7: Vimshottari & Yogini Dashas Registry
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="jhora_vimshottari"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
+            </div>
+          </div>
+
+          {/* Table JH23: Jaimini Chara Dasha (Interactive Table) */}
+          <div className="space-y-3 mt-6">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                  Table JH23
+                </span>
+                <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                  JH23: Jaimini Chara Dasha Timeline (User JSON Based)
+                </h3>
+              </div>
+              <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-wider font-bold">
+                🟢 Live Astrological Engine
+              </span>
+            </div>
+            <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <CharaDashaInteractiveTable profile={profile} astrologyData={astrologyData} isDark={isDark} />
+            </div>
+          </div>
+        </div>
+      ) : activeTab === "charts" ? (
+        <div className="space-y-4">
+          <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+            {(() => {
+              const divisional = profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts || {};
+              if (Object.keys(divisional).length === 0) {
+                return (
+                  <div className="text-center py-8 text-xs text-slate-500 font-mono">
+                    ⚠️ No Divisional Chart data available. Please generate or load user particulars.
+                  </div>
+                );
+              }
+              return renderIndexedTable("table_13", divisional, profile, astrologyData);
+            })()}
+          </div>
+
+          {/* Table JH6: Divisional Vargas & Planetary Dignities */}
+          <div className="space-y-3 mt-6">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table JH6
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH6: Divisional Vargas & Planetary Dignities Registry
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="jhora_divisional"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
+            </div>
+          </div>
         </div>
       ) : activeTab === "vedic" ? (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {/* Table JH1: Birth Details */}
-          <div className="space-y-3" id="table-jh1-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_birth_details" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table JH1
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH1: Birth Details & Astronomical Metrics
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="jhora_birth_details"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
             </div>
           </div>
 
           {/* Table JH2: Natal Planets & Longitudes */}
-          <div className="space-y-3" id="table-jh2-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_planets" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table JH2
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH2: Natal Planets & Longitudes Registry
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="jhora_planets"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
             </div>
           </div>
 
           {/* Table JH3: Shadbala Strengths */}
-          <div className="space-y-3" id="table-jh3-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_shadbala" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table JH3
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH3: Shadbala Strengths Registry
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="jhora_shadbala"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
             </div>
           </div>
 
           {/* Table JH4: Bhava Balas */}
-          <div className="space-y-3" id="table-jh4-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_bhava_balas" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table JH4
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH4: Bhava Balas & House Strengths Registry
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="jhora_bhava_balas"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
             </div>
           </div>
 
           {/* Table JH5: Ashtakavarga Bindus */}
-          <div className="space-y-3" id="table-jh5-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_ashtakavarga" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH6: Divisional Vargas */}
-          <div className="space-y-3" id="table-jh6-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_divisional" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH6-B: Shodashavargas Divisional Planetary Placements Matrix */}
-          <div className="space-y-3" id="table-jh6b-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH6-B</span>
-                Shodashavargas Divisional Planetary Placements Matrix
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              {(() => {
-                const divisional = profile?.Vedic?.divisional_charts || astrologyData?.divisionalCharts || astrologyData?.horoscope?.divisional_charts || {};
-                if (Object.keys(divisional).length === 0) {
-                  return (
-                    <div className="text-center py-8 text-xs text-slate-700 font-mono">
-                      ⚠️ No Divisional Chart data available. Please generate or load user particulars.
-                    </div>
-                  );
-                }
-                return renderIndexedTable("table_13", divisional, profile, astrologyData);
-              })()}
-            </div>
-          </div>
-
-          {/* Table JH7: Vimshottari & Yogini Dashas */}
-          <div className="space-y-3" id="table-jh7-container">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-2xs">
-              <div className="space-y-1">
-                <h4 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950">JH7</span>
-                  Vimshottari Dasha Timeline (To Prana)
-                </h4>
-                <p className="text-xs text-slate-500">
-                  Interactive multi-level Vimshottari dasha cycle down to Prana level.
-                </p>
-              </div>
-              <button
-                onClick={downloadDashaCSV}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-600 transition-all text-xs font-bold shadow-xs cursor-pointer animate-fade-in"
-              >
-                <FileDown className="w-3.5 h-3.5" />
-                <span>Download 50-Year Prana Dasha (CSV)</span>
-              </button>
-            </div>
-
-            <div className="p-1 rounded-xl">
-              {(() => {
-                const rawDashas = astrologyData?.dashas || profile?.Vedic?.dashas?.vimshottari || [];
-                if (rawDashas.length === 0) {
-                  return (
-                    <div className="p-4 bg-white border border-slate-200 rounded-xl text-center text-xs text-slate-500 font-mono">
-                      ⚠️ No Vimshottari dasha data available. Please generate or load user particulars.
-                    </div>
-                  );
-                }
-                return (
-                  <DashaTree dashas={rawDashas} isDark={false} />
-                );
-              })()}
-            </div>
-          </div>
-
-          {/* Table JH8: KP Cusps */}
-          <div className="space-y-3" id="table-jh8-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_cusps" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH9: KP Sublords */}
-          <div className="space-y-3" id="table-jh9-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_sub_lords" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH10: KP Planet Significators */}
-          <div className="space-y-3" id="table-jh10-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_planet_significators" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH11: KP House Significators */}
-          <div className="space-y-3" id="table-jh11-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_house_significators" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH12: Jaimini Chara Karakas */}
-          <div className="space-y-3" id="table-jh12-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jaimini_karakas" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH13: Jaimini Arudhas & Chara Dashas */}
-          <div className="space-y-3" id="table-jh13-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jaimini_arudhas" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH14: Western Tropical Placidus Coordinates */}
-          <div className="space-y-3" id="table-jh14-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="western_tropical" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH15: Western Planetary Aspects & Harps */}
-          <div className="space-y-3" id="table-jh15-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="western_aspects" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH33: Western Placidus House Wheel Interpretation */}
-          <div className="space-y-3" id="table-jh33-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="western_placidus_wheel" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH16: Tajik Varshaphal Sahams */}
-          <div className="space-y-3" id="table-jh16-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="tajika_varshaphal" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH17: Tajik Varshaphal Harshabala */}
-          <div className="space-y-3" id="table-jh17-container">
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="tajika_harshabala" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* LAL KITAB CALCULATIONS ENGINE & INTERACTIVE DASHBOARD (UNIFIED) */}
-          {(() => {
-            const localGenerateFallbackPlanets = (dateStr: string, timeStr: string, lat: number, lon: number) => {
-              const d = new Date(dateStr + "T" + timeStr);
-              const val = d.getTime() || Date.now();
-              const signs = [
-                "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-                "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
-              ];
-              const planetNames = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
-              const planets: any[] = [];
-              planetNames.forEach((name, idx) => {
-                const seed = val * (idx + 1) + lat + lon;
-                const long = Math.abs(Math.sin(seed) * 360);
-                const signIdx = Math.floor(long / 30);
-                const deg = long % 30;
-                const house = (Math.floor(seed) % 12) + 1;
-                planets.push({
-                  name,
-                  longitude: long,
-                  sign: signs[signIdx],
-                  signIndex: signIdx,
-                  degree: deg,
-                  house
-                });
-              });
-              const lagnaLong = Math.abs(Math.cos(val + lat + lon) * 30);
-              const lagnaSignIdx = Math.abs(Math.floor(val / 1000000)) % 12;
-              return {
-                lagna: {
-                  sign: signs[lagnaSignIdx],
-                  signIndex: lagnaSignIdx,
-                  longitude: lagnaSignIdx * 30 + lagnaLong,
-                  degree: lagnaLong
-                },
-                planets
-              };
-            };
-
-            const resolvedData = (() => {
-              if (astrologyData && astrologyData.planets && astrologyData.planets.length > 0) {
-                return astrologyData;
-              }
-              const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets;
-              if (planetsObj && Object.keys(planetsObj).length > 0) {
-                const signs = [
-                  "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
-                  "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
-                ];
-                const planetsList = Object.entries(planetsObj).map(([name, p]: [string, any]) => {
-                  const signIdx = p.sign_index !== undefined ? p.sign_index : signs.indexOf(p.sign);
-                  return {
-                    name,
-                    longitude: p.longitude || (signIdx !== -1 ? signIdx * 30 + p.degree : 0),
-                    sign: p.sign,
-                    signIndex: signIdx !== -1 ? signIdx : 0,
-                    degree: p.degree || 0,
-                    house: p.house || 1
-                  };
-                });
-                const ascSignName = profile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.sign || "Aries";
-                let ascendantSignIndex = profile?.Vedic?.ascendant?.sign_index !== undefined 
-                  ? profile?.Vedic?.ascendant?.sign_index 
-                  : (astrologyData?.lagna?.signIndex !== undefined ? astrologyData?.lagna?.signIndex : signs.indexOf(ascSignName));
-                if (ascendantSignIndex === -1) ascendantSignIndex = 0;
-                return {
-                  lagna: {
-                    sign: ascSignName,
-                    signIndex: ascendantSignIndex,
-                    longitude: ascendantSignIndex * 30 + (profile?.Vedic?.ascendant?.degree || 0),
-                    degree: profile?.Vedic?.ascendant?.degree || 0
-                  },
-                  planets: planetsList
-                };
-              }
-              const bDate = profile?.Birth?.date || "1976-01-06";
-              const bTime = profile?.Birth?.time || "18:40";
-              const bLat = profile?.Birth?.latitude || 28.6139;
-              const bLon = profile?.Birth?.longitude || 77.2090;
-              return localGenerateFallbackPlanets(bDate, bTime, bLat, bLon);
-            })();
-
-            const userAge = age?.years || 30;
-            const lkEvidence = LalKitabEvidenceAdapter(resolvedData.planets);
-            const lkDecision = LalKitabDecisionAdapter(resolvedData.planets, resolvedData.lagna, userAge);
-
-            const lalkitabHouses: { [house: number]: string[] } = {};
-            for (let h = 1; h <= 12; h++) {
-              lalkitabHouses[h] = [];
-            }
-            resolvedData.planets.forEach((p: any) => {
-              const lkHouse = p.signIndex + 1;
-              lalkitabHouses[lkHouse].push(p.name);
-            });
-
-            const getDormantStatus = (planetName: string, houseNum: number) => {
-              if (houseNum === 1) return lalkitabHouses[7].length === 0 ? "Asleep (No planets in House 7)" : "Active";
-              if (houseNum === 7) return lalkitabHouses[1].length === 0 ? "Asleep (No planets in House 1)" : "Active";
-              if (houseNum === 4) return lalkitabHouses[10].length === 0 ? "Asleep (No planets in House 10)" : "Active";
-              if (houseNum === 10) return lalkitabHouses[4].length === 0 ? "Asleep (No planets in House 4)" : "Active";
-              return "Active";
-            };
-
-            return (
-              <div className="space-y-6 pt-6 border-t border-indigo-500/10 mt-6" id="lalkitab-dashboard-section">
-                <div className="border-b border-indigo-500/10 pb-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
-                  <div>
-                    <h3 className="text-sm font-bold flex items-center gap-2 text-red-600">
-                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-red-600 text-white">LAL KITAB ENGINE</span>
-                      Unified Lal Kitab Dashboard & Calculations
-                    </h3>
-                    <p className={`text-xs ${textMutedStyle} mt-1`}>
-                      Analyzing dormancy triggers, artificial pairings, and relational alignment.
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/10 text-red-500 font-bold uppercase tracking-wider">
-                    Aries Fixed House System (Teva)
-                  </span>
-                </div>
-
-                {/* Metrics */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className={`p-4 border rounded-xl ${cardStyle} shadow-xs flex flex-col justify-between`}>
-                    <div>
-                      <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">Marriage Promise Index</span>
-                      <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>
-                        {lkDecision.overallPromiseScore}%
-                      </h4>
-                    </div>
-                    <div className="mt-3">
-                      <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
-                        <div
-                          className={`h-full transition-all ${
-                            lkDecision.overallPromiseScore >= 70 ? "bg-emerald-500" : lkDecision.overallPromiseScore >= 45 ? "bg-amber-500" : "bg-red-500"
-                          }`}
-                          style={{ width: `${lkDecision.overallPromiseScore}%` }}
-                        ></div>
-                      </div>
-                      <span className={`text-[10px] block mt-1.5 font-medium ${textMutedStyle}`}>
-                        {lkDecision.overallPromiseScore >= 70 ? "Firm marriage promise confirmed" : lkDecision.overallPromiseScore >= 45 ? "Moderate promise; triggers on remedies" : "Severe afflictions; remedial path advised"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className={`p-4 border rounded-xl ${cardStyle} shadow-xs flex flex-col justify-between`}>
-                    <div>
-                      <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">Marital Happiness Index</span>
-                      <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>
-                        {lkDecision.overallHappinessScore}%
-                      </h4>
-                    </div>
-                    <div className="mt-3">
-                      <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
-                        <div
-                          className={`h-full transition-all ${
-                            lkDecision.overallHappinessScore >= 70 ? "bg-emerald-500" : lkDecision.overallHappinessScore >= 45 ? "bg-amber-500" : "bg-red-500"
-                          }`}
-                          style={{ width: `${lkDecision.overallHappinessScore}%` }}
-                        ></div>
-                      </div>
-                      <span className={`text-[10px] block mt-1.5 font-medium ${textMutedStyle}`}>
-                        {lkDecision.overallHappinessScore >= 70 ? "Harmonious domestic parameters" : lkDecision.overallHappinessScore >= 45 ? "Mixed harmony; typical communication issues" : "High domestic friction spotted"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className={`p-4 border rounded-xl ${cardStyle} shadow-xs flex flex-col justify-between`}>
-                    <div>
-                      <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider block">Marriage Delay Risk</span>
-                      <div className="flex items-center gap-2 mt-1">
-                        <h4 className={`text-2xl font-bold font-mono ${textStyle}`}>
-                          {lkDecision.marriageDelayRisk}
-                        </h4>
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                          lkDecision.marriageDelayRisk === "High" ? "bg-red-500/10 text-red-500" : lkDecision.marriageDelayRisk === "Medium" ? "bg-amber-500/10 text-amber-500" : "bg-emerald-500/10 text-emerald-500"
-                        }`}>
-                          {lkDecision.marriageDelayRisk === "High" ? "Critical Delay" : lkDecision.marriageDelayRisk === "Medium" ? "Moderate Delay" : "No Delay"}
-                        </span>
-                      </div>
-                    </div>
-                    <p className={`text-[10px] ${textMutedStyle} leading-relaxed mt-3`}>
-                      Derived from Saturn, Rahu, and Ketu's placements across key relationship house nodes (2, 7, 8).
-                    </p>
-                  </div>
-                </div>
-
-                {/* Verdict */}
-                <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/10 text-xs leading-relaxed">
-                  <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider block mb-1">
-                    Lal Kitab Relationship Verdict
-                  </span>
-                  <p className={textStyle}>
-                    {lkDecision.finalVerdictText}
-                  </p>
-                </div>
-
-                {/* Teva Graphic & Sleeping Lists */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className={`p-6 border rounded-xl bg-white shadow-xs flex flex-col justify-center items-center`}>
-                    <span className="text-xs font-mono font-bold text-red-500 mb-4">LAL KITAB TEVA (FIXED HOUSE CHART)</span>
-                    <div className="relative w-72 h-72 border-2 border-red-500/40 bg-red-500/5 rotate-45 rounded">
-                      <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-red-500/20"></div>
-                      <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-red-500/20"></div>
-                      <div className="absolute inset-12 border border-red-500/20 bg-red-500/5 rotate-45"></div>
-
-                      <div className="absolute -rotate-45 top-6 left-[124px] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H1</span>
-                        <span className={`text-xs font-semibold ${textStyle}`}>{lalkitabHouses[1].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 left-6 top-[124px] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H4</span>
-                        <span className={`text-xs font-semibold ${textStyle}`}>{lalkitabHouses[4].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 bottom-6 left-[124px] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H7</span>
-                        <span className={`text-xs font-semibold ${textStyle}`}>{lalkitabHouses[7].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 right-6 top-[124px] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H10</span>
-                        <span className={`text-xs font-semibold ${textStyle}`}>{lalkitabHouses[10].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 left-14 top-14 flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H2</span>
-                        <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[2].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 left-14 bottom-14 flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H3</span>
-                        <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[3].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 right-14 bottom-14 flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H5</span>
-                        <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[5].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 bottom-[68px] left-[124px] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H6</span>
-                        <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[6].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 right-[68px] bottom-[68px] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H8</span>
-                        <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[8].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 right-14 top-14 flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H9</span>
-                        <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[9].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 right-[68px] top-[68px] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H11</span>
-                        <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[11].join(", ") || "—"}</span>
-                      </div>
-                      <div className="absolute -rotate-45 left-[68px] top-[68px] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-red-500">H12</span>
-                        <span className={`text-[11px] ${textStyle}`}>{lalkitabHouses[12].join(", ") || "—"}</span>
-                      </div>
-                    </div>
-                    <div className={`mt-4 text-[11px] ${textMutedStyle} text-center max-w-xs leading-relaxed`}>
-                      Lal Kitab places Aries (1) in the 1st House as a fixed backdrop, mapping all planets based on sign index + 1.
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className={`p-4 border rounded-xl bg-white shadow-xs`}>
-                      <h4 className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-2">Dormant Planets (Soye Grah)</h4>
-                      <p className={`text-[10px] ${textMutedStyle} mb-3`}>
-                        Planets are sleeping (dormant) if their opposing trigger houses are vacant:
-                      </p>
-                      <div className="space-y-1.5 text-xs">
-                        {resolvedData.planets.map((p: any) => {
-                          const lkHouse = p.signIndex + 1;
-                          const status = getDormantStatus(p.name, lkHouse);
-                          return (
-                            <div key={p.name} className="flex justify-between items-center py-1 border-b border-dashed border-slate-500/10">
-                              <span className={textStyle}>{p.name} (House {lkHouse})</span>
-                              <span className={`px-2 py-0.5 rounded font-mono text-[10px] ${(status || "").includes("Asleep") ? "bg-red-500/10 text-red-500" : "bg-emerald-500/10 text-emerald-500"}`}>
-                                {status}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className={`p-4 border rounded-xl bg-white shadow-xs`}>
-                      <h4 className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-2">Artificial Planets (Masnuoi Grah)</h4>
-                      <p className={`text-[10px] ${textMutedStyle} mb-3`}>
-                        Virtual cosmic entities formed by combining parent planet pairs:
-                      </p>
-                      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
-                        <div className="p-2 bg-slate-500/5 rounded flex justify-between">
-                          <span className={textMutedStyle}>Mrc + Ven =</span>
-                          <strong className="text-amber-500">Sun</strong>
-                        </div>
-                        <div className="p-2 bg-slate-500/5 rounded flex justify-between">
-                          <span className={textMutedStyle}>Sun + Jup =</span>
-                          <strong className="text-amber-500">Moon</strong>
-                        </div>
-                        <div className="p-2 bg-slate-500/5 rounded flex justify-between">
-                          <span className={textMutedStyle}>Sun + Mrc =</span>
-                          <strong className="text-amber-500">Mars</strong>
-                        </div>
-                        <div className="p-2 bg-slate-500/5 rounded flex justify-between">
-                          <span className={textMutedStyle}>Sat + Ven =</span>
-                          <strong className="text-amber-500">Rahu</strong>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Dossiers */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className={`p-4 border rounded-xl bg-white shadow-xs`}>
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-2 flex items-center gap-1.5">
-                      <Activity className="w-4 h-4" />
-                      Key Marriage House Dormancy States (Evidence)
-                    </h4>
-                    <p className={`text-[11px] ${textMutedStyle} mb-3`}>
-                      Lal Kitab relationship houses (2, 7, 8) fall asleep if opposing trigger houses are empty.
-                    </p>
-                    <div className="space-y-2 text-xs">
-                      {lkEvidence.dormancyStates.map((ds: any) => (
-                        <div key={ds.house} className="flex justify-between items-center py-1.5 border-b border-dashed border-slate-500/10">
-                          <span className={`font-medium ${textStyle}`}>House {ds.house} ({ds.house === 2 ? "Family Extension" : ds.house === 7 ? "Spouse/Marriage" : "Marital Longevity"})</span>
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-mono ${ds.isDormant ? "bg-red-500/10 text-red-500" : "bg-emerald-500/10 text-emerald-500"}`}>
-                            {ds.isDormant ? "ASLEEP (Dormant)" : "ACTIVE"}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className={`p-4 border rounded-xl bg-white shadow-xs`}>
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-red-500 mb-2 flex items-center gap-1.5">
-                      <User className="w-4 h-4" />
-                      Relationship Significators (Lal Kitab Positions)
-                    </h4>
-                    <p className={`text-[11px] ${textMutedStyle} mb-3`}>
-                      Lal Kitab coordinates and house placements of the primary relationship and nodal coordinates.
-                    </p>
-                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                      {lkEvidence.planetsPositions
-                        .filter((p: any) => ["Venus", "Jupiter", "Moon", "Saturn", "Rahu", "Ketu"].includes(p.name))
-                        .map((p: any) => (
-                          <div key={p.name} className="p-2 bg-slate-500/5 rounded flex justify-between items-center">
-                            <span className={`font-bold ${textStyle}`}>{p.name}</span>
-                            <span className="text-red-500 font-bold">House {p.lkHouse}</span>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Raw Tables */}
-                <div className="space-y-6">
-                  {/* Table JH18: Lalkitab Houses & Planetary Placements */}
-                  <div className="space-y-3" id="table-jh18-container">
-                    <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-                      <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="lalkitab_houses" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-                    </div>
-                  </div>
-
-                  {/* Table JH19: Lal Kitab Teva & Sleeping Planet Status */}
-                  <div className="space-y-3" id="table-jh19-container">
-                    <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-                      <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="lalkitab_teva" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* Table JH26: Personal & Birth Details */}
           <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_personal_details" isDark={false} activeUser={activeUser} hideHeaders={true} />
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table JH5
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH5: Ashtakavarga Bindus Registry
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="jhora_ashtakavarga"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
             </div>
           </div>
 
-          {/* Table JH27: Ascendant & Luminaries */}
+          {/* Table 18: Vedic Upgrahas */}
           <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_ascendant_luminaries" isDark={false} activeUser={activeUser} hideHeaders={true} />
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 18
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Vedic Upgrahas (Secondary Shadow Planets)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_18", null, profile, astrologyData)}
             </div>
           </div>
 
-          {/* Table JH28: Astrological Summary */}
+          {/* Table 20: Ashtakavarga Bindus */}
           <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_astrological_summary" isDark={false} activeUser={activeUser} hideHeaders={true} />
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 20
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Ashtakavarga Bindu Points (SAV / BAV)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_20", null, profile, astrologyData)}
             </div>
           </div>
 
-          {/* Table JH29: Birth Panchanga */}
+          {/* Table 21: Bhava Bala */}
           <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_birth_panchanga" isDark={false} activeUser={activeUser} hideHeaders={true} />
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 21
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Bhava Bala (House Strength Analysis)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_21", null, profile, astrologyData)}
             </div>
           </div>
 
-          {/* Table JH30: Strength Summary */}
+          {/* Table 22: Ishtaphala & Kashtaphala */}
           <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_strength_summary" isDark={false} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Table JH31: Astronomical Data */}
-          <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_astronomical_data" isDark={false} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* JH20: Jaimini Argalas */}
-          <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_jaimini_argalas" isDark={false} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* JH21: Jaimini Sphutas */}
-          <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_jaimini_sphutas" isDark={false} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* JH22: Jaimini Sahams */}
-          <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_jaimini_sahams" isDark={false} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* JH23: Vedic Upgrahas */}
-          <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_vedic_upgrahas" isDark={false} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* JH24: Ishtaphala & Kashtaphala */}
-          <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
-              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_ishtaphala" isDark={false} activeUser={activeUser} hideHeaders={true} />
-            </div>
-          </div>
-
-          {/* Additional: Jaimini Chara Dasha */}
-          <div className="space-y-3">
-            <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                JH25: Jaimini Chara Dasha
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 22
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Ishtaphala & Kashtaphala (Auspiciousness Index)
               </h3>
             </div>
-            
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
-              <CharaDashaInteractiveTable profile={profile} astrologyData={astrologyData} isDark={isDark} />
-            </div>
-          </div>
-
-          {/* Table JH32: Gochara */}
-          <div className="space-y-3" id="table-jh32-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH32</span>
-                Gochara (Transit positions relative to natal chart)
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_gochara" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH33: Current Planetary Longitudes */}
-          <div className="space-y-3" id="table-jh33-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH33</span>
-                Current Planetary Longitudes & Placements (Transit Coordinates)
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_transits" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH34: Current Panchanga */}
-          <div className="space-y-3" id="table-jh34-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH34</span>
-                Current Panchanga (Transit Solilunar Pillars)
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="panchanga" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH35: Current Planetary Strengths */}
-          <div className="space-y-3" id="table-jh35-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH35</span>
-                Current Planetary Strengths
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_strengths" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH36: Current Planetary Yogas */}
-          <div className="space-y-3" id="table-jh36-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH36</span>
-                Current Planetary Yogas & Conjunctions
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_yogas" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH37: Current Transiting Doshas */}
-          <div className="space-y-3" id="table-jh37-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH37</span>
-                Current Transiting Doshas & Obstructions
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_doshas" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH38: Current Planetary Aspects */}
-          <div className="space-y-3" id="table-jh38-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH38</span>
-                Current Planetary Aspects
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_aspects" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH39: House Activation Metrics */}
-          <div className="space-y-3" id="table-jh39-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH39</span>
-                House Activation Metrics
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="house_activation" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH40: Current Nakshatra Positions */}
-          <div className="space-y-3" id="table-jh40-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH40</span>
-                Current Nakshatra Positions
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_nakshatra" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH41: Sensitive Transit Points */}
-          <div className="space-y-3" id="table-jh41-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH41</span>
-                Sensitive Transit Points
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="sensitive_points" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH42: Current Astronomical Events */}
-          <div className="space-y-3" id="table-jh42-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH42</span>
-                Current Astronomical Events
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_events" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH43: Planetary Transit Timeline */}
-          <div className="space-y-3" id="table-jh43-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH43</span>
-                Planetary Transit Timeline
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="transit_timeline" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH44: Upcoming Planet Ingress Schedules */}
-          <div className="space-y-3" id="table-jh44-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH44</span>
-                Upcoming Planet Ingress Schedules
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="planet_ingress" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH45: Transit Interpretations & Summaries */}
-          <div className="space-y-3" id="table-jh45-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH45</span>
-                Transit Interpretations & Summaries
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="transit_summary" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH46: Daily Muhurtas */}
-          <div className="space-y-3" id="table-jh46-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH46</span>
-                Daily Muhurtas (Auspicious hours)
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="daily_muhurta" isDark={false} />
-            </div>
-          </div>
-
-          {/* Table JH47: Event Muhurtas */}
-          <div className="space-y-3" id="table-jh47-container">
-            <div className="border-b border-indigo-500/10 pb-2">
-              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH47</span>
-                Event Muhurtas (Auspicious event timings)
-              </h3>
-            </div>
-            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="event_muhurta" isDark={false} />
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_22", null, profile, astrologyData)}
             </div>
           </div>
         </div>
@@ -5726,7 +5083,7 @@ export function MyPageView({
               profile={profile}
             />
           ) : (
-            <div className="text-center py-8 text-xs text-slate-700 font-mono">
+            <div className="text-center py-8 text-xs text-slate-500 font-mono">
               ⚠️ Please cast a horoscope first to view real-time transits.
             </div>
           )}
@@ -5737,7 +5094,7 @@ export function MyPageView({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Left Column: Chara Karakas */}
             <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-              <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
                 <Award className="w-4 h-4 text-amber-400" />
                 <h4 className={`text-sm font-bold font-sans ${textStyle}`}>
                   Sage Jaimini's Chara Karakas (Planetary Roles)
@@ -5746,10 +5103,10 @@ export function MyPageView({
               <p className={`text-[11px] ${textMutedStyle} leading-relaxed`}>
                 The seven standard planets (Sun to Saturn) are ranked by their degree longitudes in descending order to assign vital life significations.
               </p>
-              <div className="overflow-x-auto rounded-lg border border-slate-200 bg-slate-950/20 text-xs">
+              <div className="overflow-x-auto rounded-lg border border-slate-800/60 bg-slate-950/20 text-xs">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-slate-900/60 text-slate-600 border-b border-slate-200 text-[10px] uppercase font-bold tracking-wider">
+                    <tr className="bg-slate-900/60 text-slate-400 border-b border-slate-800 text-[10px] uppercase font-bold tracking-wider">
                       <th className="py-2 px-3">Karaka Name</th>
                       <th className="py-2 px-3">Significance</th>
                       <th className="py-2 px-3">Graha (Planet)</th>
@@ -5773,10 +5130,10 @@ export function MyPageView({
                         const planet = karakas[key] || "Unknown";
                         const sig = karakaSignifications[key];
                         return (
-                          <tr key={key} className="hover:bg-slate-50 border-b border-slate-900/40">
+                          <tr key={key} className="hover:bg-slate-900/30 border-b border-slate-900/40">
                             <td className="py-2 px-3 font-bold text-amber-500 font-sans">{sig.label}</td>
-                            <td className="py-2 px-3 text-slate-600 text-[10px] leading-tight">{sig.desc}</td>
-                            <td className="py-2 px-3 font-mono font-bold text-slate-900">
+                            <td className="py-2 px-3 text-slate-400 text-[10px] leading-tight">{sig.desc}</td>
+                            <td className="py-2 px-3 font-mono font-bold text-slate-200">
                               <span className="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 border border-slate-700 text-amber-400">
                                 {planet}
                               </span>
@@ -5792,7 +5149,7 @@ export function MyPageView({
 
             {/* Right Column: Jaimini Soul Coordinates & Karakamsha */}
             <div className={`p-5 rounded-xl border ${cardStyle} shadow-sm space-y-4`}>
-              <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+              <div className="flex items-center gap-2 border-b border-slate-800 pb-2">
                 <Shield className="w-4 h-4 text-emerald-400" />
                 <h4 className={`text-sm font-bold font-sans ${textStyle}`}>
                   Jaimini Soul Coordinates & Swamsha Lagnas
@@ -5803,26 +5160,26 @@ export function MyPageView({
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
-                  <span className="text-[10px] font-mono text-slate-700 uppercase tracking-wider block">
+                <div className="p-3 bg-slate-950/40 border border-slate-800/80 rounded-lg space-y-1">
+                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">
                     Karakamsha Sign
                   </span>
                   <span className="text-sm font-bold text-emerald-400 block font-sans">
                     {profile?.Jaimini?.karakamsha || "Cancer"}
                   </span>
-                  <p className="text-[9px] text-slate-600 leading-normal font-sans">
+                  <p className="text-[9px] text-slate-400 leading-normal font-sans">
                     Navamsha sign occupied by the natal Atmakaraka. Indicates soul's inner light and path to liberation (Moksha).
                   </p>
                 </div>
 
-                <div className="p-3 bg-white border border-slate-200 rounded-lg space-y-1">
-                  <span className="text-[10px] font-mono text-slate-700 uppercase tracking-wider block">
+                <div className="p-3 bg-slate-950/40 border border-slate-800/80 rounded-lg space-y-1">
+                  <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">
                     Swamsha Sign
                   </span>
                   <span className="text-sm font-bold text-emerald-400 block font-sans">
                     {profile?.Jaimini?.swamsha || "Cancer"}
                   </span>
-                  <p className="text-[9px] text-slate-600 leading-normal font-sans">
+                  <p className="text-[9px] text-slate-400 leading-normal font-sans">
                     The Navamsha Lagna sign / Atmakaraka alignment in the divisional charts. Maps soul projection to physical manifest destiny.
                   </p>
                 </div>
@@ -5836,20 +5193,229 @@ export function MyPageView({
                     Calculation Standard Reference
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-600 leading-normal">
+                <p className="text-[10px] text-slate-400 leading-normal">
                   Calculated based on <strong>Sage Jaimini's Upadesha Sutras</strong>. Degrees sorted precisely client-side with secondary planet longitude filters to avoid static placeholder dates.
                 </p>
               </div>
             </div>
           </div>
+
+          {/* Table 10: Argalas */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 10
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Jaimini Planetary Argalas & Obstructions (Interveners Matrix)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_10", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 14: Arudhas */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 14
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Jaimini Arudha Padas (Manifested Projections of Houses)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_14", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 15: Sphutas */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 15
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Jaimini Sphutas & Special Lagnas (Hora, Ghati, Bhava & Pranapada)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_15", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 16: Shadbala */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 16
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Vedic Shadbala Strengths (Rupas & Strength Ratio)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_16", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 17: Sahams */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 17
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Jaimini Sahams (Arabic Sensitive Points)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_17", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table 23: Jaimini Chara Dasha */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table 23
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                Jaimini Chara Dasha (Zodiacal Cycles & Sign-Based Timeline)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              {renderIndexedTable("table_23", null, profile, astrologyData)}
+            </div>
+          </div>
+
+          {/* Table JH12: Jaimini Chara Karakas (Raw Data) */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table JH12
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH12: Jaimini Chara Karakas (Raw Registry)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="jaimini_karakas"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
+            </div>
+          </div>
+
+          {/* Table JH13: Jaimini Arudhas & Chara Dashas (Raw Data) */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-amber-500 font-bold uppercase tracking-wider block">
+                Table JH13
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH13: Jaimini Arudhas & Chara Dashas (Raw Registry)
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="jaimini_arudhas"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
+            </div>
+          </div>
         </div>
       ) : activeTab === "kp" ? (
         <div className="space-y-6">
-          <div className="p-4 rounded-xl border border-emerald-500/10 bg-emerald-500/5 text-emerald-950 dark:text-emerald-100 flex items-center justify-center min-h-[200px]">
-             <div className="text-center space-y-2">
-               <h3 className="text-lg font-bold">KP System Details</h3>
-               <p className="text-sm opacity-80">All raw Krishnamurti Paddhati (KP) tables (Cusps, Sublords, Significators) have been moved to the "My Astro Details" section.</p>
-             </div>
+          {/* Table JH8: KP Placidus Cusps */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">
+                Table JH8
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH8: Placidus Cusps & Longitudes Registry
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="kp_cusps"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
+            </div>
+          </div>
+
+          {/* Table JH9: KP Sublords */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">
+                Table JH9
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH9: KP Planetary Sublords Registry
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="kp_sub_lords"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
+            </div>
+          </div>
+
+          {/* Table JH10: KP Planet Significators */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">
+                Table JH10
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH10: KP Planet Significators Registry
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="kp_planet_significators"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
+            </div>
+          </div>
+
+          {/* Table JH11: KP House Significators */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+              <span className="font-mono text-[10px] text-cyan-400 font-bold uppercase tracking-wider block">
+                Table JH11
+              </span>
+              <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                JH11: KP House Significators Registry
+              </h3>
+            </div>
+            <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+              <AstroRawTablesView
+                astrologyData={astrologyData}
+                activeSubmenuId="kp_house_significators"
+                isDark={isDark}
+                activeUser={activeUser}
+                hideHeaders={true}
+              />
+            </div>
           </div>
         </div>
       ) : activeTab === "lalkitab" ? (
@@ -6278,6 +5844,48 @@ export function MyPageView({
                   </div>
                 </div>
               </div>
+
+              {/* Table JH18: Lalkitab Houses & Planetary Placements */}
+              <div className="space-y-3 mt-6">
+                <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+                  <span className="font-mono text-[10px] text-red-400 font-bold uppercase tracking-wider block">
+                    Table JH18
+                  </span>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                    JH18: Lalkitab Houses & Planetary Placements Registry
+                  </h3>
+                </div>
+                <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+                  <AstroRawTablesView
+                    astrologyData={astrologyData}
+                    activeSubmenuId="lalkitab_houses"
+                    isDark={isDark}
+                    activeUser={activeUser}
+                    hideHeaders={true}
+                  />
+                </div>
+              </div>
+
+              {/* Table JH19: Lalkitab Teva Kundli Coordinates */}
+              <div className="space-y-3 mt-6">
+                <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+                  <span className="font-mono text-[10px] text-red-400 font-bold uppercase tracking-wider block">
+                    Table JH19
+                  </span>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                    JH19: Lalkitab Teva Kundli Coordinates Registry
+                  </h3>
+                </div>
+                <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+                  <AstroRawTablesView
+                    astrologyData={astrologyData}
+                    activeSubmenuId="lalkitab_teva"
+                    isDark={isDark}
+                    activeUser={activeUser}
+                    hideHeaders={true}
+                  />
+                </div>
+              </div>
             </div>
           );
         })()
@@ -6357,7 +5965,7 @@ export function MyPageView({
                   <button
                     onClick={() => setTajikSubTab("relationship")}
                     className={`px-2 py-1 rounded transition-all cursor-pointer ${
-                      tajikSubTab === "relationship" ? "bg-indigo-500 text-slate-950" : "text-slate-600"
+                      tajikSubTab === "relationship" ? "bg-indigo-500 text-slate-950" : "text-slate-400"
                     }`}
                   >
                     Relationship Engine
@@ -6365,7 +5973,7 @@ export function MyPageView({
                   <button
                     onClick={() => setTajikSubTab("solarReturn")}
                     className={`px-2 py-1 rounded transition-all cursor-pointer ${
-                      tajikSubTab === "solarReturn" ? "bg-indigo-500 text-slate-950" : "text-slate-600"
+                      tajikSubTab === "solarReturn" ? "bg-indigo-500 text-slate-950" : "text-slate-400"
                     }`}
                   >
                     Solar Return
@@ -6468,6 +6076,186 @@ export function MyPageView({
                   </div>
                 </div>
               )}
+
+              {/* Table JH16: Tajik Varshaphal Sahams */}
+              <div className="space-y-3 mt-6">
+                <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+                  <span className="font-mono text-[10px] text-indigo-400 font-bold uppercase tracking-wider block">
+                    Table JH16
+                  </span>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                    JH16: Tajik Varshaphal Sahams (Arabic Sensitive Points) Registry
+                  </h3>
+                </div>
+                <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+                  <AstroRawTablesView
+                    astrologyData={astrologyData}
+                    activeSubmenuId="tajika_varshaphal"
+                    isDark={isDark}
+                    activeUser={activeUser}
+                    hideHeaders={true}
+                  />
+                </div>
+              </div>
+
+              {/* Table JH17: Tajik Varshaphal Harshabala */}
+              <div className="space-y-3 mt-6">
+                <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+                  <span className="font-mono text-[10px] text-indigo-400 font-bold uppercase tracking-wider block">
+                    Table JH17
+                  </span>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                    JH17: Tajik Varshaphal Harshabala (Yearly Strength Index) Registry
+                  </h3>
+                </div>
+                <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+                  <AstroRawTablesView
+                    astrologyData={astrologyData}
+                    activeSubmenuId="tajika_harshabala"
+                    isDark={isDark}
+                    activeUser={activeUser}
+                    hideHeaders={true}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })()
+      ) : activeTab === "chinese" ? (
+        (() => {
+          const stems = [
+            { name: "Jia (Yang Wood)", element: "Wood", color: "text-emerald-500" },
+            { name: "Yi (Yin Wood)", element: "Wood", color: "text-emerald-400" },
+            { name: "Bing (Yang Fire)", element: "Fire", color: "text-red-500" },
+            { name: "Ding (Yin Fire)", element: "Fire", color: "text-red-400" },
+            { name: "Wu (Yang Earth)", element: "Earth", color: "text-amber-500" },
+            { name: "Ji (Yin Earth)", element: "Earth", color: "text-amber-400" },
+            { name: "Geng (Yang Metal)", element: "Metal", color: "text-gray-400" },
+            { name: "Xin (Yin Metal)", element: "Metal", color: "text-gray-300" },
+            { name: "Ren (Yang Water)", element: "Water", color: "text-sky-500" },
+            { name: "Gui (Yin Water)", element: "Water", color: "text-sky-400" }
+          ];
+
+          const branches = [
+            { name: "Zi (Rat)", element: "Water", animal: "Rat", color: "text-sky-500" },
+            { name: "Chou (Ox)", element: "Earth", animal: "Ox", color: "text-amber-500" },
+            { name: "Yin (Tiger)", element: "Wood", animal: "Tiger", color: "text-emerald-500" },
+            { name: "Mao (Rabbit)", element: "Wood", animal: "Rabbit", color: "text-emerald-400" },
+            { name: "Chen (Dragon)", element: "Earth", animal: "Dragon", color: "text-amber-500" },
+            { name: "Si (Snake)", element: "Fire", animal: "Snake", color: "text-red-500" },
+            { name: "Wu (Horse)", element: "Fire", animal: "Horse", color: "text-red-400" },
+            { name: "Wei (Goat)", element: "Earth", animal: "Goat", color: "text-amber-500" },
+            { name: "Shen (Monkey)", element: "Metal", animal: "Monkey", color: "text-gray-400" },
+            { name: "You (Rooster)", element: "Metal", animal: "Rooster", color: "text-gray-300" },
+            { name: "Xu (Dog)", element: "Earth", animal: "Dog", color: "text-amber-500" },
+            { name: "Pig (Hai)", element: "Water", animal: "Pig", color: "text-sky-400" }
+          ];
+
+          const dateObj = new Date(profile?.Birth?.date || "1995-10-15");
+          const birthYear = dateObj.getFullYear();
+          const birthMonth = dateObj.getMonth() + 1;
+          const birthDay = dateObj.getDate();
+          const birthHour = parseInt((profile?.Birth?.time || "08:00").split(":")[0]) || 8;
+
+          const yearIdx = (birthYear - 4) % 60;
+          const yearStem = stems[yearIdx % 10];
+          const yearBranch = branches[yearIdx % 12];
+
+          const monthIdx = (birthYear * 12 + birthMonth + 12) % 60;
+          const monthStem = stems[monthIdx % 10];
+          const monthBranch = branches[(birthMonth + 1) % 12];
+
+          const baseDay = Math.abs(birthYear * 365 + birthMonth * 30 + birthDay) % 60;
+          const dayStem = stems[baseDay % 10];
+          const dayBranch = branches[baseDay % 12];
+
+          const hourBranchIdx = Math.floor(((birthHour + 1) % 24) / 2);
+          const hourStemIdx = (baseDay % 5) * 2 + hourBranchIdx;
+          const hourStem = stems[hourStemIdx % 10];
+          const hourBranch = branches[hourBranchIdx % 12];
+
+          const elementScores: { [key: string]: number } = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
+          [yearStem, monthStem, dayStem, hourStem].forEach(s => elementScores[s.element] += 15);
+          [yearBranch, monthBranch, dayBranch, hourBranch].forEach(b => elementScores[b.element] += 10);
+
+          return (
+            <div className="space-y-6">
+              {/* Pillars Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: "HOUR PILLAR", stem: hourStem, branch: hourBranch, desc: "Late life & legacy" },
+                  { label: "DAY PILLAR", stem: dayStem, branch: dayBranch, desc: "The Day Master (Self)", isPrimary: true },
+                  { label: "MONTH PILLAR", stem: monthStem, branch: monthBranch, desc: "Parents & career root" },
+                  { label: "YEAR PILLAR", stem: yearStem, branch: yearBranch, desc: "Grandparents & outer world" }
+                ].map((col) => (
+                  <div
+                    key={col.label}
+                    className={`p-4 border-2 rounded-xl text-center flex flex-col justify-between ${col.isPrimary ? "border-emerald-500 bg-emerald-500/5 shadow-lg" : cardStyle}`}
+                  >
+                    <span className={`text-[10px] font-bold tracking-widest ${col.isPrimary ? "text-emerald-500" : textMutedStyle}`}>
+                      {col.label}
+                    </span>
+                    
+                    <div className="my-4 space-y-1">
+                      <div className="flex flex-col">
+                        <span className={`text-base font-bold ${col.stem.color}`}>{col.stem.name.split(" ")[0]}</span>
+                        <span className={`text-[10px] ${textMutedStyle}`}>{col.stem.name.split(" ")[1]}</span>
+                      </div>
+                      <div className="h-0.5 bg-slate-500/10 max-w-[30px] mx-auto my-1"></div>
+                      <div className="flex flex-col">
+                        <span className={`text-base font-bold ${col.branch.color}`}>{col.branch.name.split(" ")[0]}</span>
+                        <span className={`text-[10px] font-semibold ${col.branch.color}`}>{col.branch.animal}</span>
+                      </div>
+                    </div>
+
+                    <span className={`text-[9px] italic ${textMutedStyle} leading-tight`}>
+                      {col.desc}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Elements & Day Master */}
+              <div className={`p-5 border rounded-xl ${cardStyle} grid grid-cols-1 md:grid-cols-2 gap-6`}>
+                <div>
+                  <h4 className={`text-xs font-bold mb-3 ${textStyle}`}>Wu Xing (Five Elements Balance)</h4>
+                  <div className="space-y-3">
+                    {[
+                      { name: "Wood", color: "bg-emerald-500", text: "text-emerald-500", key: "Wood" },
+                      { name: "Fire", color: "bg-red-500", text: "text-red-500", key: "Fire" },
+                      { name: "Earth", color: "bg-amber-500", text: "text-amber-500", key: "Earth" },
+                      { name: "Metal", color: "bg-gray-400", text: "text-gray-400", key: "Metal" },
+                      { name: "Water", color: "bg-sky-500", text: "text-sky-500", key: "Water" }
+                    ].map((el) => {
+                      const pct = elementScores[el.key] || 0;
+                      return (
+                        <div key={el.name} className="space-y-1">
+                          <div className="flex justify-between text-[11px]">
+                            <span className={`font-semibold ${el.text}`}>{el.name}</span>
+                            <span className="font-mono">{pct}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div className={`h-full ${el.color}`} style={{ width: `${pct}%` }}></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="flex flex-col justify-between text-xs space-y-3">
+                  <div>
+                    <h4 className={`text-xs font-bold mb-1 ${textStyle}`}>Day Master: <span className="text-emerald-500">{dayStem.name}</span></h4>
+                    <p className={`text-[11px] ${textMutedStyle} leading-relaxed`}>
+                      Your Day Master represents your core self-identity. Associated with the <strong>{dayStem.element}</strong> element, this config suggests a personality aligned with growth, adaptation, and structure.
+                    </p>
+                  </div>
+                  <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-lg leading-relaxed">
+                    <strong className="block text-emerald-500 mb-1 text-[10px] uppercase">Luck Cycle Tip</strong>
+                    Your elemental balance suggests strong adaptive characteristics. Introduce weaker element traits through visual environment accents for enhanced life alignment.
+                  </div>
+                </div>
+              </div>
             </div>
           );
         })()
@@ -6559,12 +6347,13 @@ export function MyPageView({
           };
 
           return (
-            <div className="space-y-6 flex justify-center">
-              {/* SVG Chart Wheel */}
-              <div className={`p-6 border rounded-xl ${cardStyle} flex flex-col items-center justify-center w-full max-w-xl`}>
-                <span className="text-[10px] font-mono font-bold text-sky-500 mb-4 uppercase tracking-wider">WESTERN PLACIDUS WHEEL</span>
-                
-                <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="mx-auto select-none">
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* SVG Chart Wheel */}
+                <div className={`p-6 border rounded-xl ${cardStyle} flex flex-col items-center justify-center`}>
+                  <span className="text-[10px] font-mono font-bold text-sky-500 mb-4 uppercase tracking-wider">WESTERN PLACIDUS WHEEL</span>
+                  
+                  <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="mx-auto select-none">
                     {/* Background */}
                     <circle cx={center} cy={center} r={r1} fill="none" stroke={isDark ? "#334155" : "#cbd5e1"} strokeWidth="1" />
                     <circle cx={center} cy={center} r={r2} fill="none" stroke={isDark ? "#475569" : "#94a3b8"} strokeWidth="1" />
@@ -6665,8 +6454,83 @@ export function MyPageView({
                     })}
                   </svg>
                 </div>
+
+                {/* Planets & Aspects Listing */}
+                <div className="space-y-4">
+                  <div className={`p-4 border rounded-xl ${cardStyle}`}>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-sky-400 mb-2">Tropical Planetary Coordinates</h4>
+                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                      {resolvedData.planets.map(p => (
+                        <div key={p.name} className="flex justify-between border-b border-slate-500/10 py-1">
+                          <span className={textMutedStyle}>{p.name}:</span>
+                          <span className={`${textStyle} font-bold`}>{p.degree.toFixed(1)}° {p.sign.substring(0, 3)} (H{p.house})</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className={`p-4 border rounded-xl ${cardStyle}`}>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-sky-400 mb-2">Major Planetary Aspects</h4>
+                    <div className="max-h-[160px] overflow-y-auto space-y-1.5 text-xs font-mono">
+                      {aspects.length > 0 ? (
+                        aspects.slice(0, 10).map((asp, i) => (
+                          <div key={i} className="flex justify-between items-center py-1 border-b border-dashed border-slate-500/10">
+                            <span className={textStyle}>{asp.p1} • {asp.p2}</span>
+                            <span style={{ color: asp.color }} className="font-bold">{asp.type}</span>
+                            <span className={textMutedStyle}>Orb: {asp.orb}°</span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className={`text-[11px] ${textMutedStyle}`}>No major aspects computed inside standard orb tolerances.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-            );
+
+              {/* Table JH14: Western Tropical Placidus Coordinates */}
+              <div className="space-y-3 mt-6">
+                <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+                  <span className="font-mono text-[10px] text-sky-400 font-bold uppercase tracking-wider block">
+                    Table JH14
+                  </span>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                    JH14: Western Tropical Placidus Coordinates Registry
+                  </h3>
+                </div>
+                <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+                  <AstroRawTablesView
+                    astrologyData={astrologyData}
+                    activeSubmenuId="western_tropical"
+                    isDark={isDark}
+                    activeUser={activeUser}
+                    hideHeaders={true}
+                  />
+                </div>
+              </div>
+
+              {/* Table JH15: Western Planetary Aspects & Harps */}
+              <div className="space-y-3 mt-6">
+                <div className="flex items-center gap-2 border-b border-slate-800/80 pb-1.5">
+                  <span className="font-mono text-[10px] text-sky-400 font-bold uppercase tracking-wider block">
+                    Table JH15
+                  </span>
+                  <h3 className={`text-sm font-bold uppercase tracking-wider font-sans ${textStyle}`}>
+                    JH15: Western Planetary Aspects & Harps Registry
+                  </h3>
+                </div>
+                <div className={`p-4 rounded-xl border ${cardStyle} shadow-sm overflow-x-auto`}>
+                  <AstroRawTablesView
+                    astrologyData={astrologyData}
+                    activeSubmenuId="western_aspects"
+                    isDark={isDark}
+                    activeUser={activeUser}
+                    hideHeaders={true}
+                  />
+                </div>
+              </div>
+            </div>
+          );
         })()
       ) : activeTab === "daily" ? (
         (() => {
@@ -7027,7 +6891,7 @@ export function MyPageView({
                   </p>
                 </div>
                 {/* Date switcher tabs */}
-                <div className="flex items-center gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-1.5 bg-slate-950/60 p-1 rounded-xl border border-slate-800">
                   {datesList.map((d, idx) => {
                     const dayLabel = idx === 0 ? "Today" : idx === 1 ? "Tomorrow" : "Day After";
                     const isSelected = selectedDateOffset === idx;
@@ -7038,7 +6902,7 @@ export function MyPageView({
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                           isSelected
                             ? "bg-gradient-to-r from-amber-500/10 to-indigo-500/10 border border-amber-500/30 text-amber-200"
-                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-900/40"
+                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
                         }`}
                       >
                         <span className="block font-bold text-[9px] uppercase tracking-wider text-indigo-400">
@@ -7050,19 +6914,6 @@ export function MyPageView({
                       </button>
                     );
                   })}
-                </div>
-              </div>
-
-              {/* Chinese BaZi Day Master Pillar */}
-              <div className={`p-5 rounded-2xl border ${cardStyle} flex flex-col md:flex-row items-center justify-between gap-4`}>
-                <div>
-                  <h4 className={`text-sm font-bold ${textStyle} font-sans`}>Bazi Day Master Pillar (Today's Baseline)</h4>
-                  <p className={`text-xs ${textMuted} mt-0.5`}>
-                    Representing your core self-identity and daily vitality derived from your birth BaZi coordinates.
-                  </p>
-                </div>
-                <div className="w-full md:w-auto">
-                  {renderChinesePillarCard("day")}
                 </div>
               </div>
 
@@ -7081,7 +6932,7 @@ export function MyPageView({
                       <span className="text-[10px] uppercase font-mono tracking-wider font-bold bg-indigo-500/20 text-indigo-300 px-2.5 py-0.5 rounded border border-indigo-500/10">
                         Daily Mental State
                       </span>
-                      <span className="text-xs font-mono text-slate-600 flex items-center gap-1.5">
+                      <span className="text-xs font-mono text-slate-400 flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-indigo-400" />
                         Moon in {transitMoon.nakshatraName}
                       </span>
@@ -7090,7 +6941,7 @@ export function MyPageView({
                     <div className="space-y-4">
                       <div>
                         <span className="text-xs text-indigo-300 font-mono">DOMINANT COGNITIVE CONVERGENCE</span>
-                        <h4 className="text-2xl font-bold text-black mt-1">
+                        <h4 className="text-2xl font-bold text-white mt-1">
                           Houses: {strongestCombo}
                         </h4>
                         <div className="text-xs text-amber-200 font-medium mt-1">
@@ -7098,11 +6949,11 @@ export function MyPageView({
                         </div>
                       </div>
 
-                      <div className="space-y-3 text-sm text-slate-800 leading-relaxed bg-slate-950/50 border border-slate-900 p-5 rounded-xl">
+                      <div className="space-y-3 text-sm text-slate-300 leading-relaxed bg-slate-950/50 border border-slate-900 p-5 rounded-xl">
                         <p>
                           {getPrimaryNarrative()}
                         </p>
-                        <p className="border-t border-slate-200 pt-2 text-xs text-indigo-200">
+                        <p className="border-t border-slate-800/60 pt-2 text-xs text-indigo-200">
                           <strong>Transit Color Overlay:</strong> {getMoonNarrative()}
                         </p>
                       </div>
@@ -7122,8 +6973,8 @@ export function MyPageView({
                                   {h}
                                 </span>
                                 <div>
-                                  <strong className="block text-xs text-black">{m.title}</strong>
-                                  <span className="text-[11px] text-slate-600 leading-normal block mt-0.5 font-sans">
+                                  <strong className="block text-xs text-white">{m.title}</strong>
+                                  <span className="text-[11px] text-slate-400 leading-normal block mt-0.5 font-sans">
                                     {m.desc}
                                   </span>
                                 </div>
@@ -7131,7 +6982,7 @@ export function MyPageView({
                             );
                           })}
                           {primaryThemeHouses.length === 0 && (
-                            <div className="col-span-2 text-center text-xs text-slate-700 py-4 font-mono">
+                            <div className="col-span-2 text-center text-xs text-slate-500 py-4 font-mono">
                               No primary theme houses (&ge; 5 layers) triggered for this date.
                             </div>
                           )}
@@ -7151,9 +7002,9 @@ export function MyPageView({
                       </p>
                     </div>
 
-                    <table className="w-full text-left text-xs text-slate-800 font-mono">
+                    <table className="w-full text-left text-xs text-slate-300 font-mono">
                       <thead>
-                        <tr className="border-b border-slate-200 text-[10px] text-slate-600 uppercase tracking-wider">
+                        <tr className="border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
                           <th className="py-2.5">Index</th>
                           <th className="py-2.5">Theme / Area</th>
                           <th className="py-2.5 text-center">Frequency</th>
@@ -7169,7 +7020,7 @@ export function MyPageView({
                           const m = LOCAL_HOUSE_MOOD_MAP[house];
                           
                           let tier = "Inactive";
-                          let badgeClass = "text-slate-700 bg-slate-900/30";
+                          let badgeClass = "text-slate-500 bg-slate-900/30";
                           if (count >= 5) {
                             tier = "Primary Theme";
                             badgeClass = "text-amber-300 bg-amber-500/10 border border-amber-500/20";
@@ -7178,17 +7029,17 @@ export function MyPageView({
                             badgeClass = "text-indigo-300 bg-indigo-500/10 border border-indigo-500/20";
                           } else if (count > 0) {
                             tier = "Background Overlay";
-                            badgeClass = "text-slate-600 bg-slate-800/30";
+                            badgeClass = "text-slate-400 bg-slate-800/30";
                           }
 
                           return (
                             <tr key={house} className="hover:bg-slate-900/20 transition-colors">
                               <td className="py-2.5 font-bold text-indigo-400">JH{house}</td>
                               <td className="py-2.5 font-sans">
-                                <div className="font-semibold text-black text-[11px]">{m?.title || `House ${house}`}</div>
-                                <div className="text-[10px] text-slate-600 line-clamp-1">{m?.desc || "No custom significations."}</div>
+                                <div className="font-semibold text-white text-[11px]">{m?.title || `House ${house}`}</div>
+                                <div className="text-[10px] text-slate-400 line-clamp-1">{m?.desc || "No custom significations."}</div>
                               </td>
-                              <td className="py-2.5 text-center text-slate-900 font-bold">{count} / 8</td>
+                              <td className="py-2.5 text-center text-slate-200 font-bold">{count} / 8</td>
                               <td className="py-2.5 text-right text-indigo-300 font-bold">{score.toFixed(2)}</td>
                               <td className="py-2.5 text-center">
                                 <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold ${badgeClass}`}>
@@ -7219,9 +7070,9 @@ export function MyPageView({
                     </div>
 
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs text-slate-800 font-mono">
+                      <table className="w-full text-left text-xs text-slate-300 font-mono">
                         <thead>
-                          <tr className="border-b border-slate-200 text-[10px] text-slate-600 uppercase tracking-wider">
+                          <tr className="border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider">
                             <th className="py-2">Layer</th>
                             <th className="py-2">Ruler</th>
                             <th className="py-2 text-right">Weight</th>
@@ -7233,9 +7084,9 @@ export function MyPageView({
                           {layerHouseMaps.map(layer => {
                             return (
                               <tr key={layer.id} className="hover:bg-slate-900/20 transition-colors">
-                                <td className="py-2 text-[10px] text-slate-600 uppercase tracking-wider font-sans">{layer.name.replace(" Lord", "")}</td>
-                                <td className="py-2 text-black font-bold">{layer.planet}</td>
-                                <td className="py-2 text-right text-slate-800">{layer.weight}</td>
+                                <td className="py-2 text-[10px] text-slate-400 uppercase tracking-wider font-sans">{layer.name.replace(" Lord", "")}</td>
+                                <td className="py-2 text-white font-bold">{layer.planet}</td>
+                                <td className="py-2 text-right text-slate-300">{layer.weight}</td>
                                 <td className="py-2 text-right text-emerald-400">{layer.strength.toFixed(2)}x</td>
                                 <td className="py-2 text-right">
                                   <div className="flex gap-1 justify-end flex-wrap">
@@ -7274,7 +7125,7 @@ export function MyPageView({
                               H{h}
                             </span>
                           ))}
-                          {primaryThemeHouses.length === 0 && <span className="text-[10px] text-slate-700 italic">None active</span>}
+                          {primaryThemeHouses.length === 0 && <span className="text-[10px] text-slate-500 italic">None active</span>}
                         </div>
                         <p className={`text-[11px] ${textMuted} mt-1.5 leading-normal font-sans`}>
                           Represents highly recurring mental states, environmental opportunities, and major focus vectors.
@@ -7289,7 +7140,7 @@ export function MyPageView({
                               H{h}
                             </span>
                           ))}
-                          {secondaryThemeHouses.length === 0 && <span className="text-[10px] text-slate-700 italic">None active</span>}
+                          {secondaryThemeHouses.length === 0 && <span className="text-[10px] text-slate-500 italic">None active</span>}
                         </div>
                         <p className={`text-[11px] ${textMuted} mt-1.5 leading-normal font-sans`}>
                           Reflects secondary, supporting emotional impulses or daily objectives that play a solid part in your day.
@@ -7297,10 +7148,10 @@ export function MyPageView({
                       </div>
 
                       <div className="border-l-2 border-slate-600 pl-3 py-1">
-                        <strong className="block text-slate-600 text-[11px]">Background Overlays (1 to 2 Layers)</strong>
+                        <strong className="block text-slate-400 text-[11px]">Background Overlays (1 to 2 Layers)</strong>
                         <div className="flex flex-wrap gap-1 mt-1.5">
                           {backgroundOverlayHouses.map(h => (
-                            <span key={h} className="px-2 py-0.5 rounded bg-slate-900/60 text-slate-600 border border-slate-200 font-mono text-[10px]">
+                            <span key={h} className="px-2 py-0.5 rounded bg-slate-900/60 text-slate-400 border border-slate-800 font-mono text-[10px]">
                               H{h}
                             </span>
                           ))}
@@ -7327,7 +7178,7 @@ export function MyPageView({
               subTab={activeTab}
             />
           ) : (
-            <div className="text-center py-8 text-xs text-slate-700 font-mono">
+            <div className="text-center py-8 text-xs text-slate-500 font-mono">
               ⚠️ Please cast a horoscope first to view real-time transits.
             </div>
           )}
@@ -7341,61 +7192,16 @@ export function MyPageView({
         </div>
       ) : activeTab === "my_life_analysis" ? (
         <div className="space-y-6 animate-fade-in">
-          <div className="bg-slate-900/40 border border-slate-200 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
+          <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
             <div className="p-3.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
               <Layers className="w-6 h-6 animate-pulse" />
             </div>
             <div className="space-y-1.5 max-w-sm">
-              <h4 className="text-base font-bold text-slate-900">My Life Analysis</h4>
-              <p className="text-xs text-slate-600 leading-relaxed font-sans">
+              <h4 className="text-base font-bold text-slate-200">My Life Analysis</h4>
+              <p className="text-xs text-slate-400 leading-relaxed font-sans">
                 This section is reserved for your comprehensive life analysis. Custom charts, transit trends, and predictive matrices will reside here.
               </p>
             </div>
-          </div>
-        </div>
-      ) : activeTab === "weekly" ? (
-        <div className="space-y-6 animate-fade-in">
-          <div className="bg-slate-900/40 border border-slate-200 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
-            <div className="p-3.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">
-              <Calendar className="w-6 h-6" />
-            </div>
-            <div className="space-y-1.5 max-w-sm">
-              <h4 className="text-base font-bold text-slate-900">Weekly Journey</h4>
-              <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                Weekly transit forecasts, external focus areas, and Bazi Hour Pillar influences.
-              </p>
-            </div>
-            {renderChinesePillarCard("hour")}
-          </div>
-        </div>
-      ) : activeTab === "monthly" ? (
-        <div className="space-y-6 animate-fade-in">
-          <div className="bg-slate-900/40 border border-slate-200 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
-            <div className="p-3.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              <Calendar className="w-6 h-6" />
-            </div>
-            <div className="space-y-1.5 max-w-sm">
-              <h4 className="text-base font-bold text-slate-900">Monthly Journey</h4>
-              <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                Monthly astrological transit reports, planetary shifts, and Bazi Month Pillar foundation.
-              </p>
-            </div>
-            {renderChinesePillarCard("month")}
-          </div>
-        </div>
-      ) : activeTab === "long_term" ? (
-        <div className="space-y-6 animate-fade-in">
-          <div className="bg-slate-900/40 border border-slate-200 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
-            <div className="p-3.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              <Compass className="w-6 h-6" />
-            </div>
-            <div className="space-y-1.5 max-w-sm">
-              <h4 className="text-base font-bold text-slate-900">Long Term Journey</h4>
-              <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                Long term predictive trends, major dasha shifts, life milestones, and Bazi Year Pillar overarching cycles.
-              </p>
-            </div>
-            {renderChinesePillarCard("year")}
           </div>
         </div>
       ) : activeTab === "future" ? (
@@ -7698,7 +7504,7 @@ export function MyPageView({
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-2 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-slate-800">
                   <button
                     disabled={futurePage === 0}
                     onClick={() => setFuturePage(p => Math.max(0, p - 1))}
@@ -7706,7 +7512,7 @@ export function MyPageView({
                   >
                     Prev
                   </button>
-                  <span className="text-[11px] font-mono text-slate-600 px-1">
+                  <span className="text-[11px] font-mono text-slate-400 px-1">
                     Page {futurePage + 1} of {totalPages}
                   </span>
                   <button
@@ -7739,17 +7545,17 @@ export function MyPageView({
                         <span className="text-[9px] uppercase tracking-wider font-bold text-indigo-400">
                           H{fd.house}
                         </span>
-                        <span className="text-xl font-bold text-black mt-0.5">
+                        <span className="text-xl font-bold text-white mt-0.5">
                           {fd.house}
                         </span>
-                        <span className="text-[8px] font-mono text-slate-700 uppercase mt-0.5">
+                        <span className="text-[8px] font-mono text-slate-500 uppercase mt-0.5">
                           {fd.count}/7 Layers
                         </span>
                       </div>
 
                       <div className="flex-1 space-y-1 min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-sm font-bold text-black truncate">
+                          <span className="text-sm font-bold text-white truncate">
                             {dateString}
                           </span>
                           {isToday && (
@@ -7767,7 +7573,7 @@ export function MyPageView({
                           {m?.desc}
                         </p>
 
-                        <div className="text-[10px] font-mono text-slate-700 flex items-center gap-1.5 flex-wrap">
+                        <div className="text-[10px] font-mono text-slate-500 flex items-center gap-1.5 flex-wrap">
                           <span>Moon: {fd.moonNak} ({fd.moonSign})</span>
                         </div>
                       </div>

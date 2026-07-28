@@ -4,12 +4,10 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
-import { MyPageView } from "./MyPageView";
 import {
   Send,
   Sparkles,
   Clock,
-  MapPin,
   Heart,
   RefreshCw,
   Calendar,
@@ -42,14 +40,8 @@ import {
   Paperclip,
   Settings,
   ArrowUp,
-  ArrowLeft,
   Compass,
-  Briefcase,
-  Moon,
-  Sun,
-  Orbit,
-  X,
-  LayoutDashboard
+  Briefcase
 } from "lucide-react";
 import { AstrologyData } from "../lib/astrology";
 import { apiFetch as fetch } from "../lib/api";
@@ -60,7 +52,6 @@ interface AstroChatProps {
   astrologyData: AstrologyData | null;
   isStandalone?: boolean;
   onCloseStandalone?: () => void;
-  onNavigateMenu?: (menu: string, submenu?: string) => void;
 }
 
 interface Message {
@@ -71,7 +62,7 @@ interface Message {
   debugInfo?: any;
 }
 
-export default function AstroChat({ astrologyData, isStandalone, onCloseStandalone, onNavigateMenu }: AstroChatProps) {
+export default function AstroChat({ astrologyData, isStandalone, onCloseStandalone }: AstroChatProps) {
   // Sidebar open/close state on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -97,46 +88,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const [dislikedMessages, setDislikedMessages] = useState<Record<string, boolean>>({});
   const [currentStatusMsg, setCurrentStatusMsg] = useState("");
   const [moodAnalysisExpanded, setMoodAnalysisExpanded] = useState(true);
-  const [myLifeExpanded, setMyLifeExpanded] = useState(true);
-  const [myJourneyExpanded, setMyJourneyExpanded] = useState(true);
-  const [myReportsExpanded, setMyReportsExpanded] = useState(true);
-  const [activeSubmenuPanel, setActiveSubmenuPanel] = useState<string | null>(null);
-
-  const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  const [locationName, setLocationName] = useState<string>("Gurugram, India");
-  const [locationLoading, setLocationLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
-
-    if (typeof navigator !== "undefined" && navigator.geolocation) {
-      setLocationLoading(true);
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const res = await fetch(`/api/jhora/location/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}`);
-            const data = await res.json();
-            if (data.address) {
-              const city = data.address.city || data.address.town || data.address.village || data.address.county || "Gurugram";
-              const country = data.address.country || "India";
-              setLocationName(`${city}, ${country}`);
-            }
-          } catch (e) {
-            // fallback stays Gurugram, India
-          } finally {
-            setLocationLoading(false);
-          }
-        },
-        () => {
-          setLocationLoading(false);
-        }
-      );
-    }
-
-    return () => clearInterval(timer);
-  }, []);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -188,26 +139,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const lagnaSign = astrologyData?.lagna?.sign || "Cancer";
   const natalMoonSign = astrologyData?.planets?.find(p => p.name === "Moon")?.sign || "Aquarius";
   const natalMoonNak = astrologyData?.planets?.find(p => p.name === "Moon")?.nakshatra || "Shatabhisha";
-
-  const profileName = (astrologyData as any)?.name || astrologyData?.birthDetails?.name || "Nitin";
-  const profileDob = astrologyData?.birthDetails?.date || "1979-07-16";
-  const profileTob = astrologyData?.birthDetails?.time || "17:42:00";
-  const profilePob = astrologyData?.birthDetails?.location || (astrologyData?.birthDetails as any)?.place || "New Delhi, India";
-
-  const dashaParts = activeDasha ? activeDasha.split("-") : ["Mercury", "Saturn", "Jupiter"];
-  const antaraLord = dashaParts[2] || "Jupiter";
-  const pranaLord = "Venus";
-
-  const transitMoonSign = currentSky?.moon?.currentSign?.displayName || currentSky?.moon?.currentSign || currentSky?.planets?.moon?.currentSign || "Capricorn";
-  const transitMoonNak = currentSky?.moon?.currentNakshatra?.displayName || currentSky?.moon?.currentNakshatra || currentSky?.planets?.moon?.nakshatra || "Uttara Ashadha";
-  const transitMoonStarLord = currentSky?.moon?.currentStarLord?.displayName || currentSky?.moon?.currentStarLord || currentSky?.moon?.currentNakshatra?.lord || currentSky?.planets?.moon?.starLord || "Sun";
-  const transitMoonSubLord = currentSky?.moon?.currentSubLord?.displayName || currentSky?.moon?.currentSubLord || currentSky?.planets?.moon?.subLord || "Jupiter";
-
-  const transitSunSign = currentSky?.sun?.sign?.displayName || currentSky?.planets?.sun?.currentSign || "Cancer";
-  const transitSunNak = currentSky?.sun?.nakshatra?.displayName || currentSky?.planets?.sun?.nakshatra || "Pushya";
-  const transitJupSign = currentSky?.planets?.jupiter?.currentSign || "Sagittarius";
-  const transitSatSign = currentSky?.planets?.saturn?.currentSign || "Leo";
-  const transitMarSign = currentSky?.planets?.mars?.currentSign || "Cancer";
 
   // Dynamically load/build the prompts from the imported JSON
   const getMoodPromptsFromJSON = () => {
@@ -428,444 +359,195 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     }
   ];
 
-  // Custom rich renderer for markdown text with vibrant tables & formatting
+  // Custom rich renderer for markdown text
   const renderMarkdown = (text: string) => {
-    const lines = text.split("\n");
-    const elements: React.ReactNode[] = [];
-    let i = 0;
-
-    while (i < lines.length) {
-      const line = lines[i];
-
-      // Check if line looks like a table row (contains '|' and starts/ends with '|')
-      if (line.trim().startsWith("|") && line.trim().endsWith("|")) {
-        const tableLines: string[] = [];
-        while (i < lines.length && lines[i].trim().startsWith("|") && lines[i].trim().endsWith("|")) {
-          tableLines.push(lines[i].trim());
-          i++;
-        }
-
-        // Filter out divider lines like |---|---|
-        const dataRows = tableLines.filter(row => !/^\|[\s\-:|]+\|$/.test(row));
-        if (dataRows.length > 0) {
-          const headerCells = dataRows[0]
-            .split("|")
-            .slice(1, -1)
-            .map(c => c.trim());
-
-          const bodyRows = dataRows.slice(1).map(row =>
-            row
-              .split("|")
-              .slice(1, -1)
-              .map(c => c.trim())
-          );
-
-          elements.push(
-            <div key={`table-${i}`} className="my-3 overflow-x-auto rounded-xl border border-indigo-200/90 shadow-2xs bg-white">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gradient-to-r from-indigo-700 via-purple-700 to-indigo-800 text-white font-mono text-xs uppercase tracking-wider">
-                    {headerCells.map((h, hIdx) => (
-                      <th key={hIdx} className="py-2.5 px-3.5 font-bold border-b border-indigo-900/80">
-                        {h.replace(/\*\*(.*?)\*\*/g, "$1")}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-indigo-100/80">
-                  {bodyRows.map((rowCells, rIdx) => (
-                    <tr key={rIdx} className={rIdx % 2 === 0 ? "bg-white hover:bg-purple-50/60 transition-colors" : "bg-indigo-50/50 hover:bg-purple-50/60 transition-colors"}>
-                      {rowCells.map((cell, cIdx) => {
-                        const bolded = cell.replace(/\*\*(.*?)\*\*/g, "<strong class='text-indigo-950 font-bold'>$1</strong>");
-                        return (
-                          <td key={cIdx} className="py-2 px-3.5 text-xs text-neutral-900 font-medium leading-relaxed" dangerouslySetInnerHTML={{ __html: bolded }} />
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          );
-          continue;
-        }
-      }
-
-      // Headers
+    return text.split("\n").map((line, idx) => {
       if (line.startsWith("### ")) {
-        elements.push(
-          <h4 key={`h4-${i}`} className="text-xs font-extrabold uppercase font-mono tracking-wider bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 bg-clip-text text-transparent mt-4 mb-2 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-            {line.replace("### ", "")}
-          </h4>
-        );
-      } else if (line.startsWith("## ")) {
-        elements.push(
-          <h3 key={`h3-${i}`} className="text-sm font-bold text-neutral-900 mt-5 mb-2 font-sans border-l-4 border-indigo-600 pl-2.5 py-1 bg-gradient-to-r from-indigo-50 to-purple-50/40 rounded-r-lg shadow-2xs">
-            {line.replace("## ", "")}
-          </h3>
-        );
-      } else if (line.startsWith("# ")) {
-        elements.push(
-          <h2 key={`h2-${i}`} className="text-base font-extrabold text-indigo-950 mt-6 mb-3 font-sans tracking-tight bg-gradient-to-r from-indigo-800 via-purple-800 to-indigo-950 bg-clip-text text-transparent border-b border-indigo-100 pb-1">
-            {line.replace("# ", "")}
-          </h2>
-        );
-      } else if (line.startsWith("- ") || line.startsWith("* ")) {
+        return <h4 key={idx} className="text-sm font-bold text-indigo-600 mt-3 mb-1.5 uppercase font-mono tracking-wider">{line.replace("### ", "")}</h4>;
+      }
+      if (line.startsWith("## ")) {
+        return <h3 key={idx} className="text-base font-bold text-neutral-800 mt-4 mb-2 border-b border-neutral-100 pb-1 font-sans">{line.replace("## ", "")}</h3>;
+      }
+      if (line.startsWith("# ")) {
+        return <h2 key={idx} className="text-lg font-bold text-neutral-900 mt-5 mb-2 font-sans tracking-tight">{line.replace("# ", "")}</h2>;
+      }
+      if (line.startsWith("- ") || line.startsWith("* ")) {
         const cleanLine = line.replace(/^[-*]\s+/, "");
-        const bolded = cleanLine.replace(/\*\*(.*?)\*\*/g, "<strong class='text-neutral-950 font-bold'>$1</strong>");
-        elements.push(
-          <li key={`li-${i}`} className="ml-4 list-disc text-neutral-800 text-xs mb-1.5 leading-relaxed marker:text-indigo-600" dangerouslySetInnerHTML={{ __html: bolded }} />
-        );
-      } else if (line.startsWith("> ")) {
-        const cleanLine = line.replace(/^>\s+/, "");
-        const bolded = cleanLine.replace(/\*\*(.*?)\*\*/g, "<strong class='text-amber-950 font-bold'>$1</strong>");
-        elements.push(
-          <blockquote key={`bq-${i}`} className="my-2 p-3 rounded-r-xl border-l-4 border-amber-500 bg-gradient-to-r from-amber-50 via-orange-50/60 to-amber-50/30 text-amber-950 text-xs font-medium shadow-2xs leading-relaxed" dangerouslySetInnerHTML={{ __html: bolded }} />
-        );
-      } else if (line.trim().length > 0) {
-        const bolded = line.replace(/\*\*(.*?)\*\*/g, "<strong class='text-neutral-950 font-bold'>$1</strong>");
-        elements.push(
-          <p key={`p-${i}`} className="mb-2.5 leading-relaxed text-neutral-800 text-xs font-sans" dangerouslySetInnerHTML={{ __html: bolded }} />
+        const bolded = cleanLine.replace(/\*\*(.*?)\*\*/g, "<strong class='text-neutral-900 font-semibold'>$1</strong>");
+        return (
+          <li key={idx} className="ml-4 list-disc text-neutral-700 text-sm mb-1.5 leading-relaxed" dangerouslySetInnerHTML={{ __html: bolded }} />
         );
       }
-
-      i++;
-    }
-
-    return elements;
+      const bolded = line.replace(/\*\*(.*?)\*\*/g, "<strong class='text-neutral-900 font-semibold'>$1</strong>");
+      return (
+        <p key={idx} className="mb-3 leading-relaxed text-neutral-700 text-sm" dangerouslySetInnerHTML={{ __html: bolded }} />
+      );
+    });
   };
 
   const activeDebugInfo = selectedDebugMsg?.debugInfo || messages[messages.length - 1]?.debugInfo;
 
   return (
-    <div className={`w-full ${isStandalone ? "h-screen border-none rounded-none shadow-none" : "h-[calc(100vh-140px)] min-h-[580px] rounded-2xl border border-neutral-200 shadow-xl"} bg-white text-neutral-800 flex flex-col overflow-hidden relative font-sans`}>
+    <div className={`w-full ${isStandalone ? "h-screen border-none rounded-none shadow-none" : "h-[calc(100vh-140px)] min-h-[580px] rounded-2xl border border-neutral-200 shadow-xl"} bg-white text-neutral-800 flex overflow-hidden relative font-sans`}>
       
-      {/* UNIFIED TOP COMPACT HEADER (Full width across entire app window) */}
-      <div className="h-12 border-b border-neutral-200/80 px-3 flex items-center justify-between bg-white text-neutral-800 shrink-0 z-30 gap-2">
-        <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
-          {/* Sidebar toggle button (Mobile only) */}
-          <button 
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-1 rounded-lg hover:bg-neutral-100 lg:hidden text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer shrink-0"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
-
-          <div className="flex items-center gap-1.5 overflow-x-auto text-[10px] font-sans scrollbar-none py-0.5 min-w-0">
-            {/* Transit Moon Nakshatra & Lord/Sublord Pill */}
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-indigo-50/90 border border-indigo-200/80 text-indigo-900 font-medium shrink-0 shadow-2xs text-[10px]">
-              <Moon className="w-3 h-3 text-indigo-600 shrink-0" />
-              <span className="font-bold text-indigo-950">{transitMoonSign}</span>
-              <span className="text-indigo-300">·</span>
-              <span className="font-semibold">{transitMoonNak}</span>
-              <span className="text-indigo-300">|</span>
-              <span className="font-mono text-[9.5px] text-indigo-800 flex items-center gap-0.5">
-                <strong className="text-indigo-950 font-bold">Ld:</strong> {transitMoonStarLord}
-                <span className="text-indigo-300">·</span>
-                <strong className="text-indigo-950 font-bold">Sub:</strong> {transitMoonSubLord}
-              </span>
-            </div>
-
-            {/* Major Planets Transit Summary Pill */}
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50/80 border border-amber-200/80 text-amber-900 text-[9.5px] font-mono shrink-0 shadow-2xs">
-              <Orbit className="w-3 h-3 text-amber-600 shrink-0" />
-              <span className="flex items-center gap-0.5">
-                <Sun className="w-2.5 h-2.5 text-amber-600 shrink-0" />
-                <strong className="text-amber-950 font-bold">{transitSunSign}</strong> <span className="text-[9px] text-amber-800">({transitSunNak})</span>
-              </span>
-              <span className="text-amber-300">|</span>
-              <span>
-                <strong className="text-purple-900 font-bold">Jup:</strong> {transitJupSign}
-              </span>
-              <span className="text-amber-300">|</span>
-              <span>
-                <strong className="text-slate-900 font-bold">Sat:</strong> {transitSatSign}
-              </span>
-              <span className="text-amber-300">|</span>
-              <span>
-                <strong className="text-rose-900 font-bold">Mar:</strong> {transitMarSign}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 shrink-0 ml-1">
-          {/* Current Date, Live Time & Location details pill */}
-          <div className="hidden sm:flex items-center gap-1.5 bg-neutral-50 border border-neutral-200/80 px-2 py-0.5 rounded-full text-[10px] font-medium text-neutral-700 shadow-2xs shrink-0">
-            <div className="flex items-center gap-1">
-              <Clock className="w-3 h-3 text-indigo-500 shrink-0" />
-              <span className="font-semibold text-neutral-800">
-                {currentDateTime.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-              </span>
-              <span className="text-neutral-300">·</span>
-              <span className="font-mono text-indigo-600 font-bold text-[10px]">
-                {currentDateTime.toLocaleTimeString("en-US", { hour12: true, hour: "2-digit", minute: "2-digit" })}
-              </span>
-            </div>
-            <span className="text-neutral-300">|</span>
-            <div className="flex items-center gap-1 text-neutral-700">
-              <MapPin className="w-3 h-3 text-indigo-500 shrink-0" />
-              <span className="font-medium text-neutral-800 truncate max-w-[90px]">
-                {locationLoading ? "Locating..." : locationName}
-              </span>
-            </div>
-          </div>
-
-          {/* Compact unified action icon stack */}
-          <div className="inline-flex items-center bg-white border border-neutral-200/90 rounded-full p-0.5 shadow-2xs shrink-0">
-            {onCloseStandalone && (
-              <button
-                onClick={onCloseStandalone}
-                className="p-1 rounded-full hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer"
-                title="Return to Dashboard"
-              >
-                <ArrowLeft className="w-3 h-3" />
-              </button>
-            )}
-
-            <button 
-              onClick={() => {
-                window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
-              }}
-              className="p-1 rounded-full hover:bg-neutral-100 text-[#5c4df2] transition-all cursor-pointer"
-              title="Open in New Window"
-            >
-              <ExternalLink className="w-3 h-3" />
-            </button>
-
-            <button 
-              onClick={() => {
-                alert("Share Link: Astrological conversation state serialized securely.");
-              }}
-              className="p-1 rounded-full hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900 transition-all cursor-pointer"
-              title="Share conversation"
-            >
-              <Share2 className="w-3 h-3" />
-            </button>
-
-            <button
-              onClick={clearChat}
-              title="Reset Conversation"
-              className="p-1 rounded-full hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer"
-            >
-              <Trash2 className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* MAIN CONTAINER (Sidebar + Center Workspace) */}
-      <div className="flex-1 flex overflow-hidden relative">
+      {/* 1. LEFT SIDEBAR (ChatGPT-style Premium Light Sidebar) */}
+      <div className={`fixed lg:relative inset-y-0 left-0 w-[260px] bg-white border-r border-neutral-200 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         
-        {/* 1. LEFT SIDEBAR */}
-        <div className={`fixed lg:relative inset-y-0 left-0 w-[260px] bg-white border-r border-neutral-200 flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
-          
+        {/* Sidebar Header */}
+        <div className="p-3.5 flex items-center justify-between border-b border-neutral-200/60">
+          {/* Logo and toggle controls */}
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-neutral-800 shrink-0" />
+            <span className="font-bold text-xs tracking-tight text-neutral-800 font-sans">JHora AI</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <button className="p-1.5 hover:bg-neutral-200/60 rounded-lg text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer">
+              <Search className="w-3.5 h-3.5" />
+            </button>
+            <button className="p-1.5 hover:bg-neutral-200/60 rounded-lg text-neutral-500 hover:text-neutral-800 transition-all cursor-pointer">
+              <Compass className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* New Chat Button */}
+        <div className="px-3.5 py-2.5">
+          <button 
+            onClick={() => {
+              setMessages([]);
+              setSelectedDebugMsg(null);
+            }}
+            className="flex items-center gap-2 bg-neutral-200/40 hover:bg-neutral-200/75 border border-neutral-300/20 px-3 py-2 rounded-xl text-xs font-semibold w-full text-left text-neutral-800 transition-colors group cursor-pointer"
+          >
+            <MessageSquare className="w-4 h-4 text-neutral-500" />
+            <span>New chat</span>
+            <Plus className="w-3.5 h-3.5 ml-auto text-neutral-400 group-hover:text-neutral-700" />
+          </button>
+        </div>
+
         {/* Sidebar Navigation Entries */}
-        <div className="flex-1 overflow-y-auto px-2 py-3 space-y-3 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto px-2 py-1 space-y-4 scrollbar-thin">
           
           {/* Main ChatGPT Menu items */}
-          <div className="space-y-2">
-            {/* Dashboard Menu Item */}
-            <button
-              onClick={() => {
-                setActiveSubmenuPanel("dashboard");
-                onNavigateMenu?.("ai_assistant", "dashboard");
-                setSidebarOpen(false);
-              }}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
-                activeSubmenuPanel === "dashboard"
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border border-indigo-700 shadow-sm"
-                  : "bg-neutral-50/80 hover:bg-indigo-50/60 text-neutral-800 hover:text-indigo-900 border border-neutral-200/70"
-              }`}
-            >
-              <LayoutDashboard className={`w-4 h-4 shrink-0 ${activeSubmenuPanel === "dashboard" ? "text-white" : "text-indigo-500"}`} />
-              <span className="font-sans tracking-tight">Dashboard</span>
-            </button>
-
-            {/* 1. My Journey (Renamed from My Mood Analysis) */}
+          <div className="space-y-1">
+            {/* My Mood Analysis Expandable Item */}
             <div className="space-y-0.5">
               <button
                 onClick={() => setMoodAnalysisExpanded(!moodAnalysisExpanded)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold w-full text-left transition-colors cursor-pointer ${
                   moodAnalysisExpanded 
-                    ? "bg-gradient-to-r from-indigo-100/90 via-purple-100/70 to-indigo-50 text-indigo-950 border border-indigo-200" 
-                    : "bg-neutral-50/80 hover:bg-indigo-50/60 text-neutral-800 hover:text-indigo-900 border border-neutral-200/70"
+                    ? "bg-neutral-100/90 text-[#5c4df2]" 
+                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
                 }`}
               >
-                <Compass className={`w-4 h-4 shrink-0 ${moodAnalysisExpanded ? "text-indigo-600" : "text-indigo-500"}`} />
-                <span className="font-sans tracking-tight">My Journey</span>
-                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${moodAnalysisExpanded ? "rotate-180 text-indigo-700" : ""}`} />
+                <Activity className={`w-4 h-4 shrink-0 ${moodAnalysisExpanded ? "text-[#5c4df2]" : "text-neutral-400"}`} />
+                <span>My Mood Analysis</span>
+                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-400 transition-transform duration-200 ${moodAnalysisExpanded ? "rotate-180" : ""}`} />
               </button>
 
               {moodAnalysisExpanded && (
-                <div className="mt-1 ml-2 pl-2 border-l-2 border-indigo-200 space-y-2 py-1">
-                  {/* Journey Navigation Pages */}
-                  <div className="space-y-1">
-                    {[
-                      { id: "daily", label: "Today", theme: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-500 hover:text-white" },
-                      { id: "weekly", label: "Weekly", theme: "bg-orange-50 text-orange-950 border-orange-200 hover:bg-orange-600 hover:text-white" },
-                      { id: "monthly", label: "Monthly", theme: "bg-blue-50 text-blue-950 border-blue-200 hover:bg-blue-600 hover:text-white" },
-                      { id: "long_term", label: "Yearly", theme: "bg-purple-50 text-purple-950 border-purple-200 hover:bg-purple-600 hover:text-white" },
-                      { id: "current_dasha", label: "Active Period", theme: "bg-emerald-50 text-emerald-950 border-emerald-200 hover:bg-emerald-600 hover:text-white" },
-                      { id: "predictions", label: "Predictions", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
-                      { id: "future", label: "Future", theme: "bg-cyan-50 text-cyan-950 border-cyan-200 hover:bg-cyan-600 hover:text-white" },
-                      { id: "tajik", label: "Tajik", theme: "bg-fuchsia-50/80 text-fuchsia-950 border-fuchsia-200/80 hover:bg-fuchsia-600 hover:text-white" }
-                    ].map((sub) => (
-                      <button
-                        key={sub.id}
-                        onClick={() => {
-                          setActiveSubmenuPanel(sub.id);
-                          onNavigateMenu?.("ai_assistant", sub.id);
-                          setSidebarOpen(false);
-                        }}
-                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
-                          activeSubmenuPanel === sub.id
-                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
-                            : `${sub.theme}`
-                        }`}
-                      >
-                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
-                        <span>{sub.label}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* AI Analysis Prompts */}
-                  <div className="pt-2 border-t border-neutral-200/60 space-y-1">
-                    <div className="text-[9px] font-bold text-indigo-400 uppercase tracking-wider px-1 mb-1">AI Prompt Analysis</div>
-                    <div className="space-y-1 max-h-[160px] overflow-y-auto scrollbar-thin pr-1">
-                      {getMoodPromptsFromJSON().map((p) => (
-                        <button
-                          key={p.id}
-                          onClick={() => {
-                            runAnalysis(p.query);
-                            setSidebarOpen(false);
-                          }}
-                          className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] font-medium text-neutral-800 hover:text-indigo-950 bg-neutral-50/60 hover:bg-indigo-50 border border-transparent hover:border-indigo-200/80 w-full text-left transition-all cursor-pointer group shadow-2xs"
-                          title={p.label}
-                        >
-                          <Sparkles className="w-3 h-3 text-indigo-500 group-hover:text-purple-600 shrink-0" />
-                          <span className="truncate">{p.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 2. My Life (Renamed from My Journey) */}
-            <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
-              <button
-                onClick={() => setMyJourneyExpanded(!myJourneyExpanded)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
-                  myJourneyExpanded 
-                    ? "bg-gradient-to-r from-amber-100/90 via-rose-100/70 to-purple-50 text-amber-950 border border-amber-200" 
-                    : "bg-neutral-50/80 hover:bg-amber-50/60 text-neutral-800 hover:text-amber-900 border border-neutral-200/70"
-                }`}
-              >
-                <Heart className={`w-4 h-4 shrink-0 ${myJourneyExpanded ? "text-rose-600" : "text-rose-500"}`} />
-                <span className="font-sans tracking-tight">My Life</span>
-                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${myJourneyExpanded ? "rotate-180 text-amber-700" : ""}`} />
-              </button>
-
-              {myJourneyExpanded && (
-                <div className="mt-1 ml-2 pl-2 border-l-2 border-rose-200 space-y-2 py-1">
-                  {/* My Life Section */}
-                  <div className="space-y-1">
-                    {[
-                      { id: "my_life_analysis", label: "My Life Analysis", theme: "bg-rose-50 text-rose-950 border-rose-200 hover:bg-rose-600 hover:text-white" }
-                    ].map((sub) => (
-                      <button
-                        key={sub.id}
-                        onClick={() => {
-                          setActiveSubmenuPanel(sub.id);
-                          onNavigateMenu?.("ai_assistant", sub.id);
-                          setSidebarOpen(false);
-                        }}
-                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
-                          activeSubmenuPanel === sub.id
-                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
-                            : `${sub.theme}`
-                        }`}
-                      >
-                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
-                        <span>{sub.label}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* My Astro Systems */}
-                  <div className="space-y-1 pt-1">
-                    {[
-                      { id: "vedic", label: "My Astro Details", theme: "bg-amber-50/80 text-amber-950 border-amber-200/80" }
-                    ].map((sub) => (
-                      <button
-                        key={sub.id}
-                        onClick={() => {
-                          setActiveSubmenuPanel(sub.id);
-                          onNavigateMenu?.("ai_assistant", sub.id);
-                          setSidebarOpen(false);
-                        }}
-                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
-                          activeSubmenuPanel === sub.id
-                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
-                            : `${sub.theme} hover:brightness-95`
-                        }`}
-                      >
-                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
-                        <span>{sub.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 3. My Reports */}
-            <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
-              <button
-                onClick={() => setMyReportsExpanded(!myReportsExpanded)}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
-                  myReportsExpanded 
-                    ? "bg-gradient-to-r from-teal-100/90 via-emerald-100/70 to-cyan-50 text-teal-950 border border-teal-200" 
-                    : "bg-neutral-50/80 hover:bg-teal-50/60 text-neutral-800 hover:text-teal-900 border border-neutral-200/70"
-                }`}
-              >
-                <FileText className={`w-4 h-4 shrink-0 ${myReportsExpanded ? "text-teal-600" : "text-teal-500"}`} />
-                <span className="font-sans tracking-tight">My Reports</span>
-                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${myReportsExpanded ? "rotate-180 text-teal-700" : ""}`} />
-              </button>
-
-              {myReportsExpanded && (
-                <div className="mt-1 ml-2 pl-2 border-l-2 border-teal-200 space-y-1 py-1">
-                  {[
-                    { id: "reports_hub", label: "Reports Hub", theme: "bg-teal-50 text-teal-950 border-teal-200/80" },
-                    { id: "my_life_analysis", label: "Life Analysis Report", theme: "bg-emerald-50 text-emerald-950 border-emerald-200/80" },
-                    { id: "predictions", label: "Dasha & Predictions Report", theme: "bg-indigo-50 text-indigo-950 border-indigo-200/80" },
-                    { id: "kp", label: "KP Horary & Event Report", theme: "bg-cyan-50 text-cyan-950 border-cyan-200/80" },
-                    { id: "vedic", label: "My Astro Details", theme: "bg-amber-50 text-amber-950 border-amber-200/80" }
-                  ].map((sub) => (
+                <div className="mt-1 ml-3 pl-2.5 border-l border-neutral-200/80 space-y-1 py-1 max-h-[220px] overflow-y-auto scrollbar-thin">
+                  {getMoodPromptsFromJSON().map((p) => (
                     <button
-                      key={sub.id}
+                      key={p.id}
                       onClick={() => {
-                        setActiveSubmenuPanel(sub.id);
-                        onNavigateMenu?.("ai_assistant", sub.id);
+                        runAnalysis(p.query);
                         setSidebarOpen(false);
                       }}
-                      className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
-                        activeSubmenuPanel === sub.id
-                          ? "bg-gradient-to-r from-teal-600 to-emerald-600 text-white font-bold border-teal-700"
-                          : `${sub.theme} hover:brightness-95`
-                      }`}
+                      className="flex items-center gap-2 py-1.5 px-2 rounded-md text-[10px] font-medium text-neutral-500 hover:text-[#5c4df2] hover:bg-neutral-100/60 w-full text-left transition-all cursor-pointer group"
+                      title={p.label}
                     >
-                      <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
-                      <span>{sub.label}</span>
+                      <Sparkles className="w-3 h-3 text-neutral-300 group-hover:text-[#5c4df2] shrink-0" />
+                      <span className="truncate">{p.label}</span>
                     </button>
                   ))}
                 </div>
               )}
+            </div>
+
+            {[
+              { id: "scheduled", label: "Scheduled", icon: Clock },
+              { id: "plugins", label: "Plugins", icon: Zap },
+              { id: "codex", label: "Codex", icon: Cpu }
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  alert(`${item.label} feature integration: Astrological analysis engines scheduled and managed.`);
+                }}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40 w-full text-left transition-colors cursor-pointer"
+              >
+                <item.icon className="w-4 h-4 text-neutral-400 shrink-0" />
+                <span>{item.label}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Chats / Pinned Folders Section */}
+          <div className="space-y-1 pt-1 border-t border-neutral-200/40">
+            <div className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Pinned Chats</div>
+            <div className="space-y-0.5">
+              {[
+                { id: "nitin-life", label: "Nitin Life", type: "folder" },
+                { id: "ananya-life", label: "Ananya Life", type: "folder" },
+                { id: "market-help", label: "Indian Markets Trading Help", type: "chat" },
+                { id: "jh-api", label: "Jagannatha Hora API", type: "chat" }
+              ].map((item) => {
+                const isActive = activeConversationId === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveConversationId(item.id);
+                      if (item.id === "jh-api") {
+                        // Reset to empty screen
+                        setMessages([]);
+                        setSelectedDebugMsg(null);
+                      } else {
+                        setInput(`Analyzing ${item.label} astrology parameters...`);
+                      }
+                      setSidebarOpen(false);
+                    }}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium w-full text-left transition-colors cursor-pointer ${
+                      isActive 
+                        ? "bg-neutral-200/75 text-neutral-900 border border-neutral-300/30" 
+                        : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                    }`}
+                  >
+                    {item.type === "folder" ? (
+                      <Folder className={`w-4 h-4 shrink-0 ${isActive ? "text-amber-500" : "text-neutral-400"}`} />
+                    ) : (
+                      <MessageSquare className={`w-4 h-4 shrink-0 ${isActive ? "text-[#5c4df2]" : "text-neutral-400"}`} />
+                    )}
+                    <span className="truncate">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Projects Section */}
+          <div className="space-y-1">
+            <div className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Projects</div>
+            <div className="space-y-0.5">
+              {[
+                { id: "daily-tasks", label: "Daily Tasks" },
+                { id: "ananya-fees", label: "Ananya fees" },
+                { id: "anushka-studies", label: "Anushka studies" },
+                { id: "anushka-jain", label: "Anushka Jain" }
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setInput(`Review project timeline for ${item.label}...`);
+                    setSidebarOpen(false);
+                  }}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-500 hover:text-neutral-900 hover:bg-neutral-200/40 w-full text-left cursor-pointer"
+                >
+                  <Folder className="w-4 h-4 text-neutral-400 shrink-0" />
+                  <span className="truncate">{item.label}</span>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -898,285 +580,308 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
       {/* 2. CENTER WORKSPACE (ChatGPT main screen - Pure White Background) */}
       <div className="flex-1 flex flex-col h-full overflow-hidden bg-white">
+        
+        {/* TOP COMPACT HEADER */}
+        <div className="h-14 border-b border-neutral-200/80 px-4 flex items-center justify-between bg-white text-neutral-800">
+          <div className="flex items-center gap-3">
+            {/* Sidebar toggle button (Mobile only) */}
+            <button 
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-1.5 rounded-lg hover:bg-neutral-100 lg:hidden text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
 
-        {/* CONVERSATION AREA OR SUBMENU DETAILS PANEL */}
-        <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8 space-y-6 scrollbar-thin">
-          <div className="max-w-4xl mx-auto space-y-6 w-full">
-            
-            {activeSubmenuPanel ? (
-              <div className="space-y-4 w-full">
-                <div className="flex items-center justify-between bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 px-4 py-2.5 rounded-xl border border-indigo-200/80 shadow-2xs">
-                  <span className="text-xs font-extrabold text-indigo-950 capitalize tracking-tight flex items-center gap-2">
-                    <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                    {activeSubmenuPanel === "vedic" ? "My Astro Details" : activeSubmenuPanel.replace(/_/g, " ")}
-                  </span>
-                </div>
-                <MyPageView
-                  astrologyData={astrologyData}
-                  activeUser={null}
-                  isDark={false}
-                  containerStyle="bg-white border-neutral-200"
-                  cardStyle="bg-neutral-50 border-neutral-200"
-                  textMuted="text-neutral-500"
-                  activeSubmenuId={activeSubmenuPanel}
-                  onSubmenuSelect={(id) => setActiveSubmenuPanel(id)}
-                />
-              </div>
-            ) : (
-              <div className="max-w-2xl mx-auto space-y-6 w-full">
-                {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center text-center py-12 px-6 min-h-[50vh] select-none rounded-2xl bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-pink-50/30 border border-indigo-200/80 shadow-sm">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center shadow-md mb-4">
-                      <Sparkles className="w-6 h-6 animate-pulse" />
-                    </div>
-                    <h1 className="text-2xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 bg-clip-text text-transparent font-sans">
-                      JHora AI Assistant
-                    </h1>
-                    <p className="text-neutral-700 text-xs max-w-md leading-relaxed font-medium mb-6">
-                      Your intelligent Vedic & KP astrological assistant. Ask any question about your chart, dasha, transit trends, or remedies.
-                    </p>
-
-                    {/* Quick prompts grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg text-left">
-                      {quickPrompts.map((p, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => runAnalysis(p.query)}
-                          className="p-3 rounded-xl bg-white/90 hover:bg-white border border-indigo-200/80 hover:border-indigo-400/90 shadow-2xs hover:shadow-xs transition-all cursor-pointer group flex flex-col gap-1"
-                        >
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-900 group-hover:text-purple-700">
-                            <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                            <span>{p.title}</span>
-                          </div>
-                          <span className="text-[10px] text-neutral-600 line-clamp-2 leading-tight">
-                            {p.query}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  messages.map((msg) => (
-                    <div key={msg.id} className="flex gap-4 group">
-                      
-                      {/* Message Sender Icon/Avatar */}
-                      {msg.sender === "assistant" ? (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-md select-none">
-                          <Sparkles className="w-4 h-4 text-white" />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 select-none shadow-sm border border-slate-700">
-                          NJ
-                        </div>
-                      )}
-
-                      {/* Message Balloon */}
-                      <div className="flex-1 space-y-2 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-extrabold text-neutral-900">
-                            {msg.sender === "user" ? "You" : "JHora AI Assistant"}
-                          </span>
-                          {msg.sender === "assistant" && (
-                            <span className="bg-indigo-100 text-indigo-950 font-bold border border-indigo-200 px-2 py-0.5 rounded-full text-[10px]">
-                              KP & Vedic Engine
-                            </span>
-                          )}
-                          <span className="text-[10px] text-neutral-400 font-mono ml-auto">
-                            {msg.timestamp}
-                          </span>
-                        </div>
-
-                        {/* Body Text */}
-                        <div className="text-neutral-800 leading-relaxed text-sm select-text selection:bg-purple-100">
-                          {msg.sender === "user" ? (
-                            <p className="text-xs font-sans text-white bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2.5 rounded-2xl max-w-[90%] inline-block shadow-xs font-medium">
-                              {msg.text}
-                            </p>
-                          ) : (
-                            <div className="space-y-1 bg-gradient-to-br from-indigo-50/40 via-purple-50/20 to-white border-l-4 border-indigo-600 p-4 rounded-2xl border border-indigo-100/90 shadow-2xs">
-                              {renderMarkdown(msg.text)}
-                            </div>
-                          )}
-                        </div>
+            {/* Model Dropdown Selection */}
+            <div className="relative group">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-neutral-100 text-sm font-semibold text-neutral-800 transition-colors text-left cursor-pointer">
+                <span>JHora AI (Vedic Companion)</span>
+                <ChevronDown className="w-4 h-4 text-neutral-400" />
+              </button>
+            </div>
 
 
+          </div>
 
-                        {/* Feedback Buttons underneath Assistant Message */}
-                        {msg.sender === "assistant" && (
-                          <div className="flex items-center gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={() => copyToClipboard(msg.text, msg.id)}
-                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                              title="Copy text"
-                            >
-                              {copiedMessageId === msg.id ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              ) : (
-                                <Copy className="w-3.5 h-3.5" />
-                              )}
-                            </button>
+          <div className="flex items-center gap-2">
+            {/* Response Mode Quick Switch */}
+            <div className="hidden sm:flex items-center bg-neutral-100 border border-neutral-200 p-0.5 rounded-lg text-[10px]">
+              {(["quick", "detailed", "professional", "research"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setResponseMode(m)}
+                  className={`px-2 py-1 rounded font-bold font-mono uppercase transition-all cursor-pointer ${
+                    responseMode === m
+                      ? "bg-[#5c4df2] text-white shadow-sm"
+                      : "text-neutral-500 hover:text-neutral-800"
+                  }`}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
 
-                            <button
-                              onClick={() => toggleLike(msg.id)}
-                              className={`p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer ${
-                                likedMessages[msg.id] ? "text-emerald-600" : "text-neutral-400 hover:text-neutral-700"
-                              }`}
-                              title="Good response"
-                            >
-                              <ThumbsUp className="w-3.5 h-3.5" />
-                            </button>
-
-                            <button
-                              onClick={() => toggleDislike(msg.id)}
-                              className={`p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer ${
-                                dislikedMessages[msg.id] ? "text-red-500" : "text-neutral-400 hover:text-neutral-700"
-                              }`}
-                              title="Bad response"
-                            >
-                              <ThumbsDown className="w-3.5 h-3.5" />
-                            </button>
-
-                            <button
-                              onClick={() => {
-                                alert("Serialized message trace compiled. Link exported to clipboard.");
-                              }}
-                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                              title="Share this response"
-                            >
-                              <Share2 className="w-3.5 h-3.5" />
-                            </button>
-
-                            <button
-                              onClick={() => runAnalysis(messages[messages.length - 2]?.text || "Re-evaluate natal chart context")}
-                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                              title="Regenerate response"
-                            >
-                              <RefreshCw className="w-3.5 h-3.5" />
-                            </button>
-
-                            <button
-                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                              title="More options"
-                            >
-                              <MoreHorizontal className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        )}
-
-                      </div>
-                    </div>
-                  ))
-                )}
-
-                {/* Analysis Loading / Thinking State */}
-                {analysisLoading && (
-                  <div className="flex gap-4 mr-auto animate-pulse">
-                    <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-[#5c4df2] flex items-center justify-center font-bold text-xs shrink-0 select-none">
-                      <Sparkles className="w-4 h-4 text-[#5c4df2] animate-spin" />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-neutral-800">JHora Astro AI</span>
-                        <span className="text-[10px] text-neutral-400">Synthesizing...</span>
-                      </div>
-                      <div className="bg-neutral-50 border border-neutral-200 p-3 rounded-2xl flex items-center gap-3">
-                        <RefreshCw className="w-4 h-4 text-[#5c4df2] animate-spin shrink-0" />
-                        <span className="text-xs text-neutral-600 font-mono animate-pulse">{currentStatusMsg}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div ref={messagesEndRef} />
-              </div>
+            {onCloseStandalone && (
+              <button
+                onClick={onCloseStandalone}
+                className="flex items-center gap-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border border-neutral-200"
+                title="Return to JHora Astrology Dashboard"
+              >
+                <ChevronRight className="w-3.5 h-3.5 rotate-180" />
+                <span>Return to Dashboard</span>
+              </button>
             )}
 
+            <button 
+              onClick={() => {
+                window.open(window.location.origin + window.location.pathname + "?mode=chat", "_blank");
+              }}
+              className="flex items-center gap-1.5 border border-neutral-200 px-3 py-1.5 rounded-full text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition-all cursor-pointer bg-white group"
+              title="Open full page in a new window. Note: If you get a 403 error in the preview sandbox, please use the 'Open in new tab' button at the top-right of AI Studio."
+            >
+              <ExternalLink className="w-3.5 h-3.5 group-hover:scale-105 transition-transform text-[#5c4df2]" />
+              <span className="hidden sm:inline">Open in New Window</span>
+            </button>
+
+            <button 
+              onClick={() => {
+                alert("Share Link: Astrological conversation state serialized securely. Ready to share with your personal circle!");
+              }}
+              className="flex items-center gap-1.5 border border-neutral-200 px-3 py-1.5 rounded-full text-xs font-semibold text-neutral-600 hover:bg-neutral-100 transition-all cursor-pointer bg-white"
+            >
+              <Share2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Share</span>
+            </button>
+
+            <button
+              onClick={clearChat}
+              title="Reset Conversation"
+              className="p-2 rounded-full border border-neutral-200 bg-transparent hover:bg-red-50 text-neutral-400 hover:text-red-500 transition-all cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
 
-        {/* BOTTOM INPUT CONTAINER (Hidden on submenu pages) */}
-        {!activeSubmenuPanel && (
-          <div className="p-4 bg-white border-t border-neutral-100">
-            <div className="max-w-2xl mx-auto space-y-2">
-              
-              {/* Quick action pills when input is empty and we already have some messages on screen */}
-              {messages.length > 0 && !input.trim() && !analysisLoading && (
-                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none justify-center">
-                  {quickPrompts.map((p, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => runAnalysis(p.query)}
-                      className="px-3 py-1.5 text-[10px] font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-full transition-all whitespace-nowrap cursor-pointer shrink-0"
-                    >
-                      {p.title}
-                    </button>
-                  ))}
-                </div>
-              )}
 
-              {/* Unified Input Bar (ChatGPT exact mockup - light theme) */}
-              <form onSubmit={handleCustomSubmit} className="relative bg-neutral-50 rounded-3xl p-1 px-3 flex items-center gap-2 border border-neutral-200 focus-within:border-neutral-300 shadow-sm transition-all">
-                <button
-                  type="button"
-                  onClick={() => {
-                    alert("File attachment: Upload birth charts, horary JSON payloads, or customized transit data to ground the companion.");
-                  }}
-                  className="p-1.5 hover:bg-neutral-200/50 text-neutral-400 hover:text-neutral-600 rounded-full transition-colors cursor-pointer shrink-0"
-                  title="Add attachment"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
 
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask anything"
-                  disabled={analysisLoading}
-                  className="flex-1 bg-transparent border-none outline-none py-2 text-xs text-neutral-800 placeholder-neutral-400 font-sans"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    alert("Speech-to-Text: Speak directly to the Master AI Companion to record and synthesize your query.");
-                  }}
-                  className="p-1.5 hover:bg-neutral-200/50 text-neutral-400 hover:text-neutral-600 rounded-full transition-colors cursor-pointer shrink-0"
-                  title="Voice input"
-                >
-                  <Mic className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={analysisLoading || !input.trim()}
-                  className="bg-black hover:bg-neutral-800 disabled:bg-neutral-200 text-white disabled:text-neutral-400 rounded-full p-2 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm"
-                >
-                  <ArrowUp className="w-4 h-4 stroke-[3]" />
-                </button>
-              </form>
-
-              {/* Profile summary details bar below input */}
-              <div className="flex items-center justify-center gap-2 overflow-x-auto text-[11px] font-sans text-neutral-600 whitespace-nowrap scrollbar-none pt-1 min-w-0">
-                <span className="font-bold text-neutral-800 flex items-center gap-1.5 shrink-0">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block shrink-0"></span>
-                  {profileName}
-                </span>
-                <span className="text-neutral-300 shrink-0">|</span>
-                <span className="shrink-0"><strong className="font-semibold text-neutral-500">DOB:</strong> {profileDob} @ {profileTob}</span>
-                <span className="text-neutral-300 shrink-0">|</span>
-                <span className="shrink-0"><strong className="font-semibold text-neutral-500">Place:</strong> {profilePob}</span>
-                <span className="text-neutral-300 shrink-0">|</span>
-                <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-mono text-[10px] font-medium shrink-0">
-                  <strong>ANTARA:</strong> {antaraLord} <span className="opacity-40">|</span> <strong>PRANA:</strong> {pranaLord}
-                </span>
+        {/* CONVERSATION AREA */}
+        <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8 space-y-6 scrollbar-thin">
+          <div className="max-w-2xl mx-auto space-y-6">
+            
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center text-center py-20 min-h-[50vh] select-none">
+                <Sparkles className="w-8 h-8 text-neutral-300 mb-4 animate-pulse" />
+                <h1 className="text-xl font-sans font-medium text-neutral-700 tracking-tight mb-2">
+                  JHora Astro AI
+                </h1>
+                <p className="text-neutral-400 text-xs font-sans">
+                  Ask any astrological or computational questions to start.
+                </p>
               </div>
+            ) : (
+              messages.map((msg) => (
+                <div key={msg.id} className="flex gap-4 group">
+                  
+                  {/* Message Sender Icon/Avatar */}
+                  {msg.sender === "assistant" ? (
+                    <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-[#5c4df2] flex items-center justify-center font-bold text-xs shrink-0 shadow-sm select-none">
+                      <Sparkles className="w-4 h-4 text-[#5c4df2]" />
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-neutral-800 text-white flex items-center justify-center font-bold text-xs shrink-0 select-none">
+                      NJ
+                    </div>
+                  )}
 
-            </div>
+                  {/* Message Balloon */}
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-neutral-800">
+                        {msg.sender === "user" ? "You" : "JHora Astro AI"}
+                      </span>
+                      <span className="text-[10px] text-neutral-400 font-mono">
+                        {msg.timestamp}
+                      </span>
+                    </div>
+
+                    {/* Body Text */}
+                    <div className="text-neutral-700 leading-relaxed text-sm select-text selection:bg-[#5c4df2]/10">
+                      {msg.sender === "user" ? (
+                        <p className="text-xs font-sans text-neutral-800 bg-neutral-100/80 px-4 py-2.5 rounded-2xl max-w-[90%] inline-block">
+                          {msg.text}
+                        </p>
+                      ) : (
+                        <div className="space-y-1 bg-white">
+                          {renderMarkdown(msg.text)}
+                        </div>
+                      )}
+                    </div>
+
+
+
+                    {/* Feedback Buttons underneath Assistant Message */}
+                    {msg.sender === "assistant" && (
+                      <div className="flex items-center gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => copyToClipboard(msg.text, msg.id)}
+                          className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
+                          title="Copy text"
+                        >
+                          {copiedMessageId === msg.id ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+
+                        <button
+                          onClick={() => toggleLike(msg.id)}
+                          className={`p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer ${
+                            likedMessages[msg.id] ? "text-emerald-600" : "text-neutral-400 hover:text-neutral-700"
+                          }`}
+                          title="Good response"
+                        >
+                          <ThumbsUp className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          onClick={() => toggleDislike(msg.id)}
+                          className={`p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer ${
+                            dislikedMessages[msg.id] ? "text-red-500" : "text-neutral-400 hover:text-neutral-700"
+                          }`}
+                          title="Bad response"
+                        >
+                          <ThumbsDown className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            alert("Serialized message trace compiled. Link exported to clipboard.");
+                          }}
+                          className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
+                          title="Share this response"
+                        >
+                          <Share2 className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          onClick={() => runAnalysis(messages[messages.length - 2]?.text || "Re-evaluate natal chart context")}
+                          className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
+                          title="Regenerate response"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                        </button>
+
+                        <button
+                          className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
+                          title="More options"
+                        >
+                          <MoreHorizontal className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+
+                  </div>
+                </div>
+              ))
+            )}
+
+            {/* Analysis Loading / Thinking State */}
+            {analysisLoading && (
+              <div className="flex gap-4 mr-auto animate-pulse">
+                <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-[#5c4df2] flex items-center justify-center font-bold text-xs shrink-0 select-none">
+                  <Sparkles className="w-4 h-4 text-[#5c4df2] animate-spin" />
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-neutral-800">JHora Astro AI</span>
+                    <span className="text-[10px] text-neutral-400">Synthesizing...</span>
+                  </div>
+                  <div className="bg-neutral-50 border border-neutral-200 p-3 rounded-2xl flex items-center gap-3">
+                    <RefreshCw className="w-4 h-4 text-[#5c4df2] animate-spin shrink-0" />
+                    <span className="text-xs text-neutral-600 font-mono animate-pulse">{currentStatusMsg}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
           </div>
-        )}
+        </div>
+
+        {/* BOTTOM INPUT CONTAINER */}
+        <div className="p-4 bg-white border-t border-neutral-100">
+          <div className="max-w-2xl mx-auto space-y-2">
+            
+            {/* Quick action pills when input is empty and we already have some messages on screen */}
+            {messages.length > 0 && !input.trim() && !analysisLoading && (
+              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none justify-center">
+                {quickPrompts.map((p, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => runAnalysis(p.query)}
+                    className="px-3 py-1.5 text-[10px] font-medium text-neutral-600 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 hover:border-neutral-300 rounded-full transition-all whitespace-nowrap cursor-pointer shrink-0"
+                  >
+                    {p.title}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Unified Input Bar (ChatGPT exact mockup - light theme) */}
+            <form onSubmit={handleCustomSubmit} className="relative bg-neutral-50 rounded-3xl p-1 px-3 flex items-center gap-2 border border-neutral-200 focus-within:border-neutral-300 shadow-sm transition-all">
+              <button
+                type="button"
+                onClick={() => {
+                  alert("File attachment: Upload birth charts, horary JSON payloads, or customized transit data to ground the companion.");
+                }}
+                className="p-1.5 hover:bg-neutral-200/50 text-neutral-400 hover:text-neutral-600 rounded-full transition-colors cursor-pointer shrink-0"
+                title="Add attachment"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask anything"
+                disabled={analysisLoading}
+                className="flex-1 bg-transparent border-none outline-none py-2 text-xs text-neutral-800 placeholder-neutral-400 font-sans"
+              />
+
+              <button
+                type="button"
+                onClick={() => {
+                  alert("Speech-to-Text: Speak directly to the Master AI Companion to record and synthesize your query.");
+                }}
+                className="p-1.5 hover:bg-neutral-200/50 text-neutral-400 hover:text-neutral-600 rounded-full transition-colors cursor-pointer shrink-0"
+                title="Voice input"
+              >
+                <Mic className="w-4 h-4" />
+              </button>
+
+              <button
+                type="submit"
+                disabled={analysisLoading || !input.trim()}
+                className="bg-black hover:bg-neutral-800 disabled:bg-neutral-200 text-white disabled:text-neutral-400 rounded-full p-2 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm"
+              >
+                <ArrowUp className="w-4 h-4 stroke-[3]" />
+              </button>
+            </form>
+
+            {/* ChatGPT Disclaimer */}
+            <div className="text-center text-[10px] text-neutral-400 font-sans">
+              JHora AI can make mistakes. Verify important astrological information.
+            </div>
+
+          </div>
+        </div>
       </div>
+
+
+
     </div>
-  </div>
-);
+  );
 }

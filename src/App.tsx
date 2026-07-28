@@ -556,10 +556,24 @@ export default function App() {
   };
 
   // Active Navigation Coordinate Graph
-  const [activeMenu, setActiveMenu] = useState<string>("ai_assistant");
+  const [activeMenu, setActiveMenu] = useState<string>("my_page");
   const [activeSubMenu, setActiveSubMenu] = useState<{ [key: string]: string }>({
+    horoscope: "overview",
+    charts: "d1_rasi",
+    dashas: "vimshottari",
+    strengths: "shadbala",
+    predictions: "yogas",
+    marriage: "ashtakoota",
+    transit: "current_gochara",
+    muhurta: "daily_muhurta",
+    reports: "generate_pdf",
     ai_assistant: "chat",
-    dashboard: "jhora_birth_details"
+    kp_stellar: "dashboard",
+    western_astrology: "dashboard",
+    esoteric: "nadi",
+    settings: "theme",
+    developer: "raw_json",
+    my_page: "overview"
   });
 
   // Dynamic Plugin Registry
@@ -1459,110 +1473,126 @@ export default function App() {
 
   // Navigation configuration representing Phase 10 spec
   const MAIN_MENU_STRUCTURE: MainMenuNode[] = [
+    { id: "dashboard", label: "Dashboard", icon: Compass },
     {
       id: "ai_assistant",
       label: "AI Assistant",
-      icon: Sparkles,
+      icon: Sparkles
+    },
+    {
+      id: "my_page",
+      label: "My Page",
+      icon: User
+    },
+    {
+      id: "astro",
+      label: "Astro",
+      icon: Activity,
       submenus: [
-        { id: "chat", label: "AI Assistant Chat", description: "Interactive astrological AI consultation.", systemId: "ai_assistant", category: "AI" },
-        { id: "dashboard", label: "Dashboard", description: "Horoscope overview and panchanga.", systemId: "ai_assistant", category: "OVERVIEW" },
-        // Journey / My Page tabs
-        { id: "daily", label: "Today", description: "Today's astrological insights.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "weekly", label: "Weekly Forecast", description: "Weekly astrological insights.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "monthly", label: "Monthly Forecast", description: "Monthly astrological insights.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "long_term", label: "Yearly", description: "Yearly predictive trends.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "current_dasha", label: "Active Period", description: "Active planetary period.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "predictions", label: "Predictions & Yogas", description: "Yogas and predictive matrices.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "future", label: "Future Analysis", description: "Future outlook and transits.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "tajik", label: "Tajik Annual", description: "Tajik solar return charts.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "my_life_analysis", label: "Life Analysis", description: "Comprehensive life analysis report.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "vedic", label: "My Astro Details", description: "Vedic chart details.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "jaimini", label: "Jaimini Astrology", description: "Jaimini chara dasha and karakas.", systemId: "ai_assistant", category: "JOURNEY" },
-        { id: "western", label: "Western Astrology", description: "Western chart coordinates.", systemId: "ai_assistant", category: "JOURNEY" },
-
         // Category 1: JHORA
-        { id: "jhora_birth_details", label: "Birth Details", description: "JH1: Birth Details & Astronomical Metrics.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_planets", label: "Planets Placements", description: "JH2: Natal Planets Longitudes & Rasi Placements.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_dignity", label: "Dignity Registry", description: "JH32: Planet Dignity Registry.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_shadbala", label: "Shadbala Matrix", description: "JH3: Shadbala Planet Strength Matrix.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_bhava_balas", label: "Bhava Strengths", description: "JH4: Bhava Balas (House Strengths).", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_ashtakavarga", label: "SAV Ashtakavarga", description: "JH5: Samudhaya Ashtakavarga Points.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_divisional", label: "Charts", description: "JH6: Divisional Vargas D1 to D60.", systemId: "ai_assistant", category: "JHORA" },
-        { id: "jhora_vimshottari", label: "Vimshottari Dasha", description: "JH7: Vimshottari Mahadasha Timelines.", systemId: "ai_assistant", category: "JHORA" },
+        { id: "jhora_birth_details", label: "Birth Details", description: "JH1: Birth Details & Astronomical Metrics.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_planets", label: "Planets Placements", description: "JH2: Natal Planets Longitudes & Rasi Placements.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_shadbala", label: "Shadbala Matrix", description: "JH3: Shadbala Planet Strength Matrix.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_bhava_balas", label: "Bhava Strengths", description: "JH4: Bhava Balas (House Strengths).", systemId: "astro", category: "JHORA" },
+        { id: "jhora_ashtakavarga", label: "SAV Ashtakavarga", description: "JH5: Samudhaya Ashtakavarga Points.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_divisional", label: "Charts", description: "JH6: Divisional Vargas D1 to D60.", systemId: "astro", category: "JHORA" },
+        { id: "jhora_vimshottari", label: "Vimshottari Dasha", description: "JH7: Vimshottari Mahadasha Timelines.", systemId: "astro", category: "JHORA" },
 
         // Category 2: KP STELLAR
-        { id: "kp_cusps", label: "Placidus Cusps", description: "JH8: Placidus House Cusp Coordinates.", systemId: "ai_assistant", category: "KP STELLAR" },
-        { id: "kp_sub_lords", label: "Planetary Sub-Lords", description: "JH9: KP Planetary Sub-Lords.", systemId: "ai_assistant", category: "KP STELLAR" },
-        { id: "kp_planet_significators", label: "Planet Significators", description: "JH10: KP Planet-Level Significators.", systemId: "ai_assistant", category: "KP STELLAR" },
-        { id: "kp_house_significators", label: "House Significators", description: "JH11: KP House-Level Significators.", systemId: "ai_assistant", category: "KP STELLAR" },
+        { id: "kp_cusps", label: "Placidus Cusps", description: "JH8: Placidus House Cusp Coordinates.", systemId: "astro", category: "KP STELLAR" },
+        { id: "kp_sub_lords", label: "Planetary Sub-Lords", description: "JH9: KP Planetary Sub-Lords.", systemId: "astro", category: "KP STELLAR" },
+        { id: "kp_planet_significators", label: "Planet Significators", description: "JH10: KP Planet-Level Significators.", systemId: "astro", category: "KP STELLAR" },
+        { id: "kp_house_significators", label: "House Significators", description: "JH11: KP House-Level Significators.", systemId: "astro", category: "KP STELLAR" },
+
+        // Category 3: JAIMINI
+        { id: "jaimini_karakas", label: "Chara Karakas", description: "JH12: Jaimini Chara Karakas.", systemId: "astro", category: "JAIMINI" },
+        { id: "jaimini_arudhas", label: "Arudha Padas", description: "JH13: Jaimini Arudhas & Padas.", systemId: "astro", category: "JAIMINI" },
+
+        // Category 4: WESTERN
+        { id: "western_tropical", label: "Tropical Placements", description: "JH14: Tropical Planetary Placements.", systemId: "astro", category: "WESTERN" },
+        { id: "western_aspects", label: "Aspects Matrix", description: "JH15: Tropical Planetary Aspects Matrix.", systemId: "astro", category: "WESTERN" },
 
         // Category 5: TAJIKA
-        { id: "tajika_varshaphal", label: "Varshaphal Coordinates", description: "JH16: Varshaphal Planetary Coordinates.", systemId: "ai_assistant", category: "TAJIKA" },
-        { id: "tajika_harshabala", label: "Harsha Balas", description: "JH17: Tajik Harsha Balas.", systemId: "ai_assistant", category: "TAJIKA" },
+        { id: "tajika_varshaphal", label: "Varshaphal Coordinates", description: "JH16: Varshaphal Planetary Coordinates.", systemId: "astro", category: "TAJIKA" },
+        { id: "tajika_harshabala", label: "Harsha Balas", description: "JH17: Tajik Harsha Balas.", systemId: "astro", category: "TAJIKA" },
 
         // Category 6: LAL KITAB
-        { id: "lalkitab_houses", label: "LKB Houses", description: "JH18: Lal Kitab Planetary Houses.", systemId: "ai_assistant", category: "LAL KITAB" },
-        { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "JH19: Lal Kitab Teva & Sleeping Status.", systemId: "ai_assistant", category: "LAL KITAB" },
+        { id: "lalkitab_houses", label: "LKB Houses", description: "JH18: Lal Kitab Planetary Houses.", systemId: "astro", category: "LAL KITAB" },
+        { id: "lalkitab_teva", label: "Teva & Sleep Status", description: "JH19: Lal Kitab Teva & Sleeping Status.", systemId: "astro", category: "LAL KITAB" },
 
         // Category 7: EVENTS
-        { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "ai_assistant", category: "EVENTS" },
-        { id: "engine_guide", label: "Astrological Rule Engine", description: "Master Astrological Rule Engine Specification V2.0.", systemId: "ai_assistant", category: "EVENTS" },
-        { id: "kp_book", label: "KP Book", description: "Interactive astrological rules terminal and validation panel.", systemId: "ai_assistant", category: "EVENTS" },
+        { id: "event_book", label: "Event Book", description: "Relationship & life events audit log.", systemId: "astro", category: "EVENTS" },
+        { id: "engine_guide", label: "Astrological Rule Engine", description: "Master Astrological Rule Engine Specification V2.0.", systemId: "astro", category: "EVENTS" },
+        { id: "kp_book", label: "KP Book", description: "Interactive astrological rules terminal and validation panel.", systemId: "astro", category: "EVENTS" },
 
         // Category 8: DEPLOYMENT
-        { id: "table_index", label: "Table Index", description: "JH1 to JH19 Master Tables Registry & Mapping.", systemId: "ai_assistant", category: "DEPLOYMENT" },
+        { id: "table_index", label: "Table Index", description: "JH1 to JH19 Master Tables Registry & Mapping.", systemId: "astro", category: "DEPLOYMENT" },
 
         // Category 9: SETTINGS
-        { id: "theme", label: "Theme", description: "Dark, Light, and custom styling.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "kp_documentation", label: "KP Documentation", description: "KP Knowledge Book, Rulebook & Context Specifications.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "google_drive", label: "Google Drive Backup", description: "Save and load birth charts on Google Drive.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "google_calendar", label: "Google Calendar Sync", description: "Sync Vimshottari dasha events to calendar.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "google_gmail", label: "Google Gmail Dispatcher", description: "Send astrological reports via Gmail.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "google_keep", label: "Google Keep Notes", description: "Save and backup remedies and analysis notes.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "google_contacts", label: "Google Contacts", description: "Access connected Google Contacts list.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "github_ota", label: "GitHub OTA Updates", description: "Check for new releases.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "language", label: "Language", description: "Switch display languages.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "ayanamsa", label: "Ayanamsa", description: "Select precession correction systems.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "chart_style", label: "Chart Style", description: "Choose North vs South Indian charts.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "notification", label: "Notification", description: "Ingress alert options.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "github_updates", label: "GitHub Updates", description: "System version history.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "raw_json", label: "Raw JSON", description: "JHora API Response payload.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "api_inspector", label: "API Inspector", description: "Response headers and latencies.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "request_log", label: "Request Log", description: "Outgoing request archives.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "response_log", label: "Response Log", description: "Incoming payload bodies.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "dto_viewer", label: "DTO Viewer", description: "TypeScript interface schemas.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "room_database_viewer", label: "Room Database Viewer", description: "Review IndexedDB tables.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "plugin_manager", label: "Plugin Manager", description: "Load or configure hot-swap modules.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "performance", label: "Performance", description: "Renders benchmarks.", systemId: "ai_assistant", category: "SETTINGS" },
-        { id: "cache_manager", label: "Cache Manager", description: "Manage database limits.", systemId: "ai_assistant", category: "SETTINGS" }
+        { id: "theme", label: "Theme", description: "Dark, Light, and custom styling.", systemId: "astro", category: "SETTINGS" },
+        { id: "kp_documentation", label: "KP Documentation", description: "KP Knowledge Book, Rulebook & Context Specifications.", systemId: "astro", category: "SETTINGS" },
+        { id: "google_drive", label: "Google Drive Backup", description: "Save and load birth charts on Google Drive.", systemId: "astro", category: "SETTINGS" },
+        { id: "google_calendar", label: "Google Calendar Sync", description: "Sync Vimshottari dasha events to calendar.", systemId: "astro", category: "SETTINGS" },
+        { id: "google_gmail", label: "Google Gmail Dispatcher", description: "Send astrological reports via Gmail.", systemId: "astro", category: "SETTINGS" },
+        { id: "google_keep", label: "Google Keep Notes", description: "Save and backup remedies and analysis notes.", systemId: "astro", category: "SETTINGS" },
+        { id: "google_contacts", label: "Google Contacts", description: "Access connected Google Contacts list.", systemId: "astro", category: "SETTINGS" },
+        { id: "github_ota", label: "GitHub OTA Updates", description: "Check for new releases.", systemId: "astro", category: "SETTINGS" },
+        { id: "language", label: "Language", description: "Switch display languages.", systemId: "astro", category: "SETTINGS" },
+        { id: "ayanamsa", label: "Ayanamsa", description: "Select precession correction systems.", systemId: "astro", category: "SETTINGS" },
+        { id: "chart_style", label: "Chart Style", description: "Choose North vs South Indian charts.", systemId: "astro", category: "SETTINGS" },
+        { id: "notification", label: "Notification", description: "Ingress alert options.", systemId: "astro", category: "SETTINGS" },
+        { id: "github_updates", label: "GitHub Updates", description: "System version history.", systemId: "astro", category: "SETTINGS" },
+        { id: "raw_json", label: "Raw JSON", description: "JHora API Response payload.", systemId: "astro", category: "SETTINGS" },
+        { id: "api_inspector", label: "API Inspector", description: "Response headers and latencies.", systemId: "astro", category: "SETTINGS" },
+        { id: "request_log", label: "Request Log", description: "Outgoing request archives.", systemId: "astro", category: "SETTINGS" },
+        { id: "response_log", label: "Response Log", description: "Incoming payload bodies.", systemId: "astro", category: "SETTINGS" },
+        { id: "dto_viewer", label: "DTO Viewer", description: "TypeScript interface schemas.", systemId: "astro", category: "SETTINGS" },
+        { id: "room_database_viewer", label: "Room Database Viewer", description: "Review IndexedDB tables.", systemId: "astro", category: "SETTINGS" },
+        { id: "plugin_manager", label: "Plugin Manager", description: "Load or configure hot-swap modules.", systemId: "astro", category: "SETTINGS" },
+        { id: "performance", label: "Performance", description: "Renders benchmarks.", systemId: "astro", category: "SETTINGS" },
+        { id: "cache_manager", label: "Cache Manager", description: "Manage database limits.", systemId: "astro", category: "SETTINGS" }
       ]
     }
   ];
 
-  const activeNode = MAIN_MENU_STRUCTURE[0];
+  const isAstroActive = activeMenu === "astro";
+  const activeNode = MAIN_MENU_STRUCTURE.find(node => {
+    if (node.id === "astro") return isAstroActive;
+    return node.id === activeMenu;
+  }) || MAIN_MENU_STRUCTURE[0];
   const activeSubmenus = activeNode.submenus || [];
-  const activeSubmenuId = activeSubMenu["ai_assistant"] || (activeSubmenus[0]?.id || "");
+  const activeSubmenuId = activeSubMenu[activeMenu] || (activeSubmenus[0]?.id || "");
 
   const handleSubmenuSelect = (submenuId: string) => {
-    setActiveSubMenu(prev => ({ ...prev, ai_assistant: submenuId }));
+    setActiveSubMenu(prev => ({ ...prev, [activeMenu]: submenuId }));
     setIsMobileMenuOpen(false);
   };
 
   const handleDashboardTabNavigation = (tab: string) => {
-    setActiveMenu("ai_assistant");
+    setActiveMenu("astro");
     const subId = 
       tab === "dashboard" ? "jhora_birth_details" :
       tab === "grahas" ? "jhora_planets" :
       tab === "strengths" ? "jhora_shadbala" :
       tab === "ashtakavarga" ? "jhora_ashtakavarga" :
       "jhora_birth_details";
-    setActiveSubMenu(prev => ({ ...prev, ai_assistant: subId }));
+    setActiveSubMenu(prev => ({ ...prev, astro: subId }));
     setIsMobileMenuOpen(false);
   };
 
   const handleMenuSelect = (menuId: string) => {
-    setActiveMenu("ai_assistant");
-    setActiveSubMenu(prev => ({ ...prev, ai_assistant: menuId }));
+    if (menuId === "astro") {
+      setActiveMenu("astro");
+      if (!activeSubMenu["astro"]) {
+        setActiveSubMenu(prev => ({ ...prev, astro: "jhora_birth_details" }));
+      }
+    } else {
+      setActiveMenu(menuId);
+      const defaultSub = MAIN_MENU_STRUCTURE.find(n => n.id === menuId)?.submenus?.[0]?.id || "";
+      if (defaultSub) {
+        setActiveSubMenu(prev => ({ ...prev, [menuId]: defaultSub }));
+      }
+    }
   };
 
   // Color theme definitions
@@ -2460,37 +2490,6 @@ export default function App() {
                 {/* Visual Identity & PWA App Installation Promo */}
                 <AndroidInstallerPromo isDark={isDark} />
 
-                {/* Google Login Account & Profile Association Status Banner */}
-                <div className={`p-4 rounded-2xl border flex items-center justify-between gap-4 ${containerStyle} bg-gradient-to-r from-amber-500/10 via-indigo-500/5 to-transparent`}>
-                  <div className="flex items-center gap-3">
-                    {activeUser?.photoURL ? (
-                      <img src={activeUser.photoURL} alt={activeUser.name || "User"} className="w-10 h-10 rounded-full border border-amber-500/30 object-cover shadow-sm" />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
-                        {activeUser?.name?.charAt(0) || "U"}
-                      </div>
-                    )}
-                    <div>
-                      <div className="text-xs font-semibold text-amber-500 flex items-center gap-1.5 font-sans">
-                        <span>Connected Google Account Session</span>
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      </div>
-                      <div className={`text-sm font-bold ${headingStyle}`}>
-                        {activeUser?.name || "Vedic Astrologer"} <span className="text-xs font-normal text-slate-400">({activeUser?.email || "kanakjain2309@gmail.com"})</span>
-                      </div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">
-                        Birth and cast settings and profiles directory are synchronized with your Google login credentials.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="hidden sm:flex flex-col items-end text-right">
-                    <span className="text-[10px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full">
-                      Google OAuth Active
-                    </span>
-                    <span className="text-[10px] text-slate-400 mt-1">Cloud Firestore & Local Storage</span>
-                  </div>
-                </div>
-
                 {/* Birth Details and Cast Settings Card (First Section) */}
                 <div className={`p-6 rounded-2xl border ${containerStyle}`}>
                   <div className="border-b border-indigo-500/10 pb-4 mb-6">
@@ -2721,7 +2720,7 @@ export default function App() {
                     )}
                   </h3>
                   <p className="text-xs text-slate-400 mt-1 mb-6">
-                    Manage, check availability, and hotload saved birth profiles directory associated with your Google login session ({activeUser?.email || "kanakjain2309@gmail.com"}).
+                    Manage, check availability, and hotload horoscopes from local storage, Google Drive, or browse files manually.
                   </p>
 
                   {/* Profile JSON File Importer */}
@@ -2903,15 +2902,7 @@ export default function App() {
                 className="space-y-6"
               >
                 <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                  <AstroChat 
-                    astrologyData={astrologyData} 
-                    onNavigateMenu={(menu, submenu) => {
-                      setActiveMenu(menu);
-                      if (submenu) {
-                        setActiveSubMenu(prev => ({ ...prev, [menu]: submenu }));
-                      }
-                    }}
-                  />
+                  <AstroChat astrologyData={astrologyData} />
                 </div>
               </motion.div>
             </AnimatePresence>

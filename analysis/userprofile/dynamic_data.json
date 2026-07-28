@@ -1,23 +1,23 @@
 {
   "metadata": {
     "agentName": "AstrologicalAnalysisSyncAgent",
-    "profileName": "Seeker",
+    "profileName": "Nitin",
     "profileId": "userprofile",
-    "lastUpdated": "2026-07-28T14:07:47.711Z",
+    "lastUpdated": "2026-07-28T14:05:55.508Z",
     "evaluationDate": "2026-07-28",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-28T14:07:46.139Z",
-      "localTime": "2026-07-28T07:07:46-07:00",
+      "utcTime": "2026-07-28T14:05:55.392Z",
+      "localTime": "2026-07-28T07:05:55-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Capricorn",
         "displayName": "Capricorn",
-        "longitude": 281.1
+        "longitude": 281.08
       },
       "currentNakshatra": {
         "id": "Shravana",
@@ -30,15 +30,15 @@
         "displayName": "Moon"
       },
       "currentSubLord": {
-        "id": "Moon",
-        "displayName": "Moon"
+        "id": "Venus",
+        "displayName": "Venus"
       },
       "moonPhase": {
         "type": "Waxing Gibbous",
         "displayName": "Sukla Purnima",
         "illuminationPercentage": 99.7
       },
-      "moonLongitude": 281.1,
+      "moonLongitude": 281.08,
       "waxing": true,
       "waning": false,
       "voidOfCourse": {
@@ -76,18 +76,18 @@
       },
       "moon": {
         "currentSign": "Capricorn",
-        "longitude": 281.1,
+        "longitude": 281.08,
         "nakshatra": "Shravana",
         "pada": 1,
         "starLord": "Moon",
-        "subLord": "Moon",
+        "subLord": "Venus",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mars": {
         "currentSign": "Virgo",
-        "longitude": 177.94,
+        "longitude": 177.59,
         "nakshatra": "Chitra",
         "pada": 2,
         "starLord": "Mars",
@@ -98,7 +98,7 @@
       },
       "mercury": {
         "currentSign": "Scorpio",
-        "longitude": 238.21,
+        "longitude": 238.2,
         "nakshatra": "Jyeshtha",
         "pada": 4,
         "starLord": "Mercury",
@@ -120,7 +120,7 @@
       },
       "venus": {
         "currentSign": "Leo",
-        "longitude": 135.91,
+        "longitude": 135.9,
         "nakshatra": "Purva Phalguni",
         "pada": 1,
         "starLord": "Venus",
@@ -165,60 +165,73 @@
     }
   },
   "activePeriods": {
-    "mahadasha": "Jupiter",
-    "bhukti": "Mercury",
-    "description": "Active period governed by Vimshottari lords: Jupiter and Mercury."
+    "mahadasha": "Mercury",
+    "bhukti": "Saturn",
+    "description": "Active period governed by Vimshottari lords: Mercury and Saturn."
   },
   "natalRulesEvaluations": [
     {
       "id": "KP_MAR_01",
       "name": "Cuspal Sub Lord of 7th House for Marriage Timing",
-      "isMet": false,
-      "significator": "Saturn",
-      "starLord": "Rahu",
-      "signifiedHouses": [],
+      "isMet": true,
+      "significator": "Ketu",
+      "starLord": "Venus",
+      "signifiedHouses": [
+        5,
+        4,
+        11
+      ],
       "category": "Marriage",
-      "reasoning": "The 7th Cuspal Sub Lord (Saturn) is in the star of Rahu, which signifies houses []. The linkage is mixed/neutral, suggesting that partnerships will trigger growth and require conscious alignment."
+      "reasoning": "The 7th Cuspal Sub Lord (Ketu) is in the star of Venus, which signifies houses [5, 4, 11]. This is highly favorable as it connects directly with key relationship houses (2, 7, 11), confirming marriage promise."
     },
     {
       "id": "KP_CAR_01",
       "name": "10th Cuspal Sub Lord for Career and Profession Sector",
-      "isMet": false,
-      "significator": "Mercury",
-      "starLord": "Moon",
-      "signifiedHouses": [],
+      "isMet": true,
+      "significator": "Rahu",
+      "starLord": "Jupiter",
+      "signifiedHouses": [
+        9,
+        6
+      ],
       "category": "Career",
-      "reasoning": "The 10th Cuspal Sub Lord (Mercury) is in the star of Moon, which signifies houses []. Standard career promise; suggests career advancement will occur steadily through discipline."
+      "reasoning": "The 10th Cuspal Sub Lord (Rahu) is in the star of Jupiter, which signifies houses [9, 6]. Direct connection to professional houses [2, 6, 10, 11] triggers high status, stability, and career progress."
     },
     {
       "id": "KP_FIN_01",
       "name": "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
-      "isMet": false,
+      "isMet": true,
       "significator": "Rahu",
-      "starLord": "Ketu",
-      "signifiedHouses": [],
+      "starLord": "Jupiter",
+      "signifiedHouses": [
+        9,
+        6
+      ],
       "category": "Finance",
-      "reasoning": "The 2nd Cuspal Sub Lord (Rahu) resides in the star of Ketu, signifying houses []. Requires careful financial budgeting and prudent cash-flow planning."
+      "reasoning": "The 2nd Cuspal Sub Lord (Rahu) resides in the star of Jupiter, signifying houses [9, 6]. Highly auspicious indicators for wealth accumulation and sound capital gains."
     },
     {
       "id": "KP_HEA_01",
       "name": "Health and Disease Propensity via 1st and 6th CSL",
-      "isMet": true,
-      "significator": "1st CSL: Mercury, 6th CSL: Jupiter",
-      "starLord": "Mercury",
-      "signifiedHouses": [],
+      "isMet": false,
+      "significator": "1st CSL: Mercury, 6th CSL: Rahu",
+      "starLord": "Jupiter",
+      "signifiedHouses": [
+        9,
+        6
+      ],
       "category": "Health",
-      "reasoning": "The 6th Cuspal Sub Lord (Jupiter) is in the star of Mercury, signifying houses []. Auspicious: Low susceptibility to chronic ailments, strong natural immunity."
+      "reasoning": "The 6th Cuspal Sub Lord (Rahu) is in the star of Jupiter, signifying houses [9, 6]. Alert: Linkage with disease-prone houses (6, 8, 12) suggests keeping a healthy routine."
     },
     {
       "id": "KP_DBA_01",
       "name": "Dasha-Bhukti-Antara (DBA) Event Trigger Validation",
       "isMet": true,
-      "significator": "Jupiter - Mercury",
+      "significator": "Mercury - Saturn",
       "starLord": "Various",
       "signifiedHouses": [],
       "category": "DBA",
-      "reasoning": "Current major active timeline lords are Mahadasha: Jupiter and Bhukti: Mercury. These planetary nodes are ripe to trigger events in their designated houses."
+      "reasoning": "Current major active timeline lords are Mahadasha: Mercury and Bhukti: Saturn. These planetary nodes are ripe to trigger events in their designated houses."
     }
   ],
   "triggeredTransitEvents": [
@@ -228,1309 +241,1509 @@
       "trigger": "Transit Moon Phase Sukla Purnima",
       "status": "Active",
       "category": "Muhurta",
-      "description": "Daily alignment evaluated successfully under the active planetary energies of Mahadasha lord: Jupiter and Bhukti lord: Mercury."
+      "description": "Daily alignment evaluated successfully under the active planetary energies of Mahadasha lord: Mercury and Bhukti lord: Saturn."
     }
   ],
   "eventsLog": [
     {
-      "timestamp": "2026-07-28T14:07:47.711Z",
+      "timestamp": "2026-07-28T14:05:55.508Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T14:07:46.947Z",
+      "timestamp": "2026-07-28T14:00:57.696Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T14:05:08.343Z",
+      "timestamp": "2026-07-28T14:00:57.579Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T14:05:07.613Z",
+      "timestamp": "2026-07-28T13:57:25.765Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T14:03:28.245Z",
+      "timestamp": "2026-07-28T13:52:25.795Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T14:03:27.532Z",
+      "timestamp": "2026-07-28T13:47:27.913Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T14:01:20.626Z",
+      "timestamp": "2026-07-28T13:47:27.786Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T14:01:19.875Z",
+      "timestamp": "2026-07-28T13:42:38.807Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:58:37.178Z",
+      "timestamp": "2026-07-28T13:37:40.709Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:58:36.408Z",
+      "timestamp": "2026-07-28T13:37:35.331Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:53:56.394Z",
+      "timestamp": "2026-07-28T13:37:35.113Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:49:03.740Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T17:04:42.440Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:49:02.994Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T17:04:28.538Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:43:16.527Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T17:04:28.403Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:43:15.794Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T17:03:07.637Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:38:22.842Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T17:03:07.517Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:33:30.233Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T17:02:55.744Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:33:29.499Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:57:57.831Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:30:11.403Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:57:57.728Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:25:11.534Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:57:45.643Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:20:19.044Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:57:45.563Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:20:18.319Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:55:58.667Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:17:08.876Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:55:47.150Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:12:08.944Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:55:47.067Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:07:16.302Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:52:56.512Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:07:15.535Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:52:36.449Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:06:21.259Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:52:36.325Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:01:28.245Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:50:44.723Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T13:01:27.469Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:50:44.598Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:56:32.922Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:48:15.981Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:56:32.195Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:48:15.859Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:53:48.945Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:46:35.006Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:53:48.201Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:46:34.891Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:51:53.518Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:44:43.613Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:51:52.764Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:44:43.493Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:49:29.656Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:39:48.011Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:44:37.225Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:34:48.034Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:44:36.477Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:29:50.189Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:43:59.880Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:29:50.054Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:38:59.129Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:26:27.727Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:34:06.652Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:26:27.606Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:34:05.903Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:24:15.966Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:29:07.313Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:24:15.849Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:24:14.695Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:23:14.705Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:24:13.958Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:18:16.854Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:19:17.778Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:18:16.742Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:14:25.514Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:17:42.128Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:14:24.788Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:12:44.281Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:10:24.705Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:12:44.171Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:05:24.783Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:11:18.017Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:00:32.442Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:11:17.886Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T12:00:31.623Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:10:36.191Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:56:17.919Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:05:38.238Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:51:25.177Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:05:38.119Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:51:24.454Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:03:19.388Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:49:08.175Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T16:03:19.279Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:44:16.111Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:59:32.919Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:44:15.391Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:59:32.808Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:39:30.374Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:58:22.092Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:39:29.615Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:58:21.997Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:38:06.845Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:53:33.898Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:33:14.160Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:48:35.971Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:33:13.430Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:48:23.806Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:29:52.821Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:48:23.719Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:24:53.003Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:46:26.797Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:20:00.284Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:41:28.909Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:19:59.526Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:41:28.796Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:18:16.433Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:39:57.449Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:18:15.680Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:34:57.331Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:14:47.231Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:29:59.478Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:09:47.202Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:29:59.369Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T11:04:47.240Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:25:41.691Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:59:47.383Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:25:41.568Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:54:54.817Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:23:05.970Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:54:54.065Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:18:05.958Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:50:42.204Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:13:08.163Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:45:42.150Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:13:08.048Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:40:49.626Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:11:26.245Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:40:48.893Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:11:26.119Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:38:35.387Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:09:31.392Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:33:35.410Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:09:11.714Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:28:42.750Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:09:11.517Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:28:42.043Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:08:01.787Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:27:41.596Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T15:03:01.792Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:25:53.508Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:58:01.779Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:20:53.544Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:53:01.784Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:15:53.492Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:48:01.787Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:10:53.490Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:43:03.967Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:06:05.526Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:43:03.858Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:06:04.843Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:40:47.367Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T10:04:20.620Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:35:47.428Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T09:59:20.605Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:30:47.369Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T09:54:33.172Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:25:49.566Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T09:54:32.476Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:25:49.453Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T09:51:13.051Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:24:02.996Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T09:51:12.417Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:19:03.047Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T09:46:10.192Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:14:03.010Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T09:41:21.852Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:09:03.029Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T09:41:21.207Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T14:04:03.000Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     },
     {
-      "timestamp": "2026-07-28T09:37:43.431Z",
-      "evaluationDate": "2026-07-28",
+      "timestamp": "2026-07-21T13:59:03.038Z",
+      "evaluationDate": "2026-07-21",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
         "Daily Muhurta Alignment"
       ],
       "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
         "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
       ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
     }
   ]
 }
