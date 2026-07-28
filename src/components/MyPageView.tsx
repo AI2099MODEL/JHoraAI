@@ -1766,9 +1766,7 @@ const journeyTabs = [
 const astroTabs = [
   { id: "charts", label: "Charts" },
   { id: "vedic", label: "My Astro Details" },
-  { id: "transits_data", label: "Transits" },
   { id: "jaimini", label: "Jaimini" },
-  { id: "kp", label: "KP" },
   { id: "lalkitab", label: "Lalkitab" },
   { id: "chinese", label: "Chinese" },
   { id: "tajik", label: "Tajik" },
@@ -1865,7 +1863,7 @@ export function MyPageView({
       } else if (activeSubmenuId === "my_astro") {
         setActiveSubmenu("my_astro");
         if (!astroTabs.some(t => t.id === activeTab)) {
-          setActiveTab("dasha");
+          setActiveTab("vedic");
         }
       } else if (activeSubmenuId === "my_reports" || activeSubmenuId === "reports_hub") {
         setActiveSubmenu("my_reports");
@@ -3342,12 +3340,14 @@ export function MyPageView({
                     }
                     const activeAstroTabIds = currentTabs.map(t => t.id);
                     const submenusMap: { [key: string]: string[] } = {
-                      dasha: ["jhora_vimshottari"],
                       charts: ["jhora_divisional"],
-                      vedic: ["jhora_planets", "jhora_shadbala", "jhora_bhava_balas"],
-                      transits_data: [],
+                      vedic: [
+                        "jhora_planets", "jhora_shadbala", "jhora_bhava_balas", "jhora_ashtakavarga", "jhora_vimshottari",
+                        "kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_house_significators",
+                        "jaimini_karakas", "jaimini_arudhas", "western_tropical", "western_aspects",
+                        "tajika_varshaphal", "tajika_harshabala", "lalkitab_houses", "lalkitab_teva"
+                      ],
                       jaimini: ["jaimini_karakas", "jaimini_arudhas"],
-                      kp: ["kp_cusps", "kp_sub_lords", "kp_planet_significators", "kp_house_significators"],
                       lalkitab: ["lalkitab_houses", "lalkitab_teva"],
                       tajik: ["tajika_varshaphal", "tajika_harshabala"],
                       western: ["western_tropical", "western_aspects"]
