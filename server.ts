@@ -75,10 +75,18 @@ function processGitQueue() {
       if (err) {
         const errMsg = err.message || "";
         const isLockError = errMsg.includes("lock") || errMsg.includes("index.lock") || errMsg.includes("Resource temporarily unavailable");
-        if (isLockError && retriesLeft > 0) {
-          console.log(`[Git Queue] Detected lock error for command "${item.cmd}", retrying in 1000ms. Retries left: ${retriesLeft}`);
-          setTimeout(() => attemptRun(retriesLeft - 1), 1000);
-          return;
+        if (isLockError) {
+          try {
+            const lockPath = path.join(process.cwd(), ".git", "index.lock");
+            if (fs.existsSync(lockPath)) {
+              fs.unlinkSync(lockPath);
+            }
+          } catch (e) {}
+          if (retriesLeft > 0) {
+            console.log(`[Git Queue] Detected lock error for command "${item.cmd}", unlinked lock and retrying in 1000ms. Retries left: ${retriesLeft}`);
+            setTimeout(() => attemptRun(retriesLeft - 1), 1000);
+            return;
+          }
         }
         
         console.warn(`[Git Queue Error] Command failed: "${item.cmd}". Error: ${err.message}`);
@@ -1782,7 +1790,7 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
     let response;
     try {
       response = await ai.models.generateContent({
-        model: "gemini-3.6-flash",
+        model: "gemini-2.5-flash",
         contents: prompt,
         config: {
           responseMimeType: "application/json",
@@ -1815,37 +1823,41 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
       const errMsg = (apiErr.message || "").toLowerCase();
       const isQuotaError = apiErr.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
       if (isQuotaError) {
-        console.warn("Gemini 3.6-flash quota exceeded in generate-summary. Trying gemini-3.1-flash-lite...");
-        response = await ai.models.generateContent({
-          model: "gemini-3.1-flash-lite",
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                summary: {
-                  type: Type.STRING,
-                  description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
-                },
-                sections: {
-                  type: Type.ARRAY,
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
-                      content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
-                      remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
-                      icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
-                    },
-                    required: ["title", "content", "remedy", "icon"]
+        console.warn("Gemini 2.5-flash quota exceeded in generate-summary. Trying gemini-2.5-pro...");
+        try {
+          response = await ai.models.generateContent({
+            model: "gemini-2.5-pro",
+            contents: prompt,
+            config: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.OBJECT,
+                properties: {
+                  summary: {
+                    type: Type.STRING,
+                    description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
+                  },
+                  sections: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
+                        content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
+                        remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
+                        icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
+                      },
+                      required: ["title", "content", "remedy", "icon"]
+                    }
                   }
-                }
-              },
-              required: ["summary", "sections"]
+                },
+                required: ["summary", "sections"]
+              }
             }
-          }
-        });
+          });
+        } catch (fbErr: any) {
+          throw apiErr;
+        }
       } else {
         throw apiErr;
       }
@@ -2425,10 +2437,10 @@ LAWS OF CELESTIAL ANALYSIS:
 
     const ai = getGeminiClient(geminiApiKey);
     let response;
-    let modelUsed = "gemini-3.6-flash";
+    let modelUsed = "gemini-2.5-flash";
     try {
       response = await ai.models.generateContent({
-        model: "gemini-3.6-flash",
+        model: "gemini-2.5-flash",
         contents: userPrompt,
         config: {
           systemInstruction,
@@ -2526,10 +2538,11 @@ LAWS OF CELESTIAL ANALYSIS:
       const errMsg = (apiErr.message || "").toLowerCase();
       const isQuotaError = apiErr.status === 429 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource");
       if (isQuotaError) {
-        console.warn("Gemini 3.6-flash quota exceeded in Master Ask. Trying gemini-3.1-flash-lite...");
-        modelUsed = "gemini-3.1-flash-lite";
-        response = await ai.models.generateContent({
-          model: "gemini-3.1-flash-lite",
+        console.warn("Gemini 2.5-flash quota exceeded in Master Ask. Trying gemini-2.5-pro...");
+        modelUsed = "gemini-2.5-pro";
+        try {
+          response = await ai.models.generateContent({
+            model: "gemini-2.5-pro",
           contents: userPrompt,
           config: {
             systemInstruction,
@@ -2623,6 +2636,9 @@ LAWS OF CELESTIAL ANALYSIS:
           }
         }
       });
+        } catch (fbErr: any) {
+          throw apiErr;
+        }
       } else {
         throw apiErr;
       }
@@ -2754,17 +2770,28 @@ function runNatalRulesEvaluatorAgent() {
   try {
     const usersDir = path.join(process.cwd(), "Users");
     let profilePath = path.join(usersDir, "userprofile.json");
-    if (!fs.existsSync(profilePath)) {
-      if (fs.existsSync(usersDir)) {
-        const files = fs.readdirSync(usersDir).filter(f => f.endsWith(".json"));
-        if (files.length > 0) {
-          profilePath = path.join(usersDir, files[0]);
+    let profile: any = null;
+
+    if (fs.existsSync(usersDir)) {
+      const files = fs.readdirSync(usersDir).filter(f => f.endsWith(".json"));
+      // Try userprofile.json first or first valid json file
+      const candidateFiles = [profilePath, ...files.map(f => path.join(usersDir, f))];
+      for (const cp of candidateFiles) {
+        if (fs.existsSync(cp)) {
+          try {
+            const rawData = fs.readFileSync(cp, "utf-8");
+            profile = JSON.parse(rawData);
+            profilePath = cp;
+            break;
+          } catch (e) {
+            console.warn(`[AGENT] Warning: failed to parse profile file ${cp}, skipping.`);
+          }
         }
       }
     }
 
-    if (!fs.existsSync(profilePath)) {
-      console.warn("[AGENT] No user profile files found in Users/. Agent will write default state.");
+    if (!profile) {
+      console.warn("[AGENT] No valid user profile files found in Users/. Agent will write default state.");
       const defaultState = {
         agentName: "NatalRulesEvaluatorAgent",
         status: "Healthy / Idle",
@@ -2779,8 +2806,6 @@ function runNatalRulesEvaluatorAgent() {
       return;
     }
 
-    const rawData = fs.readFileSync(profilePath, "utf-8");
-    const profile = JSON.parse(rawData);
     const kpData = profile.KP || {};
     const profileName = profile.User?.profile_name || "Guest";
 

@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
+import { MyPageView } from "./MyPageView";
 import {
   Send,
   Sparkles,
@@ -638,34 +639,50 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* Model Dropdown Selection */}
-            <div className="relative group">
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-neutral-100 text-sm font-semibold text-neutral-800 transition-colors text-left cursor-pointer">
-                <span>JHora AI (Vedic Companion)</span>
-                <ChevronDown className="w-4 h-4 text-neutral-400" />
-              </button>
-            </div>
+            {activeSubmenuPanel ? (
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => setActiveSubmenuPanel(null)}
+                  className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-xs font-semibold text-neutral-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  ← Back to Chat
+                </button>
+                <span className="text-sm font-bold text-neutral-800 capitalize tracking-tight">
+                  {activeSubmenuPanel.replace(/_/g, " ")} Module
+                </span>
+              </div>
+            ) : (
+              /* Model Dropdown Selection */
+              <div className="relative group">
+                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-neutral-100 text-sm font-semibold text-neutral-800 transition-colors text-left cursor-pointer">
+                  <span>JHora AI (Vedic Companion)</span>
+                  <ChevronDown className="w-4 h-4 text-neutral-400" />
+                </button>
+              </div>
+            )}
 
 
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Response Mode Quick Switch */}
-            <div className="hidden sm:flex items-center bg-neutral-100 border border-neutral-200 p-0.5 rounded-lg text-[10px]">
-              {(["quick", "detailed", "professional", "research"] as const).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setResponseMode(m)}
-                  className={`px-2 py-1 rounded font-bold font-mono uppercase transition-all cursor-pointer ${
-                    responseMode === m
-                      ? "bg-[#5c4df2] text-white shadow-sm"
-                      : "text-neutral-500 hover:text-neutral-800"
-                  }`}
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
+            {!activeSubmenuPanel && (
+              /* Response Mode Quick Switch */
+              <div className="hidden sm:flex items-center bg-neutral-100 border border-neutral-200 p-0.5 rounded-lg text-[10px]">
+                {(["quick", "detailed", "professional", "research"] as const).map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setResponseMode(m)}
+                    className={`px-2 py-1 rounded font-bold font-mono uppercase transition-all cursor-pointer ${
+                      responseMode === m
+                        ? "bg-[#5c4df2] text-white shadow-sm"
+                        : "text-neutral-500 hover:text-neutral-800"
+                    }`}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {onCloseStandalone && (
               <button
@@ -716,114 +733,26 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           <div className="max-w-4xl mx-auto space-y-6 w-full">
             
             {activeSubmenuPanel ? (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between pb-4 border-b border-neutral-200">
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setActiveSubmenuPanel(null)}
-                      className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-xs font-semibold text-neutral-700 flex items-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      ← Back to Chat
-                    </button>
-                    <h2 className="text-base font-bold text-neutral-800 capitalize">
-                      {activeSubmenuPanel.replace(/_/g, " ")} Module Details
-                    </h2>
-                  </div>
-                  <span className="text-xs font-mono text-[#5c4df2] bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
-                    Active Submenu View
-                  </span>
+              <div className="space-y-6 w-full">
+                <div className="flex items-center justify-end pb-2">
+                  <button
+                    onClick={() => setActiveSubmenuPanel(null)}
+                    className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-xs font-semibold text-neutral-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    ← Back to Chat
+                  </button>
                 </div>
 
-                <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-xs space-y-6">
-                  {activeSubmenuPanel === "daily" && (
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider">Daily Horoscope & Mood Reading</h3>
-                      <p className="text-xs text-neutral-600">
-                        Today's transit Moon is in {currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra ({currentSky?.moon?.currentSign?.displayName || "Libra"}). Operating under Vimshottari period: <span className="font-semibold text-[#5c4df2]">{getActiveDashaText()}</span>.
-                      </p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                        <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 space-y-2">
-                          <div className="text-xs font-bold text-neutral-700">Mood & Emotional Metric</div>
-                          <p className="text-xs text-neutral-600">Balanced mental stability; favorable for focused intellectual pursuits and calm decision making.</p>
-                        </div>
-                        <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 space-y-2">
-                          <div className="text-xs font-bold text-neutral-700">Behavioral Guidance</div>
-                          <p className="text-xs text-neutral-600">Avoid impulsive communications during afternoon transitions; leverage evening for creative synergy.</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {activeSubmenuPanel === "current_dasha" && (
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider">Current Vimshottari Period Analysis</h3>
-                      <div className="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 space-y-2">
-                        <div className="text-sm font-semibold text-[#5c4df2]">Active Dasha: {getActiveDashaText()}</div>
-                        <p className="text-xs text-neutral-600">
-                          Mahadasha lord governs overall life trajectory while Antardasha and Pratyantardasha activate specific natal houses and sub-lords.
-                        </p>
-                      </div>
-                      {astrologyData?.dashas && (
-                        <div className="space-y-2 pt-2">
-                          <div className="text-xs font-bold text-neutral-500 uppercase">Dasha Timeline Records</div>
-                          <div className="space-y-1.5 max-h-72 overflow-y-auto pr-2">
-                            {astrologyData.dashas.map((d, i) => (
-                              <div key={i} className="flex items-center justify-between p-2.5 rounded-lg border border-neutral-200 bg-white text-xs">
-                                <span className="font-semibold text-neutral-800">{d.lord} Mahadasha</span>
-                                <span className="font-mono text-neutral-500">{d.startDate} to {d.endDate}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {["overview", "predictions", "future", "my_life_analysis"].includes(activeSubmenuPanel) && (
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider capitalize">{activeSubmenuPanel.replace(/_/g, " ")} Engine Synthesis</h3>
-                      <p className="text-xs text-neutral-600">
-                        Multi-system convergence analysis integrating Krishnamurti Paddhati (KP), Parashari house activations, and Jaimini aspects for {astrologyData?.profile?.name || "Native"}.
-                      </p>
-                      <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 space-y-3 text-xs text-neutral-700">
-                        <div className="font-semibold text-neutral-800">Key Astrological Indicators:</div>
-                        <ul className="list-disc pl-4 space-y-1 text-neutral-600">
-                          <li>Primary houses 1, 2, 6, 10, and 11 activated for professional growth and financial stability.</li>
-                          <li>Sub-lord significator network guarantees favorable outcome during active planetary periods.</li>
-                          <li>Transit overlays confirm supportive planetary alignments in cardinal signs.</li>
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-
-                  {["dasha", "charts", "vedic", "transits_data", "jaimini", "kp", "lalkitab", "chinese", "tajik", "western", "reports_hub"].includes(activeSubmenuPanel) && (
-                    <div className="space-y-4">
-                      <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider capitalize">{activeSubmenuPanel.replace(/_/g, " ")} Astrological Data & Tables</h3>
-                      <p className="text-xs text-neutral-600">
-                        Complete raw and indexed tabular records (JH1 to JH19) corresponding to {activeSubmenuPanel.toUpperCase()} module.
-                      </p>
-                      <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 space-y-2">
-                        <div className="text-xs font-mono text-neutral-500">Engine Status: Fully Synchronized (JHora REST Gateway)</div>
-                        <div className="text-xs text-neutral-700">
-                          All cusps, degree longitudes, nakshatras, and sub-lords match stored profile logs exactly.
-                        </div>
-                      </div>
-                      {astrologyData?.planets && (
-                        <div className="space-y-2 pt-2">
-                          <div className="text-xs font-bold text-neutral-500 uppercase">Planetary Data Table</div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {astrologyData.planets.map((p, idx) => (
-                              <div key={idx} className="p-2.5 rounded-lg border border-neutral-200 bg-white text-xs flex justify-between items-center">
-                                <span className="font-semibold text-neutral-800">{p.name} ({p.sign})</span>
-                                <span className="font-mono text-neutral-500">{p.degree?.toFixed(2)}° | {p.nakshatra}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <MyPageView
+                  astrologyData={astrologyData}
+                  activeUser={null}
+                  isDark={false}
+                  containerStyle="bg-white border-neutral-200"
+                  cardStyle="bg-neutral-50 border-neutral-200"
+                  textMuted="text-neutral-500"
+                  activeSubmenuId={activeSubmenuPanel}
+                  onSubmenuSelect={(id) => setActiveSubmenuPanel(id)}
+                />
               </div>
             ) : (
               <div className="max-w-2xl mx-auto space-y-6 w-full">
