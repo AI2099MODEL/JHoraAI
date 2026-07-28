@@ -5,6 +5,10 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { MyPageView } from "./MyPageView";
+import EventBookView from "./EventBookView";
+import EngineGuide from "./EngineGuide";
+import RulesTerminal from "./RulesTerminal";
+
 import {
   Send,
   Sparkles,
@@ -100,6 +104,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const [myLifeExpanded, setMyLifeExpanded] = useState(false);
   const [myJourneyExpanded, setMyJourneyExpanded] = useState(false);
   const [myReportsExpanded, setMyReportsExpanded] = useState(false);
+  const [settingsExpanded, setSettingsExpanded] = useState(false);
   const [activeSubmenuPanel, setActiveSubmenuPanel] = useState<string | null>(null);
 
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -876,6 +881,12 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                   </div>
                   {birthSettingsContent}
                 </div>
+              ) : activeSubmenuPanel === "event_book" ? (
+                <EventBookView astrologyData={astrologyData} isDark={false} />
+              ) : activeSubmenuPanel === "engine_guide" ? (
+                <EngineGuide isDark={false} />
+              ) : activeSubmenuPanel === "kp_book" ? (
+                <RulesTerminal isDarkTheme={false} />
               ) : activeSubmenuPanel ? (
                 <div className="space-y-4 w-full">
                 <div className="flex items-center justify-between bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 px-4 py-2.5 rounded-xl border border-indigo-200/80 shadow-2xs">
