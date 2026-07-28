@@ -1851,9 +1851,12 @@ Synthesize these configurations into 4 distinct, meaningful, and comprehensive s
 Use the requested JSON schema. Choose appropriate icons for each section from: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'.
     `;
 
-    let response;
+    let responseText: string | null = null;
+
+    // 1. Try Gemini first
     try {
-      response = await ai.models.generateContent({
+      const ai = getGeminiClient(geminiApiKey);
+      const response = await ai.models.generateContent({
         model: "gemini-3.6-flash",
         contents: prompt,
         config: {
@@ -1883,55 +1886,72 @@ Use the requested JSON schema. Choose appropriate icons for each section from: '
           }
         }
       });
+      responseText = response.text || null;
     } catch (apiErr: any) {
-      const errMsg = (apiErr.message || "").toLowerCase();
-      const isQuotaError = apiErr.status === 429 || apiErr.status === 404 || errMsg.includes("quota") || errMsg.includes("limit") || errMsg.includes("exceeded") || errMsg.includes("429") || errMsg.includes("resource") || errMsg.includes("not found");
-      if (isQuotaError) {
-        console.warn("Gemini 3.6-flash error in generate-summary. Trying gemini-3.1-pro-preview...");
-        try {
-          response = await ai.models.generateContent({
-            model: "gemini-3.1-pro-preview",
-            contents: prompt,
-            config: {
-              responseMimeType: "application/json",
-              responseSchema: {
-                type: Type.OBJECT,
-                properties: {
-                  summary: {
-                    type: Type.STRING,
-                    description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
-                  },
-                  sections: {
-                    type: Type.ARRAY,
-                    items: {
-                      type: Type.OBJECT,
-                      properties: {
-                        title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
-                        content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
-                        remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
-                        icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
-                      },
-                      required: ["title", "content", "remedy", "icon"]
-                    }
-                  }
+      console.warn("Gemini 3.6-flash error in generate-summary. Trying gemini-3.1-pro-preview...", apiErr.message || apiErr);
+      try {
+        const ai = getGeminiClient(geminiApiKey);
+        const response = await ai.models.generateContent({
+          model: "gemini-3.1-pro-preview",
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                summary: {
+                  type: Type.STRING,
+                  description: "A beautiful, synthesis of the user's cosmic profile, soul blueprint, and path."
                 },
-                required: ["summary", "sections"]
-              }
+                sections: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      title: { type: Type.STRING, description: "Title of the section, e.g., 'Core Soul Archetype', 'Karmic Cycle & Lessons', 'Wealth & Purpose', 'Remedies & Strengths'" },
+                      content: { type: Type.STRING, description: "Detailed narrative analysis paragraph for this section." },
+                      remedy: { type: Type.STRING, description: "A simple, actionable recommendation or alignment practice." },
+                      icon: { type: Type.STRING, description: "Select one: 'user', 'zap', 'heart', 'star', 'briefcase', 'compass', 'shield', 'award'" }
+                    },
+                    required: ["title", "content", "remedy", "icon"]
+                  }
+                }
+              },
+              required: ["summary", "sections"]
             }
-          });
-        } catch (fbErr: any) {
-          throw apiErr;
-        }
-      } else {
-        throw apiErr;
+          }
+        });
+        responseText = response.text || null;
+      } catch (fbErr: any) {
+        console.warn("Gemini API unavailable in generate-summary. Falling back to ChatGPT (OpenAI)...", fbErr.message || fbErr);
       }
     }
 
-    if (!response.text) {
-      throw new Error("Empty response from Gemini API.");
+    // 2. Fallback to ChatGPT (OpenAI) if Gemini failed or key missing
+    if (!responseText) {
+      try {
+        const openai = getOpenAIClient(req);
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "You are an expert Vedic astrologer and counselor. Output raw JSON matching the required schema with keys 'summary' and 'sections'." },
+            { role: "user", content: prompt }
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.3
+        });
+        responseText = completion.choices[0]?.message?.content || null;
+      } catch (openaiErr: any) {
+        console.error("OpenAI ChatGPT fallback failed in generate-summary:", openaiErr.message || openaiErr);
+        throw openaiErr;
+      }
     }
 
-    const result = JSON.parse(response.text.trim());
+    if (!responseText) {
+      throw new Error("Empty response from AI providers.");
+    }
+
+    const result = JSON.parse(responseText.trim());
     res.json(result);
   } catch (err: any) {
     const errMsg = (err.message || "").toLowerCase();
@@ -2499,10 +2519,10 @@ LAWS OF CELESTIAL ANALYSIS:
 
     promptSize = Buffer.byteLength(userPrompt, "utf-8");
 
-    const ai = getGeminiClient(geminiApiKey);
     let response;
     let modelUsed = "gemini-3.6-flash";
     try {
+      const ai = getGeminiClient(geminiApiKey);
       response = await ai.models.generateContent({
         model: "gemini-3.6-flash",
         contents: userPrompt,
@@ -2701,15 +2721,45 @@ LAWS OF CELESTIAL ANALYSIS:
         }
       });
         } catch (fbErr: any) {
-          throw apiErr;
+          console.warn("Gemini API fallback error in Master Ask:", fbErr);
         }
       } else {
-        throw apiErr;
+        console.warn("Gemini API error in Master Ask:", apiErr);
       }
     }
 
-    const text = response.text || "{}";
-    const output = JSON.parse(text);
+    let responseText = response?.text;
+
+    // 2. Fallback to ChatGPT (OpenAI) if Gemini failed or produced no output
+    if (!responseText) {
+      console.warn("Gemini produced no output or failed. Initiating ChatGPT (OpenAI) fallback...");
+      try {
+        const openai = getOpenAIClient(req);
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: `${systemInstruction}\n\nCRITICAL OUTPUT INSTRUCTION: Output ONLY a single JSON object with schema: {"reply": string, "debugInfo": {"knowledgeBookVersion": string, "matchedRules": Array, "failedRules": Array, "evidence": Array, "decision": string, "timeline": Array, "eventIds": Array, "currentSkySnapshot": string, "contextSourcesLoaded": Array}, "intentDetected": {"intent": string, "confidence": number}}`
+            },
+            { role: "user", content: userPrompt }
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.3
+        });
+        responseText = completion.choices[0]?.message?.content || null;
+        modelUsed = "ChatGPT (gpt-4o-mini)";
+      } catch (openaiErr: any) {
+        console.error("ChatGPT fallback error in Master Ask:", openaiErr.message || openaiErr);
+        throw openaiErr;
+      }
+    }
+
+    if (!responseText) {
+      throw new Error("Celestial consultation temporarily unavailable from AI providers.");
+    }
+
+    const output = JSON.parse(responseText);
     
     // Inject dynamic performance counters on-the-fly
     if (output && output.debugInfo) {
