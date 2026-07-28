@@ -1204,7 +1204,7 @@ export default function TransitsTab({
   const SUB_TABS = [
     { id: "birth_panchanga", name: "Birth Panchang", icon: Star },
     { id: "current_gochara", name: "Current Gochara", icon: RefreshCw },
-    { id: "current_dasha", name: "Current Dasha", icon: Calendar },
+    { id: "current_dasha", name: "Active Period", icon: Calendar },
     { id: "current_transits", name: "Current Transits", icon: Layers },
     { id: "panchanga", name: "Current Panchanga", icon: Clock },
     { id: "current_strengths", name: "Current Strengths", icon: Award },

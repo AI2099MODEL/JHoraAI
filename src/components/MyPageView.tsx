@@ -1835,15 +1835,14 @@ const lifeTabs = [
 ];
 
 const journeyTabs = [
-  { id: "daily", label: "Daily" },
+  { id: "daily", label: "Today" },
   { id: "weekly", label: "Weekly" },
   { id: "monthly", label: "Monthly" },
-  { id: "long_term", label: "Long Term" },
-  { id: "current_dasha", label: "Current Dasha" },
+  { id: "long_term", label: "Yearly" },
+  { id: "current_dasha", label: "Active Period" },
   { id: "predictions", label: "Predictions" },
   { id: "future", label: "Future" },
-  { id: "tajik", label: "Tajik" },
-  { id: "chinese", label: "Chinese" }
+  { id: "tajik", label: "Tajik" }
 ];
 
 const astroTabs = [
@@ -1877,6 +1876,89 @@ export function MyPageView({
   const [lastRefreshed, setLastRefreshed] = useState<string>("");
   const [isSyncingReports, setIsSyncingReports] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string>("");
+
+  const renderChinesePillarCard = (pillarType: "day" | "hour" | "month" | "year") => {
+    const stems = [
+      { name: "Jia (Yang Wood)", element: "Wood", color: "text-emerald-500" },
+      { name: "Yi (Yin Wood)", element: "Wood", color: "text-emerald-400" },
+      { name: "Bing (Yang Fire)", element: "Fire", color: "text-red-500" },
+      { name: "Ding (Yin Fire)", element: "Fire", color: "text-red-400" },
+      { name: "Wu (Yang Earth)", element: "Earth", color: "text-amber-500" },
+      { name: "Ji (Yin Earth)", element: "Earth", color: "text-amber-400" },
+      { name: "Geng (Yang Metal)", element: "Metal", color: "text-gray-400" },
+      { name: "Xin (Yin Metal)", element: "Metal", color: "text-gray-300" },
+      { name: "Ren (Yang Water)", element: "Water", color: "text-sky-500" },
+      { name: "Gui (Yin Water)", element: "Water", color: "text-sky-400" }
+    ];
+    const branches = [
+      { name: "Zi (Rat)", element: "Water", animal: "Rat", color: "text-sky-500" },
+      { name: "Chou (Ox)", element: "Earth", animal: "Ox", color: "text-amber-500" },
+      { name: "Yin (Tiger)", element: "Wood", animal: "Tiger", color: "text-emerald-500" },
+      { name: "Mao (Rabbit)", element: "Wood", animal: "Rabbit", color: "text-emerald-400" },
+      { name: "Chen (Dragon)", element: "Earth", animal: "Dragon", color: "text-amber-500" },
+      { name: "Si (Snake)", element: "Fire", animal: "Snake", color: "text-red-500" },
+      { name: "Wu (Horse)", element: "Fire", animal: "Horse", color: "text-red-400" },
+      { name: "Wei (Goat)", element: "Earth", animal: "Goat", color: "text-amber-500" },
+      { name: "Shen (Monkey)", element: "Metal", animal: "Monkey", color: "text-gray-400" },
+      { name: "You (Rooster)", element: "Metal", animal: "Rooster", color: "text-gray-300" },
+      { name: "Xu (Dog)", element: "Earth", animal: "Dog", color: "text-amber-500" },
+      { name: "Pig (Hai)", element: "Water", animal: "Pig", color: "text-sky-400" }
+    ];
+
+    const dateObj = new Date(profile?.Birth?.date || "1995-10-15");
+    const birthYear = dateObj.getFullYear();
+    const birthMonth = dateObj.getMonth() + 1;
+    const birthDay = dateObj.getDate();
+    const birthHour = parseInt((profile?.Birth?.time || "08:00").split(":")[0]) || 8;
+
+    const yearIdx = (birthYear - 4) % 60;
+    const yearStem = stems[yearIdx % 10];
+    const yearBranch = branches[yearIdx % 12];
+
+    const monthIdx = (birthYear * 12 + birthMonth + 12) % 60;
+    const monthStem = stems[monthIdx % 10];
+    const monthBranch = branches[(birthMonth + 1) % 12];
+
+    const baseDay = Math.abs(birthYear * 365 + birthMonth * 30 + birthDay) % 60;
+    const dayStem = stems[baseDay % 10];
+    const dayBranch = branches[baseDay % 12];
+
+    const hourBranchIdx = Math.floor(((birthHour + 1) % 24) / 2);
+    const hourStemIdx = (baseDay % 5) * 2 + hourBranchIdx;
+    const hourStem = stems[hourStemIdx % 10];
+    const hourBranch = branches[hourBranchIdx % 12];
+
+    let pillarData = { label: "TODAY'S BAZI PILLAR (Day Master)", stem: dayStem, branch: dayBranch, desc: "Core self-identity & daily vitality", isPrimary: true };
+    if (pillarType === "hour") {
+      pillarData = { label: "WEEKLY BAZI PILLAR (Hour)", stem: hourStem, branch: hourBranch, desc: "Weekly action & external interactions", isPrimary: false };
+    } else if (pillarType === "month") {
+      pillarData = { label: "MONTHLY BAZI PILLAR (Month)", stem: monthStem, branch: monthBranch, desc: "Monthly career root & foundation", isPrimary: false };
+    } else if (pillarType === "year") {
+      pillarData = { label: "YEARLY BAZI PILLAR (Year)", stem: yearStem, branch: yearBranch, desc: "Yearly overarching trend & outer world", isPrimary: false };
+    }
+
+    return (
+      <div className={`p-4 border-2 rounded-xl text-center flex flex-col justify-between max-w-sm mx-auto my-4 ${pillarData.isPrimary ? "border-emerald-500 bg-emerald-500/5 shadow-lg" : cardStyle}`}>
+        <span className={`text-[10px] font-bold tracking-widest ${pillarData.isPrimary ? "text-emerald-500" : textMutedStyle}`}>
+          {pillarData.label}
+        </span>
+        <div className="my-3 space-y-1">
+          <div className="flex flex-col">
+            <span className={`text-base font-bold ${pillarData.stem.color}`}>{pillarData.stem.name.split(" ")[0]}</span>
+            <span className={`text-[10px] ${textMutedStyle}`}>{pillarData.stem.name.split(" ")[1]}</span>
+          </div>
+          <div className="h-0.5 bg-slate-500/10 max-w-[30px] mx-auto my-1"></div>
+          <div className="flex flex-col">
+            <span className={`text-base font-bold ${pillarData.branch.color}`}>{pillarData.branch.name.split(" ")[0]}</span>
+            <span className={`text-[10px] font-semibold ${pillarData.branch.color}`}>{pillarData.branch.animal}</span>
+          </div>
+        </div>
+        <span className={`text-[9px] italic ${textMutedStyle} leading-tight`}>
+          {pillarData.desc}
+        </span>
+      </div>
+    );
+  };
 
   const triggerReportSync = async (isAuto = false) => {
     setIsSyncingReports(true);
@@ -6389,144 +6471,6 @@ export function MyPageView({
             </div>
           );
         })()
-      ) : activeTab === "chinese" ? (
-        (() => {
-          const stems = [
-            { name: "Jia (Yang Wood)", element: "Wood", color: "text-emerald-500" },
-            { name: "Yi (Yin Wood)", element: "Wood", color: "text-emerald-400" },
-            { name: "Bing (Yang Fire)", element: "Fire", color: "text-red-500" },
-            { name: "Ding (Yin Fire)", element: "Fire", color: "text-red-400" },
-            { name: "Wu (Yang Earth)", element: "Earth", color: "text-amber-500" },
-            { name: "Ji (Yin Earth)", element: "Earth", color: "text-amber-400" },
-            { name: "Geng (Yang Metal)", element: "Metal", color: "text-gray-400" },
-            { name: "Xin (Yin Metal)", element: "Metal", color: "text-gray-300" },
-            { name: "Ren (Yang Water)", element: "Water", color: "text-sky-500" },
-            { name: "Gui (Yin Water)", element: "Water", color: "text-sky-400" }
-          ];
-
-          const branches = [
-            { name: "Zi (Rat)", element: "Water", animal: "Rat", color: "text-sky-500" },
-            { name: "Chou (Ox)", element: "Earth", animal: "Ox", color: "text-amber-500" },
-            { name: "Yin (Tiger)", element: "Wood", animal: "Tiger", color: "text-emerald-500" },
-            { name: "Mao (Rabbit)", element: "Wood", animal: "Rabbit", color: "text-emerald-400" },
-            { name: "Chen (Dragon)", element: "Earth", animal: "Dragon", color: "text-amber-500" },
-            { name: "Si (Snake)", element: "Fire", animal: "Snake", color: "text-red-500" },
-            { name: "Wu (Horse)", element: "Fire", animal: "Horse", color: "text-red-400" },
-            { name: "Wei (Goat)", element: "Earth", animal: "Goat", color: "text-amber-500" },
-            { name: "Shen (Monkey)", element: "Metal", animal: "Monkey", color: "text-gray-400" },
-            { name: "You (Rooster)", element: "Metal", animal: "Rooster", color: "text-gray-300" },
-            { name: "Xu (Dog)", element: "Earth", animal: "Dog", color: "text-amber-500" },
-            { name: "Pig (Hai)", element: "Water", animal: "Pig", color: "text-sky-400" }
-          ];
-
-          const dateObj = new Date(profile?.Birth?.date || "1995-10-15");
-          const birthYear = dateObj.getFullYear();
-          const birthMonth = dateObj.getMonth() + 1;
-          const birthDay = dateObj.getDate();
-          const birthHour = parseInt((profile?.Birth?.time || "08:00").split(":")[0]) || 8;
-
-          const yearIdx = (birthYear - 4) % 60;
-          const yearStem = stems[yearIdx % 10];
-          const yearBranch = branches[yearIdx % 12];
-
-          const monthIdx = (birthYear * 12 + birthMonth + 12) % 60;
-          const monthStem = stems[monthIdx % 10];
-          const monthBranch = branches[(birthMonth + 1) % 12];
-
-          const baseDay = Math.abs(birthYear * 365 + birthMonth * 30 + birthDay) % 60;
-          const dayStem = stems[baseDay % 10];
-          const dayBranch = branches[baseDay % 12];
-
-          const hourBranchIdx = Math.floor(((birthHour + 1) % 24) / 2);
-          const hourStemIdx = (baseDay % 5) * 2 + hourBranchIdx;
-          const hourStem = stems[hourStemIdx % 10];
-          const hourBranch = branches[hourBranchIdx % 12];
-
-          const elementScores: { [key: string]: number } = { Wood: 0, Fire: 0, Earth: 0, Metal: 0, Water: 0 };
-          [yearStem, monthStem, dayStem, hourStem].forEach(s => elementScores[s.element] += 15);
-          [yearBranch, monthBranch, dayBranch, hourBranch].forEach(b => elementScores[b.element] += 10);
-
-          return (
-            <div className="space-y-6">
-              {/* Pillars Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: "HOUR PILLAR", stem: hourStem, branch: hourBranch, desc: "Late life & legacy" },
-                  { label: "DAY PILLAR", stem: dayStem, branch: dayBranch, desc: "The Day Master (Self)", isPrimary: true },
-                  { label: "MONTH PILLAR", stem: monthStem, branch: monthBranch, desc: "Parents & career root" },
-                  { label: "YEAR PILLAR", stem: yearStem, branch: yearBranch, desc: "Grandparents & outer world" }
-                ].map((col) => (
-                  <div
-                    key={col.label}
-                    className={`p-4 border-2 rounded-xl text-center flex flex-col justify-between ${col.isPrimary ? "border-emerald-500 bg-emerald-500/5 shadow-lg" : cardStyle}`}
-                  >
-                    <span className={`text-[10px] font-bold tracking-widest ${col.isPrimary ? "text-emerald-500" : textMutedStyle}`}>
-                      {col.label}
-                    </span>
-                    
-                    <div className="my-4 space-y-1">
-                      <div className="flex flex-col">
-                        <span className={`text-base font-bold ${col.stem.color}`}>{col.stem.name.split(" ")[0]}</span>
-                        <span className={`text-[10px] ${textMutedStyle}`}>{col.stem.name.split(" ")[1]}</span>
-                      </div>
-                      <div className="h-0.5 bg-slate-500/10 max-w-[30px] mx-auto my-1"></div>
-                      <div className="flex flex-col">
-                        <span className={`text-base font-bold ${col.branch.color}`}>{col.branch.name.split(" ")[0]}</span>
-                        <span className={`text-[10px] font-semibold ${col.branch.color}`}>{col.branch.animal}</span>
-                      </div>
-                    </div>
-
-                    <span className={`text-[9px] italic ${textMutedStyle} leading-tight`}>
-                      {col.desc}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Elements & Day Master */}
-              <div className={`p-5 border rounded-xl ${cardStyle} grid grid-cols-1 md:grid-cols-2 gap-6`}>
-                <div>
-                  <h4 className={`text-xs font-bold mb-3 ${textStyle}`}>Wu Xing (Five Elements Balance)</h4>
-                  <div className="space-y-3">
-                    {[
-                      { name: "Wood", color: "bg-emerald-500", text: "text-emerald-500", key: "Wood" },
-                      { name: "Fire", color: "bg-red-500", text: "text-red-500", key: "Fire" },
-                      { name: "Earth", color: "bg-amber-500", text: "text-amber-500", key: "Earth" },
-                      { name: "Metal", color: "bg-gray-400", text: "text-gray-400", key: "Metal" },
-                      { name: "Water", color: "bg-sky-500", text: "text-sky-500", key: "Water" }
-                    ].map((el) => {
-                      const pct = elementScores[el.key] || 0;
-                      return (
-                        <div key={el.name} className="space-y-1">
-                          <div className="flex justify-between text-[11px]">
-                            <span className={`font-semibold ${el.text}`}>{el.name}</span>
-                            <span className="font-mono">{pct}%</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                            <div className={`h-full ${el.color}`} style={{ width: `${pct}%` }}></div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="flex flex-col justify-between text-xs space-y-3">
-                  <div>
-                    <h4 className={`text-xs font-bold mb-1 ${textStyle}`}>Day Master: <span className="text-emerald-500">{dayStem.name}</span></h4>
-                    <p className={`text-[11px] ${textMutedStyle} leading-relaxed`}>
-                      Your Day Master represents your core self-identity. Associated with the <strong>{dayStem.element}</strong> element, this config suggests a personality aligned with growth, adaptation, and structure.
-                    </p>
-                  </div>
-                  <div className="p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-lg leading-relaxed">
-                    <strong className="block text-emerald-500 mb-1 text-[10px] uppercase">Luck Cycle Tip</strong>
-                    Your elemental balance suggests strong adaptive characteristics. Introduce weaker element traits through visual environment accents for enhanced life alignment.
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })()
       ) : activeTab === "western" ? (
         (() => {
           // Resolve planets list and format for Western (Tropical Placidus)
@@ -7109,6 +7053,19 @@ export function MyPageView({
                 </div>
               </div>
 
+              {/* Chinese BaZi Day Master Pillar */}
+              <div className={`p-5 rounded-2xl border ${cardStyle} flex flex-col md:flex-row items-center justify-between gap-4`}>
+                <div>
+                  <h4 className={`text-sm font-bold ${textStyle} font-sans`}>Bazi Day Master Pillar (Today's Baseline)</h4>
+                  <p className={`text-xs ${textMuted} mt-0.5`}>
+                    Representing your core self-identity and daily vitality derived from your birth BaZi coordinates.
+                  </p>
+                </div>
+                <div className="w-full md:w-auto">
+                  {renderChinesePillarCard("day")}
+                </div>
+              </div>
+
               {/* Main Daily Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
@@ -7405,9 +7362,10 @@ export function MyPageView({
             <div className="space-y-1.5 max-w-sm">
               <h4 className="text-base font-bold text-slate-900">Weekly Journey</h4>
               <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                Weekly transit forecasts and focus areas will appear here.
+                Weekly transit forecasts, external focus areas, and Bazi Hour Pillar influences.
               </p>
             </div>
+            {renderChinesePillarCard("hour")}
           </div>
         </div>
       ) : activeTab === "monthly" ? (
@@ -7419,9 +7377,10 @@ export function MyPageView({
             <div className="space-y-1.5 max-w-sm">
               <h4 className="text-base font-bold text-slate-900">Monthly Journey</h4>
               <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                Monthly astrological transit reports and planetary shifts will appear here.
+                Monthly astrological transit reports, planetary shifts, and Bazi Month Pillar foundation.
               </p>
             </div>
+            {renderChinesePillarCard("month")}
           </div>
         </div>
       ) : activeTab === "long_term" ? (
@@ -7433,9 +7392,10 @@ export function MyPageView({
             <div className="space-y-1.5 max-w-sm">
               <h4 className="text-base font-bold text-slate-900">Long Term Journey</h4>
               <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                Long term predictive trends, major dasha shifts, and life milestones will appear here.
+                Long term predictive trends, major dasha shifts, life milestones, and Bazi Year Pillar overarching cycles.
               </p>
             </div>
+            {renderChinesePillarCard("year")}
           </div>
         </div>
       ) : activeTab === "future" ? (

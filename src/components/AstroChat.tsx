@@ -685,15 +685,14 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                   {/* Journey Navigation Pages */}
                   <div className="space-y-1">
                     {[
-                      { id: "daily", label: "Daily", theme: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-500 hover:text-white" },
+                      { id: "daily", label: "Today", theme: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-500 hover:text-white" },
                       { id: "weekly", label: "Weekly", theme: "bg-orange-50 text-orange-950 border-orange-200 hover:bg-orange-600 hover:text-white" },
                       { id: "monthly", label: "Monthly", theme: "bg-blue-50 text-blue-950 border-blue-200 hover:bg-blue-600 hover:text-white" },
-                      { id: "long_term", label: "Long Term", theme: "bg-purple-50 text-purple-950 border-purple-200 hover:bg-purple-600 hover:text-white" },
-                      { id: "current_dasha", label: "Current Dasha", theme: "bg-emerald-50 text-emerald-950 border-emerald-200 hover:bg-emerald-600 hover:text-white" },
+                      { id: "long_term", label: "Yearly", theme: "bg-purple-50 text-purple-950 border-purple-200 hover:bg-purple-600 hover:text-white" },
+                      { id: "current_dasha", label: "Active Period", theme: "bg-emerald-50 text-emerald-950 border-emerald-200 hover:bg-emerald-600 hover:text-white" },
                       { id: "predictions", label: "Predictions", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
                       { id: "future", label: "Future", theme: "bg-cyan-50 text-cyan-950 border-cyan-200 hover:bg-cyan-600 hover:text-white" },
-                      { id: "tajik", label: "Tajik", theme: "bg-fuchsia-50/80 text-fuchsia-950 border-fuchsia-200/80 hover:bg-fuchsia-600 hover:text-white" },
-                      { id: "chinese", label: "Chinese", theme: "bg-teal-50/80 text-teal-950 border-teal-200/80 hover:bg-teal-600 hover:text-white" }
+                      { id: "tajik", label: "Tajik", theme: "bg-fuchsia-50/80 text-fuchsia-950 border-fuchsia-200/80 hover:bg-fuchsia-600 hover:text-white" }
                     ].map((sub) => (
                       <button
                         key={sub.id}

@@ -2502,7 +2502,7 @@ export const HoroscopeReportView: React.FC<HoroscopeReportViewProps> = ({
         <div className="flex flex-wrap gap-1.5 py-3 border-b border-slate-800/40">
           {[
             { id: "current_gochara", label: "Current Gochara" },
-            { id: "current_dasha", label: "Current Dasha" },
+            { id: "current_dasha", label: "Active Period" },
             { id: "current_transits", label: "Current Transits" },
             { id: "panchanga", label: "Current Panchanga" },
             { id: "current_strengths", label: "Current Strengths" },
