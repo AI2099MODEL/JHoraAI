@@ -665,7 +665,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                   {/* Journey Navigation Pages */}
                   <div className="space-y-1">
                     {[
-                      { id: "birth", label: "Birth", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
                       { id: "daily", label: "Today", theme: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-500 hover:text-white" },
                       { id: "weekly", label: "Weekly", theme: "bg-orange-50 text-orange-950 border-orange-200 hover:bg-orange-600 hover:text-white" },
                       { id: "monthly", label: "Monthly", theme: "bg-blue-50 text-blue-950 border-blue-200 hover:bg-blue-600 hover:text-white" },
@@ -738,6 +737,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                   {/* My Life Section */}
                   <div className="space-y-1">
                     {[
+                      { id: "birth", label: "Birth", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
                       { id: "my_life_analysis", label: "My Life Analysis", theme: "bg-rose-50 text-rose-950 border-rose-200 hover:bg-rose-600 hover:text-white" }
                     ].map((sub) => (
                       <button
@@ -751,30 +751,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                           activeSubmenuPanel === sub.id
                             ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
                             : `${sub.theme}`
-                        }`}
-                      >
-                        <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
-                        <span>{sub.label}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* My Astro Systems */}
-                  <div className="space-y-1 pt-1">
-                    {[
-                      { id: "vedic", label: "My Astro Details", theme: "bg-amber-50/80 text-amber-950 border-amber-200/80" },
-                    ].map((sub) => (
-                      <button
-                        key={sub.id}
-                        onClick={() => {
-                          setActiveSubmenuPanel(sub.id);
-                          onNavigateMenu?.("ai_assistant", sub.id);
-                          setSidebarOpen(false);
-                        }}
-                        className={`flex items-center gap-2 py-1.5 px-2.5 rounded-lg text-[11px] font-semibold transition-all cursor-pointer w-full text-left border shadow-2xs ${
-                          activeSubmenuPanel === sub.id
-                            ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold border-indigo-700"
-                            : `${sub.theme} hover:brightness-95`
                         }`}
                       >
                         <Sparkles className="w-3 h-3 shrink-0 opacity-80" />
