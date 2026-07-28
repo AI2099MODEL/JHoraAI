@@ -76,7 +76,7 @@ export function TableIndexView({
   const textStyle = isDark ? "text-slate-100" : "text-neutral-800";
   const textMutedStyle = isDark ? "text-slate-400" : "text-neutral-500";
 
-  // Strictly Indexed JH1 to JH19 consecutively to maintain cohesive mapping bounds
+  // Strictly Indexed JH1 to JH25 consecutively to maintain cohesive mapping bounds
   const tablesRegistry = [
     {
       table_number: 1,
@@ -315,6 +315,79 @@ export function TableIndexView({
         teva_types: ["Dharmi Teva", "Andha Teva", "Nisphal Teva"],
         sleeping_status: "Soye Grah (Dormant Planet Analysis)"
       }
+
+    },
+    {
+      table_number: 10,
+      jh_id: "JH20",
+      title: "Jaimini Argalas",
+      source_origin: "Jaimini Engine",
+      section_key: "Jaimini.argalas",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true,
+      data_sample: {
+        houses: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+      }
+    },
+    {
+      table_number: 15,
+      jh_id: "JH21",
+      title: "Jaimini Sphutas",
+      source_origin: "Jaimini Engine",
+      section_key: "Jaimini.sphutas",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true,
+      data_sample: {
+        lagnas: ["Hora Lagna", "Ghati Lagna", "Bhava Lagna", "Pranapada Lagna"]
+      }
+    },
+    {
+      table_number: 17,
+      jh_id: "JH22",
+      title: "Jaimini Sahams",
+      source_origin: "Jaimini Engine",
+      section_key: "Jaimini.sahams",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true,
+      data_sample: {
+        sahams: ["Punya", "Vidya", "Yasas", "Mitra"]
+      }
+    },
+    {
+      table_number: 18,
+      jh_id: "JH23",
+      title: "Vedic Upgrahas",
+      source_origin: "Vedic Engine",
+      section_key: "Vedic.upgrahas",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true,
+      data_sample: {
+        upgrahas: ["Gulika", "Mandi", "Dhooma", "Vyatipata"]
+      }
+    },
+    {
+      table_number: 22,
+      jh_id: "JH24",
+      title: "Ishtaphala & Kashtaphala",
+      source_origin: "Vedic Engine",
+      section_key: "Vedic.phalas",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true,
+      data_sample: {
+        status: "Strengths matrix"
+      }
+    },
+    {
+      table_number: 23,
+      jh_id: "JH25",
+      title: "Jaimini Chara Dasha",
+      source_origin: "Jaimini Engine",
+      section_key: "Jaimini.chara_dasha",
+      api_source: "Computed Client-side / JHora Mapper",
+      is_populated: true,
+      data_sample: {
+        dashas: ["Aries", "Taurus", "Gemini", "Cancer"]
+      }
     }
   ];
 
@@ -340,7 +413,7 @@ export function TableIndexView({
                 Deployment Node
               </span>
               <span className="text-[10px] bg-indigo-500/15 text-indigo-400 border border-indigo-500/25 px-2.5 py-0.5 rounded font-bold uppercase tracking-wider font-mono">
-                JH1-JH19 Registry
+                JH1-JH25 Registry
               </span>
             </div>
             <h2 className={`text-xl font-sans font-bold flex items-center gap-2 ${textStyle}`}>
@@ -386,7 +459,7 @@ export function TableIndexView({
             />
           </div>
           <span className="text-[10px] font-mono text-slate-400">
-            Showing {filteredTables.length} of 19 Tables
+            Showing {filteredTables.length} of 25 Tables
           </span>
         </div>
       </div>

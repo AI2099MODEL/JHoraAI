@@ -4884,6 +4884,11 @@ export function MyPageView({
 
           {/* Additional: Jaimini Argalas */}
           <div className="space-y-3">
+            <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                JH20: Jaimini Argalas
+              </h3>
+            </div>
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_10", null, profile, astrologyData)}
@@ -4894,6 +4899,11 @@ export function MyPageView({
 
           {/* Additional: Jaimini Sphutas */}
           <div className="space-y-3">
+            <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                JH21: Jaimini Sphutas
+              </h3>
+            </div>
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_15", null, profile, astrologyData)}
@@ -4904,6 +4914,11 @@ export function MyPageView({
 
           {/* Additional: Jaimini Sahams */}
           <div className="space-y-3">
+            <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                JH22: Jaimini Sahams
+              </h3>
+            </div>
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_17", null, profile, astrologyData)}
@@ -4912,6 +4927,11 @@ export function MyPageView({
 
           {/* Additional: Vedic Upgrahas */}
           <div className="space-y-3">
+            <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                JH23: Vedic Upgrahas
+              </h3>
+            </div>
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_18", null, profile, astrologyData)}
@@ -4924,6 +4944,11 @@ export function MyPageView({
 
           {/* Additional: Ishtaphala & Kashtaphala */}
           <div className="space-y-3">
+            <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                JH24: Ishtaphala & Kashtaphala
+              </h3>
+            </div>
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               {renderIndexedTable("table_22", null, profile, astrologyData)}
@@ -4932,6 +4957,11 @@ export function MyPageView({
 
           {/* Additional: Jaimini Chara Dasha */}
           <div className="space-y-3">
+            <div className="flex justify-between items-center border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                JH25: Jaimini Chara Dasha
+              </h3>
+            </div>
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <CharaDashaInteractiveTable profile={profile} astrologyData={astrologyData} isDark={isDark} />
