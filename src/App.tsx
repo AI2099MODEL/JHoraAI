@@ -1463,8 +1463,6 @@ export default function App() {
       label: "AI Assistant",
       icon: Sparkles,
       submenus: [
-        { id: "chat", label: "AI Assistant Chat", description: "Interactive astrological AI consultation.", systemId: "ai_assistant", category: "AI" },
-        { id: "dashboard", label: "Dashboard", description: "Horoscope overview and panchanga.", systemId: "ai_assistant", category: "OVERVIEW" },
         // Journey / My Page tabs
         { id: "birth", label: "Birth", description: "Birth Details & Cast Settings.", systemId: "ai_assistant", category: "JOURNEY" },
         { id: "daily", label: "Today", description: "Today's astrological insights.", systemId: "ai_assistant", category: "JOURNEY" },
