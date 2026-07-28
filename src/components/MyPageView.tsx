@@ -1752,14 +1752,15 @@ export function renderIndexedTable(tableId: string, data: any, profile?: any, as
 }
 
 const lifeTabs = [
-  { id: "daily", label: "Daily" },
-  { id: "current_dasha", label: "Current Dasha" }
+  { id: "my_life_analysis", label: "My Life Analysis" }
 ];
 
 const journeyTabs = [
+  { id: "daily", label: "Daily" },
+  { id: "current_dasha", label: "Current Dasha" },
   { id: "predictions", label: "Predictions" },
   { id: "future", label: "Future" },
-  { id: "my_life_analysis", label: "My Life Analysis" }
+  { id: "tajik", label: "Tajik" }
 ];
 
 const astroTabs = [
@@ -1768,7 +1769,6 @@ const astroTabs = [
   { id: "jaimini", label: "Jaimini" },
   { id: "lalkitab", label: "Lalkitab" },
   { id: "chinese", label: "Chinese" },
-  { id: "tajik", label: "Tajik" },
   { id: "western", label: "Western" }
 ];
 
@@ -1852,12 +1852,12 @@ export function MyPageView({
       if (activeSubmenuId === "my_life") {
         setActiveSubmenu("my_life");
         if (!lifeTabs.some(t => t.id === activeTab)) {
-          setActiveTab("daily");
+          setActiveTab("my_life_analysis");
         }
       } else if (activeSubmenuId === "my_journey") {
         setActiveSubmenu("my_journey");
         if (!journeyTabs.some(t => t.id === activeTab)) {
-          setActiveTab("predictions");
+          setActiveTab("daily");
         }
       } else if (activeSubmenuId === "my_astro") {
         setActiveSubmenu("my_astro");
