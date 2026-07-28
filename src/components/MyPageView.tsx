@@ -1841,8 +1841,7 @@ const journeyTabs = [
   { id: "long_term", label: "Yearly" },
   { id: "current_dasha", label: "Active Period" },
   { id: "predictions", label: "Predictions" },
-  { id: "future", label: "Future" },
-  { id: "tajik", label: "Tajik" }
+  { id: "future", label: "Future" }
 ];
 
 const astroTabs = [
@@ -6281,196 +6280,6 @@ export function MyPageView({
             </div>
           );
         })()
-      ) : activeTab === "tajik" ? (
-        (() => {
-          // Resolve planets & lagna
-          const resolvedData = (() => {
-            if (astrologyData && astrologyData.planets && astrologyData.planets.length > 0) return astrologyData;
-            const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets;
-            if (planetsObj && Object.keys(planetsObj).length > 0) {
-              const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
-              const planetsList = Object.entries(planetsObj).map(([name, p]: [string, any]) => {
-                const signIdx = p.sign_index !== undefined ? p.sign_index : signs.indexOf(p.sign);
-                return {
-                  name,
-                  longitude: p.longitude || (signIdx !== -1 ? signIdx * 30 + p.degree : 0),
-                  sign: p.sign,
-                  signIndex: signIdx !== -1 ? signIdx : 0,
-                  degree: p.degree || 0,
-                  house: p.house || 1
-                };
-              });
-              const ascSignName = profile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.sign || "Aries";
-              let ascendantSignIndex = profile?.Vedic?.ascendant?.sign_index !== undefined ? profile?.Vedic?.ascendant?.sign_index : signs.indexOf(ascSignName);
-              if (ascendantSignIndex === -1) ascendantSignIndex = 0;
-              return {
-                lagna: { sign: ascSignName, signIndex: ascendantSignIndex, longitude: ascendantSignIndex * 30 + (profile?.Vedic?.ascendant?.degree || 0), degree: profile?.Vedic?.ascendant?.degree || 0 },
-                planets: planetsList
-              };
-            }
-            const bDate = profile?.Birth?.date || "1976-01-06";
-            const bTime = profile?.Birth?.time || "18:40";
-            const bLat = profile?.Birth?.latitude || 28.6139;
-            const bLon = profile?.Birth?.longitude || 77.2090;
-            const d = new Date(bDate + "T" + bTime);
-            const val = d.getTime() || Date.now();
-            const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
-            const planetNames = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
-            const planets = planetNames.map((name, idx) => {
-              const seed = val * (idx + 1) + bLat + bLon;
-              const long = Math.abs(Math.sin(seed) * 360);
-              return { name, longitude: long, sign: signs[Math.floor(long / 30)], signIndex: Math.floor(long / 30), degree: long % 30, house: (Math.floor(seed) % 12) + 1 };
-            });
-            return { lagna: { sign: signs[0], signIndex: 0, longitude: 0, degree: 0 }, planets };
-          })();
-
-          const natalAscIdx = resolvedData.lagna.signIndex || 0;
-          const munthaSignIdx = (natalAscIdx + tajikTargetAge) % 12;
-          const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
-          const munthaSign = signs[munthaSignIdx];
-          const munthaHouse = (munthaSignIdx - natalAscIdx + 12) % 12 + 1;
-
-          let munthaPrediction = "";
-          if ([1, 5, 9, 10, 11].includes(munthaHouse)) {
-            munthaPrediction = `Excellent placement! Muntha in House ${munthaHouse} indicates remarkable achievements, career progression, high confidence, health recovery, and auspicious celebrations.`;
-          } else if ([4, 7, 2].includes(munthaHouse)) {
-            munthaPrediction = `Mixed results. Muntha in House ${munthaHouse} shows focus on partnerships, relocation or home assets, but requires careful emotional balance and avoidance of hasty financial investments.`;
-          } else {
-            munthaPrediction = `Caution period. Muntha in House ${munthaHouse} is traditionally challenging. It indicates mental exhaustion, legal disputes, expenditure spikes, and demands structured disciplined living.`;
-          }
-
-          const nativeInputs = {
-            date: profile?.Birth?.date || "1976-01-06",
-            time: profile?.Birth?.time || "18:40",
-            latitude: profile?.Birth?.latitude || 28.6139,
-            longitude: profile?.Birth?.longitude || 77.2090,
-            timezone: profile?.Birth?.timezone || 5.5
-          };
-
-          const tjEvidence = TajikEvidenceAdapter(resolvedData.planets, resolvedData.lagna, tajikTargetAge, nativeInputs);
-          const tjDecision = TajikDecisionAdapter(resolvedData.planets, resolvedData.lagna, tajikTargetAge, nativeInputs);
-
-          return (
-            <div className="space-y-6">
-              <div className="flex justify-end gap-2 flex-wrap">
-                <div className="flex items-center gap-1 bg-slate-500/5 p-1 rounded-lg border border-slate-500/10 text-[10px] font-bold">
-                  <button
-                    onClick={() => setTajikSubTab("relationship")}
-                    className={`px-2 py-1 rounded transition-all cursor-pointer ${
-                      tajikSubTab === "relationship" ? "bg-indigo-500 text-slate-950" : "text-slate-600"
-                    }`}
-                  >
-                    Relationship Engine
-                  </button>
-                  <button
-                    onClick={() => setTajikSubTab("solarReturn")}
-                    className={`px-2 py-1 rounded transition-all cursor-pointer ${
-                      tajikSubTab === "solarReturn" ? "bg-indigo-500 text-slate-950" : "text-slate-600"
-                    }`}
-                  >
-                    Solar Return
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-1.5 bg-slate-500/5 px-2 py-1 rounded border border-slate-500/10 text-[10px] font-bold">
-                  <span>Target Age:</span>
-                  <input
-                    type="number"
-                    value={tajikTargetAge}
-                    onChange={(e) => setTajikTargetAge(Math.max(1, parseInt(e.target.value) || 1))}
-                    className="w-10 bg-transparent text-center border-b border-indigo-500/30 text-indigo-400 font-mono focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {tajikSubTab === "solarReturn" ? (
-                <div className="space-y-6">
-                  {/* Muntha Card */}
-                  <div className={`p-5 border rounded-lg ${cardStyle} grid grid-cols-1 md:grid-cols-3 gap-6`}>
-                    <div className="flex flex-col justify-center items-center text-center p-4 bg-indigo-500/5 rounded-lg border border-indigo-500/10">
-                      <span className="text-[10px] uppercase tracking-widest text-indigo-500 font-bold">The Muntha Point</span>
-                      <span className="text-2xl font-bold font-mono mt-2 text-indigo-400">{munthaSign}</span>
-                      <span className={`text-sm font-semibold mt-1 ${textStyle}`}>Varsha House {munthaHouse}</span>
-                      <span className={`text-[9px] mt-1 font-mono ${textMutedStyle}`}>Progressed sign coordinate</span>
-                    </div>
-                    <div className="md:col-span-2 flex flex-col justify-between">
-                      <div>
-                        <h4 className={`text-sm font-semibold mb-1 ${textStyle}`}>Yearly Progression Focus</h4>
-                        <p className={`text-xs ${textMutedStyle} leading-relaxed`}>
-                          Muntha represents the Year's vital energy point, moving one sign per year from natal Lagna.
-                        </p>
-                      </div>
-                      <div className="mt-4 p-3 bg-indigo-500/5 border border-indigo-500/10 rounded text-xs leading-relaxed">
-                        <strong className="block text-indigo-400 mb-1">Muntha Guidance:</strong>
-                        {munthaPrediction}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Tajik Yogas */}
-                  <div className={`p-4 border rounded-xl ${cardStyle}`}>
-                    <h4 className="text-xs font-semibold uppercase tracking-wider text-indigo-400 mb-2">Tajik Astrological Yogas</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                      <div className="p-2.5 bg-slate-500/5 rounded-lg">
-                        <span className={`font-bold ${textStyle}`}>Ithasala (Mutual Aspect):</span>
-                        <p className={`text-[10px] ${textMutedStyle} mt-1`}>
-                          Formed when faster planet is behind slower planet, creating mutual solar harmonic aspect. Indicates fulfillment of tasks.
-                        </p>
-                      </div>
-                      <div className="p-2.5 bg-slate-500/5 rounded-lg">
-                        <span className={`font-bold ${textStyle}`}>Easarpha (Separation):</span>
-                        <p className={`text-[10px] ${textMutedStyle} mt-1`}>
-                          Formed when faster planet is ahead of slower planet. Suggests gradual dissipation of energy or delay.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {/* Relationship Metrics */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
-                      <div>
-                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Marriage Promise</span>
-                        <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>{tjDecision.marriagePotentialScore}%</h4>
-                      </div>
-                      <div className="mt-3">
-                        <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
-                          <div className="h-full bg-indigo-500" style={{ width: `${tjDecision.marriagePotentialScore}%` }}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
-                      <div>
-                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Happiness Score</span>
-                        <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>{tjDecision.timingStrengthScore}%</h4>
-                      </div>
-                      <div className="mt-3">
-                        <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
-                          <div className="h-full bg-indigo-500" style={{ width: `${tjDecision.timingStrengthScore}%` }}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
-                      <div>
-                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Conflict Risk</span>
-                        <h4 className="text-2xl font-bold font-mono mt-1 text-indigo-400">{tjDecision.conflictRisk}</h4>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-xs leading-relaxed">
-                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block mb-1">Varshaphala Relationship Verdict</span>
-                    <p className={textStyle}>{tjDecision.verdictText}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })()
       ) : activeTab === "western" ? (
         (() => {
           // Resolve planets list and format for Western (Tropical Placidus)
@@ -7384,20 +7193,195 @@ export function MyPageView({
           </div>
         </div>
       ) : activeTab === "long_term" ? (
-        <div className="space-y-6 animate-fade-in">
-          <div className="bg-slate-900/40 border border-slate-200 rounded-2xl p-8 shadow-xl backdrop-blur-md min-h-[300px] flex flex-col items-center justify-center text-center space-y-4">
-            <div className="p-3.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
-              <Compass className="w-6 h-6" />
+        (() => {
+          // Resolve planets & lagna
+          const resolvedData = (() => {
+            if (astrologyData && astrologyData.planets && astrologyData.planets.length > 0) return astrologyData;
+            const planetsObj = profile?.Vedic?.planets || astrologyData?.vedic?.planets;
+            if (planetsObj && Object.keys(planetsObj).length > 0) {
+              const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+              const planetsList = Object.entries(planetsObj).map(([name, p]: [string, any]) => {
+                const signIdx = p.sign_index !== undefined ? p.sign_index : signs.indexOf(p.sign);
+                return {
+                  name,
+                  longitude: p.longitude || (signIdx !== -1 ? signIdx * 30 + p.degree : 0),
+                  sign: p.sign,
+                  signIndex: signIdx !== -1 ? signIdx : 0,
+                  degree: p.degree || 0,
+                  house: p.house || 1
+                };
+              });
+              const ascSignName = profile?.Vedic?.ascendant?.sign || astrologyData?.lagna?.sign || "Aries";
+              let ascendantSignIndex = profile?.Vedic?.ascendant?.sign_index !== undefined ? profile?.Vedic?.ascendant?.sign_index : signs.indexOf(ascSignName);
+              if (ascendantSignIndex === -1) ascendantSignIndex = 0;
+              return {
+                lagna: { sign: ascSignName, signIndex: ascendantSignIndex, longitude: ascendantSignIndex * 30 + (profile?.Vedic?.ascendant?.degree || 0), degree: profile?.Vedic?.ascendant?.degree || 0 },
+                planets: planetsList
+              };
+            }
+            const bDate = profile?.Birth?.date || "1976-01-06";
+            const bTime = profile?.Birth?.time || "18:40";
+            const bLat = profile?.Birth?.latitude || 28.6139;
+            const bLon = profile?.Birth?.longitude || 77.2090;
+            const d = new Date(bDate + "T" + bTime);
+            const val = d.getTime() || Date.now();
+            const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+            const planetNames = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+            const planets = planetNames.map((name, idx) => {
+              const seed = val * (idx + 1) + bLat + bLon;
+              const long = Math.abs(Math.sin(seed) * 360);
+              return { name, longitude: long, sign: signs[Math.floor(long / 30)], signIndex: Math.floor(long / 30), degree: long % 30, house: (Math.floor(seed) % 12) + 1 };
+            });
+            return { lagna: { sign: signs[0], signIndex: 0, longitude: 0, degree: 0 }, planets };
+          })();
+
+          const natalAscIdx = resolvedData.lagna.signIndex || 0;
+          const munthaSignIdx = (natalAscIdx + tajikTargetAge) % 12;
+          const signs = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
+          const munthaSign = signs[munthaSignIdx];
+          const munthaHouse = (munthaSignIdx - natalAscIdx + 12) % 12 + 1;
+
+          let munthaPrediction = "";
+          if ([1, 5, 9, 10, 11].includes(munthaHouse)) {
+            munthaPrediction = `Excellent placement! Muntha in House ${munthaHouse} indicates remarkable achievements, career progression, high confidence, health recovery, and auspicious celebrations.`;
+          } else if ([4, 7, 2].includes(munthaHouse)) {
+            munthaPrediction = `Mixed results. Muntha in House ${munthaHouse} shows focus on partnerships, relocation or home assets, but requires careful emotional balance and avoidance of hasty financial investments.`;
+          } else {
+            munthaPrediction = `Caution period. Muntha in House ${munthaHouse} is traditionally challenging. It indicates mental exhaustion, legal disputes, expenditure spikes, and demands structured disciplined living.`;
+          }
+
+          const nativeInputs = {
+            date: profile?.Birth?.date || "1976-01-06",
+            time: profile?.Birth?.time || "18:40",
+            latitude: profile?.Birth?.latitude || 28.6139,
+            longitude: profile?.Birth?.longitude || 77.2090,
+            timezone: profile?.Birth?.timezone || 5.5
+          };
+
+          const tjEvidence = TajikEvidenceAdapter(resolvedData.planets, resolvedData.lagna, tajikTargetAge, nativeInputs);
+          const tjDecision = TajikDecisionAdapter(resolvedData.planets, resolvedData.lagna, tajikTargetAge, nativeInputs);
+
+          return (
+            <div className="space-y-6">
+              <div className="flex justify-end gap-2 flex-wrap">
+                <div className="flex items-center gap-1 bg-slate-500/5 p-1 rounded-lg border border-slate-500/10 text-[10px] font-bold">
+                  <button
+                    onClick={() => setTajikSubTab("relationship")}
+                    className={`px-2 py-1 rounded transition-all cursor-pointer ${
+                      tajikSubTab === "relationship" ? "bg-indigo-500 text-slate-950" : "text-slate-600"
+                    }`}
+                  >
+                    Relationship Engine
+                  </button>
+                  <button
+                    onClick={() => setTajikSubTab("solarReturn")}
+                    className={`px-2 py-1 rounded transition-all cursor-pointer ${
+                      tajikSubTab === "solarReturn" ? "bg-indigo-500 text-slate-950" : "text-slate-600"
+                    }`}
+                  >
+                    Solar Return
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-1.5 bg-slate-500/5 px-2 py-1 rounded border border-slate-500/10 text-[10px] font-bold">
+                  <span>Target Age:</span>
+                  <input
+                    type="number"
+                    value={tajikTargetAge}
+                    onChange={(e) => setTajikTargetAge(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-10 bg-transparent text-center border-b border-indigo-500/30 text-indigo-400 font-mono focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {tajikSubTab === "solarReturn" ? (
+                <div className="space-y-6">
+                  {/* Muntha Card */}
+                  <div className={`p-5 border rounded-lg ${cardStyle} grid grid-cols-1 md:grid-cols-3 gap-6`}>
+                    <div className="flex flex-col justify-center items-center text-center p-4 bg-indigo-500/5 rounded-lg border border-indigo-500/10">
+                      <span className="text-[10px] uppercase tracking-widest text-indigo-500 font-bold">The Muntha Point</span>
+                      <span className="text-2xl font-bold font-mono mt-2 text-indigo-400">{munthaSign}</span>
+                      <span className={`text-sm font-semibold mt-1 ${textStyle}`}>Varsha House {munthaHouse}</span>
+                      <span className={`text-[9px] mt-1 font-mono ${textMutedStyle}`}>Progressed sign coordinate</span>
+                    </div>
+                    <div className="md:col-span-2 flex flex-col justify-between">
+                      <div>
+                        <h4 className={`text-sm font-semibold mb-1 ${textStyle}`}>Yearly Progression Focus</h4>
+                        <p className={`text-xs ${textMutedStyle} leading-relaxed`}>
+                          Muntha represents the Year's vital energy point, moving one sign per year from natal Lagna.
+                        </p>
+                      </div>
+                      <div className="mt-4 p-3 bg-indigo-500/5 border border-indigo-500/10 rounded text-xs leading-relaxed">
+                        <strong className="block text-indigo-400 mb-1">Muntha Guidance:</strong>
+                        {munthaPrediction}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tajik Yogas */}
+                  <div className={`p-4 border rounded-xl ${cardStyle}`}>
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-indigo-400 mb-2">Tajik Astrological Yogas</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                      <div className="p-2.5 bg-slate-500/5 rounded-lg">
+                        <span className={`font-bold ${textStyle}`}>Ithasala (Mutual Aspect):</span>
+                        <p className={`text-[10px] ${textMutedStyle} mt-1`}>
+                          Formed when faster planet is behind slower planet, creating mutual solar harmonic aspect. Indicates fulfillment of tasks.
+                        </p>
+                      </div>
+                      <div className="p-2.5 bg-slate-500/5 rounded-lg">
+                        <span className={`font-bold ${textStyle}`}>Easarpha (Separation):</span>
+                        <p className={`text-[10px] ${textMutedStyle} mt-1`}>
+                          Formed when faster planet is ahead of slower planet. Suggests gradual dissipation of energy or delay.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Relationship Metrics */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
+                      <div>
+                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Marriage Promise</span>
+                        <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>{tjDecision.marriagePotentialScore}%</h4>
+                      </div>
+                      <div className="mt-3">
+                        <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                          <div className="h-full bg-indigo-500" style={{ width: `${tjDecision.marriagePotentialScore}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
+                      <div>
+                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Happiness Score</span>
+                        <h4 className={`text-2xl font-bold font-mono mt-1 ${textStyle}`}>{tjDecision.timingStrengthScore}%</h4>
+                      </div>
+                      <div className="mt-3">
+                        <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded overflow-hidden">
+                          <div className="h-full bg-indigo-500" style={{ width: `${tjDecision.timingStrengthScore}%` }}></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={`p-4 border rounded-xl ${cardStyle} flex flex-col justify-between`}>
+                      <div>
+                        <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">Conflict Risk</span>
+                        <h4 className="text-2xl font-bold font-mono mt-1 text-indigo-400">{tjDecision.conflictRisk}</h4>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-xs leading-relaxed">
+                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block mb-1">Varshaphala Relationship Verdict</span>
+                    <p className={textStyle}>{tjDecision.verdictText}</p>
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="space-y-1.5 max-w-sm">
-              <h4 className="text-base font-bold text-slate-900">Long Term Journey</h4>
-              <p className="text-xs text-slate-600 leading-relaxed font-sans">
-                Long term predictive trends, major dasha shifts, life milestones, and Bazi Year Pillar overarching cycles.
-              </p>
-            </div>
-            {renderChinesePillarCard("year")}
-          </div>
-        </div>
+          );
+        })()
       ) : activeTab === "future" ? (
         (() => {
           // Future Analysis Tab local helpers (re-uses local date helpers)

@@ -96,10 +96,10 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const [likedMessages, setLikedMessages] = useState<Record<string, boolean>>({});
   const [dislikedMessages, setDislikedMessages] = useState<Record<string, boolean>>({});
   const [currentStatusMsg, setCurrentStatusMsg] = useState("");
-  const [moodAnalysisExpanded, setMoodAnalysisExpanded] = useState(true);
-  const [myLifeExpanded, setMyLifeExpanded] = useState(true);
-  const [myJourneyExpanded, setMyJourneyExpanded] = useState(true);
-  const [myReportsExpanded, setMyReportsExpanded] = useState(true);
+  const [moodAnalysisExpanded, setMoodAnalysisExpanded] = useState(false);
+  const [myLifeExpanded, setMyLifeExpanded] = useState(false);
+  const [myJourneyExpanded, setMyJourneyExpanded] = useState(false);
+  const [myReportsExpanded, setMyReportsExpanded] = useState(false);
   const [activeSubmenuPanel, setActiveSubmenuPanel] = useState<string | null>(null);
 
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
