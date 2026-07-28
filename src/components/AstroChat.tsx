@@ -60,6 +60,7 @@ interface AstroChatProps {
   isStandalone?: boolean;
   onCloseStandalone?: () => void;
   onNavigateMenu?: (menu: string, submenu?: string) => void;
+  birthSettingsContent?: React.ReactNode;
 }
 
 interface Message {
@@ -70,7 +71,7 @@ interface Message {
   debugInfo?: any;
 }
 
-export default function AstroChat({ astrologyData, isStandalone, onCloseStandalone, onNavigateMenu }: AstroChatProps) {
+export default function AstroChat({ astrologyData, isStandalone, onCloseStandalone, onNavigateMenu, birthSettingsContent }: AstroChatProps) {
   // Sidebar open/close state on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -865,8 +866,18 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
         <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8 space-y-6 scrollbar-thin">
           <div className="max-w-4xl mx-auto space-y-6 w-full">
             
-            {activeSubmenuPanel ? (
-              <div className="space-y-4 w-full">
+            { activeSubmenuPanel === "birth" && birthSettingsContent ? (
+                <div className="space-y-4 w-full">
+                  <div className="flex items-center justify-between bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 px-4 py-2.5 rounded-xl border border-indigo-200/80 shadow-2xs">
+                    <span className="text-xs font-extrabold text-indigo-950 capitalize tracking-tight flex items-center gap-2">
+                      <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                      Birth Details
+                    </span>
+                  </div>
+                  {birthSettingsContent}
+                </div>
+              ) : activeSubmenuPanel ? (
+                <div className="space-y-4 w-full">
                 <div className="flex items-center justify-between bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 px-4 py-2.5 rounded-xl border border-indigo-200/80 shadow-2xs">
                   <span className="text-xs font-extrabold text-indigo-950 capitalize tracking-tight flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-indigo-600" />

@@ -1965,6 +1965,416 @@ export default function App() {
     );
   }
 
+
+  const birthSettingsNode = (
+    <div className="space-y-6 w-full max-w-4xl mx-auto">
+                {/* Visual Identity & PWA App Installation Promo */}
+                <AndroidInstallerPromo isDark={isDark} />
+
+                {/* Birth Details and Cast Settings Card (First Section) */}
+                <div className={`p-6 rounded-2xl border ${containerStyle}`}>
+                  <div className="border-b border-indigo-500/10 pb-4 mb-6">
+                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
+                      <Sparkles className="w-5 h-5 text-amber-500" />
+                      Birth Details & Cast Settings
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Configure your name, birth coordinates, GMT offset, and casting properties to generate your Vedic, KP Stellar, and Western astrology charts.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                        <User className="w-4 h-4 text-amber-500" />
+                        Native Identity & Time
+                      </h4>
+                      <div>
+                        <label className="block text-[11px] text-slate-400 font-medium mb-1">Native Name</label>
+                        <input
+                          type="text"
+                          value={inputs.name}
+                          onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
+                          className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                            isDark ? "bg-slate-950 border-slate-800 text-slate-100" : "bg-white border-neutral-300 text-neutral-800"
+                          }`}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[11px] text-slate-400 font-medium mb-1">Date of Birth</label>
+                          <input
+                            type="date"
+                            value={inputs.date}
+                            onChange={(e) => setInputs({ ...inputs, date: e.target.value })}
+                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                              isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
+                            }`}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[11px] text-slate-400 font-medium mb-1">Time of Birth</label>
+                          <div className="flex gap-1.5">
+                            <div className="relative flex-1">
+                              <Clock className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500 hover:text-amber-500 transition-colors" />
+                              <input
+                                type="text"
+                                placeholder="e.g. 08:30"
+                                value={localTimeInput}
+                                onChange={(e) => setLocalTimeInput(e.target.value)}
+                                className={`w-full border rounded-lg pl-8 pr-2 py-2 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                                  isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
+                                }`}
+                              />
+                            </div>
+                            <select
+                              value={localAmpm}
+                              onChange={(e) => setLocalAmpm(e.target.value)}
+                              className={`border rounded-lg px-2 py-2 text-xs font-medium cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                                isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
+                              }`}
+                            >
+                              <option value="AM">AM</option>
+                              <option value="PM">PM</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="relative">
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-[11px] text-slate-400 font-medium">Location / City</label>
+                          <button
+                            type="button"
+                            onClick={handleUseGps}
+                            disabled={fetchingGps}
+                            className="text-[10px] text-amber-500 hover:text-amber-400 font-mono flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 disabled:opacity-50"
+                          >
+                            <MapPin className="w-3 h-3 animate-pulse text-amber-500" />
+                            {fetchingGps ? "Locating..." : "Use device GPS"}
+                          </button>
+                        </div>
+                        <div className="relative z-50">
+                          <input
+                            type="text"
+                            value={inputs.location}
+                            onChange={(e) => {
+                              setInputs({ ...inputs, location: e.target.value });
+                              setShowLocationDropdown(true);
+                            }}
+                            onFocus={() => {
+                              if (locationResults.length > 0) setShowLocationDropdown(true);
+                            }}
+                            placeholder="Type a city (e.g. Mumbai, New York)..."
+                            className={`w-full border rounded-lg pl-3 pr-8 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                              isDark ? "bg-slate-950 border-slate-800 text-slate-100" : "bg-white border-neutral-300 text-neutral-800"
+                            }`}
+                          />
+                          {searchingLocation && (
+                            <div className="absolute right-2.5 top-2.5">
+                              <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-500" />
+                            </div>
+                          )}
+                        </div>
+
+                        {showLocationDropdown && (
+                          <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowLocationDropdown(false)} />
+                        )}
+
+                        {showLocationDropdown && locationResults.length > 0 && (
+                          <div className={`absolute z-50 left-0 right-0 mt-1 border rounded-lg shadow-xl max-h-48 overflow-y-auto divide-y divide-slate-900 scrollbar-thin ${
+                            isDark ? "bg-slate-950 border-slate-800" : "bg-white border-neutral-200"
+                          }`}>
+                            {locationResults.map((result, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => handleSelectLocation(result)}
+                                className="w-full text-left px-3 py-2 text-xs hover:bg-slate-500/10 transition-colors flex flex-col cursor-pointer border-0 bg-transparent"
+                              >
+                                <span className={`font-semibold ${isDark ? "text-slate-200" : "text-neutral-700"}`}>{result.name}</span>
+                                <span className="text-[10px] text-slate-500 font-mono mt-0.5">
+                                  {result.admin1 ? `${result.admin1}, ` : ''}{result.country} • Lat: {Number(result.latitude || 0).toFixed(4)} Lon: {Number(result.longitude || 0).toFixed(4)}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
+                        <MapPin className="w-4 h-4 text-amber-500" />
+                        Geographic Coordinates
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[10px] text-slate-500 font-mono uppercase">Latitude (°N)</label>
+                          <input
+                            type="number"
+                            step="0.0001"
+                            value={inputs.latitude}
+                            onChange={(e) => setInputs({ ...inputs, latitude: Number(e.target.value) })}
+                            className={`w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                              isDark ? "bg-slate-950 border-slate-800 text-slate-300" : "bg-white border-neutral-300 text-neutral-800"
+                            }`}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-slate-500 font-mono uppercase">Longitude (°E)</label>
+                          <input
+                            type="number"
+                            step="0.0001"
+                            value={inputs.longitude}
+                            onChange={(e) => setInputs({ ...inputs, longitude: Number(e.target.value) })}
+                            className={`w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                              isDark ? "bg-slate-950 border-slate-800 text-slate-300" : "bg-white border-neutral-300 text-neutral-800"
+                            }`}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] text-slate-500 font-mono uppercase">Timezone (GMT Offset)</label>
+                        <input
+                          type="number"
+                          step="0.5"
+                          value={inputs.timezone}
+                          onChange={(e) => setInputs({ ...inputs, timezone: Number(e.target.value) })}
+                          className={`w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 ${
+                            isDark ? "bg-slate-950 border-slate-800 text-slate-300" : "bg-white border-neutral-300 text-neutral-800"
+                          }`}
+                        />
+                      </div>
+
+                      <div className="pt-2 space-y-2">
+                        <button
+                          onClick={() => handleCalculate(false, false)}
+                          disabled={loading}
+                          className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-semibold rounded-xl py-3 text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer shadow-amber-500/10"
+                        >
+                          <Sparkles className="w-4 h-4 text-slate-950" />
+                          {loading ? "Casting Horoscope..." : "Cast & Generate Horoscope"}
+                        </button>
+
+                        {(() => {
+                          const fTime = `${localTimeInput} ${localAmpm}`;
+                          const currentKey = generateCompositeKey(inputs.date, fTime, Number(inputs.latitude), Number(inputs.longitude));
+                          const hasCachedRecord = cachedList.some(r => r.id === currentKey && r.rawUserProfile);
+                          
+                          if (hasCachedRecord) {
+                            return (
+                              <button
+                                onClick={() => handleCalculate(false, true)}
+                                disabled={loading}
+                                className="w-full border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 text-amber-400 font-semibold rounded-xl py-2.5 text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                              >
+                                <RefreshCw className={`w-4 h-4 text-amber-500 ${loading ? "animate-spin" : ""}`} />
+                                Refresh Horoscope (Force Reload)
+                              </button>
+                            );
+                          }
+                          return null;
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Saved Profiles Directory */}
+                <div className={`p-6 rounded-2xl border ${containerStyle}`}>
+                  <h3 className={`text-lg font-sans font-medium flex items-center justify-between ${headingStyle}`}>
+                    <span className="flex items-center gap-2">
+                      <User className="w-5 h-5 text-amber-500" />
+                      Saved Profiles Directory
+                    </span>
+                    {cachedList.length > 0 && (
+                      <button
+                        onClick={handleClearAllRecords}
+                        className="text-xs text-rose-500 hover:text-rose-400 font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Clear All Records
+                      </button>
+                    )}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1 mb-6">
+                    Manage, check availability, and hotload horoscopes from local storage, Google Drive, or browse files manually.
+                  </p>
+
+                  {/* Profile JSON File Importer */}
+                  <div className="mb-6 p-4 rounded-xl border border-dashed border-indigo-500/25 bg-slate-950/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="space-y-1 text-center sm:text-left">
+                      <div className="text-xs font-bold text-amber-400 flex items-center justify-center sm:justify-start gap-1.5">
+                        <Download className="w-4 h-4 text-amber-500" />
+                        Import Birth Profile JSON
+                      </div>
+                      <div className="text-[10px] text-slate-400">
+                        Drop or select a profile JSON conforming to the checklist data model to instantly cache and cast.
+                      </div>
+                    </div>
+                    <label className="bg-indigo-600/20 hover:bg-indigo-600/35 text-indigo-300 border border-indigo-500/30 px-3.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shrink-0">
+                      <FolderOpen className="w-4 h-4" />
+                      Upload Profile
+                      <input
+                        type="file"
+                        accept=".json"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleUploadProfileJson(file);
+                        }}
+                      />
+                    </label>
+                  </div>
+
+                  {cachedList.length === 0 ? (
+                    <div className="text-center py-8 rounded-xl bg-slate-950/20 border border-dashed border-slate-800 text-slate-500 text-xs">
+                      <FolderOpen className="w-10 h-10 text-slate-600 mx-auto mb-2 opacity-50" />
+                      No saved profiles found. Navigate to JHORA &rarr; Birth Details to cast and save a chart.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {cachedList.map((rec) => {
+                        const isLoaded = astrologyData && astrologyData.birthDetails && 
+                          astrologyData.birthDetails.name === rec.name && 
+                          astrologyData.birthDetails.date === rec.date && 
+                          astrologyData.birthDetails.time === rec.time;
+
+                        return (
+                          <div
+                            key={rec.id}
+                            className={`p-4 rounded-xl border flex flex-col justify-between ${cardStyle} ${
+                              isLoaded ? "border-amber-500/40 bg-amber-500/5" : ""
+                            }`}
+                          >
+                            <div>
+                              <div className="flex items-start justify-between gap-2">
+                                <span className="text-sm font-semibold text-amber-500 truncate block">
+                                  {rec.name}
+                                </span>
+                                <span className="text-[9px] font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded">
+                                  {rec.data?.lagna?.sign ? `${rec.data.lagna.sign} Asc` : 'Chart'}
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-slate-400 mt-2 space-y-1">
+                                <div>📅 {rec.date} • 🕒 {rec.time}</div>
+                                <div className="truncate">📍 {rec.location}</div>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 mt-4 pt-3 border-t border-indigo-500/5">
+                              <button
+                                onClick={() => handleLoadProfileWithCheck(rec)}
+                                className={`flex-1 font-bold rounded-lg py-1.5 text-[11px] transition-colors cursor-pointer ${
+                                  isLoaded 
+                                    ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" 
+                                    : "bg-amber-500 hover:bg-amber-600 text-slate-950"
+                                }`}
+                                disabled={isLoaded}
+                              >
+                                {isLoaded ? "Active Profile" : "Load Profile"}
+                              </button>
+                              
+                              <button
+                                onClick={() => handleDownloadPdfForRecord(rec)}
+                                className="p-1.5 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 rounded-lg border border-indigo-500/10 transition-colors cursor-pointer"
+                                title="Download PDF Report"
+                              >
+                                <FileText className="w-4 h-4" />
+                              </button>
+
+                              <button
+                                onClick={() => handleExportJsonForRecord(rec)}
+                                className="p-1.5 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg border border-indigo-500/10 transition-colors cursor-pointer"
+                                title="Export JSON Profile"
+                              >
+                                <Download className="w-4 h-4" />
+                              </button>
+
+                              <button
+                                onClick={(e) => handleDeleteRecord(rec.id, e)}
+                                className="p-1.5 text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg border border-transparent transition-colors cursor-pointer"
+                                title="Delete profile"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Dashboard Technical Provenance Checklist */}
+                {astrologyData && provenanceEnabled && (
+                  <div className={`p-6 rounded-2xl border ${containerStyle}`}>
+                    <h4 className="font-mono text-xs text-indigo-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mb-4">
+                      <Database className="w-4 h-4" />
+                      Core Field Metadata Auditing Grid (Phase 9.95 Rule 5)
+                    </h4>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-[10px] font-mono text-left divide-y divide-indigo-500/10">
+                        <thead>
+                          <tr className="text-slate-400 uppercase tracking-wider">
+                            <th className="py-2.5 px-3">Field Name</th>
+                            <th className="py-2.5 px-3">Table Ref</th>
+                            <th className="py-2.5 px-3">Source</th>
+                            <th className="py-2.5 px-3">Raw JSON Path</th>
+                            <th className="py-2.5 px-3">Formula</th>
+                            <th className="py-2.5 px-3">Updated</th>
+                            <th className="py-2.5 px-3">Confidence</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-800/60">
+                          <tr>
+                            <td className="py-2 px-3 font-semibold text-slate-300">Lagna Sign</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 1</td>
+                            <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
+                            <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.Ascendant.sign</td>
+                            <td className="py-2 px-3 text-slate-500">None</td>
+                            <td className="py-2 px-3">Real-time</td>
+                            <td className="py-2 px-3 text-green-400 font-bold">100% Authoritative</td>
+                          </tr>
+                          <tr>
+                            <td className="py-2 px-3 font-semibold text-slate-300">Planet Degree</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 2</td>
+                            <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
+                            <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.[planetName].longitude</td>
+                            <td className="py-2 px-3 text-slate-500">None</td>
+                            <td className="py-2 px-3">Real-time</td>
+                            <td className="py-2 px-3 text-green-400 font-bold">100% Authoritative</td>
+                          </tr>
+                          <tr>
+                            <td className="py-2 px-3 font-semibold text-slate-300">House Placements</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 2 & 5</td>
+                            <td className="py-2 px-3 text-indigo-400">SOURCE_B (Derived)</td>
+                            <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.Ascendant.sign</td>
+                            <td className="py-2 px-3 text-slate-400">(planetSignIdx - lagnaSignIdx + 12) % 12 + 1</td>
+                            <td className="py-2 px-3">Real-time</td>
+                            <td className="py-2 px-3 text-indigo-300">100% Mapped Accuracy</td>
+                          </tr>
+                          <tr>
+                            <td className="py-2 px-3 font-semibold text-slate-300">Panchanga Tithi</td>
+                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 3</td>
+                            <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
+                            <td className="py-2 px-3 text-slate-400">$.calendar_info.Tithi</td>
+                            <td className="py-2 px-3 text-slate-500">None</td>
+                            <td className="py-2 px-3">Real-time</td>
+                            <td className="py-2 px-3 text-green-400 font-bold">100% Authoritative</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+    </div>
+  );
+
   const isChatMode = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("mode") === "chat";
 
   if (isChatMode || activeMenu === "ai_assistant") {
@@ -1973,6 +2383,7 @@ export default function App() {
         <AstroChat 
           astrologyData={astrologyData} 
           isStandalone={true} 
+          birthSettingsContent={birthSettingsNode} 
           onCloseStandalone={() => {
             setActiveMenu("dashboard");
           }}
@@ -2456,218 +2867,7 @@ export default function App() {
                 exit={{ opacity: 0, y: -5 }}
                 className="space-y-6"
               >
-                {/* Birth Details and Cast Settings Card (First Section) */}
-                <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                  <div className="border-b border-indigo-500/10 pb-4 mb-6">
-                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                      <Sparkles className="w-5 h-5 text-amber-500" />
-                      Birth Details & Cast Settings
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Configure your name, birth coordinates, GMT offset, and casting properties to generate your Vedic, KP Stellar, and Western astrology charts.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                        <User className="w-4 h-4 text-amber-500" />
-                        Native Identity & Time
-                      </h4>
-                      <div>
-                        <label className="block text-[11px] text-slate-400 font-medium mb-1">Native Name</label>
-                        <input
-                          type="text"
-                          value={inputs.name}
-                          onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
-                          className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                            isDark ? "bg-slate-950 border-slate-800 text-slate-100" : "bg-white border-neutral-300 text-neutral-800"
-                          }`}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-[11px] text-slate-400 font-medium mb-1">Date of Birth</label>
-                          <input
-                            type="date"
-                            value={inputs.date}
-                            onChange={(e) => setInputs({ ...inputs, date: e.target.value })}
-                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] text-slate-400 font-medium mb-1">Time of Birth</label>
-                          <div className="flex gap-1.5">
-                            <div className="relative flex-1">
-                              <Clock className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500 hover:text-amber-500 transition-colors" />
-                              <input
-                                type="text"
-                                placeholder="e.g. 08:30"
-                                value={localTimeInput}
-                                onChange={(e) => setLocalTimeInput(e.target.value)}
-                                className={`w-full border rounded-lg pl-8 pr-2 py-2 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                                  isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                                }`}
-                              />
-                            </div>
-                            <select
-                              value={localAmpm}
-                              onChange={(e) => setLocalAmpm(e.target.value)}
-                              className={`border rounded-lg px-2 py-2 text-xs font-medium cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                                isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                              }`}
-                            >
-                              <option value="AM">AM</option>
-                              <option value="PM">PM</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="relative">
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-[11px] text-slate-400 font-medium">Location / City</label>
-                          <button
-                            type="button"
-                            onClick={handleUseGps}
-                            disabled={fetchingGps}
-                            className="text-[10px] text-amber-500 hover:text-amber-400 font-mono flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 disabled:opacity-50"
-                          >
-                            <MapPin className="w-3 h-3 animate-pulse text-amber-500" />
-                            {fetchingGps ? "Locating..." : "Use device GPS"}
-                          </button>
-                        </div>
-                        <div className="relative z-50">
-                          <input
-                            type="text"
-                            value={inputs.location}
-                            onChange={(e) => {
-                              setInputs({ ...inputs, location: e.target.value });
-                              setShowLocationDropdown(true);
-                            }}
-                            onFocus={() => {
-                              if (locationResults.length > 0) setShowLocationDropdown(true);
-                            }}
-                            placeholder="Type a city (e.g. Mumbai, New York)..."
-                            className={`w-full border rounded-lg pl-3 pr-8 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-100" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          />
-                          {searchingLocation && (
-                            <div className="absolute right-2.5 top-2.5">
-                              <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-500" />
-                            </div>
-                          )}
-                        </div>
-
-                        {showLocationDropdown && (
-                          <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowLocationDropdown(false)} />
-                        )}
-
-                        {showLocationDropdown && locationResults.length > 0 && (
-                          <div className={`absolute z-50 left-0 right-0 mt-1 border rounded-lg shadow-xl max-h-48 overflow-y-auto divide-y divide-slate-900 scrollbar-thin ${
-                            isDark ? "bg-slate-950 border-slate-800" : "bg-white border-neutral-200"
-                          }`}>
-                            {locationResults.map((result, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                onClick={() => handleSelectLocation(result)}
-                                className="w-full text-left px-3 py-2 text-xs hover:bg-slate-500/10 transition-colors flex flex-col cursor-pointer border-0 bg-transparent"
-                              >
-                                <span className={`font-semibold ${isDark ? "text-slate-200" : "text-neutral-700"}`}>{result.name}</span>
-                                <span className="text-[10px] text-slate-500 font-mono mt-0.5">
-                                  {result.admin1 ? `${result.admin1}, ` : ''}{result.country} • Lat: {Number(result.latitude || 0).toFixed(4)} Lon: {Number(result.longitude || 0).toFixed(4)}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                        <MapPin className="w-4 h-4 text-amber-500" />
-                        Geographic Coordinates
-                      </h4>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-[10px] text-slate-500 font-mono uppercase">Latitude (°N)</label>
-                          <input
-                            type="number"
-                            step="0.0001"
-                            value={inputs.latitude}
-                            onChange={(e) => setInputs({ ...inputs, latitude: Number(e.target.value) })}
-                            className={`w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-300" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] text-slate-500 font-mono uppercase">Longitude (°E)</label>
-                          <input
-                            type="number"
-                            step="0.0001"
-                            value={inputs.longitude}
-                            onChange={(e) => setInputs({ ...inputs, longitude: Number(e.target.value) })}
-                            className={`w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-300" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] text-slate-500 font-mono uppercase">Timezone (GMT Offset)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          value={inputs.timezone}
-                          onChange={(e) => setInputs({ ...inputs, timezone: Number(e.target.value) })}
-                          className={`w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                            isDark ? "bg-slate-950 border-slate-800 text-slate-300" : "bg-white border-neutral-300 text-neutral-800"
-                          }`}
-                        />
-                      </div>
-
-                      <div className="pt-2 space-y-2">
-                        <button
-                          onClick={() => handleCalculate(false, false)}
-                          disabled={loading}
-                          className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-semibold rounded-xl py-3 text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer shadow-amber-500/10"
-                        >
-                          <Sparkles className="w-4 h-4 text-slate-950" />
-                          {loading ? "Casting Horoscope..." : "Cast & Generate Horoscope"}
-                        </button>
-
-                        {(() => {
-                          const fTime = `${localTimeInput} ${localAmpm}`;
-                          const currentKey = generateCompositeKey(inputs.date, fTime, Number(inputs.latitude), Number(inputs.longitude));
-                          const hasCachedRecord = cachedList.some(r => r.id === currentKey && r.rawUserProfile);
-                          
-                          if (hasCachedRecord) {
-                            return (
-                              <button
-                                onClick={() => handleCalculate(false, true)}
-                                disabled={loading}
-                                className="w-full border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 text-amber-400 font-semibold rounded-xl py-2.5 text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
-                              >
-                                <RefreshCw className={`w-4 h-4 text-amber-500 ${loading ? "animate-spin" : ""}`} />
-                                Refresh Horoscope (Force Reload)
-                              </button>
-                            );
-                          }
-                          return null;
-                        })()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
+                {birthSettingsNode}
               </motion.div>
             </AnimatePresence>
           ) : activeMenu === "dashboard" ? (
@@ -2679,409 +2879,7 @@ export default function App() {
                 exit={{ opacity: 0, y: -5 }}
                 className="space-y-6"
               >
-                {/* Visual Identity & PWA App Installation Promo */}
-                <AndroidInstallerPromo isDark={isDark} />
-
-                {/* Birth Details and Cast Settings Card (First Section) */}
-                <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                  <div className="border-b border-indigo-500/10 pb-4 mb-6">
-                    <h3 className={`text-lg font-sans font-medium flex items-center gap-2 ${headingStyle}`}>
-                      <Sparkles className="w-5 h-5 text-amber-500" />
-                      Birth Details & Cast Settings
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Configure your name, birth coordinates, GMT offset, and casting properties to generate your Vedic, KP Stellar, and Western astrology charts.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                        <User className="w-4 h-4 text-amber-500" />
-                        Native Identity & Time
-                      </h4>
-                      <div>
-                        <label className="block text-[11px] text-slate-400 font-medium mb-1">Native Name</label>
-                        <input
-                          type="text"
-                          value={inputs.name}
-                          onChange={(e) => setInputs({ ...inputs, name: e.target.value })}
-                          className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                            isDark ? "bg-slate-950 border-slate-800 text-slate-100" : "bg-white border-neutral-300 text-neutral-800"
-                          }`}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-[11px] text-slate-400 font-medium mb-1">Date of Birth</label>
-                          <input
-                            type="date"
-                            value={inputs.date}
-                            onChange={(e) => setInputs({ ...inputs, date: e.target.value })}
-                            className={`w-full border rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] text-slate-400 font-medium mb-1">Time of Birth</label>
-                          <div className="flex gap-1.5">
-                            <div className="relative flex-1">
-                              <Clock className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500 hover:text-amber-500 transition-colors" />
-                              <input
-                                type="text"
-                                placeholder="e.g. 08:30"
-                                value={localTimeInput}
-                                onChange={(e) => setLocalTimeInput(e.target.value)}
-                                className={`w-full border rounded-lg pl-8 pr-2 py-2 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                                  isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                                }`}
-                              />
-                            </div>
-                            <select
-                              value={localAmpm}
-                              onChange={(e) => setLocalAmpm(e.target.value)}
-                              className={`border rounded-lg px-2 py-2 text-xs font-medium cursor-pointer focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                                isDark ? "bg-slate-950 border-slate-800 text-slate-200" : "bg-white border-neutral-300 text-neutral-800"
-                              }`}
-                            >
-                              <option value="AM">AM</option>
-                              <option value="PM">PM</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="relative">
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-[11px] text-slate-400 font-medium">Location / City</label>
-                          <button
-                            type="button"
-                            onClick={handleUseGps}
-                            disabled={fetchingGps}
-                            className="text-[10px] text-amber-500 hover:text-amber-400 font-mono flex items-center gap-1 bg-transparent border-0 cursor-pointer p-0 disabled:opacity-50"
-                          >
-                            <MapPin className="w-3 h-3 animate-pulse text-amber-500" />
-                            {fetchingGps ? "Locating..." : "Use device GPS"}
-                          </button>
-                        </div>
-                        <div className="relative z-50">
-                          <input
-                            type="text"
-                            value={inputs.location}
-                            onChange={(e) => {
-                              setInputs({ ...inputs, location: e.target.value });
-                              setShowLocationDropdown(true);
-                            }}
-                            onFocus={() => {
-                              if (locationResults.length > 0) setShowLocationDropdown(true);
-                            }}
-                            placeholder="Type a city (e.g. Mumbai, New York)..."
-                            className={`w-full border rounded-lg pl-3 pr-8 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-100" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          />
-                          {searchingLocation && (
-                            <div className="absolute right-2.5 top-2.5">
-                              <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-500" />
-                            </div>
-                          )}
-                        </div>
-
-                        {showLocationDropdown && (
-                          <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setShowLocationDropdown(false)} />
-                        )}
-
-                        {showLocationDropdown && locationResults.length > 0 && (
-                          <div className={`absolute z-50 left-0 right-0 mt-1 border rounded-lg shadow-xl max-h-48 overflow-y-auto divide-y divide-slate-900 scrollbar-thin ${
-                            isDark ? "bg-slate-950 border-slate-800" : "bg-white border-neutral-200"
-                          }`}>
-                            {locationResults.map((result, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                onClick={() => handleSelectLocation(result)}
-                                className="w-full text-left px-3 py-2 text-xs hover:bg-slate-500/10 transition-colors flex flex-col cursor-pointer border-0 bg-transparent"
-                              >
-                                <span className={`font-semibold ${isDark ? "text-slate-200" : "text-neutral-700"}`}>{result.name}</span>
-                                <span className="text-[10px] text-slate-500 font-mono mt-0.5">
-                                  {result.admin1 ? `${result.admin1}, ` : ''}{result.country} • Lat: {Number(result.latitude || 0).toFixed(4)} Lon: {Number(result.longitude || 0).toFixed(4)}
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider font-mono flex items-center gap-1.5">
-                        <MapPin className="w-4 h-4 text-amber-500" />
-                        Geographic Coordinates
-                      </h4>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-[10px] text-slate-500 font-mono uppercase">Latitude (°N)</label>
-                          <input
-                            type="number"
-                            step="0.0001"
-                            value={inputs.latitude}
-                            onChange={(e) => setInputs({ ...inputs, latitude: Number(e.target.value) })}
-                            className={`w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-300" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[10px] text-slate-500 font-mono uppercase">Longitude (°E)</label>
-                          <input
-                            type="number"
-                            step="0.0001"
-                            value={inputs.longitude}
-                            onChange={(e) => setInputs({ ...inputs, longitude: Number(e.target.value) })}
-                            className={`w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                              isDark ? "bg-slate-950 border-slate-800 text-slate-300" : "bg-white border-neutral-300 text-neutral-800"
-                            }`}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-[10px] text-slate-500 font-mono uppercase">Timezone (GMT Offset)</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          value={inputs.timezone}
-                          onChange={(e) => setInputs({ ...inputs, timezone: Number(e.target.value) })}
-                          className={`w-full border rounded-lg px-3 py-2 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 ${
-                            isDark ? "bg-slate-950 border-slate-800 text-slate-300" : "bg-white border-neutral-300 text-neutral-800"
-                          }`}
-                        />
-                      </div>
-
-                      <div className="pt-2 space-y-2">
-                        <button
-                          onClick={() => handleCalculate(false, false)}
-                          disabled={loading}
-                          className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-semibold rounded-xl py-3 text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer shadow-amber-500/10"
-                        >
-                          <Sparkles className="w-4 h-4 text-slate-950" />
-                          {loading ? "Casting Horoscope..." : "Cast & Generate Horoscope"}
-                        </button>
-
-                        {(() => {
-                          const fTime = `${localTimeInput} ${localAmpm}`;
-                          const currentKey = generateCompositeKey(inputs.date, fTime, Number(inputs.latitude), Number(inputs.longitude));
-                          const hasCachedRecord = cachedList.some(r => r.id === currentKey && r.rawUserProfile);
-                          
-                          if (hasCachedRecord) {
-                            return (
-                              <button
-                                onClick={() => handleCalculate(false, true)}
-                                disabled={loading}
-                                className="w-full border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 text-amber-400 font-semibold rounded-xl py-2.5 text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
-                              >
-                                <RefreshCw className={`w-4 h-4 text-amber-500 ${loading ? "animate-spin" : ""}`} />
-                                Refresh Horoscope (Force Reload)
-                              </button>
-                            );
-                          }
-                          return null;
-                        })()}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Saved Profiles Directory */}
-                <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                  <h3 className={`text-lg font-sans font-medium flex items-center justify-between ${headingStyle}`}>
-                    <span className="flex items-center gap-2">
-                      <User className="w-5 h-5 text-amber-500" />
-                      Saved Profiles Directory
-                    </span>
-                    {cachedList.length > 0 && (
-                      <button
-                        onClick={handleClearAllRecords}
-                        className="text-xs text-rose-500 hover:text-rose-400 font-medium flex items-center gap-1 bg-transparent border-0 cursor-pointer"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Clear All Records
-                      </button>
-                    )}
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-1 mb-6">
-                    Manage, check availability, and hotload horoscopes from local storage, Google Drive, or browse files manually.
-                  </p>
-
-                  {/* Profile JSON File Importer */}
-                  <div className="mb-6 p-4 rounded-xl border border-dashed border-indigo-500/25 bg-slate-950/20 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="space-y-1 text-center sm:text-left">
-                      <div className="text-xs font-bold text-amber-400 flex items-center justify-center sm:justify-start gap-1.5">
-                        <Download className="w-4 h-4 text-amber-500" />
-                        Import Birth Profile JSON
-                      </div>
-                      <div className="text-[10px] text-slate-400">
-                        Drop or select a profile JSON conforming to the checklist data model to instantly cache and cast.
-                      </div>
-                    </div>
-                    <label className="bg-indigo-600/20 hover:bg-indigo-600/35 text-indigo-300 border border-indigo-500/30 px-3.5 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-all flex items-center gap-1.5 shrink-0">
-                      <FolderOpen className="w-4 h-4" />
-                      Upload Profile
-                      <input
-                        type="file"
-                        accept=".json"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleUploadProfileJson(file);
-                        }}
-                      />
-                    </label>
-                  </div>
-
-                  {cachedList.length === 0 ? (
-                    <div className="text-center py-8 rounded-xl bg-slate-950/20 border border-dashed border-slate-800 text-slate-500 text-xs">
-                      <FolderOpen className="w-10 h-10 text-slate-600 mx-auto mb-2 opacity-50" />
-                      No saved profiles found. Navigate to JHORA &rarr; Birth Details to cast and save a chart.
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {cachedList.map((rec) => {
-                        const isLoaded = astrologyData && astrologyData.birthDetails && 
-                          astrologyData.birthDetails.name === rec.name && 
-                          astrologyData.birthDetails.date === rec.date && 
-                          astrologyData.birthDetails.time === rec.time;
-
-                        return (
-                          <div
-                            key={rec.id}
-                            className={`p-4 rounded-xl border flex flex-col justify-between ${cardStyle} ${
-                              isLoaded ? "border-amber-500/40 bg-amber-500/5" : ""
-                            }`}
-                          >
-                            <div>
-                              <div className="flex items-start justify-between gap-2">
-                                <span className="text-sm font-semibold text-amber-500 truncate block">
-                                  {rec.name}
-                                </span>
-                                <span className="text-[9px] font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded">
-                                  {rec.data?.lagna?.sign ? `${rec.data.lagna.sign} Asc` : 'Chart'}
-                                </span>
-                              </div>
-                              <div className="text-[11px] text-slate-400 mt-2 space-y-1">
-                                <div>📅 {rec.date} • 🕒 {rec.time}</div>
-                                <div className="truncate">📍 {rec.location}</div>
-                              </div>
-                            </div>
-
-                            <div className="flex items-center gap-1.5 mt-4 pt-3 border-t border-indigo-500/5">
-                              <button
-                                onClick={() => handleLoadProfileWithCheck(rec)}
-                                className={`flex-1 font-bold rounded-lg py-1.5 text-[11px] transition-colors cursor-pointer ${
-                                  isLoaded 
-                                    ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" 
-                                    : "bg-amber-500 hover:bg-amber-600 text-slate-950"
-                                }`}
-                                disabled={isLoaded}
-                              >
-                                {isLoaded ? "Active Profile" : "Load Profile"}
-                              </button>
-                              
-                              <button
-                                onClick={() => handleDownloadPdfForRecord(rec)}
-                                className="p-1.5 text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10 rounded-lg border border-indigo-500/10 transition-colors cursor-pointer"
-                                title="Download PDF Report"
-                              >
-                                <FileText className="w-4 h-4" />
-                              </button>
-
-                              <button
-                                onClick={() => handleExportJsonForRecord(rec)}
-                                className="p-1.5 text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 rounded-lg border border-indigo-500/10 transition-colors cursor-pointer"
-                                title="Export JSON Profile"
-                              >
-                                <Download className="w-4 h-4" />
-                              </button>
-
-                              <button
-                                onClick={(e) => handleDeleteRecord(rec.id, e)}
-                                className="p-1.5 text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg border border-transparent transition-colors cursor-pointer"
-                                title="Delete profile"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-
-                {/* Dashboard Technical Provenance Checklist */}
-                {astrologyData && provenanceEnabled && (
-                  <div className={`p-6 rounded-2xl border ${containerStyle}`}>
-                    <h4 className="font-mono text-xs text-indigo-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mb-4">
-                      <Database className="w-4 h-4" />
-                      Core Field Metadata Auditing Grid (Phase 9.95 Rule 5)
-                    </h4>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-[10px] font-mono text-left divide-y divide-indigo-500/10">
-                        <thead>
-                          <tr className="text-slate-400 uppercase tracking-wider">
-                            <th className="py-2.5 px-3">Field Name</th>
-                            <th className="py-2.5 px-3">Table Ref</th>
-                            <th className="py-2.5 px-3">Source</th>
-                            <th className="py-2.5 px-3">Raw JSON Path</th>
-                            <th className="py-2.5 px-3">Formula</th>
-                            <th className="py-2.5 px-3">Updated</th>
-                            <th className="py-2.5 px-3">Confidence</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800/60">
-                          <tr>
-                            <td className="py-2 px-3 font-semibold text-slate-300">Lagna Sign</td>
-                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 1</td>
-                            <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
-                            <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.Ascendant.sign</td>
-                            <td className="py-2 px-3 text-slate-500">None</td>
-                            <td className="py-2 px-3">Real-time</td>
-                            <td className="py-2 px-3 text-green-400 font-bold">100% Authoritative</td>
-                          </tr>
-                          <tr>
-                            <td className="py-2 px-3 font-semibold text-slate-300">Planet Degree</td>
-                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 2</td>
-                            <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
-                            <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.[planetName].longitude</td>
-                            <td className="py-2 px-3 text-slate-500">None</td>
-                            <td className="py-2 px-3">Real-time</td>
-                            <td className="py-2 px-3 text-green-400 font-bold">100% Authoritative</td>
-                          </tr>
-                          <tr>
-                            <td className="py-2 px-3 font-semibold text-slate-300">House Placements</td>
-                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 2 & 5</td>
-                            <td className="py-2 px-3 text-indigo-400">SOURCE_B (Derived)</td>
-                            <td className="py-2 px-3 text-slate-400">$.divisional_charts.D-1_rasi.Ascendant.sign</td>
-                            <td className="py-2 px-3 text-slate-400">(planetSignIdx - lagnaSignIdx + 12) % 12 + 1</td>
-                            <td className="py-2 px-3">Real-time</td>
-                            <td className="py-2 px-3 text-indigo-300">100% Mapped Accuracy</td>
-                          </tr>
-                          <tr>
-                            <td className="py-2 px-3 font-semibold text-slate-300">Panchanga Tithi</td>
-                            <td className="py-2 px-3 text-indigo-400 font-bold">Table 3</td>
-                            <td className="py-2 px-3 text-emerald-400">SOURCE_A (JHora)</td>
-                            <td className="py-2 px-3 text-slate-400">$.calendar_info.Tithi</td>
-                            <td className="py-2 px-3 text-slate-500">None</td>
-                            <td className="py-2 px-3">Real-time</td>
-                            <td className="py-2 px-3 text-green-400 font-bold">100% Authoritative</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
+                {birthSettingsNode}
               </motion.div>
             </AnimatePresence>
           ) : activeMenu === "ai_assistant" ? (
@@ -3096,6 +2894,7 @@ export default function App() {
                 <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
                   <AstroChat 
                     astrologyData={astrologyData} 
+                    birthSettingsContent={birthSettingsNode} 
                     onNavigateMenu={(menu, submenu) => {
                       setActiveMenu(menu);
                       if (submenu) {
