@@ -96,10 +96,10 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const [likedMessages, setLikedMessages] = useState<Record<string, boolean>>({});
   const [dislikedMessages, setDislikedMessages] = useState<Record<string, boolean>>({});
   const [currentStatusMsg, setCurrentStatusMsg] = useState("");
-  const [moodAnalysisExpanded, setMoodAnalysisExpanded] = useState(true);
-  const [myLifeExpanded, setMyLifeExpanded] = useState(true);
-  const [myJourneyExpanded, setMyJourneyExpanded] = useState(true);
-  const [myReportsExpanded, setMyReportsExpanded] = useState(true);
+  const [moodAnalysisExpanded, setMoodAnalysisExpanded] = useState(false);
+  const [myLifeExpanded, setMyLifeExpanded] = useState(false);
+  const [myJourneyExpanded, setMyJourneyExpanded] = useState(false);
+  const [myReportsExpanded, setMyReportsExpanded] = useState(false);
   const [activeSubmenuPanel, setActiveSubmenuPanel] = useState<string | null>(null);
 
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -411,10 +411,6 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   // Pre-defined quick queries
   const quickPrompts = [
     {
-      title: "Today's Mood & Wellness",
-      query: `Analyze my daily mood, emotional energy, and general wellness today. Combine my natal coordinates (${lagnaSign} Lagna, ${natalMoonSign} ${natalMoonNak} Moon) with today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra to yield deep psychological metrics.`
-    },
-    {
       title: "Action & Behavior Drive",
       query: `Analyze my behavior metrics, personal charisma, and actionable guidelines today. Focus on how transit Mars in ${currentSky?.planets?.mars?.currentSign || "Gemini"} (aspecting natal positions) and today's transiting Moon in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} shape my interactions and productivity.`
     },
@@ -425,6 +421,10 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     {
       title: "Dasha Roadmap & Remedies",
       query: `Detail my active ${activeDasha} Vimshottari roadmap. What are the key directives, upcoming turning points, and immediate practical remedies for my life right now?`
+    },
+    {
+      title: "Planetary Transits & Strengths",
+      query: `Provide an overview of major planetary transits and natal strengths affecting my current life phase.`
     }
   ];
 
