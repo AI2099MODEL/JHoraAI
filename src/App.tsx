@@ -1968,9 +1968,6 @@ export default function App() {
 
   const birthSettingsNode = (
     <div className="space-y-6 w-full max-w-4xl mx-auto">
-                {/* Visual Identity & PWA App Installation Promo */}
-                <AndroidInstallerPromo isDark={isDark} />
-
                 {/* Birth Details and Cast Settings Card (First Section) */}
                 <div className={`p-6 rounded-2xl border ${containerStyle}`}>
                   <div className="border-b border-indigo-500/10 pb-4 mb-6">
