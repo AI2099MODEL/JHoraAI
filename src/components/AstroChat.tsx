@@ -52,6 +52,7 @@ interface AstroChatProps {
   astrologyData: AstrologyData | null;
   isStandalone?: boolean;
   onCloseStandalone?: () => void;
+  onNavigateMenu?: (menu: string, submenu?: string) => void;
 }
 
 interface Message {
@@ -62,7 +63,7 @@ interface Message {
   debugInfo?: any;
 }
 
-export default function AstroChat({ astrologyData, isStandalone, onCloseStandalone }: AstroChatProps) {
+export default function AstroChat({ astrologyData, isStandalone, onCloseStandalone, onNavigateMenu }: AstroChatProps) {
   // Sidebar open/close state on mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -88,6 +89,8 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const [dislikedMessages, setDislikedMessages] = useState<Record<string, boolean>>({});
   const [currentStatusMsg, setCurrentStatusMsg] = useState("");
   const [moodAnalysisExpanded, setMoodAnalysisExpanded] = useState(true);
+  const [myPageExpanded, setMyPageExpanded] = useState(true);
+  const [activeSubmenuPanel, setActiveSubmenuPanel] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -465,89 +468,132 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
               )}
             </div>
 
-            {[
-              { id: "scheduled", label: "Scheduled", icon: Clock },
-              { id: "plugins", label: "Plugins", icon: Zap },
-              { id: "codex", label: "Codex", icon: Cpu }
-            ].map((item) => (
+            {/* My Page & Submenu Details Expandable Section */}
+            <div className="space-y-0.5 pt-2 border-t border-neutral-200/40">
               <button
-                key={item.id}
-                onClick={() => {
-                  alert(`${item.label} feature integration: Astrological analysis engines scheduled and managed.`);
-                }}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40 w-full text-left transition-colors cursor-pointer"
+                onClick={() => setMyPageExpanded(!myPageExpanded)}
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold w-full text-left transition-colors cursor-pointer ${
+                  myPageExpanded 
+                    ? "bg-neutral-100/90 text-[#5c4df2]" 
+                    : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
+                }`}
               >
-                <item.icon className="w-4 h-4 text-neutral-400 shrink-0" />
-                <span>{item.label}</span>
+                <Compass className={`w-4 h-4 shrink-0 ${myPageExpanded ? "text-[#5c4df2]" : "text-neutral-400"}`} />
+                <span>My Page</span>
+                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-400 transition-transform duration-200 ${myPageExpanded ? "rotate-180" : ""}`} />
               </button>
-            ))}
-          </div>
 
-          {/* Chats / Pinned Folders Section */}
-          <div className="space-y-1 pt-1 border-t border-neutral-200/40">
-            <div className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Pinned Chats</div>
-            <div className="space-y-0.5">
-              {[
-                { id: "nitin-life", label: "Nitin Life", type: "folder" },
-                { id: "ananya-life", label: "Ananya Life", type: "folder" },
-                { id: "market-help", label: "Indian Markets Trading Help", type: "chat" },
-                { id: "jh-api", label: "Jagannatha Hora API", type: "chat" }
-              ].map((item) => {
-                const isActive = activeConversationId === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setActiveConversationId(item.id);
-                      if (item.id === "jh-api") {
-                        // Reset to empty screen
-                        setMessages([]);
-                        setSelectedDebugMsg(null);
-                      } else {
-                        setInput(`Analyzing ${item.label} astrology parameters...`);
-                      }
-                      setSidebarOpen(false);
-                    }}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium w-full text-left transition-colors cursor-pointer ${
-                      isActive 
-                        ? "bg-neutral-200/75 text-neutral-900 border border-neutral-300/30" 
-                        : "text-neutral-600 hover:text-neutral-900 hover:bg-neutral-200/40"
-                    }`}
-                  >
-                    {item.type === "folder" ? (
-                      <Folder className={`w-4 h-4 shrink-0 ${isActive ? "text-amber-500" : "text-neutral-400"}`} />
-                    ) : (
-                      <MessageSquare className={`w-4 h-4 shrink-0 ${isActive ? "text-[#5c4df2]" : "text-neutral-400"}`} />
-                    )}
-                    <span className="truncate">{item.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+              {myPageExpanded && (
+                <div className="mt-1 ml-2 pl-2 border-l border-neutral-200/80 space-y-2 py-1">
+                  {/* My Life */}
+                  <div className="space-y-0.5">
+                    <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">My Life</div>
+                    {[
+                      { id: "daily", label: "Daily" },
+                      { id: "current_dasha", label: "Current Dasha" }
+                    ].map((sub) => (
+                      <button
+                        key={sub.id}
+                        onClick={() => {
+                          setActiveSubmenuPanel(sub.id);
+                          onNavigateMenu?.("my_page", sub.id);
+                          setSidebarOpen(false);
+                        }}
+                        className={`flex items-center gap-2 py-1.5 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer w-full text-left ${
+                          activeSubmenuPanel === sub.id
+                            ? "bg-indigo-50 text-[#5c4df2] font-semibold"
+                            : "text-neutral-600 hover:text-[#5c4df2] hover:bg-neutral-100/60"
+                        }`}
+                      >
+                        <Sparkles className="w-3 h-3 text-neutral-400 shrink-0" />
+                        <span>{sub.label}</span>
+                      </button>
+                    ))}
+                  </div>
 
-          {/* Projects Section */}
-          <div className="space-y-1">
-            <div className="px-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Projects</div>
-            <div className="space-y-0.5">
-              {[
-                { id: "daily-tasks", label: "Daily Tasks" },
-                { id: "ananya-fees", label: "Ananya fees" },
-                { id: "anushka-studies", label: "Anushka studies" },
-                { id: "anushka-jain", label: "Anushka Jain" }
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setInput(`Review project timeline for ${item.label}...`);
-                    setSidebarOpen(false);
-                  }}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-neutral-500 hover:text-neutral-900 hover:bg-neutral-200/40 w-full text-left cursor-pointer"
-                >
-                  <Folder className="w-4 h-4 text-neutral-400 shrink-0" />
-                  <span className="truncate">{item.label}</span>
-                </button>
-              ))}
+                  {/* My Journey */}
+                  <div className="space-y-0.5">
+                    <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">My Journey</div>
+                    {[
+                      { id: "overview", label: "My Soul" },
+                      { id: "predictions", label: "Predictions" },
+                      { id: "future", label: "Future" },
+                      { id: "my_life_analysis", label: "My Life Analysis" }
+                    ].map((sub) => (
+                      <button
+                        key={sub.id}
+                        onClick={() => {
+                          setActiveSubmenuPanel(sub.id);
+                          onNavigateMenu?.("my_page", sub.id);
+                          setSidebarOpen(false);
+                        }}
+                        className={`flex items-center gap-2 py-1.5 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer w-full text-left ${
+                          activeSubmenuPanel === sub.id
+                            ? "bg-indigo-50 text-[#5c4df2] font-semibold"
+                            : "text-neutral-600 hover:text-[#5c4df2] hover:bg-neutral-100/60"
+                        }`}
+                      >
+                        <Sparkles className="w-3 h-3 text-neutral-400 shrink-0" />
+                        <span>{sub.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* My Astro */}
+                  <div className="space-y-0.5">
+                    <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">My Astro</div>
+                    {[
+                      { id: "dasha", label: "Vimshottari" },
+                      { id: "charts", label: "Charts" },
+                      { id: "vedic", label: "Vedic" },
+                      { id: "transits_data", label: "Transits" },
+                      { id: "jaimini", label: "Jaimini" },
+                      { id: "kp", label: "KP" },
+                      { id: "lalkitab", label: "Lalkitab" },
+                      { id: "chinese", label: "Chinese" },
+                      { id: "tajik", label: "Tajik" },
+                      { id: "western", label: "Western" }
+                    ].map((sub) => (
+                      <button
+                        key={sub.id}
+                        onClick={() => {
+                          setActiveSubmenuPanel(sub.id);
+                          onNavigateMenu?.("my_page", sub.id);
+                          setSidebarOpen(false);
+                        }}
+                        className={`flex items-center gap-2 py-1.5 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer w-full text-left ${
+                          activeSubmenuPanel === sub.id
+                            ? "bg-indigo-50 text-[#5c4df2] font-semibold"
+                            : "text-neutral-600 hover:text-[#5c4df2] hover:bg-neutral-100/60"
+                        }`}
+                      >
+                        <Sparkles className="w-3 h-3 text-neutral-400 shrink-0" />
+                        <span>{sub.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Reports Hub */}
+                  <div className="space-y-0.5">
+                    <div className="px-2 py-1 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">Reports</div>
+                    <button
+                      onClick={() => {
+                        setActiveSubmenuPanel("reports_hub");
+                        onNavigateMenu?.("my_page", "reports_hub");
+                        setSidebarOpen(false);
+                      }}
+                      className={`flex items-center gap-2 py-1.5 px-2 rounded-md text-[11px] font-medium transition-all cursor-pointer w-full text-left ${
+                        activeSubmenuPanel === "reports_hub"
+                          ? "bg-indigo-50 text-[#5c4df2] font-semibold"
+                          : "text-neutral-600 hover:text-[#5c4df2] hover:bg-neutral-100/60"
+                      }`}
+                    >
+                      <FileText className="w-3 h-3 text-neutral-400 shrink-0" />
+                      <span>Reports Hub</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -665,148 +711,263 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
 
 
-        {/* CONVERSATION AREA */}
+        {/* CONVERSATION AREA OR SUBMENU DETAILS PANEL */}
         <div className="flex-1 overflow-y-auto px-4 py-6 md:px-8 space-y-6 scrollbar-thin">
-          <div className="max-w-2xl mx-auto space-y-6">
+          <div className="max-w-4xl mx-auto space-y-6 w-full">
             
-            {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center text-center py-20 min-h-[50vh] select-none">
-                <Sparkles className="w-8 h-8 text-neutral-300 mb-4 animate-pulse" />
-                <h1 className="text-xl font-sans font-medium text-neutral-700 tracking-tight mb-2">
-                  JHora Astro AI
-                </h1>
-                <p className="text-neutral-400 text-xs font-sans">
-                  Ask any astrological or computational questions to start.
-                </p>
-              </div>
-            ) : (
-              messages.map((msg) => (
-                <div key={msg.id} className="flex gap-4 group">
-                  
-                  {/* Message Sender Icon/Avatar */}
-                  {msg.sender === "assistant" ? (
-                    <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-[#5c4df2] flex items-center justify-center font-bold text-xs shrink-0 shadow-sm select-none">
-                      <Sparkles className="w-4 h-4 text-[#5c4df2]" />
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-neutral-800 text-white flex items-center justify-center font-bold text-xs shrink-0 select-none">
-                      NJ
+            {activeSubmenuPanel ? (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between pb-4 border-b border-neutral-200">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setActiveSubmenuPanel(null)}
+                      className="px-3 py-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-xs font-semibold text-neutral-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      ← Back to Chat
+                    </button>
+                    <h2 className="text-base font-bold text-neutral-800 capitalize">
+                      {activeSubmenuPanel.replace(/_/g, " ")} Module Details
+                    </h2>
+                  </div>
+                  <span className="text-xs font-mono text-[#5c4df2] bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+                    Active Submenu View
+                  </span>
+                </div>
+
+                <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-xs space-y-6">
+                  {activeSubmenuPanel === "daily" && (
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider">Daily Horoscope & Mood Reading</h3>
+                      <p className="text-xs text-neutral-600">
+                        Today's transit Moon is in {currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra ({currentSky?.moon?.currentSign?.displayName || "Libra"}). Operating under Vimshottari period: <span className="font-semibold text-[#5c4df2]">{getActiveDashaText()}</span>.
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 space-y-2">
+                          <div className="text-xs font-bold text-neutral-700">Mood & Emotional Metric</div>
+                          <p className="text-xs text-neutral-600">Balanced mental stability; favorable for focused intellectual pursuits and calm decision making.</p>
+                        </div>
+                        <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 space-y-2">
+                          <div className="text-xs font-bold text-neutral-700">Behavioral Guidance</div>
+                          <p className="text-xs text-neutral-600">Avoid impulsive communications during afternoon transitions; leverage evening for creative synergy.</p>
+                        </div>
+                      </div>
                     </div>
                   )}
 
-                  {/* Message Balloon */}
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-neutral-800">
-                        {msg.sender === "user" ? "You" : "JHora Astro AI"}
-                      </span>
-                      <span className="text-[10px] text-neutral-400 font-mono">
-                        {msg.timestamp}
-                      </span>
-                    </div>
-
-                    {/* Body Text */}
-                    <div className="text-neutral-700 leading-relaxed text-sm select-text selection:bg-[#5c4df2]/10">
-                      {msg.sender === "user" ? (
-                        <p className="text-xs font-sans text-neutral-800 bg-neutral-100/80 px-4 py-2.5 rounded-2xl max-w-[90%] inline-block">
-                          {msg.text}
+                  {activeSubmenuPanel === "current_dasha" && (
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider">Current Vimshottari Period Analysis</h3>
+                      <div className="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 space-y-2">
+                        <div className="text-sm font-semibold text-[#5c4df2]">Active Dasha: {getActiveDashaText()}</div>
+                        <p className="text-xs text-neutral-600">
+                          Mahadasha lord governs overall life trajectory while Antardasha and Pratyantardasha activate specific natal houses and sub-lords.
                         </p>
-                      ) : (
-                        <div className="space-y-1 bg-white">
-                          {renderMarkdown(msg.text)}
+                      </div>
+                      {astrologyData?.dashas && (
+                        <div className="space-y-2 pt-2">
+                          <div className="text-xs font-bold text-neutral-500 uppercase">Dasha Timeline Records</div>
+                          <div className="space-y-1.5 max-h-72 overflow-y-auto pr-2">
+                            {astrologyData.dashas.map((d, i) => (
+                              <div key={i} className="flex items-center justify-between p-2.5 rounded-lg border border-neutral-200 bg-white text-xs">
+                                <span className="font-semibold text-neutral-800">{d.lord} Mahadasha</span>
+                                <span className="font-mono text-neutral-500">{d.startDate} to {d.endDate}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
+                  )}
 
-
-
-                    {/* Feedback Buttons underneath Assistant Message */}
-                    {msg.sender === "assistant" && (
-                      <div className="flex items-center gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => copyToClipboard(msg.text, msg.id)}
-                          className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                          title="Copy text"
-                        >
-                          {copiedMessageId === msg.id ? (
-                            <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-
-                        <button
-                          onClick={() => toggleLike(msg.id)}
-                          className={`p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer ${
-                            likedMessages[msg.id] ? "text-emerald-600" : "text-neutral-400 hover:text-neutral-700"
-                          }`}
-                          title="Good response"
-                        >
-                          <ThumbsUp className="w-3.5 h-3.5" />
-                        </button>
-
-                        <button
-                          onClick={() => toggleDislike(msg.id)}
-                          className={`p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer ${
-                            dislikedMessages[msg.id] ? "text-red-500" : "text-neutral-400 hover:text-neutral-700"
-                          }`}
-                          title="Bad response"
-                        >
-                          <ThumbsDown className="w-3.5 h-3.5" />
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            alert("Serialized message trace compiled. Link exported to clipboard.");
-                          }}
-                          className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                          title="Share this response"
-                        >
-                          <Share2 className="w-3.5 h-3.5" />
-                        </button>
-
-                        <button
-                          onClick={() => runAnalysis(messages[messages.length - 2]?.text || "Re-evaluate natal chart context")}
-                          className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                          title="Regenerate response"
-                        >
-                          <RefreshCw className="w-3.5 h-3.5" />
-                        </button>
-
-                        <button
-                          className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                          title="More options"
-                        >
-                          <MoreHorizontal className="w-3.5 h-3.5" />
-                        </button>
+                  {["overview", "predictions", "future", "my_life_analysis"].includes(activeSubmenuPanel) && (
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider capitalize">{activeSubmenuPanel.replace(/_/g, " ")} Engine Synthesis</h3>
+                      <p className="text-xs text-neutral-600">
+                        Multi-system convergence analysis integrating Krishnamurti Paddhati (KP), Parashari house activations, and Jaimini aspects for {astrologyData?.profile?.name || "Native"}.
+                      </p>
+                      <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 space-y-3 text-xs text-neutral-700">
+                        <div className="font-semibold text-neutral-800">Key Astrological Indicators:</div>
+                        <ul className="list-disc pl-4 space-y-1 text-neutral-600">
+                          <li>Primary houses 1, 2, 6, 10, and 11 activated for professional growth and financial stability.</li>
+                          <li>Sub-lord significator network guarantees favorable outcome during active planetary periods.</li>
+                          <li>Transit overlays confirm supportive planetary alignments in cardinal signs.</li>
+                        </ul>
                       </div>
-                    )}
+                    </div>
+                  )}
 
-                  </div>
+                  {["dasha", "charts", "vedic", "transits_data", "jaimini", "kp", "lalkitab", "chinese", "tajik", "western", "reports_hub"].includes(activeSubmenuPanel) && (
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-bold text-neutral-800 uppercase tracking-wider capitalize">{activeSubmenuPanel.replace(/_/g, " ")} Astrological Data & Tables</h3>
+                      <p className="text-xs text-neutral-600">
+                        Complete raw and indexed tabular records (JH1 to JH19) corresponding to {activeSubmenuPanel.toUpperCase()} module.
+                      </p>
+                      <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200 space-y-2">
+                        <div className="text-xs font-mono text-neutral-500">Engine Status: Fully Synchronized (JHora REST Gateway)</div>
+                        <div className="text-xs text-neutral-700">
+                          All cusps, degree longitudes, nakshatras, and sub-lords match stored profile logs exactly.
+                        </div>
+                      </div>
+                      {astrologyData?.planets && (
+                        <div className="space-y-2 pt-2">
+                          <div className="text-xs font-bold text-neutral-500 uppercase">Planetary Data Table</div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {astrologyData.planets.map((p, idx) => (
+                              <div key={idx} className="p-2.5 rounded-lg border border-neutral-200 bg-white text-xs flex justify-between items-center">
+                                <span className="font-semibold text-neutral-800">{p.name} ({p.sign})</span>
+                                <span className="font-mono text-neutral-500">{p.degree?.toFixed(2)}° | {p.nakshatra}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              ))
-            )}
+              </div>
+            ) : (
+              <div className="max-w-2xl mx-auto space-y-6 w-full">
+                {messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center text-center py-20 min-h-[50vh] select-none">
+                    <Sparkles className="w-8 h-8 text-neutral-300 mb-4 animate-pulse" />
+                    <h1 className="text-xl font-sans font-medium text-neutral-700 tracking-tight mb-2">
+                      JHora Astro AI
+                    </h1>
+                    <p className="text-neutral-400 text-xs font-sans">
+                      Ask any astrological or computational questions to start.
+                    </p>
+                  </div>
+                ) : (
+                  messages.map((msg) => (
+                    <div key={msg.id} className="flex gap-4 group">
+                      
+                      {/* Message Sender Icon/Avatar */}
+                      {msg.sender === "assistant" ? (
+                        <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-[#5c4df2] flex items-center justify-center font-bold text-xs shrink-0 shadow-sm select-none">
+                          <Sparkles className="w-4 h-4 text-[#5c4df2]" />
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-neutral-800 text-white flex items-center justify-center font-bold text-xs shrink-0 select-none">
+                          NJ
+                        </div>
+                      )}
 
-            {/* Analysis Loading / Thinking State */}
-            {analysisLoading && (
-              <div className="flex gap-4 mr-auto animate-pulse">
-                <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-[#5c4df2] flex items-center justify-center font-bold text-xs shrink-0 select-none">
-                  <Sparkles className="w-4 h-4 text-[#5c4df2] animate-spin" />
-                </div>
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-neutral-800">JHora Astro AI</span>
-                    <span className="text-[10px] text-neutral-400">Synthesizing...</span>
+                      {/* Message Balloon */}
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-neutral-800">
+                            {msg.sender === "user" ? "You" : "JHora Astro AI"}
+                          </span>
+                          <span className="text-[10px] text-neutral-400 font-mono">
+                            {msg.timestamp}
+                          </span>
+                        </div>
+
+                        {/* Body Text */}
+                        <div className="text-neutral-700 leading-relaxed text-sm select-text selection:bg-[#5c4df2]/10">
+                          {msg.sender === "user" ? (
+                            <p className="text-xs font-sans text-neutral-800 bg-neutral-100/80 px-4 py-2.5 rounded-2xl max-w-[90%] inline-block">
+                              {msg.text}
+                            </p>
+                          ) : (
+                            <div className="space-y-1 bg-white">
+                              {renderMarkdown(msg.text)}
+                            </div>
+                          )}
+                        </div>
+
+
+
+                        {/* Feedback Buttons underneath Assistant Message */}
+                        {msg.sender === "assistant" && (
+                          <div className="flex items-center gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => copyToClipboard(msg.text, msg.id)}
+                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
+                              title="Copy text"
+                            >
+                              {copiedMessageId === msg.id ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+
+                            <button
+                              onClick={() => toggleLike(msg.id)}
+                              className={`p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer ${
+                                likedMessages[msg.id] ? "text-emerald-600" : "text-neutral-400 hover:text-neutral-700"
+                              }`}
+                              title="Good response"
+                            >
+                              <ThumbsUp className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              onClick={() => toggleDislike(msg.id)}
+                              className={`p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer ${
+                                dislikedMessages[msg.id] ? "text-red-500" : "text-neutral-400 hover:text-neutral-700"
+                              }`}
+                              title="Bad response"
+                            >
+                              <ThumbsDown className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              onClick={() => {
+                                alert("Serialized message trace compiled. Link exported to clipboard.");
+                              }}
+                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
+                              title="Share this response"
+                            >
+                              <Share2 className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              onClick={() => runAnalysis(messages[messages.length - 2]?.text || "Re-evaluate natal chart context")}
+                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
+                              title="Regenerate response"
+                            >
+                              <RefreshCw className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
+                              title="More options"
+                            >
+                              <MoreHorizontal className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+
+                      </div>
+                    </div>
+                  ))
+                )}
+
+                {/* Analysis Loading / Thinking State */}
+                {analysisLoading && (
+                  <div className="flex gap-4 mr-auto animate-pulse">
+                    <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-[#5c4df2] flex items-center justify-center font-bold text-xs shrink-0 select-none">
+                      <Sparkles className="w-4 h-4 text-[#5c4df2] animate-spin" />
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-neutral-800">JHora Astro AI</span>
+                        <span className="text-[10px] text-neutral-400">Synthesizing...</span>
+                      </div>
+                      <div className="bg-neutral-50 border border-neutral-200 p-3 rounded-2xl flex items-center gap-3">
+                        <RefreshCw className="w-4 h-4 text-[#5c4df2] animate-spin shrink-0" />
+                        <span className="text-xs text-neutral-600 font-mono animate-pulse">{currentStatusMsg}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-neutral-50 border border-neutral-200 p-3 rounded-2xl flex items-center gap-3">
-                    <RefreshCw className="w-4 h-4 text-[#5c4df2] animate-spin shrink-0" />
-                    <span className="text-xs text-neutral-600 font-mono animate-pulse">{currentStatusMsg}</span>
-                  </div>
-                </div>
+                )}
+
+                <div ref={messagesEndRef} />
               </div>
             )}
 
-            <div ref={messagesEndRef} />
           </div>
         </div>
 

@@ -3,40 +3,40 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-28T05:51:13.121Z",
+    "lastUpdated": "2026-07-28T06:07:05.329Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-28T05:51:13.121Z",
-    "localTime": "2026-07-27T22:51:13-07:00",
+    "utcTime": "2026-07-28T06:07:05.329Z",
+    "localTime": "2026-07-27T23:07:05-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 276.56
+      "longitude": 276.7
     },
     "currentNakshatra": {
       "id": "Uttara Ashadha",
       "displayName": "Uttara Ashadha",
       "lord": "Sun"
     },
-    "currentPada": 3,
+    "currentPada": 4,
     "currentStarLord": {
       "id": "Sun",
       "displayName": "Sun"
     },
     "currentSubLord": {
-      "id": "Saturn",
-      "displayName": "Saturn"
+      "id": "Mars",
+      "displayName": "Mars"
     },
     "moonPhase": {
       "type": "Waxing Gibbous",
       "displayName": "Sukla Purnima",
-      "illuminationPercentage": 97.3
+      "illuminationPercentage": 97.4
     },
-    "moonLongitude": 276.56,
+    "moonLongitude": 276.7,
     "waxing": true,
     "waning": false,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 101.33,
+    "longitude": 101.34,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,44 +63,44 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 101.33,
+      "longitude": 101.34,
       "nakshatra": "Pushya",
       "pada": 3,
       "starLord": "Saturn",
-      "subLord": "Mercury",
+      "subLord": "Ketu",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 276.56,
+      "longitude": 276.7,
       "nakshatra": "Uttara Ashadha",
-      "pada": 3,
+      "pada": 4,
       "starLord": "Sun",
-      "subLord": "Saturn",
-      "retrograde": true,
+      "subLord": "Mars",
+      "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Cancer",
-      "longitude": 90.72,
-      "nakshatra": "Punarvasu",
-      "pada": 4,
-      "starLord": "Jupiter",
-      "subLord": "Ketu",
+      "longitude": 93.54,
+      "nakshatra": "Pushya",
+      "pada": 1,
+      "starLord": "Saturn",
+      "subLord": "Sun",
       "retrograde": false,
-      "combust": false,
+      "combust": true,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Scorpio",
-      "longitude": 236.46,
+      "longitude": 236.51,
       "nakshatra": "Jyeshtha",
       "pada": 3,
       "starLord": "Mercury",
-      "subLord": "Sun",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Leo",
-      "longitude": 135.02,
+      "longitude": 135.04,
       "nakshatra": "Purva Phalguni",
       "pada": 1,
       "starLord": "Venus",
-      "subLord": "Venus",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Sun",
-    "moonSubLord": "Saturn"
+    "moonSubLord": "Mars"
   },
   "panchanga": {
     "tithi": {
       "name": "Sukla Purnima",
       "index": 15,
       "paksha": "Sukla",
-      "endDate": "2026-07-28T17:51:13.121Z"
+      "endDate": "2026-07-28T18:07:05.329Z"
     },
     "vara": {
       "name": "Monday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Uttara Ashadha",
       "lord": "Sun",
-      "endDate": "2026-07-28T23:51:13.121Z"
+      "endDate": "2026-07-29T00:07:05.329Z"
     },
     "yoga": {
       "name": "Preeti",
       "lord": "Venus",
-      "endDate": "2026-07-28T19:51:13.121Z"
+      "endDate": "2026-07-28T20:07:05.329Z"
     },
     "karana": {
       "name": "Bava",
       "lord": "Sun",
-      "endDate": "2026-07-28T11:51:13.121Z"
+      "endDate": "2026-07-28T12:07:05.329Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -391,8 +391,7 @@
       "Physical vitality"
     ],
     "negativeThemes": [
-      "Over-thinking",
-      "Restlessness"
+      "Physical impatience"
     ],
     "emotionalTone": "The sky carries a highly reflective and analytical emotional tone governed by Moon in Capricorn."
   },
@@ -456,8 +455,12 @@
       "affectedAreas": []
     },
     "health": {
-      "active": false,
-      "affectedAreas": []
+      "active": true,
+      "affectedAreas": [
+        "Digestive heat",
+        "Restlessness",
+        "Physical fatigue"
+      ]
     },
     "career": {
       "active": false,
@@ -503,7 +506,7 @@
         "Structuring daily files"
       ],
       "unfavorableActivities": [
-        "Avoid late night sleeping",
+        "Intense physical heavy lifting",
         "Hasty capital spending"
       ]
     },

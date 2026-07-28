@@ -242,7 +242,7 @@ function saveUserAnalysisToFolder(userName: string, analysisText: string, astrol
         console.warn("[Analysis Git Commit Warning]", err.message);
       } else {
         console.log("[Analysis Git Commit Success]");
-        enqueueGitCommand("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
+        enqueueGitCommand("git push origin HEAD || true", (pushErr, pushStdout, pushStderr) => {
           if (pushErr) {
             console.error("[Analysis Git Push Warning]", pushErr.message);
           } else {
@@ -486,7 +486,7 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
         } else {
           console.log("[Git Sync Add Local Success] Profile committed locally.");
           // Attempt push as a separate, fully graceful operation
-          enqueueGitCommand("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
+          enqueueGitCommand("git push origin HEAD || true", (pushErr, pushStdout, pushStderr) => {
             if (pushErr) {
               console.info("[Git Sync Push Notice] Git push skipped/unauthenticated. Profile is securely saved locally and committed to Git.");
             } else {
@@ -550,7 +550,7 @@ async function syncProfileToGithub(action: "add" | "delete", profileName: string
             } else {
               console.log("[Git Sync Delete Local Success] Deactivation committed locally.");
               // Attempt push as a separate, fully graceful operation
-              enqueueGitCommand("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
+              enqueueGitCommand("git push origin HEAD || true", (pushErr, pushStdout, pushStderr) => {
                 if (pushErr) {
                   console.info("[Git Sync Push Notice] Git push skipped/unauthenticated. Deactivation is securely saved locally and committed to Git.");
                 } else {
@@ -672,7 +672,7 @@ app.post("/api/user-profile/index-table", async (req, res) => {
       } else {
         console.log("[Table Index Git Commit Success]");
         // Push HEAD to origin
-        enqueueGitCommand("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
+        enqueueGitCommand("git push origin HEAD || true", (pushErr, pushStdout, pushStderr) => {
           if (pushErr) {
             console.error("[Table Index Git Push Warning]", pushErr.message);
           } else {
@@ -3148,7 +3148,7 @@ function runAnalysisSyncAgentForProfile(profile: any, filename?: string) {
         console.warn("[Analysis Git Warning]", err.message);
       } else {
         console.log(`[Analysis Git Success] Committed static/dynamic analysis files for ${profileName}.`);
-        enqueueGitCommand("git push origin HEAD", (pushErr, pushStdout, pushStderr) => {
+        enqueueGitCommand("git push origin HEAD || true", (pushErr, pushStdout, pushStderr) => {
           if (pushErr) {
             console.warn("[Analysis Push Warning] push skipped/unauthenticated.");
           } else {

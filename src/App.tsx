@@ -2902,7 +2902,15 @@ export default function App() {
                 className="space-y-6"
               >
                 <div className={`p-6 rounded-2xl border ${containerStyle} space-y-6`}>
-                  <AstroChat astrologyData={astrologyData} />
+                  <AstroChat 
+                    astrologyData={astrologyData} 
+                    onNavigateMenu={(menu, submenu) => {
+                      setActiveMenu(menu);
+                      if (submenu) {
+                        setActiveSubMenu(prev => ({ ...prev, [menu]: submenu }));
+                      }
+                    }}
+                  />
                 </div>
               </motion.div>
             </AnimatePresence>
