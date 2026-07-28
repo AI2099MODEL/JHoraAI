@@ -4727,51 +4727,43 @@ export function MyPageView({
         </div>
       ) : activeTab === "vedic" ? (
         <div className="space-y-6">
-          
-
           {/* Table JH1: Birth Details */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh1-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_birth_details" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH2: Natal Planets & Longitudes */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh2-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_planets" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH3: Shadbala Strengths */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh3-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_shadbala" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH4: Bhava Balas */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh4-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_bhava_balas" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH5: Ashtakavarga Bindus */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh5-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_ashtakavarga" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH6: Divisional Vargas */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh6-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_divisional" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
@@ -4816,90 +4808,86 @@ export function MyPageView({
           </div>
 
           {/* Table JH8: KP Cusps */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh8-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_cusps" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH9: KP Sublords */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh9-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_sub_lords" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH10: KP Planet Significators */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh10-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_planet_significators" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH11: KP House Significators */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh11-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="kp_house_significators" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH12: Jaimini Chara Karakas */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh12-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jaimini_karakas" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH13: Jaimini Arudhas & Chara Dashas */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh13-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jaimini_arudhas" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH14: Western Tropical Placidus Coordinates */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh14-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="western_tropical" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH15: Western Planetary Aspects & Harps */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh15-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="western_aspects" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH16: Tajik Varshaphal Sahams */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh16-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="tajika_varshaphal" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH17: Tajik Varshaphal Harshabala */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh17-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="tajika_harshabala" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
           {/* Table JH18: Lalkitab Houses & Planetary Placements */}
-          <div className="space-y-3">
-            
+          <div className="space-y-3" id="table-jh18-container">
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="lalkitab_houses" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
+            </div>
+          </div>
+
+          {/* Table JH19: Lal Kitab Teva & Sleeping Planet Status */}
+          <div className="space-y-3" id="table-jh19-container">
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
+              <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="lalkitab_teva" isDark={isDark} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
 
@@ -4952,16 +4940,12 @@ export function MyPageView({
             </div>
           </div>
 
-          
-
           {/* JH21: Jaimini Sphutas */}
           <div className="space-y-3">
             <div className="p-4 rounded-xl border border-neutral-200 bg-white shadow-sm overflow-x-auto text-black">
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_jaimini_sphutas" isDark={false} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
-
-          
 
           {/* JH22: Jaimini Sahams */}
           <div className="space-y-3">
@@ -4976,10 +4960,6 @@ export function MyPageView({
               <AstroRawTablesView astrologyData={astrologyData} activeSubmenuId="jhora_vedic_upgrahas" isDark={false} activeUser={activeUser} hideHeaders={true} />
             </div>
           </div>
-
-          
-
-          
 
           {/* JH24: Ishtaphala & Kashtaphala */}
           <div className="space-y-3">
@@ -4998,6 +4978,214 @@ export function MyPageView({
             
             <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm overflow-x-auto">
               <CharaDashaInteractiveTable profile={profile} astrologyData={astrologyData} isDark={isDark} />
+            </div>
+          </div>
+
+          {/* Table JH32: Gochara */}
+          <div className="space-y-3" id="table-jh32-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH32</span>
+                Gochara (Transit positions relative to natal chart)
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_gochara" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH33: Current Planetary Longitudes */}
+          <div className="space-y-3" id="table-jh33-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH33</span>
+                Current Planetary Longitudes & Placements (Transit Coordinates)
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_transits" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH34: Current Panchanga */}
+          <div className="space-y-3" id="table-jh34-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH34</span>
+                Current Panchanga (Transit Solilunar Pillars)
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="panchanga" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH35: Current Planetary Strengths */}
+          <div className="space-y-3" id="table-jh35-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH35</span>
+                Current Planetary Strengths
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_strengths" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH36: Current Planetary Yogas */}
+          <div className="space-y-3" id="table-jh36-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH36</span>
+                Current Planetary Yogas & Conjunctions
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_yogas" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH37: Current Transiting Doshas */}
+          <div className="space-y-3" id="table-jh37-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH37</span>
+                Current Transiting Doshas & Obstructions
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_doshas" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH38: Current Planetary Aspects */}
+          <div className="space-y-3" id="table-jh38-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH38</span>
+                Current Planetary Aspects
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_aspects" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH39: House Activation Metrics */}
+          <div className="space-y-3" id="table-jh39-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH39</span>
+                House Activation Metrics
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="house_activation" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH40: Current Nakshatra Positions */}
+          <div className="space-y-3" id="table-jh40-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH40</span>
+                Current Nakshatra Positions
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_nakshatra" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH41: Sensitive Transit Points */}
+          <div className="space-y-3" id="table-jh41-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH41</span>
+                Sensitive Transit Points
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="sensitive_points" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH42: Current Astronomical Events */}
+          <div className="space-y-3" id="table-jh42-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH42</span>
+                Current Astronomical Events
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="current_events" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH43: Planetary Transit Timeline */}
+          <div className="space-y-3" id="table-jh43-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH43</span>
+                Planetary Transit Timeline
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="transit_timeline" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH44: Upcoming Planet Ingress Schedules */}
+          <div className="space-y-3" id="table-jh44-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH44</span>
+                Upcoming Planet Ingress Schedules
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="planet_ingress" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH45: Transit Interpretations & Summaries */}
+          <div className="space-y-3" id="table-jh45-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH45</span>
+                Transit Interpretations & Summaries
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="transit_summary" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH46: Daily Muhurtas */}
+          <div className="space-y-3" id="table-jh46-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH46</span>
+                Daily Muhurtas (Auspicious hours)
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="daily_muhurta" isDark={false} />
+            </div>
+          </div>
+
+          {/* Table JH47: Event Muhurtas */}
+          <div className="space-y-3" id="table-jh47-container">
+            <div className="border-b border-indigo-500/10 pb-2">
+              <h3 className="text-sm font-semibold flex items-center gap-1.5 text-amber-800">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500 text-slate-950 mr-1.5">JH47</span>
+                Event Muhurtas (Auspicious event timings)
+              </h3>
+            </div>
+            <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+              <TransitsTab astrologyData={astrologyData} profile={profile} subTab="event_muhurta" isDark={false} />
             </div>
           </div>
         </div>
