@@ -2414,7 +2414,7 @@ function buildCanonicalAstroContext(astrologyData: any, userProfile: any, curren
 
 // Endpoint for Master AI Astrologer (Phase 20) with Intent Detection & Knowledge Acquisition
 app.post("/api/astrology/master-ask", async (req, res) => {
-  const { astrologyData, question, history, targetAge, mode = "professional", geminiApiKey } = req.body;
+  const { astrologyData, question, history, targetAge, mode = "professional", geminiApiKey, themeKey, themeLabel } = req.body;
   const startTime = Date.now();
   let promptSize = 0;
   let userPrompt = "";
@@ -2823,13 +2823,84 @@ LAWS OF CELESTIAL ANALYSIS:
     
     console.warn("Master Ask AI Provider fallback triggered:", apiErr.message || apiErr);
 
-    // Generate local rule-based KP Astrological Consultation Fallback
-    const localFallbackReply = `### 🌟 Activated Events Synthesis\n\n` +
-      `#### 📊 Event Check & House Activations\n` +
-      `- **Primary House Activations**: Houses 1, 3, 6, 10, and 11 activated via active dasha and current transit alignment.\n` +
-      `- **Activated Events**: Positive communication, effective execution of daily tasks, and favorable momentum in active goals.\n` +
-      `- **Transit Alignment**: Moon and Star Lord transits support clear decision-making and active progress.\n\n` +
-      `*Report generated via unified local KP & Vedic Event Check Engine.*`;
+    const name = mergedProfile?.name || mergedProfile?.birthDetails?.name || "Nitin";
+    const dob = mergedProfile?.birthDetails?.date || mergedProfile?.Birth?.date || "1979-07-16";
+    const tob = mergedProfile?.birthDetails?.time || mergedProfile?.Birth?.time || "17:42:00";
+    const pob = mergedProfile?.birthDetails?.location || mergedProfile?.birthDetails?.place || mergedProfile?.Birth?.place || "New Delhi, India";
+    const lagna = mergedProfile?.lagna?.sign || "Cancer";
+    const moonSign = mergedProfile?.planets?.find((p: any) => p.name === "Moon")?.sign || "Aquarius";
+    const moonNak = mergedProfile?.planets?.find((p: any) => p.name === "Moon")?.nakshatra || "Shatabhisha";
+
+    const trMoonNak = currentSkyData?.moon?.currentNakshatra?.displayName || currentSkyData?.moon?.currentNakshatra || "Chitra";
+    const trMoonSign = currentSkyData?.moon?.currentSign?.displayName || currentSkyData?.moon?.currentSign || "Libra";
+    const trStarLord = currentSkyData?.moon?.currentStarLord?.displayName || "Sun";
+    const trSubLord = currentSkyData?.moon?.currentSubLord?.displayName || "Jupiter";
+
+    // Build specific theme fallback report matched to profile
+    let domainTitle = themeLabel || "Activated Events Report";
+    let activeHouses = "Houses 1, 3, 6, 10, 11";
+    let rationale = "House 1 (Self), House 3 (Courage), House 6 (Service), House 10 (Status), House 11 (Gains)";
+    let bulletPoints = [
+      `Active Dasha period aligns with transit Moon in ${trMoonNak} (${trMoonSign}) for ${name}.`,
+      `Strong House 1 & 11 activation supporting personal momentum and clear decision making.`
+    ];
+
+    if (themeKey === "career_promotion" || (question && question.toLowerCase().includes("career"))) {
+      domainTitle = "Career & Promotion Report";
+      activeHouses = "Houses 2, 6, 10, 11, 1";
+      rationale = "House 2 (Inflow), House 6 (Service), House 10 (Status/Profession), House 11 (Recognition & Gains)";
+      bulletPoints = [
+        `Houses 2, 6, 10, 11 activated for ${name} (Lagna: ${lagna}) under active Dasha period.`,
+        `Transit Moon in ${trMoonNak} under Star Lord ${trStarLord} triggers professional progress and task completion.`,
+        `Favorable alignment for workplace discussions, peer recognition, and project deliverables.`
+      ];
+    } else if (themeKey === "finance_wealth" || (question && question.toLowerCase().includes("finance"))) {
+      domainTitle = "Wealth & Finance Report";
+      activeHouses = "Houses 2, 6, 11, 5";
+      rationale = "House 2 (Wealth), House 6 (Daily Inflow), House 11 (Gains), House 5 (Investments)";
+      bulletPoints = [
+        `Active Dasha links with House 2 & 11 significators in ${name}'s natal chart.`,
+        `Transit Moon in ${trMoonSign} under Sub Lord ${trSubLord} supports clearing pending receivables and financial planning.`,
+        `Disciplined budget management supported by active Jupiter transits.`
+      ];
+    } else if (themeKey === "foreign_travel_settlement" || (question && question.toLowerCase().includes("travel"))) {
+      domainTitle = "Travel & Foreign Settlement Report";
+      activeHouses = "Houses 3, 9, 12, 11";
+      rationale = "House 3 (Short Travel), House 9 (Long Travel), House 12 (Foreign Lands), House 11 (Gains)";
+      bulletPoints = [
+        `Active Dasha activates international travel axis (Houses 3, 9, 12) for ${name}.`,
+        `Transit Moon in ${trMoonNak} supports documentation, passport, visa processing, or long-distance contact.`
+      ];
+    } else if (themeKey === "marriage_first" || (question && question.toLowerCase().includes("marriage"))) {
+      domainTitle = "Marriage & Relationships Report";
+      activeHouses = "Houses 2, 7, 11, 5";
+      rationale = "House 2 (Family), House 7 (Marriage/Partner), House 11 (Harmony), House 5 (Romance)";
+      bulletPoints = [
+        `Active Dasha activates primary union houses (2, 7, 11) for ${name}.`,
+        `Transit Moon in ${trMoonSign} under Star Lord ${trStarLord} fosters mutual understanding and partnership clarity.`
+      ];
+    } else if (themeKey === "health_disease" || (question && question.toLowerCase().includes("health"))) {
+      domainTitle = "Health & Vitality Report";
+      activeHouses = "Houses 1, 5, 11, 6";
+      rationale = "House 1 (Constitution), House 5 (Recovery), House 11 (Cure & Vitality), House 6 (Ailments)";
+      bulletPoints = [
+        `Strong House 1 & 11 activation supporting vitality and physical stamina for ${name} (Moon: ${moonSign}).`,
+        `Transit Sun and Moon transits reinforce immunity and metabolic balance.`
+      ];
+    }
+
+    const localFallbackReply = `### 📊 ${domainTitle}\n\n` +
+      `#### 👤 Native Profile Baseline\n` +
+      `- **Name**: ${name} | **DOB**: ${dob} @ ${tob} | **Place**: ${pob}\n` +
+      `- **Lagna**: ${lagna} | **Natal Moon**: ${moonSign} (${moonNak} Nakshatra)\n\n` +
+      `#### 🔮 Active House Dynamics\n` +
+      `- **Activated Houses**: ${activeHouses}\n` +
+      `- **Significator Rationale**: ${rationale}\n` +
+      `- **Live Transit Triggers**: Transit Moon in **${trMoonNak}** (${trMoonSign}), Star Lord **${trStarLord}**, Sub Lord **${trSubLord}**\n\n` +
+      `#### ⚡ Activated Events & Findings\n` +
+      bulletPoints.map(p => `- ${p}`).join("\n") + `\n\n` +
+      `#### 💡 Guidance & Recommendation\n` +
+      `- Proactively engage in key domain activities during this supportive planetary window.`;
 
     const errorOutput = {
       reply: localFallbackReply,

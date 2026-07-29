@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-29T11:21:35.706Z",
+    "lastUpdated": "2026-07-29T11:29:40.526Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-29T11:21:35.706Z",
-    "localTime": "2026-07-29T04:21:35-07:00",
+    "utcTime": "2026-07-29T11:29:40.526Z",
+    "localTime": "2026-07-29T04:29:40-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 292.76
+      "longitude": 292.83
     },
     "currentNakshatra": {
       "id": "Shravana",
@@ -28,15 +28,15 @@
       "displayName": "Moon"
     },
     "currentSubLord": {
-      "id": "Saturn",
-      "displayName": "Saturn"
+      "id": "Jupiter",
+      "displayName": "Jupiter"
     },
     "moonPhase": {
       "type": "Waning Gibbous",
       "displayName": "Krishna Prathama",
       "illuminationPercentage": 94.3
     },
-    "moonLongitude": 292.76,
+    "moonLongitude": 292.83,
     "waxing": false,
     "waning": true,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 102.54,
+    "longitude": 102.55,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,7 +63,7 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 102.54,
+      "longitude": 102.55,
       "nakshatra": "Pushya",
       "pada": 3,
       "starLord": "Saturn",
@@ -74,33 +74,33 @@
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 292.76,
+      "longitude": 292.83,
       "nakshatra": "Shravana",
       "pada": 4,
       "starLord": "Moon",
-      "subLord": "Saturn",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mars": {
-      "currentSign": "Leo",
-      "longitude": 149.97,
+      "currentSign": "Virgo",
+      "longitude": 151.37,
       "nakshatra": "Uttara Phalguni",
-      "pada": 1,
+      "pada": 2,
       "starLord": "Sun",
-      "subLord": "Sun",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Sagittarius",
-      "longitude": 242.7,
+      "longitude": 242.73,
       "nakshatra": "Mula",
       "pada": 1,
       "starLord": "Ketu",
-      "subLord": "Jupiter",
+      "subLord": "Mercury",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -118,11 +118,11 @@
     },
     "venus": {
       "currentSign": "Leo",
-      "longitude": 138.2,
+      "longitude": 138.21,
       "nakshatra": "Purva Phalguni",
       "pada": 2,
       "starLord": "Venus",
-      "subLord": "Mars",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Moon",
-    "moonSubLord": "Saturn"
+    "moonSubLord": "Jupiter"
   },
   "panchanga": {
     "tithi": {
       "name": "Krishna Prathama",
       "index": 16,
       "paksha": "Krishna",
-      "endDate": "2026-07-29T23:21:35.706Z"
+      "endDate": "2026-07-29T23:29:40.526Z"
     },
     "vara": {
       "name": "Wednesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Shravana",
       "lord": "Moon",
-      "endDate": "2026-07-30T05:21:35.706Z"
+      "endDate": "2026-07-30T05:29:40.526Z"
     },
     "yoga": {
       "name": "Ayushman",
       "lord": "Sun",
-      "endDate": "2026-07-30T01:21:35.706Z"
+      "endDate": "2026-07-30T01:29:40.526Z"
     },
     "karana": {
       "name": "Kaulava",
       "lord": "Sun",
-      "endDate": "2026-07-29T17:21:35.706Z"
+      "endDate": "2026-07-29T17:29:40.526Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
@@ -337,9 +337,9 @@
       "description": "Mercury in Sagittarius drives balanced mental stamina and communication focus."
     },
     "physicalEnergy": {
-      "score": 5.5,
-      "tone": "Balanced",
-      "description": "Mars in Leo yields a balanced reserve of physical resilience."
+      "score": 8.5,
+      "tone": "Peak Focus",
+      "description": "Mars in Virgo yields a peak focus reserve of physical resilience."
     },
     "relationshipEnergy": {
       "score": 8.5,
@@ -430,7 +430,7 @@
       "description": "Ideal day for deep reading, research, and skill courses."
     },
     "travel": {
-      "priority": "low",
+      "priority": "medium",
       "description": "Plan short journeys to refresh focus; avoid heavy over-taxing transits."
     },
     "spirituality": {
@@ -486,8 +486,8 @@
       "timeframe": "Hold cash reserves; defer speculative investments"
     },
     "travelOpportunity": {
-      "active": false,
-      "timeframe": "Consolidate energy locally"
+      "active": true,
+      "timeframe": "Auspicious travel window is active"
     },
     "learningOpportunity": {
       "active": false,

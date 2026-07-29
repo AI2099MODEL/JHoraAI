@@ -237,39 +237,164 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
       .trim();
   };
 
-  const buildLocalActivatedEventsReport = (themeLabel: string) => {
-    const moonNak = currentSky?.moon?.currentNakshatra?.displayName || "Chitra";
-    const moonSign = currentSky?.moon?.currentSign?.displayName || "Libra";
-    
-    if (themeLabel.toLowerCase().includes("mood")) {
-      return `### 🌟 Daily Mood & Activated Events Synthesis
+  const buildLocalActivatedEventsReport = (themeKey: string, themeLabel: string) => {
+    const moonNak = currentSky?.moon?.currentNakshatra?.displayName || currentSky?.moon?.currentNakshatra || transitMoonNak || "Chitra";
+    const moonSign = currentSky?.moon?.currentSign?.displayName || currentSky?.moon?.currentSign || transitMoonSign || "Libra";
+    const starLord = currentSky?.moon?.currentStarLord?.displayName || transitMoonStarLord || "Sun";
+    const subLord = currentSky?.moon?.currentSubLord?.displayName || transitMoonSubLord || "Jupiter";
 
-#### 🎯 Activated Houses Today
-- **Active Houses**: House 1 (Self & Vitality), House 3 (Courage & Communication), House 6 (Routines & Service), House 10 (Career), House 11 (Gains).
-- **Transit Trigger**: Moon in ${moonNak} Nakshatra (${moonSign}) aligning with active dasha (${activeDasha}).
+    const dashaArray = activeDasha ? activeDasha.split("-") : ["Mercury", "Saturn", "Jupiter"];
+    const mDasha = dashaArray[0] || "Mercury";
+    const aDasha = dashaArray[1] || "Saturn";
+    const pDasha = dashaArray[2] || "Jupiter";
 
-#### ⚡ Simple Activated Events
-- **Mental Energy & Focus**: High clarity for decision-making, strategic planning, and task execution.
-- **Communication & Social**: Smooth exchanges and productive interactions with colleagues or contacts.
-- **Work Routine & Gains**: Favorable momentum in clearing pending tasks and achieving short-term goals.
+    // Dynamic house mapping and rule evaluation per theme based on native's profile
+    let activeHousesList: number[] = [];
+    let primaryDomainName = "";
+    let keyEvents: string[] = [];
+    let houseRationale = "";
+    let adviceText = "";
 
-#### 💡 Guidance
-- Leverage this active planetary alignment to finalize pending matters and advance key initiatives.`;
+    switch (themeKey) {
+      case "daily_mood_prediction":
+        primaryDomainName = "Daily Mood & Activated Mental/Physical State";
+        activeHousesList = [1, 3, 5, 6, 10, 11];
+        houseRationale = `House 1 (Self/Mind), House 3 (Courage/Thoughts), House 5 (Emotions), House 6 (Daily Focus), House 10 (Action), House 11 (Desire Gains)`;
+        keyEvents = [
+          `**Mental Energy & Focus**: High clarity for decision-making and problem-solving, supported by ${mDasha} Mahadasha and ${pDasha} Pratyantardasha for ${profileName}.`,
+          `**Emotional Balance**: Transit Moon in ${moonNak} (${moonSign}) under Star Lord ${starLord} stabilizes mind and daily interactions.`,
+          `**Workplace Drive**: Active House 6 & 10 alignment gives strong competitive edge in completing pending tasks.`
+        ];
+        adviceText = `Channel active mental drive towards structured task execution. Avoid overthinking and prioritize high-value deliverables.`;
+        break;
+
+      case "foreign_travel_settlement":
+        primaryDomainName = "Travel & Foreign Settlement";
+        activeHousesList = [3, 9, 12, 1, 11];
+        houseRationale = `House 3 (Short Journeys), House 9 (Long Distance/Higher Wisdom), House 12 (Foreign Lands/Relocation), House 11 (Fulfillment)`;
+        keyEvents = [
+          `**Long Distance & International Axis**: Active ${mDasha}-${aDasha} Dasha activates Houses 3, 9, and 12, creating strong travel indicators for ${profileName}.`,
+          `**Documentation & Visas**: Transit Moon in ${moonSign} aligning with Star Lord ${starLord} provides a favorable window for paperwork, passport, or visa queries.`,
+          `**Journeys & Movements**: Transit Jupiter in ${transitJupSign} provides structural support for foreign connections and distant opportunities.`
+        ];
+        adviceText = `Favorable alignment for initiating foreign communications, applying for documentation, or planning upcoming journeys.`;
+        break;
+
+      case "career_promotion":
+        primaryDomainName = "Career, Status & Professional Promotion";
+        activeHousesList = [2, 6, 10, 11, 1];
+        houseRationale = `House 2 (Wealth/Inflow), House 6 (Service & Competition), House 10 (Profession/Status), House 11 (Gains/Recognition)`;
+        keyEvents = [
+          `**Career & Status Elevation**: Houses 2, 6, 10, 11 activated via ${mDasha}-${aDasha} Dasha for ${profileName} (Lagna: ${lagnaSign}).`,
+          `**Professional Authority**: Transit Saturn in ${transitSatSign} and Transit Sun in ${transitSunSign} trigger House 10 career responsibilities and authority.`,
+          `**Gains & Appreciation**: Transit Moon in ${moonNak} under Sub Lord ${subLord} supports favorable peer recognition and work efficiency.`
+        ];
+        adviceText = `Proactively lead key assignments and present progress updates to leadership during this active career window.`;
+        break;
+
+      case "finance_wealth":
+        primaryDomainName = "Wealth, Liquidity & Financial Inflow";
+        activeHousesList = [2, 6, 11, 5, 1];
+        houseRationale = `House 2 (Accumulated Wealth), House 6 (Daily Earnings/Service), House 11 (Financial Gains), House 5 (Investments)`;
+        keyEvents = [
+          `**Inflow & Accumulation**: Active ${mDasha} Dasha links with House 2 and 11 significators in ${profileName}'s chart.`,
+          `**Financial Stability**: Transit Jupiter in ${transitJupSign} strengthens financial asset protection and liquidity flow.`,
+          `**Receivables & Budgeting**: Transit Moon in ${moonSign} under Star Lord ${starLord} facilitates clearing pending dues and organizing savings.`
+        ];
+        adviceText = `Maintain disciplined budget allocation while taking advantage of favorable payment inflow windows.`;
+        break;
+
+      case "marriage_first":
+        primaryDomainName = "Marriage, Partnerships & Relationships";
+        activeHousesList = [2, 7, 11, 5, 1];
+        houseRationale = `House 2 (Family Addition), House 7 (Marriage/Primary Partner), House 11 (Harmony & Fulfillment), House 5 (Romance)`;
+        keyEvents = [
+          `**Partnership & Union Axis**: Active Dasha (${activeDasha}) triggers Houses 2, 7, and 11 in ${profileName}'s natal chart.`,
+          `**Harmony & Bonding**: Transit Moon in ${moonNak} under Star Lord ${starLord} fosters mutual understanding and open communication.`,
+          `**Relationship Stability**: Transit Jupiter in ${transitJupSign} aspects primary relationship houses, supporting long-term commitments.`
+        ];
+        adviceText = `Engage in open, empathetic dialogue with partners. Excellent time for family discussions and relationship alignment.`;
+        break;
+
+      case "health_disease":
+        primaryDomainName = "Health, Immunity & Vitality";
+        activeHousesList = [1, 5, 11, 6];
+        houseRationale = `House 1 (Self/Constitution), House 5 (Recovery/Vitality), House 11 (Cure/Energy Boost), House 6 (Ailments/Routines)`;
+        keyEvents = [
+          `**Physical Vitality & Recovery**: Strong activation of House 1 and 11 for ${profileName} (Natal Moon: ${natalMoonSign} in ${natalMoonNak}).`,
+          `**Immunity Boost**: Transit Sun in ${transitSunSign} reinforces physical stamina and metabolic energy.`,
+          `**Daily Routine & Wellness**: Transit Moon in ${moonSign} under Sub Lord ${subLord} encourages healthy sleep and dietary balance.`
+        ];
+        adviceText = `Focus on consistent exercise, proper hydration, and balanced nutrition to maximize current physical energy.`;
+        break;
+
+      case "property_vehicle":
+        primaryDomainName = "Property, Fixed Assets & Vehicles";
+        activeHousesList = [4, 11, 2, 12];
+        houseRationale = `House 4 (Property/Vehicles), House 11 (Acquisition/Gains), House 2 (Wealth/Liquidity), House 12 (Investment Outflow)`;
+        keyEvents = [
+          `**Fixed Asset Activation**: Houses 4 and 11 activated under ${mDasha} Mahadasha for ${profileName}.`,
+          `**Vehicle & Real Estate Comfort**: Transit Mars in ${transitMarSign} and Jupiter in ${transitJupSign} support home improvement and asset value.`,
+          `**Transaction Readiness**: Transit Moon in ${moonNak} under Star Lord ${starLord} aids in property research and legal paper verification.`
+        ];
+        adviceText = `Thoroughly verify paperwork and property documentation before entering final binding agreements.`;
+        break;
+
+      case "litigation":
+        primaryDomainName = "Litigation, Disputes & Legal Resolutions";
+        activeHousesList = [6, 11, 3, 10];
+        houseRationale = `House 6 (Arguments/Litigation), House 11 (Victory/Settlement), House 3 (Courage/Docs), House 10 (Court Authority)`;
+        keyEvents = [
+          `**Competitive Edge & Resolution**: Houses 6 and 11 strongly activated for ${profileName} under active Dasha ${activeDasha}.`,
+          `**Legal Documentation**: Transit Moon in ${moonSign} under Star Lord ${starLord} supports clear legal arguments and agreement drafts.`,
+          `**Favorable Terms**: Minimal counter-obstruction in natal chart ensures strong negotiation leverage.`
+        ];
+        adviceText = `Pursue amicable settlements or structured legal discussions; clarity of documentation brings favorable resolution.`;
+        break;
+
+      case "education":
+        primaryDomainName = "Education, Academics & Higher Learning";
+        activeHousesList = [4, 9, 11, 5];
+        houseRationale = `House 4 (Basic Education), House 9 (Higher Studies/Research), House 11 (Success/Certifications), House 5 (Intelligence)`;
+        keyEvents = [
+          `**Academic Focus & Retention**: Knowledge houses (4, 9, 11) activated via ${mDasha}-${aDasha} Dasha for ${profileName}.`,
+          `**Analytical Clarity**: Transit Jupiter in ${transitJupSign} and Transit Moon in ${moonNak} enhance memory retention and research depth.`,
+          `**Exams & Presentations**: Favorable planetary trigger for competitive exams, university submissions, or skill acquisition.`
+        ];
+        adviceText = `Dedicate focused time blocks for study and technical learning; high absorption capacity during current transit window.`;
+        break;
+
+      default:
+        primaryDomainName = themeLabel || "Activated Events";
+        activeHousesList = [1, 3, 6, 9, 10, 11];
+        houseRationale = `Houses 1, 3, 6, 9, 10, 11 activated via active Dasha and current sky transits`;
+        keyEvents = [
+          `**Event Trigger**: Active Dasha (${activeDasha}) aligns with current transit Moon in ${moonNak} (${moonSign}).`,
+          `**Profile Convergence**: Native profile for ${profileName} (Lagna: ${lagnaSign}, Moon: ${natalMoonSign}) shows positive momentum.`
+        ];
+        adviceText = `Utilize active transit support to advance personal and professional goals in this domain.`;
+        break;
     }
 
-    return `### 📊 ${themeLabel} - Activated Events Report
+    const housesStr = activeHousesList.map(h => `House ${h}`).join(", ");
+
+    return `### 📊 ${primaryDomainName} - Activated Events Report
+
+#### 👤 Native Profile Context
+- **Name**: ${profileName} | **DOB**: ${profileDob} @ ${profileTob} | **Location**: ${profilePob}
+- **Lagna (Ascendant)**: ${lagnaSign} | **Natal Moon**: ${natalMoonSign} (${natalMoonNak} Nakshatra)
+- **Active Dasha Period**: ${activeDasha} (Mahadasha: ${mDasha}, Antardasha: ${aDasha}, Pratyantardasha: ${pDasha})
 
 #### 🔮 Active House Dynamics
-- **Activated Houses**: Houses 1, 3, 6, 9, 10, and 11 activated via active dasha (${activeDasha}) and current transit alignment.
-- **Planetary Trigger**: Moon in ${moonNak} Nakshatra (${moonSign}) providing direct trigger support.
+- **Activated Houses**: ${housesStr}
+- **House Significator Basis**: ${houseRationale}
+- **Live Transit Triggers**: Transit Moon in **${moonNak}** (${moonSign}), Star Lord **${starLord}**, Sub Lord **${subLord}**
 
-#### ⚡ Simple Activated Events
-- **Favorable Event Support**: Strong structural alignment for positive developments in ${themeLabel.toLowerCase()}.
-- **Active Communications & Outreach**: Opportunity for productive connections and networking in current window.
-- **Stability & Progress**: Minimal obstruction from counter-significators, ensuring smooth execution.
+#### ⚡ Activated Events & Findings
+${keyEvents.map(e => `- ${e}`).join("\n")}
 
-#### 💡 Guidance
-- Proactively engage in activities related to ${themeLabel.toLowerCase()} during this supportive activation.`;
+#### 💡 Guidance & Recommendation
+- ${adviceText}`;
   };
 
   // Dynamically load/build the prompts from the imported JSON
@@ -369,10 +494,11 @@ OUTPUT REQUIREMENTS:
     return () => clearInterval(interval);
   }, [analysisLoading]);
 
-  const runAnalysis = async (queryText: string, displayText?: string) => {
+  const runAnalysis = async (queryText: string, displayText?: string, themeId?: string) => {
     if (analysisLoading) return;
 
     setAnalysisLoading(true);
+    const activeTabKey = themeId || selectedAskTab || "daily_mood_prediction";
 
     try {
       const preferences = ConversationService.getPreferences();
@@ -389,7 +515,9 @@ OUTPUT REQUIREMENTS:
           mode: responseMode,
           history: [],
           geminiApiKey,
-          groqApiKey
+          groqApiKey,
+          themeKey: activeTabKey,
+          themeLabel: displayText
         })
       });
 
@@ -400,7 +528,7 @@ OUTPUT REQUIREMENTS:
       }
 
       if (!cleanReply || cleanReply.length < 20) {
-        cleanReply = buildLocalActivatedEventsReport(displayText || "Activated Events");
+        cleanReply = buildLocalActivatedEventsReport(activeTabKey, displayText || "Activated Events");
       }
 
       const reportMsg: Message = {
@@ -415,7 +543,7 @@ OUTPUT REQUIREMENTS:
       setSelectedDebugMsg(reportMsg);
     } catch (err: any) {
       console.error(err);
-      const localFallback = buildLocalActivatedEventsReport(displayText || "Activated Events");
+      const localFallback = buildLocalActivatedEventsReport(activeTabKey, displayText || "Activated Events");
       const errorMsg: Message = {
         id: Math.random().toString(36).substr(2, 9),
         sender: "assistant",
@@ -434,7 +562,7 @@ OUTPUT REQUIREMENTS:
     const prompts = getMoodPromptsFromJSON();
     const target = prompts.find(p => p.id === tabId) || prompts[0];
     if (target) {
-      runAnalysis(target.query, target.label);
+      runAnalysis(target.query, target.label, target.id);
     }
   };
 
