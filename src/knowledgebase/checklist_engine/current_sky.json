@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-29T18:47:07.822Z",
+    "lastUpdated": "2026-07-29T18:49:46.899Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-29T18:47:07.822Z",
-    "localTime": "2026-07-29T11:47:07-07:00",
+    "utcTime": "2026-07-29T18:49:46.899Z",
+    "localTime": "2026-07-29T11:49:46-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 284.17
+      "longitude": 284.19
     },
     "currentNakshatra": {
       "id": "Shravana",
@@ -28,15 +28,15 @@
       "displayName": "Moon"
     },
     "currentSubLord": {
-      "id": "Moon",
-      "displayName": "Moon"
+      "id": "Jupiter",
+      "displayName": "Jupiter"
     },
     "moonPhase": {
       "type": "Waning Gibbous",
       "displayName": "Krishna Prathama",
       "illuminationPercentage": 99
     },
-    "moonLongitude": 284.17,
+    "moonLongitude": 284.19,
     "waxing": false,
     "waning": true,
     "voidOfCourse": {
@@ -74,11 +74,11 @@
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 284.17,
+      "longitude": 284.19,
       "nakshatra": "Shravana",
       "pada": 2,
       "starLord": "Moon",
-      "subLord": "Moon",
+      "subLord": "Jupiter",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Moon",
-    "moonSubLord": "Moon"
+    "moonSubLord": "Jupiter"
   },
   "panchanga": {
     "tithi": {
       "name": "Krishna Prathama",
       "index": 16,
       "paksha": "Krishna",
-      "endDate": "2026-07-30T06:47:07.822Z"
+      "endDate": "2026-07-30T06:49:46.899Z"
     },
     "vara": {
       "name": "Wednesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Shravana",
       "lord": "Moon",
-      "endDate": "2026-07-30T12:47:07.822Z"
+      "endDate": "2026-07-30T12:49:46.899Z"
     },
     "yoga": {
       "name": "Preeti",
       "lord": "Venus",
-      "endDate": "2026-07-30T08:47:07.822Z"
+      "endDate": "2026-07-30T08:49:46.899Z"
     },
     "karana": {
       "name": "Balava",
       "lord": "Sun",
-      "endDate": "2026-07-30T00:47:07.822Z"
+      "endDate": "2026-07-30T00:49:46.899Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",

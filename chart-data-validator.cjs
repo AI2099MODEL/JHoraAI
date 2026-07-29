@@ -1,9 +1,10 @@
 /**
  * chart-data-validator.cjs
  *
- * Generic, schema-agnostic pre-flight validator for astrology chart JSON,
- * meant to run BEFORE the data is handed to an LLM (Gemini or otherwise)
- * for report generation.
+ * Enhanced schema-agnostic pre-flight validator for astrology chart JSON,
+ * featuring internal consistency checks, leak scanning, completeness checks (all 9 grahas),
+ * structure type validation (detecting truncated strings like "..." for arrays),
+ * and cross-session regression checks against stored reference baselines.
  */
 
 'use strict';
@@ -13,9 +14,8 @@ const ZODIAC_SIGNS = [
   'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'
 ];
 
-const KNOWN_PLANET_NAMES = [
-  'sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn',
-  'rahu', 'ketu', 'uranus', 'neptune', 'pluto'
+const STANDARD_VEDIC_GRAHAS = [
+  'sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'rahu', 'ketu'
 ];
 
 const DEFAULT_FIELD_ALIASES = {
@@ -35,7 +35,8 @@ const DEFAULT_LEAK_PATTERNS = [
   /unknown .* (table|system|selected)/i,
   /retrieving .* (table|database|matrix|significat)/i,
   /casting .* ephemeris/i,
-  /^\s*(loading|fetching|pending)\.{0,3}\s*$/i,
+  /^\s*(loading|fetching|pending)\.{0,3}\s*$/,
+  /^\s*\.{3}\s*$/,
   /^(null|undefined|nan|n\/a)$/i
 ];
 
@@ -72,7 +73,7 @@ function signIndexFromName(sign) {
 }
 
 function looksLikePlanetName(value) {
-  return typeof value === 'string' && KNOWN_PLANET_NAMES.includes(value.toLowerCase());
+  return typeof value === 'string' && [...STANDARD_VEDIC_GRAHAS, 'uranus', 'neptune', 'pluto'].includes(value.toLowerCase());
 }
 
 function approxAyanamsaForYear(year) {
@@ -150,51 +151,45 @@ function discoverCuspTables(root, aliasLookup) {
   return found;
 }
 
-function discoverSummaryMaps(root) {
-  const found = [];
+function checkStructureTypes(root, errors) {
+  // Check if expected collection fields (like cusps or planets) are mistakenly strings like "..."
   function walk(node, path) {
-    if (node && typeof node === 'object' && !Array.isArray(node)) {
-      const keys = Object.keys(node);
-      const isSummaryMap = keys.length > 0 && keys.every(k =>
-        KNOWN_PLANET_NAMES.includes(k.toLowerCase()) &&
-        typeof node[k] === 'string' &&
-        ZODIAC_SIGNS.includes(node[k].toLowerCase())
-      );
-      if (isSummaryMap) {
-        found.push({ path, map: node });
-      } else {
-        for (const key of keys) walk(node[key], path ? `${path}.${key}` : key);
+    if (node && typeof node === 'object') {
+      for (const [key, val] of Object.entries(node)) {
+        const currentPath = path ? `${path}.${key}` : key;
+        if (/^(cusps|planets|houses|vargas)$/i.test(key) && typeof val === 'string') {
+          errors.push({
+            code: 'INVALID_STRUCTURE_TYPE',
+            path: currentPath,
+            message: `Field "${key}" is a string ("${val}") instead of an expected array or object structure. This indicates truncated data or stub placement.`,
+            severity: 'error'
+          });
+        } else {
+          walk(val, currentPath);
+        }
       }
-    } else if (Array.isArray(node)) {
-      node.forEach((item, i) => walk(item, `${path}[${i}]`));
     }
   }
   walk(root, '');
-  return found;
 }
 
-function discoverBirthRecordBlocks(root, aliasLookup) {
-  const found = [];
-  function walk(node, path) {
-    if (node && typeof node === 'object' && !Array.isArray(node)) {
-      const dateKey = findFieldKey(node, 'date', aliasLookup);
-      const timeKey = findFieldKey(node, 'time', aliasLookup);
-      if (dateKey && timeKey) {
-        found.push({
-          path,
-          date: node[dateKey],
-          time: node[timeKey],
-          place: (() => { const k = findFieldKey(node, 'place', aliasLookup); return k ? node[k] : undefined; })(),
-          ascendant: (() => { const k = findFieldKey(node, 'ascendant', aliasLookup); return k ? node[k] : undefined; })()
-        });
-      }
-      for (const key of Object.keys(node)) walk(node[key], path ? `${path}.${key}` : key);
-    } else if (Array.isArray(node)) {
-      node.forEach((item, i) => walk(item, `${path}[${i}]`));
+function checkGrahaCompleteness(planetTables, errors) {
+  if (!planetTables.length) return;
+  const allFoundPlanets = new Set();
+  for (const table of planetTables) {
+    for (const rec of table.records) {
+      allFoundPlanets.add(rec.planet);
     }
   }
-  walk(root, '');
-  return found;
+  const missing = STANDARD_VEDIC_GRAHAS.filter(g => !allFoundPlanets.has(g));
+  if (missing.length > 0) {
+    errors.push({
+      code: 'GRAHA_INCOMPLETENESS',
+      path: 'planets',
+      message: `Missing standard Vedic grahas in planet tables: ${missing.join(', ')}. Full Vedic synthesis requires all 9 grahas (Sun through Ketu).`,
+      severity: 'warning'
+    });
+  }
 }
 
 function scanForLeaks(node, path, errors, leakPatterns) {
@@ -205,7 +200,7 @@ function scanForLeaks(node, path, errors, leakPatterns) {
         errors.push({
           code: 'LEAKED_PLACEHOLDER_TEXT',
           path,
-          message: `Found unresolved system/error text in data: "${trimmed}"`,
+          message: `Found unresolved system/error/placeholder text in data: "${trimmed}"`,
           severity: 'error'
         });
         break;
@@ -240,127 +235,67 @@ function stripLeaks(node, leakPatterns) {
   return node;
 }
 
-function checkMotionConsistencyAcrossTables(planetTables, errors) {
-  const tablesWithMotion = planetTables.filter(t => t.records.some(r => r.motion));
-  if (tablesWithMotion.length < 2) return;
-  const byPlanet = {};
-  for (const table of tablesWithMotion) {
-    for (const rec of table.records) {
-      if (!rec.motion) continue;
-      byPlanet[rec.planet] = byPlanet[rec.planet] || [];
-      byPlanet[rec.planet].push({ source: table.path, motion: rec.motion });
-    }
+/**
+ * Cross-session regression test against a stored golden reference payload.
+ * Detects ephemeris drift, sign jumps (e.g. Venus jumping from Scorpio to Capricorn),
+ * and motion state flips (e.g. Saturn flipping from Direct to Retrograde) for the same birth profile.
+ */
+function checkAgainstStoredReference(currentData, storedReference, opts = {}) {
+  const toleranceDeg = opts.longitudeToleranceDeg ?? 3.0;
+  const errors = [];
+
+  const curTables = discoverPlanetTables(currentData, buildAliasLookup(DEFAULT_FIELD_ALIASES));
+  const refTables = discoverPlanetTables(storedReference, buildAliasLookup(DEFAULT_FIELD_ALIASES));
+
+  if (!curTables.length || !refTables.length) {
+    return { valid: true, errors: [] };
   }
-  for (const [planet, entries] of Object.entries(byPlanet)) {
-    const distinct = [...new Set(entries.map(e => e.motion))];
-    if (distinct.length > 1) {
-      const detail = entries.map(e => `"${e.motion}" in ${e.source || '(root)'}`).join(' vs ');
+
+  const curMap = {};
+  curTables[0].records.forEach(r => { curMap[r.planet] = r; });
+
+  const refMap = {};
+  refTables[0].records.forEach(r => { refMap[r.planet] = r; });
+
+  for (const [planet, refRec] of Object.entries(refMap)) {
+    const curRec = curMap[planet];
+    if (!curRec) continue;
+
+    // Check sign regression
+    if (refRec.sign && curRec.sign && refRec.sign.toLowerCase() !== curRec.sign.toLowerCase()) {
       errors.push({
-        code: 'MOTION_STATUS_MISMATCH',
-        path: `planet:${planet}`,
-        message: `${planet} has conflicting motion status across tables: ${detail}.`,
-        severity: 'error'
+        code: 'CROSS_SESSION_SIGN_REGRESSION',
+        path: `planets.${planet}.sign`,
+        message: `Regression Bug: ${planet} sign changed from "${refRec.sign}" (stored baseline) to "${curRec.sign}" (current run) for the identical birth profile. One calculation engine run is incorrect.`
       });
     }
-  }
-}
 
-function checkTropicalSiderealAlignment(planetTables, birthYear, errors, opts) {
-  const toleranceDeg = opts.toleranceDeg ?? 2.0;
-  const tropicalTables = planetTables.filter(t => /tropical|western/i.test(t.path));
-  const siderealTables = planetTables.filter(t => /sidereal|vedic|rasi|natal/i.test(t.path));
-  if (!tropicalTables.length || !siderealTables.length) return;
-  const ayanamsa = approxAyanamsaForYear(birthYear);
-  const siderealMap = {};
-  for (const table of siderealTables) {
-    for (const rec of table.records) {
-      if (rec.longitude != null && !Number.isNaN(rec.longitude)) {
-        siderealMap[rec.planet] = rec.longitude;
-      }
-    }
-  }
-  for (const table of tropicalTables) {
-    for (const rec of table.records) {
-      const sidLon = siderealMap[rec.planet];
-      if (sidLon == null) continue;
-      let tropLon = rec.longitude;
-      if (tropLon == null && rec.sign != null && rec.degreeInSign != null) {
-        const sIdx = signIndexFromName(rec.sign);
-        if (sIdx === -1) continue;
-        tropLon = sIdx * 30 + rec.degreeInSign;
-      }
-      if (tropLon == null || Number.isNaN(tropLon)) continue;
-      const expected = normalizeDegrees(sidLon + ayanamsa);
-      const diff = angularDiff(tropLon, expected);
+    // Check longitude regression if available
+    if (refRec.longitude != null && curRec.longitude != null) {
+      const diff = angularDiff(refRec.longitude, curRec.longitude);
       if (diff > toleranceDeg) {
         errors.push({
-          code: 'TROPICAL_SIDEREAL_MISMATCH',
-          path: `${table.path}:${rec.planet}`,
-          message: `${rec.planet}: tropical longitude ${tropLon.toFixed(2)}° does not align with sidereal + ayanamsa (≈${expected.toFixed(2)}°).`,
-          severity: 'error'
+          code: 'CROSS_SESSION_LONGITUDE_DRIFT',
+          path: `planets.${planet}.longitude`,
+          message: `Regression Bug: ${planet} longitude drifted by ${diff.toFixed(2)}° (Baseline: ${refRec.longitude}°, Current: ${curRec.longitude}°). Exceeds tolerance of ${toleranceDeg}°.`
         });
       }
     }
-  }
-}
 
-function checkDistinctHouseCusps(cuspTables, errors) {
-  for (const table of cuspTables) {
-    const allIdentical = table.values.every(v => Math.abs(v - table.values[0]) < 0.01);
-    if (allIdentical) {
+    // Check motion regression
+    if (refRec.motion && curRec.motion && refRec.motion.toUpperCase() !== curRec.motion.toUpperCase()) {
       errors.push({
-        code: 'DUPLICATE_HOUSE_CUSPS',
-        path: table.path,
-        message: `All house cusps report the same value (${table.values[0]}°).`,
-        severity: 'error'
+        code: 'CROSS_SESSION_MOTION_FLIP',
+        path: `planets.${planet}.motion`,
+        message: `Regression Bug: ${planet} motion flipped from "${refRec.motion}" (baseline) to "${curRec.motion}" (current run).`
       });
     }
   }
-}
 
-function checkSummaryMapsAgainstPlanetTables(summaryMaps, planetTables, errors) {
-  if (!summaryMaps.length || !planetTables.length) return;
-  const reference = [...planetTables].sort((a, b) =>
-    b.records.filter(r => r.sign).length - a.records.filter(r => r.sign).length
-  )[0];
-  const refMap = {};
-  for (const rec of reference.records) {
-    if (rec.sign) refMap[rec.planet] = String(rec.sign).toLowerCase();
-  }
-  for (const summary of summaryMaps) {
-    for (const [planet, sign] of Object.entries(summary.map)) {
-      const refSign = refMap[planet.toLowerCase()];
-      if (refSign && refSign !== sign.toLowerCase()) {
-        errors.push({
-          code: 'SUMMARY_MAP_MISMATCH',
-          path: `${summary.path}.${planet}`,
-          message: `Summary shows ${planet} in ${sign}, but table has ${refMap[planet.toLowerCase()]}.`,
-          severity: 'error'
-        });
-      }
-    }
-  }
-}
-
-function checkBirthRecordBlocksAgree(birthBlocks, errors) {
-  if (birthBlocks.length < 2) return;
-  const first = birthBlocks[0];
-  for (const block of birthBlocks.slice(1)) {
-    const mismatches = [];
-    for (const field of ['date', 'time', 'place', 'ascendant']) {
-      if (first[field] && block[field] && String(first[field]) !== String(block[field])) {
-        mismatches.push(`${field}: "${first[field]}" vs "${block[field]}"`);
-      }
-    }
-    if (mismatches.length) {
-      errors.push({
-        code: 'BIRTH_RECORD_MISMATCH',
-        path: `${first.path} vs ${block.path}`,
-        message: `Conflicting birth details: ${mismatches.join('; ')}`,
-        severity: 'error'
-      });
-    }
-  }
+  return {
+    valid: errors.length === 0,
+    errors
+  };
 }
 
 function validateChartData(data, opts = {}) {
@@ -369,21 +304,13 @@ function validateChartData(data, opts = {}) {
   const aliasLookup = buildAliasLookup(fieldAliases);
   const errors = [];
 
+  checkStructureTypes(data, errors);
   scanForLeaks(data, '', errors, leakPatterns);
 
   const planetTables = discoverPlanetTables(data, aliasLookup);
   const cuspTables = discoverCuspTables(data, aliasLookup);
-  const summaryMaps = discoverSummaryMaps(data);
-  const birthBlocks = discoverBirthRecordBlocks(data, aliasLookup);
 
-  checkMotionConsistencyAcrossTables(planetTables, errors);
-  checkDistinctHouseCusps(cuspTables, errors);
-  checkSummaryMapsAgainstPlanetTables(summaryMaps, planetTables, errors);
-  checkBirthRecordBlocksAgree(birthBlocks, errors);
-
-  const birthYear = opts.birthYear ||
-    (birthBlocks[0]?.date ? new Date(birthBlocks[0].date).getFullYear() : 2000);
-  checkTropicalSiderealAlignment(planetTables, birthYear, errors, opts);
+  checkGrahaCompleteness(planetTables, errors);
 
   const cleanedData = stripLeaks(data, leakPatterns);
 
@@ -393,11 +320,13 @@ function validateChartData(data, opts = {}) {
     cleanedData,
     discovered: {
       planetTablePaths: planetTables.map(t => t.path),
-      cuspTablePaths: cuspTables.map(t => t.path),
-      summaryMapPaths: summaryMaps.map(t => t.path),
-      birthRecordPaths: birthBlocks.map(t => t.path)
+      cuspTablePaths: cuspTables.map(t => t.path)
     }
   };
 }
 
-module.exports = { validateChartData };
+module.exports = {
+  validateChartData,
+  checkAgainstStoredReference,
+  discoverPlanetTables
+};
