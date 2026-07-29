@@ -2836,12 +2836,122 @@ LAWS OF CELESTIAL ANALYSIS:
     const trStarLord = currentSkyData?.moon?.currentStarLord?.displayName || "Sun";
     const trSubLord = currentSkyData?.moon?.currentSubLord?.displayName || "Jupiter";
 
+    // Helper to calculate 5-level Vimshottari Dasha (MD -> AD -> PD -> SD -> PrD)
+    const get5LevelDashaInfoServer = (astData: any) => {
+      const PLANET_YEARS: Record<string, number> = {
+        Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
+      };
+      const PLANET_ORDER = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+      const now = new Date();
+
+      if (!astData || !astData.dashas) {
+        return { md: "Mercury", ad: "Saturn", pd: "Jupiter", sd: "Venus", prd: "Sun", fullString: "Mercury - Saturn - Jupiter - Venus - Sun" };
+      }
+
+      const maha = astData.dashas.find((m: any) => {
+        const start = new Date(m.startDate);
+        const end = new Date(m.endDate);
+        return now >= start && now <= end;
+      }) || astData.dashas[0];
+
+      const mdLord = maha?.lord || "Mercury";
+      let adLord = "Saturn";
+      let adStart = maha ? new Date(maha.startDate) : new Date();
+      let adEnd = maha ? new Date(maha.endDate) : new Date();
+
+      if (maha?.subPeriods) {
+        const bhuk = maha.subPeriods.find((b: any) => {
+          const start = new Date(b.startDate);
+          const end = new Date(b.endDate);
+          return now >= start && now <= end;
+        });
+        if (bhuk) {
+          adLord = bhuk.lord;
+          adStart = new Date(bhuk.startDate);
+          adEnd = new Date(bhuk.endDate);
+        }
+      }
+
+      let pdLord = "Jupiter";
+      let pdStart = adStart;
+      let pdEnd = adEnd;
+
+      const bhukObj = maha?.subPeriods?.find((b: any) => b.lord === adLord);
+      if (bhukObj?.subPeriods) {
+        const ant = bhukObj.subPeriods.find((a: any) => {
+          const start = new Date(a.startDate);
+          const end = new Date(a.endDate);
+          return now >= start && now <= end;
+        });
+        if (ant) {
+          pdLord = ant.lord;
+          pdStart = new Date(ant.startDate);
+          pdEnd = new Date(ant.endDate);
+        }
+      }
+
+      const pdDurationMs = pdEnd.getTime() - pdStart.getTime();
+      let sdLord = "Venus";
+      let sdStart = pdStart;
+      let sdEnd = pdEnd;
+
+      if (pdDurationMs > 0) {
+        const pdLordIdx = PLANET_ORDER.indexOf(pdLord) >= 0 ? PLANET_ORDER.indexOf(pdLord) : 0;
+        let accumulatedMs = pdStart.getTime();
+        for (let i = 0; i < 9; i++) {
+          const pName = PLANET_ORDER[(pdLordIdx + i) % 9];
+          const pYears = PLANET_YEARS[pName] || 10;
+          const duration = (pYears / 120) * pdDurationMs;
+          const endMs = accumulatedMs + duration;
+
+          if (now.getTime() >= accumulatedMs && now.getTime() <= endMs) {
+            sdLord = pName;
+            sdStart = new Date(accumulatedMs);
+            sdEnd = new Date(endMs);
+            break;
+          }
+          accumulatedMs = endMs;
+        }
+      }
+
+      const sdDurationMs = sdEnd.getTime() - sdStart.getTime();
+      let prdLord = "Sun";
+
+      if (sdDurationMs > 0) {
+        const sdLordIdx = PLANET_ORDER.indexOf(sdLord) >= 0 ? PLANET_ORDER.indexOf(sdLord) : 0;
+        let accumulatedMs = sdStart.getTime();
+        for (let i = 0; i < 9; i++) {
+          const pName = PLANET_ORDER[(sdLordIdx + i) % 9];
+          const pYears = PLANET_YEARS[pName] || 10;
+          const duration = (pYears / 120) * sdDurationMs;
+          const endMs = accumulatedMs + duration;
+
+          if (now.getTime() >= accumulatedMs && now.getTime() <= endMs) {
+            prdLord = pName;
+            break;
+          }
+          accumulatedMs = endMs;
+        }
+      }
+
+      return {
+        md: mdLord,
+        ad: adLord,
+        pd: pdLord,
+        sd: sdLord,
+        prd: prdLord,
+        fullString: `${mdLord} - ${adLord} - ${pdLord} - ${sdLord} - ${prdLord}`
+      };
+    };
+
+    const dasha5Server = get5LevelDashaInfoServer(mergedProfile);
+
     // Build specific theme fallback report matched to profile
     let domainTitle = themeLabel || "Activated Events Report";
     let activeHouses = "Houses 1, 3, 6, 10, 11";
     let rationale = "House 1 (Self), House 3 (Courage), House 6 (Service), House 10 (Status), House 11 (Gains)";
     let bulletPoints = [
-      `Active Dasha period aligns with transit Moon in ${trMoonNak} (${trMoonSign}) for ${name}.`,
+      `Active 5-Level Dasha (${dasha5Server.fullString}) aligns with transit Moon in ${trMoonNak} (${trMoonSign}) for ${name}.`,
       `Strong House 1 & 11 activation supporting personal momentum and clear decision making.`
     ];
 
@@ -2850,7 +2960,7 @@ LAWS OF CELESTIAL ANALYSIS:
       activeHouses = "Houses 2, 6, 10, 11, 1";
       rationale = "House 2 (Inflow), House 6 (Service), House 10 (Status/Profession), House 11 (Recognition & Gains)";
       bulletPoints = [
-        `Houses 2, 6, 10, 11 activated for ${name} (Lagna: ${lagna}) under active Dasha period.`,
+        `Houses 2, 6, 10, 11 activated for ${name} (Lagna: ${lagna}) under 5-Level Dasha ${dasha5Server.fullString}.`,
         `Transit Moon in ${trMoonNak} under Star Lord ${trStarLord} triggers professional progress and task completion.`,
         `Favorable alignment for workplace discussions, peer recognition, and project deliverables.`
       ];
@@ -2859,7 +2969,7 @@ LAWS OF CELESTIAL ANALYSIS:
       activeHouses = "Houses 2, 6, 11, 5";
       rationale = "House 2 (Wealth), House 6 (Daily Inflow), House 11 (Gains), House 5 (Investments)";
       bulletPoints = [
-        `Active Dasha links with House 2 & 11 significators in ${name}'s natal chart.`,
+        `Active 5-Level Dasha (${dasha5Server.fullString}) links with House 2 & 11 significators in ${name}'s natal chart.`,
         `Transit Moon in ${trMoonSign} under Sub Lord ${trSubLord} supports clearing pending receivables and financial planning.`,
         `Disciplined budget management supported by active Jupiter transits.`
       ];
@@ -2868,7 +2978,7 @@ LAWS OF CELESTIAL ANALYSIS:
       activeHouses = "Houses 3, 9, 12, 11";
       rationale = "House 3 (Short Travel), House 9 (Long Travel), House 12 (Foreign Lands), House 11 (Gains)";
       bulletPoints = [
-        `Active Dasha activates international travel axis (Houses 3, 9, 12) for ${name}.`,
+        `Active 5-Level Dasha (${dasha5Server.fullString}) activates international travel axis (Houses 3, 9, 12) for ${name}.`,
         `Transit Moon in ${trMoonNak} supports documentation, passport, visa processing, or long-distance contact.`
       ];
     } else if (themeKey === "marriage_first" || (question && question.toLowerCase().includes("marriage"))) {
@@ -2876,7 +2986,7 @@ LAWS OF CELESTIAL ANALYSIS:
       activeHouses = "Houses 2, 7, 11, 5";
       rationale = "House 2 (Family), House 7 (Marriage/Partner), House 11 (Harmony), House 5 (Romance)";
       bulletPoints = [
-        `Active Dasha activates primary union houses (2, 7, 11) for ${name}.`,
+        `Active 5-Level Dasha (${dasha5Server.fullString}) activates primary union houses (2, 7, 11) for ${name}.`,
         `Transit Moon in ${trMoonSign} under Star Lord ${trStarLord} fosters mutual understanding and partnership clarity.`
       ];
     } else if (themeKey === "health_disease" || (question && question.toLowerCase().includes("health"))) {
@@ -2889,14 +2999,27 @@ LAWS OF CELESTIAL ANALYSIS:
       ];
     }
 
-    const localFallbackReply = `### 📊 ${domainTitle}\n\n` +
+    const localFallbackReply = `### 📊 ${domainTitle} - Vimshottari DBA Analysis (Till Prana)\n\n` +
       `#### 👤 Native Profile Baseline\n` +
       `- **Name**: ${name} | **DOB**: ${dob} @ ${tob} | **Place**: ${pob}\n` +
       `- **Lagna**: ${lagna} | **Natal Moon**: ${moonSign} (${moonNak} Nakshatra)\n\n` +
-      `#### 🔮 Active House Dynamics\n` +
-      `- **Activated Houses**: ${activeHouses}\n` +
-      `- **Significator Rationale**: ${rationale}\n` +
-      `- **Live Transit Triggers**: Transit Moon in **${trMoonNak}** (${trMoonSign}), Star Lord **${trStarLord}**, Sub Lord **${trSubLord}**\n\n` +
+      `#### 🔮 5-Level Vimshottari Dasha Breakdown (Till Prana)\n` +
+      `| Dasha Level | Operating Planet | Role & Celestial Influence |\n` +
+      `| :--- | :--- | :--- |\n` +
+      `| **Mahadasha (MD)** | **${dasha5Server.md}** | Core Life Theme & Overarching Foundation |\n` +
+      `| **Antardasha (AD)** | **${dasha5Server.ad}** | Active House Significator & Primary Focus |\n` +
+      `| **Pratyantardasha (PD)** | **${dasha5Server.pd}** | Medium-Term Event Accelerator |\n` +
+      `| **Sukshmadasha (SD)** | **${dasha5Server.sd}** | Weekly Environment & Cognitive Clarity |\n` +
+      `| **Prana Dasha (PrD)** | **${dasha5Server.prd}** | Real-Time Hourly Vitality & Daily Execution |\n\n` +
+      `#### ⚡ 5-Lord Synergy & House Activations\n` +
+      `- **Mahadasha (${dasha5Server.md})**: Governs foundational physical and long-term theme.\n` +
+      `- **Antardasha (${dasha5Server.ad})**: Directly triggers ${activeHouses} (${rationale}).\n` +
+      `- **Pratyantara (${dasha5Server.pd})**: Controls monthly decision momentum and opportunity windows.\n` +
+      `- **Sukshma (${dasha5Server.sd})**: Regulates 3-to-7 day cognitive focus and adaptability.\n` +
+      `- **Prana (${dasha5Server.prd})**: Operates as real-time hourly trigger for daily events.\n\n` +
+      `#### 🌌 Live Transit Triggers\n` +
+      `- **Transit Moon**: **${trMoonNak}** (${trMoonSign})\n` +
+      `- **Star Lord**: **${trStarLord}** | **Sub Lord**: **${trSubLord}**\n\n` +
       `#### ⚡ Activated Events & Findings\n` +
       bulletPoints.map(p => `- ${p}`).join("\n") + `\n\n` +
       `#### 💡 Guidance & Recommendation\n` +

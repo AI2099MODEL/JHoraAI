@@ -190,7 +190,132 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     return "Mercury-Saturn-Mercury";
   };
 
-  const activeDasha = getActiveDashaText();
+  // Helper to get 5-level Vimshottari Dasha details (MD -> AD -> PD -> SD -> PrD)
+  const get5LevelDashaInfo = () => {
+    const PLANET_YEARS: Record<string, number> = {
+      Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17
+    };
+    const PLANET_ORDER = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+
+    const now = new Date();
+
+    if (!astrologyData || !astrologyData.dashas) {
+      return {
+        md: "Mercury",
+        ad: "Saturn",
+        pd: "Jupiter",
+        sd: "Venus",
+        prd: "Sun",
+        fullString: "Mercury - Saturn - Jupiter - Venus - Sun"
+      };
+    }
+
+    // 1. Mahadasha
+    const maha = astrologyData.dashas.find((m: any) => {
+      const start = new Date(m.startDate);
+      const end = new Date(m.endDate);
+      return now >= start && now <= end;
+    }) || astrologyData.dashas[0];
+
+    const mdLord = maha?.lord || "Mercury";
+
+    // 2. Antardasha (Bhukti)
+    let adLord = "Saturn";
+    let adStart = maha ? new Date(maha.startDate) : new Date();
+    let adEnd = maha ? new Date(maha.endDate) : new Date();
+
+    if (maha?.subPeriods) {
+      const bhuk = maha.subPeriods.find((b: any) => {
+        const start = new Date(b.startDate);
+        const end = new Date(b.endDate);
+        return now >= start && now <= end;
+      });
+      if (bhuk) {
+        adLord = bhuk.lord;
+        adStart = new Date(bhuk.startDate);
+        adEnd = new Date(bhuk.endDate);
+      }
+    }
+
+    // 3. Pratyantardasha (Antara)
+    let pdLord = "Jupiter";
+    let pdStart = adStart;
+    let pdEnd = adEnd;
+
+    const bhukObj = maha?.subPeriods?.find((b: any) => b.lord === adLord);
+    if (bhukObj?.subPeriods) {
+      const ant = bhukObj.subPeriods.find((a: any) => {
+        const start = new Date(a.startDate);
+        const end = new Date(a.endDate);
+        return now >= start && now <= end;
+      });
+      if (ant) {
+        pdLord = ant.lord;
+        pdStart = new Date(ant.startDate);
+        pdEnd = new Date(ant.endDate);
+      }
+    }
+
+    // 4. Sukshma Dasha calculation
+    const pdDurationMs = pdEnd.getTime() - pdStart.getTime();
+    let sdLord = "Venus";
+    let sdStart = pdStart;
+    let sdEnd = pdEnd;
+
+    if (pdDurationMs > 0) {
+      const pdLordIdx = PLANET_ORDER.indexOf(pdLord) >= 0 ? PLANET_ORDER.indexOf(pdLord) : 0;
+      let accumulatedMs = pdStart.getTime();
+
+      for (let i = 0; i < 9; i++) {
+        const pName = PLANET_ORDER[(pdLordIdx + i) % 9];
+        const pYears = PLANET_YEARS[pName] || 10;
+        const duration = (pYears / 120) * pdDurationMs;
+        const endMs = accumulatedMs + duration;
+
+        if (now.getTime() >= accumulatedMs && now.getTime() <= endMs) {
+          sdLord = pName;
+          sdStart = new Date(accumulatedMs);
+          sdEnd = new Date(endMs);
+          break;
+        }
+        accumulatedMs = endMs;
+      }
+    }
+
+    // 5. Prana Dasha calculation
+    const sdDurationMs = sdEnd.getTime() - sdStart.getTime();
+    let prdLord = "Sun";
+
+    if (sdDurationMs > 0) {
+      const sdLordIdx = PLANET_ORDER.indexOf(sdLord) >= 0 ? PLANET_ORDER.indexOf(sdLord) : 0;
+      let accumulatedMs = sdStart.getTime();
+
+      for (let i = 0; i < 9; i++) {
+        const pName = PLANET_ORDER[(sdLordIdx + i) % 9];
+        const pYears = PLANET_YEARS[pName] || 10;
+        const duration = (pYears / 120) * sdDurationMs;
+        const endMs = accumulatedMs + duration;
+
+        if (now.getTime() >= accumulatedMs && now.getTime() <= endMs) {
+          prdLord = pName;
+          break;
+        }
+        accumulatedMs = endMs;
+      }
+    }
+
+    return {
+      md: mdLord,
+      ad: adLord,
+      pd: pdLord,
+      sd: sdLord,
+      prd: prdLord,
+      fullString: `${mdLord} - ${adLord} - ${pdLord} - ${sdLord} - ${prdLord}`
+    };
+  };
+
+  const dasha5 = get5LevelDashaInfo();
+  const activeDasha = dasha5.fullString;
   const lagnaSign = astrologyData?.lagna?.sign || "Cancer";
   const natalMoonSign = astrologyData?.planets?.find(p => p.name === "Moon")?.sign || "Aquarius";
   const natalMoonNak = astrologyData?.planets?.find(p => p.name === "Moon")?.nakshatra || "Shatabhisha";
@@ -378,17 +503,31 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
     const housesStr = activeHousesList.map(h => `House ${h}`).join(", ");
 
-    return `### 📊 ${primaryDomainName} - Activated Events Report
+    return `### 📊 ${primaryDomainName} - Vimshottari DBA Analysis (Till Prana)
 
-#### 👤 Native Profile Context
+#### 👤 Native Profile Baseline
 - **Name**: ${profileName} | **DOB**: ${profileDob} @ ${profileTob} | **Location**: ${profilePob}
 - **Lagna (Ascendant)**: ${lagnaSign} | **Natal Moon**: ${natalMoonSign} (${natalMoonNak} Nakshatra)
-- **Active Dasha Period**: ${activeDasha} (Mahadasha: ${mDasha}, Antardasha: ${aDasha}, Pratyantardasha: ${pDasha})
 
-#### 🔮 Active House Dynamics
-- **Activated Houses**: ${housesStr}
-- **House Significator Basis**: ${houseRationale}
-- **Live Transit Triggers**: Transit Moon in **${moonNak}** (${moonSign}), Star Lord **${starLord}**, Sub Lord **${subLord}**
+#### 🔮 5-Level Vimshottari Dasha Breakdown (Till Prana)
+| Dasha Level | Operating Planet | Role & Celestial Influence |
+| :--- | :--- | :--- |
+| **Mahadasha (MD)** | **${dasha5.md}** | Core Life Theme & Primary Significator |
+| **Antardasha (AD)** | **${dasha5.ad}** | Sub-Period Focus & Active House Trigger |
+| **Pratyantardasha (PD)** | **${dasha5.pd}** | Medium-Term Event Accelerator |
+| **Sukshmadasha (SD)** | **${dasha5.sd}** | Weekly Environment & Subtle Mind States |
+| **Prana Dasha (PrD)** | **${dasha5.prd}** | Real-Time Hourly Vitality & Daily Event Execution |
+
+#### ⚡ 5-Lord Synergy & House Activations
+- **Mahadasha (${dasha5.md})**: Sets overarching long-term energetic foundation for ${profileName}.
+- **Antardasha (${dasha5.ad})**: Directly triggers ${housesStr} (${houseRationale}).
+- **Pratyantara (${dasha5.pd})**: Controls active decision momentum and key monthly opportunities.
+- **Sukshma (${dasha5.sd})**: Regulates 3-to-7 day cognitive clarity and situational adaptability.
+- **Prana (${dasha5.prd})**: Operates as real-time hourly trigger for active events today.
+
+#### 🌌 Live Transit Triggers
+- **Transit Moon**: **${moonNak}** (${moonSign})
+- **Transit Star Lord**: **${starLord}** | **Sub Lord**: **${subLord}**
 
 #### ⚡ Activated Events & Findings
 ${keyEvents.map(e => `- ${e}`).join("\n")}
@@ -1274,21 +1413,25 @@ OUTPUT REQUIREMENTS:
                       <Sparkles className="w-6 h-6 animate-pulse" />
                     </div>
                     <h1 className="text-xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 bg-clip-text text-transparent font-sans">
-                      JHora Activated Events Report
+                      JHora 5-Level Vimshottari Dasha Analysis (Till Prana)
                     </h1>
                     <p className="text-neutral-700 text-xs max-w-md leading-relaxed font-medium mb-4">
-                      Select any theme above to execute a real-time event check across active houses, dasha periods, and planetary transits.
+                      Select any theme above to execute a real-time 5-level Dasha analysis (Mahadasha → Antardasha → Pratyantardasha → Sukshmadasha → Prana Dasha) along with house activations and transits.
                     </p>
                   </div>
                 ) : (
                   messages.map((msg) => (
                     <div key={msg.id} className="space-y-3">
                       <div className="flex items-center justify-between bg-white px-4 py-2 rounded-xl border border-neutral-200/80 shadow-2xs">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-xs font-extrabold text-neutral-900">
-                            Activated Events Report
+                            Vimshottari DBA (Till Prana)
                           </span>
-                          <span className="bg-indigo-100 text-indigo-950 font-bold border border-indigo-200 px-2 py-0.5 rounded-full text-[10px]">
+                          <span className="bg-indigo-100 text-indigo-950 font-bold border border-indigo-200/90 px-2.5 py-0.5 rounded-full text-[10px] flex items-center gap-1">
+                            <Sparkles className="w-3 h-3 text-indigo-600 shrink-0" />
+                            <span>{dasha5.fullString}</span>
+                          </span>
+                          <span className="bg-purple-100 text-purple-900 font-semibold border border-purple-200 px-2 py-0.5 rounded-full text-[10px]">
                             {getMoodPromptsFromJSON().find(t => t.id === selectedAskTab)?.label || "Daily Reading"}
                           </span>
                         </div>
