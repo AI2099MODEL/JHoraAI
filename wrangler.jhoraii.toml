@@ -8,6 +8,7 @@ compatibility_date = "2026-07-15"
 # See /docs/DEPLOYMENT_ARCHITECTURE.md for the full split explanation.
 [assets]
 directory = "dist"
+not_found_handling = "single-page-application"
 
 [vars]
 # JHoraAI Professional Firebase & API Configurations
