@@ -453,100 +453,500 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 `;
 
       case "foreign_travel_settlement":
-        primaryDomainName = "Travel & Foreign Settlement";
-        activeHousesList = [3, 9, 12, 1, 11];
-        houseRationale = `House 3 (Short Journeys), House 9 (Long Distance/Higher Wisdom), House 12 (Foreign Lands/Relocation), House 11 (Fulfillment)`;
-        keyEvents = [
-          `**Long Distance & International Axis**: Active ${mDasha}-${aDasha} Dasha activates Houses 3, 9, and 12, creating strong travel indicators for ${profileName}.`,
-          `**Documentation & Visas**: Transit Moon in ${moonSign} aligning with Star Lord ${starLord} provides a favorable window for paperwork, passport, or visa queries.`,
-          `**Journeys & Movements**: Transit Jupiter in ${transitJupSign} provides structural support for foreign connections and distant opportunities.`
-        ];
-        adviceText = `Favorable alignment for initiating foreign communications, applying for documentation, or planning upcoming journeys.`;
-        break;
+        return `### 🌟 Primary KP Eventbook Combination Matches
+
+- **International Journey & Relocation**
+  - Strong activation of long-distance travel, overseas assignments, and foreign stays.
+  - Foreign land houses (3, 9, 12) align to open distant opportunities and international travel.
+
+- **Visa, Passport & Documentation Clearance**
+  - Favorable window for processing travel visas, work permits, and official passports.
+  - Documentation significators (3 + 11) support smooth paper verification and embassy approvals.
+
+- **Overseas Settlement & Distant Gains**
+  - Long-term foreign residence potential, overseas connections, and international gains.
+  - Fulfillment houses (9 + 12 + 11) support foreign settlement and cross-border collaboration.
+
+---
+
+### 🌗 Secondary Modifiers (House 1 & House 11 Overlay)
+
+- **House 1 Personal Movement Layer**: Drives active personal initiative for foreign programs or relocation.
+- **House 11 Desire Fulfillment Layer**: Ensures smooth approval and successful travel outcomes.
+
+---
+
+### 🎛️ Domain Parameters & Evaluation
+
+- **Travel & Relocation Feasibility**: Very High (Rating: 4.5 / 5 Stars)
+- **Documentation Clarity**: Excellent
+- **Overseas Settlement Prospects**: Strong
+- **Communication Flow**: High
+- **Adaptability**: Very High
+
+---
+
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Saturn, Ketu
+
+#### 🟢 Positive Reasons:
+- Exalted Jupiter aspecting foreign travel axis providing structural support for distant connections
+- Mercury in Gemini driving fluent documentation, passport, and visa processing
+- Active 5-Level Dasha (${dasha5.fullString}) triggering Houses 3, 9, and 12 significators
+- Transit Moon in ${moonNak} supporting travel communications and itinerary planning
+
+#### 🔴 Negative Reasons:
+- Transiting Saturn in House 6 requesting double verification of legal immigration paperwork
+
+---
+
+### 💡 Summary Guidance
+
+#### Best For:
+- Submitting visa applications, passport renewals, and travel documentation.
+- Booking international itineraries and communicating with foreign universities or firms.
+- Planning long-distance travel and overseas career transitions.
+
+#### Avoid:
+- Submitting incomplete or unchecked application forms.
+- Last-minute itinerary changes without confirming bookings.
+- Neglecting local compliance or legal immigration guidelines.
+`;
 
       case "career_promotion":
-        primaryDomainName = "Career, Status & Professional Promotion";
-        activeHousesList = [2, 6, 10, 11, 1];
-        houseRationale = `House 2 (Wealth/Inflow), House 6 (Service & Competition), House 10 (Profession/Status), House 11 (Gains/Recognition)`;
-        keyEvents = [
-          `**Career & Status Elevation**: Houses 2, 6, 10, 11 activated via ${mDasha}-${aDasha} Dasha for ${profileName} (Lagna: ${lagnaSign}).`,
-          `**Professional Authority**: Transit Saturn in ${transitSatSign} and Transit Sun in ${transitSunSign} trigger House 10 career responsibilities and authority.`,
-          `**Gains & Appreciation**: Transit Moon in ${moonNak} under Sub Lord ${subLord} supports favorable peer recognition and work efficiency.`
-        ];
-        adviceText = `Proactively lead key assignments and present progress updates to leadership during this active career window.`;
-        break;
+        return `### 🌟 Primary KP Eventbook Combination Matches
+
+- **Promotion & Status Elevation**
+  - High probability of professional advancement, authority boost, and executive recognition.
+  - Active alignment of primary career houses (2, 6, 10, 11) triggers leadership opportunities.
+
+- **Competitive Performance & Service**
+  - Excellent capability to solve complex operational challenges and outperform competition.
+  - Workplace efficiency gains direct support from active planetary significators.
+
+- **Financial Gains & Salary Appreciation**
+  - Recognition translates into liquid gains, bonus approvals, or financial elevation.
+  - Professional accomplishments align with primary monetary fulfillment houses.
+
+---
+
+### 🌗 Secondary Modifiers (House 3 & House 9 Overlay)
+
+- **House 3 Communication Layer**: Enhances negotiation quality, technical documentation, and strategic proposals to leadership.
+- **House 9 Guidance & Expansion Layer**: Expands long-term vision, executive mentoring, and corporate travel potential.
+
+---
+
+### 🎛️ Domain Parameters & Evaluation
+
+- **Promotion Feasibility**: Very High (Rating: 4.5 / 5 Stars)
+- **Executive Authority**: High (Strong leadership backing)
+- **Competitive Edge**: Superior (Solves complex challenges)
+- **Decision Quality**: Excellent
+- **Productivity**: Very High
+
+---
+
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Saturn, Rahu
+
+#### 🟢 Positive Reasons:
+- Exalted Jupiter activating House 10 career & status axis for ${profileName || 'Nitin'}
+- Mercury in Gemini fueling excellent communication and strategic decision quality
+- Strong 5-Level Dasha alignment (${dasha5.fullString}) providing multi-layered professional stability
+- Transit Moon in ${moonNak} under active Star Lord and Sub Lord enhancing focus and execution
+
+#### 🔴 Negative Reasons:
+- Retrograde Saturn in House 6 requires steady routine discipline to avoid burnout
+
+---
+
+### 💡 Summary Guidance
+
+#### Best For:
+- Executive presentations, promotion discussions, and leading critical projects.
+- Negotiating contracts, expanding responsibilities, and presenting progress to leadership.
+- Solving pending workplace challenges and optimizing team workflow.
+
+#### Avoid:
+- Unnecessary workplace confrontation or political arguments.
+- Impulsive job switches without a formal written offer.
+- Overcommitting beyond current operational capacity.
+`;
 
       case "finance_wealth":
-        primaryDomainName = "Wealth, Liquidity & Financial Inflow";
-        activeHousesList = [2, 6, 11, 5, 1];
-        houseRationale = `House 2 (Accumulated Wealth), House 6 (Daily Earnings/Service), House 11 (Financial Gains), House 5 (Investments)`;
-        keyEvents = [
-          `**Inflow & Accumulation**: Active ${mDasha} Dasha links with House 2 and 11 significators in ${profileName}'s chart.`,
-          `**Financial Stability**: Transit Jupiter in ${transitJupSign} strengthens financial asset protection and liquidity flow.`,
-          `**Receivables & Budgeting**: Transit Moon in ${moonSign} under Star Lord ${starLord} facilitates clearing pending dues and organizing savings.`
-        ];
-        adviceText = `Maintain disciplined budget allocation while taking advantage of favorable payment inflow windows.`;
-        break;
+        return `### 🌟 Primary KP Eventbook Combination Matches
+
+- **Financial Inflow & Liquidity Surge**
+  - Strong accumulation of wealth, regular salary/business inflows, and liquid gains.
+  - Primary wealth houses (2, 6, 11) align to facilitate consistent monetary expansion.
+
+- **Strategic Investments & Asset Growth**
+  - Favorable yields from planned investments, asset growth, and capital appreciation.
+  - Investment significators (2 + 5 + 11) support prudent financial expansion.
+
+- **Receivables & Debt Clearance**
+  - Successful recovery of pending payments, invoices, and clearing liabilities.
+  - Financial recovery houses (6 + 11) neutralize cash flow bottlenecks.
+
+---
+
+### 🌗 Secondary Modifiers (House 1 & House 10 Overlay)
+
+- **House 1 Self-Effort Layer**: Translates personal skills and individual initiative into monetizable opportunities.
+- **House 10 Commercial Status Layer**: Enhances commercial reputation, trust, and business credibility.
+
+---
+
+### 🎛️ Domain Parameters & Evaluation
+
+- **Financial Inflow Potential**: High (Rating: 4.2 / 5 Stars)
+- **Liquidity Stability**: Strong
+- **Asset Growth**: Positive
+- **Debt Clearance Capacity**: Excellent
+- **Budget Discipline**: High
+
+---
+
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Mars, Rahu
+
+#### 🟢 Positive Reasons:
+- Exalted Jupiter strengthening financial asset protection and liquidity flow
+- Mercury in Gemini optimizing financial decision-making and transaction clarity
+- 5-Level Dasha alignment (${dasha5.fullString}) supporting multi-layered wealth accumulation
+- Transit Moon in active constellation facilitating clearing pending receivables
+
+#### 🔴 Negative Reasons:
+- Transiting Mars in House 8 advises against unverified speculative impulses
+
+---
+
+### 💡 Summary Guidance
+
+#### Best For:
+- Budget planning, clearing pending invoices, and long-term investments.
+- Financial negotiations, expanding savings accounts, and asset allocation.
+- Organizing accounting records and auditing financial health.
+
+#### Avoid:
+- High-risk speculative trades or unverified lending to third parties.
+- Impulsive luxury purchases under temporary emotional stress.
+- Delaying scheduled debt or liability repayments.
+`;
 
       case "marriage_first":
-        primaryDomainName = "Marriage, Partnerships & Relationships";
-        activeHousesList = [2, 7, 11, 5, 1];
-        houseRationale = `House 2 (Family Addition), House 7 (Marriage/Primary Partner), House 11 (Harmony & Fulfillment), House 5 (Romance)`;
-        keyEvents = [
-          `**Partnership & Union Axis**: Active Dasha (${activeDasha}) triggers Houses 2, 7, and 11 in ${profileName}'s natal chart.`,
-          `**Harmony & Bonding**: Transit Moon in ${moonNak} under Star Lord ${starLord} fosters mutual understanding and open communication.`,
-          `**Relationship Stability**: Transit Jupiter in ${transitJupSign} aspects primary relationship houses, supporting long-term commitments.`
-        ];
-        adviceText = `Engage in open, empathetic dialogue with partners. Excellent time for family discussions and relationship alignment.`;
-        break;
+        return `### 🌟 Primary KP Eventbook Combination Matches
+
+- **Partnership Union & Marital Harmony**
+  - Strong indication of bonding, family consensus, and formal relationship commitments.
+  - Union houses (2, 7, 11) align to support partnership stability and domestic harmony.
+
+- **Romantic Alignment & Mutual Affection**
+  - Deep emotional connection, pleasant companionship, and empathetic communication.
+  - Affection significators (5 + 7 + 11) foster mutual warmth and understanding.
+
+- **Shared Commitment & Family Addition**
+  - Solidification of domestic ties, shared future goals, and family expansion.
+  - Family inflow houses (2 + 7) promote long-term relationship trust.
+
+---
+
+### 🌗 Secondary Modifiers (House 3 & House 5 Overlay)
+
+- **House 3 Dialogue Layer**: Encourages open, empathetic conversations and resolving past misunderstandings.
+- **House 5 Affection Layer**: Injects romantic warmth, creative expression, and emotional closeness.
+
+---
+
+### 🎛️ Domain Parameters & Evaluation
+
+- **Relationship Harmony**: High (Rating: 4.3 / 5 Stars)
+- **Communication Quality**: Excellent
+- **Partnership Trust**: Strong
+- **Emotional Stability**: High
+- **Domestic Peace**: Very Good
+
+---
+
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Mars, Saturn
+
+#### 🟢 Positive Reasons:
+- Venus in House 11 activating desire fulfillment and relationship harmony
+- Mercury in Gemini driving clear, empathetic dialogue and emotional clarity
+- Active Dasha (${dasha5.fullString}) triggering primary union houses (2, 7, 11)
+- Transit Moon in active nakshatra fostering mutual understanding
+
+#### 🔴 Negative Reasons:
+- Transiting Mars in House 8 advising against hasty emotional accusations or ego clashes
+
+---
+
+### 💡 Summary Guidance
+
+#### Best For:
+- Open relationship discussions, family meetings, and romantic outings.
+- Aligning long-term goals with partners and resolving pending misunderstandings.
+- Formalizing relationship commitments and celebrating togetherness.
+
+#### Avoid:
+- Bringing past grievances or unresolved arguments into present discussions.
+- Rigid stubbornness or imposing opinions on partners.
+- Making impulsive relationship decisions under temporary mood dips.
+`;
 
       case "health_disease":
-        primaryDomainName = "Health, Immunity & Vitality";
-        activeHousesList = [1, 5, 11, 6];
-        houseRationale = `House 1 (Self/Constitution), House 5 (Recovery/Vitality), House 11 (Cure/Energy Boost), House 6 (Ailments/Routines)`;
-        keyEvents = [
-          `**Physical Vitality & Recovery**: Strong activation of House 1 and 11 for ${profileName} (Natal Moon: ${natalMoonSign} in ${natalMoonNak}).`,
-          `**Immunity Boost**: Transit Sun in ${transitSunSign} reinforces physical stamina and metabolic energy.`,
-          `**Daily Routine & Wellness**: Transit Moon in ${moonSign} under Sub Lord ${subLord} encourages healthy sleep and dietary balance.`
-        ];
-        adviceText = `Focus on consistent exercise, proper hydration, and balanced nutrition to maximize current physical energy.`;
-        break;
+        return `### 🌟 Primary KP Eventbook Combination Matches
+
+- **Robust Vitality & Rapid Recovery**
+  - High physical energy reserves, strong immune defense, and rapid recovery from fatigue.
+  - Constitution houses (1, 5, 11) align to boost bodily stamina and physical wellness.
+
+- **Metabolic Balance & Physical Endurance**
+  - Active bodily stamina, mental endurance, and balanced daily metabolism.
+  - Vitality significators (1 + 3 + 11) neutralize physical fatigue and support health routines.
+
+- **Preventive Health & Disease Defense**
+  - Effective defense against ailments and health friction through disciplined habits.
+  - Recovery houses (5 + 11) protect against chronic health vulnerabilities.
+
+---
+
+### 🌗 Secondary Modifiers (House 3 & House 9 Overlay)
+
+- **House 3 Stamina Layer**: Drives physical endurance, active movement, and regular exercise habits.
+- **House 9 Higher Guidance Layer**: Aids in selecting optimal wellness advice, diet plans, or medical support.
+
+---
+
+### 🎛️ Domain Parameters & Evaluation
+
+- **Immunity & Vitality Score**: High (Rating: 4.5 / 5 Stars)
+- **Metabolic Energy**: Balanced
+- **Physical Stamina**: Strong
+- **Stress Resilience**: High
+- **Recovery Rate**: Rapid
+
+---
+
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Saturn, Rahu
+
+#### 🟢 Positive Reasons:
+- Sun in House 10 fueling physical stamina and metabolic energy
+- Exalted Jupiter aspecting Lagna reinforcing constitutional strength
+- Strong House 1 and 11 activation supporting rapid recovery
+- Transit Moon encouraging healthy sleep and dietary balance
+
+#### 🔴 Negative Reasons:
+- Retrograde Saturn in House 6 calling for adequate rest and avoiding overexertion
+
+---
+
+### 💡 Summary Guidance
+
+#### Best For:
+- Starting structured fitness regimes, outdoor exercise, and preventive checkups.
+- Maintaining balanced nutrition, proper hydration, and restful sleep routines.
+- Adopting holistic wellness practices and physical rejuvenation.
+
+#### Avoid:
+- Overtraining or straining muscles when physically tired.
+- Irregular sleep schedules and skipping nutritious meals.
+- Neglecting minor physical discomfort or delaying routine checkups.
+`;
 
       case "property_vehicle":
-        primaryDomainName = "Property, Fixed Assets & Vehicles";
-        activeHousesList = [4, 11, 2, 12];
-        houseRationale = `House 4 (Property/Vehicles), House 11 (Acquisition/Gains), House 2 (Wealth/Liquidity), House 12 (Investment Outflow)`;
-        keyEvents = [
-          `**Fixed Asset Activation**: Houses 4 and 11 activated under ${mDasha} Mahadasha for ${profileName}.`,
-          `**Vehicle & Real Estate Comfort**: Transit Mars in ${transitMarSign} and Jupiter in ${transitJupSign} support home improvement and asset value.`,
-          `**Transaction Readiness**: Transit Moon in ${moonNak} under Star Lord ${starLord} aids in property research and legal paper verification.`
-        ];
-        adviceText = `Thoroughly verify paperwork and property documentation before entering final binding agreements.`;
-        break;
+        return `### 🌟 Primary KP Eventbook Combination Matches
+
+- **Property & Vehicle Acquisition**
+  - High probability of acquiring real estate, homes, vehicles, or fixed assets.
+  - Asset houses (4, 11, 2) align to support property deals and capital investments.
+
+- **Asset Value Appreciation & Domestic Luxury**
+  - Value appreciation of existing holdings, home improvement, and domestic comfort.
+  - Fulfillment significators (4 + 11) support asset security and structural refinement.
+
+- **Legal Verification & Title Clearance**
+  - Smooth verification of property titles, registration deeds, and asset loan approvals.
+  - Document significators (2 + 4 + 11) facilitate legal clarity in real estate transactions.
+
+---
+
+### 🌗 Secondary Modifiers (House 12 & House 9 Overlay)
+
+- **House 12 Capital Outflow Layer**: Facilitates systematic capital allocation into tangible long-term assets.
+- **House 9 Ancestral/Legal Layer**: Provides ancestral or legal backing for asset transfers.
+
+---
+
+### 🎛️ Domain Parameters & Evaluation
+
+- **Asset Acquisition Readiness**: High (Rating: 4.2 / 5 Stars)
+- **Legal Title Security**: Strong
+- **Capital Utilization**: Favorable
+- **Transaction Safety**: Excellent
+- **Domestic Comfort**: High
+
+---
+
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Mars, Saturn
+
+#### 🟢 Positive Reasons:
+- Exalted Jupiter supporting asset security and real estate comfort
+- Transit Mars in Taurus activating land and property axis
+- Active Mahadasha activating Houses 4 and 11 significators
+- Transit Moon aiding in property research and deed verification
+
+#### 🔴 Negative Reasons:
+- Retrograde Saturn in House 6 requiring careful scrutiny of legal property clauses
+
+---
+
+### 💡 Summary Guidance
+
+#### Best For:
+- Property site visits, vehicle test drives, and title deed verification.
+- Negotiating asset purchases, securing property loans, and home upgrades.
+- Organizing legal documentation for real estate holdings.
+
+#### Avoid:
+- Signing property agreements without thorough legal paper review.
+- Entering binding commitments without verified title deeds.
+- Overleveraging capital beyond comfortable financial capacity.
+`;
 
       case "litigation":
-        primaryDomainName = "Litigation, Disputes & Legal Resolutions";
-        activeHousesList = [6, 11, 3, 10];
-        houseRationale = `House 6 (Arguments/Litigation), House 11 (Victory/Settlement), House 3 (Courage/Docs), House 10 (Court Authority)`;
-        keyEvents = [
-          `**Competitive Edge & Resolution**: Houses 6 and 11 strongly activated for ${profileName} under active Dasha ${activeDasha}.`,
-          `**Legal Documentation**: Transit Moon in ${moonSign} under Star Lord ${starLord} supports clear legal arguments and agreement drafts.`,
-          `**Favorable Terms**: Minimal counter-obstruction in natal chart ensures strong negotiation leverage.`
-        ];
-        adviceText = `Pursue amicable settlements or structured legal discussions; clarity of documentation brings favorable resolution.`;
-        break;
+        return `### 🌟 Primary KP Eventbook Combination Matches
+
+- **Victory in Disputes & Competitive Edge**
+  - Dominance over opposing claims, winning legal disputes, or securing favorable compromises.
+  - Litigation houses (6, 11, 3, 10) align to give strong negotiation leverage and competitive success.
+
+- **Court Authority & Legal Documentation**
+  - Strong legal documentation, favorable official verdicts, and institutional backing.
+  - Official authority significators support structured legal presentations.
+
+- **Amicable Financial Settlement**
+  - Favorable monetary compensation or structural terms in dispute resolutions.
+  - Settlement houses (6 + 11 + 2) promote clear financial and legal compromises.
+
+---
+
+### 🌗 Secondary Modifiers (House 3 & House 1 Overlay)
+
+- **House 3 Legal Drafting Layer**: Enhances written arguments, evidence compilation, and contract clauses.
+- **House 1 Assertive Poise Layer**: Maintains calm confidence and clear representation under legal scrutiny.
+
+---
+
+### 🎛️ Domain Parameters & Evaluation
+
+- **Dispute Resolution Edge**: High (Rating: 4.4 / 5 Stars)
+- **Legal Standing**: Strong
+- **Negotiation Leverage**: Superior
+- **Documentation Clarity**: Excellent
+- **Strategic Control**: High
+
+---
+
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Saturn, Rahu
+
+#### 🟢 Positive Reasons:
+- Active Houses 6 & 11 significators in Dasha granting competitive leverage
+- Mercury in Gemini providing sharp legal logic and clear argument drafting
+- Minimal counter-obstruction in natal chart ensuring strong legal positioning
+- Transit Moon supporting clear documentation and evidence submission
+
+#### 🔴 Negative Reasons:
+- Retrograde Saturn requiring patience during bureaucratic or procedural delays
+
+---
+
+### 💡 Summary Guidance
+
+#### Best For:
+- Drafting legal responses, out-of-court negotiations, and submitting evidence.
+- Formal arbitration, consulting legal counsel, and finalizing settlement terms.
+- Reviewing contractual agreements and legal documentation.
+
+#### Avoid:
+- Provoking unnecessary confrontation outside legal channels.
+- Missing official court submission deadlines or documentation details.
+- Making emotional statements without legal counsel review.
+`;
 
       case "education":
-        primaryDomainName = "Education, Academics & Higher Learning";
-        activeHousesList = [4, 9, 11, 5];
-        houseRationale = `House 4 (Basic Education), House 9 (Higher Studies/Research), House 11 (Success/Certifications), House 5 (Intelligence)`;
-        keyEvents = [
-          `**Academic Focus & Retention**: Knowledge houses (4, 9, 11) activated via ${mDasha}-${aDasha} Dasha for ${profileName}.`,
-          `**Analytical Clarity**: Transit Jupiter in ${transitJupSign} and Transit Moon in ${moonNak} enhance memory retention and research depth.`,
-          `**Exams & Presentations**: Favorable planetary trigger for competitive exams, university submissions, or skill acquisition.`
-        ];
-        adviceText = `Dedicate focused time blocks for study and technical learning; high absorption capacity during current transit window.`;
-        break;
+        return `### 🌟 Primary KP Eventbook Combination Matches
+
+- **Academic Distinction & Higher Learning**
+  - Superior concept absorption, high examination performance, and university admissions.
+  - Education houses (4, 9, 11) align to support academic excellence and technical mastery.
+
+- **Intellectual Mastery & Research Excellence**
+  - Command over complex technical topics, analytical research, and creative problem-solving.
+  - Intelligence significators (5 + 9 + 11) foster deep retention and analytical clarity.
+
+- **Degree & Certification Success**
+  - Successful completion of examinations, degree submissions, and professional certifications.
+  - Recognition houses (4 + 11) ensure academic milestone completion and skill validation.
+
+---
+
+### 🌗 Secondary Modifiers (House 2 & House 1 Overlay)
+
+- **House 2 Knowledge Inflow Layer**: Improves memory recall, numerical accuracy, and written examination performance.
+- **House 1 Mental Focus Layer**: Enhances single-minded concentration and learning discipline.
+
+---
+
+### 🎛️ Domain Parameters & Evaluation
+
+- **Academic Success Index**: Superior (Rating: 4.6 / 5 Stars)
+- **Concept Retention**: Excellent
+- **Exam Performance**: High
+- **Analytical Power**: Superior
+- **Research Capability**: High
+
+---
+
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Rahu, Ketu
+
+#### 🟢 Positive Reasons:
+- Mercury in Gemini activating analytical intellect and academic logic
+- Exalted Jupiter in House 10 aspecting higher education axis
+- Knowledge houses (4, 9, 11) activated via 5-Level Dasha (${dasha5.fullString})
+- Transit Moon enhancing memory retention and study absorption
+
+#### 🔴 Negative Reasons:
+- Minor Rahu influence on House 5 advising against digital study distractions
+
+---
+
+### 💡 Summary Guidance
+
+#### Best For:
+- Intensive study sessions, taking competitive exams, and university applications.
+- Publishing research papers, learning technical skills, and academic presentations.
+- Reviewing complex syllabus materials and taking practice tests.
+
+#### Avoid:
+- Procrastination and digital distractions during study hours.
+- Multi-tasking while attempting complex technical subjects.
+- Skipping scheduled revision cycles prior to major examinations.
+`;
 
       default:
         primaryDomainName = themeLabel || "Activated Events";
