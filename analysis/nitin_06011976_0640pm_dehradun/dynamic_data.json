@@ -3,14 +3,14 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "nitin_06011976_0640pm_dehradun",
-    "lastUpdated": "2026-07-29T11:05:07.308Z",
+    "lastUpdated": "2026-07-29T11:05:59.178Z",
     "evaluationDate": "2026-07-29",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-29T11:05:06.248Z",
-      "localTime": "2026-07-29T04:05:06-07:00",
+      "utcTime": "2026-07-29T11:05:58.047Z",
+      "localTime": "2026-07-29T04:05:58-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
@@ -30,8 +30,8 @@
         "displayName": "Moon"
       },
       "currentSubLord": {
-        "id": "Venus",
-        "displayName": "Venus"
+        "id": "Sun",
+        "displayName": "Sun"
       },
       "moonPhase": {
         "type": "Waning Gibbous",
@@ -80,7 +80,7 @@
         "nakshatra": "Shravana",
         "pada": 4,
         "starLord": "Moon",
-        "subLord": "Venus",
+        "subLord": "Sun",
         "retrograde": true,
         "combust": false,
         "stationary": false
@@ -98,7 +98,7 @@
       },
       "mercury": {
         "currentSign": "Sagittarius",
-        "longitude": 242.64,
+        "longitude": 242.65,
         "nakshatra": "Mula",
         "pada": 1,
         "starLord": "Ketu",
@@ -232,6 +232,32 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-29T11:05:59.178Z",
+      "evaluationDate": "2026-07-29",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Health and Disease Propensity via 1st and 6th CSL",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+    },
+    {
+      "timestamp": "2026-07-29T11:05:58.351Z",
+      "evaluationDate": "2026-07-29",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Health and Disease Propensity via 1st and 6th CSL",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+    },
     {
       "timestamp": "2026-07-29T11:05:07.308Z",
       "evaluationDate": "2026-07-29",
@@ -1495,32 +1521,6 @@
     },
     {
       "timestamp": "2026-07-28T16:04:30.283Z",
-      "evaluationDate": "2026-07-28",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-28T16:04:30.067Z",
-      "evaluationDate": "2026-07-28",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-28T16:00:59.454Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
