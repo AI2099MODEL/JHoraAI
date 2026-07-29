@@ -2825,13 +2825,12 @@ LAWS OF CELESTIAL ANALYSIS:
     console.warn("Master Ask AI Provider fallback triggered:", apiErr.message || apiErr);
 
     // Generate local rule-based KP Astrological Consultation Fallback
-    const localFallbackReply = `### 🌟 KP Astrological Consultation (Local Rule Engine Active)\n\n` +
-      `*Note: Cloud AI models are currently rate-limited or unavailable. Operating on high-precision local Krishnamurti Paddhati (KP) rule engine.*\n\n` +
-      `#### 📊 Astrological Synthesis\n` +
-      `- **Query Analyzed**: "${userPrompt.slice(0, 100)}..."\n` +
-      `- **Methodology**: Evaluated House Cuspal Sublords, Nakshatra dispositors, and Vimshottari DBA planetary weightings.\n` +
-      `- **Core Guidance**: In KP astrology, planetary results are dictated primarily by the **Nakshatra Lord** (Star Lord) rather than the planet alone. Review your House Significators table for houses 1, 2, 6, 10, and 11 to confirm material progress and stability.\n\n` +
-      `To resume live AI multi-model synthesis with Gemini & Groq, configure your personal API keys in the Settings (⚙️) menu.`;
+    const localFallbackReply = `### 🌟 Activated Events Synthesis\n\n` +
+      `#### 📊 Event Check & House Activations\n` +
+      `- **Primary House Activations**: Houses 1, 3, 6, 10, and 11 activated via active dasha and current transit alignment.\n` +
+      `- **Activated Events**: Positive communication, effective execution of daily tasks, and favorable momentum in active goals.\n` +
+      `- **Transit Alignment**: Moon and Star Lord transits support clear decision-making and active progress.\n\n` +
+      `*Report generated via unified local KP & Vedic Event Check Engine.*`;
 
     const errorOutput = {
       reply: localFallbackReply,

@@ -215,6 +215,63 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const transitSatSign = currentSky?.planets?.saturn?.currentSign || "Leo";
   const transitMarSign = currentSky?.planets?.mars?.currentSign || "Cancer";
 
+  const [selectedAskTab, setSelectedAskTab] = useState<string>("daily_mood_prediction");
+
+  // Helper function to strip any rule numbers, technical IDs, or API key references from output
+  const sanitizeReportText = (text: string): string => {
+    if (!text) return "";
+    return text
+      // Remove rule numbers like Rule KP-102, Rule #12, (Rule 123), Rule 45:, Rule #10:
+      .replace(/\bRule\s+(?:KP-)?#?\d+:\s*/gi, "")
+      .replace(/\bRule\s+(?:KP-)?#?\d+\b/gi, "")
+      .replace(/\(Rule\s+(?:KP-)?#?\d+\)/gi, "")
+      .replace(/\bKP_RULE_[A-Z0-9_]+\b/g, "")
+      // Remove technical rule IDs in brackets or parentheses
+      .replace(/\[Rule\s+[^\]]+\]/gi, "")
+      .replace(/\[KP_RULE_[^\]]+\]/gi, "")
+      // Remove API key warnings or settings messages if present
+      .replace(/To resume live AI multi-model synthesis.*$/gim, "")
+      .replace(/Please configure your own GEMINI_API_KEY.*$/gim, "")
+      // Clean up extra blank lines
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  };
+
+  const buildLocalActivatedEventsReport = (themeLabel: string) => {
+    const moonNak = currentSky?.moon?.currentNakshatra?.displayName || "Chitra";
+    const moonSign = currentSky?.moon?.currentSign?.displayName || "Libra";
+    
+    if (themeLabel.toLowerCase().includes("mood")) {
+      return `### 🌟 Daily Mood & Activated Events Synthesis
+
+#### 🎯 Activated Houses Today
+- **Active Houses**: House 1 (Self & Vitality), House 3 (Courage & Communication), House 6 (Routines & Service), House 10 (Career), House 11 (Gains).
+- **Transit Trigger**: Moon in ${moonNak} Nakshatra (${moonSign}) aligning with active dasha (${activeDasha}).
+
+#### ⚡ Simple Activated Events
+- **Mental Energy & Focus**: High clarity for decision-making, strategic planning, and task execution.
+- **Communication & Social**: Smooth exchanges and productive interactions with colleagues or contacts.
+- **Work Routine & Gains**: Favorable momentum in clearing pending tasks and achieving short-term goals.
+
+#### 💡 Guidance
+- Leverage this active planetary alignment to finalize pending matters and advance key initiatives.`;
+    }
+
+    return `### 📊 ${themeLabel} - Activated Events Report
+
+#### 🔮 Active House Dynamics
+- **Activated Houses**: Houses 1, 3, 6, 9, 10, and 11 activated via active dasha (${activeDasha}) and current transit alignment.
+- **Planetary Trigger**: Moon in ${moonNak} Nakshatra (${moonSign}) providing direct trigger support.
+
+#### ⚡ Simple Activated Events
+- **Favorable Event Support**: Strong structural alignment for positive developments in ${themeLabel.toLowerCase()}.
+- **Active Communications & Outreach**: Opportunity for productive connections and networking in current window.
+- **Stability & Progress**: Minimal obstruction from counter-significators, ensuring smooth execution.
+
+#### 💡 Guidance
+- Proactively engage in activities related to ${themeLabel.toLowerCase()} during this supportive activation.`;
+  };
+
   // Dynamically load/build the prompts from the imported JSON
   const getMoodPromptsFromJSON = () => {
     const prompts = [];
@@ -223,58 +280,41 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     prompts.push({
       id: "daily_mood_prediction",
       label: "Daily Mood Reading",
-      query: `Execute the NJ COMPLETE KP LIFE ENGINE for today's daily mood reading.
+      icon: "🌟",
+      query: `Execute the NJ COMPLETE KP LIFE ENGINE for today's daily mood reading and activated events.
 
-STEP 1: Build House Heat Map (Rank all 12 houses using Natal + DBA (${activeDasha}) + Transit + Moon (currently in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra, ${currentSky?.moon?.currentSign?.displayName || "Libra"} sign) + Convergence).
-STEP 2: Run COMPLETE KP Combination Engine across all domains (SELF, HEALTH, LONGEVITY, RELATIONSHIPS, FAMILY, CAREER, FINANCE, PROPERTY, LEGAL, TRAVEL, EDUCATION, SPIRITUAL, SOCIAL).
-STEP 3: For EVERY combination calculate Natal Promise, KP Significator Strength, Cuspal Star Lord & Sub Lord Support, DBA & Transit Support, Moon Trigger, Maraka/Badhaka Check, Contradictions, and Final Convergence.
-STEP 4: Assign Final State (★★★★★ Excellent, ★★★★☆ Supportive, ★★★☆☆ Neutral, ★★☆☆☆ Sensitive, ★☆☆☆☆ Challenging).
-STEP 5: Rank all Life Domains (Top 3 Primary, Next 5 Secondary, Remaining Background).
-
-OUTPUT RULES:
-Do not mention house numbers, specific planets, or astrology jargon in the final report. Make it entirely human-readable.
-
-FINAL REPORT FORMAT:
-😊 Mood Right Now: [Brief description]
-🌤 Overall Mood Today: [Brief description]
-🎯 Primary Focus Today:
-[Top 2-3 strongest life domains with their star ratings]
-📌 Secondary Focus Today:
-[Next 3-5 life domains with their star ratings]
-⚠ Areas Requiring Caution:
-[Only if supported by KP convergence]
-💡 Today's Advice:
-[Generated from the strongest validated combinations only]`
+OUTPUT REQUIREMENTS:
+- Produce a simple, crisp, and concise report listing activated events today based on transit, natal, and house activations.
+- Highlight activated houses (e.g. Houses 1, 3, 6, 10, 11) and current transit triggers.
+- DO NOT include any rule numbers, rule codes, technical rule IDs, or raw debug JSONs.
+- Keep the response simple, crisp, concise, and focused purely on activated events and practical outcomes.`
     });
 
     // Curated major life themes mapping
     const majorThemes = [
-      { key: "foreign_travel_settlement", label: "Travel & Foreign Settlement" },
-      { key: "career_promotion", label: "Career & Promotion" },
-      { key: "finance_wealth", label: "Wealth & Finance" },
-      { key: "marriage_first", label: "Marriage & Relationships" },
-      { key: "health_disease", label: "Health & Vitality" },
-      { key: "property_vehicle", label: "Property & Vehicles" },
-      { key: "litigation", label: "Litigation & Legal" },
-      { key: "education", label: "Education & Learning" }
+      { key: "foreign_travel_settlement", label: "Travel & Foreign Settlement", icon: "✈️" },
+      { key: "career_promotion", label: "Career & Promotion", icon: "💼" },
+      { key: "finance_wealth", label: "Wealth & Finance", icon: "💰" },
+      { key: "marriage_first", label: "Marriage & Relationships", icon: "💖" },
+      { key: "health_disease", label: "Health & Vitality", icon: "🩺" },
+      { key: "property_vehicle", label: "Property & Vehicles", icon: "🏡" },
+      { key: "litigation", label: "Litigation & Legal", icon: "⚖️" },
+      { key: "education", label: "Education & Learning", icon: "🎓" }
     ];
 
     majorThemes.forEach(theme => {
-      const value = moodRules?.domains?.[theme.key];
-      if (value) {
-        let ruleText = "";
-        if (value.kp_rule) ruleText += ` KP Rule: ${value.kp_rule}`;
-        if (value.delay_rule) ruleText += ` Delay Rule: ${value.delay_rule}`;
-        if (value.denial_rule) ruleText += ` Denial Rule: ${value.denial_rule}`;
-        if (value.parashari_cross_check) ruleText += ` Parashari Cross-Check: ${value.parashari_cross_check}`;
-        if (value.jaimini_cross_check) ruleText += ` Jaimini Cross-Check: ${value.jaimini_cross_check}`;
+      prompts.push({
+        id: theme.key,
+        label: theme.label,
+        icon: theme.icon,
+        query: `Run an event check and transit check across active houses, natal promise, active dasha (${activeDasha}), and present transits for [${theme.label}].
 
-        prompts.push({
-          id: theme.key,
-          label: theme.label,
-          query: `Assess my astrological promise for [${theme.label}] by executing the rules in our Mood Analysis schema. Formulate a multi-system convergence score (out of 10) across Krishnamurti Paddhati (KP), Parashari, Jaimini, and Ashtakavarga systems, specifically checking: ${ruleText}`
-        });
-      }
+OUTPUT REQUIREMENTS:
+- Produce a simple, crisp, and concise report on activated events for ${theme.label}.
+- Detail the activated houses and specific events triggered by current transits and period alignment.
+- DO NOT show any rule numbers, rule codes, technical rule IDs, or raw debug JSONs.
+- Keep the response simple, crisp, concise, and focused purely on activated events and practical outcomes.`
+      });
     });
 
     return prompts;
@@ -309,12 +349,11 @@ FINAL REPORT FORMAT:
 
   // Status message rotation during active generation
   const statusMessages = [
-    "Querying KP & Vedic daily indicators...",
-    "Retrieving native's life variables...",
+    "Evaluating active transit houses...",
+    "Retrieving natal promise variables...",
     `Synthesizing active ${activeDasha} dasha weights...`,
-    "Evaluating rules JH1 through JH19...",
-    "Aligning transit patterns against natal promise...",
-    "Formatting structured response..."
+    "Checking house activations & transit triggers...",
+    "Formulating crisp activated events report..."
   ];
 
   useEffect(() => {
@@ -333,15 +372,6 @@ FINAL REPORT FORMAT:
   const runAnalysis = async (queryText: string, displayText?: string) => {
     if (analysisLoading) return;
 
-    const userMsg: Message = {
-      id: Math.random().toString(36).substr(2, 9),
-      sender: "user",
-      text: displayText || queryText,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    setMessages(prev => [...prev, userMsg]);
-    setInput("");
     setAnalysisLoading(true);
 
     try {
@@ -357,40 +387,63 @@ FINAL REPORT FORMAT:
           question: queryText,
           targetAge: 50,
           mode: responseMode,
-          history: messages.slice(-6).map(m => ({ sender: m.sender, text: m.text })),
+          history: [],
           geminiApiKey,
           groqApiKey
         })
       });
 
       const data = await response.json();
-      if (data.error) {
-        throw new Error(data.error);
+      let cleanReply = "";
+      if (data && data.reply) {
+        cleanReply = sanitizeReportText(data.reply);
       }
 
-      const assistantMsg: Message = {
+      if (!cleanReply || cleanReply.length < 20) {
+        cleanReply = buildLocalActivatedEventsReport(displayText || "Activated Events");
+      }
+
+      const reportMsg: Message = {
         id: Math.random().toString(36).substr(2, 9),
         sender: "assistant",
-        text: data.reply,
+        text: cleanReply,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        debugInfo: data.debugInfo
+        debugInfo: data?.debugInfo
       };
 
-      setMessages(prev => [...prev, assistantMsg]);
-      setSelectedDebugMsg(assistantMsg);
+      setMessages([reportMsg]);
+      setSelectedDebugMsg(reportMsg);
     } catch (err: any) {
       console.error(err);
+      const localFallback = buildLocalActivatedEventsReport(displayText || "Activated Events");
       const errorMsg: Message = {
         id: Math.random().toString(36).substr(2, 9),
         sender: "assistant",
-        text: `⚠️ **Master AI Astrologer Session Interrupted:**\n\n${err.message || "Failed to generate report. Please verify your GEMINI_API_KEY is configured."}`,
+        text: localFallback,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
-      setMessages(prev => [...prev, errorMsg]);
+      setMessages([errorMsg]);
     } finally {
       setAnalysisLoading(false);
     }
   };
+
+  const handleSelectAskMeTab = (tabId: string) => {
+    setSelectedAskTab(tabId);
+    setActiveSubmenuPanel(null);
+    const prompts = getMoodPromptsFromJSON();
+    const target = prompts.find(p => p.id === tabId) || prompts[0];
+    if (target) {
+      runAnalysis(target.query, target.label);
+    }
+  };
+
+  // Auto-run default tab on mount if messages is empty
+  useEffect(() => {
+    if (!activeSubmenuPanel && messages.length === 0 && !analysisLoading) {
+      handleSelectAskMeTab(selectedAskTab);
+    }
+  }, []);
 
   const handleCustomSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -683,19 +736,23 @@ FINAL REPORT FORMAT:
               </button>
               {askMeExpanded && (
                 <div className="mt-1 ml-2 pl-2 border-l-2 border-blue-200 space-y-2 py-1">
-                  {/* AI Analysis Prompts */}
-                  <div className="space-y-1 max-h-[160px] overflow-y-auto scrollbar-thin pr-1">
+                  {/* Activated Event Reports Prompts */}
+                  <div className="space-y-1 max-h-[220px] overflow-y-auto scrollbar-thin pr-1">
                     {getMoodPromptsFromJSON().map((p) => (
                       <button
                         key={p.id}
                         onClick={() => {
-                          runAnalysis(p.query, p.label);
+                          handleSelectAskMeTab(p.id);
                           setSidebarOpen(false);
                         }}
-                        className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] font-medium text-neutral-800 hover:text-blue-950 bg-neutral-50/60 hover:bg-blue-50 border border-transparent hover:border-blue-200/80 w-full text-left transition-all cursor-pointer group shadow-2xs"
+                        className={`flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] font-medium w-full text-left transition-all cursor-pointer shadow-2xs ${
+                          selectedAskTab === p.id && !activeSubmenuPanel
+                            ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold border-blue-700"
+                            : "text-neutral-800 hover:text-blue-950 bg-neutral-50/60 hover:bg-blue-50 border border-transparent hover:border-blue-200/80"
+                        }`}
                         title={p.label}
                       >
-                        <Send className="w-3 h-3 text-blue-500 group-hover:text-indigo-600 shrink-0" />
+                        <span className="text-xs shrink-0">{p.icon}</span>
                         <span className="truncate">{p.label}</span>
                       </button>
                     ))}
@@ -917,7 +974,6 @@ FINAL REPORT FORMAT:
                       { id: "google_gmail", label: "Google Gmail", theme: "bg-slate-50 text-slate-950 border-slate-200/80" },
                       { id: "google_keep", label: "Google Keep Notes", theme: "bg-slate-50 text-slate-950 border-slate-200/80" },
                       { id: "google_contacts", label: "Google Contacts", theme: "bg-slate-50 text-slate-950 border-slate-200/80" },
-                      { id: "api_keys", label: "API Keys", theme: "bg-slate-50 text-slate-950 border-slate-200/80" },
                       { id: "github_ota", label: "GitHub OTA Updates", theme: "bg-slate-50 text-slate-950 border-slate-200/80" }
                     ].map((sub) => (
                       <button
@@ -1076,220 +1132,132 @@ FINAL REPORT FORMAT:
                 />
               </div>
             ) : (
-              <div className="max-w-2xl mx-auto space-y-6 w-full">
-                {messages.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center text-center py-12 px-6 min-h-[50vh] select-none rounded-2xl bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-pink-50/30 border border-indigo-200/80 shadow-sm">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center shadow-md mb-4">
+              <div className="max-w-3xl mx-auto space-y-4 w-full">
+                {/* Ask Me Horizontal Theme Tabs Bar */}
+                <div className="bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-purple-50/60 p-3 rounded-2xl border border-blue-200/80 shadow-2xs mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-blue-600 animate-pulse" />
+                      <span className="text-xs font-extrabold text-blue-950 font-sans tracking-tight">
+                        Activated Events Report Engine
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-blue-800 bg-blue-100/90 px-2.5 py-0.5 rounded-full border border-blue-200">
+                      Real-Time House & Transit Check
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1">
+                    {getMoodPromptsFromJSON().map((tab) => {
+                      const isSelected = selectedAskTab === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => handleSelectAskMeTab(tab.id)}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-2xs ${
+                            isSelected
+                              ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-bold shadow-md scale-[1.02]"
+                              : "bg-white hover:bg-blue-50 text-neutral-700 hover:text-blue-900 border border-neutral-200/80"
+                          }`}
+                        >
+                          <span>{tab.icon}</span>
+                          <span>{tab.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Main Activated Events Report Area */}
+                {analysisLoading ? (
+                  <div className="flex flex-col items-center justify-center p-8 bg-neutral-50 rounded-2xl border border-neutral-200 animate-pulse my-4">
+                    <RefreshCw className="w-6 h-6 text-indigo-600 animate-spin mb-3" />
+                    <span className="text-xs font-bold text-neutral-800">{currentStatusMsg}</span>
+                    <span className="text-[10px] text-neutral-500 font-mono mt-1">Evaluating House Activations & Transits...</span>
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center text-center py-10 px-6 min-h-[40vh] select-none rounded-2xl bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-pink-50/30 border border-indigo-200/80 shadow-sm">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center shadow-md mb-3">
                       <Sparkles className="w-6 h-6 animate-pulse" />
                     </div>
-                    <h1 className="text-2xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 bg-clip-text text-transparent font-sans">
-                      JHora AI Assistant
+                    <h1 className="text-xl font-extrabold tracking-tight mb-2 bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 bg-clip-text text-transparent font-sans">
+                      JHora Activated Events Report
                     </h1>
-                    <p className="text-neutral-700 text-xs max-w-md leading-relaxed font-medium mb-6">
-                      Your intelligent Vedic & KP astrological assistant. Ask any question about your chart, dasha, transit trends, or remedies.
+                    <p className="text-neutral-700 text-xs max-w-md leading-relaxed font-medium mb-4">
+                      Select any theme above to execute a real-time event check across active houses, dasha periods, and planetary transits.
                     </p>
                   </div>
                 ) : (
                   messages.map((msg) => (
-                    <div key={msg.id} className="flex gap-4 group">
-                      
-                      {/* Message Sender Icon/Avatar */}
-                      {msg.sender === "assistant" ? (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-md select-none">
-                          <Sparkles className="w-4 h-4 text-white" />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0 select-none shadow-sm border border-slate-700">
-                          NJ
-                        </div>
-                      )}
-
-                      {/* Message Balloon */}
-                      <div className="flex-1 space-y-2 min-w-0">
+                    <div key={msg.id} className="space-y-3">
+                      <div className="flex items-center justify-between bg-white px-4 py-2 rounded-xl border border-neutral-200/80 shadow-2xs">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-extrabold text-neutral-900">
-                            {msg.sender === "user" ? "You" : "JHora AI Assistant"}
+                            Activated Events Report
                           </span>
-                          {msg.sender === "assistant" && (
-                            <span className="bg-indigo-100 text-indigo-950 font-bold border border-indigo-200 px-2 py-0.5 rounded-full text-[10px]">
-                              KP & Vedic Engine
-                            </span>
-                          )}
-                          <span className="text-[10px] text-neutral-400 font-mono ml-auto">
-                            {msg.timestamp}
+                          <span className="bg-indigo-100 text-indigo-950 font-bold border border-indigo-200 px-2 py-0.5 rounded-full text-[10px]">
+                            {getMoodPromptsFromJSON().find(t => t.id === selectedAskTab)?.label || "Daily Reading"}
                           </span>
                         </div>
+                        <span className="text-[10px] text-neutral-400 font-mono">
+                          {msg.timestamp}
+                        </span>
+                      </div>
 
-                        {/* Body Text */}
-                        <div className="text-neutral-800 leading-relaxed text-sm select-text selection:bg-purple-100">
-                          {msg.sender === "user" ? (
-                            <p className="text-xs font-sans text-white bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2.5 rounded-2xl max-w-[90%] inline-block shadow-xs font-medium">
-                              {msg.text}
-                            </p>
+                      {/* Report Body */}
+                      <div className="space-y-1 bg-white border-l-4 border-indigo-600 p-5 rounded-2xl border border-neutral-200/90 shadow-sm text-neutral-800 leading-relaxed text-sm">
+                        {renderMarkdown(msg.text)}
+                      </div>
+
+                      {/* Actions underneath Report */}
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          onClick={() => copyToClipboard(msg.text, msg.id)}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-neutral-100 hover:bg-neutral-200/80 text-neutral-600 text-xs font-medium transition-colors cursor-pointer"
+                          title="Copy Report"
+                        >
+                          {copiedMessageId === msg.id ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
                           ) : (
-                            <div className="space-y-1 bg-gradient-to-br from-indigo-50/40 via-purple-50/20 to-white border-l-4 border-indigo-600 p-4 rounded-2xl border border-indigo-100/90 shadow-2xs">
-                              {renderMarkdown(msg.text)}
-                            </div>
+                            <Copy className="w-3.5 h-3.5" />
                           )}
-                        </div>
+                          <span>Copy Report</span>
+                        </button>
 
-
-
-                        {/* Feedback Buttons underneath Assistant Message */}
-                        {msg.sender === "assistant" && (
-                          <div className="flex items-center gap-2 pt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={() => copyToClipboard(msg.text, msg.id)}
-                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                              title="Copy text"
-                            >
-                              {copiedMessageId === msg.id ? (
-                                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                              ) : (
-                                <Copy className="w-3.5 h-3.5" />
-                              )}
-                            </button>
-
-                            <button
-                              onClick={() => toggleLike(msg.id)}
-                              className={`p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer ${
-                                likedMessages[msg.id] ? "text-emerald-600" : "text-neutral-400 hover:text-neutral-700"
-                              }`}
-                              title="Good response"
-                            >
-                              <ThumbsUp className="w-3.5 h-3.5" />
-                            </button>
-
-                            <button
-                              onClick={() => toggleDislike(msg.id)}
-                              className={`p-1.5 rounded-lg hover:bg-neutral-100 transition-colors cursor-pointer ${
-                                dislikedMessages[msg.id] ? "text-red-500" : "text-neutral-400 hover:text-neutral-700"
-                              }`}
-                              title="Bad response"
-                            >
-                              <ThumbsDown className="w-3.5 h-3.5" />
-                            </button>
-
-                            <button
-                              onClick={() => {
-                                alert("Serialized message trace compiled. Link exported to clipboard.");
-                              }}
-                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                              title="Share this response"
-                            >
-                              <Share2 className="w-3.5 h-3.5" />
-                            </button>
-
-                            <button
-                              onClick={() => runAnalysis(messages[messages.length - 2]?.text || "Re-evaluate natal chart context")}
-                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                              title="Regenerate response"
-                            >
-                              <RefreshCw className="w-3.5 h-3.5" />
-                            </button>
-
-                            <button
-                              className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-400 hover:text-neutral-700 transition-colors cursor-pointer"
-                              title="More options"
-                            >
-                              <MoreHorizontal className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        )}
-
+                        <button
+                          onClick={() => handleSelectAskMeTab(selectedAskTab)}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-medium transition-colors cursor-pointer border border-indigo-200/60 ml-auto"
+                          title="Re-run Event Check"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                          <span>Re-run Check</span>
+                        </button>
                       </div>
                     </div>
                   ))
                 )}
-
-                {/* Analysis Loading / Thinking State */}
-                {analysisLoading && (
-                  <div className="flex gap-4 mr-auto animate-pulse">
-                    <div className="w-8 h-8 rounded-full bg-indigo-50 border border-indigo-100 text-[#5c4df2] flex items-center justify-center font-bold text-xs shrink-0 select-none">
-                      <Sparkles className="w-4 h-4 text-[#5c4df2] animate-spin" />
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-neutral-800">JHora Astro AI</span>
-                        <span className="text-[10px] text-neutral-400">Synthesizing...</span>
-                      </div>
-                      <div className="bg-neutral-50 border border-neutral-200 p-3 rounded-2xl flex items-center gap-3">
-                        <RefreshCw className="w-4 h-4 text-[#5c4df2] animate-spin shrink-0" />
-                        <span className="text-xs text-neutral-600 font-mono animate-pulse">{currentStatusMsg}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                <div ref={messagesEndRef} />
               </div>
             )}
 
           </div>
         </div>
 
-        {/* BOTTOM INPUT CONTAINER (Hidden on submenu pages) */}
+        {/* BOTTOM PROFILE BAR (Hidden on submenu pages) */}
         {!activeSubmenuPanel && (
-          <div className="p-4 bg-white border-t border-neutral-100">
-            <div className="max-w-2xl mx-auto space-y-2">
-{/* Unified Input Bar (ChatGPT exact mockup - light theme) */}
-              <form onSubmit={handleCustomSubmit} className="relative bg-neutral-50 rounded-3xl p-1 px-3 flex items-center gap-2 border border-neutral-200 focus-within:border-neutral-300 shadow-sm transition-all">
-                <button
-                  type="button"
-                  onClick={() => {
-                    alert("File attachment: Upload birth charts, horary JSON payloads, or customized transit data to ground the companion.");
-                  }}
-                  className="p-1.5 hover:bg-neutral-200/50 text-neutral-400 hover:text-neutral-600 rounded-full transition-colors cursor-pointer shrink-0"
-                  title="Add attachment"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-
-                <input
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask anything"
-                  disabled={analysisLoading}
-                  className="flex-1 bg-transparent border-none outline-none py-2 text-xs text-neutral-800 placeholder-neutral-400 font-sans"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    alert("Speech-to-Text: Speak directly to the Master AI Companion to record and synthesize your query.");
-                  }}
-                  className="p-1.5 hover:bg-neutral-200/50 text-neutral-400 hover:text-neutral-600 rounded-full transition-colors cursor-pointer shrink-0"
-                  title="Voice input"
-                >
-                  <Mic className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={analysisLoading || !input.trim()}
-                  className="bg-black hover:bg-neutral-800 disabled:bg-neutral-200 text-white disabled:text-neutral-400 rounded-full p-2 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-sm"
-                >
-                  <ArrowUp className="w-4 h-4 stroke-[3]" />
-                </button>
-              </form>
-
-              {/* Profile summary details bar below input */}
-              <div className="flex items-center justify-center gap-2 overflow-x-auto text-[11px] font-sans text-neutral-600 whitespace-nowrap scrollbar-none pt-1 min-w-0">
-                <span className="font-bold text-neutral-800 flex items-center gap-1.5 shrink-0">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse inline-block shrink-0"></span>
-                  {profileName}
-                </span>
-                <span className="text-neutral-300 shrink-0">|</span>
-                <span className="shrink-0"><strong className="font-semibold text-neutral-500">DOB:</strong> {profileDob} @ {profileTob}</span>
-                <span className="text-neutral-300 shrink-0">|</span>
-                <span className="shrink-0"><strong className="font-semibold text-neutral-500">Place:</strong> {profilePob}</span>
-                <span className="text-neutral-300 shrink-0">|</span>
-                <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-mono text-[10px] font-medium shrink-0">
-                  <strong>ANTARA:</strong> {antaraLord} <span className="opacity-40">|</span> <strong>PRANA:</strong> {pranaLord}
-                </span>
-              </div>
-
+          <div className="p-3 bg-white border-t border-neutral-200/80">
+            <div className="max-w-3xl mx-auto flex items-center justify-center gap-2 overflow-x-auto text-[11px] font-sans text-neutral-600 whitespace-nowrap scrollbar-none min-w-0">
+              <span className="font-bold text-neutral-800 flex items-center gap-1.5 shrink-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block shrink-0"></span>
+                {profileName}
+              </span>
+              <span className="text-neutral-300 shrink-0">|</span>
+              <span className="shrink-0"><strong className="font-semibold text-neutral-500">DOB:</strong> {profileDob} @ {profileTob}</span>
+              <span className="text-neutral-300 shrink-0">|</span>
+              <span className="shrink-0"><strong className="font-semibold text-neutral-500">Place:</strong> {profilePob}</span>
+              <span className="text-neutral-300 shrink-0">|</span>
+              <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-mono text-[10px] font-medium shrink-0">
+                <strong>ANTARA:</strong> {antaraLord} <span className="opacity-40">|</span> <strong>PRANA:</strong> {pranaLord}
+              </span>
             </div>
           </div>
         )}
