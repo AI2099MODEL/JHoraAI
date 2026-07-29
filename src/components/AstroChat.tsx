@@ -1133,41 +1133,6 @@ OUTPUT REQUIREMENTS:
               </div>
             ) : (
               <div className="max-w-3xl mx-auto space-y-4 w-full">
-                {/* Ask Me Horizontal Theme Tabs Bar */}
-                <div className="bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-purple-50/60 p-3 rounded-2xl border border-blue-200/80 shadow-2xs mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-blue-600 animate-pulse" />
-                      <span className="text-xs font-extrabold text-blue-950 font-sans tracking-tight">
-                        Activated Events Report Engine
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-blue-800 bg-blue-100/90 px-2.5 py-0.5 rounded-full border border-blue-200">
-                      Real-Time House & Transit Check
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1">
-                    {getMoodPromptsFromJSON().map((tab) => {
-                      const isSelected = selectedAskTab === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => handleSelectAskMeTab(tab.id)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shadow-2xs ${
-                            isSelected
-                              ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-bold shadow-md scale-[1.02]"
-                              : "bg-white hover:bg-blue-50 text-neutral-700 hover:text-blue-900 border border-neutral-200/80"
-                          }`}
-                        >
-                          <span>{tab.icon}</span>
-                          <span>{tab.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
                 {/* Main Activated Events Report Area */}
                 {analysisLoading ? (
                   <div className="flex flex-col items-center justify-center p-8 bg-neutral-50 rounded-2xl border border-neutral-200 animate-pulse my-4">

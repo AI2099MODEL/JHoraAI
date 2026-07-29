@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-29T11:13:16.531Z",
+    "lastUpdated": "2026-07-29T11:15:05.538Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-29T11:13:16.531Z",
-    "localTime": "2026-07-29T04:13:16-07:00",
+    "utcTime": "2026-07-29T11:15:05.538Z",
+    "localTime": "2026-07-29T04:15:05-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 292.68
+      "longitude": 292.7
     },
     "currentNakshatra": {
       "id": "Shravana",
@@ -28,15 +28,15 @@
       "displayName": "Moon"
     },
     "currentSubLord": {
-      "id": "Ketu",
-      "displayName": "Ketu"
+      "id": "Venus",
+      "displayName": "Venus"
     },
     "moonPhase": {
       "type": "Waning Gibbous",
       "displayName": "Krishna Prathama",
       "illuminationPercentage": 94.4
     },
-    "moonLongitude": 292.68,
+    "moonLongitude": 292.7,
     "waxing": false,
     "waning": true,
     "voidOfCourse": {
@@ -74,29 +74,29 @@
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 292.68,
+      "longitude": 292.7,
       "nakshatra": "Shravana",
       "pada": 4,
       "starLord": "Moon",
-      "subLord": "Ketu",
+      "subLord": "Venus",
       "retrograde": true,
       "combust": false,
       "stationary": false
     },
     "mars": {
       "currentSign": "Leo",
-      "longitude": 148.56,
+      "longitude": 148.91,
       "nakshatra": "Uttara Phalguni",
       "pada": 1,
       "starLord": "Sun",
-      "subLord": "Rahu",
+      "subLord": "Mars",
       "retrograde": false,
       "combust": false,
       "stationary": false
     },
     "mercury": {
       "currentSign": "Sagittarius",
-      "longitude": 242.67,
+      "longitude": 242.68,
       "nakshatra": "Mula",
       "pada": 1,
       "starLord": "Ketu",
@@ -118,7 +118,7 @@
     },
     "venus": {
       "currentSign": "Leo",
-      "longitude": 138.18,
+      "longitude": 138.19,
       "nakshatra": "Purva Phalguni",
       "pada": 2,
       "starLord": "Venus",
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Moon",
-    "moonSubLord": "Ketu"
+    "moonSubLord": "Venus"
   },
   "panchanga": {
     "tithi": {
       "name": "Krishna Prathama",
       "index": 16,
       "paksha": "Krishna",
-      "endDate": "2026-07-29T23:13:16.531Z"
+      "endDate": "2026-07-29T23:15:05.538Z"
     },
     "vara": {
       "name": "Wednesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Shravana",
       "lord": "Moon",
-      "endDate": "2026-07-30T05:13:16.531Z"
+      "endDate": "2026-07-30T05:15:05.538Z"
     },
     "yoga": {
       "name": "Ayushman",
       "lord": "Sun",
-      "endDate": "2026-07-30T01:13:16.531Z"
+      "endDate": "2026-07-30T01:15:05.538Z"
     },
     "karana": {
       "name": "Kaulava",
       "lord": "Sun",
-      "endDate": "2026-07-29T17:13:16.531Z"
+      "endDate": "2026-07-29T17:15:05.538Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
