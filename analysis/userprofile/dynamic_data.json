@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Nitin",
     "profileId": "userprofile",
-    "lastUpdated": "2026-07-29T18:07:08.498Z",
+    "lastUpdated": "2026-07-29T18:12:01.862Z",
     "evaluationDate": "2026-07-29",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-29T18:07:08.157Z",
-      "localTime": "2026-07-29T11:07:08-07:00",
+      "utcTime": "2026-07-29T18:12:01.646Z",
+      "localTime": "2026-07-29T11:12:01-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Capricorn",
         "displayName": "Capricorn",
-        "longitude": 283.83
+        "longitude": 283.87
       },
       "currentNakshatra": {
         "id": "Shravana",
@@ -30,15 +30,15 @@
         "displayName": "Moon"
       },
       "currentSubLord": {
-        "id": "Jupiter",
-        "displayName": "Jupiter"
+        "id": "Venus",
+        "displayName": "Venus"
       },
       "moonPhase": {
         "type": "Waning Gibbous",
         "displayName": "Krishna Prathama",
         "illuminationPercentage": 99.2
       },
-      "moonLongitude": 283.83,
+      "moonLongitude": 283.87,
       "waxing": false,
       "waning": true,
       "voidOfCourse": {
@@ -69,18 +69,18 @@
         "nakshatra": "Pushya",
         "pada": 3,
         "starLord": "Saturn",
-        "subLord": "Mercury",
+        "subLord": "Ketu",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "moon": {
         "currentSign": "Capricorn",
-        "longitude": 283.83,
+        "longitude": 283.87,
         "nakshatra": "Shravana",
         "pada": 2,
         "starLord": "Moon",
-        "subLord": "Jupiter",
+        "subLord": "Venus",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -109,7 +109,7 @@
       },
       "jupiter": {
         "currentSign": "Cancer",
-        "longitude": 101.97,
+        "longitude": 101.98,
         "nakshatra": "Pushya",
         "pada": 3,
         "starLord": "Saturn",
@@ -245,6 +245,21 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-29T18:12:01.862Z",
+      "evaluationDate": "2026-07-29",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Cuspal Sub Lord of 7th House for Marriage Timing",
+        "10th Cuspal Sub Lord for Career and Profession Sector",
+        "Financial Status & Wealth Promise via 2nd Cuspal Sub Lord",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 4 natal promises updated."
+    },
     {
       "timestamp": "2026-07-29T18:07:08.498Z",
       "evaluationDate": "2026-07-29",
@@ -1621,19 +1636,6 @@
     },
     {
       "timestamp": "2026-07-28T17:05:42.764Z",
-      "evaluationDate": "2026-07-28",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-28T17:02:17.717Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
