@@ -1486,53 +1486,8 @@ OUTPUT REQUIREMENTS:
           
           {/* Main ChatGPT Menu items */}
           <div className="space-y-2">
-            {/* 0. My Today (AI Prompts) */}
+            {/* 1. My Life (Above My Today) */}
             <div className="space-y-0.5">
-              <button
-                onClick={() => {
-                  setAskMeExpanded(!askMeExpanded);
-                  setActiveSubmenuPanel(null);
-                  setSelectedAskTab("ask_me");
-                }}
-                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
-                  askMeExpanded 
-                    ? "bg-gradient-to-r from-blue-100/90 via-indigo-100/70 to-blue-50 text-blue-950 border border-blue-200" 
-                    : "bg-neutral-50/80 hover:bg-blue-50/60 text-neutral-800 hover:text-blue-900 border border-neutral-200/70"
-                }`}
-              >
-                <Sparkles className={`w-4 h-4 shrink-0 ${askMeExpanded ? "text-blue-600" : "text-blue-500"}`} />
-                <span className="font-sans tracking-tight">My Today</span>
-                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${askMeExpanded ? "rotate-180 text-blue-700" : ""}`} />
-              </button>
-              {askMeExpanded && (
-                <div className="mt-1 ml-2 pl-2 border-l-2 border-blue-200 space-y-2 py-1">
-                  {/* Activated Event Reports Prompts */}
-                  <div className="space-y-1 max-h-[220px] overflow-y-auto scrollbar-thin pr-1">
-                    {getMoodPromptsFromJSON().map((p) => (
-                      <button
-                        key={p.id}
-                        onClick={() => {
-                          handleSelectAskMeTab(p.id);
-                          setSidebarOpen(false);
-                        }}
-                        className={`flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] font-medium w-full text-left transition-all cursor-pointer shadow-2xs ${
-                          selectedAskTab === p.id && !activeSubmenuPanel
-                            ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold border-blue-700"
-                            : "text-neutral-800 hover:text-blue-950 bg-neutral-50/60 hover:bg-blue-50 border border-transparent hover:border-blue-200/80"
-                        }`}
-                        title={p.label}
-                      >
-                        <span className="text-xs shrink-0">{p.icon}</span>
-                        <span className="truncate">{p.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 1. My Life */}
-            <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
               <button
                 onClick={() => setMyLifeExpanded(!myLifeExpanded)}
                 className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
@@ -1549,6 +1504,7 @@ OUTPUT REQUIREMENTS:
                 <div className="mt-1 ml-2 pl-2 border-l-2 border-rose-200 space-y-2 py-1">
                   <div className="space-y-1">
                     {[
+                      { id: "birth", label: "Birth", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
                       { id: "my_life_analysis", label: "My Life Analysis", theme: "bg-rose-50 text-rose-950 border-rose-200 hover:bg-rose-600 hover:text-white" }
                     ].map((sub) => (
                       <button
@@ -1596,6 +1552,51 @@ OUTPUT REQUIREMENTS:
               )}
             </div>
 
+            {/* 0. My Today (AI Prompts) */}
+            <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
+              <button
+                onClick={() => {
+                  setAskMeExpanded(!askMeExpanded);
+                  setActiveSubmenuPanel(null);
+                  setSelectedAskTab("ask_me");
+                }}
+                className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-bold w-full text-left transition-all cursor-pointer shadow-2xs ${
+                  askMeExpanded 
+                    ? "bg-gradient-to-r from-blue-100/90 via-indigo-100/70 to-blue-50 text-blue-950 border border-blue-200" 
+                    : "bg-neutral-50/80 hover:bg-blue-50/60 text-neutral-800 hover:text-blue-900 border border-neutral-200/70"
+                }`}
+              >
+                <Sparkles className={`w-4 h-4 shrink-0 ${askMeExpanded ? "text-blue-600" : "text-blue-500"}`} />
+                <span className="font-sans tracking-tight">My Today</span>
+                <ChevronDown className={`w-3.5 h-3.5 ml-auto text-neutral-500 transition-transform duration-200 ${askMeExpanded ? "rotate-180 text-blue-700" : ""}`} />
+              </button>
+              {askMeExpanded && (
+                <div className="mt-1 ml-2 pl-2 border-l-2 border-blue-200 space-y-2 py-1">
+                  {/* Activated Event Reports Prompts */}
+                  <div className="space-y-1 max-h-[220px] overflow-y-auto scrollbar-thin pr-1">
+                    {getMoodPromptsFromJSON().map((p) => (
+                      <button
+                        key={p.id}
+                        onClick={() => {
+                          handleSelectAskMeTab(p.id);
+                          setSidebarOpen(false);
+                        }}
+                        className={`flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] font-medium w-full text-left transition-all cursor-pointer shadow-2xs ${
+                          selectedAskTab === p.id && !activeSubmenuPanel
+                            ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold border-blue-700"
+                            : "text-neutral-800 hover:text-blue-950 bg-neutral-50/60 hover:bg-blue-50 border border-transparent hover:border-blue-200/80"
+                        }`}
+                        title={p.label}
+                      >
+                        <span className="text-xs shrink-0">{p.icon}</span>
+                        <span className="truncate">{p.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* 2. My Journey */}
             <div className="space-y-0.5 pt-2 border-t border-neutral-200/60">
               <button
@@ -1615,7 +1616,6 @@ OUTPUT REQUIREMENTS:
                   {/* Journey Navigation Pages */}
                   <div className="space-y-1">
                     {[
-                      { id: "birth", label: "Birth", theme: "bg-indigo-50 text-indigo-950 border-indigo-200 hover:bg-indigo-600 hover:text-white" },
                       { id: "daily", label: "Today", theme: "bg-amber-50 text-amber-950 border-amber-200 hover:bg-amber-500 hover:text-white" },
                       { id: "weekly", label: "Weekly", theme: "bg-orange-50 text-orange-950 border-orange-200 hover:bg-orange-600 hover:text-white" },
                       { id: "monthly", label: "Monthly", theme: "bg-blue-50 text-blue-950 border-blue-200 hover:bg-blue-600 hover:text-white" },
