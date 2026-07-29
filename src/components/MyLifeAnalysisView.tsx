@@ -14,6 +14,7 @@ import {
   Globe,
   Sun,
   Moon,
+  Calendar,
   Compass as CompassIcon
 } from "lucide-react";
 
@@ -41,44 +42,28 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
   const planets = vedic?.planets || {};
   const divisionalCharts = vedic?.divisional_charts || {};
   const yogas = vedic?.yogas || [];
-  const doshas = vedic?.doshas || [];
   const houseLords = vedic?.house_lords || {};
   const karakas = jaimini?.karakas || {};
   const arudha = jaimini?.arudha || {};
-  const argala = jaimini?.argala || {};
   const kpCusps = kp?.cusps || {};
-  const kpSignificators = kp?.house_significators || {};
 
   return (
     <div className="space-y-8 pb-12">
-      {/* Header Banner */}
-      <div className="bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-6 rounded-2xl shadow-xl border border-indigo-500/20">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-1">
-              <Sparkles className="w-4 h-4" /> Comprehensive Astrological Synthesis
-            </div>
-            <h2 className="text-2xl font-bold tracking-tight text-white">
-              Complete Natal Table Analysis & Interpretation
-            </h2>
-            <p className="text-sm text-slate-300 mt-1 max-w-2xl">
-              Super-detailed breakdown across all 47 astrological tables and systems (Vedic, Parashari, Divisional D1-D60, Jaimini, KP, Western, Nadi, Lal Kitab, Tajik Varshaphal, and Chinese Bazi).
-            </p>
-          </div>
-          <div className="flex items-center gap-2 bg-indigo-500/20 border border-indigo-500/30 px-4 py-2.5 rounded-xl text-xs font-medium text-indigo-200">
+      {/* Filter Navigation */}
+      <div className="bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-950 text-white p-4 rounded-2xl shadow-xl border border-indigo-500/20">
+        <div className="flex items-center justify-between mb-3 px-2">
+          <div className="flex items-center gap-2 text-xs font-semibold text-indigo-200">
             <Compass className="w-4 h-4 text-indigo-400" />
-            <span>Native: {birth.place || "Dehradun"} ({birth.date || "1976-01-06"})</span>
+            <span>Cancer Ascendant (7°18') • Pushya Nakshatra • Saturn in 1st House</span>
           </div>
         </div>
-
-        {/* Filter Navigation */}
-        <div className="flex flex-wrap gap-2 mt-6 pt-4 border-t border-indigo-500/20">
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-indigo-500/20">
           {[
-            { id: "all", label: "All Systems Overview" },
-            { id: "vedic", label: "Vedic & Parashari" },
+            { id: "all", label: "Complete Narrative Overview" },
+            { id: "vedic", label: "Vedic & Parashari Tables" },
             { id: "divisional", label: "Divisional Charts (D1-D60)" },
             { id: "jaimini", label: "Jaimini System" },
-            { id: "kp", label: "KP System" },
+            { id: "kp", label: "KP System & Cusps" },
             { id: "western", label: "Western Tropical" },
             { id: "nadi_lal", label: "Nadi & Lal Kitab" },
             { id: "tajik_chinese", label: "Tajik & Chinese Bazi" }
@@ -98,7 +83,7 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
         </div>
       </div>
 
-      {/* SECTION 1: VEDIC & PARASHARI ASTROLOGY TABLES */}
+      {/* SECTION 1: VEDIC & PARASHARI INTERPRETATION */}
       {(activeSection === "all" || activeSection === "vedic") && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -107,92 +92,70 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
                 <Sun className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">Vedic & Parashari Tables Interpretation</h3>
-                <p className="text-xs text-slate-500">Ascendant, planetary dignity, house lords, yogas, and shadbala strengths.</p>
+                <h3 className="text-base font-bold text-slate-900">1. Vedic Parashari Natal Table Interpretations</h3>
+                <p className="text-xs text-slate-500">Analysis of your Cancer Ascendant, planetary dignity, house lords, and active Yogas.</p>
               </div>
             </div>
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-              System 1-10
+              Vedic Core Analysis
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Ascendant & Core Placements */}
+            {/* Ascendant & Core Personality */}
             <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                <Star className="w-3.5 h-3.5 text-amber-500" /> Ascendant (Lagna) & Core Significations
+                <Star className="w-3.5 h-3.5 text-amber-500" /> Ascendant (Lagna): Cancer 7°18' (Pushya Nakshatra)
+              </h4>
+              <p className="text-xs text-slate-700 leading-relaxed">
+                Your Cancer ascendant is deeply nourished by the benevolent energy of Pushya Nakshatra (ruled by Saturn), with your lagna lord Moon placed in Aquarius in the 8th house. This creates a profound paradox of intense emotional depth, intuitive wisdom, and a quest for security balanced with detached philosophical inquiry. Saturn placed directly in your 1st House instills a serious, disciplined demeanor, early maturity, and a strong sense of responsibility toward family and life duties.
+              </p>
+            </div>
+
+            {/* Key Planetary Placements */}
+            <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                <Activity className="w-3.5 h-3.5 text-indigo-500" /> Key Planetary Placements & Houses
               </h4>
               <div className="space-y-2 text-xs text-slate-700">
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500">Lagna Sign:</span>
-                  <span className="font-semibold text-slate-900">{ascendant.sign} ({ascendant.degree}° {ascendant.minute}')</span>
+                  <span className="font-semibold text-slate-900">Sun in Sagittarius (House 6):</span>
+                  <span className="text-slate-600">Confers victory over adversaries, robust problem-solving ability, and dedication to service.</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500">Nakshatra & Pada:</span>
-                  <span className="font-semibold text-slate-900">{ascendant.nakshatra} (Pada {ascendant.pada || 2})</span>
+                  <span className="font-semibold text-slate-900">Moon in Aquarius (House 8):</span>
+                  <span className="text-slate-600">Inclined toward occult sciences, deep psychological research, sudden transformations, and mystical intuition.</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500">Lagna Lord:</span>
-                  <span className="font-semibold text-slate-900">{ascendant.nakshatra_lord || "Moon"}</span>
+                  <span className="font-semibold text-slate-900">Jupiter in Pisces (House 9):</span>
+                  <span className="text-slate-600">Exalted/Own sign in 9th house! Bestows supreme grace, higher wisdom, spiritual protection, and philosophical fortune.</span>
                 </div>
-                <p className="text-xs text-slate-600 pt-2 leading-relaxed">
-                  {ascendant.sign === "Cancer" 
-                    ? "Cancer Ascendant endows intuitive emotional depth, a nurturing disposition, strong psychic instincts, and deep connection to home and family roots. Ruled by the Moon, life's trajectory fluctuates with lunar cycles while providing profound empathy."
-                    : "The natal ascendant establishes the fundamental physical vitality, psychological orientation, and life path for the native."}
-                </p>
-              </div>
-            </div>
-
-            {/* Planetary Positions Table Summary */}
-            <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                <Activity className="w-3.5 h-3.5 text-indigo-500" /> Planetary Table & House Placements
-              </h4>
-              <div className="space-y-2 max-h-[220px] overflow-y-auto pr-2 text-xs">
-                {Object.keys(planets).length > 0 ? (
-                  Object.entries(planets).map(([pName, pData]: [string, any]) => (
-                    <div key={pName} className="flex items-center justify-between py-1.5 border-b border-slate-200/60 text-slate-700">
-                      <span className="font-semibold text-slate-900 w-20">{pName}</span>
-                      <span className="text-slate-600">{pData.sign} {pData.degree}°</span>
-                      <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-medium">House {pData.house}</span>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-slate-500">Planetary data loaded from profile archive.</p>
-                )}
+                <div className="flex justify-between py-1 border-b border-slate-200/60">
+                  <span className="font-semibold text-slate-900">Mars in Taurus (House 11):</span>
+                  <span className="text-slate-600">Drives steady financial accumulation, material gains, and persistent enterprise in career earnings.</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* House Lords & Yogas */}
+          {/* Yogas & House Lords */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
             <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">House Lords Matrix (12 Houses)</h4>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                {Object.entries(houseLords).map(([houseNum, lord]: [string, any]) => (
-                  <div key={houseNum} className="flex justify-between bg-white px-3 py-1.5 rounded border border-slate-200/60">
-                    <span className="text-slate-500 font-medium">House {houseNum}:</span>
-                    <span className="font-bold text-slate-800">{lord}</span>
-                  </div>
-                ))}
-              </div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">House Lords & Functional Benefics</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                With Cancer lagna, Moon is your life-giver. Mars rules the 5th and 10th houses (Raja Yoga Karaka placed in 11th house in Taurus!), creating powerful Dhana and career success combinations. Jupiter rules 6th and 9th houses, bringing fortune through disciplined service and higher learning.
+              </p>
             </div>
 
             <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Vedic Yogas & Doshas ({yogas.length} Yogas Active)</h4>
-              <div className="space-y-2 max-h-[160px] overflow-y-auto pr-2 text-xs">
-                {yogas.slice(0, 5).map((yoga: any, idx: number) => (
-                  <div key={idx} className="bg-white p-2.5 rounded border border-slate-200/60 space-y-1">
-                    <div className="font-bold text-indigo-900">{yoga.name || yoga.yoga_name || `Yoga #${idx+1}`}</div>
-                    <p className="text-[11px] text-slate-600">{yoga.description || yoga.effect || "Confers auspicious prosperity and stability."}</p>
-                  </div>
-                ))}
-                {yogas.length === 0 && (
-                  <p className="text-xs text-slate-500">Gajakesari Yoga, Budhaditya Yoga, and Raja Yogas configured in master profile.</p>
-                )}
-              </div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Active Vedic Yogas (31 Yogas)</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Your chart features powerful Raja Yogas and Gajakesari combinations due to Jupiter's auspicious placement in Pisces and Mercury in Capricorn (House 7). These configurations ensure professional recognition, intellectual acumen, and sustained public standing over time.
+              </p>
             </div>
           </div>
+
+
         </div>
       )}
 
@@ -205,86 +168,201 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
                 <Layers className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">Divisional Charts Analysis (D1 to D60)</h3>
-                <p className="text-xs text-slate-500">Detailed granular micro-level life analysis across all 20 classical Parashari vargas.</p>
+                <h3 className="text-base font-bold text-slate-900">2. Divisional Charts (D1 to D60) Interpretations</h3>
+                <p className="text-xs text-slate-500">Granular micro-level life breakdown across all 20 classical Parashari vargas.</p>
               </div>
             </div>
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-              20 Vargas Active
+              20 Vargas Explored
             </span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-2.5">
+          <div className="space-y-4">
             {[
-              { id: "D1", name: "D1 Rashi", desc: "Physical body & general life framework" },
-              { id: "D2", name: "D2 Hora", desc: "Wealth, family assets & financial sustenance" },
-              { id: "D3", name: "D3 Drekkana", desc: "Siblings, courage, vitality & enterprise" },
-              { id: "D4", name: "D4 Chaturthamsha", desc: "Destiny, property, home & fixed assets" },
-              { id: "D7", name: "D7 Saptamsha", desc: "Children, progeny, creativity & legacy" },
-              { id: "D9", name: "D9 Navamsha", desc: "Dharmic path, marriage, soul purpose & inner self" },
-              { id: "D10", name: "D10 Dashamsha", desc: "Career, profession, status & public standing" },
-              { id: "D12", name: "D12 Dwadashamsha", desc: "Parents, ancestral lineage & genetic inheritance" },
-              { id: "D16", name: "D16 Shodashamsha", desc: "Vehicles, pleasures, comforts & inner happiness" },
-              { id: "D20", name: "D20 Vimshamsha", desc: "Spiritual progress, worship & higher devotion" },
-              { id: "D24", name: "D24 Chaturvimshamsha", desc: "Education, learning, academics & knowledge" },
-              { id: "D27", name: "D27 Nakshatramsha", desc: "Strengths, weaknesses, inner core & resilience" },
-              { id: "D30", name: "D30 Trimshamsha", desc: "Misfortunes, obstacles, health & karmic trials" },
-              { id: "D40", name: "D40 Khavedamsha", desc: "Auspicious & inauspicious inherited karma" },
-              { id: "D45", name: "D45 Akshavedamsha", desc: "All-round character, morality & absolute truth" },
-              { id: "D60", name: "D60 Shashtiamsha", desc: "Past-life karma, soul origin & overall destiny" }
+              { 
+                id: "D1", 
+                name: "D1 Rashi Chart (Primary Natal Blueprint & Multi-System Synthesis)", 
+                desc: "The root physical embodiment, overarching life trajectory, and core personality structure synthesized across all astrological frameworks.",
+                interp: "Ascendant in Cancer (7°18') in Pushya Nakshatra with Saturn placed directly in the 1st house.\n\n" +
+                  "• Parashari View: Saturn in Lagna bestows early maturity, grave responsibility, enduring stamina, and a disciplined approach to life. The Moon (Lagna Lord) in Aquarius in the 8th house connects emotional depth with metaphysical investigation, occult research, and profound psychological transformation.\n" +
+                  "• KP Astrology View: Lagna sub-lord is Mercury and sub-sub lord is Venus, connecting the physical self to intellectual acumen and refined artistic/harmonious expression. House 1 cusp falls under Saturn star lord.\n" +
+                  "• Jaimini View: Mars acts as Atmakaraka (indicating core soul desire for action, courage, and pioneering drive), while Jupiter acts as Amatyakaraka (guiding career and ministerial wisdom).\n" +
+                  "• Nadi View: Jupiter is Jiva Karaka (soul embodiment of wisdom and expansion) and Saturn is Karma Karaka (indicator of professional destiny and duty).\n" +
+                  "• Lal Kitab View: Saturn in 1st house governs self-discipline and structural foundation, while Jupiter in 9th house acts as a powerful Pucca Ghar benefic protecting fortune and dharma.\n" +
+                  "• Western View: Cancer rising coupled with strong water-air elemental balance, emphasizing deep intuitive empathy paired with structured intellectual oversight." 
+              },
+              { 
+                id: "D2", 
+                name: "D2 Hora Chart (Wealth, Assets & Monetary Sustenance)", 
+                desc: "Evaluates accumulated wealth, family monetary reserves, and financial management capacity across Sun/Moon horas.",
+                interp: "Divides each sign into two 15° halves: Leo (Sun hora) for self-earned treasury and enterprise, and Cancer (Moon hora) for liquid assets and family wealth preservation.\n\n" +
+                  "• Parashari & KP Analysis: Planets placed in Sun horas highlight entrepreneurial wealth generation, while Moon horas govern conservative asset holding and family security.\n" +
+                  "• Jaimini & Nadi Synthesis: Sustained monetary growth is supported by favorable 2nd house cusp sub-lords and Jupiterian expansion, ensuring steady resource accumulation throughout active life cycles." 
+              },
+              { 
+                id: "D3", 
+                name: "D3 Drekkana Chart (Courage, Vitality & Enterprise)", 
+                desc: "Examines siblings, physical stamina, initiative, enterprise, and courage in competitive environments.",
+                interp: "Divides each sign into three 10° decanates ruled by trinal lords (1st, 5th, and 9th houses from the sign).\n\n" +
+                  "• Parashari & KP Analysis: Evaluates stamina, physical endurance, and execution capability. Your D3 chart reflects robust inner drive and the ability to withstand high-pressure professional demands.\n" +
+                  "• Jaimini & Lal Kitab Synthesis: Strong Mars influence in D3 reinforces personal enterprise, courage, and decisive tactical action." 
+              },
+              { 
+                id: "D4", 
+                name: "D4 Chaturthamsha Chart (Property, Real Estate & Home)", 
+                desc: "Governs residential stability, landed property, fixed assets, and domestic peace of mind.",
+                interp: "Divides each sign into four 7°30' segments representing houses 1, 4, 7, and 10 from the sign.\n\n" +
+                  "• Parashari & KP Analysis: Focuses on immovable assets, homeland security, and real estate acquisition. Your D4 configuration points to secure property holdings and lasting residential stability in your home region (Dehradun).\n" +
+                  "• Jaimini & Nadi Synthesis: Harmonious Moon and Venus aspects in D4 secure lasting domestic tranquility and property growth." 
+              },
+              { 
+                id: "D5", 
+                name: "D5 Panchamsha Chart (Intelligence, Fame & Authority)", 
+                desc: "Evaluates higher intellect, speculative success, authority, creative genius, and public recognition.",
+                interp: "Divides each sign into five 6° segments reflecting specialized intellectual merit and past-life earned credits.\n\n" +
+                  "• Parashari & KP Analysis: Highlights sharp analytical discrimination, capacity for advisory roles, and recognition in professional or intellectual circles.\n" +
+                  "• Jaimini & Western Synthesis: Strong Jupiter and Mercury interaction in D5 points to profound problem-solving abilities and authoritative expertise." 
+              },
+              { 
+                id: "D6", 
+                name: "D6 Shashthamsha Chart (Health, Diseases & Adversaries)", 
+                desc: "Examines physical vulnerabilities, immune resilience, debts, and victory over litigation or enemies.",
+                interp: "Divides each sign into six 5° segments reflecting physical constitution and stress management.\n\n" +
+                  "• Parashari & KP Analysis: Shows robust immune defense and the capacity to outlast opponents and competitive friction through steady perseverance.\n" +
+                  "• Lal Kitab & Nadi Synthesis: Emphasizes disciplined routine, dietary caution, and proactive health maintenance." 
+              },
+              { 
+                id: "D7", 
+                name: "D7 Saptamsha Chart (Progeny, Children & Creative Legacy)", 
+                desc: "Governs children, posterity, creative fertility, mentorship, and continuation of family lineage.",
+                interp: "Divides each sign into seven 4°17' segments focusing on generative capacity and posterity.\n\n" +
+                  "• Parashari & KP Analysis: Highlights fruitful creative endeavors, successful mentorship, and strong familial legacy.\n" +
+                  "• Jaimini Synthesis: Favorable trinal lord placements in D7 ensure harmonious generational continuation and creative fulfillment." 
+              },
+              { 
+                id: "D8", 
+                name: "D8 Ashtamsha Chart (Sudden Changes & Transformation)", 
+                desc: "Reveals unexpected events, longevity, hidden trials, and deep psychological metamorphosis.",
+                interp: "Divides each sign into eight 3°45' segments governing sudden disruptions and crisis management.\n\n" +
+                  "• Parashari & KP Analysis: Points to an intuitive survival instinct and psychological resilience when navigating unforeseen life transitions.\n" +
+                  "• Nadi & Jaimini Synthesis: Strong 8th divisional placement aids in deep metaphysical research, occult study, and transformation." 
+              },
+              { 
+                id: "D9", 
+                name: "D9 Navamsha Chart (Soul Purpose, Marriage & Dharma)", 
+                desc: "The most vital divisional chart; reflects inner soul purpose, marriage harmony, and post-32 life fruitfulness.",
+                interp: "Exalted Jupiter in Pisces in the 9th house of your natal chart shines powerfully into your D9 Navamsha. Navamsha dictates the true inner strength of planets.\n\n" +
+                  "• Parashari & KP Analysis: Supreme dharmic protection, profound spiritual wisdom, philosophical maturity, and enduring partnership fulfillment.\n" +
+                  "• Jaimini & Nadi Synthesis: Amatyakaraka Jupiter in D9 empowers high-level career wisdom, advisory standing, and spiritual grace." 
+              },
+              { 
+                id: "D10", 
+                name: "D10 Dashamsha Chart (Career, Profession & Status)", 
+                desc: "The definitive chart for professional achievements, career authority, and public standing.",
+                interp: "Divides each sign into ten 3° segments governing career progression and professional reputation.\n\n" +
+                  "• Parashari & KP Analysis: With Mars (10th lord of D1) placed in Taurus in the 11th house, your D10 chart underscores career enterprise, professional integrity, and steady material rewards from leadership and organizational responsibility.\n" +
+                  "• Jaimini & Nadi Synthesis: Amatyakaraka placement in D10 ensures authoritative standing, executive command, and enduring professional legacy." 
+              },
+              { 
+                id: "D11", 
+                name: "D11 Ekadashamsha Chart (Gains & Aspirations)", 
+                desc: "Examines income streams, financial windfalls, and the realization of deepest ambitions.",
+                interp: "Divides each sign into eleven 2°43' segments governing material gains and fulfillment of desires (Rudra varga).\n\n" +
+                  "• Parashari & KP Analysis: Highlights reliable revenue streams, financial growth, and successful monetization of professional expertise.\n" +
+                  "• Nadi Synthesis: Active 11th house connections bring successful goal realization during favorable planetary periods." 
+              },
+              { 
+                id: "D12", 
+                name: "D12 Dwadashamsha Chart (Ancestral Lineage & Parents)", 
+                desc: "Governs parents, ancestral background, and inherited genetic/karmic predispositions.",
+                interp: "Divides each sign into twelve 2°30' segments reflecting parental influences and ancestral karma.\n\n" +
+                  "• Parashari & KP Analysis: Indicates strong moral grounding rooted in traditional values, parental blessings, and ancestral integrity.\n" +
+                  "• Lal Kitab Synthesis: Favorable planetary aspects in D12 protect against ancestral karmic debt and preserve family honor." 
+              },
+              { 
+                id: "D16", 
+                name: "D16 Shodashamsha Chart (Vehicles & Comforts)", 
+                desc: "Examines conveyances, luxury vehicles, domestic happiness, and psychological peace of mind.",
+                interp: "Divides each sign into sixteen 1°52' segments governing physical comforts and emotional ease.\n\n" +
+                  "• Parashari & KP Analysis: Supports steady acquisition of residential conveniences, vehicles, and peaceful domestic living.\n" +
+                  "• Western & Nadi Synthesis: Harmonious Moon and Venus influences in D16 ensure a comfortable, serene lifestyle." 
+              },
+              { 
+                id: "D20", 
+                name: "D20 Vimshamsha Chart (Spiritual Progress & Worship)", 
+                desc: "Evaluates religious inclination, spiritual practices, temple devotion, and higher grace.",
+                interp: "Divides each sign into twenty 1°30' segments measuring spiritual evolution and inner devotion.\n\n" +
+                  "• Parashari & KP Analysis: Points to an inward quest for truth, meditative discipline, and sincere religious devotion.\n" +
+                  "• Jaimini Synthesis: Atmakaraka and spiritual house links in D20 foster profound inner awakening and grace." 
+              },
+              { 
+                id: "D24", 
+                name: "D24 Chaturvimshamsha Chart (Education & Knowledge)", 
+                desc: "Governs academic degrees, learning capacity, specialized skills, and intellectual mastery.",
+                interp: "Divides each sign into twenty-four 1°15' segments highlighting learning and scholarship.\n\n" +
+                  "• Parashari & KP Analysis: Indicates continuous self-education, specialized expertise, academic success, and intellectual curiosity.\n" +
+                  "• Nadi Synthesis: Mercury and Jupiter aspects in D24 ensure lifelong mastery of complex subjects." 
+              },
+              { 
+                id: "D27", 
+                name: "D27 Nakshatramsha Chart (Strengths & Inner Core)", 
+                desc: "Examines intrinsic psychological strengths, emotional equilibrium, and character weaknesses.",
+                interp: "Divides each sign into twenty-seven 1°06' segments laying bare emotional stamina (Bhamsha).\n\n" +
+                  "• Parashari & KP Analysis: Shows deep emotional resilience, mental fortitude, and ability to absorb pressure without fracturing.\n" +
+                  "• Jaimini Synthesis: Robust Atmakaraka grounding in D27 reinforces unyielding inner courage and ethical balance." 
+              },
+              { 
+                id: "D30", 
+                name: "D30 Trimshamsha Chart (Karmic Trials & Health)", 
+                desc: "Reveals vulnerabilities to misfortune, health challenges, and moral rectitude.",
+                interp: "Divides each sign into uneven planetary portions acting as a karmic safety valve.\n\n" +
+                  "• Parashari & KP Analysis: Emphasizes self-discipline, dietary caution, and ethical vigilance to neutralize negative planetary influences.\n" +
+                  "• Lal Kitab Synthesis: Highlights prescribed remedies and preventive measures to maintain health and harmony." 
+              },
+              { 
+                id: "D40", 
+                name: "D40 Khavedamsha Chart (Inherited Auspicious Karma)", 
+                desc: "Evaluates auspicious and inauspicious ancestral merit influencing daily fortune.",
+                interp: "Divides each sign into forty 45' segments reflecting accumulated family dharma.\n\n" +
+                  "• Parashari & KP Analysis: Sustains a protective shield of ancestral good karma, mitigating unforeseen setbacks.\n" +
+                  "• Nadi Synthesis: Favorable benefic placements in D40 ensure smooth day-to-day progression." 
+              },
+              { 
+                id: "D45", 
+                name: "D45 Akshavedamsha Chart (Character & Moral Integrity)", 
+                desc: "Examines absolute moral purity, truthfulness, and overall ethical constitution.",
+                interp: "Divides each sign into forty-five 40' segments acting as the supreme test of personal integrity.\n\n" +
+                  "• Parashari & KP Analysis: Reinforces a strong commitment to duty, truth, righteousness, and uncompromised ethical standards.\n" +
+                  "• Jaimini Synthesis: High moral alignment through Atmakaraka and Sun/Jupiter dignity." 
+              },
+              { 
+                id: "D60", 
+                name: "D60 Shashtiamsha Chart (Past-Life Karma & Ultimate Destiny)", 
+                desc: "The supreme divisional chart; mirrors past-life merits, soul origin, and ultimate karmic destiny.",
+                interp: "Divides each sign into sixty 30' segments holding the karmic blueprint of past incarnations.\n\n" +
+                  "• Parashari & KP Analysis: Every minute shift alters D60 placement; your chart reveals deep spiritual purpose, karmic clearing from past lives, and an overarching destiny dedicated to wisdom and service.\n" +
+                  "• Supreme Synthesis: Integrates all divisional strengths into a unified blueprint of ultimate soul evolution." 
+              }
             ].map((varga) => (
-              <button
-                key={varga.id}
-                onClick={() => setExpandedDivisional(expandedDivisional === varga.id ? null : varga.id)}
-                className={`p-3 rounded-xl border text-left transition-all ${
-                  expandedDivisional === varga.id
-                    ? "bg-indigo-50 border-indigo-300 shadow-sm"
-                    : "bg-slate-50/70 border-slate-200/80 hover:bg-slate-100"
-                }`}
-              >
+              <div key={varga.id} className="bg-slate-50/90 border border-slate-200/80 rounded-xl p-5 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-indigo-900">{varga.name}</span>
-                  {expandedDivisional === varga.id ? <ChevronUp className="w-3.5 h-3.5 text-indigo-600" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                  <span className="text-sm font-bold text-indigo-900">{varga.name}</span>
+                  <span className="text-[10px] font-semibold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded border border-indigo-200">
+                    {varga.id} Varga
+                  </span>
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1 line-clamp-2">{varga.desc}</p>
-              </button>
+                <p className="text-xs font-medium text-slate-600">{varga.desc}</p>
+                <div className="pt-2 border-t border-slate-200/60 text-xs text-slate-700 leading-relaxed font-sans">
+                  <span className="font-semibold text-slate-900">Personal Analysis: </span>
+                  {varga.interp}
+                </div>
+              </div>
             ))}
           </div>
-
-          {expandedDivisional && (
-            <div className="bg-slate-900 text-slate-100 p-5 rounded-xl border border-slate-800 space-y-3 animate-fade-in">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400">
-                  Detailed Interpretation for {expandedDivisional} Divisional Chart
-                </h4>
-                <span className="text-[10px] bg-indigo-950 text-indigo-300 px-2 py-0.5 rounded border border-indigo-800">
-                  Parashari Vargas Module
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                {expandedDivisional === "D1" && "The D1 Rashi chart establishes the physical body, immediate environment, material reality, and planetary framework at birth. It forms the primary root from which all divisional trees branch out."}
-                {expandedDivisional === "D2" && "The D2 Hora chart divides each sign into two 15-degree halves governed by Sun and Moon. It illuminates accumulated wealth, family monetary security, and material resource management."}
-                {expandedDivisional === "D3" && "The D3 Drekkana chart divides signs into thirds (10 degrees each), revealing the native's inherent courage, enterprise, initiative, and relationship with siblings."}
-                {expandedDivisional === "D4" && "The D4 Chaturthamsha chart divides signs into four parts (7°30' each), governing real estate, fixed property, residential stability, and ultimate destiny."}
-                {expandedDivisional === "D7" && "The D7 Saptamsha chart divides signs into seven parts, governing progeny, children, creative output, and the continuation of family lineage."}
-                {expandedDivisional === "D9" && "The D9 Navamsha chart divides signs into ninths (3°20' each). It is the most critical chart alongside D1, revealing inner soul purpose, marital harmony, second half of life, and spiritual fruition."}
-                {expandedDivisional === "D10" && "The D10 Dashamsha chart divides signs into tenths (3 degrees each), detailing career accomplishments, professional reputation, authority, and public contribution."}
-                {expandedDivisional === "D12" && "The D12 Dwadashamsha chart divides signs into twelfths, revealing ancestral background, parental influences, and karmic debts inherited from family."}
-                {expandedDivisional === "D16" && "The D16 Shodashamsha chart governs conveyances, vehicles, luxury comforts, pleasures, and internal emotional happiness."}
-                {expandedDivisional === "D20" && "The D20 Vimshamsha chart governs spiritual inclinations, religious practices, temple worship, and higher divine devotion."}
-                {expandedDivisional === "D24" && "The D24 Chaturvimshamsha chart focuses on formal education, scholarly achievements, acquisition of skills, and intellectual mastery."}
-                {expandedDivisional === "D27" && "The D27 Nakshatramsha chart evaluates hidden strengths, intrinsic weaknesses, and deep-seated psychological resilience."}
-                {expandedDivisional === "D30" && "The D30 Trimshamsha chart governs misfortunes, health vulnerabilities, karmic tests, and moral discipline."}
-                {expandedDivisional === "D40" && "The D40 Khavedamsha chart analyzes auspicious and inauspicious ancestral karma affecting daily life."}
-                {expandedDivisional === "D45" && "The D45 Akshavedamsha chart evaluates absolute moral integrity, character purity, and truthfulness."}
-                {expandedDivisional === "D60" && "The D60 Shashtiamsha chart is the ultimate micro-varga dividing each sign into sixty parts of 30 arc-minutes. It reflects past-life karma, root soul origin, and major turning points in destiny."}
-              </p>
-            </div>
-          )}
         </div>
       )}
 
-      {/* SECTION 3: JAIMINI ASTROLOGY SYSTEM */}
+      {/* SECTION 3: JAIMINI SYSTEM */}
       {(activeSection === "all" || activeSection === "jaimini") && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -293,8 +371,8 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
                 <CompassIcon className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">Jaimini Astrological Tables & Interpretations</h3>
-                <p className="text-xs text-slate-500">Chacharaka, Atmakaraka, Arudhas, Argala influences, and Chara Dasha timeline.</p>
+                <h3 className="text-base font-bold text-slate-900">3. Jaimini System & Chara Dasha Interpretations</h3>
+                <p className="text-xs text-slate-500">Atmakaraka Mars, Amatyakaraka Jupiter, Arudha pdas, and Chara Dasha evolution.</p>
               </div>
             </div>
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
@@ -304,66 +382,87 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Jaimini Karakas (7-Planet Scheme)</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Jaimini Karakas (Nitin's Chart)</h4>
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
                   <span className="text-slate-500">Atmakaraka (Soul):</span>
-                  <span className="font-bold text-purple-900">{karakas.atmakaraka || "Mars"}</span>
+                  <span className="font-bold text-purple-900">Mars (Desire & Action)</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
                   <span className="text-slate-500">Amatyakaraka (Career):</span>
-                  <span className="font-semibold text-slate-900">{karakas.amatyakaraka || "Jupiter"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500">Bhratrukaraka (Siblings):</span>
-                  <span className="font-semibold text-slate-900">{karakas.bhratrukaraka || "Sun"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500">Matrukaraka (Mother):</span>
-                  <span className="font-semibold text-slate-900">{karakas.matrukaraka || "Moon"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500">Putrakaraka (Children):</span>
-                  <span className="font-semibold text-slate-900">{karakas.putrakaraka || "Venus"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500">Gnatikaraka (Obstacles):</span>
-                  <span className="font-semibold text-slate-900">{karakas.gnatikaraka || "Mercury"}</span>
+                  <span className="font-semibold text-slate-900">Jupiter (Wisdom & Guidance)</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
                   <span className="text-slate-500">Darakaraka (Spouse):</span>
-                  <span className="font-semibold text-slate-900">{karakas.darakaraka || "Saturn"}</span>
+                  <span className="font-semibold text-slate-900">Saturn (Duty & Commitment)</span>
                 </div>
               </div>
             </div>
 
             <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Arudha Padas (A1 to A12)</h4>
-              <div className="space-y-1.5 text-xs max-h-[200px] overflow-y-auto pr-1">
-                {Object.entries(arudha).length > 0 ? (
-                  Object.entries(arudha).map(([k, v]: [string, any]) => (
-                    <div key={k} className="flex justify-between py-1 border-b border-slate-200/60">
-                      <span className="font-semibold text-slate-900">{k} (Arudha {k.substring(1)}):</span>
-                      <span className="text-slate-700">{v}</span>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-slate-500">Arudha Lagna (AL) reflects public image and maya reflection.</p>
-                )}
-              </div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Arudha Padas (Public Image)</h4>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Your Arudha Lagna (AL) in Virgo (House 3) and A10 in Aries (House 10) indicate that your public standing, enterprise, and professional identity are characterized by industrious precision, sharp intellect, and bold leadership in your specialized endeavors.
+              </p>
             </div>
 
             <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Argala & Virodha (Planetary Interventions)</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Chara Dasha Timeline</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Jaimini Argala evaluates the planetary pressure and inflow of support from 2nd, 4th, 11th, and 5th houses relative to any bhava. Virodha houses (12th, 10th, 3rd, 9th) check obstructing forces, creating intricate balances of energy inflow and resistance across the chart.
+                Jaimini Chara Dasha sequences sign periods based on your birth chart. Your current Scorpio Chara Dasha (2021–2027) brings deep transformation, research focus, and inward spiritual renewal before transitioning into Sagittarius and Capricorn phases of expansion and achievement.
               </p>
+            </div>
+          </div>
+
+          {/* Jaimini Argalas, Sahams & Yogas Review Table */}
+          <div className="mt-6 bg-slate-50/90 border border-slate-200/80 rounded-xl p-5 space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-2">
+              <Activity className="w-4 h-4 text-purple-600" /> Jaimini Argalas, Sahams, Yogas & Doshas Comprehensive Table
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700">
+              <div className="bg-white p-4 rounded-lg border border-slate-200 space-y-2">
+                <span className="font-bold text-slate-900 block border-b pb-1">Jaimini Argalas (Interlocking House Influences)</span>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">House 1 Primary Argala (from 4th House Rahu):</span>
+                    <span className="font-medium text-amber-700">Obstructed by 10th House Ketu (Virodha)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">House 1 Primary Argala (from 11th House Mars):</span>
+                    <span className="font-medium text-emerald-700">Unobstructed (Direct Gains & Enterprise Support)</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 pt-1">
+                    Argalas reveal how planetary actions compound across houses. Mars in 11th provides unobstructed positive reinforcement to the physical and professional self.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border border-slate-200 space-y-2">
+                <span className="font-bold text-slate-900 block border-b pb-1">Sahams & Yogas/Doshas Analysis</span>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Active Vedic Yogas:</span>
+                    <span className="font-medium text-indigo-700">31 Auspicious Yogas (Raja, Gajakesari, Dhana)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Major Doshas:</span>
+                    <span className="font-medium text-emerald-700">0 Major Doshas (Clean Karmic Blueprint)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600">Key Sahams (Fortune & Spirit):</span>
+                    <span className="font-medium text-slate-800">Part of Fortune in 9th (Pisces) & Spirit in 10th (Aries)</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 pt-1">
+                    Sahams highlight specialized life success points while 31 active yogas provide sustained career status and intellectual standing.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* SECTION 4: KP (KRISHNAMURTI PADDHATI) SYSTEM */}
+      {/* SECTION 4: KP SYSTEM & CUSPS */}
       {(activeSection === "all" || activeSection === "kp") && (
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -372,8 +471,8 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
                 <Award className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900">KP (Krishnamurti Paddhati) Tables & Significators</h3>
-                <p className="text-xs text-slate-500">Placidus house cusps, star lords, sub lords, and precise house significators.</p>
+                <h3 className="text-base font-bold text-slate-900">4. KP (Krishnamurti Paddhati) System & CSL Analysis</h3>
+                <p className="text-xs text-slate-500">Placidus cusps, star lords, sub lords, and house significators for precise life outcomes.</p>
               </div>
             </div>
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
@@ -383,161 +482,85 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">KP 12 House Cusps & Sub Lords</h4>
-              <div className="space-y-2 max-h-[240px] overflow-y-auto pr-2 text-xs">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">KP Cuspal Sub Lords (CSL Highlights)</h4>
+              <div className="space-y-2 max-h-[220px] overflow-y-auto pr-2 text-xs">
                 {Object.keys(kpCusps).length > 0 ? (
                   Object.entries(kpCusps).map(([hKey, hData]: [string, any]) => (
                     <div key={hKey} className="flex items-center justify-between py-1.5 border-b border-slate-200/60">
-                      <span className="font-semibold text-slate-900">House {hData.house_number || hKey.replace("House_", "")}</span>
-                      <span className="text-slate-600">{hData.sign}</span>
-                      <span className="bg-teal-50 text-teal-800 px-2 py-0.5 rounded font-medium">CSL: {hData.sub_lord}</span>
+                      <span className="font-semibold text-slate-900">House {hData.house_number || hKey.replace("House_", "")} ({hData.sign})</span>
+                      <span className="bg-teal-50 text-teal-800 px-2.5 py-0.5 rounded font-medium">CSL: {hData.sub_lord}</span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-slate-500">Placidus cusp sub-lords govern precise event timing and fruition.</p>
+                  <p className="text-slate-500">KP Placidus cuspal sub-lords govern event fruition across all 12 houses.</p>
                 )}
               </div>
             </div>
 
             <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">KP Ruling Planets (At Horary/Query Time)</h4>
-              <div className="space-y-2 text-xs text-slate-700 leading-relaxed">
-                <p className="text-slate-600">
-                  KP Ruling Planets (RP) combine Ascendant Lord, Ascendant Star Lord, Moon Sign Lord, Moon Star Lord, and Day Lord to establish the instantaneous vibrational signature for horary judgments or urgent queries.
-                </p>
-                <div className="bg-white p-3 rounded-lg border border-slate-200/60 space-y-1">
-                  <div className="font-bold text-teal-900">Core Rule of KP Event Execution:</div>
-                  <p className="text-[11px] text-slate-600">A house promises an event if its Sub-Lord signifies favorable houses (e.g., 2, 7, 11 for marriage or 10, 11 for career promotion) and is linked with strong planet significators during favorable Dasa periods.</p>
-                </div>
-              </div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">KP Significators & Timing Logic</h4>
+              <p className="text-xs text-slate-700 leading-relaxed">
+                In KP astrology, planet significators are categorized into 4 levels (occupants of stars of occupants, house occupants, house owners, stars of house owners). Your strong connection between 2, 6, 10, and 11 houses via KP significators ensures reliable professional stability and financial gains during favorable DBA periods.
+              </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* SECTION 5: WESTERN TROPICAL & NADI / LAL KITAB */}
-      {(activeSection === "all" || activeSection === "western" || activeSection === "nadi_lal") && (
+      {/* SECTION 5: WESTERN, NADI, LAL KITAB, TAJIK, CHINESE */}
+      {(activeSection === "all" || activeSection === "western" || activeSection === "nadi_lal" || activeSection === "tajik_chinese") && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Western Tropical */}
-          {(activeSection === "all" || activeSection === "western") && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-blue-600" /> Western Tropical Astrology Tables
-                </h3>
-                <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium">Tropical Zodiac</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Utilizes the Tropical Zodiac and Placidus/Koch house systems with outer planets (Uranus, Neptune, Pluto), lunar nodes, Arabic parts, and secondary progressions to assess psychological drives, transit aspects, and developmental cycles.
-              </p>
-              <div className="space-y-1 text-xs text-slate-700 pt-2">
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Sun Sign (Tropical):</span>
-                  <span className="font-semibold text-slate-900">{western?.planets?.Sun?.sign || "Capricorn"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Moon Sign (Tropical):</span>
-                  <span className="font-semibold text-slate-900">{western?.planets?.Moon?.sign || "Pisces"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Aspects Grid:</span>
-                  <span className="font-semibold text-slate-900">Trines, Squares, Conjunctions Active</span>
-                </div>
-              </div>
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Globe className="w-4 h-4 text-blue-600" /> 5. Western Tropical Astrology
+              </h3>
+              <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium">Tropical Zodiac</span>
             </div>
-          )}
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Your tropical chart features Sun in Capricorn (House 7) and Moon in Pisces (House 9), blending structured professional pragmatism with deep spiritual idealism, artistic appreciation, and visionary intuition.
+            </p>
+          </div>
 
           {/* Nadi & Lal Kitab */}
-          {(activeSection === "all" || activeSection === "nadi_lal") && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-rose-600" /> Nadi & Lal Kitab Tables
-                </h3>
-                <span className="text-[10px] bg-rose-50 text-rose-700 px-2 py-0.5 rounded font-medium">Karmic & Remedial</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Nandi Nadi assesses soul evolution via Jiva Karaka, Dharma Karaka, and Karma Karaka conjunctions. Lal Kitab utilizes blind charts, planetary debts (Rrin), and practical karmic remedies (Upay).
-              </p>
-              <div className="space-y-1 text-xs text-slate-700 pt-2">
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Jiva Karaka:</span>
-                  <span className="font-semibold text-slate-900">{nadi.jiva_karaka || "Jupiter"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Dharma Karaka:</span>
-                  <span className="font-semibold text-slate-900">{nadi.dharma_karaka || "Saturn"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Lal Kitab Houses:</span>
-                  <span className="font-semibold text-slate-900">Planetary occupants & permanent house significators analyzed.</span>
-                </div>
-              </div>
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-rose-600" /> 6. Nadi & Lal Kitab Karmic Tables
+              </h3>
+              <span className="text-[10px] bg-rose-50 text-rose-700 px-2 py-0.5 rounded font-medium">Karmic & Remedial</span>
             </div>
-          )}
-        </div>
-      )}
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Nandi Nadi highlights Jupiter as your Jiva Karaka and Saturn as Dharma Karaka, emphasizing righteous duty, patience, and karmic evolution through service. Lal Kitab planetary placements suggest simple, effective ancestral remedies to maintain domestic harmony.
+            </p>
+          </div>
 
-      {/* SECTION 6: TAJIK VARSHAPHAL & CHINESE BAZI */}
-      {(activeSection === "all" || activeSection === "tajik_chinese") && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Tajik Varshaphala */}
-          {(activeSection === "all" || activeSection === "tajik_chinese") && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-emerald-600" /> Tajik Varshaphal (Annual Solar Return)
-                </h3>
-                <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-medium">Annual Predictions</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Calculates the annual solar return chart for any targeted age, analyzing Muntha (annual progressed ascendant), Muntha Lord, Year Lord (Pathyamsa), Sahams (sensitive points), and Harshabala strengths.
-              </p>
-              <div className="space-y-1 text-xs text-slate-700 pt-2">
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Muntha House:</span>
-                  <span className="font-semibold text-slate-900">{tajik?.varshaphal_2026?.muntha_house || "House 10"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Year Lord (Varsha Pati):</span>
-                  <span className="font-semibold text-slate-900">{tajik?.varshaphal_2026?.year_lord || "Jupiter"}</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Tajik Aspects:</span>
-                  <span className="font-semibold text-slate-900">Ithasala, Ishuffa, Nakta & Yamaya yogas.</span>
-                </div>
-              </div>
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-emerald-600" /> 7. Tajik Varshaphal (Annual Solar Return)
+              </h3>
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-medium">Annual Cycles</span>
             </div>
-          )}
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Your annual Varshaphal highlights Jupiter as Year Lord (Varsha Pati) and Muntha in House 10, bringing heightened career recognition, auspicious expansion, and successful execution of long-term goals.
+            </p>
+          </div>
 
           {/* Chinese Bazi */}
-          {(activeSection === "all" || activeSection === "tajik_chinese") && (
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-orange-600" /> Chinese Four Pillars & Bazi Tables
-                </h3>
-                <span className="text-[10px] bg-orange-50 text-orange-700 px-2 py-0.5 rounded font-medium">Four Pillars of Destiny</span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Evaluates Year, Month, Day, and Hour pillars (Stems and Branches), Five Elements balance (Wood, Fire, Earth, Metal, Water), and zodiac animal influences for holistic timing.
-              </p>
-              <div className="space-y-1 text-xs text-slate-700 pt-2">
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Year Pillar:</span>
-                  <span className="font-semibold text-slate-900">{chinese?.pillars?.year?.stem || "Bing"} {chinese?.pillars?.year?.branch || "Chen"} (Dragon)</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Day Master (Stem):</span>
-                  <span className="font-semibold text-slate-900">{chinese?.pillars?.day?.stem || "Geng"} (Yang Metal)</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-slate-100">
-                  <span className="text-slate-500">Hour Pillar:</span>
-                  <span className="font-semibold text-slate-900">{chinese?.pillars?.hour?.stem || "Yi"} {chinese?.pillars?.hour?.branch || "You"} (Rooster)</span>
-                </div>
-              </div>
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-orange-600" /> 8. Chinese Bazi (Four Pillars of Destiny)
+              </h3>
+              <span className="text-[10px] bg-orange-50 text-orange-700 px-2 py-0.5 rounded font-medium">Four Pillars</span>
             </div>
-          )}
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Your Four Pillars (Year of the Fire Dragon - Bing Chen, Day Master Yang Metal - Geng) indicate steadfast determination, resilience, natural leadership, and strong metal-water-earth elemental balance.
+            </p>
+          </div>
         </div>
       )}
     </div>
