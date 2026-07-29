@@ -1613,9 +1613,11 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
 
 
           case "jhora_personal_details":
+            const bd = astrologyData?.birthDetails || {};
             return (
               <div className="space-y-4 animate-fade-in" id="table-26-personal">
-                <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH26: Personal & Birth Details</h3>                  <div className="flex items-center gap-2">
+                <div className="border-b border-indigo-500/10 pb-2 flex justify-between items-center"><h3 className="text-sm font-semibold text-black">JH26: Personal & Birth Details ({bd.name || "Selected Profile"})</h3>
+                  <div className="flex items-center gap-2">
                     <button onClick={() => alert("Save functionality coming soon")} className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600" title="Save">
                       <Save className="w-4 h-4" />
                     </button>
@@ -1627,14 +1629,29 @@ export const AstroRawTablesView: React.FC<AstroRawTablesViewProps> = ({
                     </button>
                   </div>
                 </div>
-                <table className="w-full text-left border-collapse text-black text-[10px]"><tbody><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Full Name</td><td className="py-2.5 px-4">Nitin</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Gender</td><td className="py-2.5 px-4">Male</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Date of Birth</td><td className="py-2.5 px-4">1979-07-16</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Time of Birth</td><td className="py-2.5 px-4">17:42:00</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Place</td><td className="py-2.5 px-4">New Delhi, India</td></tr></tbody></table>
+                <table className="w-full text-left border-collapse text-black text-[10px]"><tbody>
+                  <tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Full Name</td><td className="py-2.5 px-4 font-mono">{bd.name || "Vedic Native"}</td></tr>
+                  <tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Gender</td><td className="py-2.5 px-4 font-mono">{bd.gender || "Male"}</td></tr>
+                  <tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Date of Birth</td><td className="py-2.5 px-4 font-mono">{bd.date || "1976-01-06"}</td></tr>
+                  <tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Time of Birth</td><td className="py-2.5 px-4 font-mono">{bd.time || "18:40:00"}</td></tr>
+                  <tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Place</td><td className="py-2.5 px-4 font-mono">{bd.location || bd.place || "Dehradun, India"}</td></tr>
+                  <tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Ascendant (Lagna)</td><td className="py-2.5 px-4 font-mono font-semibold text-amber-700">{astrologyData?.ascendant?.sign || astrologyData?.lagna?.sign || bd.lagna || "Cancer"}</td></tr>
+                </tbody></table>
               </div>
             );
           case "jhora_ascendant_luminaries":
+            const bdL = astrologyData?.birthDetails || {};
+            const lagnaSign = astrologyData?.ascendant?.sign || astrologyData?.lagna?.sign || bdL.lagna || "Cancer";
+            const sunSign = astrologyData?.sunSign || astrologyData?.planets?.find((p:any)=>p.name==="Sun")?.sign || "Leo";
+            const moonSign = astrologyData?.moonSign || astrologyData?.planets?.find((p:any)=>p.name==="Moon")?.sign || "Cancer";
             return (
               <div className="space-y-4 animate-fade-in" id="table-27-ascendant">
                 <div className="border-b border-indigo-500/10 pb-2"><h3 className="text-sm font-semibold text-black">JH27: Ascendant & Luminaries</h3></div>
-                <table className="w-full text-left border-collapse text-black text-[10px]"><tbody><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Lagna Sign</td><td className="py-2.5 px-4">Sagittarius</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Sun Sign</td><td className="py-2.5 px-4">Cancer</td></tr><tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Moon Sign</td><td className="py-2.5 px-4">Sagittarius</td></tr></tbody></table>
+                <table className="w-full text-left border-collapse text-black text-[10px]"><tbody>
+                  <tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Lagna Sign</td><td className="py-2.5 px-4">{lagnaSign}</td></tr>
+                  <tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Sun Sign</td><td className="py-2.5 px-4">{sunSign}</td></tr>
+                  <tr className="border-b border-slate-100 hover:bg-slate-50"><td className="py-2.5 px-4 font-bold">Moon Sign</td><td className="py-2.5 px-4">{moonSign}</td></tr>
+                </tbody></table>
               </div>
             );
           case "jhora_astrological_summary":
