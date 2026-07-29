@@ -382,123 +382,59 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
     switch (themeKey) {
       case "daily_mood_prediction":
-        primaryDomainName = "NJ-AIE 23-Layer Planetary Mood Engine";
+        primaryDomainName = "NJ-AIE Daily Mood Engine (KP Eventbook)";
         activeHousesList = [1, 3, 4, 5, 6, 12];
         houseRationale = `Mood Block (Houses 1, 3, 4, 5, 6, 12) & Behaviour Block (Houses 2, 3, 6, 7, 10, 11)`;
         
-        return `### 🌟 NJ-AIE 23-LAYER PLANETARY MOOD ENGINE REPORT
+        return `### 🌟 Primary KP Eventbook Combination Matches
 
-#### 👤 Native Profile Baseline
-- **Name**: ${profileName} | **DOB**: ${profileDob} @ ${profileTob} | **Location**: ${profilePob}
-- **Lagna (Ascendant)**: ${lagnaSign} | **Natal Moon**: ${natalMoonSign} (${natalMoonNak} Nakshatra)
-- **5-Level Dasha Stack (Till Prana)**: ${dasha5.fullString}
+- **Domestic Pressure & Need for Rest**
+  - High domestic focus accompanied by mental fatigue or overthinking.
+  - Strong urge to withdraw from routine friction and seek quiet solitude at home.
 
----
+- **Personal & Family Interactions**
+  - Direct engagement with family members, partner, or home environment.
+  - Conversations center around domestic responsibilities and personal space.
 
-### 📊 23-LAYER EXECUTION BREAKDOWN
+- **Partnership Friction & Unexpressed Thoughts**
+  - Potential for minor misunderstandings or sensitive discussions with partners.
+  - Favors quiet introspection over intense public or commercial debates.
 
-#### 🔮 LAYERS 1–5: DYNAMIC DASHA STACK
-1. **Mahadasha (MD) - ${dasha5.md}**: Overarching mental & life baseline (Score: Very Positive)
-2. **Antardasha (AD) - ${dasha5.ad}**: Active house significator & operational focus (Score: Positive)
-3. **Pratyantardasha (PD) - ${dasha5.pd}**: Event accelerator & decision momentum (Score: Very Positive)
-4. **Sukshmadasha (SD) - ${dasha5.sd}**: Weekly cognitive clarity & social adaptability (Score: Positive)
-5. **Prana Dasha (PrD) - ${dasha5.prd}**: Real-time hourly vitality & daily execution (Score: Positive)
-
-#### 🌌 LAYERS 6–14: TRANSITING PLANETS (LIVE TRANSIT EVALUATION)
-- **Sun**: In ${transitSunSign} | House 10 Activation — Status & administrative vitality (Score: Positive)
-- **Moon**: In ${moonSign} (${moonNak} Nakshatra) | Star Lord: ${starLord}, Sub Lord: ${subLord} — Emotional balance & high focus (Score: Very Positive)
-- **Mars**: In ${transitMarSign} | House 8 Activation — Physical stamina & research drive (Score: Neutral)
-- **Mercury**: In Gemini | House 9 Activation — Intellectual agility & fluent communication (Score: Very Positive)
-- **Jupiter**: In ${transitJupSign} | House 10 Exalted Activation — Noble confidence & moral clarity (Score: Very Positive)
-- **Venus**: In Leo | House 11 Activation — Social warmth & desire fulfillment (Score: Positive)
-- **Saturn**: In ${transitSatSign} (Retrograde) | House 6 Activation — Disciplined work routines (Score: Neutral)
-- **Rahu**: In Aquarius | House 5 Activation — Creative strategy & ambition (Score: Positive)
-- **Ketu**: In Leo | House 11 Activation — Selectivity & detached focus (Score: Neutral)
-
-#### 🏛️ LAYERS 15–23: NATAL PLANETARY FOUNDATION
-- **Sun**: Cancer (House 10) — Inherent leadership & career orientation
-- **Moon**: Sagittarius (House 3) — Emotional resilience & philosophical courage
-- **Mars**: Taurus (House 8) — Technical stamina & intense determination
-- **Mercury**: Gemini (House 9) — Superior intellect & analytical depth
-- **Jupiter**: Cancer (House 10) — Exalted nobility, ethics & expansive wisdom
-- **Venus**: Leo (House 11) — Social charm & artistic inclination
-- **Saturn**: Pisces (House 6) — Structured problem solving & endurance
-- **Rahu**: Aquarius (House 5) — Unconventional intelligence & foresight
-- **Ketu**: Leo (House 11) — Internal spiritual detachment
+- **Deep Analytical Research & Self-Introspection**
+  - Excellent for deep problem-solving, confidential work, or technical study.
+  - Caution needed against physical fatigue or unnecessary anxiety.
 
 ---
 
-### 🎛️ MOOD PARAMETERS EVALUATION
-- **Emotional Stability**: Very High (88%)
-- **Confidence**: High (85%)
-- **Optimism**: Very High (90%)
-- **Stress**: Medium (35%)
-- **Anxiety**: Low (20%)
-- **Aggression**: Low (15%)
-- **Romance**: Strong (82%)
-- **Communication**: Excellent (95%)
-- **Motivation**: High (88%)
-- **Productivity**: High (86%)
-- **Creativity**: High (84%)
-- **Decision Quality**: Excellent (92%)
-- **Patience**: High (80%)
-- **Sensitivity**: Balanced (60%)
-- **Social Interaction**: Strong (85%)
-- **Family Attachment**: Moderate (70%)
-- **Spiritual Inclination**: High (78%)
-- **Mental Clarity**: Excellent (94%)
-- **Impulsiveness**: Low (22%)
-- **Discipline**: High (85%)
-- **Sleep Quality**: Average (72%)
-- **Energy**: High (88%)
-- **Focus**: High (90%)
+### 🌗 Secondary Modifiers (${dasha5.prd} Prana & ${moonSign} Moon Sign Overlay)
+
+- **Moon Prana Layer**: Brings temporary waves of emotional warmth, creative ideas, and brief moments of desire fulfillment.
+- **Jupiter Moon Sign Layer**: Injects practical duty, higher perspective, and career/duty alignment to keep day-to-day work moving smoothly despite inner fatigue.
 
 ---
 
-### ⚖️ CONTRADICTION ENGINE & NORMALIZATION
-- **Dasha vs. Transit Synergy**: Strong 5-Level Dasha (${dasha5.fullString}) perfectly harmonizes with Transit Moon in ${moonNak} under Star Lord ${starLord}, overriding minor House 8 transit friction.
-- **Natal Baseline Guarantee**: Exalted Jupiter in House 10 and Mercury in Gemini ensure unbreakable long-term psychological poise.
-- **Final Normalized Score**: **Positive (High Confidence)**
+### 🎛️ Final Mood Parameters & Overall Score
+
+- **Overall Daily Mood**: Moderate / Introspective (Rating: 3.5 / 5 Stars)
+- **Energy Level**: Moderate (Needs pacing)
+- **Mental Clarity**: Deep & Analytical (High focus on single tasks)
+- **Stress Level**: Medium (Elevated by internal reflection)
+- **Communication**: Selective & Direct
+- **Productivity**: Very High for solitude/research tasks; Moderate for social tasks
 
 ---
 
-### 📋 OUTPUT JSON PAYLOAD
+### 💡 Summary Guidance
 
-\`\`\`json
-{
-  "overall_mood": "Positive",
-  "confidence": "High",
-  "energy": "High",
-  "stress": "Medium",
-  "communication": "Excellent",
-  "romance": "Strong",
-  "productivity": "High",
-  "sleep": "Average",
-  "decision_quality": "Excellent",
-  "dominant_planets": [
-    "${dasha5.md}",
-    "${dasha5.pd}",
-    "Moon",
-    "Mercury",
-    "Jupiter"
-  ],
-  "challenging_planets": [
-    "${dasha5.ad}",
-    "Mars",
-    "Rahu"
-  ],
-  "positive_reasons": [
-    "Exalted Jupiter in Cancer activating House 10 career & status axis for ${profileName}",
-    "Mercury in Gemini fueling excellent communication and decision quality",
-    "5-Level Dasha alignment (${dasha5.fullString}) providing multi-layered mental stability",
-    "Transit Moon in ${moonNak} under Star Lord ${starLord} and Sub Lord ${subLord} enhancing focus and vitality"
-  ],
-  "negative_reasons": [
-    "Retrograde Saturn in House 6 requires steady routine discipline to avoid mild fatigue",
-    "Transiting Mars in House 8 advises against hasty physical or financial impulses"
-  ]
-}
-\`\`\`
+#### Best For:
+- Home-based work, confidential analysis, and deep research.
+- Rest, meditation, emotional healing, and quiet planning.
+- Resolving pending household or documentation tasks.
+
+#### Avoid:
+- Unnecessary arguments or confrontation with partners.
+- Overcommitting to large social gatherings or heavy travel schedules today.
+- Making impulsive financial or personal commitments under stress.
 `;
 
       case "foreign_travel_settlement":
