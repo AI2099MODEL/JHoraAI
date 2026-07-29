@@ -424,6 +424,21 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
 ---
 
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Saturn, Mars, Rahu
+
+#### 🟢 Positive Reasons:
+- Exalted Jupiter in Cancer activating House 10 career & status axis for ${profileName || 'Nitin'}
+- Mercury in Gemini fueling excellent communication and decision quality
+- Providing multi-layered mental stability
+- Transit Moon in ${natalMoonNak || 'Shravana'} under Star Lord ${starLord || 'Moon'} and Sub Lord ${subLord || 'Venus'} enhancing focus and vitality
+
+#### 🔴 Negative Reasons:
+- Retrograde Saturn in House 6 requires steady routine discipline to avoid mild fatigue
+
+---
+
 ### 💡 Summary Guidance
 
 #### Best For:

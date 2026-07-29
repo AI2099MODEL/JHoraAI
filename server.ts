@@ -2996,6 +2996,21 @@ LAWS OF CELESTIAL ANALYSIS:
 
 ---
 
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Saturn, Mars, Rahu
+
+#### 🟢 Positive Reasons:
+- Exalted Jupiter in Cancer activating House 10 career & status axis for ${name || 'Nitin'}
+- Mercury in Gemini fueling excellent communication and decision quality
+- Providing multi-layered mental stability
+- Transit Moon in ${trMoonNak || 'Shravana'} under Star Lord ${trStarLord || 'Moon'} and Sub Lord ${trSubLord || 'Venus'} enhancing focus and vitality
+
+#### 🔴 Negative Reasons:
+- Retrograde Saturn in House 6 requires steady routine discipline to avoid mild fatigue
+
+---
+
 ### 💡 Summary Guidance
 
 #### Best For:
