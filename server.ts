@@ -2955,7 +2955,16 @@ LAWS OF CELESTIAL ANALYSIS:
       `Strong House 1 & 11 activation supporting personal momentum and clear decision making.`
     ];
 
-    if (themeKey === "career_promotion" || (question && question.toLowerCase().includes("career"))) {
+    if (themeKey === "daily_mood_prediction" || (question && question.toLowerCase().includes("mood"))) {
+      domainTitle = "Daily Mood & Horoscope Reading";
+      activeHouses = "Houses 1, 3, 4, 5, 6, 12 (Mood) & Houses 2, 3, 6, 7, 10, 11 (Behaviour)";
+      rationale = "Mood Cluster (Houses 1, 3, 4, 5, 6, 12) + Behaviour Cluster (Houses 2, 3, 6, 7, 10, 11)";
+      bulletPoints = [
+        `**Mood Block (Houses 1, 3, 4, 5, 6, 12)**: Emotional & psychological metrics for ${name} (Lagna: ${lagna}) driven by 5-level Dasha (${dasha5Server.fullString}) and Transit Moon in ${trMoonNak} (${trMoonSign}) under Star Lord ${trStarLord}.`,
+        `**Behaviour Block (Houses 2, 3, 6, 7, 10, 11)**: Behavioral & interactional metrics supporting daily execution, interpersonal speech, and productivity.`,
+        `**Daily Themes Block**: Convergence of active lords yields high probabilities for daily task completion and balanced self-care. *(Major life events like Marriage, Promotion, Childbirth, Court, Property Purchase, Foreign Settlement are strictly excluded from daily readings).*`
+      ];
+    } else if (themeKey === "career_promotion" || (question && question.toLowerCase().includes("career"))) {
       domainTitle = "Career & Promotion Report";
       activeHouses = "Houses 2, 6, 10, 11, 1";
       rationale = "House 2 (Inflow), House 6 (Service), House 10 (Status/Profession), House 11 (Recognition & Gains)";

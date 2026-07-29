@@ -382,15 +382,15 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
 
     switch (themeKey) {
       case "daily_mood_prediction":
-        primaryDomainName = "Daily Mood & Activated Mental/Physical State";
-        activeHousesList = [1, 3, 5, 6, 10, 11];
-        houseRationale = `House 1 (Self/Mind), House 3 (Courage/Thoughts), House 5 (Emotions), House 6 (Daily Focus), House 10 (Action), House 11 (Desire Gains)`;
+        primaryDomainName = "Daily Mood & Horoscope Reading";
+        activeHousesList = [1, 3, 4, 5, 6, 12];
+        houseRationale = `Mood Block (Houses 1, 3, 4, 5, 6, 12) & Behaviour Block (Houses 2, 3, 6, 7, 10, 11)`;
         keyEvents = [
-          `**Mental Energy & Focus**: High clarity for decision-making and problem-solving, supported by ${mDasha} Mahadasha and ${pDasha} Pratyantardasha for ${profileName}.`,
-          `**Emotional Balance**: Transit Moon in ${moonNak} (${moonSign}) under Star Lord ${starLord} stabilizes mind and daily interactions.`,
-          `**Workplace Drive**: Active House 6 & 10 alignment gives strong competitive edge in completing pending tasks.`
+          `**Mood Cluster (Houses 1, 3, 4, 5, 6, 12)**: Emotional & psychological state driven by Transit Moon in ${moonNak} (${moonSign}) under Star Lord ${starLord} and Sub Lord ${subLord}. Active Prana Dasha (${dasha5.prd}) and Sukshma Dasha (${dasha5.sd}) yield high emotional stability and focused mental clarity for ${profileName}.`,
+          `**Behaviour Cluster (Houses 2, 3, 6, 7, 10, 11)**: Interpersonal & workplace drive structured by Mahadasha (${dasha5.md}) and Antardasha (${dasha5.ad}) targeting House 3 communication and House 10 daily action.`,
+          `**Daily Themes Cluster**: Primary & secondary house activation convergence yields strong probabilities for daily task completion, structured conversations, and balanced self-care. *(Major life events like Marriage, Promotion, Childbirth, Court, Property Purchase, Foreign Settlement are strictly excluded from daily readings).*`
         ];
-        adviceText = `Channel active mental drive towards structured task execution. Avoid overthinking and prioritize high-value deliverables.`;
+        adviceText = `Channel active mental drive towards emotional poise and structured task execution. Avoid overthinking and prioritize daily self-care and high-value deliverables.`;
         break;
 
       case "foreign_travel_settlement":
