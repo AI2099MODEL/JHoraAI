@@ -27,12 +27,90 @@ Agents working on this repository MUST strictly abide by these baseline instruct
 
 ## Daily Horoscope Engine (KP Only) Architecture Rules
 
-Whenever developing, maintaining, or documenting the Daily Horoscope Engine:
+Whenever developing, maintaining, or documenting the Daily Horoscope & Mood Engine:
 1. **INPUT SPECIFICATION**: Ensure the engine only runs when provided with both the Global Current Sky (transit coordinates, Moon details, Panchanga) and the User Input Cache (birth parameters, current Vimshottari period, natal planet coordinates, cuspal sublords, natal promise).
-2. **CONVERGENCE PROCESSING**: Calculate period weights and trigger scores sequentially through DBA -> Transit -> Convergence (Active Planet Objects) -> House Engines.
-3. **MODULAR OUTPUT CLUSTERS**: Ensure daily trends are strictly distributed across:
-   - **Mood Block**: Uses Houses 1, 3, 4, 5, 6, 12 to yield emotional metrics.
-   - **Behaviour Block**: Uses Houses 2, 3, 6, 7, 10, 11 to yield behavioral metrics.
-   - **Daily Themes Block**: Uses Primary and Secondary house activations to yield theme probabilities.
+2. **7-LAYER MOOD STACK**:
+   - MD (Mahadasha)
+   - AD (Antardasha)
+   - PD (Pratyantardasha)
+   - SD (Sukshmadasha)
+   - PrD (Prana Dasha)
+   - Current Moon Nakshatra (Star Lord)
+   - Current Moon Sign (Ruler)
+3. **CONVERGENCE & FREQUENCY EVALUATION**:
+   - Aggregate frequencies across all 7 layers of house significations.
+   - Primary combinations focus on high-frequency KP house clusters matched directly against the *KP Eventbook*.
+   - Secondary modifiers: Moon Prana Layer & Moon Sign Overlay.
 4. **DOMAIN EXCLUSION**: Absolutely exclude major life events (Marriage, Promotion, Childbirth, Court, Property Purchase, Foreign Settlement) from daily forecasts, as they are strictly reserved for long-term NJEvent evaluations.
+
+## Daily Mood Engine Report Format
+
+The output for the Daily Mood Engine must strictly follow this clean bullet-line format with Summary Guidance and Planetary Influences:
+
+```markdown
+### 🌟 Primary KP Eventbook Combination Matches
+
+- **Domestic Pressure & Need for Rest**
+  - High domestic focus accompanied by mental fatigue or overthinking.
+  - Strong urge to withdraw from routine friction and seek quiet solitude at home.
+
+- **Personal & Family Interactions**
+  - Direct engagement with family members, partner, or home environment.
+  - Conversations center around domestic responsibilities and personal space.
+
+- **Partnership Friction & Unexpressed Thoughts**
+  - Potential for minor misunderstandings or sensitive discussions with partners.
+  - Favors quiet introspection over intense public or commercial debates.
+
+- **Deep Analytical Research & Self-Introspection**
+  - Excellent for deep problem-solving, confidential work, or technical study.
+  - Caution needed against physical fatigue or unnecessary anxiety.
+
+---
+
+### 🌗 Secondary Modifiers ([Prana] Prana & [MoonSign] Moon Sign Overlay)
+
+- **Moon Prana Layer**: Brings temporary waves of emotional warmth, creative ideas, and brief moments of desire fulfillment.
+- **Jupiter Moon Sign Layer**: Injects practical duty, higher perspective, and career/duty alignment to keep day-to-day work moving smoothly despite inner fatigue.
+
+---
+
+### 🎛️ Final Mood Parameters & Overall Score
+
+- **Overall Daily Mood**: Moderate / Introspective (Rating: 3.5 / 5 Stars)
+- **Energy Level**: Moderate (Needs pacing)
+- **Mental Clarity**: Deep & Analytical (High focus on single tasks)
+- **Stress Level**: Medium (Elevated by internal reflection)
+- **Communication**: Selective & Direct
+- **Productivity**: Very High for solitude/research tasks; Moderate for social tasks
+
+---
+
+### 🪐 Planetary Influences & Key Drivers
+
+- **Challenging Planets**: Saturn, Mars, Rahu
+
+#### 🟢 Positive Reasons:
+- Exalted Jupiter in Cancer activating House 10 career & status axis for Native
+- Mercury in Gemini fueling excellent communication and decision quality
+- Providing multi-layered mental stability
+- Transit Moon in Nakshatra under Star Lord Moon and Sub Lord Venus enhancing focus and vitality
+
+#### 🔴 Negative Reasons:
+- Retrograde Saturn in House 6 requires steady routine discipline to avoid mild fatigue
+
+---
+
+### 💡 Summary Guidance
+
+#### Best For:
+- Home-based work, confidential analysis, and deep research.
+- Rest, meditation, emotional healing, and quiet planning.
+- Resolving pending household or documentation tasks.
+
+#### Avoid:
+- Unnecessary arguments or confrontation with partners.
+- Overcommitting to large social gatherings or heavy travel schedules today.
+- Making impulsive financial or personal commitments under stress.
+```
 
