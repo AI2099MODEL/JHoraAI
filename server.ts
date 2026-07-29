@@ -2593,7 +2593,7 @@ LAWS OF CELESTIAL ANALYSIS:
       });
       responseText = completion.choices[0]?.message?.content || null;
     } catch (groqErr: any) {
-      console.warn("Primary Groq failed or key unavailable in Master Ask. Trying Gemini secondary fallback...", groqErr.message || groqErr);
+      // Primary Groq unavailable; proceed to Gemini secondary fallback
     }
 
     // 2. Secondary Fallback: Gemini API
@@ -2698,7 +2698,6 @@ LAWS OF CELESTIAL ANALYSIS:
         });
         responseText = response.text || null;
       } catch (apiErr: any) {
-        console.warn("Gemini 3.6-flash error in Master Ask. Trying gemini-3.1-pro-preview...", apiErr.message || apiErr);
         try {
           const ai = getGeminiClient(geminiApiKey);
           modelUsed = "gemini-3.1-pro-preview";
@@ -2799,7 +2798,7 @@ LAWS OF CELESTIAL ANALYSIS:
           });
           responseText = response.text || null;
         } catch (fbErr: any) {
-          console.error("Gemini API fallback error in Master Ask:", fbErr);
+          // Gemini fallback quota limit reached
         }
       }
     }
