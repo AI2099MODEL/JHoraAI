@@ -2417,6 +2417,7 @@ app.post("/api/astrology/master-ask", async (req, res) => {
   const { astrologyData, question, history, targetAge, mode = "professional", geminiApiKey } = req.body;
   const startTime = Date.now();
   let promptSize = 0;
+  let userPrompt = "";
 
   // 1. Read users json file (userprofile.json) from disk for precise, fast, and secure context
   const filePath = path.join(process.cwd(), "Users", "userprofile.json");
@@ -2548,7 +2549,7 @@ No matter the mode, always structure your output reply clearly using these exact
 
 Always return your response in a valid JSON matching the schema.`;
 
-    const userPrompt = `
+    userPrompt = `
 You are consulting for Nitin using response mode: "${mode}".
 
 ==================================================
