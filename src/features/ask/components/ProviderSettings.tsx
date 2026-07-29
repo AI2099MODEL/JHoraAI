@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Key, Sparkles, Shield, AlertCircle, Check } from "lucide-react";
 import { Preferences } from "../services/ConversationService";
 import { GeminiProvider } from "../services/GeminiProvider";
-import { OpenAIProvider } from "../services/OpenAIProvider";
 import { ClaudeProvider } from "../services/ClaudeProvider";
 
 interface ProviderSettingsProps {
@@ -11,21 +10,21 @@ interface ProviderSettingsProps {
 }
 
 export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ preferences, onSave }) => {
-  const [provider, setProvider] = useState<Preferences["preferredProvider"]>(preferences.preferredProvider);
-  const [openaiKey, setOpenaiKey] = useState(preferences.openaiApiKey || "");
+  const [provider, setProvider] = useState<Preferences["preferredProvider"]>(preferences.preferredProvider || "groq");
+  const [groqKey, setGroqKey] = useState(preferences.groqApiKey || "");
   const [geminiKey, setGeminiKey] = useState(preferences.geminiApiKey || "");
   const [claudeKey, setClaudeKey] = useState(preferences.claudeApiKey || "");
   
-  const [openaiModels, setOpenaiModels] = useState<string[]>([]);
+  const [groqModels] = useState<string[]>(["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]);
   const [geminiModels, setGeminiModels] = useState<string[]>([]);
   const [claudeModels, setClaudeModels] = useState<string[]>([]);
 
-  const [selectedOpenaiModel, setSelectedOpenaiModel] = useState(preferences.preferredModels.openai || "gpt-4o-mini");
+  const [selectedGroqModel, setSelectedGroqModel] = useState(preferences.preferredModels.groq || "llama-3.3-70b-versatile");
   const [selectedGeminiModel, setSelectedGeminiModel] = useState(preferences.preferredModels.gemini || "gemini-3.6-flash");
   const [selectedClaudeModel, setSelectedClaudeModel] = useState(preferences.preferredModels.claude || "claude-3-5-sonnet-latest");
 
   const [testStatus, setTestStatus] = useState<{ [key: string]: "idle" | "loading" | "success" | "error" }>({
-    openai: "idle",
+    groq: "idle",
     gemini: "idle",
     claude: "idle",
   });
@@ -36,55 +35,64 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ preferences,
     const gemini = new GeminiProvider();
     gemini.models(geminiKey).then((m) => setGeminiModels(m));
 
-    const openai = new OpenAIProvider();
-    openai.models(openaiKey).then((m) => setOpenaiModels(m));
-
     const claude = new ClaudeProvider();
     claude.models(claudeKey).then((m) => setClaudeModels(m));
-  }, [openaiKey, geminiKey, claudeKey]);
+  }, [geminiKey, claudeKey]);
 
   const handleSave = () => {
     const updated: Preferences = {
       preferredProvider: provider,
-      openaiApiKey: openaiKey,
+      groqApiKey: groqKey,
       geminiApiKey: geminiKey,
       claudeApiKey: claudeKey,
       preferredModels: {
-        openai: selectedOpenaiModel,
+        groq: selectedGroqModel,
         gemini: selectedGeminiModel,
         claude: selectedClaudeModel,
       },
       language: preferences.language || "en",
       lastOpenChartId: preferences.lastOpenChartId,
     };
+    if (typeof window !== "undefined" && groqKey) {
+      localStorage.setItem("user_groq_api_key", groqKey);
+    }
     onSave(updated);
   };
 
-  const handleTestConnection = async (provName: "openai" | "gemini" | "claude") => {
+  const handleTestConnection = async (provName: "groq" | "gemini" | "claude") => {
     setTestStatus((prev) => ({ ...prev, [provName]: "loading" }));
     setTestMessage((prev) => ({ ...prev, [provName]: "" }));
 
     try {
-      let provInstance;
-      let key = "";
-      if (provName === "openai") {
-        provInstance = new OpenAIProvider();
-        key = openaiKey;
+      if (provName === "groq") {
+        const keyToUse = groqKey || undefined;
+        const res = await fetch("/api/astrology/master-ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: "Test ping",
+            mode: "fast",
+            groqApiKey: keyToUse
+          })
+        });
+        if (res.ok) {
+          setTestStatus((prev) => ({ ...prev, groq: "success" }));
+          setTestMessage((prev) => ({ ...prev, groq: "Groq LLaMA 3.3 70B connection active & verified!" }));
+        } else {
+          const err = await res.json().catch(() => ({}));
+          setTestStatus((prev) => ({ ...prev, groq: "error" }));
+          setTestMessage((prev) => ({ ...prev, groq: err.error || "Failed to connect to Groq API." }));
+        }
       } else if (provName === "claude") {
-        provInstance = new ClaudeProvider();
-        key = claudeKey;
+        const provInstance = new ClaudeProvider();
+        const res = await provInstance.health(claudeKey);
+        setTestStatus((prev) => ({ ...prev, claude: res.status === "available" ? "success" : "error" }));
+        setTestMessage((prev) => ({ ...prev, claude: res.message }));
       } else {
-        provInstance = new GeminiProvider();
-        key = geminiKey;
-      }
-
-      const res = await provInstance.health(key);
-      if (res.status === "available") {
-        setTestStatus((prev) => ({ ...prev, [provName]: "success" }));
-        setTestMessage((prev) => ({ ...prev, [provName]: res.message }));
-      } else {
-        setTestStatus((prev) => ({ ...prev, [provName]: "error" }));
-        setTestMessage((prev) => ({ ...prev, [provName]: res.message }));
+        const provInstance = new GeminiProvider();
+        const res = await provInstance.health(geminiKey);
+        setTestStatus((prev) => ({ ...prev, gemini: res.status === "available" ? "success" : "error" }));
+        setTestMessage((prev) => ({ ...prev, gemini: res.message }));
       }
     } catch (err: any) {
       setTestStatus((prev) => ({ ...prev, [provName]: "error" }));
@@ -99,7 +107,7 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ preferences,
         <h2 className="text-lg font-semibold text-slate-800">Intelligence Settings</h2>
       </div>
       <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-        JHoraAI uses a decentralized, client-secure strategy. Configure your preferred AI provider. All keys are encrypted locally inside your private browser session and proxy through secure backend endpoints.
+        JHoraAI uses Groq LLaMA-3.3-70B as primary high-speed AI engine with Gemini API as secondary fallback. Configure your preferred AI keys below. All keys are saved securely in your browser.
       </p>
 
       <div className="space-y-6">
@@ -109,7 +117,7 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ preferences,
             Active Provider
           </label>
           <div className="grid grid-cols-3 gap-2.5">
-            {(["gemini", "openai", "claude"] as const).map((prov) => (
+            {(["groq", "gemini", "claude"] as const).map((prov) => (
               <button
                 key={prov}
                 onClick={() => setProvider(prov)}
@@ -125,15 +133,88 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ preferences,
           </div>
         </div>
 
+        {/* Groq Settings */}
+        {provider === "groq" && (
+          <div className="space-y-3.5 border-t border-slate-100 pt-4 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
+                Groq Configuration (Primary AI)
+              </h4>
+              <span className="text-[10px] bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full font-medium">
+                Primary Ultra-Fast
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-xs text-slate-500 mb-1">Select Model</label>
+              <select
+                value={selectedGroqModel}
+                onChange={(e) => setSelectedGroqModel(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              >
+                {groqModels.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs text-slate-500">Groq API Key (Optional)</label>
+                <span className="text-[10px] text-slate-400 italic">Defaults to system key if blank</span>
+              </div>
+              <div className="relative flex gap-2">
+                <div className="relative flex-1">
+                  <Key className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                  <input
+                    type="password"
+                    value={groqKey}
+                    onChange={(e) => setGroqKey(e.target.value)}
+                    placeholder="gsk_..."
+                    className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+                <button
+                  onClick={() => handleTestConnection("groq")}
+                  className="px-3 py-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-medium text-slate-600 transition-colors cursor-pointer"
+                >
+                  {testStatus.groq === "loading" ? "Testing..." : "Test"}
+                </button>
+              </div>
+            </div>
+
+            {testStatus.groq !== "idle" && (
+              <div
+                className={`flex items-start gap-1.5 p-2.5 rounded-xl text-xs border ${
+                  testStatus.groq === "success"
+                    ? "bg-emerald-50 border-emerald-100 text-emerald-700"
+                    : testStatus.groq === "error"
+                    ? "bg-rose-50 border-rose-100 text-rose-700"
+                    : "bg-slate-50 border-slate-100 text-slate-600"
+                }`}
+              >
+                {testStatus.groq === "success" ? (
+                  <Check className="w-4 h-4 shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                )}
+                <span>{testMessage.groq || "Testing connection..."}</span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Gemini Settings */}
         {provider === "gemini" && (
           <div className="space-y-3.5 border-t border-slate-100 pt-4 animate-fade-in">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
-                Gemini configuration
+                Gemini configuration (Secondary Fallback)
               </h4>
               <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">
-                Recommended
+                Secondary Fallback
               </span>
             </div>
 
@@ -177,7 +258,6 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ preferences,
               </div>
             </div>
 
-            {/* Test Connection Results feedback */}
             {testStatus.gemini !== "idle" && (
               <div
                 className={`flex items-start gap-1.5 p-2.5 rounded-xl text-xs border ${
@@ -199,76 +279,11 @@ export const ProviderSettings: React.FC<ProviderSettingsProps> = ({ preferences,
           </div>
         )}
 
-        {/* OpenAI Settings */}
-        {provider === "openai" && (
-          <div className="space-y-3.5 border-t border-slate-100 pt-4 animate-fade-in">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
-              OpenAI configuration
-            </h4>
-
-            <div>
-              <label className="block text-xs text-slate-500 mb-1">Select Model</label>
-              <select
-                value={selectedOpenaiModel}
-                onChange={(e) => setSelectedOpenaiModel(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-              >
-                {openaiModels.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs text-slate-500 mb-1">OpenAI API Key</label>
-              <div className="relative flex gap-2">
-                <div className="relative flex-1">
-                  <Key className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-                  <input
-                    type="password"
-                    value={openaiKey}
-                    onChange={(e) => setOpenaiKey(e.target.value)}
-                    placeholder="sk-..."
-                    className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-xl text-xs bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                  />
-                </div>
-                <button
-                  onClick={() => handleTestConnection("openai")}
-                  className="px-3 py-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-medium text-slate-600 transition-colors cursor-pointer"
-                >
-                  {testStatus.openai === "loading" ? "Testing..." : "Test"}
-                </button>
-              </div>
-            </div>
-
-            {testStatus.openai !== "idle" && (
-              <div
-                className={`flex items-start gap-1.5 p-2.5 rounded-xl text-xs border ${
-                  testStatus.openai === "success"
-                    ? "bg-emerald-50 border-emerald-100 text-emerald-700"
-                    : testStatus.openai === "error"
-                    ? "bg-rose-50 border-rose-100 text-rose-700"
-                    : "bg-slate-50 border-slate-100 text-slate-600"
-                }`}
-              >
-                {testStatus.openai === "success" ? (
-                  <Check className="w-4 h-4 shrink-0 mt-0.5" />
-                ) : (
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                )}
-                <span>{testMessage.openai || "Testing connection..."}</span>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Claude Settings */}
         {provider === "claude" && (
           <div className="space-y-3.5 border-t border-slate-100 pt-4 animate-fade-in">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
-              Anthropic Claude configuration (Placeholder)
+              Anthropic Claude configuration
             </h4>
 
             <div>

@@ -223,7 +223,28 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     prompts.push({
       id: "daily_mood_prediction",
       label: "Daily Mood Reading",
-      query: `Generate a personalized daily mood reading and activity guidance based on the "daily_horoscope_engine" and "mood_prediction" rules. Layer today's Moon transit (currently in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra, ${currentSky?.moon?.currentSign?.displayName || "Libra"} sign) over my current Vimshottari period (${activeDasha}) to calculate Tara Bala, Chandra Bala, and daily emotional metrics.`
+      query: `Execute the NJ COMPLETE KP LIFE ENGINE for today's daily mood reading.
+
+STEP 1: Build House Heat Map (Rank all 12 houses using Natal + DBA (${activeDasha}) + Transit + Moon (currently in ${currentSky?.moon?.currentNakshatra?.displayName || "Chitra"} Nakshatra, ${currentSky?.moon?.currentSign?.displayName || "Libra"} sign) + Convergence).
+STEP 2: Run COMPLETE KP Combination Engine across all domains (SELF, HEALTH, LONGEVITY, RELATIONSHIPS, FAMILY, CAREER, FINANCE, PROPERTY, LEGAL, TRAVEL, EDUCATION, SPIRITUAL, SOCIAL).
+STEP 3: For EVERY combination calculate Natal Promise, KP Significator Strength, Cuspal Star Lord & Sub Lord Support, DBA & Transit Support, Moon Trigger, Maraka/Badhaka Check, Contradictions, and Final Convergence.
+STEP 4: Assign Final State (★★★★★ Excellent, ★★★★☆ Supportive, ★★★☆☆ Neutral, ★★☆☆☆ Sensitive, ★☆☆☆☆ Challenging).
+STEP 5: Rank all Life Domains (Top 3 Primary, Next 5 Secondary, Remaining Background).
+
+OUTPUT RULES:
+Do not mention house numbers, specific planets, or astrology jargon in the final report. Make it entirely human-readable.
+
+FINAL REPORT FORMAT:
+😊 Mood Right Now: [Brief description]
+🌤 Overall Mood Today: [Brief description]
+🎯 Primary Focus Today:
+[Top 2-3 strongest life domains with their star ratings]
+📌 Secondary Focus Today:
+[Next 3-5 life domains with their star ratings]
+⚠ Areas Requiring Caution:
+[Only if supported by KP convergence]
+💡 Today's Advice:
+[Generated from the strongest validated combinations only]`
     });
 
     // Add domains from JSON
@@ -316,13 +337,13 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     return () => clearInterval(interval);
   }, [analysisLoading]);
 
-  const runAnalysis = async (queryText: string) => {
+  const runAnalysis = async (queryText: string, displayText?: string) => {
     if (analysisLoading) return;
 
     const userMsg: Message = {
       id: Math.random().toString(36).substr(2, 9),
       sender: "user",
-      text: queryText,
+      text: displayText || queryText,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -333,6 +354,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
     try {
       const preferences = ConversationService.getPreferences();
       const geminiApiKey = preferences?.geminiApiKey;
+      const groqApiKey = preferences?.groqApiKey || (typeof window !== "undefined" ? localStorage.getItem("user_groq_api_key") : undefined);
 
       const response = await fetch("/api/astrology/master-ask", {
         method: "POST",
@@ -343,7 +365,8 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
           targetAge: 50,
           mode: responseMode,
           history: messages.slice(-6).map(m => ({ sender: m.sender, text: m.text })),
-          geminiApiKey
+          geminiApiKey,
+          groqApiKey
         })
       });
 
@@ -673,7 +696,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
                       <button
                         key={p.id}
                         onClick={() => {
-                          runAnalysis(p.query);
+                          runAnalysis(p.query, p.label);
                           setSidebarOpen(false);
                         }}
                         className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-[11px] font-medium text-neutral-800 hover:text-blue-950 bg-neutral-50/60 hover:bg-blue-50 border border-transparent hover:border-blue-200/80 w-full text-left transition-all cursor-pointer group shadow-2xs"
