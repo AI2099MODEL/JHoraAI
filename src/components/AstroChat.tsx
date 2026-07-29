@@ -219,7 +219,7 @@ export default function AstroChat({ astrologyData, isStandalone, onCloseStandalo
   const getMoodPromptsFromJSON = () => {
     const prompts = [];
     
-    // Add Daily Horoscope / Mood prompt
+    // 1. Add Daily Horoscope / Mood prompt
     prompts.push({
       id: "daily_mood_prediction",
       label: "Daily Mood Reading",
@@ -247,21 +247,21 @@ FINAL REPORT FORMAT:
 [Generated from the strongest validated combinations only]`
     });
 
-    // Add domains from JSON
-    if (moodRules && moodRules.domains) {
-      Object.entries(moodRules.domains).forEach(([key, value]: [string, any]) => {
-        let label = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-        // Custom beautified labels for specific keys
-        if (key === "marriage_first") label = "Marriage Promise Check";
-        else if (key === "marriage_love_vs_arranged") label = "Love vs Arranged Marriage";
-        else if (key === "marriage_delay_denial") label = "Marriage Delay & Denial";
-        else if (key === "separation_divorce") label = "Separation & Divorce Risk";
-        else if (key === "career_promotion") label = "Career & Promotion Timing";
-        else if (key === "finance_wealth") label = "Wealth & Assets Accrual";
-        else if (key === "health_disease") label = "Health & Disease Risk";
-        else if (key === "foreign_travel_settlement") label = "Foreign Relocation/Travel";
-        else if (key === "property_vehicle") label = "Property & Vehicle Purchase";
+    // Curated major life themes mapping
+    const majorThemes = [
+      { key: "foreign_travel_settlement", label: "Travel & Foreign Settlement" },
+      { key: "career_promotion", label: "Career & Promotion" },
+      { key: "finance_wealth", label: "Wealth & Finance" },
+      { key: "marriage_first", label: "Marriage & Relationships" },
+      { key: "health_disease", label: "Health & Vitality" },
+      { key: "property_vehicle", label: "Property & Vehicles" },
+      { key: "litigation", label: "Litigation & Legal" },
+      { key: "education", label: "Education & Learning" }
+    ];
 
+    majorThemes.forEach(theme => {
+      const value = moodRules?.domains?.[theme.key];
+      if (value) {
         let ruleText = "";
         if (value.kp_rule) ruleText += ` KP Rule: ${value.kp_rule}`;
         if (value.delay_rule) ruleText += ` Delay Rule: ${value.delay_rule}`;
@@ -270,18 +270,11 @@ FINAL REPORT FORMAT:
         if (value.jaimini_cross_check) ruleText += ` Jaimini Cross-Check: ${value.jaimini_cross_check}`;
 
         prompts.push({
-          id: key,
-          label: label,
-          query: `Assess my astrological promise for [${label}] by executing the rules in our Mood Analysis schema. Formulate a multi-system convergence score (out of 10) across Krishnamurti Paddhati (KP), Parashari, Jaimini, and Ashtakavarga systems, specifically checking: ${ruleText}`
+          id: theme.key,
+          label: theme.label,
+          query: `Assess my astrological promise for [${theme.label}] by executing the rules in our Mood Analysis schema. Formulate a multi-system convergence score (out of 10) across Krishnamurti Paddhati (KP), Parashari, Jaimini, and Ashtakavarga systems, specifically checking: ${ruleText}`
         });
-      });
-    }
-
-    // Add Future Predictions prompt
-    prompts.push({
-      id: "future_prediction_timeline",
-      label: "Future Forecast Timeline",
-      query: `Evaluate a medium to long-term future forecast timeline using the "future_prediction_engine" rules. Walk my forward Dasha sequences (Mahadasha, Antardasha, Pratyantardasha) against slower-resolution transits of Jupiter, Saturn, Rahu, and Ketu to trace peak activation windows and potential life-theme changes.`
+      }
     });
 
     return prompts;
