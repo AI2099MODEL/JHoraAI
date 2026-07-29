@@ -3,21 +3,21 @@
     "agentName": "AstrologicalAnalysisSyncAgent",
     "profileName": "Guest Seeker",
     "profileId": "guestseeker_28072026_1200pm_newdelhi",
-    "lastUpdated": "2026-07-29T11:41:35.895Z",
+    "lastUpdated": "2026-07-29T11:45:52.219Z",
     "evaluationDate": "2026-07-29",
     "status": "Healthy / Synchronized"
   },
   "currentSkyTransits": {
     "dateTime": {
-      "utcTime": "2026-07-29T11:41:34.763Z",
-      "localTime": "2026-07-29T04:41:34-07:00",
+      "utcTime": "2026-07-29T11:45:52.001Z",
+      "localTime": "2026-07-29T04:45:52-07:00",
       "timezone": "America/Los_Angeles"
     },
     "moon": {
       "currentSign": {
         "id": "Capricorn",
         "displayName": "Capricorn",
-        "longitude": 292.94
+        "longitude": 292.98
       },
       "currentNakshatra": {
         "id": "Shravana",
@@ -30,15 +30,15 @@
         "displayName": "Moon"
       },
       "currentSubLord": {
-        "id": "Saturn",
-        "displayName": "Saturn"
+        "id": "Sun",
+        "displayName": "Sun"
       },
       "moonPhase": {
         "type": "Waning Gibbous",
         "displayName": "Krishna Prathama",
         "illuminationPercentage": 94.2
       },
-      "moonLongitude": 292.94,
+      "moonLongitude": 292.98,
       "waxing": false,
       "waning": true,
       "voidOfCourse": {
@@ -69,40 +69,40 @@
         "nakshatra": "Pushya",
         "pada": 3,
         "starLord": "Saturn",
-        "subLord": "Mars",
+        "subLord": "Rahu",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "moon": {
         "currentSign": "Capricorn",
-        "longitude": 292.94,
+        "longitude": 292.98,
         "nakshatra": "Shravana",
         "pada": 4,
         "starLord": "Moon",
-        "subLord": "Saturn",
+        "subLord": "Sun",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mars": {
         "currentSign": "Virgo",
-        "longitude": 153.48,
+        "longitude": 154.19,
         "nakshatra": "Uttara Phalguni",
         "pada": 3,
         "starLord": "Sun",
-        "subLord": "Moon",
+        "subLord": "Venus",
         "retrograde": false,
         "combust": false,
         "stationary": false
       },
       "mercury": {
         "currentSign": "Sagittarius",
-        "longitude": 242.77,
+        "longitude": 242.79,
         "nakshatra": "Mula",
         "pada": 1,
         "starLord": "Ketu",
-        "subLord": "Mars",
+        "subLord": "Rahu",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -120,11 +120,11 @@
       },
       "venus": {
         "currentSign": "Leo",
-        "longitude": 138.23,
+        "longitude": 138.24,
         "nakshatra": "Purva Phalguni",
         "pada": 2,
         "starLord": "Venus",
-        "subLord": "Mercury",
+        "subLord": "Ketu",
         "retrograde": false,
         "combust": false,
         "stationary": false
@@ -232,6 +232,19 @@
     }
   ],
   "eventsLog": [
+    {
+      "timestamp": "2026-07-29T11:45:52.219Z",
+      "evaluationDate": "2026-07-29",
+      "triggeredEventsCount": 1,
+      "triggeredEvents": [
+        "Daily Muhurta Alignment"
+      ],
+      "rulesMet": [
+        "Health and Disease Propensity via 1st and 6th CSL",
+        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
+      ],
+      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
+    },
     {
       "timestamp": "2026-07-29T11:41:35.895Z",
       "evaluationDate": "2026-07-29",
@@ -1508,19 +1521,6 @@
     },
     {
       "timestamp": "2026-07-28T16:43:53.597Z",
-      "evaluationDate": "2026-07-28",
-      "triggeredEventsCount": 1,
-      "triggeredEvents": [
-        "Daily Muhurta Alignment"
-      ],
-      "rulesMet": [
-        "Health and Disease Propensity via 1st and 6th CSL",
-        "Dasha-Bhukti-Antara (DBA) Event Trigger Validation"
-      ],
-      "message": "Evaluation completed by AstrologicalAnalysisSyncAgent. 1 transits and 2 natal promises updated."
-    },
-    {
-      "timestamp": "2026-07-28T16:42:13.403Z",
       "evaluationDate": "2026-07-28",
       "triggeredEventsCount": 1,
       "triggeredEvents": [
