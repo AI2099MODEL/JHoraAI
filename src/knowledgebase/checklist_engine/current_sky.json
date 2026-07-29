@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-29T19:02:56.981Z",
+    "lastUpdated": "2026-07-29T19:03:24.448Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-29T19:02:56.981Z",
-    "localTime": "2026-07-29T12:02:56-07:00",
+    "utcTime": "2026-07-29T19:03:24.448Z",
+    "localTime": "2026-07-29T12:03:24-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 284.3
+      "longitude": 284.31
     },
     "currentNakshatra": {
       "id": "Shravana",
@@ -36,7 +36,7 @@
       "displayName": "Krishna Prathama",
       "illuminationPercentage": 99
     },
-    "moonLongitude": 284.3,
+    "moonLongitude": 284.31,
     "waxing": false,
     "waning": true,
     "voidOfCourse": {
@@ -74,7 +74,7 @@
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 284.3,
+      "longitude": 284.31,
       "nakshatra": "Shravana",
       "pada": 2,
       "starLord": "Moon",
@@ -285,7 +285,7 @@
       "name": "Krishna Prathama",
       "index": 16,
       "paksha": "Krishna",
-      "endDate": "2026-07-30T07:02:56.981Z"
+      "endDate": "2026-07-30T07:03:24.448Z"
     },
     "vara": {
       "name": "Wednesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Shravana",
       "lord": "Moon",
-      "endDate": "2026-07-30T13:02:56.981Z"
+      "endDate": "2026-07-30T13:03:24.448Z"
     },
     "yoga": {
       "name": "Ayushman",
       "lord": "Sun",
-      "endDate": "2026-07-30T09:02:56.981Z"
+      "endDate": "2026-07-30T09:03:24.448Z"
     },
     "karana": {
       "name": "Balava",
       "lord": "Sun",
-      "endDate": "2026-07-30T01:02:56.981Z"
+      "endDate": "2026-07-30T01:03:24.448Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",

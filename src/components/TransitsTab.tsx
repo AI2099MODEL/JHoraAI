@@ -117,6 +117,26 @@ export default function TransitsTab({
   const [lat, setLat] = useState<number>(transitLatitude !== undefined && transitLatitude !== null ? transitLatitude : astrologyData.birthDetails.latitude);
   const [lng, setLng] = useState<number>(transitLongitude !== undefined && transitLongitude !== null ? transitLongitude : astrologyData.birthDetails.longitude);
   const [tz, setTz] = useState<number>(transitTimezone !== undefined && transitTimezone !== null ? transitTimezone : astrologyData.birthDetails.timezone);
+
+  useEffect(() => {
+    if (propTransitDate) setTransitDate(propTransitDate);
+  }, [propTransitDate]);
+
+  useEffect(() => {
+    if (propTransitTime) setTransitTime(propTransitTime);
+  }, [propTransitTime]);
+
+  useEffect(() => {
+    if (transitLatitude !== undefined && transitLatitude !== null) setLat(transitLatitude);
+  }, [transitLatitude]);
+
+  useEffect(() => {
+    if (transitLongitude !== undefined && transitLongitude !== null) setLng(transitLongitude);
+  }, [transitLongitude]);
+
+  useEffect(() => {
+    if (transitTimezone !== undefined && transitTimezone !== null) setTz(transitTimezone);
+  }, [transitTimezone]);
   const [subTabState, setSubTabState] = useState<string>("birth_panchanga");
   const subTab = propSubTab || subTabState;
   const setSubTab = propSubTab ? () => {} : setSubTabState;
