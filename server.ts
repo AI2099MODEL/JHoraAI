@@ -3367,8 +3367,8 @@ function runAnalysisSyncAgent() {
         const filePath = path.join(usersDir, file);
         const profile = JSON.parse(fs.readFileSync(filePath, "utf-8"));
         runAnalysisSyncAgentForProfile(profile, file);
-      } catch (e) {
-        console.error(`[AGENT] Error processing profile file ${file}:`, e);
+      } catch (e: any) {
+        console.warn(`[AGENT] Warning: skipping malformed or corrupted profile file ${file}:`, e?.message);
       }
     });
 
