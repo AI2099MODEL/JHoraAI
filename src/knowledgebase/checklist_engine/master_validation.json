@@ -1,0 +1,660 @@
+{
+  "metadata": {
+    "schemaVersion": "1.0",
+    "engine": "MasterValidation",
+    "version": "1.0.0",
+    "lastUpdated": "2026-07-16T03:00:00Z",
+    "description": "JHoraAI Master Validation Engine Configuration and Workflow Rules"
+  },
+  "validationPipeline": {
+    "steps": [
+      {
+        "step": 1,
+        "name": "User Login",
+        "description": "Verify active authentication token, user identity session, and route access permissions",
+        "requiredInputs": ["authToken", "userId"],
+        "critical": true
+      },
+      {
+        "step": 2,
+        "name": "Select Profile",
+        "description": "Fetch the target client profile data using a valid profile identifier linked to the user account",
+        "requiredInputs": ["profileId"],
+        "critical": true
+      },
+      {
+        "step": 3,
+        "name": "Choose Profile if Multiple",
+        "description": "Check if multiple profiles fit the event criteria, prompting user selection when necessary",
+        "requiredInputs": ["availableProfileIds"],
+        "critical": false
+      },
+      {
+        "step": 4,
+        "name": "Verify Birth Details",
+        "description": "Confirm integrity of basic parameters: date, time, latitude, longitude, timezone, and gender",
+        "requiredInputs": ["date", "time", "latitude", "longitude", "timezone", "gender"],
+        "critical": true
+      },
+      {
+        "step": 5,
+        "name": "Assess Birth Accuracy",
+        "description": "Determine birth time quality (Exact, Approximate, Rectified, or Unknown) to adjust computation algorithms",
+        "requiredInputs": ["accuracy"],
+        "critical": true
+      },
+      {
+        "step": 6,
+        "name": "Verify Required Event",
+        "description": "Map event type requested to the appropriate functional validation domain",
+        "supportedEvents": [
+          "Relationship",
+          "Career",
+          "Finance",
+          "Health",
+          "Business",
+          "Travel",
+          "Property",
+          "Children",
+          "Education",
+          "Daily Horoscope",
+          "Mood"
+        ],
+        "critical": true
+      },
+      {
+        "step": 7,
+        "name": "Load Required Event JSON",
+        "description": "Dynamically load specific event rules, significators, and logic boundaries from the designated JSON configuration",
+        "requiredInputs": ["eventId"],
+        "critical": true
+      },
+      {
+        "step": 8,
+        "name": "Determine Astrology Systems",
+        "description": "Identify systems (KP, Parashari, Jaimini, Western, Nadi, Lal Kitab, Tajik) that are active and necessary for this event",
+        "critical": true
+      },
+      {
+        "step": 9,
+        "name": "Verify API Data Availability",
+        "description": "Check connection status of astrological computational engines and retrieve availability logs",
+        "critical": true
+      },
+      {
+        "step": 10,
+        "name": "Load Astrology Data",
+        "description": "Trigger downstream calculation of planetary positions, house cusps, dasha series, and transit tables",
+        "critical": true
+      },
+      {
+        "step": 11,
+        "name": "Validate Houses",
+        "description": "Verify house boundaries, checking that cusp degree calculations do not overlap or error out",
+        "critical": true
+      },
+      {
+        "step": 12,
+        "name": "Validate Planets",
+        "description": "Verify planet coordinates, verifying longitudinal values are within 0-360 degrees",
+        "critical": true
+      },
+      {
+        "step": 13,
+        "name": "Validate Cusps",
+        "description": "Confirm exact coordinates for all 12 cusps along with sign, nakshatra, sub, and sub-sub lord configurations",
+        "critical": true
+      },
+      {
+        "step": 14,
+        "name": "Validate Significators",
+        "description": "Verify correct grading of planetary significators based on the active structural system",
+        "critical": true
+      },
+      {
+        "step": 15,
+        "name": "Validate Dasha",
+        "description": "Validate active Vimshottari/Chara dasha chains at target time offsets",
+        "critical": true
+      },
+      {
+        "step": 16,
+        "name": "Validate Transit",
+        "description": "Confirm coordinate alignments of current moving planets against natal points",
+        "critical": true
+      },
+      {
+        "step": 17,
+        "name": "Validate Current Moon",
+        "description": "Confirm Moon longitude, Moon Nakshatra, and Moon Sub-lord to establish query context",
+        "critical": true
+      },
+      {
+        "step": 18,
+        "name": "Validate Current Sky",
+        "description": "Confirm integrity of global real-time planetary positions",
+        "critical": true
+      },
+      {
+        "step": 19,
+        "name": "Validate Timeline",
+        "description": "Map query time window to specific phases: Past, Present, Near Future, Medium Term, or Long Term",
+        "critical": true
+      },
+      {
+        "step": 20,
+        "name": "Validate Required Profiles",
+        "description": "Check if extra related profiles (Partner, Ex-spouse, Child, Parents, Lawyer, Third Person) exist when required by the event type",
+        "critical": true
+      },
+      {
+        "step": 21,
+        "name": "Build Evidence Package",
+        "description": "Compile structured output organizing all Supporting, Conflicting, Missing, and Unavailable indicators",
+        "critical": true
+      },
+      {
+        "step": 22,
+        "name": "Check Evidence Completeness",
+        "description": "Evaluate if required evidence criteria is met. If yes, proceed to AI. If no, trigger fallback loop",
+        "critical": true
+      }
+    ]
+  },
+  "profileValidation": {
+    "supportedProfiles": [
+      {
+        "role": "SELF",
+        "required": true,
+        "description": "The primary chart owner requesting the astrological evaluation"
+      },
+      {
+        "role": "SPOUSE",
+        "required": false,
+        "description": "Legal partner in marriage"
+      },
+      {
+        "role": "PARTNER",
+        "required": false,
+        "description": "Romantic companion, fiancé, or co-habitant"
+      },
+      {
+        "role": "EX_PARTNER",
+        "required": false,
+        "description": "Former romantic partner or ex-spouse"
+      },
+      {
+        "role": "CHILD",
+        "required": false,
+        "description": "Offspring or dependent child of the primary user"
+      },
+      {
+        "role": "FATHER",
+        "required": false,
+        "description": "Biological or legal father"
+      },
+      {
+        "role": "MOTHER",
+        "required": false,
+        "description": "Biological or legal mother"
+      },
+      {
+        "role": "BROTHER",
+        "required": false,
+        "description": "Male sibling"
+      },
+      {
+        "role": "SISTER",
+        "required": false,
+        "description": "Female sibling"
+      },
+      {
+        "role": "BUSINESS_PARTNER",
+        "required": false,
+        "description": "Professional or commercial associate"
+      },
+      {
+        "role": "LAWYER",
+        "required": false,
+        "description": "Legal representative during litigations"
+      },
+      {
+        "role": "THIRD_PERSON",
+        "required": false,
+        "description": "An external party relevant to a dispute or event"
+      },
+      {
+        "role": "CUSTOM_PROFILE",
+        "required": false,
+        "description": "User-defined custom relationship role"
+      }
+    ],
+    "fieldsToValidate": [
+      {
+        "field": "profileId",
+        "type": "UUID",
+        "nullable": false
+      },
+      {
+        "field": "name",
+        "type": "string",
+        "maxLength": 100,
+        "nullable": false
+      },
+      {
+        "field": "relationshipType",
+        "type": "enum",
+        "nullable": false
+      },
+      {
+        "field": "birthDataRef",
+        "type": "string",
+        "nullable": false
+      }
+    ]
+  },
+  "birthValidation": {
+    "fields": {
+      "date": {
+        "format": "YYYY-MM-DD",
+        "required": true,
+        "validationRule": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$"
+      },
+      "time": {
+        "format": "HH:MM:SS",
+        "required": true,
+        "validationRule": "^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+      },
+      "latitude": {
+        "type": "float",
+        "required": true,
+        "min": -90.0,
+        "max": 90.0
+      },
+      "longitude": {
+        "type": "float",
+        "required": true,
+        "min": -180.0,
+        "max": 180.0
+      },
+      "timezone": {
+        "type": "string",
+        "required": true,
+        "description": "Valid IANA timezone database entry (e.g., America/New_York, Asia/Kolkata)"
+      },
+      "country": {
+        "type": "string",
+        "required": true,
+        "maxLength": 3
+      },
+      "city": {
+        "type": "string",
+        "required": true,
+        "maxLength": 150
+      },
+      "gender": {
+        "type": "enum",
+        "allowedValues": ["MALE", "FEMALE", "NON_BINARY", "UNKNOWN"],
+        "required": true
+      },
+      "accuracy": {
+        "type": "enum",
+        "allowedValues": ["EXACT", "APPROXIMATE", "RECTIFIED", "UNKNOWN"],
+        "required": true
+      }
+    }
+  },
+  "providerValidation": {
+    "supportedProviders": [
+      {
+        "providerId": "jhora",
+        "displayName": "Jagannatha Hora Engine",
+        "supportedComputations": ["parashari", "jaimini", "tajik"]
+      },
+      {
+        "providerId": "kp_engine",
+        "displayName": "Krishnamurti Padhdhati Calculations",
+        "supportedComputations": ["kp_sublords", "significators", "ruling_planets"]
+      },
+      {
+        "providerId": "western_engine",
+        "displayName": "Western Astrology Core",
+        "supportedComputations": ["tropical_positions", "synastry", "composite"]
+      }
+    ],
+    "modes": {
+      "ONLINE": "Real-time query execution via cloud endpoints",
+      "OFFLINE": "Local fallback libraries and algorithms",
+      "CACHED_DATA": "Read-only stored query data within TTL expiration"
+    },
+    "cachingRules": {
+      "natalCuspTtlHours": 8760,
+      "natalPlanetTtlHours": 8760,
+      "dashaTreeTtlHours": 720,
+      "transitSkyTtlMinutes": 15
+    }
+  },
+  "systemValidation": {
+    "kp": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "ayanamsa": "KP_Suryasiddhanta",
+        "houseSystem": "Placidus",
+        "orbs": {
+          "conjunction": 6.0,
+          "aspect": 8.0
+        }
+      }
+    },
+    "parashari": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "ayanamsa": "Lahiri",
+        "houseSystem": "Sripati",
+        "divisionalCharts": ["D1", "D9", "D60"]
+      }
+    },
+    "jaimini": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "karakasCount": 7,
+        "dashaType": "CharaDasha"
+      }
+    },
+    "western": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "zodiacType": "Tropical",
+        "houseSystem": "Placidus",
+        "planets": ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto", "Chiron", "Juno"]
+      }
+    },
+    "nadi": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "type": "BhriguNandiNadi",
+        "primaryKarakaMale": "Jupiter",
+        "primaryKarakaFemale": "Venus"
+      }
+    },
+    "lal_kitab": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "housePositionsFixed": true,
+        "planetaryDignityIgnored": true
+      }
+    },
+    "tajik": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "system": "Varshaphala",
+        "aspects": "TajikAspects"
+      }
+    }
+  },
+  "eventValidation": {
+    "rules": {
+      "complianceCheck": "Validate event parameters against supporting schema files",
+      "allowUnknownEvents": false,
+      "enforceRequiredProfiles": true
+    }
+  },
+  "timelineValidation": {
+    "supportedPhases": {
+      "Past": {
+        "minOffsetDays": -18250,
+        "maxOffsetDays": -1
+      },
+      "Present": {
+        "minOffsetDays": 0,
+        "maxOffsetDays": 0
+      },
+      "30 Days": {
+        "minOffsetDays": 1,
+        "maxOffsetDays": 30
+      },
+      "90 Days": {
+        "minOffsetDays": 1,
+        "maxOffsetDays": 90
+      },
+      "180 Days": {
+        "minOffsetDays": 1,
+        "maxOffsetDays": 180
+      },
+      "1 Year": {
+        "minOffsetDays": 1,
+        "maxOffsetDays": 365
+      },
+      "3 Years": {
+        "minOffsetDays": 1,
+        "maxOffsetDays": 1095
+      },
+      "5 Years": {
+        "minOffsetDays": 1,
+        "maxOffsetDays": 1825
+      },
+      "Lifetime": {
+        "minOffsetDays": 0,
+        "maxOffsetDays": 36500
+      }
+    }
+  },
+  "transitValidation": {
+    "monitoredPlanets": [
+      "Current Moon",
+      "Moon Nakshatra",
+      "Moon Sub",
+      "Sun",
+      "Mars",
+      "Mercury",
+      "Jupiter",
+      "Venus",
+      "Saturn",
+      "Rahu",
+      "Ketu"
+    ],
+    "aspectRules": {
+      "exactOrbDegrees": 1.0,
+      "wideOrbDegrees": 3.2
+    }
+  },
+  "dashaValidation": {
+    "levels": [
+      {
+        "name": "Mahadasha",
+        "level": 1,
+        "required": true
+      },
+      {
+        "name": "Bhukti",
+        "level": 2,
+        "required": true
+      },
+      {
+        "name": "Antara",
+        "level": 3,
+        "required": true
+      },
+      {
+        "name": "Sookshma",
+        "level": 4,
+        "required": false
+      },
+      {
+        "name": "Prana",
+        "level": 5,
+        "required": false
+      }
+    ],
+    "contexts": ["Current", "Future"]
+  },
+  "evidenceValidation": {
+    "categories": {
+      "supporting": {
+        "description": "Verified high-weight astrological configurations supporting target event occurrence",
+        "minimumMatchCount": 1
+      },
+      "secondary": {
+        "description": "Ancillary positive linkages reinforcing key trends",
+        "minimumMatchCount": 0
+      },
+      "conflicting": {
+        "description": "Counter-indicators, challenging transit lines, or house negations",
+        "minimumMatchCount": 0
+      },
+      "missing": {
+        "description": "Configurations that cannot be calculated or determined given the birth accuracy level",
+        "minimumMatchCount": 0
+      },
+      "unavailable": {
+        "description": "Data streams or systems deactivated or offline during the validation run",
+        "minimumMatchCount": 0
+      },
+      "pendingTransit": {
+        "description": "Astrological criteria met except for upcoming key transit confirmations",
+        "minimumMatchCount": 0
+      },
+      "pendingDasha": {
+        "description": "Astrological criteria met except for activation of future positive dasha periods",
+        "minimumMatchCount": 0
+      },
+      "pendingProfile": {
+        "description": "Critical secondary profile missing (e.g., spouse birth data needed to evaluate divorce)",
+        "minimumMatchCount": 0
+      }
+    }
+  },
+  "reportValidation": {
+    "sections": {
+      "summary": {
+        "required": true,
+        "wordLimit": 150
+      },
+      "detailed": {
+        "required": true,
+        "wordLimit": 1500
+      },
+      "timeline": {
+        "required": true,
+        "maxMilestones": 10
+      },
+      "charts": {
+        "required": true,
+        "allowedTypes": ["D1", "D9", "KPCuspMap"]
+      },
+      "tables": {
+        "required": true,
+        "allowedTypes": ["planetaryDegrees", "cuspalDegrees", "dbaTable"]
+      },
+      "evidence": {
+        "required": true,
+        "structure": ["supporting", "conflicting", "missing"]
+      },
+      "remedies": {
+        "required": false,
+        "allowRemedies": true
+      },
+      "pdf": {
+        "required": false,
+        "generationEngine": "pdfkit"
+      },
+      "email": {
+        "required": false,
+        "smtpConfigurationChecked": true
+      }
+    }
+  },
+  "notificationValidation": {
+    "deliveryTypes": {
+      "daily": {
+        "enabled": true,
+        "maxDailyCount": 1
+      },
+      "weekly": {
+        "enabled": true,
+        "maxWeeklyCount": 1
+      },
+      "monthly": {
+        "enabled": true,
+        "maxMonthlyCount": 1
+      },
+      "transit": {
+        "enabled": true,
+        "triggerOnConjunction": true
+      },
+      "marriageWindow": {
+        "enabled": true,
+        "notifyDaysPrior": 30
+      },
+      "careerOpportunity": {
+        "enabled": true,
+        "notifyDaysPrior": 14
+      },
+      "healthAlert": {
+        "enabled": true,
+        "notifyDaysPrior": 3
+      },
+      "financeAlert": {
+        "enabled": true,
+        "notifyDaysPrior": 7
+      }
+    }
+  },
+  "aiValidation": {
+    "strictInputConstraints": {
+      "explanation": "To enforce safety and avoid unstructured processing, AI receives only parsed metadata and the validated Evidence Package. Raw calculations must never be piped directly into the prompt.",
+      "allowRawAstrologyArray": false,
+      "allowRawApiResponse": false,
+      "allowRawCalculations": false,
+      "allowedPayloadKeys": [
+        "intent",
+        "profile",
+        "event",
+        "timeline",
+        "evidencePackage",
+        "currentSky",
+        "knowledge",
+        "conversation"
+      ]
+    }
+  },
+  "failureHandling": {
+    "errorScenarios": [
+      {
+        "scenario": "birthDataMissing",
+        "action": "Return complete birth-validation checklist to client application, preventing request forwarding."
+      },
+      {
+        "scenario": "partnerMissing",
+        "action": "Check relationship schema. If partner role is required, halt pipeline and prompt client to choose or configure a profile."
+      },
+      {
+        "scenario": "transitUnavailable",
+        "action": "Flag transit validation state as critical, postpone trigger check, and queue a background task to refresh transit sky feeds."
+      },
+      {
+        "scenario": "providerOffline",
+        "action": "Attempt secondary local computation engine fallback, log error warning, and schedule immediate API reconnect retry with exponential backoff."
+      },
+      {
+        "scenario": "evidenceIncomplete",
+        "action": "Halt request processing before AI routing, compile a specific missing-evidence list, and block the LLM call."
+      },
+      {
+        "scenario": "eventRequiresAnotherProfile",
+        "action": "Identify missing role definition, suspend event compilation, and transmit a structured profile request back to client."
+      },
+      {
+        "scenario": "eventCannotComplete",
+        "action": "Gracefully downgrade transaction response, deliver a functional status report outlining missing details, and offer asynchronous report delivery by email."
+      }
+    ]
+  }
+}

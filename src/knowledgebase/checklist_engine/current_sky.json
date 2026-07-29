@@ -1,0 +1,566 @@
+{
+  "metadata": {
+    "schemaVersion": "1.0",
+    "engine": "CurrentSkyContext",
+    "version": "1.0.0",
+    "lastUpdated": "2026-07-29T16:29:56.710Z",
+    "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
+  },
+  "currentDateTime": {
+    "utcTime": "2026-07-29T16:29:56.710Z",
+    "localTime": "2026-07-29T09:29:56-07:00",
+    "timezone": "America/Los_Angeles"
+  },
+  "moon": {
+    "currentSign": {
+      "id": "Capricorn",
+      "displayName": "Capricorn",
+      "longitude": 283.01
+    },
+    "currentNakshatra": {
+      "id": "Shravana",
+      "displayName": "Shravana",
+      "lord": "Moon"
+    },
+    "currentPada": 1,
+    "currentStarLord": {
+      "id": "Moon",
+      "displayName": "Moon"
+    },
+    "currentSubLord": {
+      "id": "Mars",
+      "displayName": "Mars"
+    },
+    "moonPhase": {
+      "type": "Waning Gibbous",
+      "displayName": "Krishna Prathama",
+      "illuminationPercentage": 99.6
+    },
+    "moonLongitude": 283.01,
+    "waxing": false,
+    "waning": true,
+    "voidOfCourse": {
+      "isVoidOfCourse": false,
+      "aspectFreeUntil": null,
+      "nextSign": "Aquarius"
+    }
+  },
+  "sun": {
+    "sign": {
+      "id": "Cancer",
+      "displayName": "Cancer"
+    },
+    "longitude": 102.35,
+    "nakshatra": {
+      "id": "Pushya",
+      "displayName": "Pushya"
+    },
+    "starLord": {
+      "id": "Saturn",
+      "displayName": "Saturn"
+    }
+  },
+  "planets": {
+    "sun": {
+      "currentSign": "Cancer",
+      "longitude": 102.35,
+      "nakshatra": "Pushya",
+      "pada": 3,
+      "starLord": "Saturn",
+      "subLord": "Sun",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "moon": {
+      "currentSign": "Capricorn",
+      "longitude": 283.01,
+      "nakshatra": "Shravana",
+      "pada": 1,
+      "starLord": "Moon",
+      "subLord": "Mars",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "mars": {
+      "currentSign": "Gemini",
+      "longitude": 63.7,
+      "nakshatra": "Mrigashira",
+      "pada": 4,
+      "starLord": "Mars",
+      "subLord": "Jupiter",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "mercury": {
+      "currentSign": "Gemini",
+      "longitude": 87.16,
+      "nakshatra": "Punarvasu",
+      "pada": 3,
+      "starLord": "Jupiter",
+      "subLord": "Mars",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "jupiter": {
+      "currentSign": "Cancer",
+      "longitude": 101.96,
+      "nakshatra": "Pushya",
+      "pada": 3,
+      "starLord": "Saturn",
+      "subLord": "Saturn",
+      "retrograde": false,
+      "combust": true,
+      "stationary": false
+    },
+    "venus": {
+      "currentSign": "Leo",
+      "longitude": 135.6,
+      "nakshatra": "Purva Phalguni",
+      "pada": 1,
+      "starLord": "Venus",
+      "subLord": "Rahu",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "saturn": {
+      "currentSign": "Pisces",
+      "longitude": 349.22,
+      "nakshatra": "Revati",
+      "pada": 1,
+      "starLord": "Mercury",
+      "subLord": "Venus",
+      "retrograde": false,
+      "combust": false,
+      "stationary": false
+    },
+    "rahu": {
+      "currentSign": "Aquarius",
+      "longitude": 306.84,
+      "nakshatra": "Shatabhisha",
+      "pada": 1,
+      "starLord": "Rahu",
+      "subLord": "Sun",
+      "retrograde": true,
+      "combust": false,
+      "stationary": false
+    },
+    "ketu": {
+      "currentSign": "Leo",
+      "longitude": 126.84,
+      "nakshatra": "Magha",
+      "pada": 3,
+      "starLord": "Ketu",
+      "subLord": "Sun",
+      "retrograde": true,
+      "combust": false,
+      "stationary": false
+    }
+  },
+  "dasha": {
+    "mahadasha": {
+      "planet": "Saturn",
+      "startDate": "2015-06-15",
+      "endDate": "2034-06-15"
+    },
+    "bhukti": {
+      "planet": "Mercury",
+      "startDate": "2024-03-20",
+      "endDate": "2026-11-28"
+    },
+    "antara": {
+      "planet": "Rahu",
+      "startDate": "2026-05-10",
+      "endDate": "2026-10-05"
+    },
+    "sookshma": {
+      "planet": "Jupiter",
+      "startDate": "2026-07-10",
+      "endDate": "2026-08-01"
+    },
+    "prana": {
+      "planet": "Moon",
+      "startDate": "2026-07-15",
+      "endDate": "2026-07-18"
+    },
+    "remainingTime": {
+      "years": 7,
+      "months": 10,
+      "days": 28
+    },
+    "nextDba": [
+      {
+        "level": "Prana",
+        "planet": "Mars",
+        "startDate": "2026-07-18",
+        "endDate": "2026-07-21"
+      }
+    ]
+  },
+  "transits": {
+    "currentTransit": {
+      "description": "Active transiting coordinates mapped to natal structure"
+    },
+    "upcomingTransit": {
+      "description": "Upcoming transit shifts in the near term"
+    },
+    "planetEnteringNewSign": [
+      {
+        "planet": "Sun",
+        "fromSign": "Gemini",
+        "toSign": "Cancer",
+        "transitDateTime": "2026-07-16T11:45:00Z"
+      },
+      {
+        "planet": "Venus",
+        "fromSign": "Gemini",
+        "toSign": "Cancer",
+        "transitDateTime": "2026-07-12T04:30:00Z"
+      }
+    ],
+    "planetChangingNakshatra": [
+      {
+        "planet": "Moon",
+        "fromNakshatra": "Punarvasu",
+        "toNakshatra": "Pushya",
+        "transitDateTime": "2026-07-16T15:45:00Z"
+      },
+      {
+        "planet": "Mercury",
+        "fromNakshatra": "Ashlesha",
+        "toNakshatra": "Makha",
+        "transitDateTime": "2026-07-14T02:15:00Z"
+      }
+    ],
+    "planetRetrograde": [
+      {
+        "planet": "Saturn",
+        "retrogradeStartDate": "2026-06-12",
+        "retrogradeEndDate": "2026-11-04"
+      }
+    ],
+    "planetDirect": [
+      {
+        "planet": "Jupiter",
+        "directDate": "2026-04-18"
+      }
+    ],
+    "planetCombust": [
+      {
+        "planet": "Mercury",
+        "combustStartDate": "2026-07-05",
+        "combustEndDate": "2026-07-25"
+      }
+    ],
+    "planetExalted": [
+      {
+        "planet": "Sun",
+        "sign": "Aries",
+        "exaltationDegree": 10
+      }
+    ],
+    "planetDebilitated": [
+      {
+        "planet": "Saturn",
+        "sign": "Aries",
+        "debilitationDegree": 20
+      }
+    ]
+  },
+  "rulingPlanets": {
+    "dayLord": "Wednesday",
+    "ascendantLord": "Mars",
+    "ascendantStarLord": "Ketu",
+    "ascendantSubLord": "Sun",
+    "moonSignLord": "Saturn",
+    "moonStarLord": "Moon",
+    "moonSubLord": "Mars"
+  },
+  "panchanga": {
+    "tithi": {
+      "name": "Krishna Prathama",
+      "index": 16,
+      "paksha": "Krishna",
+      "endDate": "2026-07-30T04:29:56.710Z"
+    },
+    "vara": {
+      "name": "Wednesday",
+      "lord": "Mercury"
+    },
+    "nakshatra": {
+      "name": "Shravana",
+      "lord": "Moon",
+      "endDate": "2026-07-30T10:29:56.710Z"
+    },
+    "yoga": {
+      "name": "Preeti",
+      "lord": "Venus",
+      "endDate": "2026-07-30T06:29:56.710Z"
+    },
+    "karana": {
+      "name": "Balava",
+      "lord": "Sun",
+      "endDate": "2026-07-29T22:29:56.710Z"
+    },
+    "sunrise": "05:48 AM",
+    "sunset": "08:12 PM",
+    "abhijitMuhurta": {
+      "startTime": "11:45 AM",
+      "endTime": "12:35 PM"
+    },
+    "rahuKalam": {
+      "startTime": "01:30 PM",
+      "endTime": "03:15 PM"
+    },
+    "yamaganda": {
+      "startTime": "05:48 AM",
+      "endTime": "07:30 AM"
+    },
+    "gulika": {
+      "startTime": "09:12 AM",
+      "endTime": "10:54 AM"
+    }
+  },
+  "currentEnergy": {
+    "overallEnergy": {
+      "score": 6.5,
+      "tone": "Balanced",
+      "description": "Sun in Cancer establishes a balanced vitality layer for standard operations."
+    },
+    "mentalEnergy": {
+      "score": 6,
+      "tone": "Balanced",
+      "description": "Mercury in Gemini drives balanced mental stamina and communication focus."
+    },
+    "physicalEnergy": {
+      "score": 8.5,
+      "tone": "Peak Focus",
+      "description": "Mars in Gemini yields a peak focus reserve of physical resilience."
+    },
+    "relationshipEnergy": {
+      "score": 8.5,
+      "tone": "Peak Focus",
+      "description": "Venus in Leo channels peak focus empathy and social ties."
+    },
+    "careerEnergy": {
+      "score": 7,
+      "tone": "Balanced",
+      "description": "Jupiter in Cancer and Saturn in Pisces sustain balanced career structures."
+    },
+    "financialEnergy": {
+      "score": 6,
+      "tone": "Balanced",
+      "description": "Moon in Capricorn indicates balanced capital liquidity and trade dynamics."
+    },
+    "spiritualEnergy": {
+      "score": 7,
+      "tone": "Balanced",
+      "description": "Transit alignments trigger a balanced resonance suitable for introspective focus."
+    }
+  },
+  "currentMood": {
+    "dominantHouses": [
+      {
+        "houseNumber": 10,
+        "significance": "Career, status, public authority, actions"
+      },
+      {
+        "houseNumber": 4,
+        "significance": "Home, emotions, peace of mind, mother"
+      }
+    ],
+    "dominantPlanets": [
+      {
+        "planet": "Moon",
+        "strength": 1.3,
+        "influenceType": "Emotional anchor in Capricorn"
+      },
+      {
+        "planet": "Sun",
+        "strength": 1.2000000000000002,
+        "influenceType": "Vital force in Cancer"
+      }
+    ],
+    "positiveThemes": [
+      "Dynamic initiatives",
+      "Creative breakthroughs",
+      "Physical vitality"
+    ],
+    "negativeThemes": [
+      "Over-thinking",
+      "Restlessness"
+    ],
+    "emotionalTone": "The sky carries a highly reflective and analytical emotional tone governed by Moon in Capricorn."
+  },
+  "currentFocus": {
+    "career": {
+      "priority": "medium",
+      "description": "Leverage Jupiter and Saturn transits to structure workflows and secure milestones."
+    },
+    "business": {
+      "priority": "medium",
+      "description": "Mercury transits favor reviewing strategy and communication plans."
+    },
+    "finance": {
+      "priority": "medium",
+      "description": "Moon transits advise capital conservation and prudent budgeting."
+    },
+    "relationship": {
+      "priority": "high",
+      "description": "Nurture domestic relationships under active Venus forces."
+    },
+    "family": {
+      "priority": "high",
+      "description": "Engage with family and focus on home environment stability."
+    },
+    "children": {
+      "priority": "medium",
+      "description": "Encourage learning and creative activities."
+    },
+    "health": {
+      "priority": "medium",
+      "description": "Practice wellness routines, eat warm meals, and maintain sleep schedules."
+    },
+    "education": {
+      "priority": "medium",
+      "description": "Ideal day for deep reading, research, and skill courses."
+    },
+    "travel": {
+      "priority": "medium",
+      "description": "Plan short journeys to refresh focus; avoid heavy over-taxing transits."
+    },
+    "spirituality": {
+      "priority": "medium",
+      "description": "Excellent day for meditation, introspection, and self-study."
+    }
+  },
+  "currentChallenges": {
+    "delays": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "stress": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "legal": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "relationship": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "health": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "career": {
+      "active": false,
+      "affectedAreas": []
+    },
+    "finance": {
+      "active": true,
+      "affectedAreas": [
+        "Unexpected outflows",
+        "Investment delays"
+      ]
+    }
+  },
+  "currentOpportunities": {
+    "marriageWindow": {
+      "active": true,
+      "timeframe": "Highly favorable for relationship initiatives"
+    },
+    "careerOpportunity": {
+      "active": false,
+      "timeframe": "Consolidate and double-check deliverables"
+    },
+    "businessOpportunity": {
+      "active": false,
+      "timeframe": "Review contracts; verify system requirements first"
+    },
+    "investmentOpportunity": {
+      "active": false,
+      "timeframe": "Hold cash reserves; defer speculative investments"
+    },
+    "travelOpportunity": {
+      "active": true,
+      "timeframe": "Auspicious travel window is active"
+    },
+    "learningOpportunity": {
+      "active": false,
+      "timeframe": "Perfect for research, reading, and learning complex systems"
+    }
+  },
+  "timeline": {
+    "today": {
+      "summary": "A day characterized by Moon transit in Capricorn and Sun transit in Cancer, establishing a balanced flow.",
+      "favorableActivities": [
+        "Self-reflection",
+        "Pruning backlogs",
+        "Structuring daily files"
+      ],
+      "unfavorableActivities": [
+        "Avoid late night sleeping",
+        "High-stakes speculative trades"
+      ]
+    },
+    "tomorrow": {
+      "summary": "The transit Moon continues to shift forward, bringing dynamic changes to the planetary lattice.",
+      "favorableActivities": [
+        "Engaging in constructive dialogues",
+        "Reviewing metrics"
+      ],
+      "unfavorableActivities": [
+        "Committing without proper verification"
+      ]
+    },
+    "thisWeek": {
+      "summary": "Planetary aspects favor building internal discipline and optimizing routines.",
+      "trends": [
+        "Moon transiting through Capricorn stimulates active mental focusing.",
+        "Sun in Cancer highlights leadership potential and career actions."
+      ]
+    },
+    "thisMonth": {
+      "summary": "Excellent monthly alignments for structuring financial assets and organizing goals.",
+      "trends": [
+        "Saturn demands structural perseverance.",
+        "Jupiter coordinates opportunities through strategic communications."
+      ]
+    },
+    "next3Months": {
+      "summary": "Steady expansion of projects and networks as Jupiter and Sun move into supportive quadrants.",
+      "trends": [
+        "Consolidation of workspace systems",
+        "Auspicious growth in skills"
+      ]
+    },
+    "next6Months": {
+      "summary": "Long-term Saturn transit encourages finishing pending obligations before launching major ventures.",
+      "trends": [
+        "Clearing old organizational bottlenecks",
+        "Solidifying bone and cardiovascular health"
+      ]
+    },
+    "thisYear": {
+      "summary": "A foundational year of steady professional stabilization and inner spiritual refinement.",
+      "trends": [
+        "Strong alignment with mantra siddhi and personal development"
+      ]
+    }
+  },
+  "validation": {
+    "currentSkyLoaded": true,
+    "transitLoaded": true,
+    "currentMoonLoaded": true,
+    "currentDashaLoaded": true,
+    "panchangaLoaded": true,
+    "readyForAi": true
+  }
+}

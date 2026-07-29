@@ -1,0 +1,105 @@
+{
+  "schema": {
+    "name": "Static Vimshopaka Bala",
+    "version": "1.0.0",
+    "description": "Master catalog of Vimshopaka Bala divisions, Vargas and immutable reference data."
+  },
+
+  "vimshopaka_systems": [
+
+    {
+      "name": "Shadvarga",
+      "total_vargas": 6
+    },
+
+    {
+      "name": "Saptavarga",
+      "total_vargas": 7
+    },
+
+    {
+      "name": "Dashavarga",
+      "total_vargas": 10
+    },
+
+    {
+      "name": "Shodashavarga",
+      "total_vargas": 16
+    }
+
+  ],
+
+  "supported_vargas": [
+
+    "D1",
+    "D2",
+    "D3",
+    "D4",
+    "D5",
+    "D6",
+    "D7",
+    "D8",
+    "D9",
+    "D10",
+    "D11",
+    "D12",
+    "D16",
+    "D20",
+    "D24",
+    "D27",
+    "D30",
+    "D40",
+    "D45",
+    "D60"
+
+  ],
+
+  "strength_levels": [
+
+    "Excellent",
+    "Very Strong",
+    "Strong",
+    "Average",
+    "Weak",
+    "Very Weak"
+
+  ],
+
+  "supported_units": [
+
+    "Virupa",
+    "Rupa",
+    "Percentage"
+
+  ],
+
+  "supported_attributes": [
+
+    "System",
+    "Division",
+    "Varga",
+    "Weight",
+    "Maximum Score",
+    "Minimum Score",
+    "Planet Applicability",
+    "Strength Grade",
+    "Interpretation",
+    "Reference"
+
+  ],
+
+  "evaluation": {
+
+    "support_multiple_systems": true,
+
+    "support_weighted_scoring": true,
+
+    "support_planet_ranking": true,
+
+    "support_comparison": true,
+
+    "support_normalization": true
+
+  }
+
+}

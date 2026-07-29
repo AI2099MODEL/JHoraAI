@@ -1,0 +1,151 @@
+{
+  "schema": {
+    "name": "Static Astrology Core",
+    "version": "1.0.0",
+    "description": "Core constants, enumerations, standards and global configuration used by all astrology systems."
+  },
+
+  "metadata": {
+    "default_language": "en",
+    "default_ayanamsa": "Lahiri",
+    "default_house_system": "Whole Sign",
+    "coordinate_system": "Tropical and Sidereal",
+    "time_standard": "UTC"
+  },
+
+  "supported_systems": [
+    "Parashari",
+    "Jaimini",
+    "KP",
+    "Nadi",
+    "Tajik",
+    "Lal Kitab",
+    "Western",
+    "Chinese"
+  ],
+
+  "supported_chart_types": [
+    "Natal",
+    "Transit",
+    "Horary",
+    "Muhurta",
+    "Prashna",
+    "Annual",
+    "Compatibility"
+  ],
+
+  "supported_divisional_charts": [
+    "D1","D2","D3","D4","D5","D6","D7","D8","D9","D10",
+    "D11","D12","D16","D20","D24","D27","D30","D40",
+    "D45","D60","D81","D108","D144"
+  ],
+
+  "supported_dashas": [
+    "Vimshottari",
+    "Yogini",
+    "Ashtottari",
+    "Kalachakra",
+    "Chara",
+    "Narayana",
+    "Shoola",
+    "Mandooka",
+    "Drig",
+    "Tara"
+  ],
+
+  "supported_languages": [
+    "English",
+    "Hindi",
+    "Sanskrit"
+  ],
+
+  "supported_prediction_modes": [
+    "Daily",
+    "Weekly",
+    "Monthly",
+    "Yearly",
+    "Lifetime",
+    "Transit",
+    "Dasha",
+    "Event"
+  ],
+
+  "supported_calculation_modes": [
+    "Sidereal",
+    "Tropical"
+  ],
+
+  "supported_house_systems": [
+    "Whole Sign",
+    "Placidus",
+    "Equal",
+    "Koch",
+    "Campanus",
+    "Porphyry",
+    "Regiomontanus",
+    "Sripati"
+  ],
+
+  "supported_ayanamsas": [
+    "Lahiri",
+    "Raman",
+    "Krishnamurti",
+    "Fagan-Bradley",
+    "Yukteswar",
+    "True Chitrapaksha"
+  ],
+
+  "coordinate_formats": [
+    "Decimal",
+    "DMS"
+  ],
+
+  "zodiac_types": [
+    "Sidereal",
+    "Tropical"
+  ],
+
+  "gender_types": [
+    "Male",
+    "Female",
+    "Other"
+  ],
+
+  "event_categories": [
+    "Career",
+    "Finance",
+    "Marriage",
+    "Relationship",
+    "Children",
+    "Health",
+    "Education",
+    "Property",
+    "Vehicle",
+    "Travel",
+    "Foreign",
+    "Spiritual",
+    "Legal",
+    "Business",
+    "Family",
+    "General"
+  ],
+
+  "rating_scales": {
+    "confidence": {
+      "min": 0,
+      "max": 100
+    },
+    "probability": {
+      "min": 0,
+      "max": 100
+    },
+    "strength": {
+      "min": 0,
+      "max": 100
+    },
+    "priority": {
+      "min": 0,
+      "max": 100
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Represents a registered user profile, settings, and saved astrology profiles.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "The unique identifier for the user matching their Firebase Auth UID."
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "The full display name of the user."
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "The verified email address of the user."
+        },
+        "phoneNumber": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Optional contact number retrieved from auth or Google People API."
+        },
+        "photoURL": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The profile photo URL of the user."
+        },
+        "createdDate": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "ISO timestamp representing the date of creation."
+        },
+        "lastLogin": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "ISO timestamp of the user's last login session."
+        }
+      },
+      "required": ["uid", "name", "email", "createdDate", "lastLogin"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User document storing demographic data, preferences, and historical charts."
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema": {
+    "name": "Static Divisional Charts",
+    "version": "1.0.0",
+    "description": "Master catalog of all supported Vargas (Divisional Charts) and their immutable properties."
+  },
+
+  "supported_vargas": [
+    "D1",
+    "D2",
+    "D3",
+    "D4",
+    "D5",
+    "D6",
+    "D7",
+    "D8",
+    "D9",
+    "D10",
+    "D11",
+    "D12",
+    "D16",
+    "D20",
+    "D24",
+    "D27",
+    "D30",
+    "D40",
+    "D45",
+    "D60",
+    "D81",
+    "D108",
+    "D144"
+  ],
+
+  "classification": {
+    "major": [
+      "D1",
+      "D9",
+      "D10",
+      "D7",
+      "D12",
+      "D16",
+      "D20",
+      "D24",
+      "D27",
+      "D30",
+      "D60"
+    ],
+    "extended": [
+      "D2",
+      "D3",
+      "D4",
+      "D5",
+      "D6",
+      "D8",
+      "D11",
+      "D40",
+      "D45",
+      "D81",
+      "D108",
+      "D144"
+    ]
+  },
+
+  "life_areas": [
+    "General Life",
+    "Wealth",
+    "Siblings",
+    "Property",
+    "Power",
+    "Health",
+    "Children",
+    "Longevity",
+    "Marriage",
+    "Career",
+    "Parents",
+    "Vehicles",
+    "Spirituality",
+    "Education",
+    "Strength",
+    "Misfortune",
+    "Maternal Lineage",
+    "Paternal Lineage",
+    "Past Life",
+    "Karmic Analysis"
+  ],
+
+  "supported_attributes": [
+    "Chart Name",
+    "Chart Number",
+    "Sanskrit Name",
+    "Division Factor",
+    "Primary Purpose",
+    "Life Areas",
+    "Calculation Method",
+    "Planet Placement",
+    "House Interpretation",
+    "Sign Interpretation",
+    "Strength Evaluation",
+    "Yoga Evaluation",
+    "Dosha Evaluation",
+    "Dasha Relevance",
+    "Transit Relevance",
+    "KP Relevance",
+    "Jaimini Relevance",
+    "Prediction Weight"
+  ],
+
+  "prediction_usage": [
+    "Natal Analysis",
+    "Event Timing",
+    "Marriage",
+    "Career",
+    "Children",
+    "Health",
+    "Finance",
+    "Property",
+    "Spiritual Progress",
+    "Compatibility",
+    "Remedial Analysis"
+  ]
+}

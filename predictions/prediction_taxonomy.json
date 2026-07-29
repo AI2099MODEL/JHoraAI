@@ -1,0 +1,149 @@
+{
+  "schema": {
+    "version": "1.0.0",
+    "description": "Master taxonomy for all prediction categories."
+  },
+
+  "prediction_types": {
+
+    "daily": {
+      "id": 1,
+      "name": "Daily Prediction",
+      "timeframe": "1 day"
+    },
+
+    "weekly": {
+      "id": 2,
+      "name": "Weekly Prediction",
+      "timeframe": "7 days"
+    },
+
+    "monthly": {
+      "id": 3,
+      "name": "Monthly Prediction",
+      "timeframe": "1 month"
+    },
+
+    "yearly": {
+      "id": 4,
+      "name": "Yearly Prediction",
+      "timeframe": "1 year"
+    },
+
+    "lifetime": {
+      "id": 5,
+      "name": "Lifetime Trend",
+      "timeframe": "Entire Life"
+    }
+  },
+
+  "life_areas": {
+
+    "personality": {},
+    "health": {},
+    "career": {},
+    "education": {},
+    "wealth": {},
+    "business": {},
+    "profession": {},
+    "marriage": {},
+    "relationships": {},
+    "children": {},
+    "property": {},
+    "vehicle": {},
+    "travel": {},
+    "foreign": {},
+    "litigation": {},
+    "government": {},
+    "spirituality": {},
+    "parents": {},
+    "siblings": {},
+    "friends": {},
+    "social_status": {},
+    "fame": {},
+    "partnership": {},
+    "investments": {},
+    "stock_market": {},
+    "crypto": {},
+    "inheritance": {},
+    "retirement": {},
+    "death": {},
+    "longevity": {}
+  },
+
+  "event_types": {
+
+    "positive": [
+      "Marriage",
+      "Promotion",
+      "Birth",
+      "Job",
+      "Travel",
+      "Property Purchase",
+      "Business Growth",
+      "Recognition"
+    ],
+
+    "negative": [
+      "Illness",
+      "Litigation",
+      "Separation",
+      "Financial Loss",
+      "Accident",
+      "Debt",
+      "Hospitalization",
+      "Job Loss"
+    ],
+
+    "neutral": [
+      "Relocation",
+      "Education",
+      "Routine Change",
+      "Spiritual Practice"
+    ]
+  },
+
+  "severity_levels": [
+    "Very Low",
+    "Low",
+    "Moderate",
+    "High",
+    "Very High"
+  ],
+
+  "confidence_levels": [
+    "Very Weak",
+    "Weak",
+    "Average",
+    "Strong",
+    "Very Strong"
+  ],
+
+  "probability_ranges": {
+
+    "very_low": {
+      "min": 0,
+      "max": 20
+    },
+
+    "low": {
+      "min": 21,
+      "max": 40
+    },
+
+    "medium": {
+      "min": 41,
+      "max": 60
+    },
+
+    "high": {
+      "min": 61,
+      "max": 80
+    },
+
+    "very_high": {
+      "min": 81,
+      "max": 100
+    }
+  }
+}

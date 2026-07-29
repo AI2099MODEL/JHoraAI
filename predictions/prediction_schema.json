@@ -1,0 +1,108 @@
+{
+  "schema": {
+    "name": "JHoraAI Prediction Schema",
+    "version": "1.0.0",
+    "prediction_version": "1.0.0",
+    "description": "Canonical prediction object used by every prediction engine."
+  },
+
+  "prediction": {
+
+    "prediction_id": "",
+
+    "prediction_type": "",
+
+    "timeframe": "",
+
+    "subject": "",
+
+    "generated_at": "",
+
+    "engine": "",
+
+    "confidence": 0,
+
+    "probability": 0,
+
+    "priority": 0,
+
+    "severity": "",
+
+    "importance": "",
+
+    "category": "",
+
+    "headline": "",
+
+    "summary": "",
+
+    "detailed_prediction": "",
+
+    "positive_factors": [],
+
+    "negative_factors": [],
+
+    "supporting_combinations": [],
+
+    "conflicting_combinations": [],
+
+    "trigger_conditions": [],
+
+    "planetary_causes": [],
+
+    "house_causes": [],
+
+    "sign_causes": [],
+
+    "nakshatra_causes": [],
+
+    "dasha_causes": [],
+
+    "transit_causes": [],
+
+    "kp_causes": [],
+
+    "jaimini_causes": [],
+
+    "strength_factors": [],
+
+    "weakness_factors": [],
+
+    "supporting_yogas": [],
+
+    "blocking_yogas": [],
+
+    "doshas": [],
+
+    "recommended_actions": [],
+
+    "avoid_actions": [],
+
+    "remedies": [],
+
+    "best_time_windows": [],
+
+    "worst_time_windows": [],
+
+    "references": [],
+
+    "ai_explanation": "",
+
+    "technical_notes": "",
+
+    "debug": {
+
+      "score_breakdown": [],
+
+      "rules_triggered": [],
+
+      "calculations_used": [],
+
+      "weights_used": [],
+
+      "execution_time_ms": 0
+
+    }
+
+  }
+}

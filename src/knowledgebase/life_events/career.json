@@ -1,0 +1,1084 @@
+{
+  "metadata": {
+    "schemaVersion": "1.0",
+    "engine": "CareerMaster",
+    "version": "1.0.0",
+    "lastUpdated": "2026-07-16T03:05:55Z",
+    "description": "JHoraAI Master Career and Professional Life Knowledge Base and Event Dossier"
+  },
+  "categories": [
+    {
+      "categoryId": "career",
+      "displayName": "Career",
+      "description": "All events, transitions, growth phases, professional choices, and milestones in a native's career and business life"
+    }
+  ],
+  "events": [
+    {
+      "id": "career_start",
+      "displayName": "Career Start",
+      "description": "The absolute entry of a native into professional work, signifying the first generation of independent livelihood",
+      "category": "Career",
+      "subcategory": "milestone",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "first_job",
+      "displayName": "First Job",
+      "description": "The official signing and joining date of the first employment contract",
+      "category": "Career",
+      "subcategory": "milestone",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "government_job",
+      "displayName": "Government Job",
+      "description": "Securing public sector or civil service employment under state or federal authority, heavily signified by Sun, Jupiter, and the 10th house",
+      "category": "Career",
+      "subcategory": "employment_type",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term", "lifetime"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "private_job",
+      "displayName": "Private Job",
+      "description": "Employment within private corporate entities, commercial firms, or non-governmental structures",
+      "category": "Career",
+      "subcategory": "employment_type",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "contract_job",
+      "displayName": "Contract Job",
+      "description": "Fixed-term professional assignments or project-based agreements without permanent corporate liability",
+      "category": "Career",
+      "subcategory": "employment_type",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "western"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "temporary_job",
+      "displayName": "Temporary Job",
+      "description": "Short-term seasonal or transitional employment role to fulfill urgent livelihood requirements",
+      "category": "Career",
+      "subcategory": "employment_type",
+      "priority": "low",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets"],
+      "requiredSystems": ["kp", "lal_kitab"],
+      "requiredEvidence": ["transit_trigger"],
+      "requiredTimeline": ["present", "30_days", "90_days"],
+      "requiredReports": ["summary", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "permanent_job",
+      "displayName": "Permanent Job",
+      "description": "Tenured, stable, and indefinite employment offering structured social benefits and long-term security, signified by Saturn's strong alignment",
+      "category": "Career",
+      "subcategory": "employment_type",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["present", "near_future", "medium_term", "lifetime"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "promotion",
+      "displayName": "Promotion",
+      "description": "Elevation in rank, status, and authority along with professional scale progression, signified by positive linkages of 2, 6, 10, 11 houses",
+      "category": "Career",
+      "subcategory": "transition",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger", "annual_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "demotion",
+      "displayName": "Demotion",
+      "description": "Reduction in professional rank, scale, or authority, usually triggered by active 5, 8, 12 house significations overriding the 10th",
+      "category": "Career",
+      "subcategory": "transition",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "lal_kitab"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "transfer",
+      "displayName": "Transfer",
+      "description": "Geographical or departmental relocation of workplace within the same employment setup, signified by the 3rd, 4th, and 12th houses",
+      "category": "Career",
+      "subcategory": "transition",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger", "annual_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "department_change",
+      "displayName": "Department Change",
+      "description": "Shift in functional workflow or internal team structure without changing the overall employer",
+      "category": "Career",
+      "subcategory": "transition",
+      "priority": "low",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets"],
+      "requiredSystems": ["kp", "western"],
+      "requiredEvidence": ["transit_trigger"],
+      "requiredTimeline": ["present", "near_future"],
+      "requiredReports": ["summary", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "role_change",
+      "displayName": "Role Change",
+      "description": "Transformation of operational profile, core responsibilities, or title within the professional environment",
+      "category": "Career",
+      "subcategory": "transition",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "salary_increase",
+      "displayName": "Salary Increase",
+      "description": "Direct enhancement in financial compensation, wages, or performance commissions, indicating strong 2nd and 11th house sub lords",
+      "category": "Career",
+      "subcategory": "financial",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger", "annual_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "salary_reduction",
+      "displayName": "Salary Reduction",
+      "description": "Decrease in financial compensation, structural paycuts, or loss of allowances, signified by 12th house (loss) operating on 2nd and 11th",
+      "category": "Career",
+      "subcategory": "financial",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "lal_kitab"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "recognition",
+      "displayName": "Recognition",
+      "description": "Public acknowledgment, industry praise, or professional appreciation from peers and superiors",
+      "category": "Career",
+      "subcategory": "growth",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future"],
+      "requiredReports": ["summary", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "award",
+      "displayName": "Award",
+      "description": "Formal, high-status prizes, physical medals, or trophies representing ultimate merit, signified by Jupiter aspecting Sun or the 11th house",
+      "category": "Career",
+      "subcategory": "growth",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger", "annual_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "performance_review",
+      "displayName": "Performance Review",
+      "description": "Standard seasonal, quarterly, or annual corporate evaluation of the native's work metrics",
+      "category": "Career",
+      "subcategory": "milestone",
+      "priority": "low",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets"],
+      "requiredSystems": ["kp", "western"],
+      "requiredEvidence": ["transit_trigger"],
+      "requiredTimeline": ["present", "30_days", "90_days"],
+      "requiredReports": ["summary", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "leadership_role",
+      "displayName": "Leadership Role",
+      "description": "Assuming team leadership, directional charge, or project ownership responsibilities, signifying strong Mars and Sun dignities",
+      "category": "Career",
+      "subcategory": "growth",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "management_position",
+      "displayName": "Management Position",
+      "description": "Progression into mid-to-high corporate managerial cadres, driving resource allocation and strategy",
+      "category": "Career",
+      "subcategory": "growth",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["present", "near_future", "medium_term", "lifetime"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "executive_position",
+      "displayName": "Executive Position",
+      "description": "Reaching high-level executive ranks (C-Suite, VP, Director) with absolute authority, signified by strong 10th and 1st house lords in mutual linkage",
+      "category": "Career",
+      "subcategory": "growth",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term", "lifetime"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "resignation",
+      "displayName": "Resignation",
+      "description": "Voluntary release of active employment by the native, typically signified by 5th and 9th houses (giving up 6th and 10th)",
+      "category": "Career",
+      "subcategory": "transition",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "termination",
+      "displayName": "Termination",
+      "description": "Involuntary dismissal or discharge of employment due to corporate decisions, performance issues, or conflicts",
+      "category": "Career",
+      "subcategory": "decline",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "lal_kitab"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "layoff",
+      "displayName": "Layoff",
+      "description": "Mass corporate downsizing or structural redundancies, indicated by sudden outer planetary transits conjunct natal 10th/6th points",
+      "category": "Career",
+      "subcategory": "decline",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "career_break",
+      "displayName": "Career Break",
+      "description": "A prolonged sabbatical, educational pause, health leave, or maternal/paternal timeout from work",
+      "category": "Career",
+      "subcategory": "transition",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "career_restart",
+      "displayName": "Career Restart",
+      "description": "Re-entering active professional workflows after a substantial career break, sabbatical, or pause",
+      "category": "Career",
+      "subcategory": "milestone",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger", "annual_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "career_change",
+      "displayName": "Career Change",
+      "description": "A total pivot in industry, functional field, or profession (e.g., from Engineering to Art), indicating heavy 8th or 5th house activation",
+      "category": "Career",
+      "subcategory": "transition",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term", "lifetime"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "career_growth",
+      "displayName": "Career Growth",
+      "description": "Sustained upward progression, skill acquisition, expanding authority, and financial milestones in current career track",
+      "category": "Career",
+      "subcategory": "growth",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term", "lifetime"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "career_decline",
+      "displayName": "Career Decline",
+      "description": "Phase of stagnant options, performance blockages, declining opportunities, or loss of relevance in current industry",
+      "category": "Career",
+      "subcategory": "decline",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "lal_kitab"],
+      "requiredEvidence": ["dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "remedies"],
+      "enabled": true
+    },
+    {
+      "id": "business_to_job",
+      "displayName": "Business to Job",
+      "description": "Closing down self-employed business operations to resume secure salary employment, indicating the 6th house overriding the 7th and 10th",
+      "category": "Career",
+      "subcategory": "transition",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "job_to_business",
+      "displayName": "Job to Business",
+      "description": "Resigning from salary employment to start an independent business, commercial startup, or freelance agency (7th and 10th house strength)",
+      "category": "Career",
+      "subcategory": "transition",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term", "lifetime"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "foreign_employment",
+      "displayName": "Foreign Employment",
+      "description": "Working in a foreign country or cross-border location, heavily signified by the 9th and 12th houses linked with 10th and 1st",
+      "category": "Career",
+      "subcategory": "employment_type",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term", "lifetime"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "remote_work",
+      "displayName": "Remote Work",
+      "description": "Working from home or digital nomad settings, showing link of the 4th house (home) with 10th/6th houses",
+      "category": "Career",
+      "subcategory": "employment_type",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "freelancing",
+      "displayName": "Freelancing",
+      "description": "Working as an independent self-employed contractor delivering specialized services, indicated by Rahu/Uranus or strong 3rd house",
+      "category": "Career",
+      "subcategory": "employment_type",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence", "recommendations"],
+      "enabled": true
+    },
+    {
+      "id": "consulting",
+      "displayName": "Consulting",
+      "description": "Delivering strategic advice, consultation, or knowledge-base counsel, signified by strong Jupiter and Mercury placements",
+      "category": "Career",
+      "subcategory": "employment_type",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "western"],
+      "requiredEvidence": ["natal_promise", "dasha_support"],
+      "requiredTimeline": ["present", "near_future", "medium_term", "lifetime"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "retirement",
+      "displayName": "Retirement",
+      "description": "Formal exit from active professional careers due to age brackets or financial freedom, showing the detachment of 10th and 6th houses",
+      "category": "Career",
+      "subcategory": "milestone",
+      "priority": "high",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "jaimini", "nadi"],
+      "requiredEvidence": ["natal_promise", "dasha_support", "transit_trigger"],
+      "requiredTimeline": ["past", "present", "near_future", "lifetime"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    },
+    {
+      "id": "re_employment",
+      "displayName": "Re-employment",
+      "description": "Securing professional assignments, post-retirement advisory posts, or new employment contracts after formal retirement",
+      "category": "Career",
+      "subcategory": "milestone",
+      "priority": "medium",
+      "requiredProfiles": ["self"],
+      "requiredBirthData": ["date", "time", "latitude", "longitude", "timezone"],
+      "requiredProviders": ["cusps", "planets", "dasha_calculator"],
+      "requiredSystems": ["kp", "parashari", "tajik"],
+      "requiredEvidence": ["dasha_support", "transit_trigger", "annual_trigger"],
+      "requiredTimeline": ["present", "near_future", "medium_term"],
+      "requiredReports": ["summary", "detailed", "evidence"],
+      "enabled": true
+    }
+  ],
+  "systems": {
+    "kp": {
+      "natalPromise": {
+        "description": "Evaluation of career and income promises via cuspal sub-lords of the 10th and 11th houses",
+        "primaryHouses": [10, 11],
+        "supportingHouses": [2, 6],
+        "detrimentalHouses": [5, 8, 12]
+      },
+      "careerHouses": [10],
+      "incomeHouses": [2, 11],
+      "serviceHouses": [6],
+      "authorityHouses": [1, 10],
+      "promotionHouses": [2, 6, 10, 11],
+      "lossHouses": [5, 8, 12],
+      "cusps": {
+        "description": "Cuspal coordinates, degrees, and sign/star/sub/sub-sub lords",
+        "keys": ["signLord", "starLord", "subLord", "subSubLord"]
+      },
+      "houseLords": {
+        "description": "Rulers of signs occupying the cuspal degrees of the 12 houses"
+      },
+      "houseOccupants": {
+        "description": "Planets residing inside the boundary degrees of relevant houses"
+      },
+      "starLords": {
+        "description": "Constellation rulers governing planet positions and cuspal points"
+      },
+      "subLords": {
+        "description": "Sub-divisional rulers of stellar spaces determining final outcome event trends in KP"
+      },
+      "subSubLords": {
+        "description": "Micro-sub divisional rulers of sub spaces for hyper-precise timing"
+      },
+      "planetSignificators": {
+        "description": "Planetary significators categorized by A, B, C, D grades in KP system"
+      },
+      "houseSignificators": {
+        "description": "List of planets signifying specific houses sorted by strength"
+      },
+      "retrograde": {
+        "description": "Planetary backward motion indicators causing delays or repeating situations"
+      },
+      "combust": {
+        "description": "Planets in close proximity to the Sun losing their explicit outward strength"
+      },
+      "conjunction": {
+        "description": "Close longitudinal alignment of planets within orb values"
+      },
+      "aspect": {
+        "description": "Planetary aspects on houses and other planets according to Vedic degrees"
+      },
+      "mahadasha": {
+        "description": "Vimshottari Mahadasha lord career potential"
+      },
+      "bhukti": {
+        "description": "Vimshottari Bhukti lord role in timing"
+      },
+      "antara": {
+        "description": "Vimshottari Antara lord role in timing"
+      },
+      "sookshma": {
+        "description": "Vimshottari Sookshma lord role in timing"
+      },
+      "prana": {
+        "description": "Vimshottari Prana lord role in timing"
+      },
+      "currentTransit": {
+        "description": "Current moving planets conjuncting or aspecting natal significator degrees"
+      },
+      "moonTransit": {
+        "description": "Daily trigger verification based on transiting Moon over key Nakshatras"
+      },
+      "saturnTransit": {
+        "description": "Macro-structural trends, delays, and career structural lessons"
+      },
+      "jupiterTransit": {
+        "description": "Blessing, expansion, and career event sanctioning"
+      },
+      "rulingPlanets": {
+        "description": "Ascendant Sign/Star Lord, Moon Sign/Star Lord, and Day Lord computed for query hour"
+      },
+      "horarySupport": {
+        "description": "KP Horary (Prasna) support based on a number from 1 to 249"
+      },
+      "supportingEvidence": {
+        "description": "Positive linkages where 10th sub lord signifies 2, 6, 10, 11 and active DBA lords are positive significators"
+      },
+      "conflictingEvidence": {
+        "description": "Negative linkages where 10th sub lord signifies 5, 8, 12 and active DBA lords signify loss or stagnation"
+      },
+      "missingEvidence": {
+        "description": "Inability to verify precise sub-lords due to birth time uncertainty beyond 1 minute"
+      }
+    },
+    "parashari": {
+      "d1": {
+        "description": "Rashi (Natal) Chart analysis of career houses and planets"
+      },
+      "d10": {
+        "description": "Dasamsha Chart - the core divisional chart representing profession, success, and status"
+      },
+      "d9": {
+        "description": "Navamsha Chart - inner strengths, dignity, and career partner fortunes"
+      },
+      "tenthHouse": {
+        "description": "Evaluation of the 10th house in D1 and D10 for occupants, aspects, and structural strength"
+      },
+      "sixthHouse": {
+        "description": "Service, routine jobs, competitive success, and daily tasks"
+      },
+      "secondHouse": {
+        "description": "Financial reserves, wealth accumulation, and speech"
+      },
+      "eleventhHouse": {
+        "description": "Income, gains, social networks, and professional success"
+      },
+      "sun": {
+        "description": "Natural significator (Karaka) of authority, status, and government"
+      },
+      "saturn": {
+        "description": "Natural significator (Karaka) of service, hard labor, duties, and persistence"
+      },
+      "mercury": {
+        "description": "Natural significator (Karaka) of intellect, business, trade, and communication"
+      },
+      "jupiter": {
+        "description": "Natural significator (Karaka) of wisdom, expansion, counseling, and corporate heights"
+      },
+      "mars": {
+        "description": "Natural significator (Karaka) of ambition, enterprise, military, and engineering"
+      },
+      "yogas": {
+        "description": "Planetary combinations like Amala Yoga, Raja Yoga, or Pancha Mahapurusha Yoga",
+        "placeholders": ["AmalaYoga", "RajaYoga", "PanchaMahapurushaYoga"]
+      },
+      "doshas": {
+        "description": "Afflictions like Kemadruma Dosha, Shakat Dosha, or Rahu-Ketu axis afflictions",
+        "placeholders": ["KemadrumaDosha", "ShakatDosha", "RahuKetuAffliction"]
+      },
+      "vimshottari": {
+        "description": "120-year planetary dasha sequence showing professional evolution"
+      },
+      "transit": {
+        "description": "Transits of Saturn and Jupiter activating the 10th, 6th, or Ascendant"
+      },
+      "supportingEvidence": {
+        "description": "Strong 10th lord in kendra/trikona, benefic aspects on D1/D10 10th house, unafflicted Sun/Saturn"
+      },
+      "conflictingEvidence": {
+        "description": "Afflicted 10th house by multiple malefics, debilitated Sun, 10th lord in 8th house"
+      }
+    },
+    "jaimini": {
+      "atmakaraka": {
+        "description": "The planet with the highest longitudinal degree representing the soul's primary lessons"
+      },
+      "amatyakaraka": {
+        "description": "The planet with the second-highest longitudinal degree representing the career, status, and professional guide"
+      },
+      "karakamsha": {
+        "description": "The sign occupied by the Atmakaraka in the Navamsha chart analyzed in D1"
+      },
+      "arudhaA10": {
+        "description": "Rajyapada (A10) - the arudha of the 10th house representing public status and career success"
+      },
+      "argala": {
+        "description": "Interventions or direct supports from planets in 2nd, 4th, 5th, and 11th from significator points"
+      },
+      "rashiDrishti": {
+        "description": "Sign aspects where cardinal signs aspect fixed signs and mutable signs aspect each other"
+      },
+      "charaDasha": {
+        "description": "Jaimini sign-based dasha sequence timing critical career events"
+      },
+      "supportingEvidence": {
+        "description": "Benefic planets in or aspecting A10, clean aspect links between Amatyakaraka and career houses"
+      },
+      "conflictingEvidence": {
+        "description": "Malefics like Rahu or Saturn occupying or aspecting A10, afflicted Amatyakaraka"
+      }
+    },
+    "western": {
+      "mc": {
+        "description": "Medium Coeli (Midheaven) - the cusp of the 10th house representing professional zenith, public status, and career legacy"
+      },
+      "tenthHouse": {
+        "description": "Cusp, sign, and planets residing in the 10th house"
+      },
+      "saturn": {
+        "description": "Planet of structured careers, duty, corporate hierarchy, boundaries, and long-term milestones"
+      },
+      "sun": {
+        "description": "Planet of ego expression, leadership, vitality, and creative career drive"
+      },
+      "mars": {
+        "description": "Planet of ambition, competitive action, and enterprise in profession"
+      },
+      "jupiter": {
+        "description": "Planet of professional expansion, abundance, higher learning, and international jobs"
+      },
+      "progressions": {
+        "description": "Secondary progressions showing professional and psychological timeline shifts"
+      },
+      "solarReturn": {
+        "description": "Annual return of the Sun to its birth degree, highlighting the professional theme of the year"
+      },
+      "transits": {
+        "description": "Outer planets aspecting MC or natal 10th/6th house rulers"
+      }
+    },
+    "nadi": {
+      "careerRules": {
+        "description": "Bhrigu Nandi Nadi rules: Saturn representing career, Mercury representing business, Mars representing engineering",
+        "indicators": ["SaturnTransitContactJupiter", "SaturnTransitContactMercury"]
+      },
+      "professionalTiming": {
+        "description": "Timing via Saturn's transit over nakshatras and sign elements conjuncting key planets"
+      },
+      "supportingEvidence": {
+        "description": "Harmonious transit paths of Saturn without malefic node intersections"
+      }
+    },
+    "lalKitab": {
+      "relevantHouses": {
+        "description": "Houses 2, 6, and 10 evaluated using unique Lal Kitab aspects"
+      },
+      "professionalRemedies": {
+        "description": "Symbolic actions, charity, or domestic habits to rectify professional blockages"
+      },
+      "sleepingPlanets": {
+        "description": "Planets in inactive houses that require manual triggers to awaken"
+      }
+    },
+    "tajik": {
+      "muntha": {
+        "description": "The progressed yearly point in the Varshaphala (annual) chart"
+      },
+      "varshaphala": {
+        "description": "The annual Solar Return chart calculated under Vedic Tajik rules"
+      },
+      "annualTrigger": {
+        "description": "Timing via Patyini Dasha or Mudda Dasha conjunct with transit aspects"
+      }
+    }
+  },
+  "timeline": {
+    "phases": [
+      {
+        "phase": "Past",
+        "description": "Historical career events, retro-active verification, and previous milestones",
+        "timeframe": "Historical"
+      },
+      {
+        "phase": "Present",
+        "description": "Current active career energies, transits, and short-term trends",
+        "timeframe": "0 to 30 days"
+      },
+      {
+        "phase": "30 Days",
+        "description": "Short-term project completions, interviews, and immediate reviews",
+        "timeframe": "1 to 30 days"
+      },
+      {
+        "phase": "90 Days",
+        "description": "Medium-term transitions, performance review cycles, and team shifts",
+        "timeframe": "30 to 90 days"
+      },
+      {
+        "phase": "180 Days",
+        "description": "Half-yearly goals, contract evaluations, and potential promotions",
+        "timeframe": "90 to 180 days"
+      },
+      {
+        "phase": "1 Year",
+        "description": "Annual appraisal, salary increment cycle, and major planetary transits",
+        "timeframe": "180 to 365 days"
+      },
+      {
+        "phase": "3 Years",
+        "description": "Significant career changes, business growth, or executive transitions",
+        "timeframe": "1 to 3 years"
+      },
+      {
+        "phase": "5 Years",
+        "description": "Long-term legacy building, retirement timelines, or major structural shifts",
+        "timeframe": "3 to 5 years"
+      },
+      {
+        "phase": "Lifetime",
+        "description": "Fundamental natal promise, overall status potential, and macro-career evolution",
+        "timeframe": "Lifetime"
+      }
+    ]
+  },
+  "validation": {
+    "pipeline": [
+      {
+        "step": 1,
+        "name": "Birth Data",
+        "description": "Validate date, time, and coordinates for precision",
+        "required": true
+      },
+      {
+        "step": 2,
+        "name": "Profile Selection",
+        "description": "Confirm primary user profile and secondary partners if relevant",
+        "required": true
+      },
+      {
+        "step": 3,
+        "name": "Required Systems Available",
+        "description": "Verify calculation engines for selected systems are loaded",
+        "required": true
+      },
+      {
+        "step": 4,
+        "name": "Natal Promise",
+        "description": "Analyze fundamental life promise across KP cusps and Parashari houses",
+        "required": true
+      },
+      {
+        "step": 5,
+        "name": "Career Promise",
+        "description": "Check professional strength specifically using 10th and 11th cusps and D10 charts",
+        "required": true
+      },
+      {
+        "step": 6,
+        "name": "Planet Validation",
+        "description": "Evaluate strength, dignity, and associations of significators",
+        "required": true
+      },
+      {
+        "step": 7,
+        "name": "House Validation",
+        "description": "Assess relevant house strengths, cuspal sub lords, and aspects",
+        "required": true
+      },
+      {
+        "step": 8,
+        "name": "Dasha Validation",
+        "description": "Examine Vimshottari and Chara dasha support for the timeframe",
+        "required": true
+      },
+      {
+        "step": 9,
+        "name": "Transit Validation",
+        "description": "Track current and upcoming transit triggers over key degrees",
+        "required": true
+      },
+      {
+        "step": 10,
+        "name": "Evidence Package",
+        "description": "Compile structured output organizing all Supporting, Conflicting, and Missing indicators",
+        "required": true
+      },
+      {
+        "step": 11,
+        "name": "AI Ready",
+        "description": "Payload is complete and ready to relay to AI engine",
+        "required": true
+      }
+    ]
+  },
+  "evidence": {
+    "types": [
+      {
+        "typeId": "cuspal_sub_lord_link",
+        "displayName": "Cuspal Sub Lord Linkage",
+        "description": "Connectivity between a cusp sub-lord and the significator houses"
+      },
+      {
+        "typeId": "d10_dignity",
+        "displayName": "Dasamsha Dignity",
+        "description": "Strength of 10th lord or career significator in the D10 chart"
+      },
+      {
+        "typeId": "amatyakaraka_aspect",
+        "displayName": "Amatyakaraka Aspect",
+        "description": "Jaimini sign-aspect connectivity between Amatyakaraka and the lagna/arudha points"
+      }
+    ],
+    "weightingSystem": {
+      "description": "Algorithmic weights for matching patterns across multiple astrological disciplines",
+      "priorities": {
+        "high": 1.0,
+        "medium": 0.6,
+        "low": 0.3
+      }
+    }
+  },
+  "reports": {
+    "templates": {
+      "careerSummary": {
+        "title": "Career and Professional Summary",
+        "sections": ["overview", "current_professional_status", "key_trends"]
+      },
+      "promotionReport": {
+        "title": "Promotion Eligibility and Timing Analysis",
+        "sections": ["dasha_suitability", "cuspal_indicators", "favorable_dates"]
+      },
+      "transferReport": {
+        "title": "Relocation and Job Transfer Analysis",
+        "sections": ["house_activation", "relocation_directions", "timing_guideline"]
+      },
+      "careerTimeline": {
+        "title": "Professional Milestone Timeline",
+        "sections": ["short_term_outlook", "medium_term_outlook", "long_term_projection"]
+      },
+      "strengths": {
+        "title": "Key Professional Strengths",
+        "sections": ["dominant_planets", "best_skills_sectors", "leadership_potential"]
+      },
+      "weaknesses": {
+        "title": "Professional Vulnerabilities and Risks",
+        "sections": ["detrimental_cuspal_links", "malefic_aspects", "delay_elements"]
+      },
+      "supportingEvidence": {
+        "title": "Supporting Evidence List",
+        "sections": ["kp_signatures", "parashari_signatures", "jaimini_signatures"]
+      },
+      "conflictingEvidence": {
+        "title": "Conflicting Evidence List",
+        "sections": ["negating_signatures", "malefic_afflictions", "retrograde_obstacles"]
+      },
+      "recommendations": {
+        "title": "Strategic Professional Recommendations",
+        "sections": ["timing_actions", "upskilling_focus", "leadership_decisions"]
+      },
+      "remedies": {
+        "title": "Astrological Remedies for Career Obstacles",
+        "sections": ["gems", "mantras", "charity", "lal_kitab_remedies"]
+      },
+      "pdf": {
+        "title": "PDF Document Template",
+        "sections": ["header", "branding", "compiled_sections", "footer"]
+      },
+      "email": {
+        "title": "Email Report Delivery",
+        "sections": ["subject_line", "greeting", "html_body", "call_to_action"]
+      }
+    }
+  },
+  "notifications": {
+    "triggers": {
+      "promotionWindow": {
+        "id": "promotion_window",
+        "title": "Upcoming Promotion Opportunity Window",
+        "description": "Fired when active dasha and transit elements align favorably with the 10th and 11th cusps"
+      },
+      "transferAlert": {
+        "id": "transfer_alert",
+        "title": "Job Transfer/Relocation Trigger Alert",
+        "description": "Fired when planetary transits activate the 3rd and 12th houses concurrently"
+      },
+      "careerOpportunity": {
+        "id": "career_opportunity",
+        "title": "General Career Opportunity Window",
+        "description": "Fired when favorable Jupiter transits or new bhukti periods commence"
+      },
+      "interviewWindow": {
+        "id": "interview_window",
+        "title": "Auspicious Interview and Negotiation Window",
+        "description": "Fired when the Moon transits over the nakshatra of the 6th or 10th sub lord"
+      },
+      "jobChangeWindow": {
+        "id": "job_change_window",
+        "title": "Auspicious Job Transition Window",
+        "description": "Fired during 5th, 9th, or 10th house activations indicating a smooth employer change"
+      },
+      "governmentOpportunity": {
+        "id": "government_opportunity",
+        "title": "Civil Service/Government Job Alert",
+        "description": "Fired when Sun and Jupiter transits aspect the 10th house of public authority"
+      },
+      "foreignJobWindow": {
+        "id": "foreign_job_window",
+        "title": "Foreign Employment/Sponsorship Opportunity Alert",
+        "description": "Fired when 12th house elements are activated alongside career lords"
+      }
+    }
+  },
+  "futureExtensions": {
+    "placeholders": [
+      "AI_Skill_Matching_Metrics",
+      "Corporate_Governance_Yogas",
+      "Socio_Economic_Status_Scales",
+      "Global_Industry_Classification_Codes"
+    ]
+  }
+}

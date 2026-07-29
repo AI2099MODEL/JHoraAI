@@ -1,0 +1,50 @@
+{
+  "dashas": [
+    {
+      "planet": "Jupiter",
+      "start_time": "1990-10-15",
+      "end_time": "2006-10-15",
+      "level": 1,
+      "nested": [
+        {
+          "planet": "Jupiter",
+          "start_time": "1990-10-15",
+          "end_time": "1992-12-03",
+          "level": 2
+        },
+        {
+          "planet": "Saturn",
+          "start_time": "1992-12-03",
+          "end_time": "1995-06-16",
+          "level": 2
+        },
+        {
+          "planet": "Mercury",
+          "start_time": "1995-06-16",
+          "end_time": "1997-09-22",
+          "level": 2
+        }
+      ]
+    },
+    {
+      "planet": "Saturn",
+      "start_time": "2006-10-15",
+      "end_time": "2025-10-15",
+      "level": 1,
+      "nested": [
+        {
+          "planet": "Saturn",
+          "start_time": "2006-10-15",
+          "end_time": "2009-10-18",
+          "level": 2
+        },
+        {
+          "planet": "Mercury",
+          "start_time": "2009-10-18",
+          "end_time": "2012-06-27",
+          "level": 2
+        }
+      ]
+    }
+  ]
+}

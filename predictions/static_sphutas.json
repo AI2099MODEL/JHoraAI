@@ -1,0 +1,112 @@
+{
+  "schema": {
+    "name": "Static Sphutas",
+    "version": "1.0.0",
+    "description": "Master catalog of Sphutas (sensitive mathematical points) and immutable reference data."
+  },
+
+  "supported_sphutas": [
+    "Tri Sphuta",
+    "Chatur Sphuta",
+    "Pancha Sphuta",
+    "Prana Sphuta",
+    "Deha Sphuta",
+    "Mrityu Sphuta",
+    "Beeja Sphuta",
+    "Kshetra Sphuta",
+    "Yoga Sphuta",
+    "Roga Sphuta",
+    "Bhagya Sphuta",
+    "Vivaha Sphuta",
+    "Santana Sphuta",
+    "Dhana Sphuta",
+    "Vidya Sphuta",
+    "Rajya Sphuta"
+  ],
+
+  "classification": {
+
+    "life": [
+      "Prana Sphuta",
+      "Deha Sphuta",
+      "Mrityu Sphuta"
+    ],
+
+    "family": [
+      "Beeja Sphuta",
+      "Kshetra Sphuta",
+      "Santana Sphuta",
+      "Vivaha Sphuta"
+    ],
+
+    "fortune": [
+      "Bhagya Sphuta",
+      "Dhana Sphuta",
+      "Rajya Sphuta",
+      "Vidya Sphuta"
+    ],
+
+    "mathematical": [
+      "Tri Sphuta",
+      "Chatur Sphuta",
+      "Pancha Sphuta",
+      "Yoga Sphuta",
+      "Roga Sphuta"
+    ]
+
+  },
+
+  "supported_charts": [
+    "D1",
+    "D9",
+    "D10",
+    "D30",
+    "D60"
+  ],
+
+  "calculation_sources": [
+    "Planet Longitude",
+    "House Cusp",
+    "Lagna",
+    "Moon",
+    "Sun",
+    "Composite Formula"
+  ],
+
+  "supported_attributes": [
+    "Name",
+    "Sanskrit Name",
+    "Category",
+    "Calculation Formula",
+    "Reference Points",
+    "Applicable Charts",
+    "Associated Planets",
+    "Associated Houses",
+    "Life Area",
+    "Prediction Importance",
+    "Reference"
+  ],
+
+  "life_areas": [
+    "Health",
+    "Longevity",
+    "Marriage",
+    "Children",
+    "Education",
+    "Career",
+    "Finance",
+    "Fortune",
+    "Disease",
+    "Spirituality",
+    "General Life"
+  ],
+
+  "evaluation": {
+    "support_formula_based_calculation": true,
+    "support_multiple_reference_points": true,
+    "support_chart_specific_analysis": true,
+    "support_cross_validation": true,
+    "support_prediction_weight": true,
+    "support_comparison": true
+  }
+}

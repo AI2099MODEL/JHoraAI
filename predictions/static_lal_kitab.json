@@ -1,0 +1,107 @@
+{
+  "schema": {
+    "name": "Static Lal Kitab",
+    "version": "1.0.0",
+    "description": "Master index and immutable reference catalog for Lal Kitab Astrology."
+  },
+
+  "system": {
+    "name": "Lal Kitab",
+    "category": "Remedial Astrology",
+    "zodiac": "Sidereal",
+    "default_ayanamsa": "Lahiri"
+  },
+
+  "supported_modules": [
+    "Planetary Houses",
+    "Planetary States",
+    "Planetary Debts",
+    "Planetary Remedies",
+    "House Remedies",
+    "Annual Chart",
+    "Varshaphala",
+    "Destiny Houses",
+    "Special Yogas",
+    "Karmic Indicators",
+    "Inherited Karma",
+    "Behavioral Corrections"
+  ],
+
+  "supported_calculations": [
+    "Planet in House",
+    "Empty House Analysis",
+    "Sleeping Planet",
+    "Awakened Planet",
+    "Planet Pair Analysis",
+    "House Relationship",
+    "Annual Chart",
+    "Planetary Debt",
+    "Remedy Eligibility",
+    "Remedy Compatibility"
+  ],
+
+  "supported_entities": [
+    "Planet",
+    "House",
+    "Planetary Debt",
+    "Remedy",
+    "Annual Chart",
+    "Planet Pair",
+    "Karmic Indicator",
+    "Family Karma"
+  ],
+
+  "supported_remedy_categories": [
+    "Donation",
+    "Animal Feeding",
+    "Temple Remedy",
+    "Water Remedy",
+    "Metal Remedy",
+    "Gem Restriction",
+    "Behavioral Remedy",
+    "Food Remedy",
+    "Charity",
+    "Fasting"
+  ],
+
+  "supported_prediction_methods": [
+    "House Analysis",
+    "Planet Analysis",
+    "Debt Analysis",
+    "Annual Analysis",
+    "Family Karma",
+    "Financial Analysis",
+    "Marriage Analysis",
+    "Health Analysis",
+    "Career Analysis",
+    "Remedy Recommendation"
+  ],
+
+  "supported_classical_texts": [
+    "Lal Kitab (1939)",
+    "Lal Kitab (1940)",
+    "Lal Kitab (1941)",
+    "Lal Kitab (1942)",
+    "Lal Kitab (1952)"
+  ],
+
+  "supported_outputs": [
+    "House Report",
+    "Planet Report",
+    "Debt Report",
+    "Remedy Report",
+    "Annual Report",
+    "Behavioral Guidance",
+    "PDF Report",
+    "JSON Export"
+  ],
+
+  "dependencies": [
+    "static_core.json",
+    "static_planets.json",
+    "static_signs.json",
+    "static_houses.json",
+    "static_yogas.json",
+    "static_doshas.json"
+  ]
+}

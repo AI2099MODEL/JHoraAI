@@ -1,0 +1,150 @@
+{
+  "schema": {
+    "name": "Static Houses",
+    "version": "1.0.0",
+    "description": "Master catalog of astrological houses and their immutable properties."
+  },
+
+  "house_systems": [
+    "Whole Sign",
+    "Equal",
+    "Sripati",
+    "Placidus",
+    "Koch",
+    "Campanus",
+    "Porphyry",
+    "Regiomontanus"
+  ],
+
+  "house_order": [
+    1,2,3,4,5,6,7,8,9,10,11,12
+  ],
+
+  "house_groups": {
+
+    "kendras": [1,4,7,10],
+
+    "trikonas": [1,5,9],
+
+    "upachayas": [3,6,10,11],
+
+    "dusthanas": [6,8,12],
+
+    "panapharas": [2,5,8,11],
+
+    "apoklimas": [3,6,9,12],
+
+    "maraka": [2,7],
+
+    "moksha": [4,8,12],
+
+    "artha": [2,6,10],
+
+    "dharma": [1,5,9],
+
+    "kama": [3,7,11]
+  },
+
+  "house_strength_order": [
+    1,10,7,4,5,9,11,2,3,6,8,12
+  ],
+
+  "natural_karakas": {
+
+    "1": ["Sun"],
+
+    "2": ["Jupiter"],
+
+    "3": ["Mars"],
+
+    "4": ["Moon","Mercury"],
+
+    "5": ["Jupiter"],
+
+    "6": ["Mars","Saturn"],
+
+    "7": ["Venus"],
+
+    "8": ["Saturn","Ketu"],
+
+    "9": ["Jupiter","Sun"],
+
+    "10": ["Sun","Mercury","Jupiter"],
+
+    "11": ["Jupiter"],
+
+    "12": ["Saturn","Ketu"]
+  },
+
+  "life_categories": [
+
+    "Self",
+
+    "Wealth",
+
+    "Communication",
+
+    "Home",
+
+    "Children",
+
+    "Disease",
+
+    "Marriage",
+
+    "Longevity",
+
+    "Fortune",
+
+    "Career",
+
+    "Income",
+
+    "Loss"
+
+  ],
+
+  "supported_house_attributes": [
+
+    "House Number",
+
+    "House Name",
+
+    "Natural Sign",
+
+    "Natural Lord",
+
+    "Natural Karakas",
+
+    "Life Areas",
+
+    "Body Parts",
+
+    "Purushartha",
+
+    "House Group",
+
+    "Strength",
+
+    "Direction",
+
+    "Element",
+
+    "Benefic Influence",
+
+    "Malefic Influence",
+
+    "House Lord",
+
+    "Occupants",
+
+    "Aspects",
+
+    "Argala",
+
+    "Arudha",
+
+    "Bhava Bala"
+
+  ]
+}

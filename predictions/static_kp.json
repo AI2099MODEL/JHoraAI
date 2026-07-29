@@ -1,0 +1,121 @@
+{
+  "schema": {
+    "name": "Static Krishnamurti Paddhati",
+    "version": "1.0.0",
+    "description": "Master index and immutable reference catalog for Krishnamurti Paddhati (KP) Astrology."
+  },
+
+  "system": {
+    "name": "Krishnamurti Paddhati",
+    "abbreviation": "KP",
+    "zodiac": "Sidereal",
+    "default_ayanamsa": "Krishnamurti"
+  },
+
+  "supported_modules": [
+    "Cusps",
+    "Cuspal Sub Lords",
+    "Ruling Planets",
+    "Significators",
+    "Planetary Significations",
+    "House Significations",
+    "Stellar Theory",
+    "Sub Theory",
+    "Sub-Sub Theory",
+    "Horary",
+    "Birth Time Rectification",
+    "Transit",
+    "Dasha",
+    "Events",
+    "KP Number",
+    "KP Ayanamsa"
+  ],
+
+  "supported_calculations": [
+    "Cuspal Chart",
+    "House Cusps",
+    "Star Lord",
+    "Sub Lord",
+    "Sub Sub Lord",
+    "Ruling Planets",
+    "Strong Significators",
+    "Weak Significators",
+    "Cuspal Interlinks",
+    "House Occupation",
+    "House Ownership",
+    "Planet Occupation",
+    "Planet Ownership",
+    "Retrogression",
+    "Planetary Aspects",
+    "Western Aspects"
+  ],
+
+  "supported_prediction_methods": [
+    "Event Timing",
+    "Horary",
+    "Birth Time Rectification",
+    "Marriage",
+    "Career",
+    "Finance",
+    "Health",
+    "Education",
+    "Property",
+    "Litigation",
+    "Foreign Travel",
+    "Child Birth"
+  ],
+
+  "supported_entities": [
+    "Cusp",
+    "Cuspal Sub Lord",
+    "Star Lord",
+    "Sub Lord",
+    "Sub Sub Lord",
+    "Significator",
+    "Ruling Planet",
+    "KP Number",
+    "House Group"
+  ],
+
+  "house_groups": {
+    "marriage": [2, 7, 11],
+    "children": [2, 5, 11],
+    "career": [2, 6, 10, 11],
+    "education": [2, 4, 5, 9],
+    "property": [4, 11],
+    "foreign": [3, 9, 12],
+    "litigation": [6, 7, 12],
+    "health": [1, 6, 8, 12],
+    "finance": [2, 6, 10, 11],
+    "spirituality": [5, 9, 12]
+  },
+
+  "supported_classical_references": [
+    "KP Reader Volume 1",
+    "KP Reader Volume 2",
+    "KP Reader Volume 3",
+    "KP Reader Volume 4",
+    "KP Reader Volume 5",
+    "KP Reader Volume 6"
+  ],
+
+  "supported_outputs": [
+    "Significator Analysis",
+    "Cuspal Analysis",
+    "Ruling Planet Analysis",
+    "Horary Analysis",
+    "Birth Time Rectification",
+    "Event Timing",
+    "JSON Export",
+    "PDF Report"
+  ],
+
+  "dependencies": [
+    "static_core.json",
+    "static_planets.json",
+    "static_signs.json",
+    "static_houses.json",
+    "static_nakshatras.json",
+    "static_dashas.json"
+  ]
+}

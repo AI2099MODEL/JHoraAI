@@ -1,0 +1,96 @@
+{
+  "schema": {
+    "name": "Static Arudhas",
+    "version": "1.0.0",
+    "description": "Master catalog of Arudha Padas and their immutable reference data."
+  },
+
+  "supported_arudhas": [
+    "Arudha Lagna",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "A6",
+    "A7",
+    "A8",
+    "A9",
+    "A10",
+    "A11",
+    "A12",
+    "Upapada Lagna",
+    "Kosha Pada",
+    "Rajya Pada",
+    "Darapada"
+  ],
+
+  "classification": {
+    "primary": [
+      "Arudha Lagna",
+      "Upapada Lagna"
+    ],
+    "house_padas": [
+      "A2",
+      "A3",
+      "A4",
+      "A5",
+      "A6",
+      "A7",
+      "A8",
+      "A9",
+      "A10",
+      "A11",
+      "A12"
+    ],
+    "special": [
+      "Kosha Pada",
+      "Rajya Pada",
+      "Darapada"
+    ]
+  },
+
+  "supported_charts": [
+    "D1",
+    "D9",
+    "D10",
+    "D60"
+  ],
+
+  "supported_attributes": [
+    "Name",
+    "Sanskrit Name",
+    "Pada",
+    "Related House",
+    "Calculation Method",
+    "Applicable Chart",
+    "Natural Signification",
+    "Life Area",
+    "Associated Planet",
+    "Prediction Importance",
+    "Reference"
+  ],
+
+  "life_areas": [
+    "Self Image",
+    "Public Image",
+    "Marriage",
+    "Relationships",
+    "Wealth",
+    "Career",
+    "Status",
+    "Reputation",
+    "Property",
+    "Children",
+    "Spirituality",
+    "General Life"
+  ],
+
+  "evaluation": {
+    "support_all_house_padas": true,
+    "support_special_padas": true,
+    "support_cross_chart_analysis": true,
+    "support_jaimini_analysis": true,
+    "support_prediction_weight": true,
+    "support_comparison": true
+  }
+}

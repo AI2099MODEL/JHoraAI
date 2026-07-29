@@ -1,0 +1,121 @@
+{
+  "schema": {
+    "name": "Static Tajika Astrology",
+    "version": "1.0.0",
+    "description": "Master index and immutable reference catalog for Tajika (Varshaphala) Astrology."
+  },
+
+  "system": {
+    "name": "Tajika",
+    "category": "Annual Predictive Astrology",
+    "zodiac": "Sidereal",
+    "default_ayanamsa": "Lahiri"
+  },
+
+  "supported_modules": [
+    "Varshaphala",
+    "Muntha",
+    "Muntha Lord",
+    "Varsha Lagna",
+    "Varsha Dasha",
+    "Mudda Dasha",
+    "Patyayini Dasha",
+    "Sahams",
+    "Tajika Yogas",
+    "Annual Houses",
+    "Annual Planetary Strength",
+    "Annual Transits",
+    "Annual Aspects",
+    "Annual Events"
+  ],
+
+  "supported_calculations": [
+    "Solar Return Chart",
+    "Varsha Lagna",
+    "Muntha",
+    "Muntha Lord",
+    "Mudda Dasha",
+    "Patyayini Dasha",
+    "Annual Planetary Positions",
+    "Annual House Cusps",
+    "Annual Strength",
+    "Annual Aspects",
+    "Saham Calculation"
+  ],
+
+  "supported_dashas": [
+    "Mudda Dasha",
+    "Patyayini Dasha",
+    "Varsha Dasha",
+    "Yogini Annual Dasha"
+  ],
+
+  "supported_yogas": [
+    "Ithasala",
+    "Eesarpha",
+    "Nakta",
+    "Yamaya",
+    "Manahoo",
+    "Kamboola",
+    "Khallasara",
+    "Radda",
+    "Duhphali Kuttha",
+    "Tambira",
+    "Ikkavala",
+    "Induvara"
+  ],
+
+  "supported_entities": [
+    "Varsha Lagna",
+    "Muntha",
+    "Muntha Lord",
+    "Mudda Dasha",
+    "Patyayini Dasha",
+    "Saham",
+    "Annual Planet",
+    "Annual House",
+    "Annual Yoga",
+    "Annual Aspect"
+  ],
+
+  "supported_prediction_methods": [
+    "Annual Forecast",
+    "Career Forecast",
+    "Marriage Forecast",
+    "Finance Forecast",
+    "Health Forecast",
+    "Travel Forecast",
+    "Property Forecast",
+    "Litigation Forecast",
+    "Education Forecast",
+    "Spiritual Forecast"
+  ],
+
+  "supported_classical_texts": [
+    "Tajika Neelakanthi",
+    "Varsha Tantra",
+    "Tajika Shastra",
+    "Prashna Tantra"
+  ],
+
+  "supported_outputs": [
+    "Annual Report",
+    "Mudda Dasha Report",
+    "Muntha Analysis",
+    "Saham Analysis",
+    "Annual Yoga Analysis",
+    "Annual Event Timing",
+    "PDF Report",
+    "JSON Export"
+  ],
+
+  "dependencies": [
+    "static_core.json",
+    "static_planets.json",
+    "static_signs.json",
+    "static_houses.json",
+    "static_dashas.json",
+    "static_yogas.json",
+    "static_sahams.json"
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "schema": {
+    "name": "Static Planets",
+    "version": "1.0.0",
+    "description": "Master catalog of all planetary bodies supported by the astrology engine."
+  },
+
+  "planet_groups": {
+    "navagraha": [
+      "Sun",
+      "Moon",
+      "Mars",
+      "Mercury",
+      "Jupiter",
+      "Venus",
+      "Saturn",
+      "Rahu",
+      "Ketu"
+    ],
+
+    "outer_planets": [
+      "Uranus",
+      "Neptune",
+      "Pluto"
+    ],
+
+    "minor_bodies": [
+      "Gulika",
+      "Mandi",
+      "Dhuma",
+      "Vyatipata",
+      "Parivesha",
+      "IndraChapa",
+      "Upaketu"
+    ]
+  },
+
+  "supported_planets": [
+    {
+      "id": "SU",
+      "name": "Sun",
+      "category": "Luminary"
+    },
+    {
+      "id": "MO",
+      "name": "Moon",
+      "category": "Luminary"
+    },
+    {
+      "id": "MA",
+      "name": "Mars",
+      "category": "Planet"
+    },
+    {
+      "id": "ME",
+      "name": "Mercury",
+      "category": "Planet"
+    },
+    {
+      "id": "JU",
+      "name": "Jupiter",
+      "category": "Planet"
+    },
+    {
+      "id": "VE",
+      "name": "Venus",
+      "category": "Planet"
+    },
+    {
+      "id": "SA",
+      "name": "Saturn",
+      "category": "Planet"
+    },
+    {
+      "id": "RA",
+      "name": "Rahu",
+      "category": "Shadow"
+    },
+    {
+      "id": "KE",
+      "name": "Ketu",
+      "category": "Shadow"
+    },
+    {
+      "id": "UR",
+      "name": "Uranus",
+      "category": "Outer"
+    },
+    {
+      "id": "NE",
+      "name": "Neptune",
+      "category": "Outer"
+    },
+    {
+      "id": "PL",
+      "name": "Pluto",
+      "category": "Outer"
+    }
+  ],
+
+  "supported_states": [
+    "Exalted",
+    "Debilitated",
+    "Own Sign",
+    "Moolatrikona",
+    "Friendly",
+    "Neutral",
+    "Enemy",
+    "Combust",
+    "Retrograde",
+    "Direct",
+    "Stationary"
+  ],
+
+  "supported_strengths": [
+    "Shadbala",
+    "Bhava Bala",
+    "Dig Bala",
+    "Kala Bala",
+    "Chestha Bala",
+    "Naisargika Bala",
+    "Drik Bala",
+    "Sthana Bala",
+    "Vimshopaka Bala"
+  ],
+
+  "supported_relationships": [
+    "Friend",
+    "Neutral",
+    "Enemy",
+    "Temporary Friend",
+    "Temporary Enemy",
+    "Compound Friend",
+    "Compound Enemy"
+  ],
+
+  "supported_motion": [
+    "Direct",
+    "Retrograde",
+    "Stationary"
+  ],
+
+  "supported_speed": [
+    "Fast",
+    "Average",
+    "Slow"
+  ],
+
+  "supported_visibility": [
+    "Visible",
+    "Invisible",
+    "Combust",
+    "Heliacal Rising",
+    "Heliacal Setting"
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "id": "CHARA_DASHA",
+  "version": "1.0.0",
+  "engine": "JHoraAI",
+  "enabled": true,
+
+  "input": {
+    "required": [
+      "rashi_chart",
+      "lagna_sign",
+      "planet_positions"
+    ],
+    "optional": [
+      "birth_rectified",
+      "ayanamsa"
+    ]
+  },
+
+  "starting_sign": {
+    "method": "LAGNA_RASHI"
+  },
+
+  "sign_types": {
+    "Aries": "MOVABLE",
+    "Taurus": "FIXED",
+    "Gemini": "DUAL",
+    "Cancer": "MOVABLE",
+    "Leo": "FIXED",
+    "Virgo": "DUAL",
+    "Libra": "MOVABLE",
+    "Scorpio": "FIXED",
+    "Sagittarius": "DUAL",
+    "Capricorn": "MOVABLE",
+    "Aquarius": "FIXED",
+    "Pisces": "DUAL"
+  },
+
+  "direction_rules": {
+    "MOVABLE": {
+      "direction": "FORWARD"
+    },
+
+    "FIXED": {
+      "odd_sign": "FORWARD",
+      "even_sign": "REVERSE"
+    },
+
+    "DUAL": {
+      "odd_sign": "FORWARD",
+      "even_sign": "REVERSE"
+    }
+  },
+
+  "sign_order_forward": [
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces"
+  ],
+
+  "sign_order_reverse": [
+    "Pisces",
+    "Aquarius",
+    "Capricorn",
+    "Sagittarius",
+    "Scorpio",
+    "Libra",
+    "Virgo",
+    "Leo",
+    "Cancer",
+    "Gemini",
+    "Taurus",
+    "Aries"
+  ],
+
+  "sign_lords": {
+    "Aries": "Mars",
+    "Taurus": "Venus",
+    "Gemini": "Mercury",
+    "Cancer": "Moon",
+    "Leo": "Sun",
+    "Virgo": "Mercury",
+    "Libra": "Venus",
+    "Scorpio": "Mars",
+    "Sagittarius": "Jupiter",
+    "Capricorn": "Saturn",
+    "Aquarius": "Saturn",
+    "Pisces": "Jupiter"
+  },
+
+  "duration": {
+    "algorithm": "COUNT_FROM_SIGN_TO_LORD",
+
+    "count_mode": "INCLUSIVE",
+
+    "same_sign_duration": 12,
+
+    "minimum": 1,
+
+    "maximum": 12
+  },
+
+  "lord_resolution": {
+    "ignore_modern_planets": true,
+
+    "rahu_ketu_never_lords": true
+  },
+
+  "antar_dasha": {
+    "enabled": true,
+
+    "order": "SAME_AS_MAHA_DASHA",
+
+    "reuse_duration_algorithm": true
+  },
+
+  "validation": {
+    "exactly_12_signs": true,
+
+    "every_sign_has_lord": true,
+
+    "all_planets_placed": true
+  },
+
+  "execution_pipeline": [
+    "LOAD_CHART",
+    "IDENTIFY_LAGNA",
+    "IDENTIFY_START_SIGN",
+    "IDENTIFY_SIGN_TYPE",
+    "DETERMINE_DIRECTION",
+    "GENERATE_RASHI_SEQUENCE",
+    "CALCULATE_EACH_DASHA_DURATION",
+    "BUILD_MAHADASHA_TABLE",
+    "BUILD_ANTARDASHA_TABLE",
+    "VALIDATE_TOTAL"
+  ],
+
+  "output": {
+    "fields": [
+      "sign",
+      "lord",
+      "start_date",
+      "end_date",
+      "duration_years",
+      "direction",
+      "antar_dashas"
+    ]
+  },
+
+  "engine_flags": {
+    "deterministic": true,
+    "cacheable": true,
+    "parallel_safe": true,
+    "supports_future_extensions": true
+  }
+}

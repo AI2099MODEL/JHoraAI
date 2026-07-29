@@ -1,0 +1,400 @@
+{
+  "system_name": "AI_Assistant",
+  "version": "2.0",
+  "purpose": "A single structured rule-set used by an AI assistant to generate personalized daily mood readings and future predictions, cross-confirmed across multiple traditional prediction systems.",
+  "disclaimer": "This is a traditional/astrological belief-system framework intended for structured reasoning and self-reflection. It is not scientifically validated. Predictions should be presented as probabilistic tendencies, not certainties.",
+  "definitions": {
+    "significator_levels": {
+      "level_1_star_lord_of_occupant": "Strongest signification. The Nakshatra (star) lord of any planet occupying the house.",
+      "level_2_occupant_planet": "A planet physically placed in the house.",
+      "level_3_star_lord_of_owner": "The Nakshatra lord of the sign-owner (house lord) of that house.",
+      "level_4_owner_planet": "The sign-owner (house lord) of that house itself. Weakest signification."
+    },
+    "significator_weighting": {
+      "level_1": 4,
+      "level_2": 3,
+      "level_3": 2,
+      "level_4": 1,
+      "note": "Weights are additive per house per planet. A planet's total signification score for a house is the sum of applicable level weights."
+    },
+    "strength_classification": {
+      "strong_signification": "Total weighted score >= 5, OR the planet signifies via level_1 or level_2 for at least two of the relevant house groups (primary + supporting).",
+      "moderate_signification": "Total weighted score 3-4, OR signification only via level_3/level_4 across multiple relevant houses.",
+      "weak_signification": "Total weighted score 1-2, OR signification via a single level_4 link only.",
+      "usage_note": "Only strong or moderate signification should be used to declare an event 'promised'. Weak signification alone is insufficient and should be logged as 'inconclusive'."
+    },
+    "csl": "Cuspal Sub Lord - the Sub Lord of a house cusp, the primary judgment tool in KP.",
+    "dba": "Dasha-Bhukti-Antara(-Pratyantar) - the nested planetary period hierarchy that times when a promised event activates."
+  },
+  "systems_used_for_cross_confirmation": {
+    "KP_Krishnamurti_Paddhati": {
+      "role": "Primary promise engine (event promised or not) and primary timing engine (which DBA period).",
+      "primary_tools": [
+        "Cuspal Sub Lord (CSL)",
+        "Ruling Planets (RP) at query/query-birth",
+        "Sub-Sub division",
+        "DBA period lords"
+      ],
+      "output_it_provides": "Binary/graded promise verdict per house + likely activation period."
+    },
+    "Parashari_Vimshottari": {
+      "role": "Independent cross-check on house strength and period activation using classical house-lord and yoga logic rather than sub-lord logic.",
+      "primary_tools": [
+        "House lord placement/strength (Shadbala approximation optional)",
+        "Vimshottari Mahadasha-Antardasha lords",
+        "Presence of relevant classical yogas (e.g. Raja yoga for career/status, Kalatra/Vivaha yogas for marriage)"
+      ],
+      "output_it_provides": "Agreement/disagreement on whether the current Mahadasha-Antardasha lord supports the same houses KP flags."
+    },
+    "Jaimini": {
+      "role": "Independent cross-check using karaka and Chara Dasha logic, useful especially for relationships (Darakaraka) and life-direction themes.",
+      "primary_tools": [
+        "Chara Dasha sign periods",
+        "Char Karakas (Atmakaraka, Darakaraka, etc.)",
+        "Argala (intervention) on the relevant Bhava from the Chara Dasha sign"
+      ],
+      "output_it_provides": "Confirms whether the current Chara Dasha sign and its Argala support the domain being judged (e.g. Darakaraka well placed + Chara Dasha of a relationship-supporting sign confirms marriage timing)."
+    },
+    "Ashtakavarga": {
+      "role": "Quantitative strength check - confirms whether the relevant house/sign has enough transit-supportive bindus (points) for a slow-moving planet's transit to actually deliver the promised result.",
+      "primary_tools": [
+        "Sarvashtakavarga (SAV) bindu count per sign (28+ considered strong, 25-27 average, below 25 weak)",
+        "Bhinnashtakavarga (BAV) of the specific significator planet in transit"
+      ],
+      "output_it_provides": "A numeric strength filter - even a KP-promised event is judged unlikely to manifest smoothly if SAV/BAV bindus in the relevant sign are below threshold during the transit window."
+    },
+    "Panchang_Daily": {
+      "role": "Daily-resolution layer used only for the daily horoscope engine, not for long-range natal promise.",
+      "primary_tools": [
+        "Tithi (lunar day)",
+        "Vara (weekday)",
+        "Nakshatra of the day (Moon's nakshatra)",
+        "Yoga (Panchang yoga, not Raja yoga)",
+        "Karana",
+        "Choghadiya/Hora for auspicious-inauspicious windows"
+      ],
+      "output_it_provides": "Fine-grained daily quality score and windows of the day favorable/unfavorable for specific activity types."
+    },
+    "Gochara_Transit": {
+      "role": "The activation trigger layer across all timeframes - the 'when exactly' on top of the 'is it promised' (KP/Parashari/Jaimini) and 'is it strong enough' (Ashtakavarga) layers.",
+      "primary_tools": [
+        "Moon transit (mandatory daily trigger check - Moon must transit a sign/nakshatra tied to the active DBA lord or the house being judged)",
+        "Sun transit (monthly-resolution trigger)",
+        "Jupiter and Saturn transit/aspect over the primary house (Jupiter for benefic activation, Saturn/Mars/Rahu-Ketu for stressful activation)",
+        "Chandra Bala and Tara Bala (Moon's natal-relative strength, used as a daily go/no-go filter for major decisions)"
+      ]
+    }
+  },
+  "confirmation_protocol": {
+    "rule": "No single system's verdict should be presented as final. A prediction's confidence level is a function of how many independent systems concur.",
+    "scoring_model": {
+      "kp_verdict_supports": 3,
+      "parashari_verdict_supports": 2,
+      "jaimini_verdict_supports": 2,
+      "ashtakavarga_bindus_sufficient": 2,
+      "gochara_transit_active": 1,
+      "max_possible_score": 10
+    },
+    "confidence_bands": {
+      "very_high": "score 8-10 : at least KP + two other systems + transit all agree",
+      "high": "score 6-7 : KP + one other system + transit agree",
+      "medium": "score 4-5 : KP agrees with only one cross-check system, or partial agreement without transit activation",
+      "low": "score 2-3 : only KP indicates the result, no cross-system corroboration",
+      "inconclusive": "score 0-1 : insufficient or conflicting data; do not present as a prediction, present as 'unclear' instead"
+    }
+  },
+  "conflict_resolution": {
+    "precedence_order_for_promise_judgment": [
+      "KP_Krishnamurti_Paddhati",
+      "Parashari_Vimshottari",
+      "Jaimini",
+      "Ashtakavarga"
+    ],
+    "rule_1_partial_house_overlap": "If a CSL simultaneously signifies both supporting and obstructing house groups, compare total weighted signification scores (per significator_weighting) for each group; the higher-scoring group determines the lean, and confidence is downgraded by one band versus a clean (non-overlapping) case.",
+    "rule_2_cross_system_disagreement": "If KP indicates a positive promise but Parashari and Jaimini both disagree, downgrade confidence to 'low' or 'inconclusive' rather than presenting a firm prediction.",
+    "rule_3_ashtakavarga_veto": "Even with strong KP+Parashari+Jaimini agreement, if Sarvashtakavarga bindus in the relevant sign are below 25, flag the event as 'promised but likely delayed or reduced in intensity' rather than a clean positive.",
+    "rule_4_multiple_domain_clash": "If two domains are promised as active in the same DBA window (e.g. career change and marriage), present both but note that classical KP practice treats the domain whose CSL has the higher weighted signification score as the dominant theme for that period."
+  },
+  "domains": {
+    "marriage_first": {
+      "primary_house": 7,
+      "supporting_houses": [
+        2,
+        11
+      ],
+      "obstructing_houses": [
+        1,
+        6,
+        10
+      ],
+      "kp_rule": "7th CSL must be a significator of 2, 7, 11 and not primarily deposited in the nakshatra of a planet signifying 1, 6, 10.",
+      "parashari_cross_check": "7th lord and Venus (natural karaka) should be free of severe affliction; Vimshottari Antardasha lord should connect to 2/7/11.",
+      "jaimini_cross_check": "Darakaraka should be well placed from Chara Atmakaraka; Chara Dasha sign should have Argala on/from the 7th house equivalent (2nd house from Dasha sign in Jaimini counting)."
+    },
+    "marriage_love_vs_arranged": {
+      "primary_houses": [
+        5,
+        7,
+        11
+      ],
+      "kp_rule": "5th or 7th CSL connected with 5, 7, 11 simultaneously indicates love marriage; involvement of Mercury/Venus/Mars as significators strengthens formalization. 2-7-11 without 5th house involvement, or with 3rd/9th house connection, indicates arranged marriage."
+    },
+    "marriage_delay_denial": {
+      "delay_rule": "7th CSL signifies 2,7,11 but is heavily aspected by Saturn or has Saturn as its nakshatra lord -> delay beyond typical age norms.",
+      "denial_rule": "7th CSL strongly signifies 1,6,10 with zero connection to 2,7,11 -> denial or indefinite postponement."
+    },
+    "separation_divorce": {
+      "primary_houses": [
+        1,
+        6,
+        10
+      ],
+      "kp_rule": "7th CSL as strong significator of 1,6,10 indicates disputes/separation. Absolute divorce requires the running DBA lords to also concurrently signify 1,6,10.",
+      "ashtakavarga_cross_check": "Check BAV of the 7th CSL's dispositor in the sign occupied by the 7th cusp - low bindus support the separation reading; high bindus suggest reconciliation despite friction."
+    },
+    "remarriage": {
+      "primary_house": 9,
+      "supporting_houses": [
+        2,
+        11
+      ],
+      "kp_rule": "First marriage dissolution (1,6,10) must be promised first. 9th CSL must then signify 2,9,11, activated during favorable Jupiter or Venus transit over the 9th/11th."
+    },
+    "litigation": {
+      "primary_house": 6,
+      "opponent_house": 12,
+      "native_wins_houses": [
+        1,
+        6,
+        11
+      ],
+      "opponent_wins_houses": [
+        5,
+        8,
+        12
+      ],
+      "kp_rule": "6th CSL as significator of 1,6,11 -> native wins. 6th CSL as significator of 5,8,12 -> opponent wins.",
+      "parashari_cross_check": "Strength of 6th lord and any Raja-yoga karakas involved in the case's Antardasha; a well-placed 6th lord in Vimshottari Antardasha supports a native win reading."
+    },
+    "career_promotion": {
+      "primary_houses": [
+        2,
+        6,
+        10,
+        11
+      ],
+      "kp_rule": "10th CSL must signify 2,6,10,11. Promotions occur during DBA of planets strongly signifying 10 and 11 together.",
+      "jaimini_cross_check": "10th house equivalent via Chara Dasha sign with positive Argala from career-supporting signs."
+    },
+    "job_change": {
+      "primary_houses": [
+        3,
+        5,
+        9,
+        10,
+        11
+      ],
+      "kp_rule": "10th or 6th CSL signifying 3,5,9, accompanied by 10/11 signification, indicates job change with improved terms."
+    },
+    "job_loss_unemployment": {
+      "primary_houses": [
+        5,
+        8,
+        12
+      ],
+      "kp_rule": "6th or 10th CSL strongly signifying 5,8,12 while devoid of 2,6,10,11 signification, active during a hostile DBA, indicates termination/suspension."
+    },
+    "finance_wealth": {
+      "primary_houses": [
+        2,
+        11
+      ],
+      "obstructing_houses": [
+        1,
+        5,
+        8,
+        12
+      ],
+      "kp_rule": "2nd/11th CSL signifying 2, 6 (income via effort), 10 (income via status), and 11 indicates financial gain; 2nd CSL signifying 5,8,12 without 2/11 support indicates loss or heavy expenditure.",
+      "ashtakavarga_cross_check": "SAV bindus in the 2nd and 11th signs should be above 25 for the gain to be substantial rather than marginal."
+    },
+    "health_disease": {
+      "primary_houses": [
+        1,
+        6,
+        8,
+        12
+      ],
+      "kp_rule": "1st CSL signifying 6,8,12 without support from 1,5,11 indicates health vulnerability; severity is higher if the 8th CSL also signifies 6,8,12 concurrently during the same DBA.",
+      "gochara_cross_check": "Transit of Saturn/Mars/Rahu-Ketu over natal 1st, 6th, 8th, or 12th houses acts as the trigger window; absence of such transit despite promise suggests the vulnerability remains latent."
+    },
+    "education": {
+      "primary_houses": [
+        4,
+        9,
+        11
+      ],
+      "kp_rule": "4th CSL (foundational learning) and 9th CSL (higher education) signifying 4,9,11 indicates academic success; obstruction from 3,10,12 (12th from 4th relevant houses) suggests interruption or change of course."
+    },
+    "foreign_travel_settlement": {
+      "primary_houses": [
+        3,
+        9,
+        12
+      ],
+      "kp_rule": "12th CSL (foreign residence) as significator of 3 (short travel/change), 9 (long journeys), and connected to 12 itself indicates foreign travel or settlement; strength of connection to 10/11 indicates whether it is career-linked."
+    },
+    "property_vehicle": {
+      "primary_houses": [
+        4,
+        11
+      ],
+      "kp_rule": "4th CSL signifying 4,11,12 (12th = investment/expenditure, here read as acquisition cost) indicates property/vehicle purchase; obstruction from 3,8,12 negatively (i.e. as denial pattern) can indicate loss or legal issue over property."
+    },
+    "children_progeny": {
+      "primary_house": 5,
+      "supporting_houses": [
+        2,
+        11
+      ],
+      "obstructing_houses": [
+        1,
+        4,
+        10
+      ],
+      "kp_rule": "5th CSL signifying 2,5,11 indicates childbirth promise; timing follows DBA of planets connected to the 5th CSL's own significators."
+    },
+    "spirituality_moksha": {
+      "primary_houses": [
+        9,
+        12
+      ],
+      "kp_rule": "9th/12th CSL signifying 9,12 (and often 8 for transformation) during later Dasha periods indicates spiritual inclination or renunciation themes; this domain is typically read qualitatively rather than as a hard event promise."
+    }
+  },
+  "daily_horoscope_engine": {
+    "purpose": "Generate a personalized daily mood reading and activity guidance by layering fast-moving daily-resolution factors on top of the person's standing long-term promises and current active period.",
+    "inputs_required": [
+      "natal_chart (birth date, time, place -> full planetary/cuspal positions)",
+      "current_running_dasha_bhukti_antara_pratyantar (down to at least Antara for daily granularity)",
+      "target_date_time_location (for the day being predicted, usually the user's current location)"
+    ],
+    "processing_steps": [
+      "1. Pull the list of all houses/domains whose natal promise (per the domains block) is currently 'strong' or 'moderate' AND whose supporting DBA lord is active today at the Antara/Pratyantar level.",
+      "2. For each such domain, check today's Moon transit sign/nakshatra: is it in a sign/nakshatra ruled by, or in the nakshatra of, the active DBA lord or a significator of that domain's primary house? This is the mandatory daily trigger check - without it, the domain stays dormant for the day even if promised.",
+      "3. Compute today's Panchang quality score (see panchang_quality_scoring below).",
+      "4. Compute today's Chandra Bala (Moon's strength relative to natal Moon sign) and Tara Bala (birth-star-relative daily nakshatra strength) as a general go/no-go filter.",
+      "5. Cross-check Ashtakavarga bindus for the sign the Moon and the day's key transiting planet occupy today, to grade intensity (weak/moderate/strong day for that theme).",
+      "6. Assign each active domain a confidence band per confirmation_protocol using: KP daily trigger = kp_verdict_supports, Panchang favorable = gochara_transit_active, Ashtakavarga bindus adequate = ashtakavarga_bindus_sufficient.",
+      "7. Identify Choghadiya/Hora windows within the day that are favorable or unfavorable for the top 1-2 active domains, to give time-of-day guidance.",
+      "8. Compose the output using output_format below."
+    ],
+    "panchang_quality_scoring": {
+      "tithi_type": "Nanda/Bhadra/Jaya/Rikta/Purna tithis carry different favorability for new-beginning vs completion-type activities.",
+      "vara_lord_alignment": "Bonus if the weekday lord matches or supports the day's dominant active domain's significator (e.g. Thursday/Jupiter favors education, finance, marriage-related matters).",
+      "nakshatra_of_day": "Moon's nakshatra of the day compared against the natal Janma Nakshatra for Tara Bala classification (Janma, Sampat, Vipat, Kshema, Pratyak, Sadhaka, Naidhana, Mitra, Parama Mitra taras).",
+      "yoga_karana": "Panchang Yoga and Karana used as secondary auspicious/inauspicious modifiers, lower weight than tithi/vara/nakshatra."
+    },
+    "output_format": {
+      "date": "ISO date of the prediction",
+      "overall_day_theme": "one-line synthesis",
+      "chandra_bala_tara_bala_status": "favorable / neutral / unfavorable",
+      "active_domain_predictions": [
+        {
+          "domain": "string, matches a key in domains block",
+          "natal_promise_status": "strong / moderate / weak / inconclusive",
+          "daily_trigger_active": "true/false - result of step 2",
+          "confidence_band": "very_high / high / medium / low / inconclusive",
+          "systems_agreeing": [
+            "list of systems from systems_used_for_cross_confirmation that concur today"
+          ],
+          "favorable_time_windows": [
+            "Choghadiya/Hora windows"
+          ],
+          "caution_time_windows": [
+            "Choghadiya/Hora windows to avoid major decisions in this domain"
+          ],
+          "note": "short human-readable explanation"
+        }
+      ],
+      "general_caution_windows": [
+        "day-wide inauspicious windows regardless of domain, e.g. Rahu Kalam, Yamaganda"
+      ],
+      "general_favorable_windows": [
+        "day-wide auspicious windows, e.g. Abhijit Muhurta"
+      ],
+      "daily_mood": {
+        "mood_label": "very_positive / positive / neutral / cautious / low",
+        "mood_score": "0-10 numeric",
+        "one_line_summary": "string",
+        "best_focus_area": "string, domain key",
+        "area_to_go_easy_on": "string, domain key"
+      }
+    },
+    "mood_prediction": {
+      "purpose": "Derive a single daily mood/energy reading in addition to the domain-level predictions.",
+      "inputs": [
+        "Chandra Bala/Tara Bala status",
+        "Panchang quality score",
+        "today's active DBA-equivalent period",
+        "Moon transit trigger status"
+      ],
+      "scoring": {
+        "chandra_bala_favorable": 3,
+        "tara_bala_favorable": 2,
+        "panchang_quality_favorable": 2,
+        "no_major_caution_window_active": 2,
+        "active_period_supports_a_positive_domain": 1,
+        "max_score": 10
+      },
+      "mood_bands": {
+        "very_positive": "score 8-10",
+        "positive": "score 6-7",
+        "neutral": "score 4-5",
+        "cautious": "score 2-3",
+        "low": "score 0-1"
+      },
+      "output_fields": {
+        "mood_label": "very_positive / positive / neutral / cautious / low",
+        "mood_score": "0-10 numeric",
+        "one_line_summary": "short human-readable framing of the day's energy",
+        "best_focus_area": "which active domain the day's energy best supports",
+        "area_to_go_easy_on": "which active domain to avoid pushing hard on today"
+      }
+    }
+  },
+  "future_prediction_engine": {
+    "purpose": "Generate medium (monthly) and long-range (yearly/multi-year) predictions using the slower-resolution layers only - natal promise + Dasha sequence + slow transits - without the daily Panchang layer.",
+    "inputs_required": [
+      "natal_chart",
+      "full_forward_dasha_sequence (Mahadasha-Antardasha-Pratyantardasha timeline for the requested horizon)",
+      "forward_transit_ephemeris_for_Jupiter_Saturn_Rahu_Ketu (and Mars for shorter/medium horizon) over the requested horizon"
+    ],
+    "processing_steps": [
+      "1. For each domain in the domains block, evaluate natal promise strength (per definitions.strength_classification) once - this does not change over time.",
+      "2. Walk the forward Dasha sequence and flag every period whose lord(s) are strong/moderate significators of that domain's primary+supporting houses per the domain's kp_rule.",
+      "3. For each flagged period, cross-check Parashari and Jaimini per each domain's cross_check fields where available.",
+      "4. Overlay slow transits: mark sub-windows within each flagged period where Jupiter and/or Saturn are also transiting/aspecting the relevant houses (per Gochara_Transit tools) as the highest-confidence activation windows within that period.",
+      "5. Apply confirmation_protocol scoring to each flagged period to assign a confidence band.",
+      "6. Apply conflict_resolution rules where multiple domains are flagged as active in overlapping periods.",
+      "7. Compose a timeline output ordered chronologically."
+    ],
+    "output_format": {
+      "horizon": "e.g. next 12 months / next 3 years",
+      "timeline": [
+        {
+          "period_start": "date",
+          "period_end": "date",
+          "dasha_bhukti_antara": "string label of the active period",
+          "domain": "string, matches a key in domains block",
+          "confidence_band": "very_high / high / medium / low / inconclusive",
+          "systems_agreeing": [
+            "list"
+          ],
+          "peak_activation_subwindow": "date range within the period where slow transit overlay is strongest, if any",
+          "note": "short human-readable explanation"
+        }
+      ]
+    }
+  }
+}

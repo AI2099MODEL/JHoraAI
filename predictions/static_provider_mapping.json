@@ -1,0 +1,120 @@
+{
+  "schema": {
+    "name": "Static Provider Mapping",
+    "version": "1.0.0",
+    "description": "Canonical mapping between external astrology providers and the internal JHora AI Professional data model."
+  },
+
+  "canonical_provider": {
+    "id": "JHORA_NATIVE",
+    "name": "JHora AI Professional",
+    "role": "Internal Canonical Model"
+  },
+
+  "supported_providers": [
+    {
+      "id": "JHORA",
+      "name": "Jagannatha Hora",
+      "type": "Desktop Software"
+    },
+    {
+      "id": "JHORA_API",
+      "name": "Jagannatha Hora API",
+      "type": "REST API"
+    },
+    {
+      "id": "ASTROKAYA",
+      "name": "Astrokaya",
+      "type": "Web API"
+    },
+    {
+      "id": "SWISS_EPHEMERIS",
+      "name": "Swiss Ephemeris",
+      "type": "Astronomical Library"
+    },
+    {
+      "id": "FLATLIB",
+      "name": "Flatlib",
+      "type": "Python Library"
+    },
+    {
+      "id": "CUSTOM_ENGINE",
+      "name": "JHora AI Engine",
+      "type": "Internal Engine"
+    }
+  ],
+
+  "supported_entities": [
+    "Planet",
+    "House",
+    "Sign",
+    "Nakshatra",
+    "Pada",
+    "House Cusp",
+    "Planet Strength",
+    "Yoga",
+    "Dosha",
+    "Dasha",
+    "Transit",
+    "Divisional Chart",
+    "Aspect",
+    "Karaka",
+    "Special Lagna",
+    "Arudha",
+    "Upagraha",
+    "Sphuta",
+    "Saham"
+  ],
+
+  "mapping_types": [
+    "Name Mapping",
+    "Identifier Mapping",
+    "Enum Mapping",
+    "Calculation Mapping",
+    "Coordinate Mapping",
+    "Normalization Rule",
+    "Unit Conversion"
+  ],
+
+  "coordinate_systems": [
+    "Sidereal",
+    "Tropical"
+  ],
+
+  "angle_units": [
+    "Degrees",
+    "Degrees Minutes Seconds",
+    "Decimal Degrees"
+  ],
+
+  "normalization_rules": [
+    "Canonical Planet Names",
+    "Canonical Sign Names",
+    "Canonical House Numbers",
+    "Canonical Nakshatra Names",
+    "Canonical Dasha Names",
+    "Canonical Yoga Names",
+    "Canonical Dosha Names"
+  ],
+
+  "compatibility": {
+    "supports_bidirectional_mapping": true,
+    "supports_aliases": true,
+    "supports_versioning": true,
+    "supports_provider_extensions": true,
+    "supports_custom_fields": true,
+    "supports_lossless_conversion": true
+  },
+
+  "dependencies": [
+    "static_core.json",
+    "static_planets.json",
+    "static_signs.json",
+    "static_houses.json",
+    "static_nakshatras.json",
+    "static_divisional_charts.json",
+    "static_dashas.json",
+    "static_yogas.json",
+    "static_doshas.json"
+  ]
+}

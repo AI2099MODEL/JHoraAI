@@ -1,0 +1,156 @@
+{
+  "schema": {
+    "name": "Static Nakshatras",
+    "version": "1.0.0",
+    "description": "Master catalog of Nakshatras and their immutable properties."
+  },
+
+  "nakshatra_system": {
+    "total_nakshatras": 27,
+    "padas_per_nakshatra": 4,
+    "total_padas": 108,
+    "span_per_nakshatra": "13°20'",
+    "span_per_pada": "3°20'"
+  },
+
+  "nakshatra_order": [
+    "Ashwini",
+    "Bharani",
+    "Krittika",
+    "Rohini",
+    "Mrigashira",
+    "Ardra",
+    "Punarvasu",
+    "Pushya",
+    "Ashlesha",
+    "Magha",
+    "Purva Phalguni",
+    "Uttara Phalguni",
+    "Hasta",
+    "Chitra",
+    "Swati",
+    "Vishakha",
+    "Anuradha",
+    "Jyeshtha",
+    "Mula",
+    "Purva Ashadha",
+    "Uttara Ashadha",
+    "Shravana",
+    "Dhanishta",
+    "Shatabhisha",
+    "Purva Bhadrapada",
+    "Uttara Bhadrapada",
+    "Revati"
+  ],
+
+  "planetary_lords": [
+    "Ketu",
+    "Venus",
+    "Sun",
+    "Moon",
+    "Mars",
+    "Rahu",
+    "Jupiter",
+    "Saturn",
+    "Mercury"
+  ],
+
+  "ganas": [
+    "Deva",
+    "Manushya",
+    "Rakshasa"
+  ],
+
+  "genders": [
+    "Male",
+    "Female",
+    "Neutral"
+  ],
+
+  "elements": [
+    "Fire",
+    "Earth",
+    "Air",
+    "Water",
+    "Ether"
+  ],
+
+  "qualities": [
+    "Fixed",
+    "Movable",
+    "Soft",
+    "Sharp",
+    "Mixed",
+    "Ugra",
+    "Mridu",
+    "Tikshna",
+    "Dhruva",
+    "Chara"
+  ],
+
+  "yoni": [
+    "Horse",
+    "Elephant",
+    "Sheep",
+    "Serpent",
+    "Dog",
+    "Cat",
+    "Rat",
+    "Cow",
+    "Buffalo",
+    "Tiger",
+    "Deer",
+    "Monkey",
+    "Lion",
+    "Mongoose"
+  ],
+
+  "nadi": [
+    "Adi",
+    "Madhya",
+    "Antya"
+  ],
+
+  "varna": [
+    "Brahmin",
+    "Kshatriya",
+    "Vaishya",
+    "Shudra"
+  ],
+
+  "dosha_categories": [
+    "Gandanta",
+    "Visha",
+    "Abhukta Moola",
+    "Janma",
+    "Anujanma",
+    "Trijanma"
+  ],
+
+  "supported_properties": [
+    "Name",
+    "Number",
+    "Start Degree",
+    "End Degree",
+    "Sign",
+    "Padas",
+    "Planetary Lord",
+    "Deity",
+    "Symbol",
+    "Shakti",
+    "Animal",
+    "Yoni",
+    "Gana",
+    "Nadi",
+    "Varna",
+    "Element",
+    "Quality",
+    "Gender",
+    "Tree",
+    "Bird",
+    "Body Part",
+    "Nature",
+    "Compatibility",
+    "Remedies"
+  ]
+}

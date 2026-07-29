@@ -1,0 +1,140 @@
+{
+  "schema": {
+    "name": "Static Vedic Astrology",
+    "version": "1.0.0",
+    "description": "Master index and immutable reference catalog for the Vedic astrology system."
+  },
+
+  "system": {
+    "name": "Parashari",
+    "category": "Vedic Astrology",
+    "zodiac": "Sidereal",
+    "default_ayanamsa": "Lahiri"
+  },
+
+  "supported_modules": [
+    "Planets",
+    "Signs",
+    "Houses",
+    "Nakshatras",
+    "Panchanga",
+    "Dashas",
+    "Divisional Charts",
+    "Shadbala",
+    "Bhava Bala",
+    "Vimshopaka Bala",
+    "Ashtakavarga",
+    "Yogas",
+    "Doshas",
+    "Special Lagnas",
+    "Arudhas",
+    "Upagrahas",
+    "Sphutas",
+    "Sahams",
+    "Transits",
+    "Remedies"
+  ],
+
+  "supported_calculations": [
+    "Birth Chart",
+    "Planetary Positions",
+    "House Cusps",
+    "Planetary Aspects",
+    "Special Aspects",
+    "House Strength",
+    "Planet Strength",
+    "Functional Benefics",
+    "Functional Malefics",
+    "Natural Benefics",
+    "Natural Malefics",
+    "Argala",
+    "Planetary War",
+    "Combustion",
+    "Retrogression",
+    "Exaltation",
+    "Debilitation",
+    "Moolatrikona",
+    "Friendship",
+    "Avasthas",
+    "Ishta Bala",
+    "Kashta Bala"
+  ],
+
+  "supported_prediction_methods": [
+    "Natal Analysis",
+    "Dasha Analysis",
+    "Transit Analysis",
+    "Divisional Analysis",
+    "Yoga Analysis",
+    "Dosha Analysis",
+    "Strength Analysis",
+    "Annual Analysis",
+    "Compatibility",
+    "Muhurta",
+    "Prashna"
+  ],
+
+  "supported_classical_texts": [
+    "Brihat Parashara Hora Shastra",
+    "Brihat Jataka",
+    "Saravali",
+    "Phaladeepika",
+    "Jataka Parijata",
+    "Hora Ratna",
+    "Uttara Kalamrita",
+    "Bhrigu Sutras",
+    "Laghu Parashari",
+    "Prasna Marga"
+  ],
+
+  "supported_entities": [
+    "Graha",
+    "Rashi",
+    "Bhava",
+    "Nakshatra",
+    "Pada",
+    "Karaka",
+    "Yoga",
+    "Dosha",
+    "Varga",
+    "Dasha",
+    "Avastha",
+    "Upagraha",
+    "Sphuta",
+    "Saham",
+    "Lagna"
+  ],
+
+  "supported_outputs": [
+    "Chart Interpretation",
+    "Strength Analysis",
+    "Life Area Analysis",
+    "Event Timing",
+    "Compatibility",
+    "Remedies",
+    "PDF Report",
+    "JSON Export"
+  ],
+
+  "dependencies": [
+    "static_core.json",
+    "static_planets.json",
+    "static_signs.json",
+    "static_houses.json",
+    "static_nakshatras.json",
+    "static_panchanga.json",
+    "static_divisional_charts.json",
+    "static_dashas.json",
+    "static_shadbala.json",
+    "static_bhava_bala.json",
+    "static_vimshopaka.json",
+    "static_ashtakavarga.json",
+    "static_yogas.json",
+    "static_doshas.json",
+    "static_special_lagnas.json",
+    "static_arudhas.json",
+    "static_upagrahas.json",
+    "static_sphutas.json",
+    "static_sahams.json"
+  ]
+}

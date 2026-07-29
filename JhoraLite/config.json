@@ -1,0 +1,29 @@
+{
+  "appName": "JhoraLite",
+  "theme": {
+    "type": "Light Theme",
+    "primary": "#E91E63 (Pink)",
+    "secondary": "#F06292 (Soft Pink)",
+    "background": "#FFFFFF (Plain White)",
+    "surface": "#FFF0F5 (Lavender Blush)",
+    "fontColor": "#000000 (Black)",
+    "description": "Light pink and white aesthetic with maximum contrast black text for high readability."
+  },
+  "androidConfig": {
+    "namespace": "com.example",
+    "applicationId": "com.aistudio.jhoralite.kxmpzq",
+    "compileSdk": 34,
+    "minSdk": 24,
+    "targetSdk": 34,
+    "dependencies": {
+      "compose": "Jetpack Compose M3",
+      "geminiApi": "Google AI Client SDK for Server-Side Gemini API Support",
+      "database": "Room DB for offline-first state persistence"
+    }
+  },
+  "githubSync": {
+    "syncBranch": "main",
+    "directory": "JhoraLite",
+    "purpose": "Decoupled configuration and bundle repository tracking for JhoraLite release configurations."
+  }
+}

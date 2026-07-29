@@ -1,0 +1,107 @@
+{
+  "schema": {
+    "name": "Static Bhava Bala",
+    "version": "1.0.0",
+    "description": "Master catalog of Bhava Bala components and immutable reference data."
+  },
+
+  "bhava_bala": {
+
+    "total_components": 3,
+
+    "primary_components": [
+      "Bhavadhipati Bala",
+      "Dig Bala",
+      "Drishti Bala"
+    ]
+  },
+
+  "bhavadhipati_bala": {
+
+    "components": [
+      "House Lord Strength",
+      "House Lord Dignity",
+      "House Lord Placement",
+      "House Lord Aspect",
+      "House Lord Conjunction"
+    ]
+  },
+
+  "dig_bala": {
+
+    "components": [
+      "Directional House Strength"
+    ]
+  },
+
+  "drishti_bala": {
+
+    "components": [
+      "Benefic Aspect Strength",
+      "Malefic Aspect Strength",
+      "Planetary Aspect Influence",
+      "Special Aspect Influence"
+    ]
+  },
+
+  "supported_house_groups": [
+
+    "Kendra",
+
+    "Trikona",
+
+    "Panaphara",
+
+    "Apoklima",
+
+    "Upachaya",
+
+    "Dusthana",
+
+    "Maraka"
+
+  ],
+
+  "supported_units": [
+
+    "Virupa",
+
+    "Rupa"
+
+  ],
+
+  "supported_attributes": [
+
+    "Bhava",
+
+    "Category",
+
+    "Component",
+
+    "Maximum Value",
+
+    "Minimum Value",
+
+    "Calculation Method",
+
+    "Planet Applicability",
+
+    "Interpretation",
+
+    "Reference"
+
+  ],
+
+  "evaluation": {
+
+    "support_normalization": true,
+
+    "support_weighting": true,
+
+    "support_house_ranking": true,
+
+    "support_comparison": true
+
+  }
+
+}

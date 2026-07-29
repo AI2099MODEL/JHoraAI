@@ -1,0 +1,127 @@
+{
+  "schema": {
+    "name": "Static Panchanga",
+    "version": "1.0.0",
+    "description": "Master catalog of Panchanga components and immutable reference data."
+  },
+
+  "components": [
+    "Tithi",
+    "Vara",
+    "Nakshatra",
+    "Yoga",
+    "Karana"
+  ],
+
+  "tithi": {
+    "total": 30,
+    "paksha": [
+      "Shukla",
+      "Krishna"
+    ],
+    "groups": [
+      "Nanda",
+      "Bhadra",
+      "Jaya",
+      "Rikta",
+      "Poorna"
+    ]
+  },
+
+  "vara": {
+    "total": 7,
+    "days": [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday"
+    ],
+    "lords": [
+      "Sun",
+      "Moon",
+      "Mars",
+      "Mercury",
+      "Jupiter",
+      "Venus",
+      "Saturn"
+    ]
+  },
+
+  "yoga": {
+    "total": 27,
+    "calculation": "Sun + Moon Longitude"
+  },
+
+  "karana": {
+    "total": 11,
+    "movable": [
+      "Bava",
+      "Balava",
+      "Kaulava",
+      "Taitila",
+      "Gara",
+      "Vanija",
+      "Vishti"
+    ],
+    "fixed": [
+      "Shakuni",
+      "Chatushpada",
+      "Naga",
+      "Kimstughna"
+    ]
+  },
+
+  "paksha": [
+    "Shukla Paksha",
+    "Krishna Paksha"
+  ],
+
+  "ayana": [
+    "Uttarayana",
+    "Dakshinayana"
+  ],
+
+  "ritu": [
+    "Vasanta",
+    "Grishma",
+    "Varsha",
+    "Sharad",
+    "Hemanta",
+    "Shishira"
+  ],
+
+  "masa": [
+    "Chaitra",
+    "Vaishakha",
+    "Jyeshtha",
+    "Ashadha",
+    "Shravana",
+    "Bhadrapada",
+    "Ashwin",
+    "Kartika",
+    "Margashirsha",
+    "Pausha",
+    "Magha",
+    "Phalguna"
+  ],
+
+  "supported_attributes": [
+    "Name",
+    "Number",
+    "Lord",
+    "Nature",
+    "Classification",
+    "Auspiciousness",
+    "Strength",
+    "Deity",
+    "Element",
+    "Quality",
+    "Symbol",
+    "Prediction Meaning",
+    "Remedies",
+    "Compatibility"
+  ]
+}

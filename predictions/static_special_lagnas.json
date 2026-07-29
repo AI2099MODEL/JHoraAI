@@ -1,0 +1,89 @@
+{
+  "schema": {
+    "name": "Static Special Lagnas",
+    "version": "1.0.0",
+    "description": "Master catalog of all Special Lagnas and their immutable reference data."
+  },
+
+  "supported_special_lagnas": [
+    "Bhava Lagna",
+    "Hora Lagna",
+    "Ghati Lagna",
+    "Vighati Lagna",
+    "Pranapada Lagna",
+    "Indu Lagna",
+    "Sri Lagna",
+    "Varnada Lagna",
+    "Kunda Lagna",
+    "Yoga Lagna",
+    "Karakamsa Lagna",
+    "Pada Lagna"
+  ],
+
+  "classification": {
+    "time_based": [
+      "Hora Lagna",
+      "Ghati Lagna",
+      "Vighati Lagna",
+      "Bhava Lagna"
+    ],
+    "wealth_based": [
+      "Indu Lagna",
+      "Sri Lagna"
+    ],
+    "jaimini": [
+      "Karakamsa Lagna",
+      "Pada Lagna",
+      "Varnada Lagna"
+    ],
+    "special": [
+      "Pranapada Lagna",
+      "Kunda Lagna",
+      "Yoga Lagna"
+    ]
+  },
+
+  "supported_charts": [
+    "D1",
+    "D9",
+    "D10",
+    "D20",
+    "D60"
+  ],
+
+  "supported_attributes": [
+    "Name",
+    "Sanskrit Name",
+    "Category",
+    "Calculation Method",
+    "Reference Point",
+    "Applicable Charts",
+    "Life Area",
+    "Prediction Importance",
+    "Related Yogas",
+    "Related Dashas",
+    "Related Houses",
+    "Reference"
+  ],
+
+  "life_areas": [
+    "Personality",
+    "Wealth",
+    "Career",
+    "Marriage",
+    "Children",
+    "Health",
+    "Status",
+    "Fortune",
+    "Spirituality",
+    "General Life"
+  ],
+
+  "evaluation": {
+    "support_multiple_lagnas": true,
+    "support_cross_validation": true,
+    "support_chart_specific": true,
+    "support_prediction_weight": true,
+    "support_comparison": true
+  }
+}

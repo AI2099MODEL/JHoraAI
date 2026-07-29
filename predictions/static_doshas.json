@@ -1,0 +1,88 @@
+{
+  "schema": {
+    "name": "Static Doshas",
+    "version": "1.0.0",
+    "description": "Master catalog of all Doshas and afflictions supported by the astrology engine."
+  },
+
+  "categories": [
+    "Manglik",
+    "Kaal Sarpa",
+    "Pitru Dosha",
+    "Guru Chandal",
+    "Grahan",
+    "Kemadruma",
+    "Daridra",
+    "Shrapit",
+    "Papakartari",
+    "Balarishta",
+    "Gandanta",
+    "Kuja",
+    "Shakata",
+    "Kemadruma Cancellation",
+    "Arishta",
+    "Planetary Affliction",
+    "House Affliction",
+    "Nakshatra Affliction",
+    "Dasha Affliction",
+    "Transit Affliction"
+  ],
+
+  "severity_levels": [
+    "Very High",
+    "High",
+    "Moderate",
+    "Low",
+    "Negligible"
+  ],
+
+  "formation_types": [
+    "Planet Combination",
+    "Planet Aspect",
+    "House Placement",
+    "Sign Placement",
+    "Nakshatra Placement",
+    "Dasha Condition",
+    "Transit Condition",
+    "Multiple Conditions"
+  ],
+
+  "supported_attributes": [
+    "Dosha Name",
+    "Sanskrit Name",
+    "Category",
+    "Formation Rules",
+    "Severity",
+    "Affected Life Areas",
+    "Cancellation Rules",
+    "Strength",
+    "Duration",
+    "Prediction Impact",
+    "Confidence Modifier",
+    "Remedies",
+    "Classical References"
+  ],
+
+  "affected_areas": [
+    "Health",
+    "Marriage",
+    "Career",
+    "Finance",
+    "Children",
+    "Education",
+    "Property",
+    "Relationships",
+    "Longevity",
+    "Mental Peace",
+    "Spiritual Growth",
+    "General Life"
+  ],
+
+  "evaluation": {
+    "allow_multiple_doshas": true,
+    "allow_partial_formation": true,
+    "support_cancellation": true,
+    "support_severity_grading": true,
+    "support_divisional_confirmation": true
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "schema": {
+    "name": "Static Shadbala",
+    "version": "1.0.0",
+    "description": "Master catalog of Shadbala components, classifications and immutable reference data."
+  },
+
+  "total_balas": 6,
+
+  "primary_balas": [
+    "Sthana Bala",
+    "Dig Bala",
+    "Kala Bala",
+    "Chestha Bala",
+    "Naisargika Bala",
+    "Drik Bala"
+  ],
+
+  "sthana_bala": {
+    "components": [
+      "Uccha Bala",
+      "Saptavargaja Bala",
+      "Ojayugma Bala",
+      "Kendradi Bala",
+      "Drekkana Bala"
+    ]
+  },
+
+  "dig_bala": {
+    "components": [
+      "Directional Strength"
+    ]
+  },
+
+  "kala_bala": {
+    "components": [
+      "Natonnata Bala",
+      "Paksha Bala",
+      "Tribhaga Bala",
+      "Varsha Bala",
+      "Masa Bala",
+      "Dina Bala",
+      "Hora Bala",
+      "Ayana Bala",
+      "Yuddha Bala"
+    ]
+  },
+
+  "chestha_bala": {
+    "components": [
+      "Vakra",
+      "Anuvakra",
+      "Vikala",
+      "Manda",
+      "Mandatara",
+      "Sama",
+      "Chara",
+      "Atichara"
+    ]
+  },
+
+  "naisargika_bala": {
+    "components": [
+      "Natural Strength"
+    ]
+  },
+
+  "drik_bala": {
+    "components": [
+      "Benefic Aspects",
+      "Malefic Aspects"
+    ]
+  },
+
+  "supported_units": [
+    "Virupa",
+    "Rupa"
+  ],
+
+  "supported_attributes": [
+    "Name",
+    "Category",
+    "Component",
+    "Maximum Value",
+    "Minimum Value",
+    "Calculation Method",
+    "Planet Applicability",
+    "Interpretation",
+    "Reference"
+  ]
+}

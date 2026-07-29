@@ -1,0 +1,160 @@
+{
+  "schema": {
+    "name": "Conflict Resolution Engine",
+    "version": "1.0.0",
+    "description": "Rules for resolving conflicting astrological indications."
+  },
+
+  "engine": {
+
+    "enabled": true,
+
+    "strategy": "weighted_consensus",
+
+    "allow_multiple_outcomes": true,
+
+    "generate_reasoning": true,
+
+    "store_all_conflicts": true
+
+  },
+
+  "conflict_types": [
+
+    "Planet vs Planet",
+
+    "House vs House",
+
+    "Yoga vs Dosha",
+
+    "Natal vs Transit",
+
+    "Natal vs Dasha",
+
+    "Transit vs Dasha",
+
+    "KP vs Parashari",
+
+    "Jaimini vs Parashari",
+
+    "Strength vs Weakness",
+
+    "Multiple Yogas",
+
+    "Multiple Dashas",
+
+    "Multiple Divisional Charts"
+
+  ],
+
+  "resolution_order": [
+
+    {
+      "priority": 1,
+      "module": "Dasha"
+    },
+
+    {
+      "priority": 2,
+      "module": "Transit"
+    },
+
+    {
+      "priority": 3,
+      "module": "Natal Promise"
+    },
+
+    {
+      "priority": 4,
+      "module": "Divisional Charts"
+    },
+
+    {
+      "priority": 5,
+      "module": "Planetary Strength"
+    },
+
+    {
+      "priority": 6,
+      "module": "KP"
+    },
+
+    {
+      "priority": 7,
+      "module": "Jaimini"
+    },
+
+    {
+      "priority": 8,
+      "module": "Ashtakavarga"
+    },
+
+    {
+      "priority": 9,
+      "module": "Yogas"
+    },
+
+    {
+      "priority": 10,
+      "module": "Doshas"
+    }
+
+  ],
+
+  "decision_rules": {
+
+    "require_natal_promise": true,
+
+    "transit_cannot_create_event": true,
+
+    "dasha_must_support_event": true,
+
+    "minimum_supporting_modules": 2,
+
+    "minimum_confidence": 50
+
+  },
+
+  "contradiction_actions": {
+
+    "reduce_confidence": true,
+
+    "keep_both_interpretations": true,
+
+    "rank_interpretations": true,
+
+    "publish_secondary_prediction": true
+
+  },
+
+  "tie_breakers": [
+
+    "Higher Confidence",
+
+    "Higher Evidence Count",
+
+    "Higher Module Priority",
+
+    "More Classical Support",
+
+    "More Independent Confirmations"
+
+  ],
+
+  "output": {
+
+    "winner": {},
+
+    "runner_up": {},
+
+    "reason": "",
+
+    "supporting_modules": [],
+
+    "conflicting_modules": [],
+
+    "confidence_adjustment": 0
+
+  }
+
+}

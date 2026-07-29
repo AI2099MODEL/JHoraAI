@@ -1,0 +1,74 @@
+{
+  "schema": {
+    "name": "Prediction Priority Engine",
+    "version": "1.0.0",
+    "description": "Determines the order in which predictions are presented."
+  },
+
+  "engine": {
+    "enabled": true,
+    "maximum_predictions": 20,
+    "minimum_priority": 0,
+    "sort_order": "descending",
+    "allow_equal_priority": true
+  },
+
+  "priority_levels": {
+    "critical": {
+      "score": 100,
+      "label": "Critical"
+    },
+    "very_high": {
+      "score": 90,
+      "label": "Very High"
+    },
+    "high": {
+      "score": 80,
+      "label": "High"
+    },
+    "medium": {
+      "score": 60,
+      "label": "Medium"
+    },
+    "low": {
+      "score": 40,
+      "label": "Low"
+    },
+    "very_low": {
+      "score": 20,
+      "label": "Very Low"
+    }
+  },
+
+  "priority_factors": {
+    "life_area": true,
+    "event_importance": true,
+    "confidence": true,
+    "probability": true,
+    "severity": true,
+    "time_sensitivity": true,
+    "supporting_evidence": true
+  },
+
+  "sorting": [
+    "priority",
+    "confidence",
+    "probability",
+    "severity",
+    "evidence_count",
+    "prediction_date"
+  ],
+
+  "display": {
+    "group_by_category": true,
+    "merge_duplicates": true,
+    "show_priority_label": true,
+    "show_priority_score": true
+  },
+
+  "validation": {
+    "clamp_score": true,
+    "normalize": true,
+    "round_score": true
+  }
+}

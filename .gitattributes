@@ -1,0 +1,88 @@
+# ====================================================================
+# JHoraAI Professional — Binary Asset Protection
+# ====================================================================
+# This file instructs Git to treat listed file types as binary,
+# preventing text normalization, line-ending conversion, incorrect
+# merge behavior, and accidental corruption by editors, scripts, or
+# AI-assisted file-writing tools.
+# ====================================================================
+
+# ---- Default text handling -------------------------------------------------
+* text=auto eol=lf
+
+# ---- Images ------------------------------------------------------------
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.bmp   binary
+*.svg   binary
+*.tif   binary
+*.tiff  binary
+*.avif  binary
+*.heic  binary
+
+# ---- Documents ---------------------------------------------------------
+*.pdf   binary
+*.doc   binary
+*.docx  binary
+*.xls   binary
+*.xlsx  binary
+*.ppt   binary
+*.pptx  binary
+
+# ---- Android -------------------------------------------------------------
+*.apk       binary
+*.aab       binary
+*.aar       binary
+*.jar       binary
+*.dex       binary
+*.so        binary
+*.keystore  binary
+*.jks       binary
+
+# ---- Fonts ---------------------------------------------------------------
+*.ttf    binary
+*.otf    binary
+*.woff   binary
+*.woff2  binary
+*.eot    binary
+
+# ---- Archives ------------------------------------------------------------
+*.zip  binary
+*.7z   binary
+*.rar  binary
+*.tar  binary
+*.gz   binary
+*.bz2  binary
+*.xz   binary
+
+# ---- Databases -------------------------------------------------------------
+*.sqlite   binary
+*.sqlite3  binary
+*.db       binary
+*.db3      binary
+
+# ---- Media -----------------------------------------------------------------
+*.mp3   binary
+*.wav   binary
+*.ogg   binary
+*.flac  binary
+*.mp4   binary
+*.mov   binary
+*.avi   binary
+*.mkv   binary
+*.webm  binary
+
+# ---- Machine Learning Models -----------------------------------------------
+*.onnx    binary
+*.tflite  binary
+*.pb      binary
+*.pkl     binary
+
+# ---- Miscellaneous -----------------------------------------------------
+*.bin  binary
+*.pak  binary
+*.dat  binary
