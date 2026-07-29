@@ -50,6 +50,12 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
   const tajik = profile?.Tajik || {};
   const chinese = profile?.Chinese || profile?.Bazi || {};
 
+  const nativeName = profile?.name || profile?.Birth?.name || birth.name || astrologyData?.birthDetails?.name || "Nitin";
+  const ascendantSign = profile?.Vedic?.ascendant?.sign || astrologyData?.ascendant?.sign || astrologyData?.lagna?.sign || birth.lagna || "Cancer";
+  const ascendantDegree = profile?.Vedic?.ascendant?.degree || astrologyData?.ascendant?.degree || astrologyData?.lagna?.degree || "7°18'";
+  const nakshatra = profile?.Vedic?.nakshatra || astrologyData?.nakshatra || "Pushya";
+  const moonSign = profile?.MoonSign || astrologyData?.moonSign || "Aquarius";
+
   const kpCusps = kp?.cusps || {};
 
   return (
@@ -59,7 +65,7 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
         <div className="flex items-center justify-between mb-3 px-2">
           <div className="flex items-center gap-2 text-xs font-semibold text-indigo-200">
             <Compass className="w-4 h-4 text-indigo-400" />
-            <span>Cancer Ascendant (7°18') • Pushya Nakshatra • Saturn in 1st House • VedAstro & Vedic Engine</span>
+            <span>{ascendantSign} Ascendant ({ascendantDegree}) • {nakshatra} Nakshatra • Active Profile: {nativeName} • VedAstro & Vedic Engine</span>
           </div>
         </div>
         <div className="flex flex-wrap gap-2 pt-2 border-t border-indigo-500/20">
@@ -99,7 +105,7 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
               <Sparkles className="w-3.5 h-3.5" /> Expert Vedic Life-Analysis Engine
             </div>
             <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-              Personalized Astrological Life Report for Nitin
+              Personalized Astrological Life Report for {nativeName}
             </h2>
             <p className="text-sm text-slate-600 max-w-2xl mx-auto">
               A deeply personalized, emotionally intelligent, and practical life synthesis derived from your birth chart data, focusing on life outcomes, tendencies, strengths, challenges, and practical direction.
@@ -301,7 +307,7 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
               </div>
               <div>
                 <h3 className="text-base font-bold text-slate-900">Vedic Parashari Natal Table Interpretations</h3>
-                <p className="text-xs text-slate-500">Analysis of your Cancer Ascendant, planetary dignity, house lords, and active Yogas.</p>
+                <p className="text-xs text-slate-500">Analysis of your {ascendantSign} Ascendant, planetary dignity, house lords, and active Yogas.</p>
               </div>
             </div>
             <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
@@ -312,10 +318,10 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-slate-50/80 rounded-xl p-5 border border-slate-200/80 space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-                <Star className="w-3.5 h-3.5 text-amber-500" /> Ascendant (Lagna): Cancer 7°18' (Pushya Nakshatra)
+                <Star className="w-3.5 h-3.5 text-amber-500" /> Ascendant (Lagna): {ascendantSign} {ascendantDegree} ({nakshatra} Nakshatra)
               </h4>
               <p className="text-xs text-slate-700 leading-relaxed">
-                Your Cancer ascendant is deeply nourished by the benevolent energy of Pushya Nakshatra (ruled by Saturn), with your lagna lord Moon placed in Aquarius in the 8th house. This creates a profound paradox of intense emotional depth, intuitive wisdom, and a quest for security balanced with detached philosophical inquiry. Saturn placed directly in your 1st House instills a serious, disciplined demeanor, early maturity, and a strong sense of responsibility toward family and life duties.
+                Your {ascendantSign} ascendant is deeply nourished by the benevolent energy of {nakshatra} Nakshatra, creating a profound paradox of intense emotional depth, intuitive wisdom, and a quest for security balanced with structured discipline and life duties.
               </p>
             </div>
 
@@ -619,7 +625,7 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
               </div>
               <div>
                 <h3 className="text-lg font-bold text-slate-900">VedAstro Horoscopes & Free Predictions Engine</h3>
-                <p className="text-xs text-slate-500">Backend calculated astrological report and predictive synthesis for Nitin based on live planetary transits and KP/Parashari engines.</p>
+                <p className="text-xs text-slate-500">Backend calculated astrological report and predictive synthesis for {nativeName} based on live planetary transits and KP/Parashari engines.</p>
               </div>
             </div>
             <span className="text-xs font-semibold px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
@@ -635,11 +641,11 @@ export const MyLifeAnalysisView: React.FC<MyLifeAnalysisViewProps> = ({ profile,
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
               <div className="bg-white p-3 rounded-lg border border-slate-200/80">
                 <span className="text-slate-500 block mb-0.5">Ascendant (Lagna)</span>
-                <span className="font-bold text-slate-900">Cancer 7°18' (Pushya)</span>
+                <span className="font-bold text-slate-900">{ascendantSign} {ascendantDegree} ({nakshatra})</span>
               </div>
               <div className="bg-white p-3 rounded-lg border border-slate-200/80">
                 <span className="text-slate-500 block mb-0.5">Moon Sign (Rashi)</span>
-                <span className="font-bold text-slate-900">Aquarius (House 8)</span>
+                <span className="font-bold text-slate-900">{moonSign}</span>
               </div>
               <div className="bg-white p-3 rounded-lg border border-slate-200/80">
                 <span className="text-slate-500 block mb-0.5">Key Placement 1</span>

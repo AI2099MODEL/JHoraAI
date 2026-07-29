@@ -3,19 +3,19 @@
     "schemaVersion": "1.0",
     "engine": "CurrentSkyContext",
     "version": "1.0.0",
-    "lastUpdated": "2026-07-29T18:30:31.282Z",
+    "lastUpdated": "2026-07-29T18:33:36.436Z",
     "description": "JHoraAI Real-Time Astrological Sky Context Engine Configuration"
   },
   "currentDateTime": {
-    "utcTime": "2026-07-29T18:30:31.282Z",
-    "localTime": "2026-07-29T11:30:31-07:00",
+    "utcTime": "2026-07-29T18:33:36.436Z",
+    "localTime": "2026-07-29T11:33:36-07:00",
     "timezone": "America/Los_Angeles"
   },
   "moon": {
     "currentSign": {
       "id": "Capricorn",
       "displayName": "Capricorn",
-      "longitude": 284.03
+      "longitude": 284.05
     },
     "currentNakshatra": {
       "id": "Shravana",
@@ -28,15 +28,15 @@
       "displayName": "Moon"
     },
     "currentSubLord": {
-      "id": "Saturn",
-      "displayName": "Saturn"
+      "id": "Venus",
+      "displayName": "Venus"
     },
     "moonPhase": {
       "type": "Waning Gibbous",
       "displayName": "Krishna Prathama",
       "illuminationPercentage": 99.1
     },
-    "moonLongitude": 284.03,
+    "moonLongitude": 284.05,
     "waxing": false,
     "waning": true,
     "voidOfCourse": {
@@ -50,7 +50,7 @@
       "id": "Cancer",
       "displayName": "Cancer"
     },
-    "longitude": 102.43,
+    "longitude": 102.44,
     "nakshatra": {
       "id": "Pushya",
       "displayName": "Pushya"
@@ -63,7 +63,7 @@
   "planets": {
     "sun": {
       "currentSign": "Cancer",
-      "longitude": 102.43,
+      "longitude": 102.44,
       "nakshatra": "Pushya",
       "pada": 3,
       "starLord": "Saturn",
@@ -74,11 +74,11 @@
     },
     "moon": {
       "currentSign": "Capricorn",
-      "longitude": 284.03,
+      "longitude": 284.05,
       "nakshatra": "Shravana",
       "pada": 2,
       "starLord": "Moon",
-      "subLord": "Saturn",
+      "subLord": "Venus",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -100,7 +100,7 @@
       "nakshatra": "Punarvasu",
       "pada": 3,
       "starLord": "Jupiter",
-      "subLord": "Mars",
+      "subLord": "Moon",
       "retrograde": false,
       "combust": false,
       "stationary": false
@@ -278,14 +278,14 @@
     "ascendantSubLord": "Sun",
     "moonSignLord": "Saturn",
     "moonStarLord": "Moon",
-    "moonSubLord": "Saturn"
+    "moonSubLord": "Venus"
   },
   "panchanga": {
     "tithi": {
       "name": "Krishna Prathama",
       "index": 16,
       "paksha": "Krishna",
-      "endDate": "2026-07-30T06:30:31.282Z"
+      "endDate": "2026-07-30T06:33:36.436Z"
     },
     "vara": {
       "name": "Wednesday",
@@ -294,17 +294,17 @@
     "nakshatra": {
       "name": "Shravana",
       "lord": "Moon",
-      "endDate": "2026-07-30T12:30:31.282Z"
+      "endDate": "2026-07-30T12:33:36.436Z"
     },
     "yoga": {
       "name": "Preeti",
       "lord": "Venus",
-      "endDate": "2026-07-30T08:30:31.282Z"
+      "endDate": "2026-07-30T08:33:36.436Z"
     },
     "karana": {
       "name": "Balava",
       "lord": "Sun",
-      "endDate": "2026-07-30T00:30:31.282Z"
+      "endDate": "2026-07-30T00:33:36.436Z"
     },
     "sunrise": "05:48 AM",
     "sunset": "08:12 PM",
